@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Modern rounded shield -->
+  <path d="M256 48L448 128V288C448 384 352 464 256 480 160 464 64 384 64 288V128L256 48z" 
+        fill="#0B1018" stroke="#00B4D8" stroke-width="8" rx="16"/>
+  <!-- Inner glow shield -->
+  <path d="M256 96L400 160V288C400 360 328 424 256 440 184 424 112 360 112 288V160L256 96z" 
+        fill="url(#glowGrad)" stroke="#00B4D8" stroke-width="2" opacity="0.6"/>
+  <!-- Heartbeat -->
+  <polyline points="160,280 210,280 230,240 260,340 280,280 352,280" 
+            fill="none" stroke="#00B4D8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Neo pulse dot -->
+  <circle cx="256" cy="200" r="8" fill="#FF4D6A">
+    <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <defs>
+    <linearGradient id="glowGrad" x1="256" y1="96" x2="256" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00B4D8" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00B4D8" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>

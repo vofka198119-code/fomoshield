@@ -1,0 +1,59 @@
+name: scanco
+description: "F.O.M.O. Shield — Invest with discipline, not emotion"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+
+  # Navigation
+  go_router: ^15.1.2
+
+  # Network
+  dio: ^5.8.0+1
+
+  # Environment
+  flutter_dotenv: ^5.2.1
+
+  # Storage
+  shared_preferences: ^2.3.0
+  flutter_secure_storage: ^9.2.4
+
+  # UI
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.1.0
+  fl_chart: ^0.70.2
+  cached_network_image: ^3.4.1
+
+  # Supabase
+  supabase_flutter: ^2.8.3
+
+  # Utils
+  url_launcher: ^6.3.1
+  intl: ^0.20.2
+
+  # Scanner
+  mobile_scanner: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - .env

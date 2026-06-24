@@ -1,0 +1,257 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/widget_container.dart';
+import '../home_providers.dart';
+
+// ---------------------------------------------------------------------------
+// Upcoming Events Widget — Compact (Revolut style)
+// ---------------------------------------------------------------------------
+
+class UpcomingEventsWidget extends ConsumerWidget {
+  const UpcomingEventsWidget({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final eventsAsync = ref.watch(calendarEventsProvider);
+
+    return eventsAsync.when(
+      loading: () => _container(context, [
+        const Padding(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.accentBlue,
+                ),
+              ),
+              SizedBox(width: 12),
+              Text(
+                'Loading events...',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textDim,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]),
+      error: (_, _) => WidgetContainer(
+        title: 'UPCOMING EVENTS',
+        onTap: () => context.push('/events'),
+        showFooter: false,
+        emptyText: 'Nothing here yet',
+      ),
+      data: (events) {
+        if (events.isEmpty) {
+          return WidgetContainer(
+            title: 'UPCOMING EVENTS',
+            onTap: () => context.push('/events'),
+            showFooter: false,
+            emptyText: 'Nothing here yet',
+          );
+        }
+
+        // Show only first 2
+        final preview = events.take(2).toList();
+
+        return WidgetContainer(
+          title: 'UPCOMING EVENTS',
+          onTap: () => context.push('/events'),
+          showFooter: events.length > 2,
+          children: preview.map((e) => _EventTile(event: e)).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _container(BuildContext context, List<Widget> children) {
+    return WidgetContainer(
+      title: 'UPCOMING EVENTS',
+      onTap: () => context.push('/events'),
+      showFooter: false,
+      children: children,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Event Tile — Compact (no accordion)
+// ---------------------------------------------------------------------------
+
+class _EventTile extends StatelessWidget {
+  final CalendarEvent event;
+  const _EventTile({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final isEarnings = event.type == 'earnings';
+
+    return InkWell(
+      onTap: () => context.push('/company/${event.symbol}'),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            // Icon
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: (isEarnings ? AppTheme.accentBlue : AppTheme.shieldGreen)
+                    .withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                isEarnings
+                    ? Icons.bar_chart_rounded
+                    : Icons.payments_rounded,
+                size: 18,
+                color: isEarnings
+                    ? AppTheme.accentBlue
+                    : AppTheme.shieldGreen,
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Ticker + Date
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        event.symbol,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          event.title,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: AppTheme.textDim,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Text(
+                        DateFormat('MMM d, yyyy').format(event.date),
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: AppTheme.textDim,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (event.hour != null) ...[
+                        const SizedBox(width: 6),
+                        _HourBadge(hour: event.hour!),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Type badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: (isEarnings ? AppTheme.accentBlue : AppTheme.shieldGreen)
+                    .withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                isEarnings ? 'EAR' : 'DIV',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: isEarnings
+                      ? AppTheme.accentBlue
+                      : AppTheme.shieldGreen,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Hour Badge
+// ---------------------------------------------------------------------------
+
+class _HourBadge extends StatelessWidget {
+  final String hour;
+  const _HourBadge({required this.hour});
+
+  @override
+  Widget build(BuildContext context) {
+    String label;
+    Color color;
+    IconData icon;
+
+    switch (hour) {
+      case 'bmo':
+        label = 'BMO';
+        color = AppTheme.accentBlue;
+        icon = Icons.wb_sunny_rounded;
+      case 'amc':
+        label = 'AMC';
+        color = AppTheme.shieldYellow;
+        icon = Icons.nights_stay_rounded;
+      case 'dmh':
+        label = 'DMH';
+        color = AppTheme.shieldGreen;
+        icon = Icons.business_center_rounded;
+      default:
+        label = hour.toUpperCase();
+        color = AppTheme.textDim;
+        icon = Icons.schedule_rounded;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 10, color: color),
+          const SizedBox(width: 3),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+

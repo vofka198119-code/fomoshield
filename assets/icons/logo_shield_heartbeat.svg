@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Shield body -->
+  <path d="M256 32L96 96v160c0 96 64 192 160 224 96-32 160-128 160-224V96L256 32z" 
+        fill="#0B1018" stroke="#00B4D8" stroke-width="12"/>
+  <!-- Heartbeat line -->
+  <polyline points="160,260 220,260 240,220 270,320 290,260 352,260" 
+            fill="none" stroke="#FF4D6A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- FS letters -->
+  <text x="256" y="400" text-anchor="middle" font-family="Inter, sans-serif" 
+        font-size="40" font-weight="800" fill="#00B4D8">FS</text>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Minimalist circle badge -->
+  <circle cx="256" cy="256" r="224" fill="#0B1018" stroke="#00B4D8" stroke-width="8"/>
+  <!-- Inner ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#1A2235" stroke-width="4"/>
+  <!-- Minimal shield icon -->
+  <path d="M256 120L380 180V300C380 376 320 432 256 448 192 432 132 376 132 300V180L256 120z" 
+        fill="none" stroke="#00B4D8" stroke-width="6"/>
+  <!-- Heartbeat dot -->
+  <circle cx="256" cy="290" r="12" fill="#FF4D6A"/>
+  <!-- F.O.M.O. text -->
+  <text x="256" y="120" text-anchor="middle" font-family="Inter, sans-serif" 
+        font-size="36" font-weight="700" fill="#6B7A99" letter-spacing="6">FOMO</text>
+  <!-- SHEILD text -->
+  <text x="256" y="418" text-anchor="middle" font-family="Inter, sans-serif" 
+        font-size="20" font-weight="600" fill="#00B4D8" letter-spacing="8">SHIELD</text>
+</svg>
