@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
@@ -36,20 +37,21 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
           'PORTFOLIO',
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: AppTheme.textDim),
-            color: AppTheme.card,
+            icon: const Icon(Icons.more_vert, color: ThemeV2.textSecondary),
+            color: ThemeV2.surface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -68,12 +70,12 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                 child: ListTile(
                   leading: const Icon(
                     Icons.refresh_rounded,
-                    color: AppTheme.shieldYellow,
+                    color: ThemeV2.warning,
                     size: 20,
                   ),
                   title: const Text(
                     'Reset Portfolio',
-                    style: TextStyle(color: AppTheme.shieldYellow),
+                    style: TextStyle(color: ThemeV2.warning),
                   ),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
@@ -84,12 +86,12 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                 child: ListTile(
                   leading: const Icon(
                     Icons.delete_rounded,
-                    color: AppTheme.dangerRed,
+                    color: ThemeV2.loss,
                     size: 20,
                   ),
                   title: const Text(
                     'Delete Portfolio',
-                    style: TextStyle(color: AppTheme.dangerRed),
+                    style: TextStyle(color: ThemeV2.loss),
                   ),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
@@ -98,7 +100,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             ],
           ),
           IconButton(
-            icon: const Icon(Icons.add_rounded, color: AppTheme.accentBlue),
+            icon: const Icon(Icons.add_rounded, color: ThemeV2.primary),
             onPressed: () => _showCreatePortfolioDialog(context),
           ),
         ],
@@ -121,7 +123,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             const Icon(
               Icons.account_balance_wallet_rounded,
               size: 64,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
             ),
             const SizedBox(height: 16),
             Text(
@@ -129,14 +131,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Create your first virtual portfolio\nwith \$10,000 starting balance',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+              style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -144,7 +146,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               icon: const Icon(Icons.add_rounded),
               label: Text('Create Portfolio'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accentBlue,
+                backgroundColor: ThemeV2.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
@@ -163,13 +165,13 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.card,
+        backgroundColor: ThemeV2.surface,
         title: Text(
           'New Portfolio',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
         ),
         content: TextField(
@@ -177,22 +179,22 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           autofocus: true,
           decoration: InputDecoration(
             hintText: 'e.g. Tech Growth',
-            hintStyle: GoogleFonts.inter(color: AppTheme.textDim, fontSize: 14),
+            hintStyle: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 14),
             filled: true,
-            fillColor: AppTheme.cardDark,
+            fillColor: ThemeV2.surfaceDark,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
             ),
           ),
-          style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 14),
+          style: GoogleFonts.inter(color: ThemeV2.textPrimary, fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Cancel',
-              style: GoogleFonts.inter(color: AppTheme.textDim),
+              style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
           TextButton(
@@ -210,7 +212,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                             : 'Max $maxP portfolios reached.',
                         style: GoogleFonts.inter(fontSize: 13),
                       ),
-                      backgroundColor: AppTheme.premiumGreen,
+                      backgroundColor: ThemeV2.primary,
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -228,7 +230,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             child: Text(
               'Create',
               style: GoogleFonts.inter(
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -242,25 +244,25 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.card,
+        backgroundColor: ThemeV2.surface,
         title: Text(
           'Reset Portfolio?',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
         ),
         content: Text(
           'All holdings and history will be cleared.\nBalance will be restored to its original amount.',
-          style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+          style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Cancel',
-              style: GoogleFonts.inter(color: AppTheme.textDim),
+              style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
           TextButton(
@@ -271,7 +273,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             child: Text(
               'Reset',
               style: GoogleFonts.inter(
-                color: AppTheme.shieldYellow,
+                color: ThemeV2.warning,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -293,7 +295,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             'Cannot delete the last portfolio. Create a new one first.',
             style: GoogleFonts.inter(fontSize: 13),
           ),
-          backgroundColor: AppTheme.dangerRed,
+          backgroundColor: ThemeV2.loss,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -302,25 +304,25 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.card,
+        backgroundColor: ThemeV2.surface,
         title: Text(
           'Delete Portfolio?',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
         ),
         content: Text(
           'All holdings and history will be lost.',
-          style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+          style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Cancel',
-              style: GoogleFonts.inter(color: AppTheme.textDim),
+              style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
           TextButton(
@@ -333,7 +335,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             child: Text(
               'Delete',
               style: GoogleFonts.inter(
-                color: AppTheme.dangerRed,
+                color: ThemeV2.loss,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -381,7 +383,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -423,8 +425,8 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
     );
 
     return RefreshIndicator(
-      color: AppTheme.accentBlue,
-      backgroundColor: AppTheme.card,
+      color: ThemeV2.primary,
+      backgroundColor: ThemeV2.surface,
       onRefresh: () async {
         ref.invalidate(portfolioPerformanceProvider(widget.portfolioId));
         await Future.delayed(const Duration(milliseconds: 500));
@@ -463,7 +465,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                 onPressed: _showWidgetsBottomSheet,
                 icon: const Icon(
                   Icons.add_rounded,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                   size: 20,
                 ),
                 label: Text(
@@ -471,7 +473,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                   ),
                 ),
                 style: TextButton.styleFrom(
@@ -482,7 +484,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                     side: const BorderSide(
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                       width: 0.5,
                     ),
                   ),
@@ -499,7 +501,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   horizontal: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: ThemeV2.surfaceDark,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.black12, width: 0.5),
                 ),
@@ -509,14 +511,14 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                     Icon(
                       Icons.ad_units_rounded,
                       size: 14,
-                      color: AppTheme.textDim.withValues(alpha: 0.6),
+                      color: ThemeV2.textSecondary.withValues(alpha: 0.6),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Sponsored Content',
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: AppTheme.textDim.withValues(alpha: 0.6),
+                        color: ThemeV2.textSecondary.withValues(alpha: 0.6),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -641,7 +643,7 @@ class _PortfolioSelector extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: isActive ? AppTheme.accentBlue : AppTheme.card,
+                color: isActive ? ThemeV2.primary : ThemeV2.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -652,7 +654,7 @@ class _PortfolioSelector extends ConsumerWidget {
                       child: Icon(
                         Icons.check,
                         size: 14,
-                        color: AppTheme.textPrimary,
+                        color: ThemeV2.textPrimary,
                       ),
                     ),
                   Text(
@@ -660,7 +662,7 @@ class _PortfolioSelector extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: isActive ? AppTheme.accentBlue : AppTheme.textDim,
+                      color: isActive ? ThemeV2.primary : ThemeV2.textSecondary,
                     ),
                   ),
                   if (isActive)
@@ -671,7 +673,7 @@ class _PortfolioSelector extends ConsumerWidget {
                         child: const Icon(
                           Icons.close,
                           size: 14,
-                          color: AppTheme.textSecondary,
+                          color: ThemeV2.textSecondary,
                         ),
                       ),
                     ),
@@ -692,7 +694,7 @@ class _PortfolioSelector extends ConsumerWidget {
             'Cannot delete the last portfolio',
             style: GoogleFonts.inter(fontSize: 13),
           ),
-          backgroundColor: AppTheme.dangerRed,
+          backgroundColor: ThemeV2.loss,
         ),
       );
       return;
@@ -700,25 +702,25 @@ class _PortfolioSelector extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.card,
+        backgroundColor: ThemeV2.surface,
         title: Text(
           'Delete portfolio?',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
         ),
         content: Text(
           'All holdings and history will be lost.',
-          style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+          style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Cancel',
-              style: GoogleFonts.inter(color: AppTheme.textDim),
+              style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
           TextButton(
@@ -729,7 +731,7 @@ class _PortfolioSelector extends ConsumerWidget {
             child: Text(
               'Delete',
               style: GoogleFonts.inter(
-                color: AppTheme.dangerRed,
+                color: ThemeV2.loss,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -842,7 +844,7 @@ class _PortfolioWidgetsSettingsSheetState
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const Spacer(),
@@ -882,7 +884,7 @@ class _PortfolioWidgetsSettingsSheetState
                     'Reset',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -924,8 +926,8 @@ class _PortfolioWidgetsSettingsSheetState
                   margin: const EdgeInsets.only(bottom: 8),
                   decoration: BoxDecoration(
                     color: config.visible
-                        ? AppTheme.cardDark
-                        : AppTheme.cardDark.withValues(alpha: 0.5),
+                        ? ThemeV2.surfaceDark
+                        : ThemeV2.surfaceDark.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: config.visible
@@ -942,7 +944,7 @@ class _PortfolioWidgetsSettingsSheetState
                           index: index,
                           child: const Icon(
                             Icons.drag_handle_rounded,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                             size: 24,
                           ),
                         ),
@@ -951,9 +953,9 @@ class _PortfolioWidgetsSettingsSheetState
                           _widgetIcon(config.id),
                           color: config.visible
                               ? (isPremiumWidget
-                                    ? AppTheme.premiumGreen
-                                    : AppTheme.accentBlue)
-                              : AppTheme.textDim,
+                                    ? ThemeV2.primary
+                                    : ThemeV2.primary)
+                              : ThemeV2.textSecondary,
                           size: 22,
                         ),
                       ],
@@ -969,7 +971,7 @@ class _PortfolioWidgetsSettingsSheetState
                               fontWeight: FontWeight.w600,
                               color: config.visible
                                   ? Colors.white
-                                  : AppTheme.textDim,
+                                  : ThemeV2.textSecondary,
                             ),
                           ),
                         ),
@@ -979,8 +981,8 @@ class _PortfolioWidgetsSettingsSheetState
                             Icons.lock_rounded,
                             size: 14,
                             color: widget.isPremium
-                                ? AppTheme.shieldYellow
-                                : AppTheme.textDim,
+                                ? ThemeV2.warning
+                                : ThemeV2.textSecondary,
                           ),
                         ],
                       ],
@@ -996,10 +998,10 @@ class _PortfolioWidgetsSettingsSheetState
                                   ? Icons.visibility_rounded
                                   : Icons.visibility_off_rounded),
                         color: isPremiumWidget && !widget.isPremium
-                            ? AppTheme.shieldYellow
+                            ? ThemeV2.warning
                             : (config.visible
-                                  ? AppTheme.accentBlue
-                                  : AppTheme.textDim),
+                                  ? ThemeV2.primary
+                                  : ThemeV2.textSecondary),
                         size: 22,
                       ),
                     ),
@@ -1013,3 +1015,4 @@ class _PortfolioWidgetsSettingsSheetState
     );
   }
 }
+

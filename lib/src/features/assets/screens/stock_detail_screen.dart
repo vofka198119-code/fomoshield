@@ -308,7 +308,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     final logoAsync = ref.watch(cachedLogoProvider(widget.symbol));
 
     return Scaffold(
-      backgroundColor: ThemeV2.background,
+      backgroundColor: Colors.transparent,
       appBar: _buildAppBar(context),
       body: SafeArea(
         top: false,
@@ -369,7 +369,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: AppBar(
-        backgroundColor: ThemeV2.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 64,

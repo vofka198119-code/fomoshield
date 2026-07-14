@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
@@ -49,7 +50,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -59,7 +60,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return _WidgetsSettingsSheet(
           initialConfigs: currentConfigs,
           notifier: notifier,
-          isPremium: tier == SubscriptionTier.premium ||
+          isPremium:
+              tier == SubscriptionTier.premium ||
               tier == SubscriptionTier.admin,
           onPremiumLockTap: () => showPremiumPromoOverlay(
             context: context,
@@ -78,24 +80,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final widgetConfigs = ref.watch(homeWidgetsProvider);
 
-    final visibleWidgets =
-        widgetConfigs.where((w) => w.visible).toList();
+    final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: Text(
           'F.O.M.O. SHIELD',
           style: GoogleFonts.inter(
-            fontSize: 21,
+            fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
       ),
       body: RefreshIndicator(
-        color: AppTheme.accentBlue,
-        backgroundColor: AppTheme.card,
+        color: ThemeV2.primary,
+        backgroundColor: ThemeV2.surface,
         onRefresh: () async {
           _onRefresh();
           await Future.delayed(const Duration(milliseconds: 500));
@@ -120,7 +124,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onPressed: _showWidgetsBottomSheet,
                   icon: const Icon(
                     Icons.add_rounded,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                     size: 20,
                   ),
                   label: Text(
@@ -128,7 +132,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                     ),
                   ),
                   style: TextButton.styleFrom(
@@ -139,7 +143,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                       side: const BorderSide(
-                        color: AppTheme.accentBlue,
+                        color: ThemeV2.primary,
                         width: 0.5,
                       ),
                     ),
@@ -225,10 +229,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
       _configs.insert(newIndex, item);
     });
     // Persist immediately
-    widget.notifier.reorder(
-      _configs[newIndex].id,
-      newIndex,
-    );
+    widget.notifier.reorder(_configs[newIndex].id, newIndex);
   }
 
   void _toggleVisibility(String id) {
@@ -307,7 +308,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const Spacer(),
@@ -316,16 +317,34 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                     widget.notifier.resetToDefaults();
                     setState(() {
                       _configs = [
-                        const HomeWidgetConfig(id: 'shield_signal', visible: true),
+                        const HomeWidgetConfig(
+                          id: 'shield_signal',
+                          visible: true,
+                        ),
                         const HomeWidgetConfig(id: 'markets', visible: true),
                         const HomeWidgetConfig(id: 'portfolio', visible: true),
                         const HomeWidgetConfig(id: 'watchlist', visible: true),
                         const HomeWidgetConfig(id: 'news', visible: true),
-                        const HomeWidgetConfig(id: 'stress_test', visible: true),
-                        const HomeWidgetConfig(id: 'upcoming_events', visible: true),
-                        const HomeWidgetConfig(id: 'portfolio_journal', visible: true),
-                        const HomeWidgetConfig(id: 'historical_sim', visible: true),
-                        const HomeWidgetConfig(id: 'scenario_compare', visible: true),
+                        const HomeWidgetConfig(
+                          id: 'stress_test',
+                          visible: true,
+                        ),
+                        const HomeWidgetConfig(
+                          id: 'upcoming_events',
+                          visible: true,
+                        ),
+                        const HomeWidgetConfig(
+                          id: 'portfolio_journal',
+                          visible: true,
+                        ),
+                        const HomeWidgetConfig(
+                          id: 'historical_sim',
+                          visible: true,
+                        ),
+                        const HomeWidgetConfig(
+                          id: 'scenario_compare',
+                          visible: true,
+                        ),
                       ];
                     });
                   },
@@ -333,7 +352,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                     'Reset',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -366,7 +385,8 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
               },
               itemBuilder: (context, index) {
                 final config = _configs[index];
-                final isPremiumWidget = config.id == 'portfolio_journal' ||
+                final isPremiumWidget =
+                    config.id == 'portfolio_journal' ||
                     config.id == 'historical_sim' ||
                     config.id == 'scenario_compare';
                 return Container(
@@ -374,8 +394,8 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                   margin: const EdgeInsets.only(bottom: 8),
                   decoration: BoxDecoration(
                     color: config.visible
-                        ? AppTheme.cardDark
-                        : AppTheme.cardDark.withValues(alpha: 0.5),
+                        ? ThemeV2.surfaceDark
+                        : ThemeV2.surfaceDark.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: config.visible
@@ -393,7 +413,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                           index: index,
                           child: const Icon(
                             Icons.drag_handle_rounded,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                             size: 24,
                           ),
                         ),
@@ -402,9 +422,9 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                           _widgetIcon(config.id),
                           color: config.visible
                               ? (isPremiumWidget
-                                  ? AppTheme.premiumGreen
-                                  : AppTheme.accentBlue)
-                              : AppTheme.textDim,
+                                    ? ThemeV2.primary
+                                    : ThemeV2.primary)
+                              : ThemeV2.textSecondary,
                           size: 22,
                         ),
                       ],
@@ -419,8 +439,8 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: config.visible
-                                  ? AppTheme.textPrimary
-                                  : AppTheme.textDim,
+                                  ? ThemeV2.textPrimary
+                                  : ThemeV2.textSecondary,
                             ),
                           ),
                         ),
@@ -430,8 +450,8 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                             Icons.lock_rounded,
                             size: 14,
                             color: widget.isPremium
-                                ? AppTheme.premiumGreen
-                                : AppTheme.textDim,
+                                ? ThemeV2.primary
+                                : ThemeV2.textSecondary,
                           ),
                         ],
                       ],
@@ -444,13 +464,13 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                         isPremiumWidget && !widget.isPremium
                             ? Icons.lock_rounded
                             : (config.visible
-                                ? Icons.visibility_rounded
-                                : Icons.visibility_off_rounded),
+                                  ? Icons.visibility_rounded
+                                  : Icons.visibility_off_rounded),
                         color: isPremiumWidget && !widget.isPremium
-                            ? AppTheme.premiumGreen
+                            ? ThemeV2.primary
                             : (config.visible
-                                ? AppTheme.accentBlue
-                                : AppTheme.textDim),
+                                  ? ThemeV2.primary
+                                  : ThemeV2.textSecondary),
                         size: 22,
                       ),
                     ),

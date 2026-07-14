@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../auth/auth_providers.dart';
 import '../home/home_providers.dart';
@@ -28,13 +29,16 @@ class ProfileScreen extends ConsumerWidget {
     final isPremium = subscriptionTier == SubscriptionTier.premium;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: Text(
-          'Profile',
+          'PROFILE',
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -52,10 +56,10 @@ class ProfileScreen extends ConsumerWidget {
                     radius: 28,
                     backgroundColor: () {
                       if (isAdmin)
-                        return AppTheme.accentBlue.withValues(alpha: 0.15);
+                        return ThemeV2.primary.withValues(alpha: 0.15);
                       if (isPremium)
-                        return AppTheme.premiumGreen.withValues(alpha: 0.15);
-                      return AppTheme.accentBlue.withValues(alpha: 0.15);
+                        return ThemeV2.primary.withValues(alpha: 0.15);
+                      return ThemeV2.primary.withValues(alpha: 0.15);
                     }(),
                     child: Icon(
                       isAdmin
@@ -64,10 +68,10 @@ class ProfileScreen extends ConsumerWidget {
                           ? Icons.workspace_premium_rounded
                           : Icons.person_rounded,
                       color: isAdmin
-                          ? AppTheme.accentBlue
+                          ? ThemeV2.primary
                           : isPremium
-                          ? AppTheme.premiumGreen
-                          : AppTheme.accentBlue,
+                          ? ThemeV2.primary
+                          : ThemeV2.primary,
                       size: 32,
                     ),
                   ),
@@ -85,7 +89,7 @@ class ProfileScreen extends ConsumerWidget {
                                 style: GoogleFonts.inter(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
-                                  color: AppTheme.textPrimary,
+                                  color: ThemeV2.textPrimary,
                                 ),
                               ),
                             ),
@@ -99,19 +103,13 @@ class ProfileScreen extends ConsumerWidget {
                                 ),
                                 decoration: BoxDecoration(
                                   color: isAdmin
-                                      ? AppTheme.accentBlue.withValues(
-                                          alpha: 0.15,
-                                        )
-                                      : AppTheme.premiumGreen.withValues(
-                                          alpha: 0.15,
-                                        ),
+                                      ? ThemeV2.primary.withValues(alpha: 0.15)
+                                      : ThemeV2.primary.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
                                     color: isAdmin
-                                        ? AppTheme.accentBlue.withValues(
-                                            alpha: 0.5,
-                                          )
-                                        : AppTheme.premiumGreen.withValues(
+                                        ? ThemeV2.primary.withValues(alpha: 0.5)
+                                        : ThemeV2.primary.withValues(
                                             alpha: 0.5,
                                           ),
                                   ),
@@ -122,8 +120,8 @@ class ProfileScreen extends ConsumerWidget {
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
                                     color: isAdmin
-                                        ? AppTheme.accentBlue
-                                        : AppTheme.premiumGreen,
+                                        ? ThemeV2.primary
+                                        : ThemeV2.primary,
                                     letterSpacing: 1,
                                   ),
                                 ),
@@ -135,7 +133,7 @@ class ProfileScreen extends ConsumerWidget {
                           email,
                           style: GoogleFonts.inter(
                             fontSize: 13,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                           ),
                         ),
                       ],
@@ -155,17 +153,17 @@ class ProfileScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppTheme.accentBlue.withValues(alpha: 0.1),
+                color: ThemeV2.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: AppTheme.accentBlue.withValues(alpha: 0.3),
+                  color: ThemeV2.primary.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.admin_panel_settings_rounded,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
@@ -173,7 +171,7 @@ class ProfileScreen extends ConsumerWidget {
                     'Admin Mode — all premium features unlocked',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -188,10 +186,10 @@ class ProfileScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.premiumGreen.withValues(alpha: 0.08),
+                color: ThemeV2.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppTheme.premiumGreen.withValues(alpha: 0.2),
+                  color: ThemeV2.primary.withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -202,7 +200,7 @@ class ProfileScreen extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.premiumGreen,
+                      color: ThemeV2.primary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -271,14 +269,14 @@ class ProfileScreen extends ConsumerWidget {
           _section('Preferences'),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.language, color: AppTheme.accentBlue),
+              leading: const Icon(Icons.language, color: ThemeV2.primary),
               title: Text(
                 'Language',
-                style: GoogleFonts.inter(color: AppTheme.textPrimary),
+                style: GoogleFonts.inter(color: ThemeV2.textPrimary),
               ),
               trailing: const Icon(
                 Icons.chevron_right,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
               ),
               onTap: () {},
             ),
@@ -312,11 +310,11 @@ class ProfileScreen extends ConsumerWidget {
                 ListTile(
                   title: Text(
                     'Privacy Policy',
-                    style: GoogleFonts.inter(color: AppTheme.textPrimary),
+                    style: GoogleFonts.inter(color: ThemeV2.textPrimary),
                   ),
                   trailing: const Icon(
                     Icons.chevron_right,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                   onTap: () {},
                 ),
@@ -324,11 +322,11 @@ class ProfileScreen extends ConsumerWidget {
                 ListTile(
                   title: Text(
                     'Terms of Use',
-                    style: GoogleFonts.inter(color: AppTheme.textPrimary),
+                    style: GoogleFonts.inter(color: ThemeV2.textPrimary),
                   ),
                   trailing: const Icon(
                     Icons.chevron_right,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                   onTap: () {},
                 ),
@@ -336,11 +334,11 @@ class ProfileScreen extends ConsumerWidget {
                 ListTile(
                   title: Text(
                     'Methodology',
-                    style: GoogleFonts.inter(color: AppTheme.textPrimary),
+                    style: GoogleFonts.inter(color: ThemeV2.textPrimary),
                   ),
                   trailing: const Icon(
                     Icons.chevron_right,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                   onTap: () {},
                 ),
@@ -368,18 +366,13 @@ class ProfileScreen extends ConsumerWidget {
                 if (!context.mounted) return;
                 context.go('/auth');
               },
-              icon: const Icon(Icons.logout_rounded, color: AppTheme.dangerRed),
+              icon: const Icon(Icons.logout_rounded, color: ThemeV2.loss),
               label: Text(
                 'Sign Out',
-                style: GoogleFonts.inter(
-                  color: AppTheme.dangerRed,
-                  fontSize: 15,
-                ),
+                style: GoogleFonts.inter(color: ThemeV2.loss, fontSize: 15),
               ),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: AppTheme.dangerRed.withValues(alpha: 0.3),
-                ),
+                side: BorderSide(color: ThemeV2.loss.withValues(alpha: 0.3)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -403,17 +396,17 @@ class ProfileScreen extends ConsumerWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: onTap,
-        icon: Icon(icon, size: 16, color: AppTheme.premiumGreen),
+        icon: Icon(icon, size: 16, color: ThemeV2.primary),
         label: Text(
           label,
           style: GoogleFonts.inter(
             fontSize: 12,
-            color: AppTheme.premiumGreen,
+            color: ThemeV2.primary,
             fontWeight: FontWeight.w500,
           ),
         ),
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: AppTheme.premiumGreen.withValues(alpha: 0.3)),
+          side: BorderSide(color: ThemeV2.primary.withValues(alpha: 0.3)),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -441,7 +434,7 @@ class ProfileScreen extends ConsumerWidget {
         style: GoogleFonts.inter(
           fontSize: 11,
           fontWeight: FontWeight.w700,
-          color: AppTheme.accentBlue,
+          color: ThemeV2.primary,
           letterSpacing: 1.2,
         ),
       ),
@@ -456,13 +449,13 @@ class ProfileScreen extends ConsumerWidget {
           style: GoogleFonts.inter(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textDim),
+          style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
         ),
       ],
     );
@@ -488,10 +481,10 @@ class _PremiumStatusCard extends ConsumerWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.premiumGreen.withValues(alpha: 0.4)),
+        border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.premiumGreen.withValues(alpha: 0.08),
+            color: ThemeV2.primary.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -519,12 +512,12 @@ class _PremiumStatusCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppTheme.premiumGreen.withValues(alpha: 0.15),
+                color: ThemeV2.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 Icons.workspace_premium_rounded,
-                color: AppTheme.premiumGreen,
+                color: ThemeV2.primary,
                 size: 20,
               ),
             ),
@@ -538,7 +531,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.premiumGreen,
+                      color: ThemeV2.primary,
                     ),
                   ),
                   Text(
@@ -549,7 +542,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                         : '${daysLeft}d remaining',
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.premiumGreen.withValues(alpha: 0.7),
+                      color: ThemeV2.primary.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -564,13 +557,13 @@ class _PremiumStatusCard extends ConsumerWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isExpired
-                      ? AppTheme.dangerRed.withValues(alpha: 0.2)
-                      : AppTheme.premiumGreen.withValues(alpha: 0.15),
+                      ? ThemeV2.loss.withValues(alpha: 0.2)
+                      : ThemeV2.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isExpired
-                        ? AppTheme.dangerRed.withValues(alpha: 0.3)
-                        : AppTheme.premiumGreen.withValues(alpha: 0.3),
+                        ? ThemeV2.loss.withValues(alpha: 0.3)
+                        : ThemeV2.primary.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(
@@ -578,9 +571,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    color: isExpired
-                        ? AppTheme.dangerRed
-                        : AppTheme.premiumGreen,
+                    color: isExpired ? ThemeV2.loss : ThemeV2.primary,
                   ),
                 ),
               )
@@ -591,15 +582,15 @@ class _PremiumStatusCard extends ConsumerWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.premiumGreen.withValues(alpha: 0.15),
+                  color: ThemeV2.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: AppTheme.premiumGreen.withValues(alpha: 0.3),
+                    color: ThemeV2.primary.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Icon(
                   Icons.all_inclusive_rounded,
-                  color: AppTheme.premiumGreen,
+                  color: ThemeV2.primary,
                   size: 18,
                 ),
               ),
@@ -623,17 +614,13 @@ class _PremiumStatusCard extends ConsumerWidget {
   Widget _benefitRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: AppTheme.premiumGreen.withValues(alpha: 0.7),
-        ),
+        Icon(icon, size: 14, color: ThemeV2.primary.withValues(alpha: 0.7)),
         const SizedBox(width: 8),
         Text(
           text,
           style: GoogleFonts.inter(
             fontSize: 12,
-            color: AppTheme.premiumGreen.withValues(alpha: 0.85),
+            color: ThemeV2.primary.withValues(alpha: 0.85),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -648,7 +635,7 @@ class _PremiumStatusCard extends ConsumerWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: AppTheme.premiumGreen.withValues(alpha: 0.1),
+            color: ThemeV2.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
         ),
@@ -660,7 +647,7 @@ class _PremiumStatusCard extends ConsumerWidget {
               width: 120,
               height: 14,
               decoration: BoxDecoration(
-                color: AppTheme.premiumGreen.withValues(alpha: 0.1),
+                color: ThemeV2.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -669,7 +656,7 @@ class _PremiumStatusCard extends ConsumerWidget {
               width: 80,
               height: 10,
               decoration: BoxDecoration(
-                color: AppTheme.premiumGreen.withValues(alpha: 0.07),
+                color: ThemeV2.primary.withValues(alpha: 0.07),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

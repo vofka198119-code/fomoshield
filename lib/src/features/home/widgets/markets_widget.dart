@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../home_providers.dart';
 
@@ -77,7 +78,7 @@ class _MarketsWidgetState extends ConsumerState<MarketsWidget>
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppTheme.accentBlue.withValues(alpha: 0.5),
+                  color: ThemeV2.primary.withValues(alpha: 0.5),
                 ),
               ),
             ),
@@ -117,7 +118,7 @@ class _MarketsWidgetState extends ConsumerState<MarketsWidget>
                 margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark.withValues(alpha: 0.5),
+                  color: ThemeV2.surfaceDark.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(22),
                 ),
                 child: Text(
@@ -126,7 +127,7 @@ class _MarketsWidgetState extends ConsumerState<MarketsWidget>
                   'companies, and Dow Jones tracks 30 major US corporations.',
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                     height: 1.5,
                   ),
                 ),
@@ -157,7 +158,7 @@ class _MarketsWidgetState extends ConsumerState<MarketsWidget>
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
+                          color: ThemeV2.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -165,7 +166,7 @@ class _MarketsWidgetState extends ConsumerState<MarketsWidget>
                         '--',
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                         ),
                       ),
                     ],
@@ -179,14 +180,14 @@ class _MarketsWidgetState extends ConsumerState<MarketsWidget>
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                     Text(
                       '0.00%',
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   ],
@@ -222,7 +223,7 @@ class _MarketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUp = change >= 0;
-    final changeColor = isUp ? AppTheme.shieldGreen : AppTheme.shieldRed;
+    final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
 
     return GestureDetector(
       onTap: onTap,
@@ -241,7 +242,7 @@ class _MarketCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: ThemeV2.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -249,7 +250,7 @@ class _MarketCard extends StatelessWidget {
                       symbol,
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   ],
@@ -263,7 +264,7 @@ class _MarketCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -294,3 +295,4 @@ class _MarketCard extends StatelessWidget {
     );
   }
 }
+

@@ -10,11 +10,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import 'package:intl/intl.dart';
 import '../../features/stress_test/stress_test_models.dart';
 import '../../core/theme/fomo_shield_theme.dart';
-import '../../core/theme/typography_helpers.dart';
 import 'card_frame.dart';
 
 /// Data for the Psychology Meter.
@@ -256,7 +256,7 @@ class _AnalyticsSection extends StatelessWidget {
       style: GoogleFonts.inter(
         fontSize: 11,
         fontWeight: FontWeight.w700,
-        color: AppTheme.accentBlue,
+        color: ThemeV2.primary,
         letterSpacing: 0.4,
       ),
     );
@@ -915,3 +915,4 @@ class _AuditSheetContent extends StatelessWidget {
 void showPsychologyAudit(BuildContext context, PsychologyMeterData data) {
   _showAuditSheet(context, data);
 }
+

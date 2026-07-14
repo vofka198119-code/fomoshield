@@ -12,7 +12,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../widgets/asset_row_widget.dart';
@@ -79,12 +80,13 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
       return Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
+          backgroundColor: Colors.transparent,
           title: Text(
             'Assets',
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
               letterSpacing: 1.5,
             ),
           ),
@@ -96,7 +98,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         body: Center(
           child: Text(
             'Session not found',
-            style: GoogleFonts.inter(color: AppTheme.textDim, fontSize: 14),
+            style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 14),
           ),
         ),
       );
@@ -112,19 +114,20 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Text(
           'Assets',
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
           onPressed: () => context.pop(),
         ),
@@ -150,7 +153,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
           _buildSortToggle(),
 
           // ── Divider ──────────────────────────────────────────
-          const Divider(height: 1, color: AppTheme.borderSubtle),
+          const Divider(height: 1, color: ThemeV2.divider),
 
           // ── Assets List ──────────────────────────────────────
           Expanded(
@@ -160,7 +163,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
                       'No assets',
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   )
@@ -283,8 +286,8 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       decoration: const BoxDecoration(
-        color: AppTheme.card,
-        border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
+        color: ThemeV2.surface,
+        border: Border(bottom: BorderSide(color: ThemeV2.divider)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,7 +298,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
               letterSpacing: 0.8,
             ),
           ),
@@ -306,7 +309,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
             style: GoogleFonts.playfairDisplay(
               fontSize: 36,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
+              color: ThemeV2.textPrimary,
               height: 1.1,
             ),
           ),
@@ -319,7 +322,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.textSecondary,
+                  color: ThemeV2.textSecondary,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -330,7 +333,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: isPositive ? AppTheme.shieldGreen : AppTheme.dangerRed,
+                  color: isPositive ? ThemeV2.success : ThemeV2.loss,
                 ),
               ),
             ],
@@ -344,7 +347,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.textSecondary,
+                  color: ThemeV2.textSecondary,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -354,7 +357,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
             ],
@@ -369,20 +372,20 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       decoration: BoxDecoration(
         border: Border.all(
-          color: AppTheme.textSecondary.withValues(alpha: 0.3),
+          color: ThemeV2.textSecondary.withValues(alpha: 0.3),
         ),
-        color: AppTheme.card,
+        color: ThemeV2.surface,
       ),
       child: TextField(
         controller: _searchController,
         onChanged: (v) => setState(() => _searchQuery = v.trim()),
-        style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textPrimary),
+        style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textPrimary),
         decoration: InputDecoration(
           hintText: 'Search',
-          hintStyle: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+          hintStyle: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
           prefixIcon: const Icon(
             Icons.search_rounded,
-            color: AppTheme.textDim,
+            color: ThemeV2.textSecondary,
             size: 20,
           ),
           border: InputBorder.none,
@@ -390,7 +393,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
             horizontal: 12,
             vertical: 12,
           ),
-          fillColor: AppTheme.card,
+          fillColor: ThemeV2.surface,
           filled: true,
         ),
       ),
@@ -419,7 +422,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isActive ? AppTheme.accentBlue : Colors.transparent,
+              color: isActive ? ThemeV2.primary : Colors.transparent,
               width: 2,
             ),
           ),
@@ -429,7 +432,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isActive ? AppTheme.accentBlue : AppTheme.textDim,
+            color: isActive ? ThemeV2.primary : ThemeV2.textSecondary,
             letterSpacing: 0.3,
           ),
         ),
@@ -441,3 +444,4 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     return NumberFormat('#,##0.00', 'en_US').format(v);
   }
 }
+

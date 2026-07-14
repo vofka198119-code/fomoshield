@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../portfolio_providers.dart';
 
@@ -36,7 +37,7 @@ class PortfolioSummaryWidget extends StatelessWidget {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                 ),
               ),
             ),
@@ -47,7 +48,7 @@ class PortfolioSummaryWidget extends StatelessWidget {
 
     final perf = performance!;
     final isUp = perf.pnl >= 0;
-    final c = isUp ? AppTheme.shieldGreen : AppTheme.dangerRed;
+    final c = isUp ? ThemeV2.success : ThemeV2.loss;
 
     return WidgetContainer(
       title: 'PORTFOLIO SUMMARY',
@@ -68,7 +69,7 @@ class PortfolioSummaryWidget extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                   Text(
@@ -76,7 +77,7 @@ class PortfolioSummaryWidget extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -92,7 +93,7 @@ class PortfolioSummaryWidget extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                       height: 1.1,
                     ),
                   ),
@@ -122,7 +123,7 @@ class PortfolioSummaryWidget extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               // ── Divider ──
-              Container(height: 1, color: AppTheme.borderSubtle),
+              Container(height: 1, color: ThemeV2.divider),
               const SizedBox(height: 12),
               // ── Bottom stats row ──
               Row(
@@ -147,7 +148,7 @@ class PortfolioSummaryWidget extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textDim),
+          style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
         ),
         const SizedBox(height: 4),
         Text(
@@ -155,10 +156,11 @@ class PortfolioSummaryWidget extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
         ),
       ],
     ),
   );
 }
+

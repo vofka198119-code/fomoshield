@@ -12,7 +12,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../shared/widgets/portfolio_value_chart.dart';
@@ -51,19 +52,20 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Text(
           'Активы',
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
           onPressed: () => context.pop(),
         ),
@@ -104,7 +106,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
               // Sort toggle
               _buildSortToggle(),
 
-              const Divider(height: 1, color: AppTheme.borderSubtle),
+              const Divider(height: 1, color: ThemeV2.divider),
 
               // Assets list
               Expanded(
@@ -114,7 +116,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
                           'Нет активов',
                           style: GoogleFonts.inter(
                             fontSize: 14,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                           ),
                         ),
                       )
@@ -146,8 +148,8 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       decoration: const BoxDecoration(
-        color: AppTheme.card,
-        border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
+        color: ThemeV2.surface,
+        border: Border(bottom: BorderSide(color: ThemeV2.divider)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +159,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
               letterSpacing: 0.8,
             ),
           ),
@@ -167,7 +169,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
             style: GoogleFonts.playfairDisplay(
               fontSize: 36,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
+              color: ThemeV2.textPrimary,
               height: 1.1,
             ),
           ),
@@ -179,7 +181,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -190,7 +192,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: isPositive ? AppTheme.shieldGreen : AppTheme.dangerRed,
+                  color: isPositive ? ThemeV2.success : ThemeV2.loss,
                 ),
               ),
             ],
@@ -203,7 +205,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -213,7 +215,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
             ],
@@ -228,20 +230,20 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       decoration: BoxDecoration(
         border: Border.all(
-          color: AppTheme.textSecondary.withValues(alpha: 0.3),
+          color: ThemeV2.textSecondary.withValues(alpha: 0.3),
         ),
-        color: AppTheme.card,
+        color: ThemeV2.surface,
       ),
       child: TextField(
         controller: _searchController,
         onChanged: (v) => setState(() => _searchQuery = v.trim()),
-        style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textPrimary),
+        style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textPrimary),
         decoration: InputDecoration(
           hintText: 'Поиск',
-          hintStyle: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+          hintStyle: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
           prefixIcon: const Icon(
             Icons.search_rounded,
-            color: AppTheme.textDim,
+            color: ThemeV2.textSecondary,
             size: 20,
           ),
           border: InputBorder.none,
@@ -249,7 +251,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
             horizontal: 12,
             vertical: 12,
           ),
-          fillColor: AppTheme.card,
+          fillColor: ThemeV2.surface,
           filled: true,
         ),
       ),
@@ -278,7 +280,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isActive ? AppTheme.accentBlue : Colors.transparent,
+              color: isActive ? ThemeV2.primary : Colors.transparent,
               width: 2,
             ),
           ),
@@ -288,7 +290,7 @@ class _PortfolioAssetsScreenState extends ConsumerState<PortfolioAssetsScreen> {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isActive ? AppTheme.accentBlue : AppTheme.textDim,
+            color: isActive ? ThemeV2.primary : ThemeV2.textSecondary,
             letterSpacing: 0.3,
           ),
         ),
@@ -323,7 +325,7 @@ class _PortfolioAssetRow extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
         decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
+          border: Border(bottom: BorderSide(color: ThemeV2.divider)),
         ),
         child: Row(
           children: [
@@ -351,7 +353,7 @@ class _PortfolioAssetRow extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -359,7 +361,7 @@ class _PortfolioAssetRow extends ConsumerWidget {
                     '${holding.shares.toStringAsFixed(2)} акций',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -373,7 +375,7 @@ class _PortfolioAssetRow extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -383,8 +385,8 @@ class _PortfolioAssetRow extends ConsumerWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: isPositive
-                        ? AppTheme.shieldGreen
-                        : AppTheme.dangerRed,
+                        ? ThemeV2.success
+                        : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -392,7 +394,7 @@ class _PortfolioAssetRow extends ConsumerWidget {
             const SizedBox(width: 4),
             const Icon(
               Icons.chevron_right_rounded,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               size: 20,
             ),
           ],
@@ -405,3 +407,4 @@ class _PortfolioAssetRow extends ConsumerWidget {
     return NumberFormat('#,##0.00', 'en_US').format(v);
   }
 }
+

@@ -8,7 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
 
@@ -165,10 +165,6 @@ class CorporateEventsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = AppTheme.card;
-    final textColor = AppTheme.textPrimary;
-    final subTextColor = AppTheme.textDim;
-
     // Match holdings with dividend data
     final events = <MapEntry<StressTestHolding, _DividendInfo>>[];
     for (final h in holdings) {
@@ -181,37 +177,33 @@ class CorporateEventsWidget extends StatelessWidget {
     if (events.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
           Row(
             children: [
-              Icon(Icons.event_note, size: 16, color: AppTheme.accentBlue),
+              Icon(Icons.event_note, size: 14, color: ThemeV2.primary),
               const SizedBox(width: 6),
               Text(
                 'CORPORATE EVENTS',
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                   letterSpacing: 1.2,
                 ),
               ),
             ],
           ),
-          const Divider(height: 1, indent: 16, endIndent: 16, color: Color(0xFFE8E5DF)),
+          const Divider(height: 1, indent: 0, endIndent: 0, color: ThemeV2.divider),
           const SizedBox(height: 8),
           Text(
             'Upcoming ex-dividend dates and payouts',
             style: GoogleFonts.inter(
               fontSize: 11,
-              color: subTextColor,
+              color: ThemeV2.textSecondary,
             ),
           ),
           const SizedBox(height: 12),
@@ -219,8 +211,6 @@ class CorporateEventsWidget extends StatelessWidget {
           ...events.map((entry) => _EventRow(
             holding: entry.key,
             info: entry.value,
-            textColor: textColor,
-            subTextColor: subTextColor,
           )),
         ],
       ),
@@ -231,22 +221,18 @@ class CorporateEventsWidget extends StatelessWidget {
 class _EventRow extends StatelessWidget {
   final StressTestHolding holding;
   final _DividendInfo info;
-  final Color textColor;
-  final Color subTextColor;
 
   const _EventRow({
     required this.holding,
     required this.info,
-    required this.textColor,
-    required this.subTextColor,
   });
 
   void _showPopup(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.card,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: ThemeV2.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Row(
           children: [
             Text(
@@ -254,7 +240,7 @@ class _EventRow extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: textColor,
+                color: ThemeV2.textPrimary,
               ),
             ),
           ],
@@ -263,21 +249,21 @@ class _EventRow extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _detailRow('Symbol', holding.symbol, textColor, subTextColor),
+            _detailRow('Symbol', holding.symbol),
             const SizedBox(height: 6),
-            _detailRow('Ex-Dividend Date', info.exDivDate, textColor, subTextColor),
+            _detailRow('Ex-Dividend Date', info.exDivDate),
             const SizedBox(height: 6),
-            _detailRow('Pay Date', info.payDate, textColor, subTextColor),
+            _detailRow('Pay Date', info.payDate),
             const SizedBox(height: 6),
-            _detailRow('Dividend', '\$${info.amount.toStringAsFixed(2)} per share', textColor, subTextColor),
+            _detailRow('Dividend', '\$${info.amount.toStringAsFixed(2)} per share'),
             const SizedBox(height: 6),
-            _detailRow('Frequency', info.frequency, textColor, subTextColor),
+            _detailRow('Frequency', info.frequency),
             const SizedBox(height: 12),
             Text(
               info.description,
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: subTextColor,
+                color: ThemeV2.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -286,12 +272,12 @@ class _EventRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppTheme.shieldGreen.withValues(alpha: 0.1),
+                color: ThemeV2.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.monetization_on, size: 16, color: AppTheme.shieldGreen),
+                  Icon(Icons.monetization_on, size: 16, color: ThemeV2.success),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -299,7 +285,7 @@ class _EventRow extends StatelessWidget {
                       style: interNums(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.shieldGreen,
+                        color: ThemeV2.success,
                       ),
                     ),
                   ),
@@ -313,7 +299,7 @@ class _EventRow extends StatelessWidget {
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               'Close',
-              style: GoogleFonts.inter(color: AppTheme.shieldGreen),
+              style: GoogleFonts.inter(color: ThemeV2.success),
             ),
           ),
         ],
@@ -328,10 +314,10 @@ class _EventRow extends StatelessWidget {
     return GestureDetector(
       onTap: () => _showPopup(context),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
+            bottom: BorderSide(color: ThemeV2.divider.withValues(alpha: 0.4)),
           ),
         ),
         child: Row(
@@ -344,7 +330,7 @@ class _EventRow extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: textColor,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
             ),
@@ -358,14 +344,14 @@ class _EventRow extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: textColor,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   Text(
                     'Pays \$${info.amount.toStringAsFixed(2)}/share on ${info.payDate}',
                     style: interNums(
                       fontSize: 11,
-                      color: subTextColor,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -375,7 +361,7 @@ class _EventRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppTheme.shieldGreen.withValues(alpha: 0.1),
+                color: ThemeV2.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -383,12 +369,12 @@ class _EventRow extends StatelessWidget {
                 style: interNums(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.shieldGreen,
+                  color: ThemeV2.success,
                 ),
               ),
             ),
             const SizedBox(width: 4),
-            Icon(Icons.chevron_right, size: 16, color: subTextColor),
+            Icon(Icons.chevron_right, size: 16, color: ThemeV2.textSecondary),
           ],
         ),
       ),
@@ -396,12 +382,12 @@ class _EventRow extends StatelessWidget {
   }
 }
 
-Widget _detailRow(String label, String value, Color textColor, Color subTextColor) {
+Widget _detailRow(String label, String value) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Text(label, style: GoogleFonts.inter(fontSize: 12, color: subTextColor)),
-      Text(value, style: interNums(fontSize: 12, fontWeight: FontWeight.w600, color: textColor)),
+      Text(label, style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary)),
+      Text(value, style: interNums(fontSize: 12, fontWeight: FontWeight.w600, color: ThemeV2.textPrimary)),
     ],
   );
 }

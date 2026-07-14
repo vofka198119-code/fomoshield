@@ -11,7 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/guardian/guardian_engine.dart';
 import '../../../shared/guardian/guardian_providers.dart';
 import '../../stress_test/stress_test_models.dart';
@@ -53,7 +54,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
 
   bool get _isBuy => widget.orderType == 'buy';
 
-  Color get _accent => AppTheme.accentBlue;
+  Color get _accent => ThemeV2.primary;
 
   StressTestSession? get _session {
     return ref.read(stressTestProvider.notifier).getSession(widget.sessionId);
@@ -153,7 +154,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.reason),
-          backgroundColor: AppTheme.dangerRed,
+          backgroundColor: ThemeV2.loss,
         ),
       );
       return;
@@ -176,7 +177,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 : 'Sold ${realShares.toStringAsFixed(4)} ${widget.symbol} '
                       'at \$${_currentPrice.toStringAsFixed(2)}',
           ),
-          backgroundColor: _isBuy ? AppTheme.shieldGreen : AppTheme.dangerRed,
+          backgroundColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
         ),
       );
       context.pop();
@@ -253,7 +254,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 4, 16, 12),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(14),
         border: const Border(bottom: BorderSide(color: Color(0xFFE8E5DF))),
       ),
@@ -265,7 +266,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
               IconButton(
                 icon: const Icon(
                   Icons.arrow_back_rounded,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
                 onPressed: () => context.pop(),
               ),
@@ -274,7 +275,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
             ],
@@ -289,7 +290,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               const SizedBox(width: 10),
@@ -297,8 +298,8 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: isPositive
-                      ? AppTheme.shieldGreen.withValues(alpha: 0.12)
-                      : AppTheme.dangerRed.withValues(alpha: 0.12),
+                      ? ThemeV2.success.withValues(alpha: 0.12)
+                      : ThemeV2.loss.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -308,8 +309,8 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: isPositive
-                        ? AppTheme.shieldGreen
-                        : AppTheme.dangerRed,
+                        ? ThemeV2.success
+                        : ThemeV2.loss,
                   ),
                 ),
               ),
@@ -325,7 +326,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
   // ──────────────────────────────────────────────────────────────
   Widget _buildOrderTypeLabel() {
     return Container(
-      color: AppTheme.card,
+      color: ThemeV2.surface,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
@@ -359,10 +360,10 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: AppTheme.card,
+            color: ThemeV2.surface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: AppTheme.textSecondary.withValues(alpha: 0.3),
+              color: ThemeV2.textSecondary.withValues(alpha: 0.3),
             ),
           ),
           child: Row(
@@ -380,7 +381,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               const Spacer(),
@@ -388,12 +389,12 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 _isBuy
                     ? 'Cash: ${_fmt(_availableCash)}'
                     : 'Held: ${_heldShares.toStringAsFixed(2)}',
-                style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textDim),
+                style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
               ),
               const SizedBox(width: 6),
               const Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
                 size: 20,
               ),
             ],
@@ -406,7 +407,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
   Future<void> _showInputModeSheet() async {
     await showModalBottomSheet<_InputMode>(
       context: context,
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -477,14 +478,14 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           border: Border.all(
             color: isSelected
                 ? _accent
-                : AppTheme.textDim.withValues(alpha: 0.2),
+                : ThemeV2.textSecondary.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: isSelected ? _accent : AppTheme.textDim,
+              color: isSelected ? _accent : ThemeV2.textSecondary,
               size: 24,
             ),
             const SizedBox(width: 14),
@@ -497,14 +498,14 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -517,7 +518,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                   detail,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
                 if (isSelected)
@@ -554,7 +555,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
               hintStyle: GoogleFonts.playfairDisplay(
                 fontSize: 42,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textDim.withValues(alpha: 0.3),
+                color: ThemeV2.textSecondary.withValues(alpha: 0.3),
               ),
               prefixText: _inputMode == _InputMode.cost ? '\$ ' : null,
               prefixStyle: GoogleFonts.playfairDisplay(
@@ -577,7 +578,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           ),
           Text(
             _inputMode == _InputMode.cost ? 'USD' : 'Shares',
-            style: GoogleFonts.inter(fontSize: 12, color: AppTheme.textDim),
+            style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
           ),
           // Conversion preview
           if (displayAmount > 0 && _inputMode == _InputMode.cost)
@@ -587,7 +588,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 '≈ ${displayAmount > 0 && _currentPrice > 0 ? (displayAmount / _currentPrice).toStringAsFixed(4) : '0'} shares',
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: AppTheme.textSecondary,
+                  color: ThemeV2.textSecondary,
                 ),
               ),
             ),
@@ -598,7 +599,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 '≈ \$${(displayAmount * _currentPrice).toStringAsFixed(2)}',
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: AppTheme.textSecondary,
+                  color: ThemeV2.textSecondary,
                 ),
               ),
             ),
@@ -620,7 +621,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
               trackHeight: 4,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
               activeTrackColor: _accent,
-              inactiveTrackColor: AppTheme.textDim.withValues(alpha: 0.2),
+              inactiveTrackColor: ThemeV2.textSecondary.withValues(alpha: 0.2),
               thumbColor: _accent,
               overlayColor: _accent.withValues(alpha: 0.12),
               valueIndicatorColor: _accent,
@@ -678,7 +679,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
   Widget _pctLabel(String text) {
     return Text(
       text,
-      style: GoogleFonts.inter(fontSize: 10, color: AppTheme.textDim),
+      style: GoogleFonts.inter(fontSize: 10, color: ThemeV2.textSecondary),
     );
   }
 
@@ -694,7 +695,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
+        color: ThemeV2.surfaceDark,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -702,7 +703,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         children: [
           const Icon(
             Icons.info_outline_rounded,
-            color: AppTheme.textDim,
+            color: ThemeV2.textSecondary,
             size: 16,
           ),
           const SizedBox(width: 10),
@@ -711,7 +712,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
               _infoText,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: AppTheme.textSecondary,
+                color: ThemeV2.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -730,17 +731,17 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: AppTheme.textSecondary.withValues(alpha: 0.2),
+            color: ThemeV2.textSecondary.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
           children: [
             const Icon(
               Icons.access_time_rounded,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -753,14 +754,14 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   Text(
                     'Pre-market and post-market volatility',
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -789,7 +790,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
         border: const Border(top: BorderSide(color: Color(0xFFE8E5DF))),
       ),
@@ -806,7 +807,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                     _inputMode == _InputMode.cost ? 'Cost:' : 'Qty:',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                   Text(
@@ -816,7 +817,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                 ],
@@ -828,15 +829,15 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
               width: double.infinity,
               height: 52,
               color: canExecute
-                  ? (_isBuy ? _accent : AppTheme.dangerRed)
-                  : AppTheme.textDim.withValues(alpha: 0.3),
+                  ? (_isBuy ? _accent : ThemeV2.loss)
+                  : ThemeV2.textSecondary.withValues(alpha: 0.3),
               alignment: Alignment.center,
               child: Text(
                 'Review Order',
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: canExecute ? Colors.white : AppTheme.textDim,
+                  color: canExecute ? Colors.white : ThemeV2.textSecondary,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -854,3 +855,4 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     return NumberFormat.currency(locale: 'en_US', symbol: r'$').format(v);
   }
 }
+

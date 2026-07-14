@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/scoring_engine.dart';
@@ -210,7 +211,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             margin: const EdgeInsets.all(32),
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: AppTheme.card,
+              color: ThemeV2.surface,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -218,7 +219,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
               children: [
                 const Icon(
                   Icons.play_circle_rounded,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                   size: 64,
                 ),
                 const SizedBox(height: 24),
@@ -227,7 +228,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -236,7 +237,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                     height: 1.5,
                   ),
                 ),
@@ -246,7 +247,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   child: ElevatedButton(
                     onPressed: () => _showWatchAdOverlay(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accentBlue,
+                      backgroundColor: ThemeV2.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -271,7 +272,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     'Upgrade to Premium — no ads',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppTheme.premiumGreen,
+                      color: ThemeV2.primary,
                     ),
                   ),
                 ),
@@ -288,7 +289,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
       backgroundColor: Colors.transparent,
       body: asyncData.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppTheme.accentBlue),
+          child: CircularProgressIndicator(color: ThemeV2.primary),
         ),
         error: (err, _) => Center(
           child: Padding(
@@ -298,14 +299,14 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
               children: [
                 const Icon(
                   Icons.cloud_off_rounded,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   size: 56,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Could not load company data',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
@@ -315,7 +316,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 Text(
                   'The market data API may be temporarily unavailable. Please try again.',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
@@ -328,7 +329,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   icon: const Icon(Icons.refresh_rounded, size: 18),
                   label: const Text('Retry'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.accentBlue,
+                    backgroundColor: ThemeV2.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
@@ -403,7 +404,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -426,7 +427,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -434,18 +435,18 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
               (p) => ListTile(
                 title: Text(
                   p.name,
-                  style: GoogleFonts.inter(color: AppTheme.textPrimary),
+                  style: GoogleFonts.inter(color: ThemeV2.textPrimary),
                 ),
                 subtitle: Text(
                   '\$${p.cash.toStringAsFixed(2)} available',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                     fontSize: 12,
                   ),
                 ),
                 trailing: Icon(
                   Icons.chevron_right_rounded,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -492,7 +493,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                 leading: IconButton(
                   icon: const Icon(
                     Icons.arrow_back_rounded,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                   onPressed: () => context.pop(),
                 ),
@@ -507,8 +508,8 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                               ? Icons.bookmark_rounded
                               : Icons.bookmark_border_rounded,
                           color: inWatchlist
-                              ? AppTheme.accentBlue
-                              : AppTheme.textDim,
+                              ? ThemeV2.primary
+                              : ThemeV2.textSecondary,
                         ),
                         onPressed: () {
                           if (inWatchlist) {
@@ -527,7 +528,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                   IconButton(
                     icon: const Icon(
                       Icons.tune_rounded,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                     onPressed: _showWidgetsBottomSheet,
                   ),
@@ -561,7 +562,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                         onPressed: _showWidgetsBottomSheet,
                         icon: const Icon(
                           Icons.add_rounded,
-                          color: AppTheme.accentBlue,
+                          color: ThemeV2.primary,
                           size: 20,
                         ),
                         label: Text(
@@ -569,7 +570,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppTheme.accentBlue,
+                            color: ThemeV2.primary,
                           ),
                         ),
                         style: TextButton.styleFrom(
@@ -580,7 +581,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                             side: const BorderSide(
-                              color: AppTheme.accentBlue,
+                              color: ThemeV2.primary,
                               width: 0.5,
                             ),
                           ),
@@ -693,7 +694,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -731,7 +732,7 @@ class _PriceHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final changeColor = isUp ? AppTheme.shieldGreen : AppTheme.dangerRed;
+    final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -752,7 +753,7 @@ class _PriceHeader extends StatelessWidget {
                     errorBuilder: (_, _, _) => const Icon(
                       Icons.business_rounded,
                       size: 44,
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                     ),
                   ),
                 )
@@ -760,7 +761,7 @@ class _PriceHeader extends StatelessWidget {
                 const Icon(
                   Icons.business_rounded,
                   size: 44,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                 ),
               const SizedBox(width: 10),
               Expanded(
@@ -772,7 +773,7 @@ class _PriceHeader extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: ThemeV2.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -781,7 +782,7 @@ class _PriceHeader extends StatelessWidget {
                       symbol,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   ],
@@ -799,7 +800,7 @@ class _PriceHeader extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                   height: 1,
                 ),
               ),
@@ -896,7 +897,7 @@ class _KeyMetricsSection extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -907,7 +908,7 @@ class _KeyMetricsSection extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -937,7 +938,7 @@ class _KeyMetricsSection extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 1),
@@ -945,7 +946,7 @@ class _KeyMetricsSection extends StatelessWidget {
                   item.subtitle,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
               ],
@@ -955,7 +956,7 @@ class _KeyMetricsSection extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
               ),
             ),
           ],
@@ -963,7 +964,7 @@ class _KeyMetricsSection extends StatelessWidget {
         if (showDivider)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Container(height: 1, color: AppTheme.borderSubtle),
+            child: Container(height: 1, color: ThemeV2.divider),
           ),
       ],
     );
@@ -1041,7 +1042,7 @@ class _PositionSection extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -1052,7 +1053,7 @@ class _PositionSection extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -1074,7 +1075,7 @@ class _PositionSection extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: pnl >= 0 ? AppTheme.shieldGreen : AppTheme.dangerRed,
+                    color: pnl >= 0 ? ThemeV2.success : ThemeV2.loss,
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -1082,7 +1083,7 @@ class _PositionSection extends ConsumerWidget {
                   pnl >= 0 ? 'all time' : 'all time',
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
               ],
@@ -1099,7 +1100,7 @@ class _PositionSection extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textDim),
+          style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
         ),
         const SizedBox(height: 2),
         Text(
@@ -1107,7 +1108,7 @@ class _PositionSection extends ConsumerWidget {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
         ),
       ],
@@ -1129,7 +1130,7 @@ class _EventsStub extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -1140,19 +1141,19 @@ class _EventsStub extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.event_rounded, size: 20, color: AppTheme.textDim),
+                Icon(Icons.event_rounded, size: 20, color: ThemeV2.textSecondary),
                 const SizedBox(width: 8),
                 Text(
                   'No upcoming events',
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
               ],
@@ -1193,7 +1194,7 @@ class _NewsSection extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
           ),
@@ -1201,7 +1202,7 @@ class _NewsSection extends StatelessWidget {
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
-                child: CircularProgressIndicator(color: AppTheme.accentBlue),
+                child: CircularProgressIndicator(color: ThemeV2.primary),
               ),
             )
           else if (news == null || news!.isEmpty)
@@ -1211,7 +1212,7 @@ class _NewsSection extends StatelessWidget {
                 child: Text(
                   'No news available',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                     fontSize: 13,
                   ),
                 ),
@@ -1234,7 +1235,7 @@ class _NewsSection extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.card,
+                  color: ThemeV2.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -1249,7 +1250,7 @@ class _NewsSection extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.textPrimary,
+                              color: ThemeV2.textPrimary,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -1262,7 +1263,7 @@ class _NewsSection extends StatelessWidget {
                                   source,
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: AppTheme.accentBlue,
+                                    color: ThemeV2.primary,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -1271,7 +1272,7 @@ class _NewsSection extends StatelessWidget {
                                   ' · ',
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: AppTheme.textDim,
+                                    color: ThemeV2.textSecondary,
                                   ),
                                 ),
                               if (dateStr.isNotEmpty)
@@ -1279,7 +1280,7 @@ class _NewsSection extends StatelessWidget {
                                   dateStr,
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: AppTheme.textDim,
+                                    color: ThemeV2.textSecondary,
                                   ),
                                 ),
                             ],
@@ -1420,7 +1421,7 @@ class _CompanyWidgetsSettingsSheetState
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const Spacer(),
@@ -1439,7 +1440,7 @@ class _CompanyWidgetsSettingsSheetState
                     'Reset',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1477,8 +1478,8 @@ class _CompanyWidgetsSettingsSheetState
                   margin: const EdgeInsets.only(bottom: 8),
                   decoration: BoxDecoration(
                     color: config.visible
-                        ? AppTheme.cardDark
-                        : AppTheme.cardDark.withValues(alpha: 0.5),
+                        ? ThemeV2.surfaceDark
+                        : ThemeV2.surfaceDark.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: config.visible
@@ -1496,7 +1497,7 @@ class _CompanyWidgetsSettingsSheetState
                           index: index,
                           child: const Icon(
                             Icons.drag_handle_rounded,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                             size: 24,
                           ),
                         ),
@@ -1504,8 +1505,8 @@ class _CompanyWidgetsSettingsSheetState
                         Icon(
                           _widgetIcon(config.id),
                           color: config.visible
-                              ? AppTheme.accentBlue
-                              : AppTheme.textDim,
+                              ? ThemeV2.primary
+                              : ThemeV2.textSecondary,
                           size: 22,
                         ),
                       ],
@@ -1516,8 +1517,8 @@ class _CompanyWidgetsSettingsSheetState
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: config.visible
-                            ? AppTheme.textPrimary
-                            : AppTheme.textDim,
+                            ? ThemeV2.textPrimary
+                            : ThemeV2.textSecondary,
                       ),
                     ),
                     trailing: GestureDetector(
@@ -1527,8 +1528,8 @@ class _CompanyWidgetsSettingsSheetState
                             ? Icons.visibility_rounded
                             : Icons.visibility_off_rounded,
                         color: config.visible
-                            ? AppTheme.accentBlue
-                            : AppTheme.textDim,
+                            ? ThemeV2.primary
+                            : ThemeV2.textSecondary,
                         size: 22,
                       ),
                     ),
@@ -1588,7 +1589,7 @@ class _BottomBar extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onBuy,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.shieldGreen,
+                  backgroundColor: ThemeV2.success,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -1613,7 +1614,7 @@ class _BottomBar extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onSell,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.dangerRed,
+                  backgroundColor: ThemeV2.loss,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -1686,7 +1687,7 @@ class _CompanyAdOverlayState extends State<_CompanyAdOverlay>
           margin: const EdgeInsets.all(32),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: AppTheme.card,
+            color: ThemeV2.surface,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
@@ -1694,7 +1695,7 @@ class _CompanyAdOverlayState extends State<_CompanyAdOverlay>
             children: [
               const Icon(
                 Icons.videocam_rounded,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
                 size: 48,
               ),
               const SizedBox(height: 24),
@@ -1703,13 +1704,13 @@ class _CompanyAdOverlayState extends State<_CompanyAdOverlay>
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Continuing in a moment…',
-                style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+                style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
               ),
               const SizedBox(height: 24),
               AnimatedBuilder(
@@ -1722,7 +1723,7 @@ class _CompanyAdOverlayState extends State<_CompanyAdOverlay>
                       minHeight: 4,
                       backgroundColor: Colors.white12,
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppTheme.accentBlue,
+                        ThemeV2.primary,
                       ),
                     ),
                   );
@@ -1735,3 +1736,4 @@ class _CompanyAdOverlayState extends State<_CompanyAdOverlay>
     );
   }
 }
+

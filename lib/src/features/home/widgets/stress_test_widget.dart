@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../stress_test/stress_test_models.dart';
@@ -26,7 +27,7 @@ class StressTestWidget extends ConsumerWidget {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -56,7 +57,7 @@ class StressTestWidget extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -126,7 +127,7 @@ class StressTestWidget extends ConsumerWidget {
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.premiumGreen,
+                  color: ThemeV2.primary,
                   letterSpacing: 1.5,
                 ),
               ),
@@ -134,7 +135,7 @@ class StressTestWidget extends ConsumerWidget {
               Icon(
                 Icons.check_circle_rounded,
                 size: 12,
-                color: AppTheme.premiumGreen,
+                color: ThemeV2.primary,
               ),
               const Spacer(),
               // PREMIUM badge for free users
@@ -145,7 +146,7 @@ class StressTestWidget extends ConsumerWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.premiumGreen,
+                    color: ThemeV2.primary,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -172,7 +173,7 @@ class StressTestWidget extends ConsumerWidget {
               '+${completedSessions.length - 2} more completed',
               style: GoogleFonts.inter(
                 fontSize: 11,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -195,7 +196,7 @@ class StressTestWidget extends ConsumerWidget {
               children: [
                 const Icon(
                   Icons.psychology_rounded,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   size: 32,
                 ),
                 const SizedBox(height: 8),
@@ -204,7 +205,7 @@ class StressTestWidget extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -213,7 +214,7 @@ class StressTestWidget extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
               ],
@@ -252,12 +253,12 @@ class StressTestWidget extends ConsumerWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppTheme.accentBlue.withValues(alpha: 0.15),
+                color: ThemeV2.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.play_circle_rounded,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
                 size: 22,
               ),
             ),
@@ -271,7 +272,7 @@ class StressTestWidget extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: ThemeV2.textPrimary,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -284,8 +285,8 @@ class StressTestWidget extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: tier == SubscriptionTier.free
-                          ? AppTheme.textDim.withValues(alpha: 0.15)
-                          : AppTheme.premiumGreen.withValues(alpha: 0.15),
+                          ? ThemeV2.textSecondary.withValues(alpha: 0.15)
+                          : ThemeV2.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Text(
@@ -294,8 +295,8 @@ class StressTestWidget extends ConsumerWidget {
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                         color: tier == SubscriptionTier.free
-                            ? AppTheme.textDim
-                            : AppTheme.premiumGreen,
+                            ? ThemeV2.textSecondary
+                            : ThemeV2.primary,
                         letterSpacing: 0.8,
                       ),
                     ),
@@ -311,7 +312,7 @@ class StressTestWidget extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -321,8 +322,8 @@ class StressTestWidget extends ConsumerWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: session.profitLoss >= 0
-                        ? AppTheme.shieldGreen
-                        : AppTheme.dangerRed,
+                        ? ThemeV2.success
+                        : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -349,8 +350,8 @@ class StressTestWidget extends ConsumerWidget {
     final verdictTitle = verdict?.title ?? '—';
     final fsScore = verdict?.fsScore ?? 0;
     final pnlColor = session.profitLoss >= 0
-        ? AppTheme.shieldGreen
-        : AppTheme.dangerRed;
+        ? ThemeV2.success
+        : ThemeV2.loss;
 
     return InkWell(
       key: ValueKey('st_completed_${session.id}'),
@@ -365,7 +366,7 @@ class StressTestWidget extends ConsumerWidget {
               height: 38,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppTheme.premiumGreen, Color(0xFF006634)],
+                  colors: [ThemeV2.primary, Color(0xFF006634)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -391,7 +392,7 @@ class StressTestWidget extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 1),
@@ -399,7 +400,7 @@ class StressTestWidget extends ConsumerWidget {
                     session.duration.displayName,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -417,7 +418,7 @@ class StressTestWidget extends ConsumerWidget {
             const SizedBox(width: 8),
             const Icon(
               Icons.chevron_right_rounded,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               size: 18,
             ),
           ],
@@ -426,3 +427,4 @@ class StressTestWidget extends ConsumerWidget {
     );
   }
 }
+

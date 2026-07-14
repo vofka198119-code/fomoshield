@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../home_providers.dart';
 
@@ -95,12 +96,12 @@ class _NewsTile extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppTheme.cardDark,
+                color: ThemeV2.surfaceDark,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.newspaper_rounded,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
                 size: 16,
               ),
             ),
@@ -115,7 +116,7 @@ class _NewsTile extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -128,7 +129,7 @@ class _NewsTile extends StatelessWidget {
                           source,
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: AppTheme.accentBlue,
+                            color: ThemeV2.primary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -139,7 +140,7 @@ class _NewsTile extends StatelessWidget {
                           timeStr,
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                           ),
                         ),
                     ],
@@ -153,3 +154,4 @@ class _NewsTile extends StatelessWidget {
     );
   }
 }
+

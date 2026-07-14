@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
-import 'src/core/theme/app_theme.dart';
 import 'src/core/theme/theme_v2.dart';
 
 void main() async {
@@ -48,7 +47,13 @@ class ScanCoApp extends ConsumerWidget {
           child: Center(
             child: SizedBox(
               width: 430,
-              child: child ?? const SizedBox.shrink(),
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  scaffoldBackgroundColor: Colors.transparent,
+                  canvasColor: Colors.transparent,
+                ),
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
         );

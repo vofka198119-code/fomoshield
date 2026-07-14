@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../shared/widgets/widget_container.dart';
@@ -47,7 +48,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                 ),
               ),
             ),
@@ -99,18 +100,18 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
             child: Column(
               children: [
                 const Icon(Icons.shopping_bag_rounded,
-                    size: 48, color: AppTheme.textDim),
+                    size: 48, color: ThemeV2.textSecondary),
                 const SizedBox(height: 12),
                 Text('No holdings yet',
                     style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary)),
+                        color: ThemeV2.textPrimary)),
                 const SizedBox(height: 8),
                 Text('Search and add companies to "$name"',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                        fontSize: 13, color: AppTheme.textDim)),
+                        fontSize: 13, color: ThemeV2.textSecondary)),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () => context.push('/search'),
@@ -119,7 +120,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                       style: GoogleFonts.inter(
                           fontSize: 14, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.accentBlue,
+                    backgroundColor: ThemeV2.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
@@ -175,13 +176,13 @@ class _HoldingCard extends ConsumerWidget {
                             style: GoogleFonts.inter(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: AppTheme.textPrimary)),
+                                color: ThemeV2.textPrimary)),
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 5, vertical: 1),
                           decoration: BoxDecoration(
-                            color: AppTheme.accentBlue.withValues(alpha: 0.15),
+                            color: ThemeV2.primary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -189,7 +190,7 @@ class _HoldingCard extends ConsumerWidget {
                             style: GoogleFonts.inter(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.accentBlue),
+                                color: ThemeV2.primary),
                           ),
                         ),
                       ],
@@ -198,7 +199,7 @@ class _HoldingCard extends ConsumerWidget {
                     Text(
                         '${holding.shares.toStringAsFixed(4)} @ \$${holding.avgCost.toStringAsFixed(2)}',
                         style: GoogleFonts.inter(
-                            fontSize: 12, color: AppTheme.textDim)),
+                            fontSize: 12, color: ThemeV2.textSecondary)),
                   ],
                 ),
               ),
@@ -211,7 +212,7 @@ class _HoldingCard extends ConsumerWidget {
                         style: GoogleFonts.inter(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: AppTheme.textPrimary)),
+                            color: ThemeV2.textPrimary)),
                   ),
                   const SizedBox(height: 2),
                   FittedBox(
@@ -221,8 +222,8 @@ class _HoldingCard extends ConsumerWidget {
                         style: GoogleFonts.inter(
                             fontSize: 12,
                             color: isUp
-                                ? AppTheme.shieldGreen
-                                : AppTheme.dangerRed)),
+                                ? ThemeV2.success
+                                : ThemeV2.loss)),
                   ),
                 ],
               ),
@@ -233,3 +234,4 @@ class _HoldingCard extends ConsumerWidget {
     );
   }
 }
+

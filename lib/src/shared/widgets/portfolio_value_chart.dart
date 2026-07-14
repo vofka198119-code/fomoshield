@@ -12,7 +12,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../features/stress_test/stress_test_engine.dart';
 import '../../features/portfolio/portfolio_chart_providers.dart';
 
@@ -73,7 +73,7 @@ class PortfolioValueChartWidget extends ConsumerWidget {
       height: height,
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE8E5DF)),
       ),
@@ -83,7 +83,7 @@ class PortfolioValueChartWidget extends ConsumerWidget {
           height: 20,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
           ),
         ),
       ),
@@ -95,14 +95,14 @@ class PortfolioValueChartWidget extends ConsumerWidget {
       height: height,
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE8E5DF)),
       ),
       child: Center(
         child: Text(
           'Not enough data for chart',
-          style: GoogleFonts.inter(fontSize: 13, color: AppTheme.textDim),
+          style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
         ),
       ),
     );
@@ -206,7 +206,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
   bool get _isUp => _spots.length >= 2 && _spots.last.y >= _spots.first.y;
 
   Color get _lineColor =>
-      _isUp ? AppTheme.shieldGreen : AppTheme.dangerRed;
+      _isUp ? ThemeV2.success : ThemeV2.loss;
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +214,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE8E5DF)),
       ),
@@ -231,7 +231,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -267,7 +267,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                 ? Center(
                     child: Text(
                       'Not enough data',
-                      style: GoogleFonts.inter(color: AppTheme.textDim),
+                      style: GoogleFonts.inter(color: ThemeV2.textSecondary),
                     ),
                   )
                 : LineChart(
@@ -277,7 +277,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                         drawVerticalLine: false,
                         horizontalInterval: _calcYInterval(),
                         getDrawingHorizontalLine: (value) => FlLine(
-                          color: AppTheme.cardDark,
+                          color: ThemeV2.surfaceDark,
                           strokeWidth: 1,
                         ),
                       ),
@@ -291,7 +291,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                                 '\$${_fmtAxis(value)}',
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
-                                  color: AppTheme.textDim,
+                                  color: ThemeV2.textSecondary,
                                 ),
                               );
                             },
@@ -327,7 +327,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                                   _fmtTime(point.time),
                                   style: GoogleFonts.inter(
                                     fontSize: 9,
-                                    color: AppTheme.textDim,
+                                    color: ThemeV2.textSecondary,
                                   ),
                                 ),
                               );
@@ -369,7 +369,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                       lineTouchData: LineTouchData(
                         enabled: true,
                         touchTooltipData: LineTouchTooltipData(
-                          getTooltipColor: (_) => AppTheme.card,
+                          getTooltipColor: (_) => ThemeV2.surface,
                           tooltipRoundedRadius: 8,
                           tooltipPadding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
@@ -395,8 +395,8 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                                         '\n${changeSinceStart >= 0 ? '+' : ''}${changeSinceStart.toStringAsFixed(2)}%',
                                     style: TextStyle(
                                       color: changeSinceStart >= 0
-                                          ? AppTheme.shieldGreen
-                                          : AppTheme.dangerRed,
+                                          ? ThemeV2.success
+                                          : ThemeV2.loss,
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                       fontFamily:
@@ -422,7 +422,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
             margin: const EdgeInsets.symmetric(horizontal: 4),
             padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
-              color: AppTheme.cardDark,
+              color: ThemeV2.surfaceDark,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -438,7 +438,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(vertical: 5),
                       decoration: BoxDecoration(
-                        color: selected ? AppTheme.card : Colors.transparent,
+                        color: selected ? ThemeV2.surface : Colors.transparent,
                         borderRadius: BorderRadius.circular(6),
                         boxShadow: selected
                             ? [
@@ -458,8 +458,8 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                           fontWeight:
                               selected ? FontWeight.w700 : FontWeight.w500,
                           color: selected
-                              ? AppTheme.textPrimary
-                              : AppTheme.textDim,
+                              ? ThemeV2.textPrimary
+                              : ThemeV2.textSecondary,
                         ),
                       ),
                     ),
@@ -541,3 +541,4 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
     }
   }
 }
+

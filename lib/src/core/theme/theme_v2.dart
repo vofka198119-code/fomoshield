@@ -44,16 +44,18 @@ abstract final class ThemeV2 {
 
   /// Background — single app-wide background.
   /// Step 10
-  static const Color background = Color(0xFFF5F1E8);
+  static const Color background = Color(0xFFF8F5EC);
 
-  /// Subtle gradient from background to a slightly deeper warm tone.
-  /// No new colors — derived from the core palette.
+  /// Gradient background for the entire app.
+  /// Top: 3 tones lighter than base (#F8F5EC → #FDFBF5) — airy cream.
+  /// Bottom: noticeably darker warm beige (#C8BFA8) — visible depth.
+  /// Applied in main.dart via BoxDecoration. All Scaffolds must use transparent bg.
   static const LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color(0xFFF5F1E8), // background — светлый верх
-      Color(0xFFE7DECC), // чуть глубже — тёплый беж низ
+      Color(0xFFFDFBF5), // 3 тона светлее базового #F8F5EC
+      Color(0xFFC8BFA8), // средне-тёмный бежевый — видимый градиент
     ],
   );
 
@@ -72,6 +74,10 @@ abstract final class ThemeV2 {
   /// Divider — thin separators between cards and rows.
   /// Step 14
   static const Color divider = Color(0xFFECECEC);
+
+  /// Dark surface — subtle off-white for secondary surfaces, grid lines, range selectors, etc.
+  /// Replaces legacy AppTheme.cardDark / surfaceDark. Matches bottom of backgroundGradient.
+  static const Color surfaceDark = Color(0xFFE8E4D6);
 
   // ══════════════════════════════════════════════
   //  EXTENDED PALETTE (semantic, derived from core)
@@ -271,7 +277,8 @@ abstract final class ThemeV2 {
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: background,
+      scaffoldBackgroundColor: Colors.transparent,
+      canvasColor: Colors.transparent,
       textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme)
           .copyWith(
             bodyLarge: body,
@@ -287,7 +294,7 @@ abstract final class ThemeV2 {
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
-        backgroundColor: background,
+        backgroundColor: Colors.transparent,
         foregroundColor: textPrimary,
         titleTextStyle: section,
       ),
@@ -352,6 +359,12 @@ abstract final class ThemeV2 {
         hintStyle: caption,
       ),
       iconTheme: const IconThemeData(size: iconSize, color: textPrimary),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
     );
   }
 }

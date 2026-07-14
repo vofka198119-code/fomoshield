@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import 'card_frame.dart';
 
 // ---------------------------------------------------------------------------
@@ -47,14 +47,14 @@ class WidgetContainer extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                       letterSpacing: 1.2,
                     ),
                   ),
                   const Spacer(),
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                     size: 20,
                   ),
                 ],
@@ -101,7 +101,7 @@ class WidgetContainer extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.accentBlue,
+                        color: ThemeV2.primary,
                       ),
                     ),
                   ),
@@ -118,7 +118,7 @@ class WidgetContainer extends StatelessWidget {
                   emptyText!,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -129,3 +129,4 @@ class WidgetContainer extends StatelessWidget {
     );
   }
 }
+

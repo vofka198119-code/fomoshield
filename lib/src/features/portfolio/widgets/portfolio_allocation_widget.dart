@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../portfolio_providers.dart';
 
@@ -64,7 +65,7 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
                     '${sorted.length} holdings',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                   Text(
@@ -72,7 +73,7 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                 ],
@@ -112,7 +113,7 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: AppTheme.textPrimary,
+                                  color: ThemeV2.textPrimary,
                                 ),
                               ),
                             ],
@@ -125,7 +126,7 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: AppTheme.textPrimary,
+                                  color: ThemeV2.textPrimary,
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -136,7 +137,7 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
                                   textAlign: TextAlign.right,
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
-                                    color: AppTheme.textDim,
+                                    color: ThemeV2.textSecondary,
                                   ),
                                 ),
                               ),
@@ -150,7 +151,7 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
                         borderRadius: BorderRadius.circular(3),
                         child: Container(
                           height: 6,
-                          color: AppTheme.cardDark,
+                          color: ThemeV2.surfaceDark,
                           child: FractionallySizedBox(
                             alignment: Alignment.centerLeft,
                             widthFactor: fraction.clamp(0.02, 1.0),
@@ -178,7 +179,7 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.cardDark,
+                        color: ThemeV2.surfaceDark,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -186,7 +187,7 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.accentBlue,
+                          color: ThemeV2.primary,
                         ),
                       ),
                     ),
@@ -207,15 +208,16 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
   }
 
   static const _colors = [
-    AppTheme.accentBlue,
-    AppTheme.shieldGreen,
+    ThemeV2.primary,
+    ThemeV2.success,
     Color(0xFF9B59B6),
     Color(0xFFE67E22),
     Color(0xFF1ABC9C),
     Color(0xFF3498DB),
-    AppTheme.shieldYellow,
-    AppTheme.dangerRed,
+    ThemeV2.warning,
+    ThemeV2.loss,
   ];
 
   Color _barColor(int i) => _colors[i % _colors.length];
 }
+

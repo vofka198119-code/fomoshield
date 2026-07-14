@@ -189,12 +189,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           toolbarHeight: 64,
+          centerTitle: true,
           title: Text(
-            'Stress Test Portfolio',
+            'STRESS TEST PORTFOLIO',
             style: GoogleFonts.inter(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
               color: ThemeV2.primary,
+              letterSpacing: 1.5,
             ),
           ),
         ),
@@ -210,12 +212,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         toolbarHeight: 64,
+        centerTitle: true,
         title: Text(
-          'Stress Test Portfolio',
+          'STRESS TEST PORTFOLIO',
           style: GoogleFonts.inter(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
             color: ThemeV2.primary,
+            letterSpacing: 1.5,
           ),
         ),
         leading: IconButton(
@@ -997,16 +1001,16 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                       onTapCancel: () {},
                       behavior: HitTestBehavior.opaque,
                       child: Container(
-                        height: 82,
+                        height: 76,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 4,
-                          vertical: 10,
+                          vertical: 8,
                         ),
                         decoration: i < sorted.length - 1
-                            ? const BoxDecoration(
+                            ? BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: Color(0xFFE8E5DF),
+                                    color: ThemeV2.divider,
                                     width: 0.5,
                                   ),
                                 ),
@@ -1014,26 +1018,44 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                             : null,
                         child: Row(
                           children: [
-                            // Logo 54×54 (Step 71)
-                            ClipOval(
-                              child: SizedBox(
-                                width: 54,
-                                height: 54,
-                                child: logoAsync.when(
-                                  data: (url) => CompanyLogo(
-                                    ticker: h.symbol,
-                                    logoUrl: url,
-                                    radius: 27,
+                            // Logo 48×48 с цветным кольцом от аллокации
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _allocationColor(
+                                    i,
+                                  ).withValues(alpha: 0.7),
+                                  width: 1.5,
+                                ),
+                              ),
+                              padding: const EdgeInsets.all(2),
+                              child: ClipOval(
+                                child: SizedBox(
+                                  width: 48,
+                                  height: 48,
+                                  child: logoAsync.when(
+                                    data: (url) => CompanyLogo(
+                                      ticker: h.symbol,
+                                      logoUrl: url,
+                                      radius: 24,
+                                    ),
+                                    error: (_, _) => CompanyLogo(
+                                      ticker: h.symbol,
+                                      radius: 24,
+                                    ),
+                                    loading: () => CompanyLogo(
+                                      ticker: h.symbol,
+                                      radius: 24,
+                                    ),
                                   ),
-                                  error: (_, _) =>
-                                      CompanyLogo(ticker: h.symbol, radius: 27),
-                                  loading: () =>
-                                      CompanyLogo(ticker: h.symbol, radius: 27),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 14),
-                            // Company name + ticker/shares (Steps 72-74)
+                            const SizedBox(width: 12),
+                            // Company name + ticker/shares
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1044,19 +1066,19 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.inter(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
                                       color: ThemeV2.textPrimary,
                                     ),
                                   ),
-                                  const SizedBox(height: 3),
+                                  const SizedBox(height: 2),
                                   Row(
                                     children: [
                                       Text(
                                         h.symbol,
                                         maxLines: 1,
                                         style: GoogleFonts.inter(
-                                          fontSize: 13,
+                                          fontSize: 12,
                                           color: ThemeV2.textSecondary,
                                         ),
                                       ),
@@ -1065,7 +1087,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                         '· ${h.shares.toStringAsFixed(2)} shares',
                                         maxLines: 1,
                                         style: GoogleFonts.inter(
-                                          fontSize: 13,
+                                          fontSize: 12,
                                           color: ThemeV2.textSecondary,
                                         ),
                                       ),
@@ -1075,7 +1097,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            // Position value + P&L (Steps 76-78)
+                            // Position value + P&L
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -1083,19 +1105,19 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                 Text(
                                   '\$${_fmtPosition(positionValue)}',
                                   style: interNums(
-                                    fontSize: 22,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w700,
                                     color: ThemeV2.textPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 3),
+                                const SizedBox(height: 2),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
                                       '${isPositive ? '+' : ''}\$${pnl.toStringAsFixed(2)}',
                                       style: interNums(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w700,
                                         color: isPositive
                                             ? ThemeV2.success
@@ -1106,7 +1128,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                     Text(
                                       '(${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
                                       style: interNums(
-                                        fontSize: 14,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                         color: isPositive
                                             ? ThemeV2.success
@@ -1295,7 +1317,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE8E5DF)),
+            const Divider(height: 1, color: ThemeV2.divider),
             // ── List ──
             Expanded(
               child: ListView.builder(

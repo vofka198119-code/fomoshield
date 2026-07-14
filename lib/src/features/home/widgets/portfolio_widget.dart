@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../portfolio/portfolio_providers.dart';
 
@@ -30,7 +31,7 @@ class PortfolioWidget extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Text('No portfolio',
                 style: GoogleFonts.inter(
-                    fontSize: 14, color: AppTheme.textDim)),
+                    fontSize: 14, color: ThemeV2.textSecondary)),
           ),
         ],
       );
@@ -55,12 +56,12 @@ class PortfolioWidget extends ConsumerWidget {
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2, color: AppTheme.accentBlue),
+                      strokeWidth: 2, color: ThemeV2.primary),
                 ),
                 const SizedBox(width: 12),
                 Text(activePortfolio.name,
                     style: GoogleFonts.inter(
-                        fontSize: 14, color: AppTheme.textDim)),
+                        fontSize: 14, color: ThemeV2.textSecondary)),
               ],
             ),
           ),
@@ -77,7 +78,7 @@ class PortfolioWidget extends ConsumerWidget {
                 style: GoogleFonts.inter(
                     fontSize: 36,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                     letterSpacing: -0.5)),
           ),
         ],
@@ -103,7 +104,7 @@ class PortfolioWidget extends ConsumerWidget {
 
   Widget _balanceSection(dynamic perf) {
     final isUp = perf.pnl >= 0;
-    final c = isUp ? AppTheme.shieldGreen : AppTheme.dangerRed;
+    final c = isUp ? ThemeV2.success : ThemeV2.loss;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -113,14 +114,14 @@ class PortfolioWidget extends ConsumerWidget {
           Text('Total Balance',
               style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           Text('\$${perf.currentValue.toStringAsFixed(2)}',
               style: GoogleFonts.inter(
                   fontSize: 36,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                   letterSpacing: -0.5)),
           const SizedBox(height: 4),
           Row(
@@ -134,7 +135,7 @@ class PortfolioWidget extends ConsumerWidget {
               const SizedBox(width: 8),
               Text('\u00b7 \$${perf.totalInvested.toStringAsFixed(0)} invested',
                   style: GoogleFonts.inter(
-                      fontSize: 12, color: AppTheme.textDim)),
+                      fontSize: 12, color: ThemeV2.textSecondary)),
             ],
           ),
         ],
@@ -152,10 +153,10 @@ class PortfolioWidget extends ConsumerWidget {
             children: [
               Text('Holdings (${perf.holdings.length})',
                   style: GoogleFonts.inter(
-                      fontSize: 12, color: AppTheme.textDim)),
+                      fontSize: 12, color: ThemeV2.textSecondary)),
               Text('\$${perf.currentValue.toStringAsFixed(2)} in stocks',
                   style: GoogleFonts.inter(
-                      fontSize: 12, color: AppTheme.textDim)),
+                      fontSize: 12, color: ThemeV2.textSecondary)),
             ],
           ),
           const SizedBox(height: 8),
@@ -169,13 +170,13 @@ class PortfolioWidget extends ConsumerWidget {
                       style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary)),
+                          color: ThemeV2.textPrimary)),
                   const Spacer(),
                   Text('\$${h.currentValue.toStringAsFixed(2)}',
                       style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: AppTheme.textPrimary)),
+                          color: ThemeV2.textPrimary)),
                   const SizedBox(width: 8),
                   SizedBox(
                     width: 72,
@@ -185,8 +186,8 @@ class PortfolioWidget extends ConsumerWidget {
                       style: GoogleFonts.inter(
                           fontSize: 12,
                           color: hIsUp
-                              ? AppTheme.shieldGreen
-                              : AppTheme.dangerRed),
+                              ? ThemeV2.success
+                              : ThemeV2.loss),
                     ),
                   ),
                 ],
@@ -199,7 +200,7 @@ class PortfolioWidget extends ConsumerWidget {
               child: Text('+${perf.holdings.length - 3} more',
                   style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                       fontWeight: FontWeight.w600)),
             ),
         ],
@@ -214,7 +215,7 @@ class PortfolioWidget extends ConsumerWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
-          color: AppTheme.cardDark,
+          color: ThemeV2.surfaceDark,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
@@ -224,22 +225,23 @@ class PortfolioWidget extends ConsumerWidget {
               height: 6,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppTheme.shieldYellow,
+                color: ThemeV2.warning,
               ),
             ),
             const SizedBox(width: 8),
             Text('Simulation mode',
                 style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppTheme.shieldYellow,
+                    color: ThemeV2.warning,
                     fontWeight: FontWeight.w500)),
             const Spacer(),
             Text('Tap to open',
                 style: GoogleFonts.inter(
-                    fontSize: 11, color: AppTheme.textDim)),
+                    fontSize: 11, color: ThemeV2.textSecondary)),
           ],
         ),
       ),
     );
   }
 }
+

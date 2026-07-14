@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../home_providers.dart';
 
 // ---------------------------------------------------------------------------
@@ -19,12 +20,14 @@ class EventsFullScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: Text(
-          'Upcoming Events',
+          'EVENTS',
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -33,7 +36,7 @@ class EventsFullScreen extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
           ),
         ),
         error: (_, _) => _emptyState(),
@@ -64,7 +67,7 @@ class EventsFullScreen extends ConsumerWidget {
         children: [
           Icon(
             Icons.calendar_month_rounded,
-            color: AppTheme.textDim,
+            color: ThemeV2.textSecondary,
             size: 48,
           ),
           const SizedBox(height: 12),
@@ -73,7 +76,7 @@ class EventsFullScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
+              color: ThemeV2.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -81,7 +84,7 @@ class EventsFullScreen extends ConsumerWidget {
             'Add companies to see earnings & dividends',
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
             ),
           ),
         ],
@@ -145,7 +148,7 @@ class _EventCardState extends ConsumerState<_EventCard>
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       clipBehavior: Clip.antiAlias,
@@ -163,9 +166,8 @@ class _EventCardState extends ConsumerState<_EventCard>
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color:
-                          (isEarnings ? AppTheme.accentBlue : AppTheme.shieldGreen)
-                              .withValues(alpha: 0.15),
+                      color: (isEarnings ? ThemeV2.primary : ThemeV2.success)
+                          .withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -173,9 +175,7 @@ class _EventCardState extends ConsumerState<_EventCard>
                           ? Icons.bar_chart_rounded
                           : Icons.payments_rounded,
                       size: 20,
-                      color: isEarnings
-                          ? AppTheme.accentBlue
-                          : AppTheme.shieldGreen,
+                      color: isEarnings ? ThemeV2.primary : ThemeV2.success,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -191,7 +191,7 @@ class _EventCardState extends ConsumerState<_EventCard>
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.textPrimary,
+                                color: ThemeV2.textPrimary,
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -200,7 +200,7 @@ class _EventCardState extends ConsumerState<_EventCard>
                                 e.title,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
-                                  color: AppTheme.textDim,
+                                  color: ThemeV2.textSecondary,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -214,7 +214,7 @@ class _EventCardState extends ConsumerState<_EventCard>
                               DateFormat('MMM d, yyyy').format(e.date),
                               style: GoogleFonts.inter(
                                 fontSize: 11,
-                                color: AppTheme.textDim,
+                                color: ThemeV2.textSecondary,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -235,9 +235,8 @@ class _EventCardState extends ConsumerState<_EventCard>
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          (isEarnings ? AppTheme.accentBlue : AppTheme.shieldGreen)
-                              .withValues(alpha: 0.1),
+                      color: (isEarnings ? ThemeV2.primary : ThemeV2.success)
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -245,9 +244,7 @@ class _EventCardState extends ConsumerState<_EventCard>
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: isEarnings
-                            ? AppTheme.accentBlue
-                            : AppTheme.shieldGreen,
+                        color: isEarnings ? ThemeV2.primary : ThemeV2.success,
                       ),
                     ),
                   ),
@@ -258,7 +255,7 @@ class _EventCardState extends ConsumerState<_EventCard>
                     duration: const Duration(milliseconds: 300),
                     child: Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                       size: 20,
                     ),
                   ),
@@ -276,7 +273,7 @@ class _EventCardState extends ConsumerState<_EventCard>
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark.withValues(alpha: 0.5),
+                  color: ThemeV2.surfaceDark.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: isEarnings
@@ -308,19 +305,19 @@ class _HourBadge extends StatelessWidget {
     switch (hour) {
       case 'bmo':
         label = 'BMO';
-        color = AppTheme.accentBlue;
+        color = ThemeV2.primary;
         icon = Icons.wb_sunny_rounded;
       case 'amc':
         label = 'AMC';
-        color = AppTheme.shieldYellow;
+        color = ThemeV2.warning;
         icon = Icons.nights_stay_rounded;
       case 'dmh':
         label = 'DMH';
-        color = AppTheme.shieldGreen;
+        color = ThemeV2.success;
         icon = Icons.business_center_rounded;
       default:
         label = hour.toUpperCase();
-        color = AppTheme.textDim;
+        color = ThemeV2.textSecondary;
         icon = Icons.schedule_rounded;
     }
 
@@ -377,10 +374,7 @@ class _EarningsDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (event.hour != null) ...[
-          _DetailRow(
-            label: 'Time',
-            value: _hourDescription(event.hour),
-          ),
+          _DetailRow(label: 'Time', value: _hourDescription(event.hour)),
           const SizedBox(height: 8),
         ],
         _DetailRow(
@@ -432,14 +426,14 @@ class _DetailRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 12, color: AppTheme.textDim),
+          style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
         ),
         Text(
           value,
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
         ),
       ],

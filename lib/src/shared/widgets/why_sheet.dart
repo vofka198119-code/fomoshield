@@ -23,7 +23,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../widgets/guardian/guardian_data.dart';
 import 'card_frame.dart';
@@ -63,7 +63,7 @@ class _WhySheet extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: FomoShieldTheme.background,
+        color: Colors.transparent,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: DraggableScrollableSheet(
@@ -143,7 +143,7 @@ class _GuardianComment extends StatelessWidget {
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.2,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -175,3 +175,4 @@ class _GuardianComment extends StatelessWidget {
     return GuardianState.crash;
   }
 }
+

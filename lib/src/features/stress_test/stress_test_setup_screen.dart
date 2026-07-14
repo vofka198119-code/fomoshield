@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
@@ -120,7 +120,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
             ),
           ),
         ),
@@ -137,13 +137,13 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
           ),
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
           onPressed: () => context.go('/stress-test-hub'),
         ),
@@ -167,7 +167,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
                 letterSpacing: 1.2,
               ),
             ),
@@ -185,7 +185,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               child: ElevatedButton(
                 onPressed: _startTest,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accentBlue,
+                  backgroundColor: const Color(0xFF1B365D),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -225,16 +225,16 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppTheme.premiumGreen.withValues(alpha: 0.08),
+        color: ThemeV2.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.premiumGreen.withValues(alpha: 0.2)),
+        border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppTheme.premiumGreen,
+              color: ThemeV2.primary,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -255,7 +255,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                   : 'Test ${totalCreated + 1}/2 free · Premium = 5 tests, no ads',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: AppTheme.premiumGreen,
+                color: ThemeV2.primary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -275,8 +275,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isPremium
-              ? [AppTheme.premiumGreen, const Color(0xFF002E18)]
-              : [AppTheme.accentBlue, const Color(0xFF0F2440)],
+              ? [ThemeV2.primary, const Color(0xFF002E18)]
+              : [ThemeV2.primary, const Color(0xFF0F2440)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -346,14 +346,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
         tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
     final accentColor = isPremium
         ? const Color(0xFFD4AF37) // Gold for Premium/Admin
-        : AppTheme.textDim; // Gray for Free
+        : ThemeV2.textSecondary; // Gray for Free
 
     // Always show all 5 options; Free gets lock on Infinite & Custom
     final durations = TestDuration.values;
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -401,10 +401,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         ? Icons.radio_button_checked_rounded
                         : Icons.radio_button_unchecked_rounded,
                     color: isPremiumLocked
-                        ? AppTheme.textDim
+                        ? ThemeV2.textSecondary
                         : (selected || isCustomRow || isInfiniteRow)
                         ? rowColor
-                        : AppTheme.textDim,
+                        : ThemeV2.textSecondary,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -418,10 +418,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         color: isPremiumLocked
-                            ? AppTheme.textDim.withValues(alpha: 0.5)
+                            ? ThemeV2.textSecondary.withValues(alpha: 0.5)
                             : selected || isCustomRow || isInfiniteRow
                             ? rowColor
-                            : AppTheme.textDim,
+                            : ThemeV2.textSecondary,
                         fontWeight: selected
                             ? FontWeight.w600
                             : FontWeight.w400,
@@ -436,7 +436,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.premiumGreen,
+                        color: ThemeV2.primary,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -474,7 +474,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       d.label,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                 ],
@@ -495,7 +495,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     if (!isCurrentlyAdmin) return const SizedBox.shrink();
 
     return PopupMenuButton<String>(
-      icon: Icon(Icons.bug_report_rounded, color: AppTheme.textDim, size: 20),
+      icon: Icon(Icons.bug_report_rounded, color: ThemeV2.textSecondary, size: 20),
       tooltip: 'Debug tools',
       onSelected: (value) {
         switch (value) {
@@ -539,8 +539,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 Icons.visibility_rounded,
                 size: 18,
                 color: tier == SubscriptionTier.free
-                    ? AppTheme.textPrimary
-                    : AppTheme.textDim,
+                    ? ThemeV2.textPrimary
+                    : ThemeV2.textSecondary,
               ),
               const SizedBox(width: 10),
               Text(
@@ -560,8 +560,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 Icons.admin_panel_settings_rounded,
                 size: 18,
                 color: tier != SubscriptionTier.free
-                    ? AppTheme.premiumGreen
-                    : AppTheme.textDim,
+                    ? ThemeV2.primary
+                    : ThemeV2.textSecondary,
               ),
               const SizedBox(width: 10),
               Text(
@@ -578,7 +578,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           value: 'simulate_ad',
           child: Row(
             children: [
-              Icon(Icons.tv_rounded, size: 18, color: AppTheme.textDim),
+              Icon(Icons.tv_rounded, size: 18, color: ThemeV2.textSecondary),
               const SizedBox(width: 10),
               Text(
                 'Simulate Ad Overlay',
@@ -591,7 +591,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           value: 'simulate_monetization',
           child: Row(
             children: [
-              Icon(Icons.sell_rounded, size: 18, color: AppTheme.textDim),
+              Icon(Icons.sell_rounded, size: 18, color: ThemeV2.textSecondary),
               const SizedBox(width: 10),
               Text(
                 'Simulate Purchase Modal',
@@ -609,7 +609,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        backgroundColor: AppTheme.card,
+        backgroundColor: ThemeV2.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -627,7 +627,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -637,7 +637,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -672,7 +672,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 child: Text(
                   'Not now',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                     fontSize: 13,
                   ),
                 ),
@@ -700,7 +700,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -736,7 +736,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -768,7 +768,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                             'run for the full period you select below.',
                             style: GoogleFonts.inter(
                               fontSize: 12,
-                              color: AppTheme.textDim,
+                              color: ThemeV2.textSecondary,
                               height: 1.5,
                             ),
                           ),
@@ -816,14 +816,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         'Min: 5 days',
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                         ),
                       ),
                       Text(
                         'Max: 365 days',
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                         ),
                       ),
                     ],
@@ -839,9 +839,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                           child: OutlinedButton(
                             onPressed: () => Navigator.of(ctx).pop(),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: AppTheme.textDim,
+                              foregroundColor: ThemeV2.textSecondary,
                               side: BorderSide(
-                                color: AppTheme.textDim.withValues(alpha: 0.3),
+                                color: ThemeV2.textSecondary.withValues(alpha: 0.3),
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -925,7 +925,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
 
   /// Gold for Premium, brand green for Free
   Color get _accentColor =>
-      widget.isPremium ? const Color(0xFFD4AF37) : AppTheme.premiumGreen;
+      widget.isPremium ? const Color(0xFFD4AF37) : ThemeV2.primary;
 
   @override
   void initState() {
@@ -969,7 +969,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
         !widget.isPremium && widget.selectedDuration == TestDuration.infinite;
 
     return Dialog(
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
       child: Padding(
@@ -999,7 +999,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: isFreeInfinite ? _accentColor : AppTheme.textPrimary,
+                color: isFreeInfinite ? _accentColor : ThemeV2.textPrimary,
                 letterSpacing: 0.5,
               ),
             ),
@@ -1022,14 +1022,14 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                   Icon(
                     Icons.arrow_downward_rounded,
                     size: 14,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     'Scroll to the end to agree',
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -1041,14 +1041,14 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                   Icon(
                     Icons.check_circle_rounded,
                     size: 14,
-                    color: AppTheme.shieldGreen,
+                    color: ThemeV2.success,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     'You have read the full disclaimer',
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.shieldGreen,
+                      color: ThemeV2.success,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1066,9 +1066,9 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     child: OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(false),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.textDim,
+                        foregroundColor: ThemeV2.textSecondary,
                         side: BorderSide(
-                          color: AppTheme.textDim.withValues(alpha: 0.3),
+                          color: ThemeV2.textSecondary.withValues(alpha: 0.3),
                         ),
                         backgroundColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
@@ -1098,9 +1098,9 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _hasScrolledToBottom || isFreeInfinite
                             ? _accentColor
-                            : AppTheme.textDim.withValues(alpha: 0.3),
+                            : ThemeV2.textSecondary.withValues(alpha: 0.3),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: AppTheme.textDim.withValues(
+                        disabledBackgroundColor: ThemeV2.textSecondary.withValues(
                           alpha: 0.2,
                         ),
                         disabledForegroundColor: Colors.white38,
@@ -1152,7 +1152,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     'financial market collapses.',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                       height: 1.6,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1163,7 +1163,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     'acknowledge the following:',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                       height: 1.6,
                     ),
                   ),
@@ -1221,7 +1221,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     '▸ End of Disclaimer',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: AppTheme.textDim.withValues(alpha: 0.3),
+                      color: ThemeV2.textSecondary.withValues(alpha: 0.3),
                       height: 1.6,
                     ),
                   ),
@@ -1262,7 +1262,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
             'to Premium subscribers. Upgrade to unlock:',
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               height: 1.6,
             ),
           ),
@@ -1288,7 +1288,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
           text,
           style: GoogleFonts.inter(
             fontSize: 13,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -1302,14 +1302,14 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
       children: [
         Text(
           '•  ',
-          style: GoogleFonts.inter(color: AppTheme.textDim, fontSize: 13),
+          style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 13),
         ),
         Expanded(
           child: Text(
             text,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               height: 1.6,
             ),
           ),
@@ -1318,3 +1318,4 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
     );
   }
 }
+

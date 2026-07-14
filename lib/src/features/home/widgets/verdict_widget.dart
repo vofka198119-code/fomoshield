@@ -12,7 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../../shared/widgets/verdict_card.dart';
 import '../../../shared/widgets/widget_container.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 
 class VerdictWidget extends ConsumerWidget {
   const VerdictWidget({super.key});
@@ -52,14 +53,14 @@ class VerdictWidget extends ConsumerWidget {
           child: Column(
             children: [
               Icon(Icons.assignment_rounded,
-                  size: 32, color: AppTheme.textDim.withOpacity(0.3)),
+                  size: 32, color: ThemeV2.textSecondary.withOpacity(0.3)),
               const SizedBox(height: 8),
               Text(
                 'Complete a stress test\nto receive your verdict',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -70,3 +71,4 @@ class VerdictWidget extends ConsumerWidget {
     );
   }
 }
+

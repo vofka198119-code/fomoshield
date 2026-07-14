@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../home_providers.dart';
 
 // ---------------------------------------------------------------------------
@@ -86,8 +87,8 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
     final isGreen = level == 'greed';
     final isRed = level == 'fear';
     final signalColor = isGreen
-        ? AppTheme.shieldGreen
-        : (isRed ? AppTheme.shieldRed : AppTheme.shieldYellow);
+        ? ThemeV2.success
+        : (isRed ? ThemeV2.loss : ThemeV2.warning);
     final signalBg = signalColor.withValues(alpha: 0.1);
 
     return GestureDetector(
@@ -131,7 +132,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                           style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: AppTheme.accentBlue,
+                              color: ThemeV2.primary,
                               letterSpacing: 1.2)),
                       const SizedBox(height: 4),
                       Text(label,
@@ -165,7 +166,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                       duration: const Duration(milliseconds: 300),
                       child: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                         size: 22,
                       ),
                     ),
@@ -182,15 +183,15 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                     style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary)),
+                        color: ThemeV2.textSecondary)),
                 Text(
                     '${spyChange >= 0 ? '+' : ''}${spyChange.toStringAsFixed(2)}% today',
                     style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: spyChange >= 0
-                            ? AppTheme.shieldGreen
-                            : AppTheme.dangerRed)),
+                            ? ThemeV2.success
+                            : ThemeV2.loss)),
               ],
             ),
             // Expandable details
@@ -202,7 +203,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppTheme.cardDark.withValues(alpha: 0.5),
+                    color: ThemeV2.surfaceDark.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(22),
                   ),
                   child: Column(
@@ -213,7 +214,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
+                          color: ThemeV2.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -223,7 +224,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                         '${isGreen ? 'The market is showing strong bullish momentum.' : isRed ? 'The market is showing bearish sentiment.' : 'The market is currently in a neutral state without clear direction.'}',
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                           height: 1.5,
                         ),
                       ),
@@ -238,3 +239,4 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
     );
   }
 }
+

@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
 
@@ -21,7 +21,7 @@ class BalancePanel extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black87;
-    final subTextColor = isDark ? AppTheme.textSecondary : Colors.black54;
+    final subTextColor = isDark ? ThemeV2.textSecondary : Colors.black54;
     final totalValue = session.totalValue;
     final pnl = session.profitLoss;
     final pnlPercent = session.profitLossPercent;
@@ -50,9 +50,9 @@ class BalancePanel extends StatelessWidget {
             child: _MetricCard(
               label: 'P&L',
               value: '${isPositive ? '+' : ''}\$${_fmt(pnl.abs())}',
-              valueColor: isPositive ? AppTheme.shieldGreen : AppTheme.dangerRed,
+              valueColor: isPositive ? ThemeV2.success : ThemeV2.loss,
               subText: '${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(1)}%',
-              subTextColor: isPositive ? AppTheme.shieldGreen : AppTheme.dangerRed,
+              subTextColor: isPositive ? ThemeV2.success : ThemeV2.loss,
             ),
           ),
           Container(width: 1, height: 48, color: isDark ? Colors.white12 : Colors.black12),
@@ -125,3 +125,4 @@ class _MetricCard extends StatelessWidget {
     );
   }
 }
+

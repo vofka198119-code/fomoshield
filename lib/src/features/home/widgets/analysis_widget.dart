@@ -14,7 +14,8 @@ import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/explainable_card.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 
 class AnalysisWidget extends ConsumerWidget {
   const AnalysisWidget({super.key});
@@ -55,14 +56,14 @@ class AnalysisWidget extends ConsumerWidget {
           child: Column(
             children: [
               Icon(Icons.analytics_rounded,
-                  size: 32, color: AppTheme.textDim.withOpacity(0.3)),
+                  size: 32, color: ThemeV2.textSecondary.withOpacity(0.3)),
               const SizedBox(height: 8),
               Text(
                 'Run a stress test to see\nwhat drives your returns',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -106,3 +107,5 @@ class AnalysisWidget extends ConsumerWidget {
     );
   }
 }
+
+

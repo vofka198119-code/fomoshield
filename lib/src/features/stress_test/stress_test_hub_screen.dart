@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../monetization/monetization_modal.dart';
@@ -34,15 +34,16 @@ class StressTestHubScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: Text(
           'STRESS TEST',
           style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.accentBlue,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: ThemeV2.primary,
+            letterSpacing: 1.5,
           ),
         ),
-        centerTitle: true,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -74,9 +75,9 @@ class StressTestHubScreen extends ConsumerWidget {
               showFooter: archive.length > 2,
               children: archive.isNotEmpty
                   ? archive
-                      .take(20)
-                      .map((entry) => _buildArchiveTile(context, entry))
-                      .toList()
+                        .take(20)
+                        .map((entry) => _buildArchiveTile(context, entry))
+                        .toList()
                   : [
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -88,7 +89,7 @@ class StressTestHubScreen extends ConsumerWidget {
                             'No completed tests yet',
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: AppTheme.textDim,
+                              color: ThemeV2.textSecondary,
                             ),
                           ),
                         ),
@@ -105,7 +106,7 @@ class StressTestHubScreen extends ConsumerWidget {
                   children: [
                     const Icon(
                       Icons.psychology_rounded,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                       size: 48,
                     ),
                     const SizedBox(height: 12),
@@ -114,7 +115,7 @@ class StressTestHubScreen extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -122,7 +123,7 @@ class StressTestHubScreen extends ConsumerWidget {
                       'Tap the button above to start your first test',
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   ],
@@ -154,14 +155,14 @@ class StressTestHubScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [AppTheme.accentBlue, Color(0xFF0055CC)],
+            colors: [ThemeV2.primary, Color(0xFF0055CC)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.accentBlue.withValues(alpha: 0.3),
+              color: ThemeV2.primary.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -213,7 +214,7 @@ class StressTestHubScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppTheme.premiumGreen.withValues(alpha: 0.8),
+                  color: ThemeV2.primary.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -304,8 +305,7 @@ class StressTestHubScreen extends ConsumerWidget {
     final tierLabel = tier == SubscriptionTier.free ? 'free' : 'premium';
     final plDollar = session.profitLoss;
     final plSign = plDollar >= 0 ? '+' : '';
-    final plColor =
-        plDollar >= 0 ? AppTheme.shieldGreen : AppTheme.dangerRed;
+    final plColor = plDollar >= 0 ? ThemeV2.success : ThemeV2.loss;
 
     return InkWell(
       key: ValueKey('st_${session.id}'),
@@ -318,12 +318,12 @@ class StressTestHubScreen extends ConsumerWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppTheme.accentBlue.withValues(alpha: 0.15),
+                color: ThemeV2.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.play_circle_rounded,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
                 size: 22,
               ),
             ),
@@ -337,7 +337,7 @@ class StressTestHubScreen extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: ThemeV2.textPrimary,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -350,8 +350,8 @@ class StressTestHubScreen extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: tier == SubscriptionTier.free
-                          ? AppTheme.textDim.withValues(alpha: 0.15)
-                          : AppTheme.premiumGreen.withValues(alpha: 0.15),
+                          ? ThemeV2.textSecondary.withValues(alpha: 0.15)
+                          : ThemeV2.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Text(
@@ -360,8 +360,8 @@ class StressTestHubScreen extends ConsumerWidget {
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                         color: tier == SubscriptionTier.free
-                            ? AppTheme.textDim
-                            : AppTheme.premiumGreen,
+                            ? ThemeV2.textSecondary
+                            : ThemeV2.primary,
                         letterSpacing: 0.8,
                       ),
                     ),
@@ -377,7 +377,7 @@ class StressTestHubScreen extends ConsumerWidget {
                   style: interNums(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -400,9 +400,7 @@ class StressTestHubScreen extends ConsumerWidget {
   // ── Archive Tile (Verdict Archive — WidgetContainer style) ──────
 
   Widget _buildArchiveTile(BuildContext context, VerdictArchiveEntry entry) {
-    final pnlColor = entry.pnlPercent >= 0
-        ? AppTheme.shieldGreen
-        : AppTheme.dangerRed;
+    final pnlColor = entry.pnlPercent >= 0 ? ThemeV2.success : ThemeV2.loss;
 
     return InkWell(
       key: ValueKey('archive_${entry.sessionId}'),
@@ -436,7 +434,7 @@ class StressTestHubScreen extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -444,7 +442,7 @@ class StressTestHubScreen extends ConsumerWidget {
                     'Final: \$${entry.finalValue.toStringAsFixed(0)} · ${entry.holdingCount} holdings · ${entry.totalTrades} trades',
                     style: interNums(
                       fontSize: 11,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],

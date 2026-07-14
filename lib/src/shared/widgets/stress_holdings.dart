@@ -9,7 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../features/stress_test/stress_test_models.dart';
@@ -38,9 +38,9 @@ class _StressHoldingsWidgetState extends ConsumerState<StressHoldingsWidget> {
     final holdings = widget.session.holdings;
     if (holdings.isEmpty) return const SizedBox.shrink();
 
-    final bgColor = AppTheme.card;
-    final textColor = AppTheme.textPrimary;
-    final subTextColor = AppTheme.textDim;
+    final bgColor = ThemeV2.surface;
+    final textColor = ThemeV2.textPrimary;
+    final subTextColor = ThemeV2.textSecondary;
 
     final displayList = _showAll ? holdings : holdings.take(_initialCount).toList();
 
@@ -62,7 +62,7 @@ class _StressHoldingsWidgetState extends ConsumerState<StressHoldingsWidget> {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                   letterSpacing: 1.2,
                 ),
               ),
@@ -79,7 +79,7 @@ class _StressHoldingsWidgetState extends ConsumerState<StressHoldingsWidget> {
                     style: interNums(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.shieldGreen,
+                      color: ThemeV2.success,
                     ),
                   ),
                 ),
@@ -194,7 +194,7 @@ class _HoldingRow extends ConsumerWidget {
                   style: interNums(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: isPositive ? AppTheme.shieldGreen : AppTheme.dangerRed,
+                    color: isPositive ? ThemeV2.success : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -246,3 +246,4 @@ class _TradeButton extends StatelessWidget {
     );
   }
 }
+

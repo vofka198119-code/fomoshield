@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../disclaimer/disclaimer_providers.dart';
 import '../auth/auth_providers.dart';
@@ -115,8 +116,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 height: 132,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppTheme.card,
-                  border: Border.all(color: AppTheme.accentBlue, width: 2),
+                  color: ThemeV2.surface,
+                  border: Border.all(color: ThemeV2.primary, width: 2),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(66),
@@ -128,7 +129,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     errorBuilder: (_, _, _) => const Icon(
                       Icons.shield_rounded,
                       size: 62,
-                      color: AppTheme.accentBlue,
+                      color: ThemeV2.primary,
                     ),
                   ),
                 ),
@@ -142,7 +143,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 16,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -155,3 +156,4 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
   }
 }
+

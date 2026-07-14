@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../home_providers.dart';
@@ -67,7 +68,7 @@ class WatchlistWidget extends ConsumerWidget {
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
               ),
             ),
           ),
@@ -114,7 +115,7 @@ class _WatchlistTile extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -124,7 +125,7 @@ class _WatchlistTile extends StatelessWidget {
                     symbol,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -139,7 +140,7 @@ class _WatchlistTile extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 1),
@@ -149,8 +150,8 @@ class _WatchlistTile extends StatelessWidget {
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                     color: change >= 0
-                        ? AppTheme.shieldGreen
-                        : AppTheme.shieldRed,
+                        ? ThemeV2.success
+                        : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -161,3 +162,4 @@ class _WatchlistTile extends StatelessWidget {
     );
   }
 }
+

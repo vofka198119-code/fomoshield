@@ -8,7 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../shared/services/scoring_engine.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
@@ -37,7 +38,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
             ),
           ),
         ),
@@ -100,13 +101,13 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
           ),
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
           onPressed: () => context.pop(),
         ),
@@ -128,7 +129,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -154,7 +155,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                     label: 'Total Value',
                     value: '\$${_fmt(totalValue)}',
                     icon: Icons.account_balance_wallet_rounded,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -167,8 +168,8 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                         ? Icons.trending_up_rounded
                         : Icons.trending_down_rounded,
                     color: pnlPercent >= 0
-                        ? AppTheme.shieldGreen
-                        : AppTheme.dangerRed,
+                        ? ThemeV2.success
+                        : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -181,7 +182,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                     label: 'Holdings',
                     value: '${session.holdings.length}',
                     icon: Icons.percent_rounded,
-                    color: AppTheme.shieldYellow,
+                    color: ThemeV2.warning,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -190,7 +191,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                     label: 'Cash Remaining',
                     value: '\$${_fmt(session.cash)}',
                     icon: Icons.monetization_on_rounded,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
               ],
@@ -210,7 +211,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -234,7 +235,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
                 letterSpacing: 1.2,
               ),
             ),
@@ -249,7 +250,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                       'No holdings yet. Buy stocks to see analytics.',
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   ),
@@ -265,7 +266,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
   Widget _buildCard({required Widget child}) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
       ),
@@ -311,7 +312,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 2.5,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
               ),
             ),
           ],
@@ -328,7 +329,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
       ),
@@ -343,7 +344,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: AppTheme.textPrimary,
+              color: ThemeV2.textPrimary,
             ),
           ),
           const SizedBox(height: 2),
@@ -352,7 +353,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w500,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
             ),
           ),
         ],
@@ -374,7 +375,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
         ),
@@ -410,7 +411,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -418,7 +419,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                     '${shares.toStringAsFixed(2)} sh. @ \$${entryPrice.toStringAsFixed(2)}',
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -432,7 +433,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -442,8 +443,8 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: priceChange >= 0
-                        ? AppTheme.shieldGreen
-                        : AppTheme.dangerRed,
+                        ? ThemeV2.success
+                        : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -455,9 +456,9 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
   }
 
   Color _scoreColor(int score) {
-    if (score >= 70) return AppTheme.shieldGreen;
-    if (score >= 40) return AppTheme.shieldYellow;
-    return AppTheme.dangerRed;
+    if (score >= 70) return ThemeV2.success;
+    if (score >= 40) return ThemeV2.warning;
+    return ThemeV2.loss;
   }
 
   String _scoreLabel(int score) {
@@ -602,7 +603,7 @@ class _AnalyticsRadarPainter extends CustomPainter {
           text: TextSpan(
             text: short,
             style: TextStyle(
-              color: AppTheme.textDim.withValues(alpha: 0.7),
+              color: ThemeV2.textSecondary.withValues(alpha: 0.7),
               fontSize: 9,
               fontWeight: FontWeight.w600,
             ),
@@ -638,3 +639,4 @@ class _AnalyticsRadarPainter extends CustomPainter {
   @override
   bool shouldRepaint(_AnalyticsRadarPainter oldDelegate) => true;
 }
+

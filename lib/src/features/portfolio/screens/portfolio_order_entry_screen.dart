@@ -16,7 +16,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../portfolio_providers.dart';
 import '../../orders/order_model.dart' as orders;
@@ -243,7 +244,7 @@ class _PortfolioOrderEntryScreenState
                   : 'Sold ${shares.toStringAsFixed(4)} ${widget.symbol} '
                         'at \$${_currentPrice.toStringAsFixed(2)}',
             ),
-            backgroundColor: _isBuy ? AppTheme.shieldGreen : AppTheme.dangerRed,
+            backgroundColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
           ),
         );
         context.pop();
@@ -253,7 +254,7 @@ class _PortfolioOrderEntryScreenState
             content: Text(
               '${orderType.label} order placed — Pending${limitPrice != null ? ' at \$${limitPrice.toStringAsFixed(2)}' : ''}',
             ),
-            backgroundColor: AppTheme.accentBlue,
+            backgroundColor: ThemeV2.primary,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -275,13 +276,13 @@ class _PortfolioOrderEntryScreenState
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.card,
+        backgroundColor: ThemeV2.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Row(
           children: [
             const Icon(
               Icons.access_time_rounded,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
               size: 22,
             ),
             const SizedBox(width: 10),
@@ -291,7 +292,7 @@ class _PortfolioOrderEntryScreenState
                 style: GoogleFonts.inter(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
             ),
@@ -303,7 +304,7 @@ class _PortfolioOrderEntryScreenState
           'You can cancel it anytime before execution.',
           style: GoogleFonts.inter(
             fontSize: 14,
-            color: AppTheme.textSecondary,
+            color: ThemeV2.textSecondary,
             height: 1.5,
           ),
         ),
@@ -315,7 +316,7 @@ class _PortfolioOrderEntryScreenState
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
               ),
             ),
           ),
@@ -326,7 +327,7 @@ class _PortfolioOrderEntryScreenState
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
               ),
             ),
           ),
@@ -358,19 +359,20 @@ class _PortfolioOrderEntryScreenState
       return Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
+          backgroundColor: Colors.transparent,
           title: Text(
             '${_isBuy ? 'Buy' : 'Sell'} ${widget.symbol}',
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
               letterSpacing: 1.5,
             ),
           ),
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back_rounded,
-              color: AppTheme.textPrimary,
+              color: ThemeV2.textPrimary,
             ),
             onPressed: () => context.pop(),
           ),
@@ -439,9 +441,9 @@ class _PortfolioOrderEntryScreenState
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 4, 16, 12),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
+        border: Border(bottom: BorderSide(color: ThemeV2.divider)),
       ),
       child: Column(
         children: [
@@ -451,7 +453,7 @@ class _PortfolioOrderEntryScreenState
               IconButton(
                 icon: const Icon(
                   Icons.arrow_back_rounded,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
                 onPressed: () => context.pop(),
               ),
@@ -460,7 +462,7 @@ class _PortfolioOrderEntryScreenState
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
             ],
@@ -475,7 +477,7 @@ class _PortfolioOrderEntryScreenState
                 style: GoogleFonts.inter(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               const SizedBox(width: 10),
@@ -483,8 +485,8 @@ class _PortfolioOrderEntryScreenState
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: isPositive
-                      ? AppTheme.shieldGreen.withValues(alpha: 0.12)
-                      : AppTheme.dangerRed.withValues(alpha: 0.12),
+                      ? ThemeV2.success.withValues(alpha: 0.12)
+                      : ThemeV2.loss.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -494,8 +496,8 @@ class _PortfolioOrderEntryScreenState
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: isPositive
-                        ? AppTheme.shieldGreen
-                        : AppTheme.dangerRed,
+                        ? ThemeV2.success
+                        : ThemeV2.loss,
                   ),
                 ),
               ),
@@ -513,7 +515,7 @@ class _PortfolioOrderEntryScreenState
     const types = {_OrderType.market: 'Market', _OrderType.limit: 'Limit'};
 
     return Container(
-      color: AppTheme.card,
+      color: ThemeV2.surface,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Row(
         children: types.entries.map((entry) {
@@ -538,7 +540,7 @@ class _PortfolioOrderEntryScreenState
                   border: Border(
                     bottom: BorderSide(
                       color: isActive
-                          ? AppTheme.accentBlue
+                          ? ThemeV2.primary
                           : Colors.transparent,
                       width: 2,
                     ),
@@ -551,8 +553,8 @@ class _PortfolioOrderEntryScreenState
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: isActive
-                        ? AppTheme.accentBlue
-                        : AppTheme.textSecondary,
+                        ? ThemeV2.primary
+                        : ThemeV2.textSecondary,
                   ),
                 ),
               ),
@@ -574,10 +576,10 @@ class _PortfolioOrderEntryScreenState
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: AppTheme.card,
+            color: ThemeV2.surface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: AppTheme.textSecondary.withValues(alpha: 0.3),
+              color: ThemeV2.textSecondary.withValues(alpha: 0.3),
             ),
           ),
           child: Row(
@@ -586,7 +588,7 @@ class _PortfolioOrderEntryScreenState
                 _inputMode == _InputMode.cost
                     ? Icons.attach_money_rounded
                     : Icons.inventory_2_rounded,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
                 size: 20,
               ),
               const SizedBox(width: 10),
@@ -595,7 +597,7 @@ class _PortfolioOrderEntryScreenState
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               const Spacer(),
@@ -603,12 +605,12 @@ class _PortfolioOrderEntryScreenState
                 _isBuy
                     ? 'Cash: \$${_fmt(_availableCash)}'
                     : 'Held: ${_heldShares.toStringAsFixed(2)}',
-                style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textDim),
+                style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
               ),
               const SizedBox(width: 6),
               const Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
                 size: 20,
               ),
             ],
@@ -621,7 +623,7 @@ class _PortfolioOrderEntryScreenState
   Future<void> _showInputModeSheet() async {
     await showModalBottomSheet<_InputMode>(
       context: context,
-      backgroundColor: AppTheme.card,
+      backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -686,20 +688,20 @@ class _PortfolioOrderEntryScreenState
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppTheme.accentBlue.withValues(alpha: 0.06)
+              ? ThemeV2.primary.withValues(alpha: 0.06)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected
-                ? AppTheme.accentBlue
-                : AppTheme.textDim.withValues(alpha: 0.2),
+                ? ThemeV2.primary
+                : ThemeV2.textSecondary.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: isSelected ? AppTheme.accentBlue : AppTheme.textDim,
+              color: isSelected ? ThemeV2.primary : ThemeV2.textSecondary,
               size: 24,
             ),
             const SizedBox(width: 14),
@@ -712,14 +714,14 @@ class _PortfolioOrderEntryScreenState
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -732,13 +734,13 @@ class _PortfolioOrderEntryScreenState
                   detail,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
                 if (isSelected)
                   const Icon(
                     Icons.check_circle_rounded,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                     size: 20,
                   ),
               ],
@@ -765,7 +767,7 @@ class _PortfolioOrderEntryScreenState
             style: GoogleFonts.inter(
               fontSize: 42,
               fontWeight: FontWeight.w700,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
             ),
             textAlign: TextAlign.center,
             decoration: InputDecoration(
@@ -773,13 +775,13 @@ class _PortfolioOrderEntryScreenState
               hintStyle: GoogleFonts.inter(
                 fontSize: 42,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textDim.withValues(alpha: 0.3),
+                color: ThemeV2.textSecondary.withValues(alpha: 0.3),
               ),
               prefixText: _inputMode == _InputMode.cost ? '\$ ' : null,
               prefixStyle: GoogleFonts.inter(
                 fontSize: 42,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.accentBlue,
+                color: ThemeV2.primary,
               ),
               border: InputBorder.none,
               filled: false,
@@ -797,7 +799,7 @@ class _PortfolioOrderEntryScreenState
           ),
           Text(
             _inputMode == _InputMode.cost ? 'USD' : 'Shares',
-            style: GoogleFonts.inter(fontSize: 12, color: AppTheme.textDim),
+            style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
           ),
           // Conversion preview
           if (displayAmount > 0 && _inputMode == _InputMode.cost)
@@ -807,7 +809,7 @@ class _PortfolioOrderEntryScreenState
                 '≈ ${displayAmount > 0 && _currentPrice > 0 ? (displayAmount / _currentPrice).toStringAsFixed(4) : '0'} shares',
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: AppTheme.textSecondary,
+                  color: ThemeV2.textSecondary,
                 ),
               ),
             ),
@@ -818,7 +820,7 @@ class _PortfolioOrderEntryScreenState
                 '≈ \$${(displayAmount * _currentPrice).toStringAsFixed(2)}',
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: AppTheme.textSecondary,
+                  color: ThemeV2.textSecondary,
                 ),
               ),
             ),
@@ -839,11 +841,11 @@ class _PortfolioOrderEntryScreenState
             data: SliderThemeData(
               trackHeight: 4,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-              activeTrackColor: AppTheme.accentBlue,
-              inactiveTrackColor: AppTheme.textDim.withValues(alpha: 0.2),
-              thumbColor: AppTheme.accentBlue,
-              overlayColor: AppTheme.accentBlue.withValues(alpha: 0.12),
-              valueIndicatorColor: AppTheme.accentBlue,
+              activeTrackColor: ThemeV2.primary,
+              inactiveTrackColor: ThemeV2.textSecondary.withValues(alpha: 0.2),
+              thumbColor: ThemeV2.primary,
+              overlayColor: ThemeV2.primary.withValues(alpha: 0.12),
+              valueIndicatorColor: ThemeV2.primary,
               valueIndicatorTextStyle: GoogleFonts.inter(
                 color: Colors.white,
                 fontSize: 12,
@@ -888,7 +890,7 @@ class _PortfolioOrderEntryScreenState
   Widget _pctLabel(String text) {
     return Text(
       text,
-      style: GoogleFonts.inter(fontSize: 10, color: AppTheme.textDim),
+      style: GoogleFonts.inter(fontSize: 10, color: ThemeV2.textSecondary),
     );
   }
 
@@ -901,15 +903,15 @@ class _PortfolioOrderEntryScreenState
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.accentBlue.withValues(alpha: 0.3)),
+          border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
             const Icon(
               Icons.trending_flat_rounded,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
               size: 20,
             ),
             const SizedBox(width: 10),
@@ -918,7 +920,7 @@ class _PortfolioOrderEntryScreenState
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
             const Spacer(),
@@ -932,7 +934,7 @@ class _PortfolioOrderEntryScreenState
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                 ),
                 textAlign: TextAlign.right,
                 decoration: InputDecoration(
@@ -940,7 +942,7 @@ class _PortfolioOrderEntryScreenState
                   prefixStyle: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.accentBlue,
+                    color: ThemeV2.primary,
                   ),
                   border: InputBorder.none,
                   isDense: true,
@@ -963,7 +965,7 @@ class _PortfolioOrderEntryScreenState
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -971,7 +973,7 @@ class _PortfolioOrderEntryScreenState
         children: [
           const Icon(
             Icons.info_outline_rounded,
-            color: AppTheme.textDim,
+            color: ThemeV2.textSecondary,
             size: 16,
           ),
           const SizedBox(width: 10),
@@ -980,7 +982,7 @@ class _PortfolioOrderEntryScreenState
               _infoText,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: AppTheme.textSecondary,
+                color: ThemeV2.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -999,17 +1001,17 @@ class _PortfolioOrderEntryScreenState
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: AppTheme.textSecondary.withValues(alpha: 0.2),
+            color: ThemeV2.textSecondary.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
           children: [
             const Icon(
               Icons.access_time_rounded,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -1022,14 +1024,14 @@ class _PortfolioOrderEntryScreenState
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   Text(
                     'Pre-market and post-market volatility',
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -1038,7 +1040,7 @@ class _PortfolioOrderEntryScreenState
             Switch(
               value: _extendedHours,
               onChanged: (v) => setState(() => _extendedHours = v),
-              activeTrackColor: AppTheme.accentBlue,
+              activeTrackColor: ThemeV2.primary,
             ),
           ],
         ),
@@ -1055,17 +1057,17 @@ class _PortfolioOrderEntryScreenState
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: AppTheme.textSecondary.withValues(alpha: 0.2),
+            color: ThemeV2.textSecondary.withValues(alpha: 0.2),
           ),
         ),
         child: Row(
           children: [
             const Icon(
               Icons.calendar_today_rounded,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -1078,14 +1080,14 @@ class _PortfolioOrderEntryScreenState
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   Text(
                     'Valid until end of day',
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -1093,7 +1095,7 @@ class _PortfolioOrderEntryScreenState
             ),
             const Icon(
               Icons.keyboard_arrow_down_rounded,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               size: 20,
             ),
           ],
@@ -1111,9 +1113,9 @@ class _PortfolioOrderEntryScreenState
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-        border: const Border(top: BorderSide(color: AppTheme.borderSubtle)),
+        border: const Border(top: BorderSide(color: ThemeV2.divider)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -1128,7 +1130,7 @@ class _PortfolioOrderEntryScreenState
                     _inputMode == _InputMode.cost ? 'Cost:' : 'Qty:',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                   Text(
@@ -1138,7 +1140,7 @@ class _PortfolioOrderEntryScreenState
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                 ],
@@ -1150,15 +1152,15 @@ class _PortfolioOrderEntryScreenState
               width: double.infinity,
               height: 52,
               color: canExecute
-                  ? (_isBuy ? AppTheme.accentBlue : AppTheme.dangerRed)
-                  : AppTheme.textDim.withValues(alpha: 0.3),
+                  ? (_isBuy ? ThemeV2.primary : ThemeV2.loss)
+                  : ThemeV2.textSecondary.withValues(alpha: 0.3),
               alignment: Alignment.center,
               child: Text(
                 'Review Order',
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: canExecute ? Colors.white : AppTheme.textDim,
+                  color: canExecute ? Colors.white : ThemeV2.textSecondary,
                   letterSpacing: 0.5,
                 ),
               ),

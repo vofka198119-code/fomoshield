@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:scanco/src/core/theme/app_theme.dart';
+import 'package:scanco/src/core/theme/theme_v2.dart';
+import 'package:scanco/src/core/theme/typography_helpers.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -141,8 +142,19 @@ class _ScannerScreenState extends State<ScannerScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text('Сканер QR', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: AppTheme.accentBlue, letterSpacing: 1.5)),
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          'SCANNER',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: ThemeV2.primary,
+            letterSpacing: 1.5,
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(
@@ -156,20 +168,14 @@ class _ScannerScreenState extends State<ScannerScreen>
       ),
       body: Stack(
         children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
-          ),
+          MobileScanner(controller: _controller, onDetect: _onDetect),
           // Scan overlay
           Center(
             child: Container(
               width: 260,
               height: 260,
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: theme.colorScheme.primary,
-                  width: 3,
-                ),
+                border: Border.all(color: theme.colorScheme.primary, width: 3),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: AnimatedBuilder(
@@ -208,7 +214,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                 child: Text(
                   'Наведите камеру на QR-код',
                   style: GoogleFonts.inter(
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                     fontSize: 14,
                   ),
                 ),

@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/theme/fomo_shield_theme.dart';
 import '../../shared/widgets/guardian/guardian_data.dart';
 import '../../shared/guardian/guardian_engine.dart';
 import '../../shared/guardian/guardian_providers.dart';
@@ -41,7 +41,7 @@ class VerdictScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppTheme.accentBlue,
+              color: ThemeV2.primary,
             ),
           ),
         ),
@@ -65,13 +65,13 @@ class VerdictScreen extends ConsumerWidget {
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
           ),
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: AppTheme.textPrimary,
+            color: ThemeV2.textPrimary,
           ),
           onPressed: () => context.go('/stress-test-hub'),
         ),
@@ -151,7 +151,7 @@ class VerdictScreen extends ConsumerWidget {
                   'Back to Home',
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -166,17 +166,17 @@ class VerdictScreen extends ConsumerWidget {
 
   Widget _buildFsScoreGauge(int score) {
     final color = score >= 70
-        ? AppTheme.shieldGreen
+        ? ThemeV2.success
         : score >= 40
-        ? AppTheme.shieldYellow
-        : AppTheme.dangerRed;
+        ? ThemeV2.warning
+        : ThemeV2.loss;
 
     return Container(
       width: 180,
       height: 180,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
         boxShadow: [
           BoxShadow(
@@ -205,7 +205,7 @@ class VerdictScreen extends ConsumerWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 2.5,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
               ),
             ),
           ],
@@ -221,21 +221,21 @@ class VerdictScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppTheme.shieldYellow.withValues(alpha: 0.15),
-            AppTheme.shieldYellow.withValues(alpha: 0.05),
+            ThemeV2.warning.withValues(alpha: 0.15),
+            ThemeV2.warning.withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppTheme.shieldYellow.withValues(alpha: 0.4),
+          color: ThemeV2.warning.withValues(alpha: 0.4),
           width: 1.5,
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.shield_rounded, color: AppTheme.shieldYellow, size: 48),
+          const Icon(Icons.shield_rounded, color: ThemeV2.warning, size: 48),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -246,7 +246,7 @@ class VerdictScreen extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.shieldYellow,
+                    color: ThemeV2.warning,
                     letterSpacing: 1,
                   ),
                 ),
@@ -254,7 +254,7 @@ class VerdictScreen extends ConsumerWidget {
                   'Master of Emotions — rarest achievement',
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppTheme.shieldYellow.withValues(alpha: 0.7),
+                    color: ThemeV2.warning.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -271,16 +271,16 @@ class VerdictScreen extends ConsumerWidget {
 
     switch (verdict.primaryType) {
       case VerdictType.panic:
-        verdictColor = AppTheme.dangerRed;
+        verdictColor = ThemeV2.loss;
         verdictIcon = Icons.psychology_rounded;
       case VerdictType.fomo:
-        verdictColor = AppTheme.shieldYellow;
+        verdictColor = ThemeV2.warning;
         verdictIcon = Icons.trending_up_rounded;
       case VerdictType.activeTrader:
-        verdictColor = AppTheme.accentBlue;
+        verdictColor = ThemeV2.primary;
         verdictIcon = Icons.swap_horiz_rounded;
       case VerdictType.buffettShield:
-        verdictColor = AppTheme.shieldGreen;
+        verdictColor = ThemeV2.success;
         verdictIcon = Icons.shield_rounded;
     }
 
@@ -288,7 +288,7 @@ class VerdictScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: verdictColor.withValues(alpha: 0.3)),
       ),
@@ -316,7 +316,7 @@ class VerdictScreen extends ConsumerWidget {
             verdict.description,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: AppTheme.textSecondary,
+              color: ThemeV2.textSecondary,
               height: 1.7,
             ),
           ),
@@ -330,16 +330,16 @@ class VerdictScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.shieldYellow.withValues(alpha: 0.08),
+        color: ThemeV2.warning.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.shieldYellow.withValues(alpha: 0.3)),
+        border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Icon(
             Icons.warning_amber_rounded,
-            color: AppTheme.shieldYellow,
+            color: ThemeV2.warning,
             size: 20,
           ),
           const SizedBox(width: 10),
@@ -349,7 +349,7 @@ class VerdictScreen extends ConsumerWidget {
               'of capital into one asset exposes you to unmitigated systemic risk.',
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: AppTheme.shieldYellow,
+                color: ThemeV2.warning,
                 height: 1.5,
               ),
             ),
@@ -362,14 +362,14 @@ class VerdictScreen extends ConsumerWidget {
   Widget _buildStatsCard(VerdictArchiveEntry entry) {
     final pnlPercent = entry.pnlPercent;
     final pnlColor = pnlPercent >= 0
-        ? AppTheme.shieldGreen
-        : AppTheme.dangerRed;
+        ? ThemeV2.success
+        : ThemeV2.loss;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -380,7 +380,7 @@ class VerdictScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               letterSpacing: 1.2,
             ),
           ),
@@ -411,14 +411,14 @@ class VerdictScreen extends ConsumerWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.inter(fontSize: 13, color: AppTheme.textDim),
+            style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
           ),
           Text(
             value,
             style: interNums(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: valueColor ?? AppTheme.textPrimary,
+              color: valueColor ?? ThemeV2.textPrimary,
             ),
           ),
         ],
@@ -464,10 +464,10 @@ class VerdictScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppTheme.textSecondary.withValues(alpha: 0.2),
+          color: ThemeV2.textSecondary.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -477,10 +477,10 @@ class VerdictScreen extends ConsumerWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppTheme.accentBlue.withValues(alpha: 0.1),
+              color: ThemeV2.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: Icon(icon, size: 18, color: AppTheme.accentBlue),
+            child: Icon(icon, size: 18, color: ThemeV2.primary),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -493,7 +493,7 @@ class VerdictScreen extends ConsumerWidget {
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.0,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -503,7 +503,7 @@ class VerdictScreen extends ConsumerWidget {
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     height: 1.5,
-                    color: AppTheme.textSecondary,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
               ],
@@ -635,3 +635,4 @@ class _GuardianVerdictSection extends ConsumerWidget {
     GuardianState.speculation => -10,
   };
 }
+

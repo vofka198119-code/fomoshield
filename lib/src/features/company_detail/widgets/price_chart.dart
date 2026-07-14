@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
 import '../../../shared/services/finnhub_service.dart';
 
 // ---------------------------------------------------------------------------
@@ -132,13 +132,13 @@ class _PriceChartState extends State<PriceChart> {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppTheme.accentBlue.withValues(alpha: 0.15)
+                        ? ThemeV2.primary.withValues(alpha: 0.15)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isSelected
-                          ? AppTheme.accentBlue.withValues(alpha: 0.5)
-                          : AppTheme.cardDark,
+                          ? ThemeV2.primary.withValues(alpha: 0.5)
+                          : ThemeV2.surfaceDark,
                     ),
                   ),
                   child: Text(
@@ -146,7 +146,7 @@ class _PriceChartState extends State<PriceChart> {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? AppTheme.accentBlue : AppTheme.textDim,
+                      color: isSelected ? ThemeV2.primary : ThemeV2.textSecondary,
                     ),
                   ),
                 ),
@@ -169,7 +169,7 @@ class _PriceChartState extends State<PriceChart> {
   Widget _buildChartArea() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppTheme.accentBlue, strokeWidth: 2),
+        child: CircularProgressIndicator(color: ThemeV2.primary, strokeWidth: 2),
       );
     }
 
@@ -178,10 +178,10 @@ class _PriceChartState extends State<PriceChart> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.show_chart_rounded, size: 40, color: AppTheme.textDim),
+            const Icon(Icons.show_chart_rounded, size: 40, color: ThemeV2.textSecondary),
             const SizedBox(height: 8),
             Text(_error!,
-                style: GoogleFonts.inter(fontSize: 13, color: AppTheme.textDim)),
+                style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary)),
           ],
         ),
       );
@@ -193,7 +193,7 @@ class _PriceChartState extends State<PriceChart> {
     if (closes.length < 2) {
       return Center(
         child: Text('Not enough data',
-            style: GoogleFonts.inter(fontSize: 13, color: AppTheme.textDim)),
+            style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary)),
       );
     }
 
@@ -206,7 +206,7 @@ class _PriceChartState extends State<PriceChart> {
 
     // Determine color: green if last close >= first close
     final isUp = closes.last >= closes.first;
-    final lineColor = isUp ? AppTheme.shieldGreen : AppTheme.dangerRed;
+    final lineColor = isUp ? ThemeV2.success : ThemeV2.loss;
 
     final spots = <FlSpot>[];
     for (int i = 0; i < closes.length; i++) {
@@ -222,7 +222,7 @@ class _PriceChartState extends State<PriceChart> {
           drawVerticalLine: false,
           horizontalInterval: (chartMaxY - chartMinY) / 4,
           getDrawingHorizontalLine: (value) => FlLine(
-            color: AppTheme.cardDark,
+            color: ThemeV2.surfaceDark,
             strokeWidth: 1,
           ),
         ),
@@ -236,7 +236,7 @@ class _PriceChartState extends State<PriceChart> {
               getTitlesWidget: (value, meta) {
                 return Text(
                   '\$${value.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: 10, color: AppTheme.textDim),
+                  style: GoogleFonts.inter(fontSize: 10, color: ThemeV2.textSecondary),
                 );
               },
             ),
@@ -255,7 +255,7 @@ class _PriceChartState extends State<PriceChart> {
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
                     '${date.month}/${date.year % 100}',
-                    style: GoogleFonts.inter(fontSize: 10, color: AppTheme.textDim),
+                    style: GoogleFonts.inter(fontSize: 10, color: ThemeV2.textSecondary),
                   ),
                 );
               },
@@ -285,7 +285,7 @@ class _PriceChartState extends State<PriceChart> {
                           TextSpan(
                             text: '\n${date.day}.${date.month}.${date.year}',
                             style: TextStyle(
-                              color: AppTheme.textDim,
+                              color: ThemeV2.textSecondary,
                               fontSize: 11,
                               fontWeight: FontWeight.w400,
                               fontFamily: 'Inter',
@@ -341,3 +341,4 @@ class _PriceChartState extends State<PriceChart> {
     return 250;
   }
 }
+

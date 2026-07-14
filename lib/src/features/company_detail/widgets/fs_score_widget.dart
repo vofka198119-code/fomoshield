@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 
 // ---------------------------------------------------------------------------
 // FS Score Widget — gauge + radar chart + 6 marker details
@@ -23,7 +24,7 @@ class FsScoreWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppTheme.card,
+          color: ThemeV2.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
         ),
@@ -40,7 +41,7 @@ class FsScoreWidget extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
               ],
@@ -68,21 +69,21 @@ class FsScoreWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppTheme.shieldYellow.withValues(alpha: 0.1),
+                  color: ThemeV2.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppTheme.shieldYellow.withValues(alpha: 0.2)),
+                  border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.warning_amber_rounded, size: 14, color: AppTheme.shieldYellow),
+                    Icon(Icons.warning_amber_rounded, size: 14, color: ThemeV2.warning),
                     const SizedBox(width: 6),
                     Text(
                       'Dividend trap penalty: -$penalty pts',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.shieldYellow,
+                        color: ThemeV2.warning,
                       ),
                     ),
                   ],
@@ -103,9 +104,9 @@ class FsScoreWidget extends StatelessWidget {
   }
 
   Color _gaugeColor(int score) {
-    if (score >= 70) return AppTheme.shieldGreen;
-    if (score >= 40) return AppTheme.shieldYellow;
-    return AppTheme.dangerRed;
+    if (score >= 70) return ThemeV2.success;
+    if (score >= 40) return ThemeV2.warning;
+    return ThemeV2.loss;
   }
 
   Widget _buildFsScoreGauge(int score) {
@@ -116,7 +117,7 @@ class FsScoreWidget extends StatelessWidget {
       height: 120,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
         boxShadow: [
           BoxShadow(
@@ -145,7 +146,7 @@ class FsScoreWidget extends StatelessWidget {
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 2,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
               ),
             ),
           ],
@@ -236,12 +237,12 @@ class _RadarChartPainter extends CustomPainter {
     dataPath.close();
 
     final dataPaint = Paint()
-      ..color = AppTheme.accentBlue.withValues(alpha: 0.15)
+      ..color = ThemeV2.primary.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
     canvas.drawPath(dataPath, dataPaint);
 
     final dataStroke = Paint()
-      ..color = AppTheme.accentBlue.withValues(alpha: 0.6)
+      ..color = ThemeV2.primary.withValues(alpha: 0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawPath(dataPath, dataStroke);
@@ -259,7 +260,7 @@ class _RadarChartPainter extends CustomPainter {
       canvas.drawCircle(
         Offset(x, y),
         3,
-        Paint()..color = AppTheme.accentBlue,
+        Paint()..color = ThemeV2.primary,
       );
 
       // Label at edge
@@ -287,7 +288,7 @@ class _RadarChartPainter extends CustomPainter {
       text: TextSpan(
         text: text,
         style: TextStyle(
-          color: AppTheme.textDim.withValues(alpha: 0.8),
+          color: ThemeV2.textSecondary.withValues(alpha: 0.8),
           fontSize: 9,
           fontWeight: FontWeight.w600,
         ),
@@ -327,16 +328,16 @@ class _MarkerCard extends StatelessWidget {
     Color markerColor;
     switch (colorStr) {
       case 'green':
-        markerColor = AppTheme.shieldGreen;
+        markerColor = ThemeV2.success;
         break;
       case 'yellow':
-        markerColor = AppTheme.shieldYellow;
+        markerColor = ThemeV2.warning;
         break;
       case 'red':
-        markerColor = AppTheme.dangerRed;
+        markerColor = ThemeV2.loss;
         break;
       default:
-        markerColor = AppTheme.textDim;
+        markerColor = ThemeV2.textSecondary;
     }
 
     return Container(
@@ -369,7 +370,7 @@ class _MarkerCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -377,7 +378,7 @@ class _MarkerCard extends StatelessWidget {
                   description,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
               ],
@@ -412,3 +413,4 @@ class _MarkerCard extends StatelessWidget {
     );
   }
 }
+

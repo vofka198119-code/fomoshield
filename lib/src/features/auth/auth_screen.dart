@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../shared/services/user_data_service.dart';
 import '../disclaimer/disclaimer_providers.dart';
@@ -187,7 +188,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
               // Back
               IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary),
+                icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.textPrimary),
                 onPressed: () => context.go('/'),
               ),
 
@@ -199,7 +200,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -209,7 +210,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     : 'Start your journey to disciplined investing',
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                 ),
               ),
 
@@ -221,7 +222,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Text(
                     _errorText!,
-                    style: GoogleFonts.inter(fontSize: 13, color: AppTheme.dangerRed),
+                    style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.loss),
                   ),
                 ),
 
@@ -231,7 +232,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   hintText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined, color: AppTheme.textDim),
+                  prefixIcon: Icon(Icons.email_outlined, color: ThemeV2.textSecondary),
                 ),
               ),
 
@@ -243,11 +244,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   hintText: 'Password',
-                  prefixIcon: const Icon(Icons.lock_outlined, color: AppTheme.textDim),
+                  prefixIcon: const Icon(Icons.lock_outlined, color: ThemeV2.textSecondary),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                     ),
                     onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
@@ -272,7 +273,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       'Forgot Password?',
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppTheme.accentBlue,
+                        color: ThemeV2.primary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -290,16 +291,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     child: Checkbox(
                       value: _rememberMe,
                       onChanged: (val) => setState(() => _rememberMe = val ?? false),
-                      activeColor: AppTheme.accentBlue,
+                      activeColor: ThemeV2.primary,
                       checkColor: Colors.white,
-                      side: const BorderSide(color: AppTheme.textDim),
+                      side: const BorderSide(color: ThemeV2.textSecondary),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     'Remember me',
-                    style: GoogleFonts.inter(fontSize: 13, color: AppTheme.textDim),
+                    style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
                   ),
                 ],
               ),
@@ -313,9 +314,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 child: ElevatedButton(
                   onPressed: (_isLoading || _isBlocked) ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.accentBlue,
+                    backgroundColor: ThemeV2.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: AppTheme.card,
+                    disabledBackgroundColor: ThemeV2.surface,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: _isLoading
@@ -324,7 +325,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppTheme.textPrimary,
+                            color: ThemeV2.textPrimary,
                           ),
                         )
                       : Text(
@@ -342,7 +343,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 children: [
                   Text(
                     _isLogin ? "Don't have an account?" : 'Already have an account?',
-                    style: GoogleFonts.inter(color: AppTheme.textDim, fontSize: 13),
+                    style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 13),
                   ),
                   TextButton(
                     onPressed: () => setState(() {
@@ -351,7 +352,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     }),
                     child: Text(
                       _isLogin ? 'Sign Up' : 'Sign In',
-                      style: GoogleFonts.inter(color: AppTheme.accentBlue, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.inter(color: ThemeV2.primary, fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -363,3 +364,4 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 }
+

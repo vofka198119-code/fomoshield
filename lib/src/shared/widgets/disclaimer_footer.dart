@@ -6,7 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 
 class DisclaimerFooter extends StatelessWidget {
   const DisclaimerFooter({super.key});
@@ -23,10 +23,11 @@ class DisclaimerFooter extends StatelessWidget {
         textAlign: TextAlign.center,
         style: GoogleFonts.inter(
           fontSize: 10,
-          color: AppTheme.textDim.withValues(alpha: 0.5),
+          color: ThemeV2.textSecondary.withValues(alpha: 0.5),
           height: 1.4,
         ),
       ),
     );
   }
 }
+

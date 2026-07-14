@@ -10,7 +10,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
@@ -89,16 +89,16 @@ class _MarketTimelineState extends State<MarketTimeline> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
           child: Row(
             children: [
               Text(
                 'MARKET TIMELINE',
                 style: GoogleFonts.inter(
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.accentBlue,
-                  letterSpacing: 1.2,
+                  color: ThemeV2.primary,
+                  letterSpacing: 1.0,
                 ),
               ),
               const Spacer(),
@@ -107,13 +107,13 @@ class _MarketTimelineState extends State<MarketTimeline> {
                 style: interNums(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                 ),
               ),
             ],
           ),
         ),
-        const Divider(height: 1, indent: 16, endIndent: 16, color: Color(0xFFE8E5DF)),
+        const Divider(height: 1, indent: 20, endIndent: 20, color: ThemeV2.divider),
         // ── Epoch rows (no scroll, natural height) ──
         ...shown.asMap().entries.map((entry) {
           final i = entry.key;
@@ -141,7 +141,7 @@ class _MarketTimelineState extends State<MarketTimeline> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                 ),
               ),
             ),
@@ -221,7 +221,7 @@ class _TimelineRow extends StatelessWidget {
                   Expanded(
                     child: Container(
                       width: 2,
-                      color: AppTheme.textDim.withValues(alpha: 0.15),
+                      color: ThemeV2.divider.withValues(alpha: 0.4),
                     ),
                   )
                 else
@@ -252,7 +252,7 @@ class _TimelineRow extends StatelessWidget {
                   Expanded(
                     child: Container(
                       width: 2,
-                      color: AppTheme.textDim.withValues(alpha: 0.15),
+                      color: ThemeV2.divider.withValues(alpha: 0.4),
                     ),
                   )
                 else
@@ -277,7 +277,7 @@ class _TimelineRow extends StatelessWidget {
                           fontWeight: isCurrent
                               ? FontWeight.w800
                               : FontWeight.w600,
-                          color: AppTheme.textPrimary.withValues(
+                          color: ThemeV2.textPrimary.withValues(
                             alpha: opacity,
                           ),
                         ),
@@ -312,7 +312,7 @@ class _TimelineRow extends StatelessWidget {
                     style: interNums(
                       fontSize: 11,
                       fontWeight: FontWeight.w400,
-                      color: AppTheme.textDim.withValues(alpha: opacity),
+                      color: ThemeV2.textSecondary.withValues(alpha: opacity),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -344,8 +344,8 @@ class _TimelineRow extends StatelessWidget {
                       borderRadius: BorderRadius.circular(2),
                       child: LinearProgressIndicator(
                         value: epochProgress ?? epoch.progress,
-                        backgroundColor: AppTheme.textDim.withValues(
-                          alpha: 0.12,
+                        backgroundColor: ThemeV2.divider.withValues(
+                          alpha: 0.25,
                         ),
                         valueColor: AlwaysStoppedAnimation<Color>(_phaseColor),
                       ),

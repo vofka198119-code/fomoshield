@@ -14,7 +14,7 @@ import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../portfolio/portfolio_providers.dart';
 import '../../../shared/widgets/widget_container.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 
 class HoldingsWidget extends ConsumerWidget {
@@ -53,7 +53,7 @@ class HoldingsWidget extends ConsumerWidget {
                   style: interNums(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -62,7 +62,7 @@ class HoldingsWidget extends ConsumerWidget {
                   '${symbols.length} holding${symbols.length == 1 ? '' : 's'} · \$${_format(cash)} cash',
                   style: interNums(
                     fontSize: 12,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                 ),
                 if (symbols.isNotEmpty) ...[
@@ -81,7 +81,7 @@ class HoldingsWidget extends ConsumerWidget {
                         '+${symbols.length - 3} more',
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                         ),
                       ),
                     ),
@@ -133,7 +133,7 @@ class HoldingsWidget extends ConsumerWidget {
                       '+${holdings.length - 3} more',
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   ),
@@ -144,7 +144,7 @@ class HoldingsWidget extends ConsumerWidget {
                       'No holdings yet',
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   ),
@@ -167,14 +167,14 @@ class HoldingsWidget extends ConsumerWidget {
           child: Column(
             children: [
               Icon(Icons.account_balance_rounded,
-                  size: 32, color: AppTheme.textDim.withOpacity(0.3)),
+                  size: 32, color: ThemeV2.textSecondary.withOpacity(0.3)),
               const SizedBox(height: 8),
               Text(
                 'No holdings yet.\nStart a stress test to invest.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -194,7 +194,7 @@ class HoldingsWidget extends ConsumerWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: AppTheme.cardDark,
+              color: ThemeV2.surfaceDark,
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,
@@ -203,7 +203,7 @@ class HoldingsWidget extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textDim,
+                color: ThemeV2.textSecondary,
               ),
             ),
           ),
@@ -214,7 +214,7 @@ class HoldingsWidget extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
           ),
@@ -226,7 +226,7 @@ class HoldingsWidget extends ConsumerWidget {
                 style: interNums(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               if (change != null)
@@ -235,7 +235,7 @@ class HoldingsWidget extends ConsumerWidget {
                   style: interNums(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: change >= 0 ? AppTheme.shieldGreen : AppTheme.shieldRed,
+                    color: change >= 0 ? ThemeV2.success : ThemeV2.loss,
                   ),
                 ),
             ],
@@ -250,3 +250,4 @@ class HoldingsWidget extends ConsumerWidget {
     return fmt.format(v);
   }
 }
+

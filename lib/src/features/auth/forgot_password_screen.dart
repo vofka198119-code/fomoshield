@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_client.dart';
 
 /// Rate-limiting guard: track last request time per email to prevent spam.
@@ -109,7 +110,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary),
+          icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -127,7 +128,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -136,7 +137,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 'to reset your password.',
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -149,10 +150,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppTheme.shieldGreen.withValues(alpha: 0.1),
+                    color: ThemeV2.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppTheme.shieldGreen.withValues(alpha: 0.3),
+                      color: ThemeV2.success.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Column(
@@ -161,14 +162,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       Row(
                         children: [
                           const Icon(Icons.check_circle_rounded,
-                              color: AppTheme.shieldGreen, size: 20),
+                              color: ThemeV2.success, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             'Check your email',
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.shieldGreen,
+                              color: ThemeV2.success,
                             ),
                           ),
                         ],
@@ -179,7 +180,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         'we\'ve sent a password reset link to it.',
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                           height: 1.4,
                         ),
                       ),
@@ -188,13 +189,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppTheme.cardDark,
+                          color: ThemeV2.surfaceDark,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
                             const Icon(Icons.info_outlined,
-                                color: AppTheme.accentBlue, size: 16),
+                                color: ThemeV2.primary, size: 16),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -202,7 +203,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                 'in the debug console.',
                                 style: GoogleFonts.inter(
                                   fontSize: 11,
-                                  color: AppTheme.accentBlue,
+                                  color: ThemeV2.primary,
                                 ),
                               ),
                             ),
@@ -221,7 +222,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     child: Text(
                       _errorText!,
                       style: GoogleFonts.inter(
-                          fontSize: 13, color: AppTheme.dangerRed),
+                          fontSize: 13, color: ThemeV2.loss),
                     ),
                   ),
 
@@ -232,7 +233,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   decoration: const InputDecoration(
                     hintText: 'Email',
                     prefixIcon:
-                        Icon(Icons.email_outlined, color: AppTheme.textDim),
+                        Icon(Icons.email_outlined, color: ThemeV2.textSecondary),
                   ),
                 ),
 
@@ -245,9 +246,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _sendResetLink,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accentBlue,
+                      backgroundColor: ThemeV2.primary,
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: AppTheme.card,
+                      disabledBackgroundColor: ThemeV2.surface,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -258,7 +259,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: AppTheme.textPrimary,
+                              color: ThemeV2.textPrimary,
                             ),
                           )
                         : Text(
@@ -281,7 +282,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     onPressed: () => context.pop(),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                        color: AppTheme.accentBlue.withValues(alpha: 0.3),
+                        color: ThemeV2.primary.withValues(alpha: 0.3),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -292,7 +293,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.accentBlue,
+                        color: ThemeV2.primary,
                       ),
                     ),
                   ),
@@ -305,3 +306,4 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     );
   }
 }
+

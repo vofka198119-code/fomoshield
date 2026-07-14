@@ -10,7 +10,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../stress_test_engine.dart';
@@ -184,7 +185,7 @@ class _StressTestSearchSheetState
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -208,7 +209,7 @@ class _StressTestSearchSheetState
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.textPrimary,
+                color: ThemeV2.textPrimary,
               ),
             ),
           ),
@@ -224,10 +225,10 @@ class _StressTestSearchSheetState
                   hintText: 'Search company (e.g. Apple, Cola)...',
                   hintStyle: GoogleFonts.inter(
                     fontSize: 14,
-                    color: AppTheme.textDim,
+                    color: ThemeV2.textSecondary,
                   ),
                   prefixIcon: const Icon(Icons.search_rounded,
-                      color: AppTheme.textDim),
+                      color: ThemeV2.textSecondary),
                   suffixIcon: _isLoading
                       ? const Padding(
                           padding: EdgeInsets.all(12),
@@ -236,14 +237,14 @@ class _StressTestSearchSheetState
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: AppTheme.accentBlue,
+                              color: ThemeV2.primary,
                             ),
                           ),
                         )
                       : (_searchController.text.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear_rounded,
-                                  size: 20, color: AppTheme.textDim),
+                                  size: 20, color: ThemeV2.textSecondary),
                               onPressed: () {
                                 _searchController.clear();
                                 setState(() {
@@ -254,7 +255,7 @@ class _StressTestSearchSheetState
                             )
                           : null),
                   filled: true,
-                  fillColor: AppTheme.stressBg,
+                  fillColor: ThemeV2.surface,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none,
@@ -263,7 +264,7 @@ class _StressTestSearchSheetState
                 ),
                 style: GoogleFonts.inter(
                   fontSize: 15,
-                  color: AppTheme.textPrimary,
+                  color: ThemeV2.textPrimary,
                 ),
               ),
             ),
@@ -276,7 +277,7 @@ class _StressTestSearchSheetState
                   _errorMessage!,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: AppTheme.dangerRed,
+                    color: ThemeV2.loss,
                   ),
                 ),
               ),
@@ -291,7 +292,7 @@ class _StressTestSearchSheetState
                             : 'No results found',
                         style: GoogleFonts.inter(
                           fontSize: 14,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                         ),
                       ),
                     )
@@ -323,14 +324,14 @@ class _StressTestSearchSheetState
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: AppTheme.textPrimary,
+                              color: ThemeV2.textPrimary,
                             ),
                           ),
                           subtitle: Text(
                             desc,
                             style: GoogleFonts.inter(
                               fontSize: 12,
-                              color: AppTheme.textDim,
+                              color: ThemeV2.textSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -339,7 +340,7 @@ class _StressTestSearchSheetState
                             type,
                             style: GoogleFonts.inter(
                               fontSize: 11,
-                              color: AppTheme.textDim,
+                              color: ThemeV2.textSecondary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -373,14 +374,14 @@ class _StressTestSearchSheetState
                               style: GoogleFonts.inter(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
-                                color: AppTheme.textPrimary,
+                                color: ThemeV2.textPrimary,
                               ),
                             ),
                             Text(
                               _selectedDescription,
                               style: GoogleFonts.inter(
                                 fontSize: 13,
-                                color: AppTheme.textDim,
+                                color: ThemeV2.textSecondary,
                               ),
                             ),
                           ],
@@ -394,7 +395,7 @@ class _StressTestSearchSheetState
                       'Current price: \$${_selectedPrice.toStringAsFixed(2)}',
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -405,7 +406,7 @@ class _StressTestSearchSheetState
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: ThemeV2.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -419,16 +420,16 @@ class _StressTestSearchSheetState
                         prefixStyle: GoogleFonts.inter(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary,
+                          color: ThemeV2.textPrimary,
                         ),
                         hintText: '500',
                         hintStyle: GoogleFonts.inter(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                         ),
                         filled: true,
-                        fillColor: AppTheme.stressBg,
+                        fillColor: ThemeV2.surface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide.none,
@@ -439,7 +440,7 @@ class _StressTestSearchSheetState
                       style: GoogleFonts.inter(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
+                        color: ThemeV2.textPrimary,
                       ),
                       onChanged: (v) {
                         _amount = double.tryParse(v.replaceAll('\$', '')) ?? 0;
@@ -460,12 +461,12 @@ class _StressTestSearchSheetState
                               fontWeight: FontWeight.w600,
                               color: selected
                                   ? Colors.white
-                                  : AppTheme.textPrimary,
+                                  : ThemeV2.textPrimary,
                             ),
                           ),
                           selected: selected,
-                          selectedColor: AppTheme.accentBlue,
-                          backgroundColor: AppTheme.stressBg,
+                          selectedColor: ThemeV2.primary,
+                          backgroundColor: ThemeV2.surface,
                           onSelected: (_) =>
                               setState(() => _amount = v.toDouble()),
                           shape: RoundedRectangleBorder(
@@ -485,7 +486,7 @@ class _StressTestSearchSheetState
                           _errorMessage!,
                           style: GoogleFonts.inter(
                             fontSize: 13,
-                            color: AppTheme.dangerRed,
+                            color: ThemeV2.loss,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -499,10 +500,10 @@ class _StressTestSearchSheetState
                         onPressed:
                             _isLoading || _amount <= 0 ? null : _confirmPurchase,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.accentBlue,
+                          backgroundColor: ThemeV2.primary,
                           foregroundColor: Colors.white,
                           disabledBackgroundColor:
-                              AppTheme.accentBlue.withValues(alpha: 0.4),
+                              ThemeV2.primary.withValues(alpha: 0.4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -542,7 +543,7 @@ class _StressTestSearchSheetState
                         'Choose another company',
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -557,3 +558,4 @@ class _StressTestSearchSheetState
     );
   }
 }
+

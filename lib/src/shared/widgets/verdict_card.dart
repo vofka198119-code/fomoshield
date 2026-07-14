@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
 import 'card_frame.dart';
@@ -93,7 +93,7 @@ class VerdictCard extends StatelessWidget {
                       verdict.description,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppTheme.textSecondary,
+                        color: ThemeV2.textSecondary,
                         height: 1.4,
                       ),
                       maxLines: 2,
@@ -112,17 +112,17 @@ class VerdictCard extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppTheme.shieldYellow.withValues(alpha: 0.1),
+              color: ThemeV2.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppTheme.shieldYellow.withValues(alpha: 0.3),
+                color: ThemeV2.warning.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.shield_rounded,
-                  color: AppTheme.shieldYellow,
+                  color: ThemeV2.warning,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -131,7 +131,7 @@ class VerdictCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.shieldYellow,
+                    color: ThemeV2.warning,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -152,8 +152,8 @@ class VerdictCard extends StatelessWidget {
                 'P&L',
                 '${entry.pnlPercent >= 0 ? '+' : ''}${entry.pnlPercent.toStringAsFixed(1)}%',
                 valueColor: entry.pnlPercent >= 0
-                    ? AppTheme.shieldGreen
-                    : AppTheme.dangerRed,
+                    ? ThemeV2.success
+                    : ThemeV2.loss,
               ),
             ],
           ),
@@ -168,7 +168,7 @@ class VerdictCard extends StatelessWidget {
                 Icon(
                   Icons.warning_amber_rounded,
                   size: 14,
-                  color: AppTheme.shieldYellow,
+                  color: ThemeV2.warning,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
@@ -177,7 +177,7 @@ class VerdictCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: AppTheme.shieldYellow,
+                      color: ThemeV2.warning,
                     ),
                   ),
                 ),
@@ -203,9 +203,9 @@ class VerdictCard extends StatelessWidget {
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppTheme.accentBlue,
+                foregroundColor: ThemeV2.primary,
                 side: BorderSide(
-                  color: AppTheme.accentBlue.withValues(alpha: 0.4),
+                  color: ThemeV2.primary.withValues(alpha: 0.4),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(
@@ -229,7 +229,7 @@ class VerdictCard extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: AppTheme.textDim,
+            color: ThemeV2.textSecondary,
           ),
         ),
         Text(
@@ -237,7 +237,7 @@ class VerdictCard extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: valueColor ?? AppTheme.textPrimary,
+            color: valueColor ?? ThemeV2.textPrimary,
           ),
         ),
       ],
@@ -245,16 +245,16 @@ class VerdictCard extends StatelessWidget {
   }
 
   Color _fsColor(int score) {
-    if (score >= 70) return AppTheme.shieldGreen;
-    if (score >= 40) return AppTheme.shieldYellow;
-    return AppTheme.dangerRed;
+    if (score >= 70) return ThemeV2.success;
+    if (score >= 40) return ThemeV2.warning;
+    return ThemeV2.loss;
   }
 
   Color _verdictColor(VerdictType type) => switch (type) {
-    VerdictType.panic => AppTheme.dangerRed,
-    VerdictType.fomo => AppTheme.shieldYellow,
-    VerdictType.activeTrader => AppTheme.accentBlue,
-    VerdictType.buffettShield => AppTheme.shieldGreen,
+    VerdictType.panic => ThemeV2.loss,
+    VerdictType.fomo => ThemeV2.warning,
+    VerdictType.activeTrader => ThemeV2.primary,
+    VerdictType.buffettShield => ThemeV2.success,
   };
 
   IconData _verdictIcon(VerdictType type) => switch (type) {
@@ -264,3 +264,4 @@ class VerdictCard extends StatelessWidget {
     VerdictType.buffettShield => Icons.shield_rounded,
   };
 }
+

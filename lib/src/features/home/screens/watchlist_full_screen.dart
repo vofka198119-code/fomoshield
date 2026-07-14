@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../home_providers.dart';
 
@@ -36,18 +37,20 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: Text(
-          'Watchlist',
+          'WATCHLIST',
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppTheme.accentBlue,
+            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_rounded, color: AppTheme.accentBlue),
+            icon: const Icon(Icons.add_rounded, color: ThemeV2.primary),
             tooltip: 'Add company',
             onPressed: _isNavigating ? null : _navigateToSearch,
           ),
@@ -59,7 +62,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
               loading: () => const Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                 ),
               ),
               error: (err, _) {
@@ -72,7 +75,8 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                   itemCount: companies.length,
                   itemBuilder: (_, i) {
-                    final symbol = companies[i]['symbol'] as String? ?? 'unknown';
+                    final symbol =
+                        companies[i]['symbol'] as String? ?? 'unknown';
                     return Padding(
                       key: ValueKey(symbol),
                       padding: const EdgeInsets.only(bottom: 8),
@@ -92,7 +96,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
         children: [
           Icon(
             Icons.visibility_off_rounded,
-            color: AppTheme.textDim,
+            color: ThemeV2.textSecondary,
             size: 48,
           ),
           const SizedBox(height: 12),
@@ -101,7 +105,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
+              color: ThemeV2.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -109,7 +113,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
             'Tap + to search and add companies',
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
             ),
           ),
           const SizedBox(height: 24),
@@ -185,7 +189,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       clipBehavior: Clip.antiAlias,
@@ -209,7 +213,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppTheme.textPrimary,
+                            color: ThemeV2.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 1),
@@ -217,7 +221,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                           symbol,
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                           ),
                         ),
                       ],
@@ -231,16 +235,14 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
+                          color: ThemeV2.textPrimary,
                         ),
                       ),
                       Text(
                         '${change >= 0 ? '+' : ''}${change.toStringAsFixed(2)}%',
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: change >= 0
-                              ? AppTheme.shieldGreen
-                              : AppTheme.shieldRed,
+                          color: change >= 0 ? ThemeV2.success : ThemeV2.loss,
                         ),
                       ),
                     ],
@@ -251,7 +253,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                     duration: const Duration(milliseconds: 300),
                     child: const Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: AppTheme.textDim,
+                      color: ThemeV2.textSecondary,
                       size: 20,
                     ),
                   ),
@@ -279,7 +281,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: AppTheme.accentBlue.withAlpha(25),
+                                color: ThemeV2.primary.withAlpha(25),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -287,7 +289,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: AppTheme.accentBlue,
+                                  color: ThemeV2.primary,
                                 ),
                               ),
                             ),
@@ -297,7 +299,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                           'No description available.',
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                           ),
                         ),
                   const SizedBox(height: 12),
@@ -315,9 +317,9 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                         style: GoogleFonts.inter(fontSize: 13),
                       ),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.accentBlue,
+                        foregroundColor: ThemeV2.primary,
                         side: const BorderSide(
-                          color: AppTheme.accentBlue,
+                          color: ThemeV2.primary,
                           width: 0.5,
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 10),

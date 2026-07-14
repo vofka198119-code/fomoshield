@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../stress_test/stress_test_models.dart';
@@ -75,7 +76,7 @@ class AssetRowWidget extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: ThemeV2.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -83,7 +84,7 @@ class AssetRowWidget extends ConsumerWidget {
                     '${holding.symbol} · ${allocation.toStringAsFixed(2)}%',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppTheme.textSecondary,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                 ],
@@ -98,7 +99,7 @@ class AssetRowWidget extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
+                    color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -108,8 +109,8 @@ class AssetRowWidget extends ConsumerWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: isPositive
-                        ? AppTheme.shieldGreen
-                        : AppTheme.dangerRed,
+                        ? ThemeV2.success
+                        : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -117,7 +118,7 @@ class AssetRowWidget extends ConsumerWidget {
             const SizedBox(width: 4),
             const Icon(
               Icons.chevron_right_rounded,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               size: 20,
             ),
           ],
@@ -199,3 +200,4 @@ class AssetRowWidget extends ConsumerWidget {
     return names[symbol] ?? symbol;
   }
 }
+

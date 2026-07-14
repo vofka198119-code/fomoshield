@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../home_providers.dart';
 
@@ -29,7 +30,7 @@ class UpcomingEventsWidget extends ConsumerWidget {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppTheme.accentBlue,
+                  color: ThemeV2.primary,
                 ),
               ),
               SizedBox(width: 12),
@@ -37,7 +38,7 @@ class UpcomingEventsWidget extends ConsumerWidget {
                 'Loading events...',
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                 ),
               ),
             ],
@@ -106,7 +107,7 @@ class _EventTile extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: (isEarnings ? AppTheme.accentBlue : AppTheme.shieldGreen)
+                color: (isEarnings ? ThemeV2.primary : ThemeV2.success)
                     .withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -116,8 +117,8 @@ class _EventTile extends StatelessWidget {
                     : Icons.payments_rounded,
                 size: 18,
                 color: isEarnings
-                    ? AppTheme.accentBlue
-                    : AppTheme.shieldGreen,
+                    ? ThemeV2.primary
+                    : ThemeV2.success,
               ),
             ),
             const SizedBox(width: 12),
@@ -133,7 +134,7 @@ class _EventTile extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary,
+                          color: ThemeV2.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -142,7 +143,7 @@ class _EventTile extends StatelessWidget {
                           event.title,
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: AppTheme.textDim,
+                            color: ThemeV2.textSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -156,7 +157,7 @@ class _EventTile extends StatelessWidget {
                         DateFormat('MMM d, yyyy').format(event.date),
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: AppTheme.textDim,
+                          color: ThemeV2.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -174,7 +175,7 @@ class _EventTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: (isEarnings ? AppTheme.accentBlue : AppTheme.shieldGreen)
+                color: (isEarnings ? ThemeV2.primary : ThemeV2.success)
                     .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
@@ -184,8 +185,8 @@ class _EventTile extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   color: isEarnings
-                      ? AppTheme.accentBlue
-                      : AppTheme.shieldGreen,
+                      ? ThemeV2.primary
+                      : ThemeV2.success,
                 ),
               ),
             ),
@@ -213,19 +214,19 @@ class _HourBadge extends StatelessWidget {
     switch (hour) {
       case 'bmo':
         label = 'BMO';
-        color = AppTheme.accentBlue;
+        color = ThemeV2.primary;
         icon = Icons.wb_sunny_rounded;
       case 'amc':
         label = 'AMC';
-        color = AppTheme.shieldYellow;
+        color = ThemeV2.warning;
         icon = Icons.nights_stay_rounded;
       case 'dmh':
         label = 'DMH';
-        color = AppTheme.shieldGreen;
+        color = ThemeV2.success;
         icon = Icons.business_center_rounded;
       default:
         label = hour.toUpperCase();
-        color = AppTheme.textDim;
+        color = ThemeV2.textSecondary;
         icon = Icons.schedule_rounded;
     }
 
@@ -253,5 +254,6 @@ class _HourBadge extends StatelessWidget {
     );
   }
 }
+
 
 

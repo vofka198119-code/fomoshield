@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 
 // ---------------------------------------------------------------------------
 // CompanyLogo — Cached logo with CircleAvatar letter fallback
@@ -63,7 +63,7 @@ class CompanyLogo extends StatelessWidget {
         imageUrl: url,
         imageBuilder: (context, imageProvider) => CircleAvatar(
           radius: radius,
-          backgroundColor: AppTheme.cardDark,
+          backgroundColor: ThemeV2.surfaceDark,
           backgroundImage: imageProvider,
         ),
         placeholder: (context, url) => _buildPlaceholder(initial),
@@ -79,11 +79,11 @@ class CompanyLogo extends StatelessWidget {
   Widget _buildPlaceholder(String initial) {
     return CircleAvatar(
       radius: radius,
-      backgroundColor: AppTheme.cardDark,
+      backgroundColor: ThemeV2.surfaceDark,
       child: Text(
         initial,
         style: GoogleFonts.inter(
-          color: AppTheme.accentBlue,
+          color: ThemeV2.primary,
           fontWeight: FontWeight.w700,
           fontSize: radius > 16 ? 14 : 12,
         ),
@@ -91,3 +91,5 @@ class CompanyLogo extends StatelessWidget {
     );
   }
 }
+
+

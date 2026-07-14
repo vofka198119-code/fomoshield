@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_theme.dart';
+import 'theme_v2.dart';
 import 'typography_helpers.dart';
 
 /// Design Tokens for FOMO Shield Dashboard.
@@ -223,7 +224,7 @@ abstract final class FomoShieldTheme {
         fontSize: 13,
         fontWeight: FontWeight.w700,
         letterSpacing: 1.2,
-        color: color ?? AppTheme.accentBlue,
+        color: color ?? ThemeV2.primary,
       );
 
   /// Portfolio value: 42px, w800, -2px letter-spacing.
@@ -474,3 +475,4 @@ abstract final class FomoShieldTheme {
         boxShadow: shadowSoft,
       );
 }
+

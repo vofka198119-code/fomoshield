@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
+import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_client.dart';
 
 import 'disclaimer_providers.dart';
@@ -59,7 +60,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
       body: SafeArea(
         child: geoAsync.when(
           loading: () => const Center(
-            child: CircularProgressIndicator(color: AppTheme.accentBlue),
+            child: CircularProgressIndicator(color: ThemeV2.primary),
           ),
           error: (_, _) => _buildContent(isBlocked: false),
           data: (geo) => _buildContent(isBlocked: geo.isBlocked, reason: geo.reason),
@@ -76,9 +77,9 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
           child: Column(
             children: [
-              const Icon(Icons.info_outline_rounded, color: AppTheme.accentBlue, size: 40),
+              const Icon(Icons.info_outline_rounded, color: ThemeV2.primary, size: 40),
               const SizedBox(height: 12),
-              Text('Disclaimer', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+              Text('Disclaimer', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: ThemeV2.textPrimary)),
             ],
           ),
         ),
@@ -90,22 +91,22 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.gpp_bad_rounded, color: AppTheme.dangerRed, size: 64),
+                  const Icon(Icons.gpp_bad_rounded, color: ThemeV2.loss, size: 64),
                   const SizedBox(height: 24),
                   Text(
                     reason ?? 'Access Restricted',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(fontSize: 16, color: AppTheme.textDim, height: 1.5),
+                    style: GoogleFonts.inter(fontSize: 16, color: ThemeV2.textSecondary, height: 1.5),
                   ),
                   const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity, height: 52,
                     child: ElevatedButton(
                       onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('The app will now close'), backgroundColor: AppTheme.dangerRed),
+                        const SnackBar(content: Text('The app will now close'), backgroundColor: ThemeV2.loss),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.dangerRed, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        backgroundColor: ThemeV2.loss, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text('Close App', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600)),
                     ),
@@ -180,9 +181,9 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                         child: Checkbox(
                           value: _isChecked,
                           onChanged: (val) => setState(() => _isChecked = val ?? false),
-                          activeColor: AppTheme.accentBlue,
+                          activeColor: ThemeV2.primary,
                           checkColor: Colors.white,
-                          side: const BorderSide(color: AppTheme.textDim),
+                          side: const BorderSide(color: ThemeV2.textSecondary),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                         ),
                       ),
@@ -191,7 +192,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                     Expanded(
                       child: RichText(
                         text: TextSpan(
-                          style: GoogleFonts.inter(fontSize: 12, color: AppTheme.textDim, height: 1.5),
+                          style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary, height: 1.5),
                           children: [
                             const TextSpan(text: 'I confirm that I am at least 18 years old, '
                                 'I am not located in Russia or Belarus, and I fully accept '
@@ -204,12 +205,12 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     border: Border(
-                                      bottom: BorderSide(color: AppTheme.accentBlue, width: 0.5),
+                                      bottom: BorderSide(color: ThemeV2.primary, width: 0.5),
                                     ),
                                   ),
                                   child: Text(
                                     'Terms of Service',
-                                    style: GoogleFonts.inter(fontSize: 12, color: AppTheme.accentBlue, height: 1.0),
+                                    style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.primary, height: 1.0),
                                   ),
                                 ),
                               ),
@@ -223,12 +224,12 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     border: Border(
-                                      bottom: BorderSide(color: AppTheme.accentBlue, width: 0.5),
+                                      bottom: BorderSide(color: ThemeV2.primary, width: 0.5),
                                     ),
                                   ),
                                   child: Text(
                                     'Privacy Policy',
-                                    style: GoogleFonts.inter(fontSize: 12, color: AppTheme.accentBlue, height: 1.0),
+                                    style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.primary, height: 1.0),
                                   ),
                                 ),
                               ),
@@ -246,10 +247,10 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                   child: ElevatedButton(
                     onPressed: _isChecked ? _handleAccept : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _isChecked ? AppTheme.accentBlue : AppTheme.card,
+                      backgroundColor: _isChecked ? ThemeV2.primary : ThemeV2.surface,
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: AppTheme.card,
-                      disabledForegroundColor: AppTheme.textDim,
+                      disabledBackgroundColor: ThemeV2.surface,
+                      disabledForegroundColor: ThemeV2.textSecondary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                     child: Text('I Accept', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600)),
@@ -266,12 +267,13 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.accentBlue)),
+        Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: ThemeV2.primary)),
         const SizedBox(height: 8),
-        Text(body, style: GoogleFonts.inter(fontSize: 13, color: AppTheme.textDim, height: 1.6)),
+        Text(body, style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary, height: 1.6)),
       ],
     );
   }
 }
+
 
 

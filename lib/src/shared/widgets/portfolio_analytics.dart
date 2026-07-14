@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
 
@@ -55,7 +55,7 @@ class PortfolioAnalytics extends StatelessWidget {
                       Icons.account_balance_wallet_rounded,
                       'Total Value',
                       '\$${_fmt(totalValue)}',
-                      AppTheme.accentBlue,
+                      ThemeV2.primary,
                     ),
                     const SizedBox(height: 10),
                     _metricRow(
@@ -65,8 +65,8 @@ class PortfolioAnalytics extends StatelessWidget {
                       'P&L',
                       '${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(1)}%',
                       isPositive
-                          ? AppTheme.shieldGreen
-                          : AppTheme.dangerRed,
+                          ? ThemeV2.success
+                          : ThemeV2.loss,
                     ),
                   ],
                 ),
@@ -79,14 +79,14 @@ class PortfolioAnalytics extends StatelessWidget {
                       Icons.percent_rounded,
                       'Holdings',
                       '$holdingCount',
-                      AppTheme.shieldYellow,
+                      ThemeV2.warning,
                     ),
                     const SizedBox(height: 10),
                     _metricRow(
                       Icons.monetization_on_rounded,
                       'Cash',
                       '\$${_fmt(cash)}',
-                      AppTheme.textDim,
+                      ThemeV2.textSecondary,
                     ),
                   ],
                 ),
@@ -112,9 +112,9 @@ class PortfolioAnalytics extends StatelessWidget {
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppTheme.accentBlue,
+                foregroundColor: ThemeV2.primary,
                 side: BorderSide(
-                  color: AppTheme.accentBlue.withValues(alpha: 0.4),
+                  color: ThemeV2.primary.withValues(alpha: 0.4),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(
@@ -131,10 +131,10 @@ class PortfolioAnalytics extends StatelessWidget {
   /// Mini FS Score ring (56px).
   Widget _buildMiniFsScore(int score) {
     final color = score >= 70
-        ? AppTheme.shieldGreen
+        ? ThemeV2.success
         : score >= 40
-            ? AppTheme.shieldYellow
-            : AppTheme.dangerRed;
+            ? ThemeV2.warning
+            : ThemeV2.loss;
 
     return Container(
       width: 64,
@@ -166,7 +166,7 @@ class PortfolioAnalytics extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 8,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textDim,
+              color: ThemeV2.textSecondary,
               letterSpacing: 0.8,
               height: 1.0,
             ),
@@ -190,7 +190,7 @@ class PortfolioAnalytics extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.textDim,
+                  color: ThemeV2.textSecondary,
                   letterSpacing: 0.3,
                 ),
                 maxLines: 1,
@@ -218,3 +218,4 @@ class PortfolioAnalytics extends StatelessWidget {
     return NumberFormat('#,##0.00', 'en_US').format(v);
   }
 }
+

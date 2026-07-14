@@ -27,7 +27,7 @@ import '../../features/assets/screens/assets_screen.dart';
 import '../../features/assets/screens/stock_detail_screen.dart';
 import '../../features/assets/screens/why_today_screen.dart';
 import '../../features/assets/screens/order_entry_screen.dart';
-import '../theme/app_theme.dart';
+import '../theme/theme_v2.dart';
 
 class AppRouter {
   AppRouter._();
@@ -261,6 +261,7 @@ class _AppShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       extendBody: true,
       body: child,
       bottomNavigationBar: ClipRRect(
@@ -269,7 +270,7 @@ class _AppShell extends ConsumerWidget {
           filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
           child: Container(
             decoration: BoxDecoration(
-              color: AppTheme.card.withValues(alpha: 0.75),
+              color: ThemeV2.surface.withValues(alpha: 0.75),
               border: Border(
                 top: BorderSide(
                   color: Colors.black.withValues(alpha: 0.06),
@@ -327,3 +328,4 @@ class _AppShell extends ConsumerWidget {
     );
   }
 }
+

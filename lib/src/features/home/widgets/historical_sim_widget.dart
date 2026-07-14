@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 
 // ---------------------------------------------------------------------------
@@ -30,12 +31,12 @@ class HistoricalSimWidget extends ConsumerWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppTheme.premiumGreen.withValues(alpha: 0.15),
+                  color: ThemeV2.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.query_stats_rounded,
-                  color: AppTheme.premiumGreen,
+                  color: ThemeV2.primary,
                   size: 22,
                 ),
               ),
@@ -49,7 +50,7 @@ class HistoricalSimWidget extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: ThemeV2.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -57,7 +58,7 @@ class HistoricalSimWidget extends ConsumerWidget {
                       'See how your portfolio would have performed historically',
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: AppTheme.textDim,
+                        color: ThemeV2.textSecondary,
                       ),
                     ),
                   ],
@@ -70,3 +71,4 @@ class HistoricalSimWidget extends ConsumerWidget {
     );
   }
 }
+
