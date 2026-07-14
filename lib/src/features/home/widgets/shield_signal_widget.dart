@@ -62,7 +62,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
         spyChange: 0,
         spyPrice: 0,
       ),
-      error: (_, __) => _buildCard(
+      error: (_, _) => _buildCard(
         level: 'neutral',
         label: 'Unable to load signal',
         spyChange: 0,
@@ -96,7 +96,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: signalBg,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(color: signalColor.withValues(alpha: 0.3)),
         ),
         child: Column(
@@ -127,11 +127,12 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Shield Signal',
+                      Text('SHIELD SIGNAL',
                           style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white)),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.accentBlue,
+                              letterSpacing: 1.2)),
                       const SizedBox(height: 4),
                       Text(label,
                           style: GoogleFonts.inter(
@@ -181,7 +182,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                     style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white70)),
+                        color: AppTheme.textSecondary)),
                 Text(
                     '${spyChange >= 0 ? '+' : ''}${spyChange.toStringAsFixed(2)}% today',
                     style: GoogleFonts.inter(
@@ -195,14 +196,14 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
             // Expandable details
             SizeTransition(
               sizeFactor: _heightFactor,
-              axisAlignment: -1.0,
+              alignment: Alignment.topCenter,
               child: Padding(
                 padding: const EdgeInsets.only(top: 16),
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppTheme.cardDark.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(22),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +213,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget>
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),

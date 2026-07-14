@@ -301,15 +301,16 @@ class _PriceChartState extends State<PriceChart> {
         lineBarsData: [
           LineChartBarData(
             spots: spots,
-            isCurved: true,
-            preventCurveOverShooting: true,
+            isCurved: false,
             color: lineColor,
-            barWidth: 2,
+            barWidth: 2.5,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
-              color: lineColor.withValues(alpha: 0.08),
+              color: lineColor.withValues(alpha: 0.20),
+              cutOffY: chartMinY,
+              applyCutOffY: true,
             ),
           ),
         ],

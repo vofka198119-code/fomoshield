@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
+import 'card_frame.dart';
 
 // ---------------------------------------------------------------------------
 // Widget Container — Card wrapper in Revolut style
@@ -29,12 +30,8 @@ class WidgetContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.card,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      clipBehavior: Clip.antiAlias,
+    return CardFrame(
+      showTopBar: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -42,7 +39,7 @@ class WidgetContainer extends StatelessWidget {
           InkWell(
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+              padding: const EdgeInsets.all(22),
               child: Row(
                 children: [
                   Text(
@@ -50,7 +47,7 @@ class WidgetContainer extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textDim,
+                    color: AppTheme.accentBlue,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -73,7 +70,7 @@ class WidgetContainer extends StatelessWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.06),
+                  color: Colors.black.withValues(alpha: 0.06),
                 );
               }
               return children[i ~/ 2];
@@ -86,7 +83,7 @@ class WidgetContainer extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                   ),
                 ),
               ),

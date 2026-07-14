@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/app_theme.dart';
+import 'src/core/theme/theme_v2.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,7 @@ void main() async {
 
   await Supabase.initialize(
     url: SupabaseConfig.projectUrl,
-    anonKey: SupabaseConfig.anonKey,
+    publishableKey: SupabaseConfig.anonKey,
   );
 
   runApp(const ProviderScope(child: ScanCoApp()));
@@ -39,8 +40,19 @@ class ScanCoApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'F.O.M.O. Shield',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: ThemeV2.lightTheme,
       routerConfig: AppRouter.router,
+      builder: (context, child) {
+        return Container(
+          decoration: const BoxDecoration(gradient: ThemeV2.backgroundGradient),
+          child: Center(
+            child: SizedBox(
+              width: 430,
+              child: child ?? const SizedBox.shrink(),
+            ),
+          ),
+        );
+      },
     );
   }
 }

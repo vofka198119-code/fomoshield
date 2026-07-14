@@ -1,0 +1,218 @@
+﻿00:00 +0: loading d:/Projects/scanco/test/services/stress_test_engine_test.dart
+00:00 +0: 1. Session Creation & Limits 1.1 Create session in setup mode
+00:00 +1: 1. Session Creation & Limits 1.2 Can create session respects limits
+00:00 +2: 1. Session Creation & Limits 1.3 Delete session
+00:00 +3: 1. Session Creation & Limits 1.4 Delete all sessions
+00:00 +4: 2. Asset Setup Phase 2.1 Buy asset during setup
+00:00 +5: 2. Asset Setup Phase 2.2 Cannot exceed cash during setup
+00:00 +6: 2. Asset Setup Phase 2.3 Remove asset during setup
+00:00 +7: 3. Epoch Generation & Scenario Distribution 3.1 Generate epochs for 1W (14 epochs = 2 per day ├Ч 7 days)
+00:00 +8: 3. Epoch Generation & Scenario Distribution 3.2 Generate epochs for Infinite (780 epochs)
+00:00 +9: 3. Epoch Generation & Scenario Distribution 3.2 Scenario distribution over epochs
+
+тХРтХРтХР SCENARIO DISTRIBUTION (200 epochs) тХРтХРтХР
+  bull              :  71 ep. (35.5%) [wt: 35.0]
+  sideways          :  37 ep. (18.5%) [wt: 18.0]
+  bear              :  37 ep. (18.5%) [wt: 18.0]
+  volatility        :  28 ep. (14.0%) [wt: 15.0]
+  recovery          :  15 ep. (7.5%) [wt: 7.0]
+  hype              :   0 ep. (0.0%) [wt: 8.0]
+  speculation       :   0 ep. (0.0%) [wt: 8.0]
+  blackSwan         :   7 ep. (3.5%) [wt: 3.5]
+  crash             :   5 ep. (2.5%) [wt: 3.5]
+00:00 +10: 4. Price Simulation & Sector Behavior 4.1 Prices move from entry values
+[FOMO-DT] dt=0.005  sqrt(dt)=0.070711  drift├Чdt=0.000000  vol├ЧтИЪdt=0.004243  (╬╝,╧Г)=(0.0000,0.0600) sector=techSpeculative  regime=sideways
+
+тХРтХРтХР PRICE MOVEMENT тХРтХРтХР
+  AAPL: $150.0 тЗТ $168.08
+  KO: $60.0 тЗТ $60.07
+  XOM: $100.0 тЗТ $100.31
+00:00 +11: 4. Price Simulation & Sector Behavior 4.2 Sector divergence across 6 sectors
+
+тХРтХРтХР SECTOR PERFORMANCE (scenario: sideways) тХРтХРтХР
+  TSLA  +0.37%
+  JPM   +30.00%
+  KO    -0.10%
+  XOM   +30.00%
+  PLD   +30.00%
+  JNJ   +0.08%
+00:00 +12: 4. Price Simulation & Sector Behavior 4.3 KO (staples) within ┬▒30% first 10 moves
+
+тХРтХРтХР KO STABILITY тХРтХРтХР
+  Entry: $60.00 тЗТ $60.54 (|╬Ф|=0.91%)
+00:00 +13: 5. Trading During Active Test 5.1 Buy trade updates cash and holdings
+00:00 +14: 5. Trading During Active Test 5.2 Sell trade reduces shares
+00:00 +15: 5. Trading During Active Test 5.3 Insufficient shares rejected
+00:00 +16: 5. Trading During Active Test 5.4 Insufficient cash rejected
+00:00 +17: 6. IPO System (CompanyStock autonomous lifecycle) 6.1 No IPO in non-Infinite modes
+00:00 +18: 6. IPO System (CompanyStock autonomous lifecycle) 6.2 IPO triggers ~3% in Infinite
+
+тХРтХРтХР IPO TRIGGER RATE тХРтХРтХР
+  Trials: 500, IPOs: 14 (2.8000000000000003%)   [expected ~3%]
+00:01 +19: 6. IPO System (CompanyStock autonomous lifecycle) 6.3 IPO lifecycle when triggered
+
+тХРтХРтХР IPO LIFECYCLE тХРтХРтХР
+  Step 0: NEXO (NexoSpace Industries)
+    Phase: shakeout
+    Age: 0 weeks
+    Current:  $60.04
+00:01 +20: 7. Test Completion & Verdict 7.1 Archive exists after test
+00:01 +21: 7. Test Completion & Verdict 7.2 Terminate infinite mode
+  Terminated тАФ Verdict: FOMO тАФ Momentum Chaser
+00:01 +22: 7. Test Completion & Verdict 7.3 Various verdict types
+
+тХРтХРтХР VERDICT EXAMPLES тХРтХРтХР
+  Trader (20 trades): BUFFETT SHIELD тАФ Disciplined Investor тАФ FS: 65
+  Minimal (3 trades):  BALANCED тАФ Developing Investor тАФ FS: 50
+00:01 +23: 8. Pre/Post Market Effects 8.1 Prices stay in clamp range
+
+тХРтХРтХР PRE/POST MARKET тХРтХРтХР
+  AAPL clamped: $161.01  [min=45.0, max=450.0]
+00:01 +24: 9. Comprehensive Market Analysis 9.1 1M duration тАФ all 6 sectors
+
+тХРтХРтХР LONG SIMULATION (1M) тХРтХРтХР
+  Portfolio: $31098.17  P&L: 3.66%
+  AAPL  $150.0 тЗТ $195.00  +30.00%
+  JPM   $65.0 тЗТ $62.27  -4.20%
+  KO    $60.0 тЗТ $59.38  -1.03%
+  XOM   $100.0 тЗТ $98.89  -1.11%
+  JNJ   $160.0 тЗТ $160.72  +0.45%
+  PLD   $120.0 тЗТ $117.43  -2.14%
+00:01 +25: 9. Comprehensive Market Analysis 9.2 KO (stable) vs TSLA (volatile) volatility
+
+тХРтХРтХР VOLATILITY: KO vs TSLA тХРтХРтХР
+  KO (Staples):   avg step 0.112%
+  TSLA (Tech):    avg step 1.843%
+  Ratio: 16.45├Ч  (TSLA should be more volatile)
+00:02 +26: 9. Comprehensive Market Analysis 9.3 Bear market тАФ staples vs tech
+
+тХРтХРтХР BEAR MARKET тХРтХРтХР
+  Bears: 1/1
+  KO    -0.21%
+  AAPL  -0.13%
+00:02 +27: 10. Edge Cases & Stability 10.1 Start with no holdings goes to active
+00:02 +28: 10. Edge Cases & Stability 10.2 Trade on missing session fails
+00:02 +29: 10. Edge Cases & Stability 10.3 Price clamping after 100 refreshes
+
+тХРтХРтХР CLAMP CHECK тХРтХРтХР
+  AAPL after 100 refs: $300.00  [45.0 тАж 450.0]
+00:03 +30: 10. Edge Cases & Stability 10.4 Multiple independent sessions
+
+тХРтХРтХР MULTI-SESSION тХРтХРтХР
+  S1 (1W, KO):   $59.49
+  S2 (1M, AAPL): $149.89
+  S2 (MSFT):     $296.22
+00:03 +31: 11. Per-Stock Price Correction Events 11.1 Sector-dependent price correction events
+
+тХРтХРтХР CORRECTION EVENT CHECK тХРтХРтХР
+  Refreshes: 500
+  AAPL final: $195.00
+  KO final:   $78.00
+00:05 +32: 11. Per-Stock Price Correction Events 11.2 Macro drop magnitudes from scenario drift (crash/blackSwan)
+
+тХРтХРтХР MACRO DROP MAGNITUDE тХРтХРтХР
+  No >6% step drop in 500 refreshes тАФ crash/blackSwan not rolled
+00:08 +33: 11. Per-Stock Price Correction Events 11.3 Correction does not affect other holdings
+
+тХРтХРтХР CORRECTION INDEPENDENCE тХРтХРтХР
+  Max AAPL drop/step: 0.5%
+  Max KO drop/step:   0.2%
+  (Corrections are per-stock, not correlated)
+00:08 +34: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.1 Explanation log is populated after refresh
+
+тХРтХРтХР EXPLAINABLE SIMULATION тХРтХРтХР
+  AAPL entries: 20
+  First: epoch#0 recovery/recovery $150.00 тЖТ $150.10
+00:08 +35: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.2 Contributions sum to 100% (within tolerance)
+
+тХРтХРтХР CONTRIBUTION SUM CHECK тХРтХРтХР
+  Entries checked: 60
+  Within tolerance: 60
+00:08 +36: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.3 MarketPct dominates in stable market
+
+тХРтХРтХР MARKET CONTRIBUTION тХРтХРтХР
+  Avg marketPct: 40.2%
+00:09 +37: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.4 SectorPct differs between tech and defensive sectors
+
+тХРтХРтХР SECTOR CONTRIBUTION COMPARISON тХРтХРтХР
+  AAPL (tech) avg sectorPct: 12.4%
+  KO (consumer) avg sectorPct: 24.1%
+00:09 +38: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.5 Correction event increases newsPct contribution
+
+тХРтХРтХР NEWS CONTRIBUTION (CORRECTION) тХРтХРтХР
+  Max newsPct observed: 98.2%
+00:10 +39: 13. Causal Chain тАФ Scenario тЖТ Phase тЖТ Explanation 13.1 Explanation captures phase and scenario metadata
+
+тХРтХРтХР CAUSAL CHAIN METADATA тХРтХРтХР
+  Phases observed: {volatility}
+  Scenarios observed: {volatility}
+  Total ticks logged: 30
+00:10 +40: 13. Causal Chain тАФ Scenario тЖТ Phase тЖТ Explanation 13.2 PriceBefore and PriceAfter form a sequential chain
+
+тХРтХРтХР PRICE CHAIN INTEGRITY тХРтХРтХР
+  AAPL: 25 ticks, $150.00 тЖТ $158.07
+  MSFT: 25 ticks, $300.00 тЖТ $316.94
+00:10 +41: 13. Causal Chain тАФ Scenario тЖТ Phase тЖТ Explanation 13.3 Scenario phase transitions create distinct patterns
+
+тХРтХРтХР PHASE TRANSITIONS тХРтХРтХР
+  Total ticks: 60
+  Unique phases: {bull}
+  Phase transitions: 0
+00:11 +42: 13. Causal Chain тАФ Scenario тЖТ Phase тЖТ Explanation 13.4 Epoch scenario changes are reflected in explanation metadata
+
+тХРтХРтХР SCENARIO CONSISTENCY тХРтХРтХР
+  Epoch scenarios: {blackSwan}
+  Scenarios in log: {blackSwan}
+  Mismatches: 0
+00:11 +43: 14. Determinism тАФ Seeded Reproducibility 14.1 Same seed тЖТ identical prices across two independent notifiers
+
+тХРтХРтХР DETERMINISM CHECK тХРтХРтХР
+  Seed: 42, Ticks: 48
+  Epochs: n1=1, n2=1
+  AAPL : n1=$165.9826 n2=$165.9826  diff=0.00e+0
+  MSFT : n1=$600.0000 n2=$600.0000  diff=0.00e+0
+00:11 +44: 14. Determinism тАФ Seeded Reproducibility 14.2 Different seeds produce different price paths
+
+тХРтХРтХР DIFFERENT SEEDS тХРтХРтХР
+  Seed 42: $152.6334
+  Seed 999: $163.4518
+  Diff: $10.8185
+00:12 +45: 15. Ephemeral Session Wipe on Complete/Delete 15.1 Active session is wiped from state after terminateTest
+  тЬЕ Active session wiped: getSession тЖТ null, state has 0 refs
+00:12 +46: 15. Ephemeral Session Wipe on Complete/Delete 15.2 deleteSession wipes session from state and RNG map
+  тЬЕ deleteSession: state empty, getSession тЖТ null
+00:12 +47: 15. Ephemeral Session Wipe on Complete/Delete 15.3 deleteSession does NOT affect verdict history
+  тЬЕ Verdict history untouched after deleteSession
+00:12 +48: 15. Ephemeral Session Wipe on Complete/Delete 15.4 Active session key is rewritten without completed session
+  тЬЕ active_stress_test_sessions key: no leaked session IDs
+00:12 +49: 16. FIFO Verdict History тАФ 21st Element Rule 16.1 Archive stays at exactly 20 after 22 completions
+
+тХРтХРтХР FIFO VERIFICATION тХРтХРтХР
+  Total completed: 22
+  Archive length: 20 (capped at 20)
+  Evicted: st_1783854271026_4907, st_1783854271026_6536
+  Oldest present: st_1783854271028_4232 (completed 3rd)
+  Newest present: st_1783854271074_6718 (completed 22nd)
+00:12 +50: 16. FIFO Verdict History тАФ 21st Element Rule 16.2 Exactly 20 entries remain after filling to exactly 20
+  тЬЕ 20 entries тАФ exactly at cap, no eviction
+00:12 +51: 16. FIFO Verdict History тАФ 21st Element Rule 16.3 Archive persists across notifier reloads
+  тЬЕ Archive survived full notifier reload
+00:12 +52: 16. FIFO Verdict History тАФ 21st Element Rule 16.4 Verdict entry structure is complete (all fields present)
+
+тХРтХРтХР VERDICT ENTRY STRUCTURE тХРтХРтХР
+  ID: st_1783854271456_2960
+  Duration: Infinite
+  P&L: 0.50%
+  Trades: 3  Holdings: 2
+  Verdict: FOMO тАФ Momentum Chaser (FS: 40)
+00:12 +53: 17. Corruption & Null Safety тАФ Graceful Degradation 17.1 Corrupted verdict JSON does not crash engine
+  тЬЕ Corrupted JSON тЖТ empty list, no crash
+00:12 +54: 17. Corruption & Null Safety тАФ Graceful Degradation 17.2 Corrupted active sessions JSON does not crash engine
+  тЬЕ Corrupted active sessions тЖТ empty state, no crash
+00:13 +55: 17. Corruption & Null Safety тАФ Graceful Degradation 17.3 Missing fields in verdict JSON use safe defaults
+  тЬЕ Missing fields тЖТ empty fallback, no crash
+00:13 +56: 17. Corruption & Null Safety тАФ Graceful Degradation 17.4 Empty string storage key returns clean empty state
+  тЬЕ Empty string storage тЖТ clean empty state
+00:13 +57: 17. Corruption & Null Safety тАФ Graceful Degradation 17.5 Null/missing storage keys default to empty gracefully
+  тЬЕ Fresh user (no keys) тЖТ all defaults empty
+00:13 +58: All tests passed!

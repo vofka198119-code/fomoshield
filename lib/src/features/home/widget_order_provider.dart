@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../shared/services/user_data_service.dart';
+import '../../core/supabase/supabase_providers.dart';
 
 // ---------------------------------------------------------------------------
 // Home Widget Order Provider (SharedPreferences-backed)
@@ -11,16 +13,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ---------------------------------------------------------------------------
 
 const List<String> _defaultOrder = [
+  // Bible Part 2 — Main Screen Sections (in order)
+  'portfolio',
+  'holdings',
+  'analysis',
+  'verdict',
+  // Legacy / utility widgets
   'shield_signal',
   'markets',
-  'portfolio',
+  'stress_test',
   'watchlist',
   'news',
   'upcoming_events',
+  // Premium widgets (hidden by default for FREE, shown with 🔒)
+  'portfolio_journal',
+  'historical_sim',
+  'scenario_compare',
 ];
 
-const String _prefsKey = 'home_widget_order';
-const String _prefsVisibilityKey = 'home_widget_visibility';
+String _prefsKey(String? uid) =>
+    uid != null ? 'home_widget_order_$uid' : 'home_widget_order';
+String _prefsVisibilityKey(String? uid) =>
+    uid != null ? 'home_widget_visibility_$uid' : 'home_widget_visibility';
 
 /// Model representing a home widget's configuration.
 class HomeWidgetConfig {
@@ -41,8 +55,22 @@ class HomeWidgetConfig {
         return 'Upcoming Events';
       case 'news':
         return 'News';
+      case 'stress_test':
+        return 'Stress Test';
       case 'portfolio':
         return 'My Portfolio';
+      case 'holdings':
+        return 'Holdings';
+      case 'analysis':
+        return 'Analysis';
+      case 'verdict':
+        return 'Latest Verdict';
+      case 'portfolio_journal':
+        return 'Portfolio Journal';
+      case 'historical_sim':
+        return 'Historical Simulator';
+      case 'scenario_compare':
+        return 'Scenario Comparison';
       default:
         return id;
     }
@@ -64,19 +92,37 @@ class HomeWidgetConfig {
 // ---------------------------------------------------------------------------
 
 class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
-  HomeWidgetsNotifier() : super([]) {
+  final UserDataService _supabaseService;
+  String? _userId;
+
+  HomeWidgetsNotifier(this._supabaseService, {this._userId})
+      : super([]) {
     _load();
+  }
+
+  /// Set user ID to enable Supabase sync + re-scope local cache.
+  void setUserId(String? uid) {
+    _userId = uid;
+    _load();
+  }
+
+  /// Load widget order from Supabase data (replaces local).
+  void loadFromSupabase(List<HomeWidgetConfig> configs) {
+    if (configs.isEmpty) return;
+    state = configs;
+    _saveLocal();
   }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    final orderKey = _prefsKey(_userId);
+    final visKey = _prefsVisibilityKey(_userId);
 
     // Load order
-    final savedOrder = prefs.getStringList(_prefsKey);
+    final savedOrder = prefs.getStringList(orderKey);
     var order = savedOrder ?? _defaultOrder;
 
     // Merge: append any default widgets missing from saved order
-    // This ensures new widgets appear automatically after updates
     if (savedOrder != null) {
       final savedSet = Set<String>.from(savedOrder);
       final missing = _defaultOrder.where((id) => !savedSet.contains(id));
@@ -86,7 +132,7 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
     }
 
     // Load visibility
-    final savedVisibility = prefs.getString(_prefsVisibilityKey);
+    final savedVisibility = prefs.getString(visKey);
     Map<String, bool> visibilityMap = {};
     if (savedVisibility != null) {
       try {
@@ -107,13 +153,21 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
     }).toList();
   }
 
-  Future<void> _save() async {
+  Future<void> _saveLocal() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_prefsKey, state.map((c) => c.id).toList());
+    await prefs.setStringList(
+        _prefsKey(_userId), state.map((c) => c.id).toList());
     await prefs.setString(
-      _prefsVisibilityKey,
+      _prefsVisibilityKey(_userId),
       state.map((c) => '${c.id}:${c.visible}').join(','),
     );
+  }
+
+  Future<void> _syncToSupabase() async {
+    final uid = _userId;
+    if (uid != null) {
+      await _supabaseService.saveWidgetOrder(uid, state);
+    }
   }
 
   /// Reorder by moving [id] from its current position to [newIndex].
@@ -127,7 +181,8 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
       ..insert(newIndex.clamp(0, state.length - 1), config);
 
     state = newList;
-    await _save();
+    await _saveLocal();
+    _syncToSupabase();
   }
 
   /// Toggle visibility of a widget.
@@ -136,7 +191,8 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
       if (c.id == id) return HomeWidgetConfig(id: c.id, visible: !c.visible);
       return c;
     }).toList();
-    await _save();
+    await _saveLocal();
+    _syncToSupabase();
   }
 
   /// Reset to default order and visibility.
@@ -144,7 +200,8 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
     state = _defaultOrder
         .map((id) => HomeWidgetConfig(id: id, visible: true))
         .toList();
-    await _save();
+    await _saveLocal();
+    _syncToSupabase();
   }
 }
 
@@ -154,5 +211,7 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
 
 final homeWidgetsProvider =
     StateNotifierProvider<HomeWidgetsNotifier, List<HomeWidgetConfig>>((ref) {
-  return HomeWidgetsNotifier();
+  final service = ref.read(userDataServiceProvider);
+  final user = ref.watch(currentUserProvider);
+  return HomeWidgetsNotifier(service, userId: user?.id);
 });

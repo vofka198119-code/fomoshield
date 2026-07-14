@@ -55,13 +55,13 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
     final geoAsync = ref.watch(geoCheckProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: geoAsync.when(
           loading: () => const Center(
             child: CircularProgressIndicator(color: AppTheme.accentBlue),
           ),
-          error: (_, __) => _buildContent(isBlocked: false),
+          error: (_, _) => _buildContent(isBlocked: false),
           data: (geo) => _buildContent(isBlocked: geo.isBlocked, reason: geo.reason),
         ),
       ),
@@ -78,7 +78,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
             children: [
               const Icon(Icons.info_outline_rounded, color: AppTheme.accentBlue, size: 40),
               const SizedBox(height: 12),
-              Text('Disclaimer', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white)),
+              Text('Disclaimer', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
             ],
           ),
         ),
@@ -164,8 +164,8 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
             decoration: BoxDecoration(
-              color: AppTheme.background,
-              border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.06))),
+              color: Colors.transparent,
+              border: Border(top: BorderSide(color: Colors.black.withValues(alpha: 0.06))),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -266,7 +266,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+        Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.accentBlue)),
         const SizedBox(height: 8),
         Text(body, style: GoogleFonts.inter(fontSize: 13, color: AppTheme.textDim, height: 1.6)),
       ],

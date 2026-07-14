@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../core/utils/constants.dart';
+import '../../core/supabase/supabase_providers.dart';
 import '../../shared/services/finnhub_service.dart';
+import '../../shared/services/user_data_service.dart';
 
 // ---------------------------------------------------------------------------
 // Models
@@ -96,9 +98,12 @@ class Portfolio {
             map[t.symbol]!['cost']! + (t.shares * t.price);
       } else {
         map.putIfAbsent(t.symbol, () => {'shares': 0, 'cost': 0});
-        map[t.symbol]!['shares'] = map[t.symbol]!['shares']! - t.shares;
-        map[t.symbol]!['cost'] =
-            map[t.symbol]!['cost']! - (t.shares * t.price);
+        final curShares = map[t.symbol]!['shares']!;
+        final curCost = map[t.symbol]!['cost']!;
+        final avgCost = curShares > 0 ? curCost / curShares : 0;
+        map[t.symbol]!['shares'] = curShares - t.shares;
+        // Reduce cost by avg cost × shares sold (not sell price)
+        map[t.symbol]!['cost'] = curCost - (avgCost * t.shares);
       }
     }
     // Remove zero-share holdings
@@ -139,11 +144,29 @@ class Portfolio {
 // ---------------------------------------------------------------------------
 
 class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
-  PortfolioNotifier() : super([]) {
+  final UserDataService _supabaseService;
+  String? _userId;
+
+  PortfolioNotifier(this._supabaseService, {this._userId})
+      : super([]) {
     _load();
   }
 
-  static const _storageKey = 'portfolios';
+  /// Set user ID to enable Supabase sync + re-scope local cache.
+  void setUserId(String? uid) {
+    _userId = uid;
+    _load();
+  }
+
+  /// Load portfolios from Supabase data (replaces local).
+  void loadFromSupabase(List<Portfolio> portfolios) {
+    if (portfolios.isEmpty) return;
+    state = portfolios;
+    _saveLocal(); // Cache locally
+  }
+
+  String get _storageKey =>
+      _userId != null ? 'portfolios_$_userId' : 'portfolios';
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -161,25 +184,34 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
           name: 'Main Portfolio',
         ),
       ];
-      await _save();
+      await _saveLocal();
     }
   }
 
-  Future<void> _save() async {
+  Future<void> _saveLocal() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = jsonEncode(state.map((p) => p.toJson()).toList());
     await prefs.setString(_storageKey, raw);
   }
 
-  void addPortfolio(String name) {
+  Future<void> _syncToSupabase() async {
+    final uid = _userId;
+    if (uid != null) {
+      await _supabaseService.savePortfolios(uid, state);
+    }
+  }
+
+  void addPortfolio(String name, {double? startingBalance}) {
     state = [
       ...state,
       Portfolio(
         id: 'p_${DateTime.now().millisecondsSinceEpoch}',
         name: name,
+        startingBalance: startingBalance,
       ),
     ];
-    _save();
+    _saveLocal();
+    _syncToSupabase();
   }
 
   void renamePortfolio(String id, String newName) {
@@ -187,12 +219,26 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
       if (p.id == id) p.name = newName;
       return p;
     }).toList();
-    _save();
+    _saveLocal();
+    _syncToSupabase();
   }
 
   void deletePortfolio(String id) {
     state = state.where((p) => p.id != id).toList();
-    _save();
+    _saveLocal();
+    _syncToSupabase();
+  }
+
+  void resetPortfolio(String id) {
+    state = state.map((p) {
+      if (p.id == id) {
+        p.transactions = [];
+        // Keep original startingBalance (tier-based amount)
+      }
+      return p;
+    }).toList();
+    _saveLocal();
+    _syncToSupabase();
   }
 
   void addTransaction(String portfolioId, Transaction tx) {
@@ -202,7 +248,8 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
       }
       return p;
     }).toList();
-    _save();
+    _saveLocal();
+    _syncToSupabase();
   }
 }
 
@@ -212,7 +259,9 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
 
 final portfoliosProvider =
     StateNotifierProvider<PortfolioNotifier, List<Portfolio>>((ref) {
-  return PortfolioNotifier();
+  final service = ref.read(userDataServiceProvider);
+  final user = ref.watch(currentUserProvider);
+  return PortfolioNotifier(service, userId: user?.id);
 });
 
 final activePortfolioIdProvider = StateProvider<String?>((ref) => null);

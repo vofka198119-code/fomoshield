@@ -17,14 +17,15 @@ class EventsFullScreen extends ConsumerWidget {
     final eventsAsync = ref.watch(calendarEventsProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Upcoming Events',
           style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.accentBlue,
+            letterSpacing: 1.5,
           ),
         ),
       ),
@@ -35,7 +36,7 @@ class EventsFullScreen extends ConsumerWidget {
             color: AppTheme.accentBlue,
           ),
         ),
-        error: (_, __) => _emptyState(),
+        error: (_, _) => _emptyState(),
         data: (events) {
           if (events.isEmpty) return _emptyState();
           return ListView.builder(
@@ -72,7 +73,7 @@ class EventsFullScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: AppTheme.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -190,7 +191,7 @@ class _EventCardState extends ConsumerState<_EventCard>
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color: AppTheme.textPrimary,
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -268,7 +269,7 @@ class _EventCardState extends ConsumerState<_EventCard>
           // Expandable details
           SizeTransition(
             sizeFactor: _heightFactor,
-            axisAlignment: -1.0,
+            alignment: Alignment.topCenter,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Container(
@@ -438,7 +439,7 @@ class _DetailRow extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: AppTheme.textPrimary,
           ),
         ),
       ],

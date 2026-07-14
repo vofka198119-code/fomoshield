@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:scanco/src/core/theme/app_theme.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -141,7 +142,7 @@ class _ScannerScreenState extends State<ScannerScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Сканер QR'),
+        title: Text('Сканер QR', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: AppTheme.accentBlue, letterSpacing: 1.5)),
         actions: [
           IconButton(
             icon: Icon(
@@ -207,7 +208,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                 child: Text(
                   'Наведите камеру на QR-код',
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                     fontSize: 14,
                   ),
                 ),

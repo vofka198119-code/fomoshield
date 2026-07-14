@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/widget_container.dart';
 import '../home_providers.dart';
 
 // ---------------------------------------------------------------------------
@@ -63,170 +63,141 @@ class _MarketsWidgetState extends ConsumerState<MarketsWidget>
   Widget build(BuildContext context) {
     final indicesAsync = ref.watch(marketIndicesProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section header
-        GestureDetector(
-          onTap: _toggle,
-          child: Row(
-            children: [
-              Text(
-                'MARKETS',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.textDim,
-                  letterSpacing: 1.5,
-                ),
-              ),
-              const Spacer(),
-              AnimatedRotation(
-                turns: _expanded ? 0.5 : 0,
-                duration: const Duration(milliseconds: 300),
-                child: Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: AppTheme.textDim,
-                  size: 20,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        indicesAsync.when(
-          loading: () => _marketLoading(),
-          error: (err, _) {
-            debugPrint('❌ MarketsWidget error: $err');
-            return _marketFallback();
-          },
-          data: (indices) => Column(
-            children: indices
-                .map(
-                  (i) => _MarketCard(
-                    name: i.name,
-                    symbol: i.symbol,
-                    price: i.price,
-                    change: i.change,
-                    onTap: () => _onIndexTap(i.symbol),
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-        // Expandable details
-        SizeTransition(
-          sizeFactor: _heightFactor,
-          axisAlignment: -1.0,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.cardDark.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'Major market indices snapshot from the previous trading day. '
-                'S&P 500 tracks large-cap US stocks, NASDAQ tracks tech-heavy '
-                'companies, and Dow Jones tracks 30 major US corporations.',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: AppTheme.textDim,
-                  height: 1.5,
+    return indicesAsync.when(
+      loading: () => WidgetContainer(
+        title: 'MARKETS',
+        onTap: _toggle,
+        showFooter: false,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.accentBlue.withValues(alpha: 0.5),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
+      error: (err, _) {
+        debugPrint('❌ MarketsWidget error: $err');
+        return WidgetContainer(
+          title: 'MARKETS',
+          onTap: _toggle,
+          showFooter: false,
+          children: _buildFallbackCards(),
+        );
+      },
+      data: (indices) => WidgetContainer(
+        title: 'MARKETS',
+        onTap: _toggle,
+        showFooter: false,
+        children: [
+          ...indices.map(
+            (i) => _MarketCard(
+              name: i.name,
+              symbol: i.symbol,
+              price: i.price,
+              change: i.change,
+              onTap: () => _onIndexTap(i.symbol),
+            ),
+          ),
+          // Expandable details
+          SizeTransition(
+            sizeFactor: _heightFactor,
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Text(
+                  'Major market indices snapshot from the previous trading day. '
+                  'S&P 500 tracks large-cap US stocks, NASDAQ tracks tech-heavy '
+                  'companies, and Dow Jones tracks 30 major US corporations.',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: AppTheme.textDim,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _marketLoading() => Column(
-    children: [0, 1, 2]
-        .map(
-          (_) => Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            height: 56,
-            decoration: BoxDecoration(
-              color: AppTheme.card,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Center(
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppTheme.accentBlue,
-                ),
-              ),
-            ),
-          ),
-        )
-        .toList(),
-  );
-
-  Widget _marketFallback() => Column(
-    children: ['S&P 500', 'NASDAQ', 'DOW JONES']
-        .map(
-          (name) => Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '--',
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            color: AppTheme.textDim,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+  List<Widget> _buildFallbackCards() {
+    return ['S&P 500', 'NASDAQ', 'DOW JONES'].map((name) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        child: Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '\$0.00',
+                        name,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white54,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
-                        '0.00%',
+                        '--',
                         style: GoogleFonts.inter(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: AppTheme.textDim,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '\$0.00',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    Text(
+                      '0.00%',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppTheme.textDim,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        )
-        .toList(),
-  );
+        ),
+      );
+    }).toList();
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -270,7 +241,7 @@ class _MarketCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppTheme.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -292,7 +263,7 @@ class _MarketCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),

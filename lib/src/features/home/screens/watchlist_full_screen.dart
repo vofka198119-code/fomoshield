@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,14 +34,15 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
     final watchlistQuotesAsync = ref.watch(watchlistQuotesProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Watchlist',
           style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.accentBlue,
+            letterSpacing: 1.5,
           ),
         ),
         actions: [
@@ -101,7 +101,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: AppTheme.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -209,7 +209,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppTheme.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 1),
@@ -231,7 +231,7 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
                       Text(
@@ -262,13 +262,13 @@ class _CompanyCardState extends ConsumerState<_CompanyCard>
           // Expandable description + View Full Audit
           SizeTransition(
             sizeFactor: _heightFactor,
-            axisAlignment: -1.0,
+            alignment: Alignment.topCenter,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Divider(height: 1, color: Colors.white12),
+                  const Divider(height: 1, color: Colors.black12),
                   const SizedBox(height: 12),
                   tag != null
                       ? Row(

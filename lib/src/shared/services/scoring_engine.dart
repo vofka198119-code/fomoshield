@@ -107,14 +107,23 @@ class ScoringEngine {
   static double _calcFinancialHealth(double debtEquity, double currentRatio) {
     double score = 50;
     // Lower D/E is better
-    if (debtEquity <= 0.3) score += 30;
-    else if (debtEquity <= 1.0) score += 15;
-    else if (debtEquity <= 2.0) score += 0;
-    else score -= 20;
+    if (debtEquity <= 0.3) {
+      score += 30;
+    } else if (debtEquity <= 1.0) {
+      score += 15;
+    } else if (debtEquity <= 2.0) {
+      score += 0;
+    } else {
+      score -= 20;
+    }
     // Higher current ratio is better
-    if (currentRatio >= 2.0) score += 20;
-    else if (currentRatio >= 1.0) score += 10;
-    else score -= 10;
+    if (currentRatio >= 2.0) {
+      score += 20;
+    } else if (currentRatio >= 1.0) {
+      score += 10;
+    } else {
+      score -= 10;
+    }
     return score.clamp(0, 100);
   }
 
@@ -146,12 +155,19 @@ class ScoringEngine {
   static double _calcCapitalReturn(double divYield, double payoutRatio) {
     double score = 40;
     // Yield up to reasonable threshold
-    if (divYield > 0 && divYield <= 0.05) score += 20;
-    else if (divYield > 0.05 && divYield <= AppConstants.dividendTrapThreshold / 100) score += 15;
+    if (divYield > 0 && divYield <= 0.05) {
+      score += 20;
+    } else if (divYield > 0.05 && divYield <= AppConstants.dividendTrapThreshold / 100) {
+      score += 15;
+    }
     // Reasonable payout ratio
-    if (payoutRatio > 0 && payoutRatio <= 0.6) score += 20;
-    else if (payoutRatio > 0.6 && payoutRatio <= 0.9) score += 10;
-    else if (payoutRatio > 0.9) score -= 10;
+    if (payoutRatio > 0 && payoutRatio <= 0.6) {
+      score += 20;
+    } else if (payoutRatio > 0.6 && payoutRatio <= 0.9) {
+      score += 10;
+    } else if (payoutRatio > 0.9) {
+      score -= 10;
+    }
     return score.clamp(0, 100);
   }
 

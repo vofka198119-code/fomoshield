@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/services/finnhub_service.dart';
+import '../../shared/services/user_data_service.dart';
+import '../../core/supabase/supabase_providers.dart';
 import '../../core/cache/logo_dao.dart';
 import '../../core/models/logo_cache_entry.dart';
 import '../../core/services/company_tag_mapper.dart';
@@ -183,20 +185,40 @@ final debouncerProvider = Provider<Debouncer>((ref) {
 });
 
 // ---------------------------------------------------------------------------
-// Watchlist Provider (shared_preferences backed)
+// Watchlist Provider (SharedPreferences + Supabase)
 // ---------------------------------------------------------------------------
 
 final watchlistSymbolsProvider =
     StateNotifierProvider<WatchlistNotifier, List<String>>((ref) {
-      return WatchlistNotifier();
+      final service = ref.read(userDataServiceProvider);
+      final user = ref.watch(currentUserProvider);
+      return WatchlistNotifier(service, userId: user?.id);
     });
 
 class WatchlistNotifier extends StateNotifier<List<String>> {
-  WatchlistNotifier() : super([]) {
+  final UserDataService _supabaseService;
+  String? _userId;
+
+  WatchlistNotifier(this._supabaseService, {this._userId})
+      : super([]) {
     _load();
   }
 
-  static const _key = 'watchlist_symbols';
+  String get _key =>
+      _userId != null ? 'watchlist_symbols_$_userId' : 'watchlist_symbols';
+
+  /// Set user ID to enable Supabase sync + re-scope local cache.
+  void setUserId(String? uid) {
+    _userId = uid;
+    _load();
+  }
+
+  /// Load watchlist from Supabase data (replaces local).
+  void loadFromSupabase(List<String> symbols) {
+    if (symbols.isEmpty) return;
+    state = symbols;
+    _saveLocal();
+  }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -204,19 +226,31 @@ class WatchlistNotifier extends StateNotifier<List<String>> {
     state = list;
   }
 
+  Future<void> _saveLocal() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_key, state);
+  }
+
+  Future<void> _syncToSupabase() async {
+    final uid = _userId;
+    if (uid != null) {
+      await _supabaseService.saveWatchlist(uid, state);
+    }
+  }
+
   Future<void> add(String symbol) async {
     if (state.contains(symbol.toUpperCase())) return;
     final newState = [...state, symbol.toUpperCase()];
     state = newState;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_key, newState);
+    await _saveLocal();
+    _syncToSupabase();
   }
 
   Future<void> remove(String symbol) async {
     final newState = state.where((s) => s != symbol.toUpperCase()).toList();
     state = newState;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_key, newState);
+    await _saveLocal();
+    _syncToSupabase();
   }
 
   bool contains(String symbol) => state.contains(symbol.toUpperCase());
@@ -454,8 +488,9 @@ final calendarEventsProvider = FutureProvider<List<CalendarEvent>>((ref) async {
         if (dateStr == null) continue;
         final date = DateTime.tryParse(dateStr);
         if (date == null ||
-            date.isBefore(now.subtract(const Duration(days: 1))))
+            date.isBefore(now.subtract(const Duration(days: 1)))) {
           continue;
+        }
 
         final quarterRaw = data['quarter'] as int?;
         final yearRaw = data['year'] as int?;
@@ -495,8 +530,9 @@ final calendarEventsProvider = FutureProvider<List<CalendarEvent>>((ref) async {
         if (dateStr == null) continue;
         final date = DateTime.tryParse(dateStr);
         if (date == null ||
-            date.isBefore(now.subtract(const Duration(days: 1))))
+            date.isBefore(now.subtract(const Duration(days: 1)))) {
           continue;
+        }
 
         events.add(
           CalendarEvent(

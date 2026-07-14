@@ -1,12 +1,22 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/cache/logo_providers.dart';
-import '../../shared/widgets/company_logo.dart';
+import '../../core/supabase/supabase_providers.dart';
+import '../monetization/monetization_modal.dart';
+import '../monetization/premium_promo_overlay.dart';
 import 'portfolio_providers.dart';
+import 'portfolio_limits_provider.dart';
+import 'portfolio_ad_provider.dart';
+import 'portfolio_widget_order_provider.dart';
+import 'widgets/portfolio_summary_widget.dart';
+import 'widgets/portfolio_allocation_widget.dart';
+import 'widgets/portfolio_holdings_widget.dart';
+import '../home/widgets/portfolio_journal_widget.dart';
+import '../home/widgets/historical_sim_widget.dart';
+import '../home/widgets/scenario_compare_widget.dart';
+import '../../shared/widgets/disclaimer_footer.dart';
 
 class PortfolioScreen extends ConsumerStatefulWidget {
   const PortfolioScreen({super.key});
@@ -24,21 +34,69 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
         activeId ?? (portfolios.isNotEmpty ? portfolios.first.id : null);
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(Icons.account_balance_wallet_rounded,
-                color: AppTheme.accentBlue, size: 22),
-            const SizedBox(width: 8),
-            Text('PORTFOLIO',
-                style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: 1)),
-          ],
+        centerTitle: true,
+        title: Text(
+          'PORTFOLIO',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.accentBlue,
+            letterSpacing: 1.5,
+          ),
         ),
         actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: AppTheme.textDim),
+            color: AppTheme.card,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            onSelected: (value) {
+              final pid = effectiveId;
+              if (pid == null) return;
+              if (value == 'reset') {
+                _showResetPortfolioDialog(context, pid);
+              } else if (value == 'delete') {
+                _showDeletePortfolioDialog(context, pid, portfolios);
+              }
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: 'reset',
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.refresh_rounded,
+                    color: AppTheme.shieldYellow,
+                    size: 20,
+                  ),
+                  title: const Text(
+                    'Reset Portfolio',
+                    style: TextStyle(color: AppTheme.shieldYellow),
+                  ),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'delete',
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.delete_rounded,
+                    color: AppTheme.dangerRed,
+                    size: 20,
+                  ),
+                  title: const Text(
+                    'Delete Portfolio',
+                    style: TextStyle(color: AppTheme.dangerRed),
+                  ),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.add_rounded, color: AppTheme.accentBlue),
             onPressed: () => _showCreatePortfolioDialog(context),
@@ -48,16 +106,8 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
       body: portfolios.isEmpty
           ? _emptyState(context)
           : effectiveId == null
-              ? _emptyState(context)
-              : RefreshIndicator(
-                  color: AppTheme.accentBlue,
-                  backgroundColor: AppTheme.card,
-                  onRefresh: () async {
-                    ref.invalidate(portfolioPerformanceProvider(effectiveId));
-                    await Future.delayed(const Duration(milliseconds: 500));
-                  },
-                  child: _PortfolioBody(portfolioId: effectiveId),
-                ),
+          ? _emptyState(context)
+          : _PortfolioBody(portfolioId: effectiveId),
     );
   }
 
@@ -68,19 +118,26 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.account_balance_wallet_rounded,
-                size: 64, color: AppTheme.textDim),
+            const Icon(
+              Icons.account_balance_wallet_rounded,
+              size: 64,
+              color: AppTheme.textDim,
+            ),
             const SizedBox(height: 16),
-            Text('No portfolios yet',
-                style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white)),
+            Text(
+              'No portfolios yet',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+              ),
+            ),
             const SizedBox(height: 8),
             Text(
-                'Create your first virtual portfolio\nwith \$10,000 starting balance',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim)),
+              'Create your first virtual portfolio\nwith \$10,000 starting balance',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+            ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => _showCreatePortfolioDialog(context),
@@ -89,7 +146,10 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.accentBlue,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
           ],
@@ -104,11 +164,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.card,
-        title: Text('New Portfolio',
-            style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Colors.white)),
+        title: Text(
+          'New Portfolio',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textPrimary,
+          ),
+        ),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -118,30 +181,162 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             filled: true,
             fillColor: AppTheme.cardDark,
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
           ),
-          style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
+          style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel',
-                style: GoogleFonts.inter(color: AppTheme.textDim)),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(color: AppTheme.textDim),
+            ),
           ),
           TextButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
+                final maxP = ref.read(maxPortfoliosProvider);
+                final currentCount = ref.read(portfoliosProvider).length;
+                if (currentCount >= maxP) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        maxP == 3
+                            ? 'FREE limit: 3 portfolios. Upgrade to Premium (6).'
+                            : 'Max $maxP portfolios reached.',
+                        style: GoogleFonts.inter(fontSize: 13),
+                      ),
+                      backgroundColor: AppTheme.premiumGreen,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                  return;
+                }
                 ref
                     .read(portfoliosProvider.notifier)
-                    .addPortfolio(controller.text.trim());
+                    .addPortfolio(
+                      controller.text.trim(),
+                      startingBalance: ref.read(startingCapitalProvider),
+                    );
                 Navigator.pop(ctx);
               }
             },
-            child: Text('Create',
-                style: GoogleFonts.inter(
-                    color: AppTheme.accentBlue,
-                    fontWeight: FontWeight.w600)),
+            child: Text(
+              'Create',
+              style: GoogleFonts.inter(
+                color: AppTheme.accentBlue,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showResetPortfolioDialog(BuildContext context, String portfolioId) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.card,
+        title: Text(
+          'Reset Portfolio?',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        content: Text(
+          'All holdings and history will be cleared.\nBalance will be restored to its original amount.',
+          style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(color: AppTheme.textDim),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(portfoliosProvider.notifier).resetPortfolio(portfolioId);
+              Navigator.pop(ctx);
+            },
+            child: Text(
+              'Reset',
+              style: GoogleFonts.inter(
+                color: AppTheme.shieldYellow,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeletePortfolioDialog(
+    BuildContext context,
+    String portfolioId,
+    List<Portfolio> ps,
+  ) {
+    if (ps.length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Cannot delete the last portfolio. Create a new one first.',
+            style: GoogleFonts.inter(fontSize: 13),
+          ),
+          backgroundColor: AppTheme.dangerRed,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.card,
+        title: Text(
+          'Delete Portfolio?',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        content: Text(
+          'All holdings and history will be lost.',
+          style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(color: AppTheme.textDim),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              ref
+                  .read(portfoliosProvider.notifier)
+                  .deletePortfolio(portfolioId);
+              Navigator.pop(ctx);
+            },
+            child: Text(
+              'Delete',
+              style: GoogleFonts.inter(
+                color: AppTheme.dangerRed,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -150,131 +345,254 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// Portfolio Body
+// Portfolio Body — widget-based (customizable order + visibility)
 // ---------------------------------------------------------------------------
 
-class _PortfolioBody extends ConsumerWidget {
+class _PortfolioBody extends ConsumerStatefulWidget {
   final String portfolioId;
   const _PortfolioBody({required this.portfolioId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final portfolios = ref.watch(portfoliosProvider);
-    final performanceAsync =
-        ref.watch(portfolioPerformanceProvider(portfolioId));
-    final portfolio = portfolios.firstWhere((p) => p.id == portfolioId);
+  ConsumerState<_PortfolioBody> createState() => _PortfolioBodyState();
+}
 
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _PortfolioSelector(portfolios: portfolios, activeId: portfolioId),
-          const SizedBox(height: 16),
-          performanceAsync.when(
-            loading: () => _perfLoading(),
-            error: (_, __) => _perfLoading(),
-            data: (perf) => _PerformanceCard(performance: perf),
-          ),
-          const SizedBox(height: 24),
-          performanceAsync.when(
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-            data: (perf) {
-              if (perf.holdings.isEmpty) return const SizedBox.shrink();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('ALLOCATION',
-                      style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textDim,
-                          letterSpacing: 1.5)),
-                  const SizedBox(height: 12),
-                  _PieChartSection(holdings: perf.holdings),
-                  const SizedBox(height: 24),
-                ],
-              );
+class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) {
+        ref.invalidate(portfolioPerformanceProvider(widget.portfolioId));
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  void _showWidgetsBottomSheet() {
+    final notifier = ref.read(portfolioWidgetsProvider.notifier);
+    final currentConfigs = ref.read(portfolioWidgetsProvider);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        final tier = ref.read(subscriptionTierProvider);
+        return _PortfolioWidgetsSettingsSheet(
+          initialConfigs: currentConfigs,
+          notifier: notifier,
+          isPremium:
+              tier == SubscriptionTier.premium ||
+              tier == SubscriptionTier.admin,
+          onPremiumLockTap: () => showPremiumPromoOverlay(
+            context: context,
+            title: 'Premium widget',
+            durationSeconds: 5,
+            onComplete: () {
+              if (context.mounted) showMonetizationModal(context, ref);
             },
           ),
-          performanceAsync.when(
-            loading: () => _holdingsLoading(),
-            error: (_, __) => _holdingsLoading(),
-            data: (perf) => perf.holdings.isEmpty
-                ? _emptyHoldings(portfolio.name)
-                : _HoldingsList(holdings: perf.holdings),
-          ),
-          const SizedBox(height: 100),
-        ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final portfolios = ref.watch(portfoliosProvider);
+    final performanceAsync = ref.watch(
+      portfolioPerformanceProvider(widget.portfolioId),
+    );
+    final widgetConfigs = ref.watch(portfolioWidgetsProvider);
+    final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
+    final activeIndex = portfolios.indexWhere(
+      (p) => p.id == widget.portfolioId,
+    );
+    final showBannerAd = ref.watch(
+      isPortfolioBannerAdSupportedProvider(activeIndex),
+    );
+
+    return RefreshIndicator(
+      color: AppTheme.accentBlue,
+      backgroundColor: AppTheme.card,
+      onRefresh: () async {
+        ref.invalidate(portfolioPerformanceProvider(widget.portfolioId));
+        await Future.delayed(const Duration(milliseconds: 500));
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _PortfolioSelector(
+              portfolios: portfolios,
+              activeId: widget.portfolioId,
+            ),
+            const SizedBox(height: 16),
+            // Render visible widgets in order
+            ...performanceAsync.when(
+              loading: () => [
+                _buildWidget('portfolio_summary', isLoading: true),
+                _buildWidget('portfolio_allocation', isLoading: true),
+                _buildWidget('portfolio_holdings', isLoading: true),
+              ],
+              error: (_, _) => [
+                _buildWidget('portfolio_summary', hasError: true),
+                _buildWidget('portfolio_allocation', hasError: true),
+                _buildWidget('portfolio_holdings', hasError: true),
+              ],
+              data: (perf) => visibleWidgets
+                  .map((w) => _buildWidget(w.id, performance: perf))
+                  .toList(),
+            ),
+            const SizedBox(height: 24),
+            // Add widgets button
+            Center(
+              child: TextButton.icon(
+                onPressed: _showWidgetsBottomSheet,
+                icon: const Icon(
+                  Icons.add_rounded,
+                  color: AppTheme.accentBlue,
+                  size: 20,
+                ),
+                label: Text(
+                  'Add widgets',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.accentBlue,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: const BorderSide(
+                      color: AppTheme.accentBlue,
+                      width: 0.5,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Banner ad for 2nd/3rd portfolio (free tier)
+            if (showBannerAd) ...[
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black12, width: 0.5),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.ad_units_rounded,
+                      size: 14,
+                      color: AppTheme.textDim.withValues(alpha: 0.6),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Sponsored Content',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: AppTheme.textDim.withValues(alpha: 0.6),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            const DisclaimerFooter(),
+            const SizedBox(height: 100),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _perfLoading() => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppTheme.card,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Center(
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-                strokeWidth: 2, color: AppTheme.accentBlue),
+  Widget _buildWidget(
+    String id, {
+    PortfolioPerformance? performance,
+    bool isLoading = false,
+    bool hasError = false,
+  }) {
+    switch (id) {
+      case 'portfolio_summary':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: PortfolioSummaryWidget(
+            performance: performance,
+            isLoading: isLoading,
+            hasError: hasError,
           ),
-        ),
-      );
-
-  Widget _holdingsLoading() => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Center(
-            child: Column(
-              children: [
-                const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: AppTheme.accentBlue),
-                ),
-                const SizedBox(height: 8),
-                Text('Loading holdings...',
-                    style: GoogleFonts.inter(
-                        fontSize: 14, color: AppTheme.textDim)),
-              ],
-            ),
+        );
+      case 'portfolio_allocation':
+        if (isLoading ||
+            hasError ||
+            performance == null ||
+            performance.holdings.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: PortfolioAllocationWidget(holdings: performance.holdings),
+        );
+      case 'portfolio_holdings':
+        if (isLoading || hasError) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: PortfolioHoldingsWidget(holdings: null),
+          );
+        }
+        if (performance == null) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: PortfolioHoldingsWidget(
+            holdings: performance.holdings,
+            emptyPortfolioName: performance.name,
           ),
-        ),
-      );
-
-  Widget _emptyHoldings(String name) => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              children: [
-                const Icon(Icons.shopping_bag_rounded,
-                    size: 48, color: AppTheme.textDim),
-                const SizedBox(height: 12),
-                Text('No holdings yet',
-                    style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white)),
-                const SizedBox(height: 8),
-                Text(
-                    'Search and add companies\nto "$name" from the detail screen',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                        fontSize: 13, color: AppTheme.textDim)),
-              ],
-            ),
-          ),
-        ),
-      );
+        );
+      case 'portfolio_journal':
+        return const Padding(
+          padding: EdgeInsets.only(bottom: 24),
+          child: PortfolioJournalWidget(),
+        );
+      case 'historical_sim':
+        return const Padding(
+          padding: EdgeInsets.only(bottom: 24),
+          child: HistoricalSimWidget(),
+        );
+      case 'scenario_compare':
+        return const Padding(
+          padding: EdgeInsets.only(bottom: 24),
+          child: ScenarioCompareWidget(),
+        );
+      default:
+        return const SizedBox.shrink();
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -284,8 +602,7 @@ class _PortfolioBody extends ConsumerWidget {
 class _PortfolioSelector extends ConsumerWidget {
   final List<Portfolio> portfolios;
   final String activeId;
-  const _PortfolioSelector(
-      {required this.portfolios, required this.activeId});
+  const _PortfolioSelector({required this.portfolios, required this.activeId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -294,17 +611,35 @@ class _PortfolioSelector extends ConsumerWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: portfolios.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final p = portfolios[i];
           final isActive = p.id == activeId;
           return GestureDetector(
             key: ValueKey(p.id),
-            onTap: () =>
-                ref.read(activePortfolioIdProvider.notifier).state = p.id,
+            onTap: () async {
+              if (p.id == activeId) return;
+              ref.read(activePortfolioIdProvider.notifier).state = p.id;
+              // Check ad counter on switch
+              final tier = ref.read(subscriptionTierProvider);
+              if (tier == SubscriptionTier.free) {
+                final showAd = await ref
+                    .read(portfolioAdProvider.notifier)
+                    .incrementSwitch();
+                if (showAd && context.mounted) {
+                  showPremiumPromoOverlay(
+                    context: context,
+                    title: 'Portfolio switched',
+                    durationSeconds: 5,
+                    onComplete: () {
+                      if (context.mounted) showMonetizationModal(context, ref);
+                    },
+                  );
+                }
+              }
+            },
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: isActive ? AppTheme.accentBlue : AppTheme.card,
                 borderRadius: BorderRadius.circular(20),
@@ -314,21 +649,30 @@ class _PortfolioSelector extends ConsumerWidget {
                   if (isActive)
                     const Padding(
                       padding: EdgeInsets.only(right: 6),
-                      child: Icon(Icons.check, size: 14, color: Colors.white),
+                      child: Icon(
+                        Icons.check,
+                        size: 14,
+                        color: AppTheme.textPrimary,
+                      ),
                     ),
-                  Text(p.name,
-                      style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color:
-                              isActive ? Colors.white : AppTheme.textDim)),
+                  Text(
+                    p.name,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isActive ? AppTheme.accentBlue : AppTheme.textDim,
+                    ),
+                  ),
                   if (isActive)
                     Padding(
                       padding: const EdgeInsets.only(left: 6),
                       child: GestureDetector(
                         onTap: () => _deleteConfirm(context, ref, p.id),
-                        child: const Icon(Icons.close,
-                            size: 14, color: Colors.white70),
+                        child: const Icon(
+                          Icons.close,
+                          size: 14,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                     ),
                 ],
@@ -342,39 +686,53 @@ class _PortfolioSelector extends ConsumerWidget {
 
   void _deleteConfirm(BuildContext context, WidgetRef ref, String id) {
     if (portfolios.length <= 1) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Cannot delete the last portfolio',
-            style: GoogleFonts.inter(fontSize: 13)),
-        backgroundColor: AppTheme.dangerRed,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Cannot delete the last portfolio',
+            style: GoogleFonts.inter(fontSize: 13),
+          ),
+          backgroundColor: AppTheme.dangerRed,
+        ),
+      );
       return;
     }
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.card,
-        title: Text('Delete portfolio?',
-            style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Colors.white)),
-        content: Text('All holdings and history will be lost.',
-            style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim)),
+        title: Text(
+          'Delete portfolio?',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        content: Text(
+          'All holdings and history will be lost.',
+          style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel',
-                style: GoogleFonts.inter(color: AppTheme.textDim)),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(color: AppTheme.textDim),
+            ),
           ),
           TextButton(
             onPressed: () {
               ref.read(portfoliosProvider.notifier).deletePortfolio(id);
               Navigator.pop(ctx);
             },
-            child: Text('Delete',
-                style: GoogleFonts.inter(
-                    color: AppTheme.dangerRed,
-                    fontWeight: FontWeight.w600)),
+            child: Text(
+              'Delete',
+              style: GoogleFonts.inter(
+                color: AppTheme.dangerRed,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -383,289 +741,274 @@ class _PortfolioSelector extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Performance Card
+// Widget Settings BottomSheet (Revolut-style, matching HomeScreen exactly)
 // ---------------------------------------------------------------------------
 
-class _PerformanceCard extends StatelessWidget {
-  final PortfolioPerformance performance;
-  const _PerformanceCard({required this.performance});
+class _PortfolioWidgetsSettingsSheet extends StatefulWidget {
+  final List<PortfolioWidgetConfig> initialConfigs;
+  final PortfolioWidgetsNotifier notifier;
+  final bool isPremium;
+  final VoidCallback onPremiumLockTap;
+
+  const _PortfolioWidgetsSettingsSheet({
+    required this.initialConfigs,
+    required this.notifier,
+    required this.isPremium,
+    required this.onPremiumLockTap,
+  });
+
+  @override
+  State<_PortfolioWidgetsSettingsSheet> createState() =>
+      _PortfolioWidgetsSettingsSheetState();
+}
+
+class _PortfolioWidgetsSettingsSheetState
+    extends State<_PortfolioWidgetsSettingsSheet> {
+  late List<PortfolioWidgetConfig> _configs;
+
+  @override
+  void initState() {
+    super.initState();
+    _configs = List.from(widget.initialConfigs);
+  }
+
+  void _onReorder(int oldIndex, int newIndex) {
+    setState(() {
+      final item = _configs.removeAt(oldIndex);
+      _configs.insert(newIndex, item);
+    });
+    widget.notifier.reorder(_configs[newIndex].id, newIndex);
+  }
+
+  void _toggleVisibility(String id) {
+    setState(() {
+      final index = _configs.indexWhere((c) => c.id == id);
+      if (index >= 0) {
+        final current = _configs[index];
+        _configs[index] = PortfolioWidgetConfig(
+          id: current.id,
+          visible: !current.visible,
+        );
+      }
+    });
+    widget.notifier.toggleVisibility(id);
+  }
+
+  IconData _widgetIcon(String id) {
+    switch (id) {
+      case 'portfolio_summary':
+        return Icons.account_balance_rounded;
+      case 'portfolio_allocation':
+        return Icons.pie_chart_rounded;
+      case 'portfolio_holdings':
+        return Icons.view_list_rounded;
+      case 'portfolio_journal':
+        return Icons.auto_stories_rounded;
+      case 'historical_sim':
+        return Icons.query_stats_rounded;
+      case 'scenario_compare':
+        return Icons.compare_arrows_rounded;
+      default:
+        return Icons.widgets_rounded;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isUp = performance.pnl >= 0;
-    final c = isUp ? AppTheme.shieldGreen : AppTheme.dangerRed;
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [c.withValues(alpha: 0.15), AppTheme.card],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: c.withValues(alpha: 0.2)),
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Total Value',
+          // Handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
+            width: 36,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.black26,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Title
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Row(
+              children: [
+                Text(
+                  'Portfolio Widgets',
                   style: GoogleFonts.inter(
-                      fontSize: 13, color: AppTheme.textDim)),
-              Text('P&L',
-                  style: GoogleFonts.inter(
-                      fontSize: 13, color: AppTheme.textDim)),
-            ],
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {
+                    widget.notifier.resetToDefaults();
+                    setState(() {
+                      _configs = [
+                        const PortfolioWidgetConfig(
+                          id: 'portfolio_summary',
+                          visible: true,
+                        ),
+                        const PortfolioWidgetConfig(
+                          id: 'portfolio_allocation',
+                          visible: true,
+                        ),
+                        const PortfolioWidgetConfig(
+                          id: 'portfolio_holdings',
+                          visible: true,
+                        ),
+                        const PortfolioWidgetConfig(
+                          id: 'portfolio_journal',
+                          visible: true,
+                        ),
+                        const PortfolioWidgetConfig(
+                          id: 'historical_sim',
+                          visible: true,
+                        ),
+                        const PortfolioWidgetConfig(
+                          id: 'scenario_compare',
+                          visible: true,
+                        ),
+                      ];
+                    });
+                  },
+                  child: Text(
+                    'Reset',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: AppTheme.accentBlue,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('\$${performance.currentValue.toStringAsFixed(2)}',
-                  style: GoogleFonts.inter(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white)),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${isUp ? '+' : ''}\$${performance.pnl.toStringAsFixed(2)}',
-                    style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: c),
+          // Reorderable list
+          Flexible(
+            child: ReorderableListView.builder(
+              shrinkWrap: true,
+              itemCount: _configs.length,
+              onReorderItem: _onReorder,
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              buildDefaultDragHandles: false,
+              proxyDecorator: (child, index, animation) {
+                return AnimatedBuilder(
+                  animation: animation,
+                  builder: (context, child) {
+                    return Material(
+                      color: Colors.transparent,
+                      elevation: 4,
+                      shadowColor: Colors.black45,
+                      child: child!,
+                    );
+                  },
+                  child: child,
+                );
+              },
+              itemBuilder: (context, index) {
+                final config = _configs[index];
+                final isPremiumWidget =
+                    config.id == 'portfolio_journal' ||
+                    config.id == 'historical_sim' ||
+                    config.id == 'scenario_compare';
+                return Container(
+                  key: ValueKey(config.id),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: config.visible
+                        ? AppTheme.cardDark
+                        : AppTheme.cardDark.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: config.visible
+                          ? Colors.black12
+                          : Colors.black.withValues(alpha: 0.03),
+                    ),
                   ),
-                  Text(
-                    '${isUp ? '+' : ''}${performance.pnlPercent.toStringAsFixed(2)}%',
-                    style: GoogleFonts.inter(
-                        fontSize: 14, fontWeight: FontWeight.w500, color: c),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Divider(color: AppTheme.cardDark),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _stat('Invested',
-                  '\$${performance.totalInvested.toStringAsFixed(2)}'),
-              _stat('Cash', '\$${performance.cash.toStringAsFixed(2)}'),
-              _stat('Holdings', '${performance.holdings.length}'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _stat(String label, String value) => Expanded(
-        child: Column(
-          children: [
-            Text(label,
-                style: GoogleFonts.inter(
-                    fontSize: 11, color: AppTheme.textDim)),
-            const SizedBox(height: 4),
-            Text(value,
-                style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white)),
-          ],
-        ),
-      );
-}
-
-// ---------------------------------------------------------------------------
-// Pie Chart
-// ---------------------------------------------------------------------------
-
-class _PieChartSection extends StatelessWidget {
-  final List<HoldingPerformance> holdings;
-  const _PieChartSection({required this.holdings});
-
-  @override
-  Widget build(BuildContext context) {
-    final total =
-        holdings.fold<double>(0, (s, h) => s + h.currentValue);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.card,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 120,
-            height: 120,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 2,
-                centerSpaceRadius: 24,
-                sections: holdings.map((h) {
-                  final pct = total > 0 ? h.currentValue / total : 0;
-                  return PieChartSectionData(
-                    value: pct * 100,
-                    title: '${(pct * 100).toStringAsFixed(0)}%',
-                    titleStyle: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white),
-                    radius: 28,
-                    color: _color(holdings.indexOf(h)),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: holdings.take(6).map((h) {
-                final share = total > 0 ? h.currentValue / total : 0;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _color(holdings.indexOf(h)),
+                  child: ListTile(
+                    key: ValueKey('${config.id}_tile'),
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ReorderableDragStartListener(
+                          index: index,
+                          child: const Icon(
+                            Icons.drag_handle_rounded,
+                            color: AppTheme.textDim,
+                            size: 24,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(h.symbol,
+                        const SizedBox(width: 8),
+                        Icon(
+                          _widgetIcon(config.id),
+                          color: config.visible
+                              ? (isPremiumWidget
+                                    ? AppTheme.premiumGreen
+                                    : AppTheme.accentBlue)
+                              : AppTheme.textDim,
+                          size: 22,
+                        ),
+                      ],
+                    ),
+                    title: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            config.displayName,
                             style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white)),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: config.visible
+                                  ? Colors.white
+                                  : AppTheme.textDim,
+                            ),
+                          ),
+                        ),
+                        if (isPremiumWidget) ...[
+                          const SizedBox(width: 6),
+                          Icon(
+                            Icons.lock_rounded,
+                            size: 14,
+                            color: widget.isPremium
+                                ? AppTheme.shieldYellow
+                                : AppTheme.textDim,
+                          ),
+                        ],
+                      ],
+                    ),
+                    trailing: GestureDetector(
+                      onTap: isPremiumWidget && !widget.isPremium
+                          ? widget.onPremiumLockTap
+                          : () => _toggleVisibility(config.id),
+                      child: Icon(
+                        isPremiumWidget && !widget.isPremium
+                            ? Icons.lock_rounded
+                            : (config.visible
+                                  ? Icons.visibility_rounded
+                                  : Icons.visibility_off_rounded),
+                        color: isPremiumWidget && !widget.isPremium
+                            ? AppTheme.shieldYellow
+                            : (config.visible
+                                  ? AppTheme.accentBlue
+                                  : AppTheme.textDim),
+                        size: 22,
                       ),
-                      Text('${(share * 100).toStringAsFixed(1)}%',
-                          style: GoogleFonts.inter(
-                              fontSize: 12, color: AppTheme.textDim)),
-                    ],
+                    ),
                   ),
                 );
-              }).toList(),
+              },
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  static const _colors = [
-    AppTheme.accentBlue,
-    AppTheme.shieldGreen,
-    AppTheme.shieldYellow,
-    AppTheme.dangerRed,
-    Color(0xFF9B59B6),
-    Color(0xFFE67E22),
-    Color(0xFF1ABC9C),
-    Color(0xFF3498DB),
-  ];
-
-  Color _color(int i) => _colors[i % _colors.length];
-}
-
-// ---------------------------------------------------------------------------
-// Holdings List
-// ---------------------------------------------------------------------------
-
-class _HoldingsList extends StatelessWidget {
-  final List<HoldingPerformance> holdings;
-  const _HoldingsList({required this.holdings});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('HOLDINGS',
-            style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.textDim,
-                letterSpacing: 1.5)),
-        const SizedBox(height: 8),
-        ...holdings.map((h) => KeyedSubtree(key: ValueKey(h.symbol), child: _HoldingCard(holding: h))),
-      ],
-    );
-  }
-}
-
-class _HoldingCard extends ConsumerWidget {
-  final HoldingPerformance holding;
-  const _HoldingCard({required this.holding});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isUp = holding.pnl >= 0;
-    final logoAsync = ref.watch(quickLogoProvider(holding.symbol));
-    final logoUrl = logoAsync.valueOrNull;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: () => context.push('/company/${holding.symbol}'),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              CompanyLogo(
-                ticker: holding.symbol,
-                logoUrl: logoUrl,
-                radius: 18,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(holding.symbol,
-                        style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white)),
-                    const SizedBox(height: 2),
-                    Text(
-                        '${holding.shares.toStringAsFixed(4)} @ \$${holding.avgCost.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                            fontSize: 11, color: AppTheme.textDim)),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('\$${holding.currentValue.toStringAsFixed(2)}',
-                      style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white)),
-                  const SizedBox(height: 2),
-                  Text(
-                      '${isUp ? '+' : ''}\$${holding.pnl.toStringAsFixed(2)} (${isUp ? '+' : ''}${holding.pnlPercent.toStringAsFixed(2)}%)',
-                      style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: isUp
-                              ? AppTheme.shieldGreen
-                              : AppTheme.dangerRed)),
-                ],
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

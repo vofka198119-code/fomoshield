@@ -1,0 +1,1801 @@
+﻿00:00 +0: loading D:/Projects/scanco/test/services/stress_test_engine_test.dart
+00:00 +0: 1. Session Creation & Limits 1.1 Create session in setup mode
+00:00 +1: 1. Session Creation & Limits 1.2 Can create session respects limits
+00:00 +2: 1. Session Creation & Limits 1.3 Delete session
+00:00 +3: 1. Session Creation & Limits 1.4 Delete all sessions
+00:00 +4: 2. Asset Setup Phase 2.1 Buy asset during setup
+00:00 +5: 2. Asset Setup Phase 2.2 Cannot exceed cash during setup
+00:00 +6: 2. Asset Setup Phase 2.3 Remove asset during setup
+00:00 +7: 3. Epoch Generation & Scenario Distribution 3.1 Generate epochs for 1W (7d / 9h тЙИ 19 epochs)
+00:00 +8: 3. Epoch Generation & Scenario Distribution 3.2 Generate epochs for Infinite (780 epochs)
+00:00 +9: 3. Epoch Generation & Scenario Distribution 3.3 Scenario distribution over 780 epochs
+
+тХРтХРтХР SCENARIO DISTRIBUTION (780 epochs) тХРтХРтХР
+  bull              : 428 ep. (54.9%) [wt: 52]
+  sideways          : 170 ep. (21.8%) [wt: 22]
+  bear              :  33 ep. (4.2%) [wt: 4]
+  volatile          : 100 ep. (12.8%) [wt: 14]
+  blackSwan         :  24 ep. (3.1%) [wt: 4]
+  mortgageCrisis    :  25 ep. (3.2%) [wt: 4]
+00:00 +10: 4. Price Simulation & Sector Behavior 4.1 Prices move from entry values
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (3): AAPL, KO, XOM
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (3): AAPL, KO, XOM
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (3): AAPL, KO, XOM
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (3): AAPL, KO, XOM
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (3): AAPL, KO, XOM
+
+тХРтХРтХР PRICE MOVEMENT тХРтХРтХР
+  AAPL: $150.0 тЗТ $150.39
+  KO: $60.0 тЗТ $60.04
+  XOM: $100.0 тЗТ $100.34
+00:00 +11: 4. Price Simulation & Sector Behavior 4.2 Sector divergence across 6 sectors
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): TSLA, JPM, KO, XOM, PLD, JNJ
+
+тХРтХРтХР SECTOR PERFORMANCE (scenario: sideways) тХРтХРтХР
+  TSLA  -6.15%
+  JPM   -8.71%
+  KO    -2.35%
+  XOM   -10.70%
+  PLD   +0.03%
+  JNJ   -2.43%
+00:00 +12: 4. Price Simulation & Sector Behavior 4.3 KO (staples) within ┬▒30% first 10 moves
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): KO
+
+тХРтХРтХР KO STABILITY тХРтХРтХР
+  Entry: $60.00 тЗТ $60.19 (|╬Ф|=0.31%)
+00:00 +13: 5. Trading During Active Test 5.1 Buy trade updates cash and holdings
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: AAPL | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $149.43 | Session: active | In holdings: true
+00:00 +14: 5. Trading During Active Test 5.2 Sell trade reduces shares
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+00:00 +15: 5. Trading During Active Test 5.3 Insufficient shares rejected
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+00:00 +16: 5. Trading During Active Test 5.4 Insufficient cash rejected
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: AAPL | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $149.86 | Session: active | In holdings: true
+00:00 +17: 6. IPO System (CompanyStock autonomous lifecycle) 6.1 No IPO in non-Infinite modes
+00:00 +18: 6. IPO System (CompanyStock autonomous lifecycle) 6.2 IPO triggers ~3% in Infinite
+
+тХРтХРтХР IPO TRIGGER RATE тХРтХРтХР
+  Trials: 500, IPOs: 10 (2.0%)   [expected ~3%]
+00:09 +19: 6. IPO System (CompanyStock autonomous lifecycle) 6.3 IPO lifecycle when triggered
+
+тХРтХРтХР IPO LIFECYCLE тХРтХРтХР
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): KO
+  Step 0: NOVA (NovaTech Quantum)
+    Phase: shakeout
+    Age: 0 weeks
+    Current:  $78.48
+00:10 +20: 7. Test Completion & Verdict 7.1 Archive exists after test
+00:10 +21: 7. Test Completion & Verdict 7.2 Terminate infinite mode
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.00 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.00 | Session: active | In holdings: true
+  Terminated тАФ Verdict: BALANCED тАФ Developing Investor
+00:10 +22: 7. Test Completion & Verdict 7.3 Various verdict types
+
+тХРтХРтХР VERDICT EXAMPLES тХРтХРтХР
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $59.98 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.01 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.11 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.22 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.18 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.10 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.11 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.14 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.10 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.03 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $59.98 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $59.97 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.02 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $59.97 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.02 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.08 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.05 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.04 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.08 | Session: active | In holdings: true
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Asset: KO | Action: ADDITIONAL BUY | Price source: Engine (session.currentPrices) | Price: $60.09 | Session: active | In holdings: true
+  Trader (20 trades): BALANCED тАФ Developing Investor тАФ FS: 50
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.7 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.9 | Symbols driven by engine (1): KO
+  Minimal (3 trades):  BUFFETT SHIELD тАФ Disciplined Investor тАФ FS: 50
+00:10 +23: 8. Pre/Post Market Effects 8.1 Prices stay in clamp range
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.7 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.3 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.7 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.3 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР PRE/POST MARKET тХРтХРтХР
+  AAPL clamped: $142.08  [min=45.0, max=450.0]
+00:10 +24: 9. Comprehensive Market Analysis 9.1 1M duration тАФ all 6 sectors
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 21.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 21.0 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 20.5 | Symbols driven by engine (6): AAPL, JPM, KO, XOM, JNJ, PLD
+
+тХРтХРтХР LONG SIMULATION (1M) тХРтХРтХР
+  Portfolio: $28807.79  P&L: -3.97%
+  AAPL  $150.0 тЗТ $139.47  -7.02%
+  JPM   $65.0 тЗТ $55.14  -15.16%
+  KO    $60.0 тЗТ $59.72  -0.47%
+  XOM   $100.0 тЗТ $100.24  +0.24%
+  JNJ   $160.0 тЗТ $159.51  -0.30%
+  PLD   $120.0 тЗТ $118.65  -1.12%
+00:10 +25: 9. Comprehensive Market Analysis 9.2 KO (stable) vs TSLA (volatile) volatility
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): KO, TSLA
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): KO, TSLA
+
+тХРтХРтХР VOLATILITY: KO vs TSLA тХРтХРтХР
+  KO (Staples):   avg step 0.051%
+  TSLA (Tech):    avg step 0.785%
+  Ratio: 15.32├Ч  (TSLA should be more volatile)
+00:11 +26: 9. Comprehensive Market Analysis 9.3 Bear market тАФ staples vs tech
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): KO, AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 22.5 | Symbols driven by engine (2): KO, AAPL
+
+тХРтХРтХР BEAR MARKET тХРтХРтХР
+  Bears: 1/19
+  KO    +0.55%
+  AAPL  +0.75%
+00:11 +27: 10. Edge Cases & Stability 10.1 Start with no holdings goes to active
+00:11 +28: 10. Edge Cases & Stability 10.2 Trade on missing session fails
+00:11 +29: 10. Edge Cases & Stability 10.3 Price clamping after 100 refreshes
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: crash | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР CLAMP CHECK тХРтХРтХР
+  AAPL after 100 refs: $135.70  [45.0 тАж 450.0]
+00:11 +30: 10. Edge Cases & Stability 10.4 Multiple independent sessions
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, MSFT
+
+тХРтХРтХР MULTI-SESSION тХРтХРтХР
+  S1 (1W, KO):   $59.79
+  S2 (1M, AAPL): $149.24
+  S2 (MSFT):     $301.78
+00:12 +31: 11. Per-Stock Price Correction Events 11.1 Sector-dependent price correction events
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 22.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 22.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 22.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 22.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 22.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 22.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 22.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 24.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 24.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 24.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 24.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 24.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 24.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 24.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 25.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 25.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 25.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 25.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 25.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 25.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 25.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 27.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 27.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 27.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 27.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 27.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 27.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 27.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 28.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 29.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 30.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 30.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 30.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 30.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 30.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 30.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 30.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 30.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 32.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 32.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 32.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 32.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 32.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 32.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 32.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 33.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 33.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 33.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 33.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 33.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 33.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 33.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 35.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 35.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 35.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 35.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 35.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 35.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 35.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 36.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 36.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 36.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 36.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 36.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 36.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 36.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 38.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 38.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 38.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 38.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 38.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 38.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 38.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 39.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 39.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 39.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 39.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 39.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 39.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 39.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 41.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 41.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 41.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 41.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 41.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 41.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 41.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 42.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 42.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 42.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 42.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 42.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 42.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 42.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 44.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 44.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 44.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 44.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 44.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 44.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 44.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 45.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 45.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 45.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 45.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 45.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 45.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 45.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 47.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 47.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 47.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 47.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 47.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 47.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 47.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 48.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 48.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 48.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 48.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 48.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 48.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 48.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 50.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 50.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 50.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 50.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 50.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 50.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 50.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 51.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 51.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 51.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 51.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 51.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 51.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 51.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 53.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 53.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 53.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 53.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 53.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 53.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 53.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.1 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.3 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 57.7 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 57.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 56.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 55.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 54.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 53.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 53.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 53.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 53.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 53.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 53.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 53.9 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 53.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 53.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 53.4 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 53.4 | Symbols driven by engine (2): AAPL, KO
+
+тХРтХРтХР CORRECTION EVENT CHECK тХРтХРтХР
+  Refreshes: 500
+  AAPL final: $95.34
+  KO final:   $46.72
+00:14 +32: 11. Per-Stock Price Correction Events 11.2 Correction magnitude varies by sector (tech 10-15%)
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР CORRECTION MAGNITUDE тХРтХРтХР
+  Drop detected: 15.4%
+00:14 +33: 11. Per-Stock Price Correction Events 11.3 Correction does not affect other holdings
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 19.0 | Symbols driven by engine (2): AAPL, KO
+
+тХРтХРтХР CORRECTION INDEPENDENCE тХРтХРтХР
+  Max AAPL drop/step: 13.1%
+  Max KO drop/step:   0.0%
+  (Corrections are per-stock, not correlated)
+00:15 +34: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.1 Explanation log is populated after refresh
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+
+тХРтХРтХР EXPLAINABLE SIMULATION тХРтХРтХР
+  AAPL entries: 20
+  First: epoch#779 bull/sideways $150.00 тЖТ $149.90
+00:15 +35: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.2 Contributions sum to 100% (within tolerance)
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+
+тХРтХРтХР CONTRIBUTION SUM CHECK тХРтХРтХР
+  Entries checked: 60
+  Within tolerance: 60
+00:15 +36: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.3 MarketPct dominates in stable bull market
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР MARKET CONTRIBUTION тХРтХРтХР
+  Avg marketPct: 24.1%
+00:15 +37: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.4 SectorPct differs between tech and defensive sectors
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, KO
+
+тХРтХРтХР SECTOR CONTRIBUTION COMPARISON тХРтХРтХР
+  AAPL (tech) avg sectorPct: 0.3%
+  KO (consumer) avg sectorPct: 0.2%
+00:15 +38: 12. Explainable Simulation тАФ Price Contribution Breakdown 12.5 Correction event increases newsPct contribution
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 21.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 23.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 23.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 23.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 23.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 23.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 23.8 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР NEWS CONTRIBUTION (CORRECTION) тХРтХРтХР
+  Max newsPct observed: 100.0%
+00:16 +39: 13. Causal Chain тАФ Scenario тЖТ Phase тЖТ Explanation 13.1 Explanation captures phase and scenario metadata
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР CAUSAL CHAIN METADATA тХРтХРтХР
+  Phases observed: {bull, volatility, bear}
+  Scenarios observed: {bull}
+  Total ticks logged: 30
+00:16 +40: 13. Causal Chain тАФ Scenario тЖТ Phase тЖТ Explanation 13.2 PriceBefore and PriceAfter form a sequential chain
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+
+тХРтХРтХР PRICE CHAIN INTEGRITY тХРтХРтХР
+  AAPL: 25 ticks, $150.00 тЖТ $150.67
+  MSFT: 25 ticks, $300.00 тЖТ $297.75
+00:16 +41: 13. Causal Chain тАФ Scenario тЖТ Phase тЖТ Explanation 13.3 Scenario phase transitions create distinct patterns
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 22.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 22.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 20.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 20.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 18.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 18.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 14.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 14.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 12.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 12.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 8.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 8.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 2.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 2.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 0.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 0.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 8.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 8.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 11.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.0 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР PHASE TRANSITIONS тХРтХРтХР
+  Total ticks: 60
+  Unique phases: {bull, bear}
+  Phase transitions: 2
+  Phase transition: bull тЖТ bear
+    Before: M=54.5 S=24.6 C=0.0 N=0.0 Noise=20.9
+    After:  M=16.0 S=0.2 C=0.0 N=0.0 Noise=83.8
+00:17 +42: 13. Causal Chain тАФ Scenario тЖТ Phase тЖТ Explanation 13.4 Epoch scenario changes are reflected in explanation metadata
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 19.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 21.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.7 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.7 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 22.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.3 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.3 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.7 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.7 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 23.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.3 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.3 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.7 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.7 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 24.9 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 25.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 25.1 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 25.3 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 25.3 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 25.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 25.5 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР SCENARIO CONSISTENCY тХРтХРтХР
+  Epoch scenarios: {sideways, mortgageCrisis, bull, volatile, bear}
+  Scenarios in log: {sideways}
+  Mismatches: 0
+00:17 +43: 14. Determinism тАФ Seeded Reproducibility 14.1 Same seed тЖТ identical prices across two independent notifiers
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 18.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 18.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 14.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 14.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 12.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 12.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 8.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 8.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 6.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 6.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 2.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 2.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 0.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 0.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: -1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 18.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 18.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.0 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 14.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 14.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 12.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 12.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 10.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 8.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 8.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 6.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 6.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 4.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 2.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 2.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 0.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 0.5 | Symbols driven by engine (2): AAPL, MSFT
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: -1.5 | Symbols driven by engine (2): AAPL, MSFT
+
+тХРтХРтХР DETERMINISM CHECK тХРтХРтХР
+  Seed: 42, Ticks: 48
+  Epochs: n1=60, n2=60
+  AAPL : n1=$153.7424 n2=$153.7424  diff=0.00e+0
+  MSFT : n1=$296.0691 n2=$296.0691  diff=0.00e+0
+00:17 +44: 14. Determinism тАФ Seeded Reproducibility 14.2 Different seeds produce different price paths
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: volatility | Temp: 17.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 14.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 14.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 12.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 12.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 8.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 8.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 6.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 2.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 2.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 0.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: 0.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: -1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bear | Temp: -1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 0.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 1.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 3.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 4.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 6.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 7.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 9.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 10.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 12.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 13.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 15.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: bull | Temp: 16.5 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 18.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.6 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 19.8 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.0 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.2 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.4 | Symbols driven by engine (1): AAPL
+[FOMO SHIELD DIAGNOSTIC] Engine tick complete | Phase: sideways | Temp: 20.4 | Symbols driven by engine (1): AAPL
+
+тХРтХРтХР DIFFERENT SEEDS тХРтХРтХР
+  Seed 42: $140.8061
+  Seed 999: $117.8863
+  Diff: $22.9198
+00:18 +45: All tests passed!

@@ -1,0 +1,39 @@
+00:00 +0: loading D:/Projects/scanco/test/services/ko_stress_test_simulation.dart
+00:00 +0: KO 1-month stress test — buy & hold
+  Cash before buy: $10000.00
+  Buy result: true
+  Holdings: 1, Cash after: $0.00
+
+========== KO STRESS TEST — 1 MONTH ==========
+  Entry:  KO $80.48
+  Invest: $10000.00
+  Total epochs: 30
+
+---------- RESULTS ----------
+  Final price:  $59.51
+  Shares held:  124.2545
+  Final value:  $7394.05
+  P&L:          $-2605.95 (-26.06%)
+
+---------- SCENARIO LOG (30 epochs) ----------
+  bull: 11 ep. (36.7%)
+  bear: 5 ep. (16.7%)
+  volatile: 2 ep. (6.7%)
+  mortgageCrisis: 2 ep. (6.7%)
+  sideways: 8 ep. (26.7%)
+  blackSwan: 2 ep. (6.7%)
+
+---------- PRICE BEHAVIOR ----------
+  High:        $80.48
+  Low:         $58.71
+  Volatility:  $21.77 (27.0%)
+  Corrections (>10% drop/step): 2
+
+---------- VERDICT ----------
+  BALANCED — Developing Investor
+  FS Score: 37/100
+  Your trading patterns show a mix of behaviors. While you avoided major emotional pitfalls, there is room for improvement in your decision-making process. Focus on building a systematic approach to investing that minimizes emotional reactions.
+
+========== END ==========
+
+00:00 +1: All tests passed!

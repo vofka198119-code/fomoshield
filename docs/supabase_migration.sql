@@ -1,4 +1,76 @@
 -- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 002
+-- Table: user_data
+-- Description: Stores all user data (portfolios, watchlist, widget settings)
+-- =============================================================================
+--
+-- Each user gets a single JSONB row with all their app data:
+--   portfolios: JSON array of Portfolio objects (with transactions)
+--   watchlist:  JSON array of ticker symbols
+--   widget_order: JSON array of {id, visible} objects
+--
+-- This approach keeps RLS simple (one row per user) and avoids schema changes
+-- when adding new data types. Loaded on login, saved on every mutation.
+--
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS public.user_data (
+    id            UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    portfolios    JSONB NOT NULL DEFAULT '[]'::jsonb,
+    watchlist     JSONB NOT NULL DEFAULT '[]'::jsonb,
+    widget_order  JSONB NOT NULL DEFAULT '[]'::jsonb,
+    orders        JSONB NOT NULL DEFAULT '[]'::jsonb,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.user_data ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "user_data_select_own" ON public.user_data;
+CREATE POLICY "user_data_select_own"
+    ON public.user_data
+    FOR SELECT
+    USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "user_data_insert_own" ON public.user_data;
+CREATE POLICY "user_data_insert_own"
+    ON public.user_data
+    FOR INSERT
+    WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "user_data_update_own" ON public.user_data;
+CREATE POLICY "user_data_update_own"
+    ON public.user_data
+    FOR UPDATE
+    USING (auth.uid() = id);
+
+-- Auto-create user_data row on signup
+CREATE OR REPLACE FUNCTION public.handle_new_user_data()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = ''
+AS $$
+BEGIN
+    INSERT INTO public.user_data (id)
+    VALUES (NEW.id)
+    ON CONFLICT (id) DO NOTHING;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created_data
+    AFTER INSERT ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_new_user_data();
+
+-- Auto-update updated_at
+CREATE OR REPLACE TRIGGER on_user_data_updated
+    BEFORE UPDATE ON public.user_data
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+
+-- =============================================================================
 -- F.O.M.O. Shield — Supabase Migration 001
 -- Table: users
 -- Description: Stores user profile and setup progress
@@ -40,7 +112,8 @@ CREATE POLICY "users_insert_own"
     FOR INSERT
     WITH CHECK (auth.uid() = id);
 
-DROP POLICY IF EXISTS "users_update_own" ON public.users;
+DROP POLICY IF EXISTS "users_update_own" ON public.users
+;
 CREATE POLICY "users_update_own"
     ON public.users
     FOR UPDATE
@@ -105,3 +178,45 @@ CREATE OR REPLACE TRIGGER on_users_updated
     BEFORE UPDATE ON public.users
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 003
+-- Table: users (ALTER)
+-- Description: Adds subscription management columns
+-- =============================================================================
+--
+-- Adds:
+--   subscription_tier      — 'free', 'premium', or 'admin'
+--   subscription_expires_at — NULL for lifetime, timestamp for fixed-term
+--
+-- Usage:
+--   -- Make a user premium for 1 year:
+--   UPDATE public.users
+--   SET subscription_tier = 'premium',
+--       subscription_expires_at = now() + INTERVAL '1 year'
+--   WHERE email = 'user@example.com';
+--
+--   -- Make a user premium (lifetime):
+--   UPDATE public.users
+--   SET subscription_tier = 'premium',
+--       subscription_expires_at = NULL
+--   WHERE email = 'user@example.com';
+--
+-- =============================================================================
+
+ALTER TABLE public.users
+ADD COLUMN IF NOT EXISTS subscription_tier TEXT NOT NULL DEFAULT 'free';
+
+ALTER TABLE public.users
+ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ;
+
+-- =============================================================================
+-- Set vofka198119@gmail.com as Premium (5 years from now — test account)
+-- Run this AFTER running Migration 003 ALTER statements above.
+-- =============================================================================
+
+UPDATE public.users
+SET subscription_tier = 'premium',
+    subscription_expires_at = now() + INTERVAL '5 years'
+WHERE email = 'vofka198119@gmail.com';

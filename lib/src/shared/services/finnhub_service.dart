@@ -142,6 +142,44 @@ class FinnhubService {
   // Search
   // ---------------------------------------------------------------------------
 
+  /// Allowed exchanges for search results.
+  /// Empty = US (no suffix). .L = London Stock Exchange.
+  /// We keep ETFs (type='ETF') regardless of exchange.
+  static const _allowedExchangeSuffixes = {'', '.US', '.L'};
+
+  /// Exchanges to explicitly exclude (e.g. Warsaw, Mexico, etc.)
+  static const _excludedSuffixes = {
+    '.WA',  // Warsaw
+    '.MX',  // Mexico
+    '.BC',  // Colombia
+    '.LM',  // Chile
+    '.IS',  // Israel
+    '.TA',  // Tel Aviv
+    '.SS',  // Shanghai
+    '.SZ',  // Shenzhen
+    '.HK',  // Hong Kong
+    '.TW',  // Taiwan
+    '.KS',  // Korea
+    '.KQ',  // KOSDAQ
+    '.T',   // Tokyo
+    '.F',   // Frankfurt (we keep .DE for Xetra)
+    '.BE',  // Berlin
+    '.MU',  // Munich
+    '.HA',  // Hanover
+    '.SG',  // Singapore
+    '.OL',  // Oslo
+    '.ST',  // Stockholm
+    '.CO',  // Copenhagen
+    '.HE',  // Helsinki
+    '.VI',  // Vienna
+    '.AT',  // Athens
+    '.IR',  // Irish
+    '.LS',  // Lisbon
+    '.PA',  // Euronext Paris
+    '.AS',  // Euronext Amsterdam
+    '.BR',  // Euronext Brussels
+  };
+
   Future<List<Map<String, dynamic>>> search(String query) async {
     if (query.length < AppConstants.minSearchChars) return [];
     // Finnhub /search returns { "count": N, "result": [...] }
@@ -153,13 +191,33 @@ class FinnhubService {
     for (final item in items) {
       final m = Map<String, dynamic>.from(item);
       final symbol = m['symbol'] as String? ?? '';
-      // Deduplication: prefer US ticker (no dot)
-      final baseSymbol = symbol.split('.')[0];
-      if (seen.contains(baseSymbol)) continue;
-      if (symbol.contains('.') && symbol.endsWith('.US') == false) {
-        // Foreign listing, skip if we have US version
+      final type = (m['type'] as String? ?? '').toUpperCase();
+
+      // Always keep ETFs regardless of exchange
+      if (type == 'ETF') {
+        final baseSymbol = symbol.split('.')[0];
+        if (seen.contains(baseSymbol)) continue;
+        seen.add(baseSymbol);
+        results.add(m);
+        if (results.length >= AppConstants.maxSearchResults) break;
         continue;
       }
+
+      // Extract exchange suffix
+      final exchangeSuffix = symbol.contains('.')
+          ? '.${symbol.split('.').last}'
+          : '';
+
+      // Skip explicitly excluded exchanges
+      if (_excludedSuffixes.contains(exchangeSuffix)) continue;
+
+      // Check if exchange is allowed
+      if (!_allowedExchangeSuffixes.contains(exchangeSuffix)) continue;
+
+      // Deduplication: prefer US ticker (no dot) or .US
+      final baseSymbol = symbol.split('.')[0];
+      if (seen.contains(baseSymbol)) continue;
+
       seen.add(baseSymbol);
       results.add(m);
       if (results.length >= AppConstants.maxSearchResults) break;

@@ -9,7 +9,7 @@ class NewsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('News')),
+      appBar: AppBar(title: Text('News', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: AppTheme.accentBlue, letterSpacing: 1.5))),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -20,7 +20,7 @@ class NewsScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(
                 'No news yet',
-                style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
+                style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
               ),
               const SizedBox(height: 8),
               Text(

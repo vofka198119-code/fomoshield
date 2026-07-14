@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../shared/services/user_data_service.dart';
 import '../disclaimer/disclaimer_providers.dart';
 import 'auth_providers.dart';
 
@@ -24,6 +25,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool _rememberMe = false;
   String? _errorText;
 
+  // ── Rate Limiting (brute-force protection) ──────────────────────
+  int _failedAttempts = 0;
+  DateTime? _blockedUntil;
+
+  bool get _isBlocked =>
+      _blockedUntil != null && DateTime.now().isBefore(_blockedUntil!);
+
+  String? get _blockRemaining {
+    if (!_isBlocked) return null;
+    final remaining = _blockedUntil!.difference(DateTime.now()).inSeconds;
+    return 'Too many attempts. Try again in $remaining seconds.';
+  }
+
+  void _recordFailedAttempt() {
+    _failedAttempts++;
+    if (_failedAttempts >= 3) {
+      // Block: 30s → 5min → 15min → 30min
+      final durations = [30, 300, 900, 1800];
+      final level = (_failedAttempts - 3) % durations.length;
+      final seconds = durations[level];
+      _blockedUntil = DateTime.now().add(Duration(seconds: seconds));
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -32,6 +57,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _submit() async {
+    // ── Check rate limit ──────────────────────────────────────────
+    if (_isBlocked) {
+      setState(() => _errorText = _blockRemaining);
+      return;
+    }
+
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
@@ -52,6 +83,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           email: email,
           password: password,
         );
+        // Success → reset failed attempts counter
+        _failedAttempts = 0;
+        _blockedUntil = null;
       } else {
         // ── Sign Up — check for duplicate email first ────────────
         // Try signing in first — if it succeeds, email is already taken
@@ -86,6 +120,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           });
           return;
         }
+
+        // Sign up success → reset failed attempts
+        _failedAttempts = 0;
+        _blockedUntil = null;
       }
 
       if (!mounted) return;
@@ -97,6 +135,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       } else {
         await setIsLoggedIn(false);
       }
+
+      if (!mounted) return;
+
+      // ── Sync user data from Supabase ────────────────────────────
+      await ref.read(userDataSyncProvider.future);
 
       if (!mounted) return;
 
@@ -113,17 +156,27 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       }
     } on AuthException catch (e) {
       if (!mounted) return;
-      setState(() { _errorText = e.message; _isLoading = false; });
+      _recordFailedAttempt();
+      setState(() {
+        _errorText = _isBlocked ? _blockRemaining : e.message;
+        _isLoading = false;
+      });
     } catch (e) {
       if (!mounted) return;
-      setState(() { _errorText = 'Something went wrong. Please try again.'; _isLoading = false; });
+      _recordFailedAttempt();
+      setState(() {
+        _errorText = _isBlocked
+            ? _blockRemaining!
+            : 'Something went wrong. Please try again.';
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -134,7 +187,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
               // Back
               IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary),
                 onPressed: () => context.go('/'),
               ),
 
@@ -146,7 +199,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -203,6 +256,31 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
               const SizedBox(height: 12),
 
+              // Forgot Password link (sign-in mode only)
+              if (_isLogin)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => context.push('/forgot-password'),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 8),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Forgot Password?',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppTheme.accentBlue,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 4),
+
               // Remember Me checkbox
               Row(
                 children: [
@@ -233,7 +311,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submit,
+                  onPressed: (_isLoading || _isBlocked) ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.accentBlue,
                     foregroundColor: Colors.white,
@@ -246,7 +324,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppTheme.textPrimary,
                           ),
                         )
                       : Text(

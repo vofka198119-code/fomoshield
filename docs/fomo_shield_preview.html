@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOMO Shield Dashboard — Design Prototype</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #F8F5EC;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+  }
+
+  .container {
+    max-width: 420px;
+    width: 100%;
+    background: #F8F5EC;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 20px 20px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1F1F1F;
+    letter-spacing: -0.3px;
+  }
+  .header-meta {
+    font-size: 11px;
+    color: #7D7D7D;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .dev-bar {
+    margin: 0 20px 8px;
+    padding: 6px 12px;
+    background: rgba(30,32,34,0.05);
+    border-radius: 8px;
+    font-size: 10px;
+    color: #7D7D7D;
+    font-family: monospace;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ── Center Group Row ── */
+  .center-row {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px;
+  }
+
+  /* ── Left Card ── */
+  .left-card {
+    flex: 1;
+    background: #1E2022;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .card-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #7D7D7D;
+    font-weight: 600;
+  }
+  .bull-icon {
+    width: 28px; height: 28px;
+    background: rgba(90,164,105,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .phase-name {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .phase-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+  }
+  .temp-value {
+    color: #5AA469;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .temp-slider {
+    position: relative;
+    height: 4px;
+    background: linear-gradient(to right, #B95A5A, #E8C84A, #5AA469);
+    border-radius: 2px;
+    margin: 4px 0;
+  }
+  .temp-thumb {
+    position: absolute;
+    left: 52%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(90,164,105,0.5);
+    border: 2px solid #5AA469;
+  }
+  .temp-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Center Beast ── */
+  .center-beast {
+    flex: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 8px 0 0;
+  }
+  .beast-glow {
+    position: absolute;
+    top: 20px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(90,164,105,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .beast-body {
+    position: relative;
+    z-index: 1;
+    width: 80px; height: 90px;
+    background: #2A2D2F;
+    border-radius: 40px 40px 20px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .beast-shield {
+    width: 36px; height: 42px;
+    background: linear-gradient(135deg, #FFD700, #DAA520);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 900;
+    color: #8B6914;
+    box-shadow: 0 2px 8px rgba(218,165,32,0.4);
+  }
+  .beast-eyes {
+    display: flex;
+    gap: 12px;
+    margin-top: -4px;
+    position: relative;
+    z-index: 1;
+  }
+  .beast-eye {
+    width: 6px; height: 6px;
+    background: #fff;
+    border-radius: 50%;
+  }
+  .status-badge {
+    margin-top: 8px;
+    padding: 6px 16px;
+    background: rgba(30,32,34,0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    background: #5AA469;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #5AA469;
+  }
+  .status-label {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255,255,255,0.5);
+  }
+  .status-value {
+    font-size: 10px;
+    font-weight: 700;
+    color: #5AA469;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .manifesto {
+    margin-top: 8px;
+    font-size: 9px;
+    color: rgba(255,255,255,0.45);
+    font-style: italic;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .manifesto::before { content: '"'; }
+  .manifesto::after { content: '"'; }
+
+  /* ── Right Card (Psychology Meter) ── */
+  .right-card {
+    flex: 1;
+    background: #1E2022;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .donut-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    margin: 6px 0;
+  }
+  .donut-svg {
+    width: 100%;
+    height: 100%;
+  }
+  .donut-center {
+    position: absolute;
+    inset: 22%;
+    background: #1E2022;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .fs-score {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .fs-label {
+    font-size: 7px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.5px;
+  }
+  .fs-verdict {
+    font-size: 10px;
+    color: #5AA469;
+    font-weight: 700;
+  }
+  .sub-indices {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .sub-index {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.6);
+  }
+  .sub-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sub-val {
+    color: #fff;
+    font-weight: 600;
+    margin-left: auto;
+  }
+
+  /* ── Bottom Metrics Bar ── */
+  .metrics-bar {
+    margin: 8px 20px 0;
+    background: #1E2022;
+    border-radius: 12px;
+    padding: 10px 4px;
+    display: flex;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .metric-item {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 0 4px;
+  }
+  .metric-item + .metric-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10%;
+    height: 80%;
+    width: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+  .metric-icon {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .metric-name {
+    font-size: 6.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 600;
+  }
+  .metric-value {
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.2px;
+    line-height: 1.3;
+  }
+  .metric-status {
+    font-size: 7px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.3px;
+  }
+  .metric-status.green { color: #5AA469; }
+  .metric-status.yellow { color: #E8C84A; }
+  .metric-status.gray { color: rgba(255,255,255,0.3); }
+
+  /* ── Portfolio Section (mock) ── */
+  .portfolio-section {
+    margin: 12px 20px 20px;
+  }
+  .portfolio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 8px;
+  }
+  .portfolio-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1F1F1F;
+    letter-spacing: -0.5px;
+  }
+  .portfolio-change {
+    font-size: 12px;
+    font-weight: 700;
+    color: #5AA469;
+  }
+
+  .asset-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    gap: 10px;
+  }
+  .asset-row:last-child { border-bottom: none; }
+  .asset-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+  }
+  .asset-info { flex: 1; }
+  .asset-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1F1F1F;
+  }
+  .asset-shares {
+    font-size: 10px;
+    color: #7D7D7D;
+  }
+  .asset-price {
+    text-align: right;
+  }
+  .asset-price-val {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1F1F1F;
+  }
+  .asset-price-chg {
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .asset-price-chg.pos { color: #5AA469; }
+  .asset-price-chg.neg { color: #B95A5A; }
+
+  .sparkline-placeholder {
+    width: 36px; height: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .spark-svg {
+    width: 100%; height: 100%;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Dev Trace Bar -->
+  <div class="dev-bar">
+    <span>🔧 TICK: 47</span>
+    <span>PHASE: Bull</span>
+    <span>TEMP: +42</span>
+    <span>FATIGUE: 48%</span>
+    <span>SEED: 8731</span>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="header-title">Stress Test</div>
+      <div class="header-meta">Day 14 · Infinite Mode</div>
+    </div>
+    <div style="display:flex; gap:4px;">
+      <span style="font-size:18px;">⚙️</span>
+      <span style="font-size:18px;">⏸️</span>
+    </div>
+  </div>
+
+  <!-- Center Row -->
+  <div class="center-row">
+
+    <!-- LEFT: Market Phase + Temperature -->
+    <div class="left-card">
+      <div class="card-label">Market Phase</div>
+      <div class="bull-icon">🐂</div>
+      <div class="phase-name">Bull Market</div>
+      <div class="phase-sub">Optimism</div>
+      <div style="margin-top:6px;">
+        <div class="card-label">Temperature</div>
+        <div class="temp-value">+42</div>
+        <div class="temp-slider">
+          <div class="temp-thumb"></div>
+        </div>
+        <div class="temp-label">Warm</div>
+      </div>
+    </div>
+
+    <!-- CENTER: Beast -->
+    <div class="center-beast">
+      <div class="beast-glow"></div>
+      <div class="beast-body">
+        <div class="beast-shield">F</div>
+      </div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span class="status-label">Shield Status</span>
+        <span class="status-value">Stable</span>
+      </div>
+      <div class="manifesto">Market is in good shape. Stay disciplined.</div>
+    </div>
+
+    <!-- RIGHT: Psychology Meter -->
+    <div class="right-card">
+      <div class="card-label">Psychology Meter</div>
+      <div class="donut-container">
+        <svg class="donut-svg" viewBox="0 0 100 100">
+          <!-- 4 sectors with rounded caps -->
+          <circle cx="50" cy="50" r="34" fill="none" stroke="#4A90D9" stroke-width="8"
+            stroke-dasharray="53.4 160" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90,50,50)"/>
+          <circle cx="50" cy="50" r="34" fill="none" stroke="#5AA469" stroke-width="8"
+            stroke-dasharray="53.4 160" stroke-dashoffset="-53.4" stroke-linecap="round" transform="rotate(-90,50,50)"/>
+          <circle cx="50" cy="50" r="34" fill="none" stroke="#4FB6AD" stroke-width="8"
+            stroke-dasharray="53.4 160" stroke-dashoffset="-106.8" stroke-linecap="round" transform="rotate(-90,50,50)"/>
+          <circle cx="50" cy="50" r="34" fill="none" stroke="#E8944A" stroke-width="8"
+            stroke-dasharray="53.4 160" stroke-dashoffset="-160.2" stroke-linecap="round" transform="rotate(-90,50,50)"/>
+        </svg>
+        <div class="donut-center">
+          <div class="fs-label">FS Score</div>
+          <div class="fs-score">66</div>
+          <div class="fs-verdict">Good</div>
+        </div>
+      </div>
+      <div class="sub-indices">
+        <div class="sub-index"><span class="sub-dot" style="background:#4A90D9;"></span> Panic Resistance <span class="sub-val">72</span></div>
+        <div class="sub-index"><span class="sub-dot" style="background:#5AA469;"></span> Discipline <span class="sub-val">65</span></div>
+        <div class="sub-index"><span class="sub-dot" style="background:#4FB6AD;"></span> Awareness <span class="sub-val">58</span></div>
+        <div class="sub-index"><span class="sub-dot" style="background:#E8944A;"></span> Conviction <span class="sub-val">71</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Metrics Bar -->
+  <div class="metrics-bar">
+    <div class="metric-item">
+      <div class="metric-icon">🔵</div>
+      <div class="metric-name">Fear Index</div>
+      <div class="metric-value">34</div>
+      <div class="metric-status green">Moderate</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-icon">🔥</div>
+      <div class="metric-name">Fatigue</div>
+      <div class="metric-value">48%</div>
+      <div class="metric-status yellow">Medium</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-icon">🌿</div>
+      <div class="metric-name">Recovery</div>
+      <div class="metric-value">0%</div>
+      <div class="metric-status gray">Inactive</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-icon">📈</div>
+      <div class="metric-name">Volatility</div>
+      <div class="metric-value">1.2x</div>
+      <div class="metric-status green">Normal</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-icon">📅</div>
+      <div class="metric-name">Next Event</div>
+      <div class="metric-value" style="font-size:10px;">IPO</div>
+      <div class="metric-status green">In 5 days</div>
+    </div>
+  </div>
+
+  <!-- Portfolio Section -->
+  <div class="portfolio-section">
+    <div class="portfolio-header">
+      <div>
+        <div style="font-size:10px; color:#7D7D7D; font-weight:500; text-transform:uppercase; letter-spacing:0.5px;">Portfolio Value</div>
+        <div class="portfolio-value">$22,413.89</div>
+      </div>
+      <div class="portfolio-change">+$1,842.30 (8.9%)</div>
+    </div>
+
+    <!-- Asset rows -->
+    <div class="asset-row">
+      <div class="asset-icon" style="background:#005A9C;">M</div>
+      <div class="asset-info">
+        <div class="asset-name">Microsoft</div>
+        <div class="asset-shares">12 shares · avg $395.20</div>
+      </div>
+      <div>
+        <div class="asset-price-val">$4,891.44</div>
+        <div class="asset-price-chg pos">+$93.12 (1.9%)</div>
+      </div>
+    </div>
+    <div class="asset-row">
+      <div class="asset-icon" style="background:#5AA469;">N</div>
+      <div class="asset-info">
+        <div class="asset-name">NVIDIA</div>
+        <div class="asset-shares">8 shares · avg $128.50</div>
+      </div>
+      <div>
+        <div class="asset-price-val">$1,204.72</div>
+        <div class="asset-price-chg neg">-$22.18 (-1.8%)</div>
+      </div>
+    </div>
+    <div class="asset-row">
+      <div class="asset-icon" style="background:#E8944A;">A</div>
+      <div class="asset-info">
+        <div class="asset-name">Apple</div>
+        <div class="asset-shares">4 shares · avg $88.90</div>
+      </div>
+      <div>
+        <div class="asset-price-val">$381.16</div>
+        <div class="asset-price-chg pos">+$7.24 (1.9%)</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

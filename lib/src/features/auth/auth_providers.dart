@@ -91,3 +91,23 @@ Future<void> setIsLoggedIn(bool value) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool('is_logged_in', value);
 }
+
+// ---------------------------------------------------------------------------
+// Session Data Cleanup — call on logout to prevent data leaks between accounts
+// ---------------------------------------------------------------------------
+
+/// Clears auth session data and credentials.
+/// Does NOT clear SharedPreferences (portfolios, watchlist, widget order)
+/// so data persists for the next login under the same email.
+Future<void> clearAllSessionData() async {
+  // 1) Clear Remember Me credentials from FlutterSecureStorage
+  await _secureStorage.delete(key: RememberMeNotifier._emailKey);
+  await _secureStorage.delete(key: RememberMeNotifier._passwordKey);
+
+  // 2) Clear is_logged_in flag
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('is_logged_in', false);
+
+  // 3) Sign out from Supabase
+  await SupabaseConfig.client.auth.signOut();
+}

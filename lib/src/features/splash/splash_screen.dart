@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../disclaimer/disclaimer_providers.dart';
@@ -50,10 +49,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
       if (!isLoggedIn) {
         _navigated = true;
-        // Force-clear any lingering Supabase session
-        if (SupabaseConfig.client.auth.currentSession != null) {
-          await SupabaseConfig.client.auth.signOut();
-        }
+        // Force-clear any lingering Supabase session + local data
+        await clearAllSessionData();
         if (!mounted) return;
         context.go('/auth');
         return;
@@ -65,11 +62,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
       if (savedCreds == null) {
         _navigated = true;
-        if (SupabaseConfig.client.auth.currentSession != null) {
-          await SupabaseConfig.client.auth.signOut();
-        }
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('is_logged_in', false);
+        await clearAllSessionData();
         if (!mounted) return;
         context.go('/auth');
         return;
@@ -82,12 +75,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         );
       } catch (_) {
         _navigated = true;
-        if (SupabaseConfig.client.auth.currentSession != null) {
-          await SupabaseConfig.client.auth.signOut();
-        }
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('is_logged_in', false);
-        await ref.read(rememberMeProvider.notifier).clear();
+        await clearAllSessionData();
         if (!mounted) return;
         context.go('/auth');
         return;
@@ -114,7 +102,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: Center(
@@ -137,7 +125,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     width: 132,
                     height: 132,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(
+                    errorBuilder: (_, _, _) => const Icon(
                       Icons.shield_rounded,
                       size: 62,
                       color: AppTheme.accentBlue,

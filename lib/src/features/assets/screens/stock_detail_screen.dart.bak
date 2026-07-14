@@ -1,0 +1,1459 @@
+// ---------------------------------------------------------------------------
+// Stress Test Stock Detail Screen — stock detail (Block 2)
+// ---------------------------------------------------------------------------
+// Trading 212 style:
+//   - Header: logo, name, ticker/exchange
+//   - Price (large) + change badge
+//   - Sparkline (CustomPainter, real price history) + period toggles (1D, 1W, 1M, 3M, 1Y, MAX)
+//   - AVG PRICE dashed line on sparkline (if held)
+//   - Open-price dashed reference line
+//   - "Your Position" card (if held)
+//   - Transaction History
+//   - Bottom Buy / Sell buttons
+// ---------------------------------------------------------------------------
+
+import 'dart:math';
+import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/cache/logo_providers.dart';
+import '../../../shared/services/finnhub_service.dart';
+import '../../../shared/widgets/company_logo.dart';
+import '../../../shared/widgets/explainable_card.dart';
+import '../../../shared/widgets/why_sheet.dart';
+import '../../stress_test/stress_test_models.dart';
+import '../../stress_test/stress_test_engine.dart';
+
+/// Sparkline periods
+enum _SparkPeriod { d1, w1, m1, m3, y1, max }
+
+/// Market session phases for UI display.
+enum _MarketPhase { preMarket, regular, postMarket, closed }
+
+_MarketPhase _currentMarketPhase() {
+  final now = DateTime.now();
+  if (now.weekday == DateTime.saturday || now.weekday == DateTime.sunday) {
+    return _MarketPhase.closed;
+  }
+  final hour = now.hour;
+  if (hour < 9 || hour >= 19) return _MarketPhase.closed;
+  if (hour < 11) return _MarketPhase.preMarket;
+  if (hour < 17) return _MarketPhase.regular;
+  return _MarketPhase.postMarket;
+}
+
+({String label, String emoji, Color color}) _marketPhaseDisplay(
+  _MarketPhase phase,
+) {
+  return switch (phase) {
+    _MarketPhase.preMarket => (
+      label: 'Pre-market',
+      emoji: '🌅',
+      color: const Color(0xFFE67E22),
+    ),
+    _MarketPhase.regular => (
+      label: 'Open',
+      emoji: '🟢',
+      color: AppTheme.shieldGreen,
+    ),
+    _MarketPhase.postMarket => (
+      label: 'After-hours',
+      emoji: '🌆',
+      color: const Color(0xFF8E44AD),
+    ),
+    _MarketPhase.closed => (
+      label: 'Market closed',
+      emoji: '🌙',
+      color: AppTheme.textDim,
+    ),
+  };
+}
+
+class StockDetailScreen extends ConsumerStatefulWidget {
+  final String sessionId;
+  final String symbol;
+
+  const StockDetailScreen({
+    super.key,
+    required this.sessionId,
+    required this.symbol,
+  });
+
+  @override
+  ConsumerState<StockDetailScreen> createState() => _StockDetailScreenState();
+}
+
+class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
+  _SparkPeriod _selectedPeriod = _SparkPeriod.m1;
+  List<double> _rawPrices = [];
+  bool _chartReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _generateSparkData();
+    // If this is a new asset (not yet in portfolio), fetch price from Finnhub
+    Future.microtask(() => _ensurePriceForNewAsset());
+  }
+
+  @override
+  void didUpdateWidget(StockDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.symbol != widget.symbol ||
+        oldWidget.sessionId != widget.sessionId) {
+      _generateSparkData();
+    }
+  }
+
+  void _generateSparkData() {
+    final session = _session;
+    if (session == null) return;
+
+    // Sync period to available options for current duration
+    final available = _availablePeriods(session);
+    if (!available.contains(_selectedPeriod)) {
+      _selectedPeriod = available.first;
+    }
+
+    final history = session.priceHistory[widget.symbol] ?? [];
+    if (history.isEmpty) {
+      // Fallback: flat line at current price
+      final price =
+          session.currentPrices[widget.symbol] ??
+          session.basePrices[widget.symbol] ??
+          100.0;
+      setState(() {
+        _rawPrices = [price, price];
+        _chartReady = true;
+      });
+      return;
+    }
+
+    // Determine target point count for the selected period.
+    // We downsample evenly if history has more points than needed.
+    final targetCount = switch (_selectedPeriod) {
+      _SparkPeriod.d1 => 24,
+      _SparkPeriod.w1 => 30,
+      _SparkPeriod.m1 => 60,
+      _SparkPeriod.m3 => 90,
+      _SparkPeriod.y1 => 120,
+      _SparkPeriod.max => 200,
+    };
+
+    final sampled = _sampleData(history, targetCount);
+
+    setState(() {
+      _rawPrices = sampled;
+      _chartReady = true;
+    });
+  }
+
+  /// Evenly downsample [data] to at most [targetCount] points,
+  /// always keeping the very last point as-is.
+  List<double> _sampleData(List<double> data, int targetCount) {
+    if (data.length <= targetCount) return data;
+    final step = data.length / targetCount;
+    final result = <double>[];
+    for (int i = 0; i < targetCount; i++) {
+      final idx = (i * step).floor();
+      result.add(data[idx.clamp(0, data.length - 1)]);
+    }
+    result.last = data.last;
+    return result;
+  }
+
+  StressTestSession? get _session {
+    return ref.read(stressTestProvider.notifier).getSession(widget.sessionId);
+  }
+
+  /// Returns available sparkline periods based on session duration.
+  List<_SparkPeriod> _availablePeriods(StressTestSession session) {
+    return switch (session.duration) {
+      TestDuration.week1 => [_SparkPeriod.d1, _SparkPeriod.w1],
+      TestDuration.month1 => [
+        _SparkPeriod.d1,
+        _SparkPeriod.w1,
+        _SparkPeriod.m1,
+      ],
+      TestDuration.months3 => [
+        _SparkPeriod.d1,
+        _SparkPeriod.w1,
+        _SparkPeriod.m1,
+        _SparkPeriod.m3,
+      ],
+      TestDuration.infinite => [
+        _SparkPeriod.d1,
+        _SparkPeriod.w1,
+        _SparkPeriod.m1,
+        _SparkPeriod.m3,
+        _SparkPeriod.y1,
+      ],
+      TestDuration.custom => [
+        _SparkPeriod.d1,
+        _SparkPeriod.w1,
+        _SparkPeriod.m1,
+        _SparkPeriod.m3,
+        _SparkPeriod.y1,
+      ],
+    };
+  }
+
+  StressTestHolding? _findHolding(StressTestSession session) {
+    try {
+      return session.holdings.firstWhere((h) => h.symbol == widget.symbol);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// For a new asset not yet in the portfolio, fetch the current price
+  /// from Finnhub and store it in the engine via setExternalPrice.
+  Future<void> _ensurePriceForNewAsset() async {
+    final session = ref
+        .read(stressTestProvider.notifier)
+        .getSession(widget.sessionId);
+    if (session == null) return;
+
+    final isHeld = session.holdings.any((h) => h.symbol == widget.symbol);
+    final hasPrice =
+        session.currentPrices.containsKey(widget.symbol) ||
+        session.basePrices.containsKey(widget.symbol);
+
+    if (!isHeld && !hasPrice) {
+      try {
+        final quote = await FinnhubService().quote(widget.symbol);
+        if (!mounted) return;
+        final price = (quote['c'] as num?)?.toDouble() ?? 0;
+        if (price > 0) {
+          ref
+              .read(stressTestProvider.notifier)
+              .setExternalPrice(widget.sessionId, widget.symbol, price);
+          _generateSparkData();
+        }
+      } catch (_) {
+        // Silently fail — price remains 0, user sees fallback
+      }
+    }
+  }
+
+  /// Показывает WhySheet с разложением изменения цены на факторы.
+  void _showWhySheet() {
+    final session = _session;
+    if (session == null) return;
+
+    final tickLog = session.explanationLog[widget.symbol];
+    final latest = tickLog?.isNotEmpty == true ? tickLog!.last : null;
+
+    // Если нет TickExplanation — fallback к грубой оценке от базовой цены
+    if (latest == null) {
+      final currentPrice =
+          session.currentPrices[widget.symbol] ??
+          session.basePrices[widget.symbol] ??
+          0;
+      final basePrice = session.basePrices[widget.symbol] ?? currentPrice;
+      final priceChangePercent = basePrice > 0
+          ? ((currentPrice - basePrice) / basePrice) * 100
+          : 0.0;
+      final data = ExplainableData(
+        symbol: widget.symbol,
+        changePercent: priceChangePercent,
+        contributions: PriceContribution(
+          marketPct: 40,
+          sectorPct: 25,
+          companyPct: 15,
+          newsPct: 12,
+          noisePct: 8,
+        ),
+        marketPhase: session.devMarketPhase,
+        scenario: session.devMarketPhase,
+      );
+      final temperature = session.devMarketTemperature;
+      showWhySheet(context, data: data, temperature: temperature);
+      return;
+    }
+
+    // ── Sandbox Isolation (Step 4): используем тот же TickExplanation,
+    //    что и основной ExplainableCard — единый источник фактов ──
+    final data = ExplainableData.fromExplanation(latest);
+    final temperature = session.devMarketTemperature;
+
+    showWhySheet(context, data: data, temperature: temperature);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(stressTestRefreshProvider);
+    final session = _session;
+    if (session == null) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: const Center(child: Text('Session not found')),
+      );
+    }
+
+    final currentPrice =
+        session.currentPrices[widget.symbol] ??
+        session.basePrices[widget.symbol] ??
+        0;
+    final basePrice = session.basePrices[widget.symbol] ?? currentPrice;
+    final priceChange = currentPrice - basePrice;
+    final priceChangePercent = basePrice > 0
+        ? (priceChange / basePrice) * 100
+        : 0.0;
+    final isPositive = priceChange >= 0;
+    final holding = _findHolding(session);
+    final logoAsync = ref.watch(cachedLogoProvider(widget.symbol));
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ── Scrollable Content ────────────────────────────
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // ── Header ─────────────────────────────────
+                    _buildHeader(session, logoAsync, holding),
+
+                    // ── Price ──────────────────────────────────
+                    _buildPriceBlock(
+                      session: session,
+                      currentPrice: currentPrice,
+                      priceChange: priceChange,
+                      priceChangePercent: priceChangePercent,
+                      isPositive: isPositive,
+                    ),
+
+                    // ── Sparkline ──────────────────────────────
+                    _buildSparkline(holding: holding),
+
+                    // ── Period Toggles ─────────────────────────
+                    _buildPeriodToggles(),
+
+                    // ── Investment Card (if held) ──────────────
+                    if (holding != null) _buildInvestmentCard(holding, session),
+
+                    // ── Transaction History ────────────────────
+                    _buildTransactionHistory(session),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Bottom Buy/Sell Button ─────────────────────────
+            _buildBottomButtons(session),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(
+    StressTestSession session,
+    AsyncValue<String?> logoAsync,
+    StressTestHolding? holding,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Column(
+        children: [
+          // Top bar with back button
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_rounded,
+                  color: AppTheme.textPrimary,
+                ),
+                onPressed: () => context.pop(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Logo + Name + Ticker
+          Row(
+            children: [
+              SizedBox(
+                width: 56,
+                height: 56,
+                child: logoAsync.when(
+                  data: (url) => CompanyLogo(
+                    ticker: widget.symbol,
+                    logoUrl: url,
+                    radius: 28,
+                  ),
+                  error: (_, _) =>
+                      CompanyLogo(ticker: widget.symbol, radius: 28),
+                  loading: () => CompanyLogo(ticker: widget.symbol, radius: 28),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _companyName(widget.symbol),
+                    style: GoogleFonts.inter(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${widget.symbol} · NYSE',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceBlock({
+    required StressTestSession session,
+    required double currentPrice,
+    required double priceChange,
+    required double priceChangePercent,
+    required bool isPositive,
+  }) {
+    final phase = _currentMarketPhase();
+    final phaseInfo = _marketPhaseDisplay(phase);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Price row ──
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.end,
+            spacing: 8,
+            children: [
+              Text(
+                '\$${currentPrice.toStringAsFixed(2)}',
+                style: GoogleFonts.inter(
+                  fontSize: 40,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.textPrimary,
+                  height: 1.0,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isPositive
+                      ? AppTheme.shieldGreen.withValues(alpha: 0.12)
+                      : AppTheme.dangerRed.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '${isPositive ? '+' : ''}${priceChange.toStringAsFixed(2)} '
+                  '(${isPositive ? '+' : ''}${priceChangePercent.toStringAsFixed(2)}%)',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: isPositive
+                        ? AppTheme.shieldGreen
+                        : AppTheme.dangerRed,
+                  ),
+                ),
+              ),
+              // ── Why? button ──
+              if (session.explanationLog.containsKey(widget.symbol))
+                GestureDetector(
+                  onTap: () => _showWhySheet(),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.accentBlue.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'Why?',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.accentBlue,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // ── Market status row ──
+          GestureDetector(
+            onTap: () => _showMarketHoursSheet(),
+            child: Row(
+              children: [
+                Text(phaseInfo.emoji, style: const TextStyle(fontSize: 14)),
+                const SizedBox(width: 6),
+                Text(
+                  phaseInfo.label,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: phaseInfo.color,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: 14,
+                  color: AppTheme.textDim.withValues(alpha: 0.6),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSparkline({StressTestHolding? holding}) {
+    if (!_chartReady || _rawPrices.isEmpty) {
+      return const SizedBox(
+        height: 160,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final isUp = _rawPrices.last >= _rawPrices.first;
+    final lineColor = isUp ? AppTheme.shieldGreen : AppTheme.dangerRed;
+    final openPrice = _rawPrices.first;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 160,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ClipRect(
+              child: CustomPaint(
+                size: const Size(double.infinity, 160),
+                painter: _SparklinePainter(
+                  prices: _rawPrices,
+                  avgPrice: holding?.averagePrice,
+                  lineColor: lineColor,
+                ),
+              ),
+            ),
+          ),
+        ),
+        // O: and AVG row below chart canvas
+        Padding(
+          padding: const EdgeInsets.only(left: 28, right: 28, top: 4),
+          child: Row(
+            children: [
+              _techLabel('O:', openPrice),
+              if (holding != null) ...[
+                const SizedBox(width: 16),
+                _techLabel('AVG', holding.averagePrice),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _techLabel(String prefix, double price) {
+    return Text(
+      '$prefix \$${price.toStringAsFixed(2)}',
+      style: GoogleFonts.inter(
+        fontSize: 11,
+        color: AppTheme.textDim.withValues(alpha: 0.5),
+      ),
+    );
+  }
+
+  Widget _buildPeriodToggles() {
+    final session = _session;
+    if (session == null) return const SizedBox.shrink();
+
+    final periods = _availablePeriods(session);
+    const labels = {
+      _SparkPeriod.d1: '1D',
+      _SparkPeriod.w1: '1W',
+      _SparkPeriod.m1: '1M',
+      _SparkPeriod.m3: '3M',
+      _SparkPeriod.y1: '1Y',
+      _SparkPeriod.max: 'MAX',
+    };
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: periods.map((period) {
+          final isActive = _selectedPeriod == period;
+          return GestureDetector(
+            onTap: () {
+              if (_selectedPeriod != period) {
+                setState(() => _selectedPeriod = period);
+                _generateSparkData();
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: isActive ? AppTheme.accentBlue : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: Text(
+                labels[period]!,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isActive
+                      ? AppTheme.accentBlue
+                      : AppTheme.textSecondary,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildInvestmentCard(
+    StressTestHolding holding,
+    StressTestSession session,
+  ) {
+    final pnl = session.positionPnL[widget.symbol] ?? 0.0;
+    final isProfitPositive = pnl >= 0;
+    final costBasis = holding.shares * holding.avgCost;
+    final positionValue = costBasis + pnl;
+    final profit = pnl;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppTheme.textSecondary.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'YOUR POSITION',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.accentBlue,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Row 1: VALUE | P&L
+          Row(
+            children: [
+              Expanded(
+                child: _investMetric(
+                  label: 'VALUE',
+                  value: '\$${_fmt(positionValue)}',
+                  valueColor: AppTheme.textPrimary,
+                ),
+              ),
+              Expanded(
+                child: _investMetric(
+                  label: 'P&L',
+                  value:
+                      '${isProfitPositive ? '+' : ''}\$${_fmt(profit.abs())}',
+                  valueColor: isProfitPositive
+                      ? AppTheme.shieldGreen
+                      : AppTheme.dangerRed,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          // Row 2: SHARES | AVG PRICE
+          Row(
+            children: [
+              Expanded(
+                child: _investMetric(
+                  label: 'SHARES',
+                  value: holding.shares.toStringAsFixed(2),
+                  valueColor: AppTheme.textPrimary,
+                ),
+              ),
+              Expanded(
+                child: _investMetric(
+                  label: 'AVG PRICE',
+                  value: '\$${holding.averagePrice.toStringAsFixed(2)}',
+                  valueColor: AppTheme.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _investMetric({
+    required String label,
+    required String value,
+    required Color valueColor,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.textDim,
+            letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: valueColor,
+            letterSpacing: -0.3,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTransactionHistory(StressTestSession session) {
+    final symbolTrades =
+        session.trades.where((t) => t.symbol == widget.symbol).toList()
+          ..sort((a, b) => b.date.compareTo(a.date));
+
+    final displayTrades = symbolTrades.take(5).toList();
+    final hasMore = symbolTrades.length > 5;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppTheme.textSecondary.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'TRANSACTION HISTORY',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.accentBlue,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (displayTrades.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                'No transactions yet',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: AppTheme.textDim,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            )
+          else ...[
+            ...displayTrades.map((t) => _buildTradeRow(t, session)),
+            if (hasMore)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Center(
+                  child: TextButton(
+                    onPressed: () {
+                      // Navigate to full trade list (future)
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppTheme.textDim,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
+                    ),
+                    child: Text(
+                      'See All (${symbolTrades.length})',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.textDim,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTradeRow(StressTestTrade trade, StressTestSession session) {
+    final day = session.startedAt != null
+        ? (trade.date.difference(session.startedAt!).inDays + 1)
+        : 0;
+    final isBuy = trade.isBuy;
+    final totalAmount = trade.shares * trade.price;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          // Left: BUY/SELL badge + day
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isBuy ? 'BUY' : 'SELL',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: isBuy
+                      ? AppTheme.shieldGreen.withValues(alpha: 0.8)
+                      : AppTheme.dangerRed.withValues(alpha: 0.8),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Day $day',
+                style: GoogleFonts.inter(fontSize: 11, color: AppTheme.textDim),
+              ),
+            ],
+          ),
+          const SizedBox(width: 12),
+          // Separator line
+          Container(
+            width: 2,
+            height: 32,
+            decoration: BoxDecoration(
+              color: isBuy
+                  ? AppTheme.shieldGreen.withValues(alpha: 0.2)
+                  : AppTheme.dangerRed.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(1),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Right: shares + amount
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '${isBuy ? '+' : '-'}${trade.shares.toStringAsFixed(4)} ${widget.symbol}',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '\$${_fmt(totalAmount)}',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: AppTheme.textDim,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomButtons(StressTestSession session) {
+    final currentPrice =
+        session.currentPrices[widget.symbol] ??
+        session.basePrices[widget.symbol] ??
+        0;
+    final hasShares = _findHolding(session) != null;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+      decoration: const BoxDecoration(
+        color: AppTheme.card,
+        border: Border(top: BorderSide(color: AppTheme.borderSubtle)),
+      ),
+      child: Row(
+        children: [
+          // Buy button
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                context.push(
+                  '/stress-test/${widget.sessionId}/stock/${widget.symbol}/order',
+                  extra: {'type': 'buy', 'price': currentPrice},
+                );
+              },
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppTheme.accentBlue,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'Buy',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (hasShares) ...[
+            const SizedBox(width: 12),
+            // Sell button
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  context.push(
+                    '/stress-test/${widget.sessionId}/stock/${widget.symbol}/order',
+                    extra: {'type': 'sell', 'price': currentPrice},
+                  );
+                },
+                child: Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: AppTheme.dangerRed,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Sell',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Show market hours bottom sheet (Revolut-style).
+  void _showMarketHoursSheet() {
+    final currentPhase = _currentMarketPhase();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          top: false,
+          bottom: true,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                24,
+                12,
+                24,
+                MediaQuery.of(ctx).padding.bottom + 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppTheme.textDim.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Market Hours',
+                    style: GoogleFonts.inter(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Trading schedule for simulated market engine',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Session rows
+                  _marketHourRow(
+                    emoji: '🌅',
+                    label: 'Pre-market',
+                    time: '09:00 – 10:59',
+                    desc: 'Low volatility, sleepy price action',
+                    isActive: currentPhase == _MarketPhase.preMarket,
+                  ),
+                  const SizedBox(height: 12),
+                  _marketHourRow(
+                    emoji: '🟢',
+                    label: 'Main session',
+                    time: '11:00 – 16:59',
+                    desc: 'Full activity, maximum volatility',
+                    isActive: currentPhase == _MarketPhase.regular,
+                  ),
+                  const SizedBox(height: 12),
+                  _marketHourRow(
+                    emoji: '🌆',
+                    label: 'After-hours',
+                    time: '17:00 – 18:59',
+                    desc: 'Fading activity, noise dies down',
+                    isActive: currentPhase == _MarketPhase.postMarket,
+                  ),
+                  const SizedBox(height: 12),
+                  _marketHourRow(
+                    emoji: '🌙',
+                    label: 'Market closed',
+                    time: '19:00 – 08:59',
+                    desc: 'No trading, weekend included',
+                    isActive: currentPhase == _MarketPhase.closed,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Single row in market hours sheet.
+  Widget _marketHourRow({
+    required String emoji,
+    required String label,
+    required String time,
+    required String desc,
+    required bool isActive,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isActive
+            ? AppTheme.accentBlue.withValues(alpha: 0.08)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        border: isActive
+            ? Border.all(
+                color: AppTheme.accentBlue.withValues(alpha: 0.25),
+                width: 1.5,
+              )
+            : null,
+      ),
+      child: Row(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 20)),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: isActive
+                            ? AppTheme.accentBlue
+                            : AppTheme.textPrimary,
+                      ),
+                    ),
+                    if (isActive) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.accentBlue.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'NOW',
+                          style: GoogleFonts.inter(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.accentBlue,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  time,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  desc,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: AppTheme.textDim,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _fmt(double v) {
+    return NumberFormat('#,##0.00', 'en_US').format(v);
+  }
+
+  String _companyName(String symbol) {
+    const names = <String, String>{
+      'AAPL': 'Apple',
+      'MSFT': 'Microsoft',
+      'GOOGL': 'Alphabet',
+      'GOOG': 'Alphabet',
+      'AMZN': 'Amazon',
+      'META': 'Meta',
+      'NVDA': 'NVIDIA',
+      'TSLA': 'Tesla',
+      'AMD': 'AMD',
+      'INTC': 'Intel',
+      'CRM': 'Salesforce',
+      'ADBE': 'Adobe',
+      'NFLX': 'Netflix',
+      'CSCO': 'Cisco',
+      'ORCL': 'Oracle',
+      'IBM': 'IBM',
+      'QCOM': 'Qualcomm',
+      'TXN': 'Texas Instruments',
+      'AVGO': 'Broadcom',
+      'MU': 'Micron',
+      'JPM': 'JPMorgan Chase',
+      'BAC': 'Bank of America',
+      'C': 'Citigroup',
+      'GS': 'Goldman Sachs',
+      'MS': 'Morgan Stanley',
+      'WFC': 'Wells Fargo',
+      'AXP': 'American Express',
+      'V': 'Visa',
+      'MA': 'Mastercard',
+      'BLK': 'BlackRock',
+      'SCHW': 'Charles Schwab',
+      'PYPL': 'PayPal',
+      'JNJ': 'Johnson & Johnson',
+      'PFE': 'Pfizer',
+      'UNH': 'UnitedHealth',
+      'ABBV': 'AbbVie',
+      'MRK': 'Merck',
+      'ABT': 'Abbott',
+      'LLY': 'Eli Lilly',
+      'MDT': 'Medtronic',
+      'BMY': 'Bristol-Myers',
+      'AMGN': 'Amgen',
+      'KO': 'Coca-Cola',
+      'PEP': 'PepsiCo',
+      'PG': 'Procter & Gamble',
+      'WMT': 'Walmart',
+      'COST': 'Costco',
+      'MO': 'Altria',
+      'CL': 'Colgate',
+      'KMB': 'Kimberly-Clark',
+      'SYY': 'Sysco',
+      'GIS': 'General Mills',
+      'NOVA': 'NovaGenix',
+      'ZEN': 'Zenith AI',
+      'AURA': 'Aura Energy',
+      'VERT': 'VertiCarbon',
+      'CORE': 'CoreVault',
+      'MORF': 'Morphic Labs',
+      'DRIF': 'Drift Auto',
+      'PULS': 'Pulse Health',
+      'CASP': 'Caspian Data',
+      'NEXO': 'NexoGene',
+    };
+    return names[symbol] ?? symbol;
+  }
+}
+
+// ── Custom Painter for sparkline ────────────────────────────────────────────
+class _SparklinePainter extends CustomPainter {
+  final List<double> prices;
+  final double? avgPrice;
+  final Color lineColor;
+
+  _SparklinePainter({
+    required this.prices,
+    this.avgPrice,
+    required this.lineColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (prices.length < 2) return;
+
+    const topPad = 20.0;
+    const bottomPad = 24.0;
+    const leftPad = 12.0;
+    const rightPad = 12.0;
+    final chartW = size.width - leftPad - rightPad;
+    final chartH = size.height - topPad - bottomPad;
+
+    final minPrice = prices.reduce(min);
+    final maxPrice = prices.reduce(max);
+    final range = maxPrice - minPrice;
+
+    // Map price to Y (min → bottom+pad, max → top+pad)
+    double yPrice(double p) {
+      if (range == 0) return size.height / 2;
+      return topPad + chartH * (1 - (p - minPrice) / range);
+    }
+
+    // Map index to X
+    double xIdx(int i) {
+      return leftPad + (i / (prices.length - 1)) * chartW;
+    }
+
+    // ── Dashed open‑price line (from first point → right edge) ──
+    final openPrice = prices.first;
+    final openY = yPrice(openPrice);
+    final dashPaint = Paint()
+      ..color = AppTheme.textDim.withValues(alpha: 0.25)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+    _drawDashedLine(
+      canvas,
+      leftPad,
+      openY,
+      size.width - rightPad,
+      openY,
+      dashPaint,
+    );
+
+    final labelStyle = TextStyle(
+      color: AppTheme.textDim.withValues(alpha: 0.5),
+      fontSize: 9,
+      fontWeight: FontWeight.w400,
+    );
+
+    // ── AVG PRICE dashed line (label moved below chart) ──
+    if (avgPrice != null &&
+        avgPrice! >= minPrice * 0.995 &&
+        avgPrice! <= maxPrice * 1.005) {
+      final avgY = yPrice(avgPrice!);
+      final avgPaint = Paint()
+        ..color = AppTheme.textDim.withValues(alpha: 0.4)
+        ..strokeWidth = 1.0
+        ..style = PaintingStyle.stroke;
+      _drawDashedLine(
+        canvas,
+        leftPad,
+        avgY,
+        size.width - rightPad,
+        avgY,
+        avgPaint,
+      );
+    }
+
+    // ── Price line (straight segments, NO Bezier) ──
+    final path = Path();
+    path.moveTo(xIdx(0), yPrice(prices[0]));
+    for (int i = 1; i < prices.length; i++) {
+      path.lineTo(xIdx(i), yPrice(prices[i]));
+    }
+
+    final linePaint = Paint()
+      ..color = lineColor
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawPath(path, linePaint);
+
+    // ── Gradient fill below the line ──
+    final fillPath = Path.from(path);
+    final lastX = xIdx(prices.length - 1);
+    fillPath.lineTo(lastX, size.height);
+    fillPath.lineTo(xIdx(0), size.height);
+    fillPath.close();
+
+    final gradient = ui.Gradient.linear(
+      Offset(0, topPad),
+      Offset(0, size.height - bottomPad),
+      [lineColor.withValues(alpha: 0.12), lineColor.withValues(alpha: 0.0)],
+    );
+    final fillPaint = Paint()
+      ..shader = gradient
+      ..style = PaintingStyle.fill;
+
+    canvas.drawPath(fillPath, fillPaint);
+
+    // ── MIN price dashed line + label ──
+    final minY = yPrice(minPrice);
+    final minLinePaint = Paint()
+      ..color = AppTheme.textDim.withValues(alpha: 0.2)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+    _drawDashedLine(
+      canvas,
+      leftPad,
+      minY,
+      size.width - rightPad,
+      minY,
+      minLinePaint,
+    );
+
+    final minLabel = TextPainter(
+      text: TextSpan(
+        text: '\$${minPrice.toStringAsFixed(2)}',
+        style: labelStyle.copyWith(
+          color: AppTheme.textDim.withValues(alpha: 0.5),
+        ),
+      ),
+      textDirection: ui.TextDirection.ltr,
+    )..layout();
+    minLabel.paint(canvas, Offset(leftPad + 2, minY + 2));
+
+    // ── MAX price label (top right) ──
+    final maxY = yPrice(maxPrice);
+    final maxLinePaint = Paint()
+      ..color = AppTheme.textDim.withValues(alpha: 0.2)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+    _drawDashedLine(
+      canvas,
+      leftPad,
+      maxY,
+      size.width - rightPad,
+      maxY,
+      maxLinePaint,
+    );
+
+    // ── MAX label: below dashed line, larger font (Revolut style) ──
+    final maxLabelStyle = TextStyle(
+      color: AppTheme.textPrimary.withValues(alpha: 0.65),
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+    );
+    final maxLabel = TextPainter(
+      text: TextSpan(
+        text: '\$${maxPrice.toStringAsFixed(2)}',
+        style: maxLabelStyle,
+      ),
+      textDirection: ui.TextDirection.ltr,
+    )..layout();
+    maxLabel.paint(
+      canvas,
+      Offset(size.width - rightPad - maxLabel.width - 2, maxY + 3),
+    );
+  }
+
+  void _drawDashedLine(
+    Canvas canvas,
+    double x1,
+    double y1,
+    double x2,
+    double y2,
+    Paint paint,
+  ) {
+    const dashLen = 4.0;
+    const gapLen = 4.0;
+    final dx = x2 - x1;
+    final dy = y2 - y1;
+    final dist = sqrt(dx * dx + dy * dy);
+    if (dist == 0) return;
+    final ux = dx / dist;
+    final uy = dy / dist;
+    double drawn = 0;
+    bool dash = true;
+    double cx = x1, cy = y1;
+    while (drawn < dist) {
+      final remaining = dist - drawn;
+      final segment = dash ? min(dashLen, remaining) : min(gapLen, remaining);
+      if (dash) {
+        canvas.drawLine(
+          Offset(cx, cy),
+          Offset(cx + ux * segment, cy + uy * segment),
+          paint,
+        );
+      }
+      cx += ux * segment;
+      cy += uy * segment;
+      drawn += segment;
+      dash = !dash;
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SparklinePainter old) {
+    return old.prices != prices ||
+        old.avgPrice != avgPrice ||
+        old.lineColor != lineColor;
+  }
+}

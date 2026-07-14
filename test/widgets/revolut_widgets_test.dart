@@ -16,8 +16,7 @@ import 'package:scanco/src/features/home/home_providers.dart';
 // =============================================================================
 
 /// 5 companies with price/change data — overrides watchlistQuotesProvider.
-final _mockWatchlistQuotesProvider =
-    FutureProvider<List<Map<String, dynamic>>>((ref) async {
+Future<List<Map<String, dynamic>>> _mockWatchlistQuotes() async {
   return [
     {
       'symbol': 'AAPL',
@@ -50,11 +49,10 @@ final _mockWatchlistQuotesProvider =
       'change': -1.50,
     },
   ];
-});
+}
 
 /// 5 calendar events — overrides calendarEventsProvider.
-final _mockCalendarEventsProvider =
-    FutureProvider<List<CalendarEvent>>((ref) async {
+Future<List<CalendarEvent>> _mockCalendarEvents() async {
   final now = DateTime.now();
   return [
     CalendarEvent(
@@ -93,7 +91,7 @@ final _mockCalendarEventsProvider =
       amount: 0.50,
     ),
   ];
-});
+}
 
 // =============================================================================
 // Test Helpers
@@ -104,7 +102,7 @@ final _mockCalendarEventsProvider =
 /// WidgetContainer).
 Widget _wrapWithTheme(Widget child) {
   return MaterialApp(
-    theme: AppTheme.darkTheme,
+    theme: AppTheme.lightTheme,
     home: Scaffold(body: child),
   );
 }
@@ -163,11 +161,11 @@ void main() {
         WidgetContainer(
           title: 'TEST',
           onTap: () {},
+          showFooter: false,
           children: [
             const Text('Item 1'),
             const Text('Item 2'),
           ],
-          showFooter: false,
         ),
       ));
 
@@ -180,12 +178,12 @@ void main() {
         WidgetContainer(
           title: 'TEST',
           onTap: () {},
+          showFooter: true,
           children: [
             const Text('Item 1'),
             const Text('Item 2'),
             const Text('Item 3'),
           ],
-          showFooter: true,
         ),
       ));
 
@@ -203,8 +201,8 @@ void main() {
         WidgetContainer(
           title: 'TEST',
           onTap: () {},
-          children: const [],
           emptyText: 'Здесь пока ничего нет',
+          children: const [],
         ),
       ));
 
@@ -225,7 +223,7 @@ void main() {
         ProviderScope(
           overrides: [
             watchlistQuotesProvider
-                .overrideWithProvider(_mockWatchlistQuotesProvider),
+                .overrideWith((ref) => _mockWatchlistQuotes()),
           ],
           child: _wrapWithTheme(const WatchlistWidget()),
         ),
@@ -256,7 +254,7 @@ void main() {
         ProviderScope(
           overrides: [
             calendarEventsProvider
-                .overrideWithProvider(_mockCalendarEventsProvider),
+                .overrideWith((ref) => _mockCalendarEvents()),
           ],
           child: _wrapWithTheme(const UpcomingEventsWidget()),
         ),

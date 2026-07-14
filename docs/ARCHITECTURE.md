@@ -89,6 +89,7 @@ lib/
     │   │   ├── screens/               # Full-screen pages (watchlist, events)
     │   │   └── widgets/               # Home card widgets (shield, markets, etc.)
     │   ├── news/                      # Market news feed
+    │   ├── orders/                    # Order Engine (model, execution, provider)
     │   ├── portfolio/                 # Portfolio management
     │   ├── profile/                   # User profile + sign out
     │   ├── scanner/                   # QR/barcode scanner
@@ -418,6 +419,23 @@ A reusable card component used across all home screen widgets.
 | **News** | `_NewsTab` | Latest company news from Finnhub |
 | **Add Portfolio** | `_AddPortfolioTab` | Buy/Sell transaction form |
 
+### Portfolio Order Entry
+
+| Screen | File | Description |
+|---|---|---|
+| `PortfolioOrderEntryScreen` | `portfolio/screens/portfolio_order_entry_screen.dart` | Trading 212-style BUY/SELL with Market/Limit order types |
+| `PortfolioAssetsScreen` | `portfolio/screens/portfolio_assets_screen.dart` | Holdings list for a portfolio |
+
+#### Order Entry UI Features
+- **Top panel**: Current price, $ change, % change (green/red)
+- **Order type tabs**: Рыночный (Market) / Лимит (Limit) — Стоп (Stop) and Стоп-лимит (Stop-Limit) tabs hidden in UI but code kept for future use
+- **Limit price input**: Auto-filled at ±2% of current price (buy +2%, sell -2%), editable by user
+- **Input mode BottomSheet**: Стоимость (Cost) / Количество акций (Shares) — converts between cost↔shares
+- **42px Playfair Display input** with conversion preview
+- **Slider** 0-100% with 20 divisions
+- **Info box** with per-order-type descriptions
+- **Warning dialog**: When placing Market order during closed market session, shows `_showMarketClosedWarning()` dialog with "Cancel" / "Place Order Anyway" buttons
+
 ---
 
 ## 10. Persistence Layer
@@ -567,3 +585,214 @@ All providers then re-fetch fresh data from the API.
 | 2 | **Footer logic** | Added `showFooter` param — hidden when ≤2 children |
 | 3 | **Splash effect** | Footer `InkWell` clips to bottom card corners via `borderRadius.only(bottomLeft: 20, bottomRight: 20)` |
 | 4 | **Empty state** | Added `emptyText` param — shows centered muted text "Здесь пока ничего нет" when children empty |
+
+---
+
+## 14. Order Engine
+
+> **Location:** `lib/src/features/orders/`
+> **Status:** ✅ Active — Market + Limit orders (Stop/Stop-Limit code kept, UI hidden)
+
+### Purpose
+
+The Order Engine allows users to place BUY/SELL orders within a portfolio context with realistic market simulation: price spread, partial fills, and market session rules.
+
+### Files
+
+| File | Purpose |
+|---|---|
+| `order_model.dart` | Data models: `Order`, enums (`OrderSide`, `OrderType`, `OrderStatus`, `MarketSession`) |
+| `order_execution_service.dart` | Pure execution engine: evaluates orders against price & session, handles fills |
+| `order_provider.dart` | Riverpod `StateNotifier` — order CRUD, persistence (SharedPreferences + Supabase) |
+
+---
+
+### 14.1 Order Model (`order_model.dart`)
+
+#### Enums
+
+| Enum | Values | Description |
+|---|---|---|
+| `OrderSide` | `buy`, `sell` | Direction of trade |
+| `OrderType` | `market`, `limit`, `stop`, `stopLimit` | Order type (`.label` → localized string) |
+| `OrderStatus` | `pending`, `partiallyFilled`, `filled`, `cancelled`, `expired` | Lifecycle (`.isActive` = pending/partiallyFilled; `.isTerminal` = filled/cancelled/expired) |
+| `MarketSession` | `regular`, `preMarket`, `afterHours`, `closed` | Trading session (`.isTrading` = regular/pre/after; `.isRegular` = regular only) |
+
+#### Order Class (13 fields)
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `String` | Unique ID: `ord_{timestamp}_{6 random chars}` |
+| `portfolioId` | `String` | Parent portfolio |
+| `symbol` | `String` | Ticker symbol |
+| `side` | `OrderSide` | buy / sell |
+| `type` | `OrderType` | market / limit / stop / stopLimit |
+| `quantity` | `double` | Original order quantity |
+| `filledQuantity` | `double` | Quantity already filled |
+| `limitPrice` | `double?` | Required for limit/stopLimit |
+| `stopPrice` | `double?` | Required for stop/stopLimit |
+| `status` | `OrderStatus` | Current lifecycle status |
+| `createdAt` | `DateTime` | Order creation timestamp |
+| `updatedAt` | `DateTime` | Last status change |
+| `expiresAt` | `DateTime?` | Optional expiration |
+
+**Computed properties:** `remainingQuantity`, `isFullyFilled`, `canCancel`
+
+#### Market Session Helper
+
+```dart
+MarketSession currentMarketSession()
+```
+
+Returns session based on current time (UTC):
+| Session | Weekday | Hours (UTC) |
+|---|---|---|
+| **Pre-market** | Mon–Fri | 10:00–14:30 |
+| **Regular** | Mon–Fri | 14:30–21:00 |
+| **After-hours** | Mon–Fri | 21:00–23:00 (Fri), 21:00–00:00 (Mon–Thu) |
+| **Closed** | Sat/Sun or 23:00–10:00 / 00:00–10:00 |
+
+---
+
+### 14.2 Order Execution Service (`order_execution_service.dart`)
+
+Pure Dart service with no side effects. All methods are static.
+
+#### Key Methods
+
+| Method | Returns | Description |
+|---|---|---|
+| `evaluateOrder(order, currentPrice, session)` | `ExecutionResult` | Evaluate a single order: checks session, applies rules, returns fill result |
+| `processPendingOrders(orders, prices, session)` | `List<ExecutionResult>` | Batch-process all active orders |
+| `canTradeInSession(type, session)` | `bool` | Checks if order type is allowed in current session |
+
+#### ExecutionResult
+
+| Field | Type | Description |
+|---|---|---|
+| `order` | `Order` | Updated order (with new status/quantities) |
+| `wasExecuted` | `bool` | Whether any fill occurred |
+| `fillPrice` | `double?` | Price at which fill happened |
+| `fillQuantity` | `double?` | How many shares were filled |
+| `message` | `String` | Human-readable result description |
+
+#### Order Type Rules
+
+| Type | Pre-market | Regular | After-hours | Closed |
+|---|---|---|---|---|
+| **Market** | ✅ Execute | ✅ Execute | ✅ Execute | ➜ PENDING |
+| **Limit** | ✅ Check price | ✅ Check price | ✅ Check price | ✅ Check price |
+| **Stop** | ✅ | ✅ | ✅ | ✅ |
+| **Stop-Limit** | ✅ | ✅ | ✅ | ✅ |
+
+#### Market Order in Closed Session
+
+When a Market order is placed during a closed session:
+1. Order is added as `PENDING` (not executed immediately)
+2. Warning dialog shown to user: *"Market is closed. Your market order will be placed as a pending order and will be executed when the market opens."*
+3. User can choose "Place Order Anyway" or "Cancel"
+
+#### Spread Multiplier
+
+Applied to limit price checks to account for lower liquidity outside regular hours:
+
+| Session | Multiplier |
+|---|---|
+| Regular | 1.0× (no adjustment) |
+| Pre-market | 1.5× |
+| After-hours | 1.3× |
+| Closed | 2.0× |
+
+#### Limit Order Logic
+
+- **Buy limit**: Executes if `currentPrice <= limitPrice`. Fill price = `min(currentPrice, limitPrice)`.
+- **Sell limit**: Executes if `currentPrice >= limitPrice`. Fill price = `max(currentPrice, limitPrice)`.
+
+#### Partial Fill Simulation
+
+- **20% chance** of partial fill on any execution
+- Fill range: **30%–80% of remaining quantity**
+- Remaining quantity stays as `PENDING`
+- Can be filled further on next `processPendingOrders()` call
+
+---
+
+### 14.3 Order Provider (`order_provider.dart`)
+
+Riverpod `StateNotifier<OrderState>` managing all orders.
+
+#### OrderState
+
+| Field | Type | Description |
+|---|---|---|
+| `orders` | `List<Order>` | All orders across all portfolios |
+| `isLoading` | `bool` | Loading flag for async operations |
+
+#### Public Methods
+
+| Method | Description |
+|---|---|
+| `placeOrder(order)` | Add order: Market → execute or PENDING (based on session); Limit/Stop → PENDING |
+| `processPendingOrders(prices)` | Batch-execute all active orders, returns `List<ExecutionResult>` |
+| `cancelOrder(orderId)` | Set status to `cancelled` (only if `.canCancel`) |
+| `loadFromSupabase(ordersJson)` | Restore orders from Supabase on login |
+| `clear()` | Clear all orders (on sign-out) |
+
+#### Persistence
+
+| Layer | Storage | When |
+|---|---|---|
+| **Local** | SharedPreferences | On every mutation (`_persistOrders()`) |
+| **Remote** | Supabase JSONB | Via `UserDataService.saveOrders()` (called after local persist) |
+
+#### Provider
+
+```dart
+final orderProvider = StateNotifierProvider<OrderNotifier, OrderState>((ref) {
+  return OrderNotifier(ref);
+});
+```
+
+---
+
+### 14.4 Integration Points
+
+#### UserDataService
+
+| Method | Description |
+|---|---|
+| `saveOrders(userId, ordersJson)` | Saves orders JSONB to Supabase `public.user_data.orders` |
+| `loadAll(userId)` | Now includes `orders` field in loaded data |
+
+#### PortfolioOrderEntryScreen
+
+- Located at `lib/src/features/portfolio/screens/portfolio_order_entry_screen.dart`
+- **Order flow**: User fills form → `_submitOrder()` → `orderProvider.notifier.placeOrder()` + `portfoliosProvider.notifier.addTransaction()`
+- **Limit price**: Auto-filled at ±2% (buy +2%, sell -2%), user-editable, validated
+- **Market closed warning**: `_showMarketClosedWarning()` dialog shown before placing Market order when `currentMarketSession() != MarketSession.regular`
+
+---
+
+### 14.5 Provider Map Additions
+
+| Provider | Returns | Description |
+|---|---|---|
+| `orderProvider` | `OrderState` | StateNotifier — all orders CRUD + persistence |
+| `currentMarketSessionProvider` | `MarketSession` | Derived from current UTC time |
+
+---
+
+### 14.6 Tests
+
+| File | Tests | Description |
+|---|---|---|
+| `test/services/order_execution_test.dart` | 12 | Market/Limit orders, batch processing, market sessions, real-world simulation |
+
+**Test groups:**
+1. Market Orders — immediate fill in regular session, PENDING in closed
+2. Limit Orders — buy/sell at/above/below limit price
+3. Batch Processing — multiple orders processed together
+4. Market Sessions — pre-market, after-hours, closed behavior
+5. Real-world Simulation — mixed order types with realistic prices
+
+All 12 tests passing ✅

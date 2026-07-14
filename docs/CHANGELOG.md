@@ -4,6 +4,63 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.1.0] — 2026-06-27
+
+### Added
+
+#### Order Engine (Full Trading System)
+- **`lib/src/features/orders/order_model.dart`** — Central data model with enums:
+  - `MarketSession` (regular / preMarket / afterHours / closed) — determines order eligibility
+  - `OrderSide` (buy / sell)
+  - `OrderType` (market / limit / stop / stopLimit) — Stop/Stop-Limit code kept, UI hidden
+  - `OrderStatus` (pending / partiallyFilled / filled / cancelled / expired)
+  - `Order` class with 13 fields, `copyWith()`, `toJson()`/`fromJson()`
+  - `currentMarketSession()` helper — determines session from UTC time
+- **`lib/src/features/orders/order_execution_service.dart`** — Pure execution engine:
+  - `evaluateOrder()` — checks market session, applies order-type rules, returns fill result
+  - `processPendingOrders()` — batch execution of all active orders
+  - `canTradeInSession()` — per-type session eligibility
+  - Spread multipliers: regular 1.0× / pre-market 1.5× / after-hours 1.3× / closed 2.0×
+  - Partial fill simulation: 20% chance, 30–80% of remaining quantity
+- **`lib/src/features/orders/order_provider.dart`** — Riverpod StateNotifier:
+  - `placeOrder()` — Market orders execute immediately in open sessions; go to PENDING in closed sessions
+  - `processPendingOrders()` — batch processing for all active orders
+  - `cancelOrder()` — cancels active orders
+  - Dual persistence: SharedPreferences (local) + Supabase JSONB (remote)
+  - `loadFromSupabase()` — restores orders on login
+
+#### Portfolio Order Entry Enhancements
+- **Limit price input field**: Auto-filled at ±2% of current price (buy +2%, sell -2%), user-editable, validated before submission
+- **Warning dialog for closed market**: `_showMarketClosedWarning()` — shown when placing Market order during closed session, with "Cancel" / "Place Order Anyway" options
+- **Stop/Stop-Limit tabs hidden** in UI (code preserved for future activation)
+
+#### Database
+- **`docs/supabase_migration.sql`** — Added `orders JSONB NOT NULL DEFAULT '[]'::jsonb` column to `public.user_data` table
+
+#### Tests
+- **`test/services/order_execution_test.dart`** — 12 tests covering:
+  - Market orders (immediate fill in regular, PENDING in closed)
+  - Limit orders (buy/sell at/above/below limit price)
+  - Batch processing (multiple orders evaluated together)
+  - Market sessions (pre-market, after-hours, closed)
+  - Real-world simulation (mixed order types with realistic prices)
+  - All 12 tests passing ✅
+
+### Changed
+
+#### UserDataService
+- `saveOrders()` method added — saves orders JSONB to Supabase
+- `loadAll()` now includes `orders` field in the loaded data map
+
+#### Supabase Schema
+- `public.user_data` table extended with `orders JSONB` column
+
+### Fixed
+
+- Market orders no longer attempt immediate execution during closed market sessions — correctly placed as PENDING
+
+---
+
 ## [1.0.0] — 2026-06-23
 
 ### Added

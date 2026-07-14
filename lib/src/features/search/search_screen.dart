@@ -1,73 +1,15 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/cache/logo_providers.dart';
-import '../../shared/services/finnhub_service.dart';
+import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../home/home_providers.dart';
-
-// ---------------------------------------------------------------------------
-// Search Provider with 500ms Debounce
-// ---------------------------------------------------------------------------
-
-final searchProvider = ChangeNotifierProvider<SearchNotifier>(
-  (ref) => SearchNotifier(),
-);
-
-class SearchNotifier extends ChangeNotifier {
-  final FinnhubService _api = FinnhubService();
-  List<Map<String, dynamic>> results = [];
-  List<String> recentSearches = [];
-  bool isLoading = false;
-  String query = '';
-  Timer? _debounce;
-
-  SearchNotifier();
-
-  /// Called on every keystroke — debounces 500ms before actual API call
-  void onSearchInput(String q) {
-    query = q;
-    _debounce?.cancel();
-
-    if (q.length < 2) {
-      results = [];
-      isLoading = false;
-      notifyListeners();
-      return;
-    }
-
-    isLoading = true;
-    notifyListeners();
-
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
-      try {
-        results = await _api.search(q);
-      } catch (e) {
-        debugPrint('❌ Search error for "$q": $e');
-        results = [];
-      }
-      isLoading = false;
-      notifyListeners();
-    });
-  }
-
-  void selectCompany(String symbol) {
-    if (!recentSearches.contains(symbol)) {
-      recentSearches.insert(0, symbol);
-      if (recentSearches.length > 10) recentSearches.removeLast();
-    }
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
-  }
-}
+import '../monetization/monetization_modal.dart';
+import 'search_counter_provider.dart';
+import 'search_provider.dart';
 
 // ---------------------------------------------------------------------------
 // Search Screen
@@ -91,7 +33,7 @@ class SearchScreen extends ConsumerWidget {
             border: InputBorder.none,
             filled: false,
           ),
-          style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
+          style: GoogleFonts.inter(color: AppTheme.textPrimary, fontSize: 14),
         ),
       ),
       body: state.isLoading
@@ -100,15 +42,46 @@ class SearchScreen extends ConsumerWidget {
             )
           : state.results.isEmpty && state.query.isNotEmpty
           ? Center(
-              child: Text(
-                'No results',
-                style: GoogleFonts.inter(color: AppTheme.textDim, fontSize: 14),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      state.errorMessage != null
+                          ? Icons.cloud_off_rounded
+                          : Icons.search_off_rounded,
+                      color: AppTheme.textDim,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      state.errorMessage ?? 'No results',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        color: AppTheme.textDim,
+                        fontSize: 14,
+                      ),
+                    ),
+                    if (state.errorMessage != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'The API key may be exhausted. Try again shortly.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          color: AppTheme.textDim,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             )
           : ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: state.results.length,
-              separatorBuilder: (_, __) => const Divider(),
+              separatorBuilder: (_, _) => const Divider(),
               itemBuilder: (context, i) {
                 final item = state.results[i];
                 final symbol = item['symbol'] as String? ?? '';
@@ -124,12 +97,18 @@ class SearchScreen extends ConsumerWidget {
                       return CompanyLogo(ticker: symbol, logoUrl: logoUrl);
                     },
                   ),
-                  title: Text(
-                    symbol,
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                  title: Row(
+                    children: [
+                      Text(
+                        symbol,
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      _ExchangeBadge(symbol: symbol, type: type),
+                    ],
                   ),
                   subtitle: Text(
                     name,
@@ -137,18 +116,12 @@ class SearchScreen extends ConsumerWidget {
                       fontSize: 12,
                       color: AppTheme.textDim,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        type,
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: AppTheme.textDim,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
                       Consumer(
                         builder: (context, ref, _) {
                           final inWatchlist = ref
@@ -180,16 +153,102 @@ class SearchScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  onTap: () {
+                  onTap: () async {
                     ref.read(searchProvider.notifier).selectCompany(symbol);
+
+                    // ── Check search counter ───────────────────────
+                    final tier = ref.read(subscriptionTierProvider);
+                    final canSearch = tier == SubscriptionTier.premium ||
+                        tier == SubscriptionTier.admin ||
+                        ref.read(searchCounterProvider) > 0;
+
+                    if (!canSearch) {
+                      showMonetizationModal(context, ref);
+                      return;
+                    }
+
+                    // Consume one search (no-op for premium)
+                    if (tier != SubscriptionTier.premium &&
+                        tier != SubscriptionTier.admin) {
+                      await ref.read(searchCounterProvider.notifier).consumeSearch();
+                    }
+
+                    if (!context.mounted) return;
+
+                    // Check if navigating from stress-test context
+                    final extra = GoRouterState.of(context).extra
+                        as Map<String, dynamic>?;
+                    final source = extra?['source'] as String?;
+                    final sessionId = extra?['sessionId'] as String?;
+
                     // Debounce 1s guard against double-tap
-                    ref
-                        .read(debouncerProvider)
-                        .run(() => context.push('/company/$symbol'));
+                    if (source == 'stress-test' && sessionId != null) {
+                      ref.read(debouncerProvider).run(() =>
+                          context.push(
+                              '/stress-test/$sessionId/stock/$symbol'));
+                    } else {
+                      ref.read(debouncerProvider).run(() =>
+                          context.push('/company/$symbol'));
+                    }
                   },
                 );
               },
             ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Exchange & Type Badge
+// ---------------------------------------------------------------------------
+
+class _ExchangeBadge extends StatelessWidget {
+  final String symbol;
+  final String type;
+
+  const _ExchangeBadge({required this.symbol, required this.type});
+
+  @override
+  Widget build(BuildContext context) {
+    final isEtf = type.toUpperCase() == 'ETF';
+    final exchange = symbol.contains('.') ? symbol.split('.').last.toUpperCase() : 'US';
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _badge(
+          exchange,
+          exchange == 'US'
+              ? AppTheme.accentBlue
+              : exchange == 'L'
+                  ? const Color(0xFF9B59B6)
+                  : AppTheme.textDim,
+        ),
+        if (isEtf) ...[
+          const SizedBox(width: 4),
+          _badge('ETF', AppTheme.shieldYellow),
+        ],
+      ],
+    );
+  }
+
+  Widget _badge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.inter(
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+          color: color,
+          letterSpacing: 0.5,
+        ),
+      ),
     );
   }
 }
