@@ -608,7 +608,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       'specEventCooldowns': s.specEventCooldowns.map(
         (k, v) => MapEntry(k, v.toIso8601String()),
       ),
-      'specEventCheckedEpochs': s.specEventCheckedEpochs.toList(),
+      if (s.lastSpecEventCheckAt != null)
+        'lastSpecEventCheckAt': s.lastSpecEventCheckAt!.toIso8601String(),
       // ── Block 6: Casino wall-clock epoch history ──────────
       if (s.lastEpochRollAt != null)
         'lastEpochRollAt': s.lastEpochRollAt!.toIso8601String(),
@@ -738,11 +739,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             (k, v) => MapEntry(k, DateTime.parse(v as String)),
           ) ??
           const {},
-      specEventCheckedEpochs:
-          (json['specEventCheckedEpochs'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toSet() ??
-          const {},
+      lastSpecEventCheckAt: json['lastSpecEventCheckAt'] != null
+          ? DateTime.parse(json['lastSpecEventCheckAt'] as String)
+          : null,
 
       // ── Block 6: Casino wall-clock epoch history ──────────
       lastEpochRollAt: json['lastEpochRollAt'] != null
@@ -898,13 +897,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             },
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
-            correctionBounceSymbols: session.correctionBounceSymbols,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
             specEvents: session.specEvents,
             specEventCooldowns: session.specEventCooldowns,
-            specEventCheckedEpochs: session.specEventCheckedEpochs,
+            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )
@@ -981,12 +979,11 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       },
       explanationLog: session.explanationLog,
       currentWeights: session.currentWeights,
-      correctionBounceSymbols: session.correctionBounceSymbols,
       soldDuringCatastrophe: session.soldDuringCatastrophe,
       catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
       specEvents: session.specEvents,
       specEventCooldowns: session.specEventCooldowns,
-      specEventCheckedEpochs: session.specEventCheckedEpochs,
+      lastSpecEventCheckAt: session.lastSpecEventCheckAt,
       lastEpochRollAt: session.lastEpochRollAt,
       epochHistory: session.epochHistory,
     );
@@ -1066,13 +1063,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             priceHistory: Map.from(session.priceHistory)..remove(symbol),
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
-            correctionBounceSymbols: session.correctionBounceSymbols,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
             specEvents: session.specEvents,
             specEventCooldowns: session.specEventCooldowns,
-            specEventCheckedEpochs: session.specEventCheckedEpochs,
+            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )
@@ -1124,13 +1120,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             priceHistory: session.priceHistory,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
-            correctionBounceSymbols: session.correctionBounceSymbols,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
             specEvents: session.specEvents,
             specEventCooldowns: session.specEventCooldowns,
-            specEventCheckedEpochs: session.specEventCheckedEpochs,
+            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )
@@ -1225,7 +1220,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       currentWeights: fatigueWeights,
       psychologyProfile: session.psychologyProfile,
       simulationSeed: rng.nextInt(99999999) + 1,
-      correctionBounceSymbols: const {},
       catastropheSurvivalRecorded: false,
       customDurationDays: session.customDurationDays,
       casinoCatastropheCooldown: 0,
@@ -1247,6 +1241,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       // ── Block 5 + 6: Fresh for new test ──
       specEvents: const [],
       specEventCooldowns: {},
+      lastSpecEventCheckAt: now,
       lastEpochRollAt: now,
       epochHistory: [firstRecord],
     );
@@ -1413,9 +1408,22 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             .floor()
             .clamp(0, 30); // cap at 30 to avoid massive lag
 
-    // If no rolls missed, just do a live tick
+    // If no epoch rolls missed, still catch up on granular ticks —
+    // otherwise a freshly bought holding (or any position refreshed less
+    // often than every _tickSeconds) sits frozen at its entry price until
+    // enough wall-clock time passes to cross an epoch boundary.
     if (missedRolls == 0) {
-      _simulateCurrentPrices(idx);
+      final lastTick =
+          session.lastTickTimestamp ??
+          session.lastEpochRollAt ??
+          session.startedAt ??
+          now;
+      final missedSeconds = now.difference(lastTick).inSeconds;
+      final missedTicks = (missedSeconds / _tickSeconds).floor().clamp(
+        1,
+        _maxCatchUpTicks,
+      );
+      _simulateCurrentPrices(idx, ticks: missedTicks);
       return;
     }
 
@@ -1445,9 +1453,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       '  specEvents=${session.specEvents.map((e) => "${e.symbol}:${e.type.name} tick=${e.currentTick}/${e.rampDurationTicks} peak=${e.peakAmplitude}").toList()}',
     );
     // ignore: avoid_print
-    print(
-      '  specEventCheckedEpochs=${session.specEventCheckedEpochs.toList()}',
-    );
+    print('  lastSpecEventCheckAt=${session.lastSpecEventCheckAt}');
     // ignore: avoid_print
     print('  missedRolls=$missedRolls');
 
@@ -1722,23 +1728,23 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
   // ── Block 5: Per-Company Speculation / Hype Events ──────────────────
   // Replaces the old global speculation/hype scenarios.
-  // Each company has a 5% chance PER EPOCH to trigger a hidden spec/hype
-  // event with bell-shape price impact (ramp up → reversal).
-  // Cooldown: 3-4 epochs after event ends.
+  // Each company gets one chance per weekly wall-clock window (see
+  // lastSpecEventCheckAt in _simulateCurrentPrices) to trigger a hidden
+  // spec/hype event with bell-shape price impact (ramp up → reversal).
+  // Cooldown: 3-4 weeks after event ends.
   // Events are evaluated in _simulateCurrentPrices.
 
-  /// Per-epoch spec event chance per company.
-  static const double _specEventChancePerEpoch = 0.05;
+  /// Chance per company per weekly check.
+  static const double _specEventChancePerCheck = 0.05;
 
-  /// Cooldown in epochs (3-4 weeks → 3-4 epochs for 1W mode).
-  static const int _specEventCooldownEpochs = 3;
+  /// Cooldown in weeks after an event ends.
+  static const int _specEventCooldownWeeks = 3;
 
-  /// Try to fire a spec/hype event for a single holding at the start
-  /// of a new epoch. Called once per holding per epoch.
+  /// Try to fire a spec/hype event for a single holding. Called once per
+  /// holding per weekly wall-clock window (see lastSpecEventCheckAt).
   CompanySpecEvent? _maybeFireSpecEvent(
     StressTestSession session,
     String symbol,
-    int currentEpochIndex,
     Random rng,
     DateTime now,
   ) {
@@ -1752,17 +1758,22 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     );
     if (hasActive) return null;
 
-    // 5% chance per epoch
-    if (rng.nextDouble() >= _specEventChancePerEpoch) return null;
+    // 5% chance per weekly check
+    if (rng.nextDouble() >= _specEventChancePerCheck) return null;
 
     // Hype vs speculation weighted: 60% hype, 40% speculation
     final type = rng.nextDouble() < 0.6
         ? CompanySpecEventType.hype
         : CompanySpecEventType.speculation;
 
-    // Bell-shape duration: 120-300 ticks (~40-100 min real-time at 20s/tick).
-    // Long enough that the surge+correction spans a meaningful timeframe.
-    final rampTicks = 120 + rng.nextInt(181);
+    // Bell-shape duration spans the full current epoch (Block 6 roll
+    // interval) rather than a fixed tick count — a weekly test's epoch is
+    // 12h, a monthly/3-month test's is 24h, an infinite/custom test's is
+    // 7/5 days — so the surge+reversal cycle scales with the test's own
+    // rhythm instead of a constant that only matched one mode.
+    final rampTicks = (session.duration.rollInterval.inSeconds / _tickSeconds)
+        .round()
+        .clamp(1, 1000000);
 
     // Peak amplitude:
     // Hype: moderate +3-8% (always positive — good news)
@@ -1772,15 +1783,15 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         : (rng.nextDouble() < 0.5 ? 1.0 : -1.0) *
               (0.05 + rng.nextDouble() * 0.10);
 
-    // Cooldown: 3-4 epochs (≈3-4 weeks) from now
-    final cooldownEnd = now.add(Duration(days: _specEventCooldownEpochs * 7));
+    // Cooldown: 3-4 weeks from now
+    final cooldownEnd = now.add(Duration(days: _specEventCooldownWeeks * 7));
     session.specEventCooldowns[symbol] = cooldownEnd;
 
     return CompanySpecEvent(
       symbol: symbol,
       type: type,
       startedAt: now,
-      endsAt: now.add(Duration(seconds: rampTicks * 20)), // ticks × 20s each
+      endsAt: now.add(Duration(seconds: rampTicks * _tickSeconds)),
       rampDurationTicks: rampTicks,
       peakAmplitude: peak,
     );
@@ -1874,37 +1885,22 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       session.currentPrices,
     );
 
-    // ── Correction bounce recovery ───────────────────────────────────
-    // Per-session sandbox: mutable copy of correctionBounceSymbols
-    final bounceSymbols = Set<String>.from(session.correctionBounceSymbols);
-    for (final sym in bounceSymbols) {
-      if (newPrices.containsKey(sym)) {
-        final sector = _getSector(sym);
-        double bounceRate;
-        switch (sector) {
-          case MarketSector.consumerStaples:
-          case MarketSector.healthcare:
-            bounceRate = 0.010 + rng.nextDouble() * 0.020; // 1-3%
-          case MarketSector.technology:
-            bounceRate = 0.020 + rng.nextDouble() * 0.030; // 2-5%
-          case MarketSector.finance:
-          case MarketSector.realEstate:
-            bounceRate = 0.010 + rng.nextDouble() * 0.020; // 1-3%
-          case MarketSector.energy:
-            bounceRate = 0.015 + rng.nextDouble() * 0.020; // 1.5-3.5%
-          case MarketSector.biotech:
-            bounceRate = 0.005 + rng.nextDouble() * 0.010; // 0.5-1.5%
-          case MarketSector.cyclical:
-            bounceRate = 0.010 + rng.nextDouble() * 0.020; // 1-3%
-          default:
-            bounceRate = 0.010 + rng.nextDouble() * 0.015; // 1-2.5%
+    // ── Block 5: Spec/Hype weekly wall-clock check ──────────────────
+    // Runs at most once per call (regardless of the `ticks` batch size),
+    // gated on real elapsed time rather than epoch rolls — epoch length
+    // varies per test type (Block 6: 12h/24h/7d/5d), so tying this to the
+    // epoch counter would fire far more often than the intended weekly
+    // cadence. Mirrors the lastEpochRollAt pattern used for casino state.
+    final lastSpecCheck =
+        session.lastSpecEventCheckAt ?? session.startedAt ?? now;
+    if (now.difference(lastSpecCheck) >= const Duration(days: 7)) {
+      for (final h in session.holdings) {
+        final newSpecEvent = _maybeFireSpecEvent(session, h.symbol, rng, now);
+        if (newSpecEvent != null) {
+          session.specEvents = [...session.specEvents, newSpecEvent];
         }
-        newPrices[sym] = newPrices[sym]! * (1 + bounceRate);
-        newPrices[sym] = newPrices[sym]!.clamp(
-          (session.basePrices[sym] ?? newPrices[sym]!) * 0.3,
-          (session.basePrices[sym] ?? newPrices[sym]!) * 3.0,
-        );
       }
+      session.lastSpecEventCheckAt = now;
     }
 
     final explanations = Map<String, List<TickExplanation>>.from(
@@ -1969,23 +1965,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         }
 
         // ── Block 5: Apply per-company spec/hype bell-shape event ──
-        // Only fires ONCE per epoch per symbol (not every tick).
-        // Gate: check if this symbol was already evaluated this epoch.
-        final epochKey = '${h.symbol}_${currentEpoch.index}';
-        if (!session.specEventCheckedEpochs.contains(epochKey)) {
-          session.specEventCheckedEpochs.add(epochKey);
-          final newSpecEvent = _maybeFireSpecEvent(
-            session,
-            h.symbol,
-            currentEpoch.index,
-            rng,
-            now,
-          );
-          if (newSpecEvent != null) {
-            session.specEvents = [...session.specEvents, newSpecEvent];
-          }
-        }
-        // Always apply amplitude from currently active events (bell-shape).
+        // Firing is decided once per weekly wall-clock window, before this
+        // loop (see the lastSpecEventCheckAt check above). Here we only
+        // advance/apply the amplitude of whatever is currently active.
         final specAmplitude = _applySpecEvents(session, h.symbol);
         if (specAmplitude.abs() > 0.0001) {
           currentPrice *= (1.0 + specAmplitude);
@@ -2022,82 +2004,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             '(μ,σ)=(${params.annualDrift.toStringAsFixed(4)},${params.annualVolatility.toStringAsFixed(4)}) '
             'sector=${assetSector.name}  regime=${_toMacroRegime(scenario).name}',
           );
-        }
-
-        // ── Scenario-aware correction events ─────────────────────────
-        // Realistic S&P 500 micro-corrections, calibrated per scenario.
-        // Bull/bear/recovery: tiny corrections add natural texture.
-        // Hype: larger corrections in bubbled sectors (tech, biotech).
-        // Speculation: moderate multi-directional corrections.
-        // Crash/blackSwan: the scenario drift IS the event; corrections minimal.
-        double correctionProb;
-        double correctionMin;
-        double correctionMax;
-        final sc = currentEpoch.scenario;
-        if (sc.isCatastrophe) {
-          // Crash/BlackSwan: the scenario itself is the catastrophe
-          correctionProb = 0.005;
-          correctionMin = 0.005;
-          correctionMax = 0.015;
-        } else if (sc == MarketScenario.hype) {
-          // Hype: bigger corrections in bubbled sectors
-          switch (sector) {
-            case MarketSector.technology:
-            case MarketSector.biotech:
-              correctionProb = 0.030;
-              correctionMin = 0.03;
-              correctionMax = 0.08;
-            case MarketSector.cyclical:
-              correctionProb = 0.015;
-              correctionMin = 0.02;
-              correctionMax = 0.05;
-            default:
-              correctionProb = 0.005;
-              correctionMin = 0.005;
-              correctionMax = 0.02;
-          }
-        } else if (sc == MarketScenario.speculation) {
-          // Speculation: moderate corrections across the board
-          correctionProb = 0.015;
-          correctionMin = 0.02;
-          correctionMax = 0.05;
-        } else {
-          // Bull / Bear / Recovery: smooth macro — tiny micro-corrections
-          switch (sector) {
-            case MarketSector.technology:
-            case MarketSector.energy:
-              correctionProb = 0.008;
-              correctionMin = 0.005;
-              correctionMax = 0.02;
-            case MarketSector.finance:
-            case MarketSector.realEstate:
-              correctionProb = 0.006;
-              correctionMin = 0.005;
-              correctionMax = 0.02;
-            case MarketSector.healthcare:
-            case MarketSector.consumerStaples:
-            case MarketSector.other:
-              correctionProb = 0.004;
-              correctionMin = 0.003;
-              correctionMax = 0.015;
-            case MarketSector.biotech:
-              correctionProb = 0.012;
-              correctionMin = 0.01;
-              correctionMax = 0.03;
-            case MarketSector.cyclical:
-              correctionProb = 0.015;
-              correctionMin = 0.01;
-              correctionMax = 0.03;
-          }
-        }
-        if (rng.nextDouble() < correctionProb) {
-          final correction =
-              correctionMin +
-              rng.nextDouble() * (correctionMax - correctionMin);
-          currentPrice *= (1 - correction);
-          currentPrice = currentPrice.clamp(basePrice * 0.3, basePrice * 3.0);
-          // Mark this symbol for bounce recovery next epoch
-          bounceSymbols.add(h.symbol);
         }
 
         // Gradual recovery: bounce decays over 3 epochs after a catastrophe.
@@ -2146,9 +2052,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
         // ── Explainable Simulation ────────────────────────────────
         final hasCorrection =
-            bounceSymbols.contains(h.symbol) ||
-            (priceBefore > 0 &&
-                (priceBefore - currentPrice).abs() / priceBefore > 0.05);
+            priceBefore > 0 &&
+            (priceBefore - currentPrice).abs() / priceBefore > 0.05;
         final expl = _explainPriceChange(
           symbol: h.symbol,
           priceBefore: priceBefore,
@@ -2274,7 +2179,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             devMarketPhase: currentEpoch.scenario.name,
             devFearIndex: currentEpoch.scenario.contrarianScore,
             psychologyProfile: session.psychologyProfile,
-            correctionBounceSymbols: bounceSymbols,
             currentWeights: session.currentWeights,
             realizedPnl: session.realizedPnl,
             customDurationDays: session.customDurationDays,
@@ -2310,7 +2214,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             // ── Block 5 + 6: Per-company events & casino state ─
             specEvents: session.specEvents,
             specEventCooldowns: session.specEventCooldowns,
-            specEventCheckedEpochs: session.specEventCheckedEpochs,
+            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt ?? now,
             epochHistory: session.epochHistory,
           )
@@ -2635,10 +2539,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             activeShock: session.activeShock,
-            correctionBounceSymbols: session.correctionBounceSymbols,
             specEvents: session.specEvents,
             specEventCooldowns: session.specEventCooldowns,
-            specEventCheckedEpochs: session.specEventCheckedEpochs,
+            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )
@@ -2710,13 +2613,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             psychologyProfile: session.psychologyProfile,
             activeShock: session.activeShock,
             priceHistory: session.priceHistory,
-            correctionBounceSymbols: session.correctionBounceSymbols,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
             specEvents: session.specEvents,
             specEventCooldowns: session.specEventCooldowns,
-            specEventCheckedEpochs: session.specEventCheckedEpochs,
+            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )

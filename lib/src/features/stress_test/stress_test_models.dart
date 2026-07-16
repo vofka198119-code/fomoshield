@@ -1218,11 +1218,6 @@ class StressTestSession {
   /// Используется для catch-up при возврате пользователя.
   DateTime? lastTickTimestamp;
 
-  /// Per-session sandbox: символы, которые получили коррекцию
-  /// и ждут bounce-восстановления в следующем тике.
-  /// Заменяет старый глобальный Set<String> в StateNotifier.
-  Set<String> correctionBounceSymbols;
-
   /// Per-session sandbox: true, если катастрофа уже записана
   /// в психологический профиль для этой сессии.
   /// Заменяет старый глобальный Set<String> в StateNotifier.
@@ -1247,9 +1242,11 @@ class StressTestSession {
   /// Cooldown map: symbol → DateTime until which new events are blocked.
   Map<String, DateTime> specEventCooldowns;
 
-  /// Per-session set of "${symbol}_${epochIndex}" keys that have already
-  /// been checked for spec/hype events. Survives app restarts via JSON.
-  Set<String> specEventCheckedEpochs;
+  /// Timestamp of the last weekly wall-clock check for spec/hype events.
+  /// Gated on real elapsed time (~7 days), not on epoch rolls — epoch
+  /// length varies per test type (Block 6), so tying this to epoch count
+  /// would fire far more often than the intended weekly cadence.
+  DateTime? lastSpecEventCheckAt;
 
   // ── Block 6: Casino Wall-Clock Epoch History ──────────────────
   /// Timestamp of the last epoch roll (for catch-up on re-entry).
@@ -1303,14 +1300,13 @@ class StressTestSession {
     this.stabilizationDeadlines = const {},
     this.currentWeights = const {},
     this.lastTickTimestamp,
-    this.correctionBounceSymbols = const {},
     this.catastropheSurvivalRecorded = false,
     this.diversificationBonusRecorded = false,
     this.soldDuringCatastrophe = const <String>{},
     this.activeShock,
     this.specEvents = const [],
     this.specEventCooldowns = const {},
-    this.specEventCheckedEpochs = const {},
+    this.lastSpecEventCheckAt,
     this.lastEpochRollAt,
     this.epochHistory = const [],
   }) : cash = cash ?? startingCash,

@@ -22,8 +22,6 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
-import '../../../shared/widgets/explainable_card.dart';
-import '../../../shared/widgets/why_sheet.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 
@@ -237,50 +235,6 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
         // Silently fail — price remains 0, user sees fallback
       }
     }
-  }
-
-  /// Показывает WhySheet с разложением изменения цены на факторы.
-  void _showWhySheet() {
-    final session = _session;
-    if (session == null) return;
-
-    final tickLog = session.explanationLog[widget.symbol];
-    final latest = tickLog?.isNotEmpty == true ? tickLog!.last : null;
-
-    // Если нет TickExplanation — fallback к грубой оценке от базовой цены
-    if (latest == null) {
-      final currentPrice =
-          session.currentPrices[widget.symbol] ??
-          session.basePrices[widget.symbol] ??
-          0;
-      final basePrice = session.basePrices[widget.symbol] ?? currentPrice;
-      final priceChangePercent = basePrice > 0
-          ? ((currentPrice - basePrice) / basePrice) * 100
-          : 0.0;
-      final data = ExplainableData(
-        symbol: widget.symbol,
-        changePercent: priceChangePercent,
-        contributions: PriceContribution(
-          marketPct: 40,
-          sectorPct: 25,
-          companyPct: 15,
-          newsPct: 12,
-          noisePct: 8,
-        ),
-        marketPhase: session.devMarketPhase,
-        scenario: session.devMarketPhase,
-      );
-      final temperature = session.devMarketTemperature;
-      showWhySheet(context, data: data, temperature: temperature);
-      return;
-    }
-
-    // ── Sandbox Isolation (Step 4): используем тот же TickExplanation,
-    //    что и основной ExplainableCard — единый источник фактов ──
-    final data = ExplainableData.fromExplanation(latest);
-    final temperature = session.devMarketTemperature;
-
-    showWhySheet(context, data: data, temperature: temperature);
   }
 
   @override
@@ -498,7 +452,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('\$${_fmtFull(currentPrice)}', style: ThemeV2.displayXL),
+              Text(_fmtFull(currentPrice), style: ThemeV2.displayXL),
               const SizedBox(width: 10),
               // Change capsule (Step 115)
               Container(
@@ -664,7 +618,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
 
   Widget _techLabelV2(String prefix, double price) {
     return Text(
-      '$prefix \$${_fmtFull(price)}',
+      '$prefix ${_fmtFull(price)}',
       style: ThemeV2.small.copyWith(
         color: ThemeV2.textSecondary.withValues(alpha: 0.7),
         fontFeatures: const [FontFeature.tabularFigures()],
@@ -752,14 +706,14 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                 Expanded(
                   child: _positionMetric(
                     label: 'VALUE',
-                    value: '\$${_fmtFull(positionValue)}',
+                    value: _fmtFull(positionValue),
                   ),
                 ),
                 Expanded(
                   child: _positionMetric(
                     label: 'P&L',
                     value:
-                        '${isProfitPositive ? '+' : ''}\$${_fmtFull(pnl.abs())}',
+                        '${isProfitPositive ? '+' : ''}${_fmtFull(pnl.abs())}',
                     valueColor: isProfitPositive
                         ? ThemeV2.success
                         : ThemeV2.loss,
@@ -782,7 +736,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                 Expanded(
                   child: _positionMetric(
                     label: 'AVG PRICE',
-                    value: '\$${_fmtFull(holding.averagePrice)}',
+                    value: _fmtFull(holding.averagePrice),
                   ),
                 ),
               ],
@@ -1131,7 +1085,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
               Text(_fmtDate(trade.date), style: ThemeV2.small),
               const SizedBox(height: 2),
               Text(
-                '\$${_fmtFull(totalAmount)}',
+                _fmtFull(totalAmount),
                 style: ThemeV2.caption.copyWith(
                   fontWeight: FontWeight.w700,
                   color: ThemeV2.textPrimary,

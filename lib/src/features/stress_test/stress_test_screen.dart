@@ -30,8 +30,6 @@ import '../../shared/widgets/disclaimer_footer.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import '../../shared/widgets/psychology_meter.dart';
-import '../../shared/widgets/explainable_card.dart';
-import '../../shared/widgets/why_sheet.dart';
 import '../../shared/widgets/market_timeline.dart';
 import '../../shared/widgets/verdict_card.dart';
 import 'stress_test_models.dart';
@@ -1001,10 +999,10 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                       onTapCancel: () {},
                       behavior: HitTestBehavior.opaque,
                       child: Container(
-                        height: 76,
+                        height: 60,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 4,
-                          vertical: 8,
+                          vertical: 6,
                         ),
                         decoration: i < sorted.length - 1
                             ? BoxDecoration(
@@ -1018,10 +1016,10 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                             : null,
                         child: Row(
                           children: [
-                            // Logo 48×48 с цветным кольцом от аллокации
+                            // Logo 40×40 с цветным кольцом от аллокации
                             Container(
-                              width: 52,
-                              height: 52,
+                              width: 40,
+                              height: 40,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -1031,31 +1029,31 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                   width: 1.5,
                                 ),
                               ),
-                              padding: const EdgeInsets.all(2),
+                              padding: const EdgeInsets.all(1.5),
                               child: ClipOval(
                                 child: SizedBox(
-                                  width: 48,
-                                  height: 48,
+                                  width: 36,
+                                  height: 36,
                                   child: logoAsync.when(
                                     data: (url) => CompanyLogo(
                                       ticker: h.symbol,
                                       logoUrl: url,
-                                      radius: 24,
+                                      radius: 18,
                                     ),
                                     error: (_, _) => CompanyLogo(
                                       ticker: h.symbol,
-                                      radius: 24,
+                                      radius: 18,
                                     ),
                                     loading: () => CompanyLogo(
                                       ticker: h.symbol,
-                                      radius: 24,
+                                      radius: 18,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                             const SizedBox(width: 12),
-                            // Company name + ticker/shares
+                            // Symbol + shares (как в Portfolio Holdings)
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1066,89 +1064,68 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.inter(
-                                      fontSize: 16,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                       color: ThemeV2.textPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        h.symbol,
-                                        maxLines: 1,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          color: ThemeV2.textSecondary,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '· ${h.shares.toStringAsFixed(2)} shares',
-                                        maxLines: 1,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          color: ThemeV2.textSecondary,
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    '${h.shares.toStringAsFixed(2)} shares @ \$${currentPrice.toStringAsFixed(2)}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      color: ThemeV2.textSecondary,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            // Position value + P&L
+                            const SizedBox(width: 8),
+                            // Position value + P&L (как в Portfolio Holdings)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  '\$${_fmtPosition(positionValue)}',
-                                  style: interNums(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: ThemeV2.textPrimary,
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    '\$${_fmtPosition(positionValue)}',
+                                    style: interNums(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: ThemeV2.textPrimary,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 2),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      '${isPositive ? '+' : ''}\$${pnl.toStringAsFixed(2)}',
-                                      style: interNums(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: isPositive
-                                            ? ThemeV2.success
-                                            : ThemeV2.loss,
-                                      ),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    '${isPositive ? '+' : ''}\$${pnl.toStringAsFixed(2)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
+                                    style: interNums(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: isPositive
+                                          ? ThemeV2.success
+                                          : ThemeV2.loss,
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '(${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
-                                      style: interNums(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: isPositive
-                                            ? ThemeV2.success
-                                            : ThemeV2.loss,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),
-                            // ── Lightbulb button (Steps 80-84) ──
+                            // ── Lightbulb button — компактный ──
                             if (session.explanationLog.containsKey(h.symbol))
                               GestureDetector(
-                                onTap: () =>
-                                    _showWhySheet(context, session, h.symbol),
+                                onTap: () => context.push(
+                                  '/stress-test/${widget.sessionId}/stock/${h.symbol}/why',
+                                ),
                                 child: Padding(
-                                  padding: const EdgeInsets.only(left: 6),
+                                  padding: const EdgeInsets.only(left: 4),
                                   child: Container(
-                                    width: 40,
-                                    height: 40,
+                                    width: 28,
+                                    height: 28,
                                     decoration: BoxDecoration(
                                       color: ThemeV2.primary.withValues(
                                         alpha: 0.1,
@@ -1159,8 +1136,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                     ),
                                     alignment: Alignment.center,
                                     child: const Icon(
-                                      Icons.lightbulb_outline_rounded,
-                                      size: 20,
+                                      Icons.help_outline_rounded,
+                                      size: 16,
                                       color: ThemeV2.primary,
                                     ),
                                   ),
@@ -1247,23 +1224,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 
   String _fmtPosition(double v) {
     return _fmtFull(v);
-  }
-
-  /// Показывает Bottom Sheet с ExplainableCard + Guardian для указанного символа.
-  void _showWhySheet(
-    BuildContext context,
-    StressTestSession session,
-    String symbol,
-  ) {
-    final explanations = session.explanationLog[symbol] ?? [];
-    if (explanations.isEmpty) return;
-
-    // Берём последнее объяснение (самый свежий тик)
-    final latest = explanations.last;
-    final data = ExplainableData.fromExplanation(latest);
-    final temperature = session.devMarketTemperature;
-
-    showWhySheet(context, data: data, temperature: temperature);
   }
 
   /// Opens a full-screen bottom sheet with the complete trade history.
