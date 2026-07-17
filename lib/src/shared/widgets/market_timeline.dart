@@ -18,7 +18,7 @@ import '../../features/stress_test/stress_test_models.dart';
 /// Compact vertical timeline of market epochs.
 ///
 /// Shows epochs in reverse order (active/current at top, oldest at bottom).
-/// Default max visible = 5. After that, a "MORE" button expands inline.
+/// Default max visible = 10. After that, a "MORE" button expands inline.
 class MarketTimeline extends StatefulWidget {
   final List<EpochRecord> epochs;
   final int? currentEpochIndex;
@@ -35,7 +35,7 @@ class MarketTimeline extends StatefulWidget {
     required this.epochs,
     this.currentEpochIndex,
     this.activeEpochProgress,
-    this.initialLimit = 5,
+    this.initialLimit = 10,
   });
 
   /// Find the current (active) epoch index: the one with endedAt == null.
@@ -94,12 +94,7 @@ class _MarketTimelineState extends State<MarketTimeline> {
             children: [
               Text(
                 'MARKET TIMELINE',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: ThemeV2.primary,
-                  letterSpacing: 1.0,
-                ),
+                style: FomoShieldTheme.cardTitle(),
               ),
               const Spacer(),
               Text(
@@ -127,31 +122,41 @@ class _MarketTimelineState extends State<MarketTimeline> {
             isCurrent: isCurrent,
             isPast: isPast,
             isFirst: i == 0,
-            isLast: i == shown.length - 1 && !_canExpand,
+            isLast: i == shown.length - 1 && widget.epochs.length <= widget.initialLimit,
             epochProgress: isCurrent ? widget.activeEpochProgress : null,
           );
         }),
-        // ── MORE button ──
-        if (_canExpand)
-          Center(
-            child: TextButton(
-              onPressed: () => setState(() => _expanded = true),
-              child: Text(
-                'MORE',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: ThemeV2.primary,
+        // ── MORE / LESS button ──
+        if (widget.epochs.length > widget.initialLimit) ...[
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: ThemeV2.primary.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  _expanded
+                      ? 'Less'
+                      : 'More (${widget.epochs.length - widget.initialLimit})',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: ThemeV2.primary,
+                  ),
                 ),
               ),
             ),
           ),
+        ],
       ],
     );
   }
-
-  bool get _canExpand =>
-      !_expanded && widget.epochs.length > widget.initialLimit;
 }
 
 /// A single row in the timeline: dot + connecting line + phase info.

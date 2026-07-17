@@ -19,6 +19,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../shared/widgets/company_logo.dart';
@@ -50,6 +51,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   Timer? _countdownTimer;
   Timer? _timelineTimer;
   int _tick = 0;
+  bool _showAllAssets = false;
+  bool _showAllTrades = false;
 
   @override
   void initState() {
@@ -504,23 +507,26 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       case 'corporate_events':
         if (session.holdings.isEmpty) return const SizedBox.shrink();
         return _buildSectionCard(
-          title: 'CORPORATE EVENTS',
+          title: '',
           noInnerPadding: true,
           child: CorporateEventsWidget(holdings: session.holdings),
         );
       case 'trade_history':
         if (session.trades.isEmpty) return const SizedBox.shrink();
         final allTrades = session.trades.reversed.toList();
-        final displayTrades = allTrades.take(6).toList();
+        final displayTrades = _showAllTrades
+            ? allTrades
+            : allTrades.take(10).toList();
         return _buildSectionCard(
           title: 'TRADE HISTORY',
           child: Column(
             children: [
               ...displayTrades.map((t) => _buildTradeTile(t)),
-              if (allTrades.length > 6) ...[
+              if (allTrades.length > 10) ...[
                 const SizedBox(height: 6),
                 GestureDetector(
-                  onTap: () => _showFullTradeHistory(session),
+                  onTap: () =>
+                      setState(() => _showAllTrades = !_showAllTrades),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -530,7 +536,9 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        'View all ${allTrades.length} trades',
+                        _showAllTrades
+                            ? 'Less'
+                            : 'More (${allTrades.length - 10})',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -594,25 +602,21 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.primary,
-                    letterSpacing: 1.0,
+          if (title.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: FomoShieldTheme.cardTitle(),
                   ),
-                ),
-                if (trailing != null) trailing,
-              ],
+                  if (trailing != null) trailing,
+                ],
+              ),
             ),
-          ),
           if (!noInnerPadding)
             Divider(
               height: 1,
@@ -941,6 +945,11 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       ),
     );
 
+    // Show first 10 by default, expand with "More" button
+    final displayList = _showAllAssets
+        ? sorted
+        : sorted.take(10).toList();
+
     return _buildSectionCard(
       title: 'MY ASSETS',
       trailing: addButton,
@@ -976,7 +985,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
               ),
             )
           : Column(
-              children: sorted.asMap().entries.map((entry) {
+              children: [
+                ...displayList.asMap().entries.map((entry) {
                 final i = entry.key;
                 final h = entry.value;
                 final currentPrice =
@@ -1071,7 +1081,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    '${h.shares.toStringAsFixed(2)} shares @ \$${currentPrice.toStringAsFixed(2)}',
+                                    '${h.shares.toStringAsFixed(2)} shares',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.inter(
@@ -1150,6 +1160,31 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   },
                 );
               }).toList(),
+              if (sorted.length > 10)
+                GestureDetector(
+                  onTap: () => setState(() => _showAllAssets = !_showAllAssets),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: ThemeV2.primary.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _showAllAssets
+                            ? 'Less'
+                            : 'More (${sorted.length - 10})',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: ThemeV2.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
     );
   }
@@ -1224,75 +1259,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 
   String _fmtPosition(double v) {
     return _fmtFull(v);
-  }
-
-  /// Opens a full-screen bottom sheet with the complete trade history.
-  void _showFullTradeHistory(StressTestSession session) {
-    final allTrades = session.trades.reversed.toList();
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: ThemeV2.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      isScrollControlled: true,
-      builder: (_) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.7,
-        child: Column(
-          children: [
-            // ── Handle ──
-            Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 4),
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            // ── Header ──
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Row(
-                children: [
-                  Text(
-                    'Trade History',
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${allTrades.length} total',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: ThemeV2.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1, color: ThemeV2.divider),
-            // ── List ──
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                itemCount: allTrades.length,
-                itemBuilder: (context, i) => _buildTradeTile(allTrades[i]),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   // ── Timer Bar — real-time countdown (ticks every second) ──────

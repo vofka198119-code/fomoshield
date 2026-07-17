@@ -158,16 +158,23 @@ class _DividendInfo {
 // Corporate Events Widget
 // ---------------------------------------------------------------------------
 
-class CorporateEventsWidget extends StatelessWidget {
+class CorporateEventsWidget extends StatefulWidget {
   final List<StressTestHolding> holdings;
 
   const CorporateEventsWidget({super.key, required this.holdings});
 
   @override
+  State<CorporateEventsWidget> createState() => _CorporateEventsWidgetState();
+}
+
+class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
+  bool _showAll = false;
+
+  @override
   Widget build(BuildContext context) {
     // Match holdings with dividend data
     final events = <MapEntry<StressTestHolding, _DividendInfo>>[];
-    for (final h in holdings) {
+    for (final h in widget.holdings) {
       final info = _dividendData[h.symbol];
       if (info != null) {
         events.add(MapEntry(h, info));
@@ -176,8 +183,10 @@ class CorporateEventsWidget extends StatelessWidget {
 
     if (events.isEmpty) return const SizedBox.shrink();
 
+    final displayEvents = _showAll ? events : events.take(10).toList();
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -208,10 +217,36 @@ class CorporateEventsWidget extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           // Events list
-          ...events.map((entry) => _EventRow(
+          ...displayEvents.map((entry) => _EventRow(
             holding: entry.key,
             info: entry.value,
           )),
+          if (events.length > 10) ...[
+            const SizedBox(height: 6),
+            GestureDetector(
+              onTap: () => setState(() => _showAll = !_showAll),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: ThemeV2.primary.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Text(
+                    _showAll
+                        ? 'Less'
+                        : 'More (${events.length - 10})',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: ThemeV2.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
