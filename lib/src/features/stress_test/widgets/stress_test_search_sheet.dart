@@ -181,6 +181,9 @@ class _StressTestSearchSheetState
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final availableCash =
+        ref.watch(stressTestSessionProvider(widget.sessionId))?.cash ?? 0;
+    final exceedsCash = _amount > availableCash;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -443,7 +446,9 @@ class _StressTestSearchSheetState
                         color: ThemeV2.textPrimary,
                       ),
                       onChanged: (v) {
-                        _amount = double.tryParse(v.replaceAll('\$', '')) ?? 0;
+                        setState(() {
+                          _amount = double.tryParse(v.replaceAll('\$', '')) ?? 0;
+                        });
                       },
                     ),
                     const SizedBox(height: 12),
@@ -476,7 +481,21 @@ class _StressTestSearchSheetState
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 8),
+
+                    // Exceeds-cash hint (proactive — mirrors the engine's own check)
+                    if (_amount > 0 && exceedsCash)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          'Exceeds available cash (\$${availableCash.toStringAsFixed(0)})',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: ThemeV2.loss,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
 
                     // Error
                     if (_errorMessage != null)
@@ -497,8 +516,9 @@ class _StressTestSearchSheetState
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed:
-                            _isLoading || _amount <= 0 ? null : _confirmPurchase,
+                        onPressed: _isLoading || _amount <= 0 || exceedsCash
+                            ? null
+                            : _confirmPurchase,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ThemeV2.primary,
                           foregroundColor: Colors.white,
