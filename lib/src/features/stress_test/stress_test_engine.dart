@@ -17,6 +17,7 @@ import 'stress_test_models.dart';
 part 'gbm_engine.dart';
 part 'casino_epochs.dart';
 part 'trades_engine.dart';
+part 'speculation_event.dart';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -851,103 +852,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       marketPhase: scenario.name,
       scenario: scenario.name,
     );
-  }
-
-  // ── Block 5: Per-Company Speculation / Hype Events ──────────────────
-  // Replaces the old global speculation/hype scenarios.
-  // Each company gets one chance per weekly wall-clock window (see
-  // lastSpecEventCheckAt in _simulateCurrentPrices) to trigger a hidden
-  // spec/hype event with bell-shape price impact (ramp up → reversal).
-  // Cooldown: 3-4 weeks after event ends.
-  // Events are evaluated in _simulateCurrentPrices.
-
-  /// Chance per company per weekly check.
-  static const double _specEventChancePerCheck = 0.05;
-
-  /// Cooldown in weeks after an event ends.
-  static const int _specEventCooldownWeeks = 3;
-
-  /// Try to fire a spec/hype event for a single holding. Called once per
-  /// holding per weekly wall-clock window (see lastSpecEventCheckAt).
-  CompanySpecEvent? _maybeFireSpecEvent(
-    StressTestSession session,
-    String symbol,
-    Random rng,
-    DateTime now,
-  ) {
-    // Check cooldown: skip if still cooling down
-    final cooldownUntil = session.specEventCooldowns[symbol];
-    if (cooldownUntil != null && now.isBefore(cooldownUntil)) return null;
-
-    // Avoid stacking: skip if this symbol already has an active event
-    final hasActive = session.specEvents.any(
-      (e) => e.symbol == symbol && !e.isExpired,
-    );
-    if (hasActive) return null;
-
-    // 5% chance per weekly check
-    if (rng.nextDouble() >= _specEventChancePerCheck) return null;
-
-    // Hype vs speculation weighted: 60% hype, 40% speculation
-    final type = rng.nextDouble() < 0.6
-        ? CompanySpecEventType.hype
-        : CompanySpecEventType.speculation;
-
-    // Bell-shape duration spans the full current epoch (Block 6 roll
-    // interval) rather than a fixed tick count — a weekly test's epoch is
-    // 12h, a monthly/3-month test's is 24h, an infinite/custom test's is
-    // 7/5 days — so the surge+reversal cycle scales with the test's own
-    // rhythm instead of a constant that only matched one mode.
-    final rampTicks = (session.duration.rollInterval.inSeconds / _tickSeconds)
-        .round()
-        .clamp(1, 1000000);
-
-    // Peak amplitude:
-    // Hype: moderate +3-8% (always positive — good news)
-    // Speculation: volatile ±5-15% (50% positive / 50% negative — bad news)
-    final peak = type == CompanySpecEventType.hype
-        ? 0.03 + rng.nextDouble() * 0.05
-        : (rng.nextDouble() < 0.5 ? 1.0 : -1.0) *
-              (0.05 + rng.nextDouble() * 0.10);
-
-    // Cooldown: 3-4 weeks from now
-    final cooldownEnd = now.add(Duration(days: _specEventCooldownWeeks * 7));
-    session.specEventCooldowns[symbol] = cooldownEnd;
-
-    return CompanySpecEvent(
-      symbol: symbol,
-      type: type,
-      startedAt: now,
-      endsAt: now.add(Duration(seconds: rampTicks * _tickSeconds)),
-      rampDurationTicks: rampTicks,
-      peakAmplitude: peak,
-    );
-  }
-
-  /// Apply active spec/hype events to price calculations.
-  /// Returns the cumulative amplitude to add to the price change.
-  double _applySpecEvents(StressTestSession session, String symbol) {
-    double cumulative = 0.0;
-    final updatedEvents = <CompanySpecEvent>[];
-
-    for (final event in session.specEvents) {
-      if (event.symbol != symbol) {
-        updatedEvents.add(event);
-        continue;
-      }
-
-      if (event.isExpired) continue; // drop expired
-
-      cumulative += event.amplitude;
-
-      // Advance tick counter
-      final updated = event.copy();
-      updated.currentTick++;
-      updatedEvents.add(updated);
-    }
-
-    session.specEvents = updatedEvents;
-    return cumulative;
   }
 
   /// Simulate current prices using sector-based market model.
