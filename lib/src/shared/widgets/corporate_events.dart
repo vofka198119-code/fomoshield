@@ -20,7 +20,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Mar 20, 2025',
     amount: 0.25,
     frequency: 'Quarterly',
-    description: 'Apple continues its capital return program with a \$0.25 quarterly dividend.',
+    description:
+        'Apple continues its capital return program with a \$0.25 quarterly dividend.',
   ),
   'MSFT': _DividendInfo(
     companyName: 'Microsoft Corporation',
@@ -28,7 +29,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Mar 13, 2025',
     amount: 0.83,
     frequency: 'Quarterly',
-    description: 'Microsoft increased its quarterly dividend by 10% reflecting strong cash flow.',
+    description:
+        'Microsoft increased its quarterly dividend by 10% reflecting strong cash flow.',
   ),
   'GOOGL': _DividendInfo(
     companyName: 'Alphabet Inc.',
@@ -52,7 +54,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Apr 2, 2025',
     amount: 0.04,
     frequency: 'Quarterly',
-    description: 'NVIDIA maintains a modest dividend while reinvesting heavily in AI.',
+    description:
+        'NVIDIA maintains a modest dividend while reinvesting heavily in AI.',
   ),
   'META': _DividendInfo(
     companyName: 'Meta Platforms Inc.',
@@ -60,7 +63,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Mar 26, 2025',
     amount: 0.50,
     frequency: 'Quarterly',
-    description: 'Meta initiated a \$0.50 quarterly dividend alongside record profits.',
+    description:
+        'Meta initiated a \$0.50 quarterly dividend alongside record profits.',
   ),
   'JPM': _DividendInfo(
     companyName: 'JPMorgan Chase & Co.',
@@ -92,7 +96,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Mar 17, 2025',
     amount: 1.03,
     frequency: 'Quarterly',
-    description: 'P&G maintains its Dividend King status with 68 consecutive years of growth.',
+    description:
+        'P&G maintains its Dividend King status with 68 consecutive years of growth.',
   ),
   'JNJ': _DividendInfo(
     companyName: 'Johnson & Johnson',
@@ -108,7 +113,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Apr 10, 2025',
     amount: 0.95,
     frequency: 'Quarterly',
-    description: 'Exxon rewards shareholders with increased dividend amid high energy prices.',
+    description:
+        'Exxon rewards shareholders with increased dividend amid high energy prices.',
   ),
   'TSLA': _DividendInfo(
     companyName: 'Tesla Inc.',
@@ -116,7 +122,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Apr 5, 2025',
     amount: 0.05,
     frequency: 'Variable',
-    description: 'Tesla pays a small variable dividend as part of shareholder returns.',
+    description:
+        'Tesla pays a small variable dividend as part of shareholder returns.',
   ),
   'NFLX': _DividendInfo(
     companyName: 'Netflix Inc.',
@@ -124,7 +131,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Mar 25, 2025',
     amount: 0.35,
     frequency: 'Quarterly',
-    description: 'Netflix began paying dividends after reaching mature subscriber growth.',
+    description:
+        'Netflix began paying dividends after reaching mature subscriber growth.',
   ),
   'DIS': _DividendInfo(
     companyName: 'The Walt Disney Company',
@@ -132,7 +140,8 @@ final Map<String, _DividendInfo> _dividendData = {
     payDate: 'Mar 19, 2025',
     amount: 0.45,
     frequency: 'Semi-Annual',
-    description: 'Disney restores its dividend as theme parks and streaming turn profitable.',
+    description:
+        'Disney restores its dividend as theme parks and streaming turn profitable.',
   ),
 };
 
@@ -183,7 +192,7 @@ class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
 
     if (events.isEmpty) return const SizedBox.shrink();
 
-    final displayEvents = _showAll ? events : events.take(10).toList();
+    final displayEvents = _showAll ? events : events.take(3).toList();
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
@@ -206,7 +215,12 @@ class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
               ),
             ],
           ),
-          const Divider(height: 1, indent: 0, endIndent: 0, color: ThemeV2.divider),
+          const Divider(
+            height: 1,
+            indent: 0,
+            endIndent: 0,
+            color: ThemeV2.divider,
+          ),
           const SizedBox(height: 8),
           Text(
             'Upcoming ex-dividend dates and payouts',
@@ -217,11 +231,10 @@ class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
           ),
           const SizedBox(height: 12),
           // Events list
-          ...displayEvents.map((entry) => _EventRow(
-            holding: entry.key,
-            info: entry.value,
-          )),
-          if (events.length > 10) ...[
+          ...displayEvents.map(
+            (entry) => _EventRow(holding: entry.key, info: entry.value),
+          ),
+          if (events.length > 3) ...[
             const SizedBox(height: 6),
             GestureDetector(
               onTap: () => setState(() => _showAll = !_showAll),
@@ -234,9 +247,7 @@ class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
                 ),
                 child: Center(
                   child: Text(
-                    _showAll
-                        ? 'Less'
-                        : 'More (${events.length - 10})',
+                    _showAll ? 'Less' : 'More (${events.length - 3})',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -257,10 +268,7 @@ class _EventRow extends StatelessWidget {
   final StressTestHolding holding;
   final _DividendInfo info;
 
-  const _EventRow({
-    required this.holding,
-    required this.info,
-  });
+  const _EventRow({required this.holding, required this.info});
 
   void _showPopup(BuildContext context) {
     showDialog(
@@ -290,7 +298,10 @@ class _EventRow extends StatelessWidget {
             const SizedBox(height: 6),
             _detailRow('Pay Date', info.payDate),
             const SizedBox(height: 6),
-            _detailRow('Dividend', '\$${info.amount.toStringAsFixed(2)} per share'),
+            _detailRow(
+              'Dividend',
+              '\$${info.amount.toStringAsFixed(2)} per share',
+            ),
             const SizedBox(height: 6),
             _detailRow('Frequency', info.frequency),
             const SizedBox(height: 12),
@@ -421,8 +432,18 @@ Widget _detailRow(String label, String value) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Text(label, style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary)),
-      Text(value, style: interNums(fontSize: 12, fontWeight: FontWeight.w600, color: ThemeV2.textPrimary)),
+      Text(
+        label,
+        style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+      ),
+      Text(
+        value,
+        style: interNums(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: ThemeV2.textPrimary,
+        ),
+      ),
     ],
   );
 }
