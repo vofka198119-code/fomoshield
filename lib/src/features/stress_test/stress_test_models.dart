@@ -270,6 +270,17 @@ enum MarketScenario {
   bool get isPerCompanyEvent =>
       this == MarketScenario.hype || this == MarketScenario.speculation;
 
+  /// Recovery is scripted, not weighted-random: real markets recover
+  /// after a crash, not randomly and never right after a Bull run. It
+  /// happens deterministically for exactly the 2 epochs immediately
+  /// following a blackSwan/crash (see casino_epochs.dart's
+  /// _rollScenario) and is never reachable any other way — not via the
+  /// normal roulette, not via the anti-stuck-bear redirect. Like
+  /// [isPerCompanyEvent], must be excluded from all epoch fatigue-weight
+  /// bookkeeping (it's never actually rolled, so it must never hold or
+  /// absorb roulette weight).
+  bool get isScriptedRecovery => this == MarketScenario.recovery;
+
   /// Human-readable description (hidden from user).
   String get description {
     return switch (this) {

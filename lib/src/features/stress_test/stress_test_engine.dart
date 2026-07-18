@@ -674,11 +674,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
     // ── Initialize Scenario Fatigue weights ─────────────────────
     // hype/speculation excluded: they're per-company events (Block 5),
-    // never rolled by the epoch roulette, so they must never hold epoch
-    // fatigue weight — see MarketScenario.isPerCompanyEvent.
+    // never rolled by the epoch roulette — see isPerCompanyEvent.
+    // recovery excluded: it's scripted (forced for 2 epochs right after
+    // a catastrophe), never weighted-random — see isScriptedRecovery.
     final Map<String, double> fatigueWeights = {};
     for (final s in MarketScenario.values) {
-      if (!s.isCatastrophe && !s.isPerCompanyEvent) {
+      if (!s.isCatastrophe && !s.isPerCompanyEvent && !s.isScriptedRecovery) {
         fatigueWeights[s.name] = s.weight.toDouble();
       }
     }

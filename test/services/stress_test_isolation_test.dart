@@ -388,14 +388,18 @@ void main() {
       //  functional isolation — independent content — is what matters.)
       for (final s in [s1, s2]) {
         expect(s.currentWeights, isNotEmpty);
-        // All non-catastrophe, non-per-company-event scenarios should
-        // have entries. hype/speculation are per-COMPANY events (Block 5,
-        // see speculation_event.dart) — never rolled by the epoch
-        // roulette, so they must NOT hold epoch fatigue weight (fixed:
-        // they used to leak/absorb redistribution forever as dead
-        // weight since they could never be spent back).
+        // All non-catastrophe, non-per-company-event, non-scripted-
+        // recovery scenarios should have entries. hype/speculation are
+        // per-COMPANY events (Block 5, see speculation_event.dart) —
+        // never rolled by the epoch roulette. recovery is scripted (forced
+        // for exactly 2 epochs right after a crash, never weighted-
+        // random). None of the three must hold epoch fatigue weight —
+        // they used to leak/absorb redistribution forever as dead weight
+        // since they could never be spent back via the normal roll.
         for (final scenario in MarketScenario.values) {
-          if (!scenario.isCatastrophe && !scenario.isPerCompanyEvent) {
+          if (!scenario.isCatastrophe &&
+              !scenario.isPerCompanyEvent &&
+              !scenario.isScriptedRecovery) {
             expect(
               s.currentWeights.containsKey(scenario.name),
               isTrue,
@@ -413,6 +417,11 @@ void main() {
           isFalse,
           reason:
               'speculation is a per-company event — must not hold epoch weight',
+        );
+        expect(
+          s.currentWeights.containsKey(MarketScenario.recovery.name),
+          isFalse,
+          reason: 'recovery is scripted — must not hold epoch weight',
         );
       }
 

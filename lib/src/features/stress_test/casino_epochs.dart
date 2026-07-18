@@ -32,44 +32,55 @@ extension CasinoEpochsEngine on StressTestNotifier {
     StressTestSession session, {
     required Random rng,
   }) {
+    final epochIdx = session.epochHistory.length;
+    final lastCatIdx = session.casinoLastCatastropheEpoch;
+
+    // ── Scripted post-catastrophe recovery ──────────────────────────
+    // Recovery is not weighted-random: real markets recover after a
+    // crash, not out of nowhere and never right after a Bull run. Force
+    // it for exactly the 2 epochs immediately following a blackSwan/
+    // crash — bypasses the roulette AND the anti-stuck-bear redirect
+    // below entirely, so recovery is unreachable any other way. See
+    // MarketScenario.isScriptedRecovery.
+    final epochsSinceLastCatastrophe = epochIdx - lastCatIdx;
+    if (epochsSinceLastCatastrophe >= 1 && epochsSinceLastCatastrophe <= 2) {
+      return MarketScenario.recovery;
+    }
+
     // Anti-stuck Bear correction: after 2+ consecutive Bear declines,
-    // hard-redirect to Recovery/Bull/Sideways/Volatility — prevents death loops.
+    // hard-redirect to Bull/Sideways/Volatility — prevents death loops.
+    // Recovery is deliberately NOT one of the options here (see above).
     if (session.casinoDeclineStreak >= 2) {
       final antiStuckRoll = rng.nextDouble();
-      if (antiStuckRoll < 0.30) return MarketScenario.recovery;
-      if (antiStuckRoll < 0.60) return MarketScenario.bull;
-      if (antiStuckRoll < 0.80) return MarketScenario.sideways;
+      if (antiStuckRoll < 0.40) return MarketScenario.bull;
+      if (antiStuckRoll < 0.70) return MarketScenario.sideways;
       return MarketScenario.volatility;
     }
 
-    // ── Block 5 fix: hype/speculation are now per-company events, ──
-    // NOT global macro scenarios. Remove them from the roulette wheel.
+    // ── Block 5 fix: hype/speculation are per-company events, NOT ──
+    // global macro scenarios — remove them from the roulette wheel.
+    // Recovery is also removed: it's scripted-only (see above), never
+    // part of the weighted roll.
     final pool = MarketScenario.values
-        .where((s) => !s.isPerCompanyEvent)
+        .where((s) => !s.isPerCompanyEvent && !s.isScriptedRecovery)
         .toList();
     final List<double> weights = [];
     final currentWeights = session.currentWeights;
     final cooldown = session.casinoCatastropheCooldown;
-    final epochIdx = session.epochHistory.length;
-    final lastCatIdx = session.casinoLastCatastropheEpoch;
     const minEpochsBetweenCatastrophes = 6;
     final allowCatastrophe =
         (epochIdx - lastCatIdx) >= minEpochsBetweenCatastrophes;
 
     if (cooldown > 0 || !allowCatastrophe) {
+      // No manual weight redirect needed: removing catastrophes from
+      // `pool` without re-injecting their weight elsewhere lets the
+      // remaining pool members absorb that share proportionally on
+      // their own (recovery used to get a hand-picked 60% cut here —
+      // it can't anymore, since it's scripted-only now).
       pool.removeWhere((s) => s.isCatastrophe);
       for (final s in pool) {
         weights.add(currentWeights[s.name] ?? s.weight.toDouble());
       }
-      final catWeight = MarketScenario.values
-          .where((s) => s.isCatastrophe)
-          .fold<double>(0, (a, b) => a + b.weight);
-      final toRecovery = catWeight * 0.6;
-      final toBull = catWeight - toRecovery;
-      final recoveryIdx = pool.indexOf(MarketScenario.recovery);
-      final bullIdx = pool.indexOf(MarketScenario.bull);
-      if (recoveryIdx >= 0) weights[recoveryIdx] += toRecovery;
-      if (bullIdx >= 0) weights[bullIdx] += toBull;
     } else {
       for (final s in pool) {
         weights.add(currentWeights[s.name] ?? s.weight.toDouble());
@@ -90,15 +101,21 @@ extension CasinoEpochsEngine on StressTestNotifier {
     StressTestSession session,
     MarketScenario scenario,
   ) {
-    if (scenario.isCatastrophe) return;
+    // Catastrophes and scripted recovery never participate in fatigue —
+    // recovery is forced (not weighted-random), so it must never decay,
+    // absorb redistribution, or hold epoch weight. See
+    // MarketScenario.isScriptedRecovery.
+    if (scenario.isCatastrophe || scenario.isScriptedRecovery) return;
     final currentWeights = session.currentWeights;
 
-    // Self-heal sessions persisted before hype/speculation were isolated
-    // from epoch weight bookkeeping — they can never be rolled (excluded
-    // from `pool` above), so any lingering entry is dead weight that used
-    // to silently absorb redistribution/recovery below forever.
+    // Self-heal sessions persisted before hype/speculation/recovery were
+    // isolated from epoch weight bookkeeping — none of them can ever be
+    // rolled by the roulette (excluded from `pool` above), so any
+    // lingering entry is dead weight that used to silently absorb
+    // redistribution/recovery below forever.
     currentWeights.remove(MarketScenario.hype.name);
     currentWeights.remove(MarketScenario.speculation.name);
+    currentWeights.remove(MarketScenario.recovery.name);
 
     final double oldW =
         currentWeights[scenario.name] ?? scenario.weight.toDouble();
@@ -126,7 +143,12 @@ extension CasinoEpochsEngine on StressTestNotifier {
     }
 
     for (final s in MarketScenario.values) {
-      if (s.isCatastrophe || s.isPerCompanyEvent || s == scenario) continue;
+      if (s.isCatastrophe ||
+          s.isPerCompanyEvent ||
+          s.isScriptedRecovery ||
+          s == scenario) {
+        continue;
+      }
       final String name = s.name;
       if (currentWeights.containsKey(name)) {
         final double cur = currentWeights[name]!;
