@@ -154,10 +154,16 @@ extension CasinoEpochsEngine on StressTestNotifier {
     final now = DateTime.now();
 
     // Check if test should be completed (timer expired — time-limited modes)
-    if (session.duration.isTimeLimited) {
-      final limit =
-          session.duration == TestDuration.custom &&
-              session.customDurationDays != null
+    // `session.duration.isTimeLimited` is an enum-level property and knows
+    // nothing about the session's own `customDurationDays` — it's `false`
+    // for TestDuration.custom by definition (see totalDuration's doc comment
+    // in stress_test_models.dart), so a Custom test needs its own check
+    // here rather than being gated behind `isTimeLimited`.
+    final isCustomWithLimit =
+        session.duration == TestDuration.custom &&
+        session.customDurationDays != null;
+    if (session.duration.isTimeLimited || isCustomWithLimit) {
+      final limit = isCustomWithLimit
           ? Duration(days: session.customDurationDays!)
           : session.duration.totalDuration!;
       final elapsed = now.difference(session.startedAt!);

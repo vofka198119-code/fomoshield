@@ -473,6 +473,7 @@ extension TradesEngine on StressTestNotifier {
             basePrices: session.basePrices,
             epochPriceRanges: session.epochPriceRanges,
             realizedPnl: newRealizedPnl,
+            customDurationDays: session.customDurationDays,
             stabilizationDeadlines: newStabilizationDeadlines,
             psychologyProfile: session.psychologyProfile,
             simulationSeed: session.simulationSeed,

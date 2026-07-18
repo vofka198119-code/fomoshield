@@ -59,6 +59,13 @@ enum TestDuration {
   }
 }
 
+/// Minimum real-world elapsed time before an Infinite ("until bored") test
+/// can be manually ended — a countdown to this mark is shown in the UI
+/// (see stress_test_screen.dart's `_getTestDuration`/`_buildTimerBar`)
+/// before it's replaced by the "test complete" state. Shared constant so
+/// the UI countdown and [StressTestSession.canExitInfinite] can never drift.
+const Duration infiniteMinDuration = Duration(days: 14);
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Timeline — Deterministic Epoch Calculation
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1417,11 +1424,17 @@ class StressTestSession {
   /// Number of symbols held.
   int get holdingCount => holdings.length;
 
-  /// True if the user can exit (infinite mode conditions met).
+  /// True once the Infinite ("until bored") minimum has elapsed and the
+  /// user is allowed to manually end the test. Purely time-based — real
+  /// wall-clock elapsed since [startedAt], same measure every other
+  /// duration type uses for its own completion check (see
+  /// casino_epochs.dart's `_catchUp` and `stress_test_screen.dart`'s
+  /// `_getTestDuration`/`_buildTimerBar`, which already counts down to
+  /// this same [infiniteMinDuration] before switching to "Test Complete").
   bool get canExitInfinite =>
       duration == TestDuration.infinite &&
-      trades.length >= 3 &&
-      epochHistory.length >= 2;
+      startedAt != null &&
+      DateTime.now().difference(startedAt!) >= infiniteMinDuration;
 }
 
 // ---------------------------------------------------------------------------

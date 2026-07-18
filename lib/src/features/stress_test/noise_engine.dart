@@ -377,6 +377,15 @@ extension NoiseEngine on StressTestNotifier {
         ];
         explanations[h.symbol] = symLog;
 
+        // Advance the anchor to this tick's result so the NEXT tick (in
+        // this same catch-up batch) diffs against its immediate
+        // predecessor instead of the price from before the whole batch —
+        // restores the invariant stated in the comment above the
+        // `preBouncePrices` snapshot ("priceBefore MUST equal the
+        // previous tick's priceAfter"), which the loop was violating for
+        // ticks > 1.
+        preBouncePrices[h.symbol] = currentPrice;
+
         // Track price range for peak/bottom detection
         if (!newRanges.containsKey(h.symbol)) {
           newRanges[h.symbol] = EpochPriceRange(currentPrice, currentPrice);

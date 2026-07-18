@@ -24,6 +24,34 @@ void main() {
     return n;
   }
 
+  /// Backdates [sessionId]'s `startedAt` (and `lastTickTimestamp`) by [by]
+  /// in persisted storage, then returns a freshly reloaded notifier for
+  /// [userId] that picks up the change. Used to simulate real elapsed time
+  /// for the time-based `canExitInfinite` gate (14 days) without an actual
+  /// 14-day wait — mirrors the technique used to verify the Custom-duration
+  /// and load-race fixes.
+  Future<StressTestNotifier> backdateStartedAtAndReload(
+    String userId,
+    String sessionId,
+    Duration by,
+  ) async {
+    // Let any pending fire-and-forget _save() from setup calls flush first.
+    await Future.delayed(const Duration(milliseconds: 150));
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'active_stress_test_sessions_$userId';
+    final raw = prefs.getString(key)!;
+    final list = jsonDecode(raw) as List;
+    final sessJson = list.firstWhere((e) => e['id'] == sessionId) as Map;
+    final backdated = DateTime.now().subtract(by);
+    sessJson['startedAt'] = backdated.toIso8601String();
+    sessJson['lastTickTimestamp'] = backdated.toIso8601String();
+    await prefs.setString(key, jsonEncode(list));
+    await Future.delayed(const Duration(milliseconds: 150));
+    final reloaded = StressTestNotifier(userId: userId);
+    await Future.delayed(const Duration(milliseconds: 200));
+    return reloaded;
+  }
+
   group('1. Session Creation & Limits', () {
     test('1.1 Create session in setup mode', () async {
       final notifier = await createNotifier();
@@ -433,35 +461,37 @@ void main() {
       // Leave $1000 cash for trading during active phase
       await notifier.buyAssetSetup(id, 'KO', 4000, 60.0);
       notifier.startTest(id);
-
-      // Execute 3+ trades for canExitInfinite
       notifier.refreshPrices(id);
-      var r = notifier.executeTrade(id, 'KO', true, 100);
-      expect(r.success, isTrue);
-      r = notifier.executeTrade(id, 'KO', false, 20, useShares: true);
-      expect(r.success, isTrue);
-      r = notifier.executeTrade(id, 'KO', true, 200);
+      final r = notifier.executeTrade(id, 'KO', true, 100);
       expect(r.success, isTrue);
 
-      // canExitInfinite requires trades >= 3 AND epochs >= 2.
-      // In production epochs accumulate via wall-clock (7d each).
-      // Force one additional epoch so the condition is satisfied.
-      notifier.debugForceEpochRoll(id);
+      // canExitInfinite is time-based: minimum 14 real days elapsed since
+      // startedAt (matches the countdown shown in stress_test_screen.dart's
+      // timer bar, replaced by "Test Complete" once elapsed). Before that,
+      // termination must be refused even with trades already executed.
+      expect(notifier.getSession(id)!.canExitInfinite, isFalse);
+      expect(notifier.terminateTest(id), isFalse);
+      expect(notifier.getSession(id), isNotNull);
 
-      final s = notifier.getSession(id)!;
-      expect(s.trades.length, greaterThanOrEqualTo(3));
-      expect(s.epochHistory.length, greaterThanOrEqualTo(2));
+      // Simulate 15 real days having elapsed (past the 14-day minimum).
+      final reloaded = await backdateStartedAtAndReload(
+        'test_user',
+        id,
+        const Duration(days: 15),
+      );
+
+      final s = reloaded.getSession(id)!;
       expect(s.canExitInfinite, isTrue);
 
       // Now test actual termination
-      final terminated = notifier.terminateTest(id);
+      final terminated = reloaded.terminateTest(id);
       expect(terminated, isTrue);
       // Session should be removed from state (archived)
-      expect(notifier.getSession(id), isNull);
+      expect(reloaded.getSession(id), isNull);
       // Archive should have 1 entry
-      expect(notifier.verdictArchive.length, equals(1));
+      expect(reloaded.verdictArchive.length, equals(1));
       print(
-        '  Terminated — Verdict: ${notifier.verdictArchive.first.verdict.title}',
+        '  Terminated — Verdict: ${reloaded.verdictArchive.first.verdict.title}',
       );
     });
 
@@ -1294,34 +1324,30 @@ void main() {
       final id = notifier.createSession(TestDuration.infinite, 5000);
       await notifier.buyAssetSetup(id, 'KO', 4000, 60.0);
       notifier.startTest(id);
-
-      // Perform 3+ trades to satisfy canExitInfinite
       notifier.refreshPrices(id);
       expect(notifier.executeTrade(id, 'KO', true, 100).success, isTrue);
-      notifier.refreshPrices(id);
-      expect(
-        notifier.executeTrade(id, 'KO', false, 20, useShares: true).success,
-        isTrue,
-      );
-      notifier.refreshPrices(id);
-      expect(notifier.executeTrade(id, 'KO', true, 200).success, isTrue);
 
       final before = notifier.getSession(id);
       expect(before, isNotNull);
       expect(before!.status, equals(StressTestStatus.active));
 
-      // Force second epoch (needed for canExitInfinite: epochHistory.length >= 2)
-      notifier.debugForceEpochRoll(id);
+      // canExitInfinite is time-based (14 real days elapsed) — simulate
+      // that having passed so terminateTest's real gate actually opens.
+      final reloaded = await backdateStartedAtAndReload(
+        'test_user',
+        id,
+        const Duration(days: 15),
+      );
 
       // Terminate → _completeTest wipes from state
-      final terminated = notifier.terminateTest(id);
+      final terminated = reloaded.terminateTest(id);
       expect(terminated, isTrue);
 
       // Session must be null — fully removed from active state
-      expect(notifier.getSession(id), isNull);
+      expect(reloaded.getSession(id), isNull);
 
       // State list must NOT contain the session
-      expect(notifier.state.any((s) => s.id == id), isFalse);
+      expect(reloaded.state.any((s) => s.id == id), isFalse);
 
       print('  ✅ Active session wiped: getSession → null, state has 0 refs');
     });
@@ -1357,8 +1383,9 @@ void main() {
       notifier.executeTrade(id1, 'KO', false, 20, useShares: true);
       notifier.refreshPrices(id1);
       notifier.executeTrade(id1, 'KO', true, 200);
-      notifier.debugForceEpochRoll(id1);
-      notifier.terminateTest(id1);
+      // canExitInfinite is now time-based (14 real days elapsed) — this
+      // test isn't about the termination gate itself, so bypass it.
+      notifier.debugCompleteTest(id1);
       final archiveAfterComplete = notifier.verdictArchive.length;
       expect(archiveAfterComplete, equals(1));
 
@@ -1392,8 +1419,9 @@ void main() {
         notifier.executeTrade(id, 'KO', false, 20, useShares: true);
         notifier.refreshPrices(id);
         notifier.executeTrade(id, 'KO', true, 200);
-        notifier.debugForceEpochRoll(id);
-        notifier.terminateTest(id);
+        // canExitInfinite is now time-based (14 real days elapsed) — this
+        // test isn't about the termination gate itself, so bypass it.
+        notifier.debugCompleteTest(id);
 
         // _save() is called async inside _completeTest() — wait for it
         await Future.delayed(const Duration(milliseconds: 100));
@@ -1439,8 +1467,9 @@ void main() {
         notifier.executeTrade(id, 'KO', false, 10, useShares: true);
         notifier.refreshPrices(id);
         notifier.executeTrade(id, 'KO', true, 100);
-        notifier.debugForceEpochRoll(id);
-        notifier.terminateTest(id);
+        // canExitInfinite is now time-based (14 real days elapsed) — this
+        // test is about FIFO eviction, not the termination gate, so bypass it.
+        notifier.debugCompleteTest(id);
       }
 
       final archive = notifier.verdictArchive;
@@ -1502,8 +1531,9 @@ void main() {
           notifier.executeTrade(id, 'KO', false, 10, useShares: true);
           notifier.refreshPrices(id);
           notifier.executeTrade(id, 'KO', true, 100);
-          notifier.debugForceEpochRoll(id);
-          notifier.terminateTest(id);
+          // canExitInfinite is now time-based (14 real days elapsed) — this
+          // test is about the FIFO cap, not the termination gate, so bypass it.
+          notifier.debugCompleteTest(id);
         }
 
         expect(notifier.verdictArchive.length, equals(20));
@@ -1529,8 +1559,9 @@ void main() {
         n1.executeTrade(id, 'KO', false, 10, useShares: true);
         n1.refreshPrices(id);
         n1.executeTrade(id, 'KO', true, 100);
-        n1.debugForceEpochRoll(id);
-        n1.terminateTest(id);
+        // canExitInfinite is now time-based (14 real days elapsed) — this
+        // test is about archive persistence, not the termination gate.
+        n1.debugCompleteTest(id);
       }
       expect(n1.verdictArchive.length, equals(5));
 
@@ -1569,8 +1600,9 @@ void main() {
         notifier.executeTrade(id, 'KO', false, 10, useShares: true);
         notifier.refreshPrices(id);
         notifier.executeTrade(id, 'KO', true, 100);
-        notifier.debugForceEpochRoll(id);
-        notifier.terminateTest(id);
+        // canExitInfinite is now time-based (14 real days elapsed) — this
+        // test is about verdict-entry structure, not the termination gate.
+        notifier.debugCompleteTest(id);
 
         final entry = notifier.verdictArchive.first;
         expect(entry.sessionId, equals(id));

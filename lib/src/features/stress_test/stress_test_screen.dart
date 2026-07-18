@@ -61,15 +61,18 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     // GoRouter path parameter → widget.sessionId. Screen uses
     // ref.watch(stressTestSessionProvider(widget.sessionId)) which is
     // 100% isolated and deterministic — no global state, no race.
-    try {
-      ref.read(stressTestProvider.notifier).refreshPrices(widget.sessionId);
-    } catch (_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ref.read(stressTestProvider.notifier).refreshPrices(widget.sessionId);
-        }
-      });
-    }
+    // refreshPrices() → _catchUp() → _simulateCurrentPrices() writes to the
+    // StressTestNotifier's state synchronously. Calling it directly here
+    // hits Riverpod's "Tried to modify a provider while the widget tree
+    // was building" error on every (re)open of this screen, since initState
+    // runs mid-build. Deferred via addPostFrameCallback so it runs only
+    // after the current frame has fully built — matches the pattern already
+    // used below for the ad-counter check and the periodic refresh timer.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(stressTestProvider.notifier).refreshPrices(widget.sessionId);
+      }
+    });
     // Check open counter for ad (every 6th opening for free users past 1st test)
     Future.microtask(() {
       if (!mounted) return;
@@ -339,7 +342,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 
   Duration? _getTestDuration(StressTestSession session) {
     if (session.duration == TestDuration.infinite) {
-      return const Duration(days: 14);
+      return infiniteMinDuration;
     }
     if (session.duration == TestDuration.custom) {
       if (session.customDurationDays != null &&
@@ -1306,6 +1309,13 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           '$dд ${h.toString().padLeft(2, '0')}ч ${m.toString().padLeft(2, '0')}м ${s.toString().padLeft(2, '0')}с';
     }
 
+    // Infinite ("until bored") past its 14-day minimum: the countdown is
+    // done, and unlike Fixed/Custom (which auto-complete on their own),
+    // Infinite only ever ends when the user says so — show the actual
+    // tappable action here instead of leaving the label as a dead end.
+    final showFinishButton =
+        session.duration == TestDuration.infinite && session.canExitInfinite;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1318,61 +1328,142 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
               : Colors.black.withValues(alpha: 0.06),
         ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
-            width: 32,
-            height: 32,
-            child: Icon(
-              isExpiredTimer
-                  ? Icons.check_circle_rounded
-                  : isCountdown
-                  ? Icons.timer_rounded
-                  : Icons.timer_off_rounded,
-              color: timerColor,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
+          Row(
+            children: [
+              SizedBox(
+                width: 32,
+                height: 32,
+                child: Icon(
+                  isExpiredTimer
+                      ? Icons.check_circle_rounded
+                      : isCountdown
+                      ? Icons.timer_rounded
+                      : Icons.timer_off_rounded,
+                  color: timerColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: isExpiredTimer
+                            ? ThemeV2.loss
+                            : ThemeV2.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      timeText,
+                      style: interNums(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: timerColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Epoch progress indicator
+              if (!isExpiredTimer &&
+                  session.epochHistory.isNotEmpty &&
+                  session.startedAt != null)
                 Text(
-                  label,
-                  style: GoogleFonts.inter(
+                  'Epoch #${session.epochHistory.length}',
+                  style: interNums(
                     fontSize: 11,
-                    color: isExpiredTimer
-                        ? ThemeV2.loss
-                        : ThemeV2.textSecondary,
+                    color: ThemeV2.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 1),
-                Text(
-                  timeText,
-                  style: interNums(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: timerColor,
+            ],
+          ),
+          if (showFinishButton) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _confirmFinishInfiniteTest(session),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1B365D),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-              ],
-            ),
-          ),
-          // Epoch progress indicator
-          if (!isExpiredTimer &&
-              session.epochHistory.isNotEmpty &&
-              session.startedAt != null)
-            Text(
-              'Epoch #${session.epochHistory.length}',
-              style: interNums(
-                fontSize: 11,
-                color: ThemeV2.textSecondary,
-                fontWeight: FontWeight.w500,
+                child: Text(
+                  'FINISH TEST',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                  ),
+                ),
               ),
             ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // ── Finish Test (Infinite mode manual completion) ──────────────────
+
+  void _confirmFinishInfiniteTest(StressTestSession session) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ThemeV2.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Finish Test?',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: ThemeV2.textPrimary,
+          ),
+        ),
+        content: Text(
+          "End this test now and get your verdict? This can't be undone.",
+          style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(color: ThemeV2.textSecondary),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              final ended = ref
+                  .read(stressTestProvider.notifier)
+                  .terminateTest(session.id);
+              if (ended && mounted) {
+                _showVerdict();
+              }
+            },
+            child: Text(
+              'Finish Test',
+              style: GoogleFonts.inter(
+                color: ThemeV2.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -150,8 +150,19 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// from completely separate storage keys.
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    // ── Isolated verdict history (lightweight, FIFO 20) ───────────
+    // Loaded BEFORE catch-up runs. _catchUpAll() below can synchronously
+    // complete a test (if its duration elapsed while the app was closed)
+    // and append a fresh entry to _verdictArchive via _completeTest(); that
+    // completion's own _save() is fire-and-forget, so if _loadArchive ran
+    // AFTER catch-up (as it used to), it would read the stale pre-completion
+    // archive off disk and clobber the entry that was just added in memory
+    // — silently losing the verdict. Loading first means catch-up only ever
+    // appends on top of the real, already-current archive.
+    _loadArchive(prefs);
     // ── Ephemeral active sessions (heavy) ────────────────────────
     final raw = prefs.getString(_storageKey);
+    bool ranCatchUp = false;
     if (raw != null) {
       try {
         final list = (jsonDecode(raw) as List<dynamic>)
@@ -160,6 +171,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         state = list;
         // Run catch-up for any active sessions
         _catchUpAll();
+        ranCatchUp = true;
       } catch (_) {
         state = [];
       }
@@ -167,8 +179,13 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _adCounter = prefs.getInt(_adKey) ?? 0;
     _testCounter = prefs.getInt(_testKey) ?? 0;
     _openCounter = prefs.getInt(_openKey) ?? 0;
-    // ── Isolated verdict history (lightweight, FIFO 20) ──────────
-    _loadArchive(prefs);
+    if (ranCatchUp) {
+      // Guarantee anything catch-up completed (session removal + archive
+      // entry) is actually persisted before _load() resolves, instead of
+      // trusting the completion's own fire-and-forget _save() to land
+      // before anyone reads storage again.
+      await _save();
+    }
   }
 
   /// ── Task 1.7: Persist with strict cache separation ────────────
@@ -849,7 +866,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _save();
   }
 
-  /// Manually complete a test (for infinite mode).
+  /// Manually complete a test before its natural end. Only Infinite ("until
+  /// bored") tests support this, gated on [StressTestSession.canExitInfinite]
+  /// (minimum 14 days elapsed). Fixed-duration (week1/month1/months3) and
+  /// Custom tests always auto-complete on their own schedule and are never
+  /// manually terminable early — reverted from a previous incorrect change
+  /// that allowed early exit for Custom.
   bool terminateTest(String sessionId) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) return false;
@@ -860,6 +882,19 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
     _completeTest(idx);
     return true;
+  }
+
+  /// Test-only: force-complete a session immediately, bypassing every
+  /// duration/gate check (wall-clock time limits, canExitInfinite, etc).
+  /// Mirrors [CasinoEpochsEngine.debugForceEpochRoll] — lets tests exercise
+  /// verdict-archive behavior (FIFO cap, persistence, entry structure)
+  /// without needing real elapsed time to satisfy a duration's actual
+  /// completion gate.
+  @visibleForTesting
+  void debugCompleteTest(String sessionId) {
+    final idx = state.indexWhere((s) => s.id == sessionId);
+    if (idx == -1) return;
+    _completeTest(idx);
   }
 
   // ── Ad Counter ───────────────────────────────────────────────────
