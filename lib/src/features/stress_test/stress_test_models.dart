@@ -259,6 +259,17 @@ enum MarketScenario {
       this == MarketScenario.blackSwan || this == MarketScenario.crash;
   bool get isDecline => this == MarketScenario.bear;
 
+  /// Block 5: hype/speculation are per-COMPANY events now (see
+  /// speculation_event.dart's CompanySpecEventType), not global epoch
+  /// scenarios — they're never rolled by casino_epochs.dart's roulette.
+  /// These two enum values only remain because [description]/[drift]/etc.
+  /// need exhaustive switches; anything that deals with epoch weights
+  /// (fatigue init, redistribution, recovery) must exclude them via this
+  /// getter or they silently absorb/leak roulette weight they can never
+  /// spend (confirmed during the Volatility-lock investigation).
+  bool get isPerCompanyEvent =>
+      this == MarketScenario.hype || this == MarketScenario.speculation;
+
   /// Human-readable description (hidden from user).
   String get description {
     return switch (this) {

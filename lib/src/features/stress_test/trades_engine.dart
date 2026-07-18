@@ -469,6 +469,19 @@ extension TradesEngine on StressTestNotifier {
             blackSwanSurvived: newBlackSwanSurvived,
             hasExperiencedCatastrophe: session.hasExperiencedCatastrophe,
             catastropheCooldown: session.catastropheCooldown,
+            // ── Casino Wall-Clock State — must survive every trade ──────
+            // Previously omitted here, silently resetting to their
+            // constructor defaults (0/0/0/-100) on every buy/sell during
+            // an active test: wiped the post-catastrophe cooldown and the
+            // 6-epoch minimum-gap tracking the instant the user traded,
+            // making catastrophes roll far more often than the casino
+            // engine intends. Confirmed empirically during the
+            // Volatility-lock investigation (ruled out as that bug's
+            // cause, but real on its own).
+            casinoCatastropheCooldown: session.casinoCatastropheCooldown,
+            casinoDeclineStreak: session.casinoDeclineStreak,
+            casinoCatastropheCount: session.casinoCatastropheCount,
+            casinoLastCatastropheEpoch: session.casinoLastCatastropheEpoch,
             currentPrices: session.currentPrices,
             basePrices: session.basePrices,
             epochPriceRanges: session.epochPriceRanges,
@@ -477,10 +490,17 @@ extension TradesEngine on StressTestNotifier {
             stabilizationDeadlines: newStabilizationDeadlines,
             psychologyProfile: session.psychologyProfile,
             simulationSeed: session.simulationSeed,
+            enableDeveloperTrace: session.enableDeveloperTrace,
             companies: session.companies,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             priceHistory: session.priceHistory,
+            // lastTickTimestamp drives _catchUp's granular-tick fallback
+            // chain (lastTickTimestamp ?? lastEpochRollAt ?? startedAt) —
+            // was also silently dropped here, reverting to null and
+            // making catch-up fall back to a coarser anchor right after
+            // any trade.
+            lastTickTimestamp: session.lastTickTimestamp,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             soldDuringCatastrophe: session.soldDuringCatastrophe,

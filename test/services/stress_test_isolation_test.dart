@@ -388,9 +388,14 @@ void main() {
       //  functional isolation — independent content — is what matters.)
       for (final s in [s1, s2]) {
         expect(s.currentWeights, isNotEmpty);
-        // All non-catastrophe scenarios should have entries
+        // All non-catastrophe, non-per-company-event scenarios should
+        // have entries. hype/speculation are per-COMPANY events (Block 5,
+        // see speculation_event.dart) — never rolled by the epoch
+        // roulette, so they must NOT hold epoch fatigue weight (fixed:
+        // they used to leak/absorb redistribution forever as dead
+        // weight since they could never be spent back).
         for (final scenario in MarketScenario.values) {
-          if (!scenario.isCatastrophe) {
+          if (!scenario.isCatastrophe && !scenario.isPerCompanyEvent) {
             expect(
               s.currentWeights.containsKey(scenario.name),
               isTrue,
@@ -398,6 +403,17 @@ void main() {
             );
           }
         }
+        expect(
+          s.currentWeights.containsKey(MarketScenario.hype.name),
+          isFalse,
+          reason: 'hype is a per-company event — must not hold epoch weight',
+        );
+        expect(
+          s.currentWeights.containsKey(MarketScenario.speculation.name),
+          isFalse,
+          reason:
+              'speculation is a per-company event — must not hold epoch weight',
+        );
       }
 
       // Verify no cross-contamination: mutate S1 weights and check S2 unchanged

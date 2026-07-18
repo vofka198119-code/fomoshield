@@ -45,9 +45,7 @@ extension CasinoEpochsEngine on StressTestNotifier {
     // ── Block 5 fix: hype/speculation are now per-company events, ──
     // NOT global macro scenarios. Remove them from the roulette wheel.
     final pool = MarketScenario.values
-        .where(
-          (s) => s != MarketScenario.hype && s != MarketScenario.speculation,
-        )
+        .where((s) => !s.isPerCompanyEvent)
         .toList();
     final List<double> weights = [];
     final currentWeights = session.currentWeights;
@@ -95,6 +93,13 @@ extension CasinoEpochsEngine on StressTestNotifier {
     if (scenario.isCatastrophe) return;
     final currentWeights = session.currentWeights;
 
+    // Self-heal sessions persisted before hype/speculation were isolated
+    // from epoch weight bookkeeping — they can never be rolled (excluded
+    // from `pool` above), so any lingering entry is dead weight that used
+    // to silently absorb redistribution/recovery below forever.
+    currentWeights.remove(MarketScenario.hype.name);
+    currentWeights.remove(MarketScenario.speculation.name);
+
     final double oldW =
         currentWeights[scenario.name] ?? scenario.weight.toDouble();
     final double newW = (oldW - _fatigueDecay).clamp(
@@ -121,7 +126,7 @@ extension CasinoEpochsEngine on StressTestNotifier {
     }
 
     for (final s in MarketScenario.values) {
-      if (s.isCatastrophe || s == scenario) continue;
+      if (s.isCatastrophe || s.isPerCompanyEvent || s == scenario) continue;
       final String name = s.name;
       if (currentWeights.containsKey(name)) {
         final double cur = currentWeights[name]!;
@@ -241,7 +246,23 @@ extension CasinoEpochsEngine on StressTestNotifier {
     final baseLength = session.epochHistory.length;
 
     for (int r = 0; r < missedRolls; r++) {
-      final scenario = _rollScenario(session, rng: rng);
+      // ── Scenario-roll RNG: deterministic per epoch, NOT the shared
+      // `rng` stream above. `_sessionRandom` (and therefore `rng`) is
+      // in-memory-only — it never survives an app restart. Real usage
+      // means the app is almost always closed between rolls (12h/24h/
+      // 7-day cadence), so every catch-up's first `_rollScenario` call
+      // was drawing from a freshly re-seeded Random(simulationSeed) —
+      // the SAME deterministic first value every single time, hard-
+      // locking every post-restart roll onto one scenario. Seeding by
+      // (simulationSeed, epochIndex) instead makes each epoch's roll
+      // reproducible AND distinct, independent of in-memory RNG state.
+      // `rng` itself is left untouched above — _simulateCurrentPrices'
+      // tick noise still needs that continuously-advancing stream.
+      final epochIndexForRoll = baseLength + r;
+      final scenario = _rollScenario(
+        session,
+        rng: Random(Object.hash(session.simulationSeed, epochIndexForRoll)),
+      );
       _applyScenarioFatigue(session, scenario);
 
       // Update casino state
@@ -349,7 +370,13 @@ extension CasinoEpochsEngine on StressTestNotifier {
     final rng = _sessionRandom[session.id] ?? Random(session.simulationSeed);
     _sessionRandom[session.id] = rng;
 
-    final newScenario = _rollScenario(session, rng: rng);
+    // Deterministic per-epoch seed — see the matching comment in _catchUp's
+    // roll loop for why this can't use the shared `rng` stream above.
+    final epochIndexForRoll = session.epochHistory.length;
+    final newScenario = _rollScenario(
+      session,
+      rng: Random(Object.hash(session.simulationSeed, epochIndexForRoll)),
+    );
     _applyScenarioFatigue(session, newScenario);
 
     // ── Casino state update (mirrors _simulateCurrentPrices / _catchUp) ──

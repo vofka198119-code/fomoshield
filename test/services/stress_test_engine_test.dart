@@ -373,6 +373,43 @@ void main() {
       final r = notifier.executeTrade(id, 'AAPL', true, 999999);
       expect(r.success, isFalse);
     });
+
+    test(
+      '5.5 executeTrade preserves casino state + lastTickTimestamp',
+      () async {
+        // Regression test for the executeTrade state-wipe bug: these
+        // fields are mutable, non-final fields on StressTestSession, set
+        // directly by casino_epochs.dart via in-place mutation —
+        // executeTrade's full-object rebuild used to omit them from the
+        // constructor call, silently reverting them to their constructor
+        // defaults (0/0/0/-100/null) on every single trade.
+        final notifier = await createNotifier();
+        final id = notifier.createSession(TestDuration.month1, 10000);
+        await notifier.buyAssetSetup(id, 'AAPL', 5000, 150.0);
+        notifier.startTest(id);
+        notifier.refreshPrices(id);
+
+        // Force non-default values as if a catastrophe had recently
+        // rolled and a tick had recently run.
+        final before = notifier.getSession(id)!;
+        before.casinoCatastropheCooldown = 2;
+        before.casinoDeclineStreak = 1;
+        before.casinoCatastropheCount = 3;
+        before.casinoLastCatastropheEpoch = 5;
+        final tickStamp = DateTime.now().subtract(const Duration(seconds: 45));
+        before.lastTickTimestamp = tickStamp;
+
+        final r = notifier.executeTrade(id, 'AAPL', false, 5, useShares: true);
+        expect(r.success, isTrue);
+
+        final after = notifier.getSession(id)!;
+        expect(after.casinoCatastropheCooldown, equals(2));
+        expect(after.casinoDeclineStreak, equals(1));
+        expect(after.casinoCatastropheCount, equals(3));
+        expect(after.casinoLastCatastropheEpoch, equals(5));
+        expect(after.lastTickTimestamp, equals(tickStamp));
+      },
+    );
   });
 
   group('6. IPO System (CompanyStock autonomous lifecycle)', () {

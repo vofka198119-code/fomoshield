@@ -673,9 +673,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _sessionRandom[sessionId] = rng;
 
     // ── Initialize Scenario Fatigue weights ─────────────────────
+    // hype/speculation excluded: they're per-company events (Block 5),
+    // never rolled by the epoch roulette, so they must never hold epoch
+    // fatigue weight — see MarketScenario.isPerCompanyEvent.
     final Map<String, double> fatigueWeights = {};
     for (final s in MarketScenario.values) {
-      if (!s.isCatastrophe) {
+      if (!s.isCatastrophe && !s.isPerCompanyEvent) {
         fatigueWeights[s.name] = s.weight.toDouble();
       }
     }
@@ -710,7 +713,17 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     }
 
     // ── Zero Roll: Roll first scenario, don't pre-generate ────
-    final firstScenario = _rollScenario(session, rng: rng);
+    // Deterministic per-epoch seed (Object.hash(simulationSeed, epochIndex))
+    // instead of the shared `rng` stream: _sessionRandom is in-memory-only
+    // and doesn't survive an app restart, so any roll fed from a lazily
+    // re-seeded Random(simulationSeed) — which every subsequent roll is,
+    // once the app has been closed and reopened — must not depend on the
+    // stream's in-memory position. See casino_epochs.dart's other roll
+    // sites for the full fix and the harness log proving the bug.
+    final firstScenario = _rollScenario(
+      session,
+      rng: Random(Object.hash(session.simulationSeed, 0)),
+    );
 
     // Push the first EpochRecord
     final firstRecord = EpochRecord(
