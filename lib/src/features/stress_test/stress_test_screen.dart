@@ -53,6 +53,11 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   int _tick = 0;
   bool _showAllAssets = false;
   bool _showAllTrades = false;
+  // Guards the auto-navigate-to-verdict side effect (see
+  // _handleCompletionIfNeeded) against firing twice for the same session
+  // completion — both the ref.listen transition and the Finish Test
+  // button's own post-terminateTest call route through it.
+  bool _handledCompletion = false;
 
   @override
   void initState() {
@@ -169,6 +174,22 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     });
   }
 
+  // Called whenever this session might have just completed (either the
+  // ref.listen transition below, or right after a manual terminateTest()
+  // call from the Finish Test button). Guarded by _handledCompletion so
+  // whichever call happens first "wins" and the other becomes a no-op —
+  // avoids depending on the exact sync/async ordering between a provider
+  // notification and the caller that triggered it.
+  void _handleCompletionIfNeeded() {
+    if (_handledCompletion || !mounted) return;
+    final archive = ref.read(verdictArchiveProvider);
+    final hasVerdict = archive.any((e) => e.sessionId == widget.sessionId);
+    if (hasVerdict) {
+      _handledCompletion = true;
+      _showVerdict();
+    }
+  }
+
   Future<bool?> _showDisclaimerModal() {
     return showModalBottomSheet<bool>(
       context: context,
@@ -186,6 +207,20 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     ref.watch(stressTestRefreshProvider);
     // ── Sandbox Isolation (Step 2): Watch per-session timeline tick ──
     ref.watch(timelineTickProvider(widget.sessionId));
+    // Auto-navigate to the verdict screen instead of a dead-end "Session
+    // not found" when this session disappears from active state because
+    // it completed (Fixed/Custom auto-completion, cold-start catch-up, or
+    // Infinite's Finish Test button). A genuine deletion leaves no archive
+    // entry, so _handleCompletionIfNeeded() is a no-op and the existing
+    // "Session not found" fallback below still applies.
+    ref.listen<StressTestSession?>(
+      stressTestSessionProvider(widget.sessionId),
+      (previous, next) {
+        if (previous != null && next == null) {
+          _handleCompletionIfNeeded();
+        }
+      },
+    );
     final session = ref.watch(stressTestSessionProvider(widget.sessionId));
     if (session == null) {
       return Scaffold(
@@ -505,6 +540,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             epochs: session.epochHistory,
             currentEpochIndex: epochIndex,
             activeEpochProgress: epochProgress,
+            initialLimit: 3,
           ),
         );
       case 'corporate_events':
@@ -519,18 +555,25 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         final allTrades = session.trades.reversed.toList();
         final displayTrades = _showAllTrades
             ? allTrades
-            : allTrades.take(10).toList();
+            : allTrades.take(5).toList();
         return _buildSectionCard(
           title: 'TRADE HISTORY',
+          noInnerPadding: true,
           child: Column(
             children: [
+              const Divider(
+                height: 1,
+                indent: 20,
+                endIndent: 20,
+                color: ThemeV2.divider,
+              ),
               ...displayTrades.map((t) => _buildTradeTile(t)),
-              if (allTrades.length > 10) ...[
+              if (allTrades.length > 5) ...[
                 const SizedBox(height: 6),
                 GestureDetector(
-                  onTap: () =>
-                      setState(() => _showAllTrades = !_showAllTrades),
+                  onTap: () => setState(() => _showAllTrades = !_showAllTrades),
                   child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
@@ -541,7 +584,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                       child: Text(
                         _showAllTrades
                             ? 'Less'
-                            : 'More (${allTrades.length - 10})',
+                            : 'More (${allTrades.length - 5})',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -612,10 +655,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    title,
-                    style: FomoShieldTheme.cardTitle(),
-                  ),
+                  Text(title, style: FomoShieldTheme.cardTitle()),
                   if (trailing != null) trailing,
                 ],
               ),
@@ -949,14 +989,12 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
 
     // Show first 10 by default, expand with "More" button
-    final displayList = _showAllAssets
-        ? sorted
-        : sorted.take(10).toList();
+    final displayList = _showAllAssets ? sorted : sorted.take(10).toList();
 
     return _buildSectionCard(
       title: 'MY ASSETS',
       trailing: addButton,
-      noInnerPadding: holdings.isEmpty,
+      noInnerPadding: true,
       child: holdings.isEmpty
           ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
@@ -989,204 +1027,212 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             )
           : Column(
               children: [
+                const Divider(
+                  height: 1,
+                  indent: 20,
+                  endIndent: 20,
+                  color: ThemeV2.divider,
+                ),
                 ...displayList.asMap().entries.map((entry) {
-                final i = entry.key;
-                final h = entry.value;
-                final currentPrice =
-                    session.currentPrices[h.symbol] ?? h.entryPrice;
-                final positionValue = h.shares * currentPrice;
-                final costBasis = h.shares * h.avgCost;
-                final pnl = positionValue - costBasis;
-                final pnlPercent = costBasis > 0
-                    ? (pnl / costBasis) * 100
-                    : 0.0;
-                final isPositive = pnl >= 0;
+                  final i = entry.key;
+                  final h = entry.value;
+                  final currentPrice =
+                      session.currentPrices[h.symbol] ?? h.entryPrice;
+                  final positionValue = h.shares * currentPrice;
+                  final costBasis = h.shares * h.avgCost;
+                  final pnl = positionValue - costBasis;
+                  final pnlPercent = costBasis > 0
+                      ? (pnl / costBasis) * 100
+                      : 0.0;
+                  final isPositive = pnl >= 0;
 
-                return Consumer(
-                  builder: (context, ref, _) {
-                    final logoAsync = ref.watch(cachedLogoProvider(h.symbol));
+                  return Consumer(
+                    builder: (context, ref, _) {
+                      final logoAsync = ref.watch(cachedLogoProvider(h.symbol));
 
-                    return GestureDetector(
-                      onTap: () => _onAssetRowTap(h.symbol),
-                      onTapDown: (_) {},
-                      onTapCancel: () {},
-                      behavior: HitTestBehavior.opaque,
-                      child: Container(
-                        height: 60,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 4,
-                          vertical: 6,
-                        ),
-                        decoration: i < sorted.length - 1
-                            ? BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: ThemeV2.divider,
-                                    width: 0.5,
-                                  ),
-                                ),
-                              )
-                            : null,
-                        child: Row(
-                          children: [
-                            // Logo 40×40 с цветным кольцом от аллокации
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: _allocationColor(
-                                    i,
-                                  ).withValues(alpha: 0.7),
-                                  width: 1.5,
-                                ),
-                              ),
-                              padding: const EdgeInsets.all(1.5),
-                              child: ClipOval(
-                                child: SizedBox(
-                                  width: 36,
-                                  height: 36,
-                                  child: logoAsync.when(
-                                    data: (url) => CompanyLogo(
-                                      ticker: h.symbol,
-                                      logoUrl: url,
-                                      radius: 18,
-                                    ),
-                                    error: (_, _) => CompanyLogo(
-                                      ticker: h.symbol,
-                                      radius: 18,
-                                    ),
-                                    loading: () => CompanyLogo(
-                                      ticker: h.symbol,
-                                      radius: 18,
+                      return GestureDetector(
+                        onTap: () => _onAssetRowTap(h.symbol),
+                        onTapDown: (_) {},
+                        onTapCancel: () {},
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          height: 60,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 0,
+                            vertical: 6,
+                          ),
+                          decoration: i < sorted.length - 1
+                              ? BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: ThemeV2.divider,
+                                      width: 0.5,
                                     ),
                                   ),
+                                )
+                              : null,
+                          child: Row(
+                            children: [
+                              // Logo 40×40 с цветным кольцом от аллокации
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: _allocationColor(
+                                      i,
+                                    ).withValues(alpha: 0.7),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(1.5),
+                                child: ClipOval(
+                                  child: SizedBox(
+                                    width: 36,
+                                    height: 36,
+                                    child: logoAsync.when(
+                                      data: (url) => CompanyLogo(
+                                        ticker: h.symbol,
+                                        logoUrl: url,
+                                        radius: 18,
+                                      ),
+                                      error: (_, _) => CompanyLogo(
+                                        ticker: h.symbol,
+                                        radius: 18,
+                                      ),
+                                      loading: () => CompanyLogo(
+                                        ticker: h.symbol,
+                                        radius: 18,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            // Symbol + shares (как в Portfolio Holdings)
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              const SizedBox(width: 12),
+                              // Symbol + shares (как в Portfolio Holdings)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      _companyName(h.symbol),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: ThemeV2.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${h.shares.toStringAsFixed(2)} shares',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: ThemeV2.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              // Position value + P&L (как в Portfolio Holdings)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    _companyName(h.symbol),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: ThemeV2.textPrimary,
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      '\$${_fmtPosition(positionValue)}',
+                                      style: interNums(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: ThemeV2.textPrimary,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  Text(
-                                    '${h.shares.toStringAsFixed(2)} shares',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 11,
-                                      color: ThemeV2.textSecondary,
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      '${isPositive ? '+' : ''}\$${pnl.toStringAsFixed(2)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
+                                      style: interNums(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: isPositive
+                                            ? ThemeV2.success
+                                            : ThemeV2.loss,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            // Position value + P&L (как в Portfolio Holdings)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    '\$${_fmtPosition(positionValue)}',
-                                    style: interNums(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: ThemeV2.textPrimary,
-                                    ),
+                              // ── Lightbulb button — компактный ──
+                              if (session.explanationLog.containsKey(h.symbol))
+                                GestureDetector(
+                                  onTap: () => context.push(
+                                    '/stress-test/${widget.sessionId}/stock/${h.symbol}/why',
                                   ),
-                                ),
-                                const SizedBox(height: 2),
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    '${isPositive ? '+' : ''}\$${pnl.toStringAsFixed(2)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
-                                    style: interNums(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: isPositive
-                                          ? ThemeV2.success
-                                          : ThemeV2.loss,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            // ── Lightbulb button — компактный ──
-                            if (session.explanationLog.containsKey(h.symbol))
-                              GestureDetector(
-                                onTap: () => context.push(
-                                  '/stress-test/${widget.sessionId}/stock/${h.symbol}/why',
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 4),
-                                  child: Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      color: ThemeV2.primary.withValues(
-                                        alpha: 0.1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 4),
+                                    child: Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        color: ThemeV2.primary.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          ThemeV2.radiusSmall,
+                                        ),
                                       ),
-                                      borderRadius: BorderRadius.circular(
-                                        ThemeV2.radiusSmall,
+                                      alignment: Alignment.center,
+                                      child: const Icon(
+                                        Icons.help_outline_rounded,
+                                        size: 16,
+                                        color: ThemeV2.primary,
                                       ),
                                     ),
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.help_outline_rounded,
-                                      size: 16,
-                                      color: ThemeV2.primary,
-                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
+                      );
+                    },
+                  );
+                }).toList(),
+                if (sorted.length > 10)
+                  GestureDetector(
+                    onTap: () =>
+                        setState(() => _showAllAssets = !_showAllAssets),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: ThemeV2.primary.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    );
-                  },
-                );
-              }).toList(),
-              if (sorted.length > 10)
-                GestureDetector(
-                  onTap: () => setState(() => _showAllAssets = !_showAllAssets),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: ThemeV2.primary.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: Text(
-                        _showAllAssets
-                            ? 'Less'
-                            : 'More (${sorted.length - 10})',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: ThemeV2.primary,
+                      child: Center(
+                        child: Text(
+                          _showAllAssets
+                              ? 'Less'
+                              : 'More (${sorted.length - 10})',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: ThemeV2.primary,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
     );
@@ -1453,7 +1499,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   .read(stressTestProvider.notifier)
                   .terminateTest(session.id);
               if (ended && mounted) {
-                _showVerdict();
+                _handleCompletionIfNeeded();
               }
             },
             child: Text(
@@ -1523,7 +1569,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     return Container(
       key: ValueKey('${trade.date.millisecondsSinceEpoch}_${trade.symbol}'),
       margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: ThemeV2.surface,
         borderRadius: BorderRadius.circular(10),

@@ -490,6 +490,15 @@ void main() {
       expect(reloaded.getSession(id), isNull);
       // Archive should have 1 entry
       expect(reloaded.verdictArchive.length, equals(1));
+      // Mirrors the exact predicate stress_test_screen.dart's
+      // _handleCompletionIfNeeded uses to distinguish "completed" from
+      // "deleted" when the session disappears from active state — confirms
+      // the archive entry is already present (not just non-empty) by the
+      // time getSession returns null, since terminateTest is synchronous.
+      expect(
+        reloaded.verdictArchive.any((e) => e.sessionId == id),
+        isTrue,
+      );
       print(
         '  Terminated — Verdict: ${reloaded.verdictArchive.first.verdict.title}',
       );
