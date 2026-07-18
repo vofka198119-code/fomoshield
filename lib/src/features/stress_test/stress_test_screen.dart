@@ -561,11 +561,11 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           noInnerPadding: true,
           child: Column(
             children: [
-              const Divider(
+              Divider(
                 height: 1,
-                indent: 20,
-                endIndent: 20,
-                color: ThemeV2.divider,
+                indent: 16,
+                endIndent: 16,
+                color: Colors.black.withValues(alpha: 0.06),
               ),
               ...displayTrades.map((t) => _buildTradeTile(t)),
               if (allTrades.length > 5) ...[
@@ -639,10 +639,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     bool noInnerPadding = false,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: ThemeV2.surface,
-        borderRadius: BorderRadius.circular(ThemeV2.radiusLarge),
-      ),
+      decoration: FomoShieldTheme.cardDecoration,
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -650,7 +647,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         children: [
           if (title.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -663,15 +660,15 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           if (!noInnerPadding)
             Divider(
               height: 1,
-              indent: 20,
-              endIndent: 20,
-              color: ThemeV2.divider,
+              indent: 16,
+              endIndent: 16,
+              color: Colors.black.withValues(alpha: 0.06),
             ),
           if (noInnerPadding)
             child
           else
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
               child: child,
             ),
         ],
@@ -725,11 +722,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     return Container(
       height: 92,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: BoxDecoration(
-        color: ThemeV2.surface,
-        borderRadius: BorderRadius.circular(ThemeV2.radiusLarge),
-        boxShadow: ThemeV2.cardShadow,
-      ),
+      decoration: FomoShieldTheme.cardDecoration,
       child: Row(
         children: [
           // Market icon
@@ -1027,11 +1020,11 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             )
           : Column(
               children: [
-                const Divider(
+                Divider(
                   height: 1,
-                  indent: 20,
-                  endIndent: 20,
-                  color: ThemeV2.divider,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.black.withValues(alpha: 0.06),
                 ),
                 ...displayList.asMap().entries.map((entry) {
                   final i = entry.key;
@@ -1065,7 +1058,9 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                               ? BoxDecoration(
                                   border: Border(
                                     bottom: BorderSide(
-                                      color: ThemeV2.divider,
+                                      color: Colors.black.withValues(
+                                        alpha: 0.06,
+                                      ),
                                       width: 0.5,
                                     ),
                                   ),
@@ -1366,7 +1361,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: ThemeV2.surface,
+        color: FomoShieldTheme.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isExpiredTimer
@@ -1709,10 +1704,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: ThemeV2.surface,
-                    borderRadius: BorderRadius.circular(ThemeV2.radiusLarge),
-                  ),
+                  decoration: FomoShieldTheme.cardDecoration,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
