@@ -1051,7 +1051,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                         child: Container(
                           height: 60,
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 0,
+                            horizontal: 16,
                             vertical: 6,
                           ),
                           decoration: i < sorted.length - 1
