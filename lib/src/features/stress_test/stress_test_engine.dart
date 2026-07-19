@@ -12,12 +12,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../core/supabase/supabase_providers.dart';
+import '../../core/services/gics_sector_mapper.dart';
 import 'stress_test_models.dart';
 
 part 'gbm_engine.dart';
 part 'casino_epochs.dart';
 part 'trades_engine.dart';
-part 'speculation_event.dart';
+part 'speculation/speculation_event.dart';
+part 'hype/hype_event.dart';
 part 'news_event.dart';
 part 'noise_engine.dart';
 
@@ -291,9 +293,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       if (s.activeNewsEvent != null)
         'activeNewsEvent': s.activeNewsEvent!.toJson(),
       'lastNewsCheckedEpoch': s.lastNewsCheckedEpoch,
+      // ── Hype: sector-wide trending move (0-2 concurrent) ──────
+      'activeHypeEvents': s.activeHypeEvents.map((e) => e.toJson()).toList(),
+      'lastHypeCheckedEpoch': s.lastHypeCheckedEpoch,
       'customDurationDays': s.customDurationDays,
       'companies': s.companies.map((k, v) => MapEntry(k, v.toJson())),
-      // ── Block 5: Per-company spec/hype events ──────────────
+      // ── Block 5: Per-company speculation events ─────────────
       'specEvents': s.specEvents.map((e) => e.toJson()).toList(),
       'specEventCooldowns': s.specEventCooldowns.map(
         (k, v) => MapEntry(k, v.toIso8601String()),
@@ -418,7 +423,15 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           ) ??
           const {},
 
-      // ── Block 5: Per-company spec/hype events ──────────────
+      // ── Hype: sector-wide trending move (0-2 concurrent) ──────
+      activeHypeEvents:
+          (json['activeHypeEvents'] as List<dynamic>?)
+              ?.map((e) => HypeEvent.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      lastHypeCheckedEpoch: json['lastHypeCheckedEpoch'] as int? ?? -1,
+
+      // ── Block 5: Per-company speculation events ─────────────
       specEvents:
           (json['specEvents'] as List<dynamic>?)
               ?.map((e) => CompanySpecEvent.fromJson(e as Map<String, dynamic>))
@@ -604,6 +617,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             psychologyProfile: session.psychologyProfile,
             activeNewsEvent: session.activeNewsEvent,
             lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
+            activeHypeEvents: session.activeHypeEvents,
+            lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: {
               ...session.priceHistory,
               symbol: [...(session.priceHistory[symbol] ?? []), price],
@@ -665,6 +680,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             psychologyProfile: session.psychologyProfile,
             activeNewsEvent: session.activeNewsEvent,
             lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
+            activeHypeEvents: session.activeHypeEvents,
+            lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: session.priceHistory,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
@@ -807,6 +824,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       epochHistory: [firstRecord],
       activeNewsEvent: null,
       lastNewsCheckedEpoch: -1,
+      activeHypeEvents: const [],
+      lastHypeCheckedEpoch: -1,
     );
     newSession.epochPriceRanges = {};
     for (final h in session.holdings) {
@@ -864,6 +883,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             psychologyProfile: session.psychologyProfile,
             activeNewsEvent: session.activeNewsEvent,
             lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
+            activeHypeEvents: session.activeHypeEvents,
+            lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: session.priceHistory,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,

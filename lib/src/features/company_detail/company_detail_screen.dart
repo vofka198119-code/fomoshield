@@ -19,6 +19,7 @@ import 'watchlist_ad_provider.dart';
 import 'company_widget_order_provider.dart';
 import 'widgets/price_chart.dart';
 import 'widgets/fs_score_widget.dart';
+import '../../core/services/gics_sector_mapper.dart';
 
 // ---------------------------------------------------------------------------
 // Providers — with layered cache: 4h (main) + 30d (score + metrics)
@@ -778,12 +779,40 @@ class _PriceHeader extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      symbol,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: ThemeV2.textSecondary,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          symbol,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: ThemeV2.textSecondary,
+                          ),
+                        ),
+                        if (resolveGicsSector(symbol, companyName: companyName) != null) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: ThemeV2.primary.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              resolveGicsSector(
+                                symbol,
+                                companyName: companyName,
+                              )!.label,
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: ThemeV2.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),

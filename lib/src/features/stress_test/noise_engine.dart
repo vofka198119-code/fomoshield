@@ -249,6 +249,26 @@ extension NoiseEngine on StressTestNotifier {
       }
     }
 
+    // ── Hype: sector-wide trending move, checked once per EPOCH ──────
+    // Same eligibility/cadence pattern as News (8+ holdings, once per
+    // epoch index) but only rolled while 0 Hype events are currently
+    // active — see hype/hype_event.dart for the pairing/rest rules.
+    if (session.lastHypeCheckedEpoch != currentEpoch.index) {
+      session.lastHypeCheckedEpoch = currentEpoch.index;
+      if (session.activeHypeEvents.isEmpty &&
+          session.holdings.length >= _hypeMinHoldings) {
+        final newHypeEvents = _maybeFireHypeEvents(
+          session,
+          rng,
+          now,
+          ticksPerEpoch,
+        );
+        if (newHypeEvents.isNotEmpty) {
+          session.activeHypeEvents = newHypeEvents;
+        }
+      }
+    }
+
     final explanations = Map<String, List<TickExplanation>>.from(
       session.explanationLog,
     );
@@ -262,6 +282,11 @@ extension NoiseEngine on StressTestNotifier {
               session.holdings.length;
 
     for (int tick = 0; tick < ticks; tick++) {
+      // Peek once per tick (not once per holding — one Hype event can
+      // target many holdings within the same tick); advanced once after
+      // the holdings loop below via _advanceHypeEvents.
+      final hypeIncrements = _hypeTickIncrements(session);
+
       for (final h in session.holdings) {
         final basePrice = session.basePrices[h.symbol] ?? h.entryPrice;
         double currentPrice = newPrices[h.symbol] ?? h.entryPrice;
@@ -307,7 +332,26 @@ extension NoiseEngine on StressTestNotifier {
           currentPrice *= (1.0 + newsIncrement);
         }
 
-        // ── Block 5: Apply per-company spec/hype bell-shape event ──
+        // ── Hype: apply this tick's sector increment, if this holding's
+        // GICS sector currently has an active Hype event ──────────────
+        final holdingGicsSector = resolveGicsSector(h.symbol);
+        double hypeIncrement = holdingGicsSector != null
+            ? (hypeIncrements[holdingGicsSector] ?? 0.0)
+            : 0.0;
+        if (hypeIncrement > 0 &&
+            (regime == _MacroRegime.bull || regime == _MacroRegime.recovery)) {
+          // Damp Hype when it would stack in the same direction as an
+          // already-strong Bull/Recovery regime — explicit ask: Hype +
+          // Bull together should never compound into sky-high numbers.
+          // The per-regime price clamp below is still the hard backstop;
+          // this is a softer, earlier damping.
+          hypeIncrement *= _hypeBullCoOccurrenceDamping;
+        }
+        if (hypeIncrement.abs() > 0.0001) {
+          currentPrice *= (1.0 + hypeIncrement);
+        }
+
+        // ── Block 5: Apply per-company speculation bell-shape event ──
         // Firing is decided once per weekly wall-clock window, before this
         // loop (see the lastSpecEventCheckAt check above). Here we only
         // advance/apply the amplitude of whatever is currently active.
@@ -399,6 +443,11 @@ extension NoiseEngine on StressTestNotifier {
           if (currentPrice > range.max) range.max = currentPrice;
         }
       }
+
+      // Advance all active Hype events by exactly this one tick — once
+      // per tick, not once per holding (see _hypeTickIncrements' peek
+      // above, which one or more holdings may have just consumed).
+      _advanceHypeEvents(session);
     }
 
     // ── Psychology Profile: diversification / concentration ──
@@ -513,6 +562,8 @@ extension NoiseEngine on StressTestNotifier {
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             activeNewsEvent: session.activeNewsEvent,
             lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
+            activeHypeEvents: session.activeHypeEvents,
+            lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: () {
               final hist = Map<String, List<double>>.from(session.priceHistory);
               for (final h in session.holdings) {

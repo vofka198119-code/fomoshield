@@ -251,7 +251,7 @@ extension CasinoEpochsEngine on StressTestNotifier {
     print('  currentPrices=${session.currentPrices}');
     // ignore: avoid_print
     print(
-      '  specEvents=${session.specEvents.map((e) => "${e.symbol}:${e.type.name} tick=${e.currentTick}/${e.rampDurationTicks} peak=${e.peakAmplitude}").toList()}',
+      '  specEvents=${session.specEvents.map((e) => "${e.symbol} tick=${e.currentTick}/${e.rampDurationTicks} peak=${e.peakAmplitude}").toList()}',
     );
     // ignore: avoid_print
     print('  lastSpecEventCheckAt=${session.lastSpecEventCheckAt}');
@@ -369,7 +369,7 @@ extension CasinoEpochsEngine on StressTestNotifier {
     print('  currentPrices=${session.currentPrices}');
     // ignore: avoid_print
     print(
-      '  specEvents=${session.specEvents.map((e) => "${e.symbol}:${e.type.name} tick=${e.currentTick}/${e.rampDurationTicks}").toList()}',
+      '  specEvents=${session.specEvents.map((e) => "${e.symbol} tick=${e.currentTick}/${e.rampDurationTicks}").toList()}',
     );
   }
 

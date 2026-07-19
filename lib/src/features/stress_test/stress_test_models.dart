@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 import 'dart:math';
+import '../../core/services/gics_sector_mapper.dart';
 
 /// Supported test durations.
 /// [custom] requires [StressTestSession.customDurationDays] at runtime.
@@ -678,28 +679,42 @@ class TraderPsychologyProfile {
       );
 }
 
-/// ── Block 5: Per-Company Speculation / Hype Event ─────────────────────
+/// ── Block 5: Per-Company Speculation Event ─────────────────────────────
 ///
-/// Instead of global market-wide hype/speculation scenarios, each company
-/// can get a hidden bell-shape event with 5% weekly chance per tick.
+/// Each company can get a hidden bell-shape event with a 5% weekly chance
+/// per check. Speculation is deliberately volatile and two-sided — it can
+/// be a positive rumor or a negative one, and it always ends in a sharp
+/// overcorrection past zero (panic overreaction), unlike the calmer,
+/// sector-wide Hype mechanism (hype/hype_event.dart) or the single-company
+/// News mechanism (news_event.dart).
 ///
-/// Bell-shape: price ramps up in the first half, then reverses.
-/// Peak amplitude: hype +8%, speculation ±15% (volatile).
-/// Cooldown: 3–4 weeks after event ends.
+/// NOTE: this used to also cover per-company "hype" (see git history,
+/// commit before the hype/speculation split) — that concept has been
+/// replaced entirely by the new sector-wide Hype mechanism, so this class
+/// and file are speculation-only now.
+///
+/// Bell-shape: price ramps up, plateaus, then sharply reverses past zero.
+/// Peak amplitude: ±15% (volatile). Cooldown: 3–4 weeks after event ends.
+///
+/// Known bug, deferred by explicit instruction (own follow-up task):
+/// [amplitude] returns the bell curve's cumulative-so-far value, but
+/// noise_engine.dart applies it as a raw per-tick multiplier every tick
+/// instead of a per-tick increment — the same un-dt-scaled compounding
+/// bug class already fixed for the macro epoch roll and for Hype/News.
+/// Left alone here per the user's explicit "fix speculation separately"
+/// instruction when the hype/speculation split was requested.
 class CompanySpecEvent {
   final String symbol;
-  final CompanySpecEventType type;
   final DateTime startedAt;
   final DateTime endsAt;
   final int rampDurationTicks;
   int currentTick;
 
-  /// Peak price impact (% as decimal, e.g. 0.08 = +8%).
+  /// Peak price impact (% as decimal, signed — e.g. 0.08 = +8%, -0.12 = -12%).
   final double peakAmplitude;
 
   CompanySpecEvent({
     required this.symbol,
-    required this.type,
     required this.startedAt,
     required this.endsAt,
     required this.rampDurationTicks,
@@ -709,37 +724,22 @@ class CompanySpecEvent {
 
   /// Bell-shape amplitude at current tick.
   /// f(t) = sin(π × t / duration) × peakAmplitude
-  /// Positive = hype (ramp up), negative after reversal point for speculation.
   double get amplitude {
     if (rampDurationTicks <= 0) return 0.0;
     final progress = (currentTick / rampDurationTicks).clamp(0.0, 1.0);
     return _bellShape(progress) * peakAmplitude;
   }
 
-  /// Asymmetric surge+correction shape — no mechanical symmetry.
-  /// Hype: gradual ramp (0→35%), then slow correction retains ~33% of peak.
-  /// Speculation: fast ramp (0→25%), plateau (25→45%), sharp reversal past zero.
+  /// Fast ramp (0→25%), plateau (25→45%), sharp reversal past zero
+  /// (45→100%: 1.0 → -0.25, net negative, panic overreaction).
   double _bellShape(double t) {
-    if (type == CompanySpecEventType.speculation) {
-      // Phase 1 (0→25%): fast ramp up → market overreacts
-      if (t < 0.25) {
-        return sin(t / 0.25 * pi / 2); // 0 → 1.0
-      }
-      // Phase 2 (25→45%): plateau — price stays elevated
-      if (t < 0.45) {
-        return 1.0;
-      }
-      // Phase 3 (45→100%): sharp correction past zero → overcorrects
-      // 1.0 → -0.25 (net negative, panic overreaction)
-      return 1.0 - (t - 0.45) / 0.55 * 1.25;
+    if (t < 0.25) {
+      return sin(t / 0.25 * pi / 2); // 0 → 1.0
     }
-    // Hype: moderate news, partial correction
-    // Phase 1 (0→35%): gradual ramp
-    if (t < 0.35) {
-      return sin(t / 0.35 * pi / 2); // 0 → 1.0
+    if (t < 0.45) {
+      return 1.0;
     }
-    // Phase 2 (35→100%): slow correction, retains ~33% of peak
-    return 1.0 - (t - 0.35) / 0.65 * 0.67; // 1.0 → 0.33
+    return 1.0 - (t - 0.45) / 0.55 * 1.25;
   }
 
   /// Whether the event has finished its ramp.
@@ -752,7 +752,6 @@ class CompanySpecEvent {
 
   CompanySpecEvent copy() => CompanySpecEvent(
     symbol: symbol,
-    type: type,
     startedAt: startedAt,
     endsAt: endsAt,
     rampDurationTicks: rampDurationTicks,
@@ -762,7 +761,6 @@ class CompanySpecEvent {
 
   Map<String, dynamic> toJson() => {
     'symbol': symbol,
-    'type': type.name,
     'startedAt': startedAt.toIso8601String(),
     'endsAt': endsAt.toIso8601String(),
     'rampDurationTicks': rampDurationTicks,
@@ -773,10 +771,6 @@ class CompanySpecEvent {
   factory CompanySpecEvent.fromJson(Map<String, dynamic> json) =>
       CompanySpecEvent(
         symbol: json['symbol'] as String,
-        type: CompanySpecEventType.values.firstWhere(
-          (e) => e.name == json['type'],
-          orElse: () => CompanySpecEventType.hype,
-        ),
         startedAt: DateTime.parse(json['startedAt'] as String),
         endsAt: DateTime.parse(json['endsAt'] as String),
         rampDurationTicks: json['rampDurationTicks'] as int? ?? 40,
@@ -784,8 +778,6 @@ class CompanySpecEvent {
         peakAmplitude: (json['peakAmplitude'] as num?)?.toDouble() ?? 0.08,
       );
 }
-
-enum CompanySpecEventType { hype, speculation }
 
 /// ── Block 6: Casino Wall-Clock Epoch Record ──────────────────────────
 ///
@@ -1126,6 +1118,102 @@ class NewsEvent {
   );
 }
 
+/// ── Hype — a sector-wide trending move (hype/hype_event.dart) ─────────
+///
+/// Unlike [NewsEvent] (one company, sharp ramp, no reversal) or the
+/// per-company Speculation bell curve (speculation/speculation_event.dart),
+/// Hype targets an entire GICS sector at once — every holding in that
+/// sector trends the same direction together, the way a real sector-wide
+/// rally or sell-off would move a diversified portfolio.
+///
+/// Progress curve: smooth ease-in-out ramp that OVERSHOOTS to 115% of
+/// [targetAmplitude] around 70% of the way through, then eases back down
+/// to exactly 100% by the end — a gentle "small pullback before settling"
+/// correction, per explicit design ask, rather than a flat plateau or an
+/// instant snap. Applied as a per-TICK INCREMENT (like [NewsEvent]), never
+/// by re-applying the full amplitude every tick — the bug class found (and
+/// left alone, by explicit instruction) in the sibling Speculation
+/// mechanism.
+class HypeEvent {
+  final GicsSector sector;
+  final bool isPositive;
+
+  /// Total signed net move by the end of the ramp (e.g. 0.07 = +7%).
+  /// The curve overshoots this mid-ramp and corrects back to exactly
+  /// this value — see class doc.
+  final double targetAmplitude;
+
+  final DateTime startedAt;
+  final int rampDurationTicks;
+  int currentTick;
+
+  HypeEvent({
+    required this.sector,
+    required this.isPositive,
+    required this.targetAmplitude,
+    required this.startedAt,
+    required this.rampDurationTicks,
+    this.currentTick = 0,
+  });
+
+  /// Ease-in-out overshoot-then-correct progress curve, 0.0 → 1.15 → 1.0.
+  static double _progressShape(double t) {
+    final clamped = t.clamp(0.0, 1.0);
+    if (clamped < 0.7) {
+      // 0 → 0.7: ease up to the 1.15 overshoot peak.
+      return sin(clamped / 0.7 * pi / 2) * 1.15;
+    }
+    // 0.7 → 1.0: ease back down from 1.15 to 1.0 (the correction).
+    final tail = (clamped - 0.7) / 0.3;
+    return 1.15 - sin(tail * pi / 2) * 0.15;
+  }
+
+  double _progressAt(int tick) {
+    if (rampDurationTicks <= 0) return 1.0;
+    return _progressShape(tick / rampDurationTicks);
+  }
+
+  /// The price multiplier to apply THIS tick — the incremental slice of
+  /// [targetAmplitude] between the previous tick's progress and this
+  /// one's. Sums to exactly [targetAmplitude] across the whole ramp
+  /// (the overshoot and correction cancel out along the way).
+  double get tickIncrement =>
+      (_progressAt(currentTick + 1) - _progressAt(currentTick)) *
+      targetAmplitude;
+
+  bool get isExpired => currentTick >= rampDurationTicks;
+
+  HypeEvent copy() => HypeEvent(
+    sector: sector,
+    isPositive: isPositive,
+    targetAmplitude: targetAmplitude,
+    startedAt: startedAt,
+    rampDurationTicks: rampDurationTicks,
+    currentTick: currentTick,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'sector': sector.name,
+    'isPositive': isPositive,
+    'targetAmplitude': targetAmplitude,
+    'startedAt': startedAt.toIso8601String(),
+    'rampDurationTicks': rampDurationTicks,
+    'currentTick': currentTick,
+  };
+
+  factory HypeEvent.fromJson(Map<String, dynamic> json) => HypeEvent(
+    sector: GicsSector.values.firstWhere(
+      (s) => s.name == json['sector'],
+      orElse: () => GicsSector.technology,
+    ),
+    isPositive: json['isPositive'] as bool,
+    targetAmplitude: (json['targetAmplitude'] as num).toDouble(),
+    startedAt: DateTime.parse(json['startedAt'] as String),
+    rampDurationTicks: json['rampDurationTicks'] as int,
+    currentTick: json['currentTick'] as int? ?? 0,
+  );
+}
+
 /// A single trade executed in a stress test session.
 class StressTestTrade {
   final String symbol;
@@ -1321,8 +1409,19 @@ class StressTestSession {
   /// within the same epoch. -1 = never checked.
   int lastNewsCheckedEpoch;
 
-  // ── Block 5: Per-Company Spec/Hype Events ────────────────────
-  /// Active per-company speculation/hype events (bell-shape price impact).
+  /// ── Hype (hype/hype_event.dart) ──────────────────────────────────
+  /// Active sector-wide Hype events. 0, 1, or 2 concurrent — when 2 are
+  /// active they are always opposite-signed (one sector up, one down);
+  /// same-signed duplicates are collapsed to 1 at roll time. No new roll
+  /// is attempted while this is non-empty.
+  List<HypeEvent> activeHypeEvents;
+
+  /// Epoch index this session last rolled the 7%-per-epoch Hype check at
+  /// (whether or not it actually fired) — mirrors [lastNewsCheckedEpoch].
+  int lastHypeCheckedEpoch;
+
+  // ── Block 5: Per-Company Speculation Events ──────────────────
+  /// Active per-company speculation events (bell-shape price impact).
   List<CompanySpecEvent> specEvents;
 
   /// Cooldown map: symbol → DateTime until which new events are blocked.
@@ -1391,6 +1490,8 @@ class StressTestSession {
     this.soldDuringCatastrophe = const <String>{},
     this.activeNewsEvent,
     this.lastNewsCheckedEpoch = -1,
+    this.activeHypeEvents = const [],
+    this.lastHypeCheckedEpoch = -1,
     this.specEvents = const [],
     this.specEventCooldowns = const {},
     this.lastSpecEventCheckAt,

@@ -24,6 +24,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../../shared/widgets/guardian/guardian_data.dart';
+import '../../../core/services/gics_sector_mapper.dart';
 
 // ── Factor color constants (Steps 267–271) ───────────────────────────────
 const _marketColor = Color(0xFF6FA7D6);
@@ -118,6 +119,11 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     // targeted by an active News event.
                     if (session.activeNewsEvent?.symbol == widget.symbol)
                       _buildNewsHeadline(session.activeNewsEvent!),
+
+                    // Hype micro-scenario banner (hype/hype_event.dart) —
+                    // only shown when THIS symbol's GICS sector currently
+                    // has an active sector-wide Hype event.
+                    ..._buildHypeBanners(session),
 
                     // 2. Summary Card (Steps 208–213)
                     _buildSummaryCard(changePercent, isPositive, latest),
@@ -282,6 +288,71 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                   Text(
                     '${event.isPositive ? '+' : ''}'
                     '${(event.targetAmplitude * 100).toStringAsFixed(1)}% target impact on ${widget.symbol}',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: ThemeV2.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── Hype banner (hype/hype_event.dart) ──────────────────────────────
+  List<Widget> _buildHypeBanners(StressTestSession session) {
+    final mySector = resolveGicsSector(widget.symbol);
+    if (mySector == null) return const [];
+    for (final event in session.activeHypeEvents) {
+      if (event.sector == mySector) return [_buildHypeBanner(event)];
+    }
+    return const [];
+  }
+
+  Widget _buildHypeBanner(HypeEvent event) {
+    final color = event.isPositive ? ThemeV2.success : ThemeV2.loss;
+    return _FadeSlide(
+      index: 1,
+      controller: _staggerController,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              event.isPositive
+                  ? Icons.local_fire_department_rounded
+                  : Icons.trending_down_rounded,
+              color: color,
+              size: 22,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hype: ${event.sector.label} '
+                    '${event.isPositive ? 'rallying' : 'declining'}',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: ThemeV2.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${event.isPositive ? '+' : ''}'
+                    '${(event.targetAmplitude * 100).toStringAsFixed(1)}% sector-wide target impact',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: ThemeV2.textSecondary,
