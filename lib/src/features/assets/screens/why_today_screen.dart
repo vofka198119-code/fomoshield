@@ -341,7 +341,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hype: ${event.sector.label} '
+                    'Sector: ${event.sector.label} '
                     '${event.isPositive ? 'rallying' : 'declining'}',
                     style: GoogleFonts.inter(
                       fontSize: 14,

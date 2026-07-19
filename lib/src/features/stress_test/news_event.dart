@@ -249,8 +249,7 @@ extension NewsEventEngine on StressTestNotifier {
   /// Apply this tick's slice of the active News event, if [symbol] is the
   /// one it targets. Mutates session.activeNewsEvent in place (advances
   /// currentTick, clears to null on expiry) so multi-tick catch-up
-  /// batches progress correctly call-by-call — same pattern as
-  /// _applySpecEvents in speculation_event.dart.
+  /// batches progress correctly call-by-call.
   double _applyNewsEvent(StressTestSession session, String symbol) {
     final event = session.activeNewsEvent;
     if (event == null || event.symbol != symbol) return 0.0;

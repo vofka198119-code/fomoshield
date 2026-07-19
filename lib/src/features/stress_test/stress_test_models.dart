@@ -265,9 +265,10 @@ enum MarketScenario {
       this == MarketScenario.blackSwan || this == MarketScenario.crash;
   bool get isDecline => this == MarketScenario.bear;
 
-  /// Block 5: hype/speculation are per-COMPANY events now (see
-  /// speculation_event.dart's CompanySpecEventType), not global epoch
+  /// Block 5: hype/speculation are per-COMPANY concepts, not global epoch
   /// scenarios — they're never rolled by casino_epochs.dart's roulette.
+  /// (Speculation's implementation was removed 2026-07-19 — see repair
+  /// queue in project memory for the "add back later" list.)
   /// These two enum values only remain because [description]/[drift]/etc.
   /// need exhaustive switches; anything that deals with epoch weights
   /// (fatigue init, redistribution, recovery) must exclude them via this
@@ -358,164 +359,6 @@ enum MarketScenario {
     MarketScenario.hype => 90,
   };
 }
-
-// ---------------------------------------------------------------------------
-// IPO Pattern & Phase — Autonomous Company Lifecycle
-// ---------------------------------------------------------------------------
-
-/// IPO pattern type for a company's public debut.
-enum IpoPattern { none, tesla, reverse }
-
-/// The 6 phases of an autonomous IPO lifecycle.
-/// Each company manages its own phase transitions internally.
-enum CompanyIpoPhase { none, shakeout, fomo, coolOff, sharpPullback, recovery }
-
-/// Autonomous company stock with self-managed IPO lifecycle.
-///
-/// Each [CompanyStock] instance manages its own age, IPO phase transitions,
-/// and daily drift bonus independently — no central IPO controller needed.
-class CompanyStock {
-  final String symbol;
-  final String companyName;
-  final MarketSector sector;
-  int ageWeeks;
-  final IpoPattern ipoPattern;
-  CompanyIpoPhase ipoPhase;
-  int _phaseWeeks; // weeks spent in current phase
-
-  CompanyStock({
-    required this.symbol,
-    required this.companyName,
-    required this.sector,
-    this.ageWeeks = 0,
-    this.ipoPattern = IpoPattern.none,
-    this.ipoPhase = CompanyIpoPhase.none,
-    int phaseWeeks = 0,
-  }) : _phaseWeeks = phaseWeeks;
-
-  /// Advance age by 1 week and transition IPO phase if needed.
-  void advanceAge() {
-    ageWeeks++;
-    if (ipoPattern == IpoPattern.none) return;
-    _phaseWeeks++;
-
-    switch (ipoPattern) {
-      case IpoPattern.tesla:
-        _advanceTesla();
-      case IpoPattern.reverse:
-        _advanceReverse();
-      case IpoPattern.none:
-        break;
-    }
-  }
-
-  void _advanceTesla() {
-    // Tesla: shakeout(2w) → fomo(2w) → coolOff(2w) → recovery(∞)
-    switch (ipoPhase) {
-      case CompanyIpoPhase.shakeout:
-        if (_phaseWeeks >= 2) {
-          ipoPhase = CompanyIpoPhase.fomo;
-          _phaseWeeks = 0;
-        }
-      case CompanyIpoPhase.fomo:
-        if (_phaseWeeks >= 2) {
-          ipoPhase = CompanyIpoPhase.coolOff;
-          _phaseWeeks = 0;
-        }
-      case CompanyIpoPhase.coolOff:
-        if (_phaseWeeks >= 2) {
-          ipoPhase = CompanyIpoPhase.recovery;
-          _phaseWeeks = 0;
-        }
-      default:
-        break;
-    }
-  }
-
-  void _advanceReverse() {
-    // Reverse: shakeout(2w) → sharpPullback(2w) → recovery(∞)
-    switch (ipoPhase) {
-      case CompanyIpoPhase.shakeout:
-        if (_phaseWeeks >= 2) {
-          ipoPhase = CompanyIpoPhase.sharpPullback;
-          _phaseWeeks = 0;
-        }
-      case CompanyIpoPhase.sharpPullback:
-        if (_phaseWeeks >= 2) {
-          ipoPhase = CompanyIpoPhase.recovery;
-          _phaseWeeks = 0;
-        }
-      default:
-        break;
-    }
-  }
-
-  /// Micro-drift contributed by IPO phase activity for the current tick.
-  ///
-  /// Returns 0.0 when [ipoPattern] is [IpoPattern.none] or [ipoPhase] is
-  /// [CompanyIpoPhase.none]. Otherwise uses [rng] to generate a random value
-  /// within the configured range for the current phase + pattern combination.
-  double computeIpoBonusDrift(Random rng) {
-    if (ipoPattern == IpoPattern.none || ipoPhase == CompanyIpoPhase.none) {
-      return 0.0;
-    }
-    return switch (ipoPattern) {
-      IpoPattern.tesla => switch (ipoPhase) {
-        CompanyIpoPhase.shakeout =>
-          -(0.08 + rng.nextDouble() * 0.07), // -0.08..-0.15
-        CompanyIpoPhase.fomo => 0.25 + rng.nextDouble() * 0.25, // +0.25..+0.50
-        CompanyIpoPhase.coolOff =>
-          -(0.05 + rng.nextDouble() * 0.05), // -0.05..-0.10
-        CompanyIpoPhase.recovery =>
-          0.02 + rng.nextDouble() * 0.03, // +0.02..+0.05
-        _ => 0.0,
-      },
-      IpoPattern.reverse => switch (ipoPhase) {
-        CompanyIpoPhase.shakeout =>
-          0.15 + rng.nextDouble() * 0.15, // +0.15..+0.30
-        CompanyIpoPhase.sharpPullback =>
-          -(0.10 + rng.nextDouble() * 0.10), // -0.10..-0.20
-        CompanyIpoPhase.recovery =>
-          0.03 + rng.nextDouble() * 0.05, // +0.03..+0.08
-        _ => 0.0,
-      },
-      IpoPattern.none => 0.0,
-    };
-  }
-
-  /// @Deprecated Use [computeIpoBonusDrift] instead.
-  double get ipoBonusDrift => computeIpoBonusDrift(_fallbackRng);
-
-  static final Random _fallbackRng = Random();
-
-  Map<String, dynamic> toJson() => {
-    'symbol': symbol,
-    'companyName': companyName,
-    'sector': sector.name,
-    'ageWeeks': ageWeeks,
-    'ipoPattern': ipoPattern.name,
-    'ipoPhase': ipoPhase.name,
-    '_phaseWeeks': _phaseWeeks,
-  };
-
-  factory CompanyStock.fromJson(Map<String, dynamic> json) => CompanyStock(
-    symbol: json['symbol'] as String,
-    companyName: json['companyName'] as String? ?? '',
-    sector: MarketSector.values.firstWhere(
-      (s) => s.name == (json['sector'] as String? ?? 'other'),
-    ),
-    ageWeeks: json['ageWeeks'] as int? ?? 0,
-    ipoPattern: IpoPattern.values.firstWhere(
-      (p) => p.name == (json['ipoPattern'] as String? ?? 'none'),
-    ),
-    ipoPhase: CompanyIpoPhase.values.firstWhere(
-      (p) => p.name == (json['ipoPhase'] as String? ?? 'none'),
-    ),
-    phaseWeeks: json['_phaseWeeks'] as int? ?? 0,
-  );
-}
-
-/// @Deprecated Use [CompanyStock.computeIpoBonusDrift] instead.
 
 // ---------------------------------------------------------------------------
 // Trader Psychology Profile — 4 Sub-Indices
@@ -676,106 +519,6 @@ class TraderPsychologyProfile {
         patience: (json['patience'] as num?)?.toDouble() ?? 0.0,
         strategyAdherence:
             (json['strategyAdherence'] as num?)?.toDouble() ?? 0.0,
-      );
-}
-
-/// ── Block 5: Per-Company Speculation Event ─────────────────────────────
-///
-/// Each company can get a hidden bell-shape event with a 5% weekly chance
-/// per check. Speculation is deliberately volatile and two-sided — it can
-/// be a positive rumor or a negative one, and it always ends in a sharp
-/// overcorrection past zero (panic overreaction), unlike the calmer,
-/// sector-wide Hype mechanism (hype/hype_event.dart) or the single-company
-/// News mechanism (news_event.dart).
-///
-/// NOTE: this used to also cover per-company "hype" (see git history,
-/// commit before the hype/speculation split) — that concept has been
-/// replaced entirely by the new sector-wide Hype mechanism, so this class
-/// and file are speculation-only now.
-///
-/// Bell-shape: price ramps up, plateaus, then sharply reverses past zero.
-/// Peak amplitude: ±15% (volatile). Cooldown: 3–4 weeks after event ends.
-///
-/// Known bug, deferred by explicit instruction (own follow-up task):
-/// [amplitude] returns the bell curve's cumulative-so-far value, but
-/// noise_engine.dart applies it as a raw per-tick multiplier every tick
-/// instead of a per-tick increment — the same un-dt-scaled compounding
-/// bug class already fixed for the macro epoch roll and for Hype/News.
-/// Left alone here per the user's explicit "fix speculation separately"
-/// instruction when the hype/speculation split was requested.
-class CompanySpecEvent {
-  final String symbol;
-  final DateTime startedAt;
-  final DateTime endsAt;
-  final int rampDurationTicks;
-  int currentTick;
-
-  /// Peak price impact (% as decimal, signed — e.g. 0.08 = +8%, -0.12 = -12%).
-  final double peakAmplitude;
-
-  CompanySpecEvent({
-    required this.symbol,
-    required this.startedAt,
-    required this.endsAt,
-    required this.rampDurationTicks,
-    this.currentTick = 0,
-    this.peakAmplitude = 0.08,
-  });
-
-  /// Bell-shape amplitude at current tick.
-  /// f(t) = sin(π × t / duration) × peakAmplitude
-  double get amplitude {
-    if (rampDurationTicks <= 0) return 0.0;
-    final progress = (currentTick / rampDurationTicks).clamp(0.0, 1.0);
-    return _bellShape(progress) * peakAmplitude;
-  }
-
-  /// Fast ramp (0→25%), plateau (25→45%), sharp reversal past zero
-  /// (45→100%: 1.0 → -0.25, net negative, panic overreaction).
-  double _bellShape(double t) {
-    if (t < 0.25) {
-      return sin(t / 0.25 * pi / 2); // 0 → 1.0
-    }
-    if (t < 0.45) {
-      return 1.0;
-    }
-    return 1.0 - (t - 0.45) / 0.55 * 1.25;
-  }
-
-  /// Whether the event has finished its ramp.
-  bool get isExpired => currentTick >= rampDurationTicks;
-
-  /// Time remaining until expiry.
-  Duration get remaining => endsAt.difference(DateTime.now()).isNegative
-      ? Duration.zero
-      : endsAt.difference(DateTime.now());
-
-  CompanySpecEvent copy() => CompanySpecEvent(
-    symbol: symbol,
-    startedAt: startedAt,
-    endsAt: endsAt,
-    rampDurationTicks: rampDurationTicks,
-    currentTick: currentTick,
-    peakAmplitude: peakAmplitude,
-  );
-
-  Map<String, dynamic> toJson() => {
-    'symbol': symbol,
-    'startedAt': startedAt.toIso8601String(),
-    'endsAt': endsAt.toIso8601String(),
-    'rampDurationTicks': rampDurationTicks,
-    'currentTick': currentTick,
-    'peakAmplitude': peakAmplitude,
-  };
-
-  factory CompanySpecEvent.fromJson(Map<String, dynamic> json) =>
-      CompanySpecEvent(
-        symbol: json['symbol'] as String,
-        startedAt: DateTime.parse(json['startedAt'] as String),
-        endsAt: DateTime.parse(json['endsAt'] as String),
-        rampDurationTicks: json['rampDurationTicks'] as int? ?? 40,
-        currentTick: json['currentTick'] as int? ?? 0,
-        peakAmplitude: (json['peakAmplitude'] as num?)?.toDouble() ?? 0.08,
       );
 }
 
@@ -1304,9 +1047,6 @@ class StressTestSession {
   /// Persistent casino state: index of the last catastrophe epoch.
   int casinoLastCatastropheEpoch;
 
-  // Autonomous company stocks with self-managed IPO lifecycles
-  Map<String, CompanyStock> companies;
-
   // Trader psychology profile (4 sub-indices)
   TraderPsychologyProfile psychologyProfile;
 
@@ -1420,19 +1160,6 @@ class StressTestSession {
   /// (whether or not it actually fired) — mirrors [lastNewsCheckedEpoch].
   int lastHypeCheckedEpoch;
 
-  // ── Block 5: Per-Company Speculation Events ──────────────────
-  /// Active per-company speculation events (bell-shape price impact).
-  List<CompanySpecEvent> specEvents;
-
-  /// Cooldown map: symbol → DateTime until which new events are blocked.
-  Map<String, DateTime> specEventCooldowns;
-
-  /// Timestamp of the last weekly wall-clock check for spec/hype events.
-  /// Gated on real elapsed time (~7 days), not on epoch rolls — epoch
-  /// length varies per test type (Block 6), so tying this to epoch count
-  /// would fire far more often than the intended weekly cadence.
-  DateTime? lastSpecEventCheckAt;
-
   // ── Block 6: Casino Wall-Clock Epoch History ──────────────────
   /// Timestamp of the last epoch roll (for catch-up on re-entry).
   DateTime? lastEpochRollAt;
@@ -1461,7 +1188,6 @@ class StressTestSession {
     this.casinoDeclineStreak = 0,
     this.casinoCatastropheCount = 0,
     this.casinoLastCatastropheEpoch = -100,
-    this.companies = const {},
     TraderPsychologyProfile? psychologyProfile,
     this.currentPrices = const {},
     this.basePrices = const {},
@@ -1492,9 +1218,6 @@ class StressTestSession {
     this.lastNewsCheckedEpoch = -1,
     this.activeHypeEvents = const [],
     this.lastHypeCheckedEpoch = -1,
-    this.specEvents = const [],
-    this.specEventCooldowns = const {},
-    this.lastSpecEventCheckAt,
     this.lastEpochRollAt,
     this.epochHistory = const [],
   }) : cash = cash ?? startingCash,

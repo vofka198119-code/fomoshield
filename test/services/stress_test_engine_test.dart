@@ -412,78 +412,11 @@ void main() {
     );
   });
 
-  group('6. IPO System (CompanyStock autonomous lifecycle)', () {
-    test('6.1 No IPO in non-Infinite modes', () async {
-      final notifier = await createNotifier();
-      for (int a = 0; a < 200; a++) {
-        final id = notifier.createSession(TestDuration.week1, 5000);
-        await notifier.buyAssetSetup(id, 'KO', 5000, 60.0);
-        notifier.startTest(id);
-        expect(notifier.getSession(id)!.companies.isEmpty, isTrue);
-        notifier.deleteSession(id);
-      }
-    });
-
-    test('6.2 IPO triggers ~3% in Infinite', () async {
-      SharedPreferences.setMockInitialValues({});
-      final notifier = StressTestNotifier(userId: 'ipo_test');
-
-      int ipoCount = 0;
-      const int N = 500;
-      for (int a = 0; a < N; a++) {
-        final id = notifier.createSession(TestDuration.infinite, 5000);
-        await notifier.buyAssetSetup(id, 'KO', 5000, 60.0);
-        notifier.startTest(id);
-        if (notifier.getSession(id)!.companies.isNotEmpty) ipoCount++;
-        notifier.deleteSession(id);
-      }
-
-      final pct = ipoCount / N * 100;
-      print('\n═══ IPO TRIGGER RATE ═══');
-      print('  Trials: $N, IPOs: $ipoCount ($pct%)   [expected ~3%]');
-      expect(ipoCount, greaterThan(0));
-      expect(pct, lessThan(15.0));
-    });
-
-    test('6.3 IPO lifecycle when triggered', () async {
-      // Find an IPO by brute force
-      String? ipoId;
-      SharedPreferences.setMockInitialValues({});
-      final notifier = StressTestNotifier(userId: 'ipo_life');
-      for (int a = 0; a < 500; a++) {
-        final id = notifier.createSession(TestDuration.infinite, 10000);
-        await notifier.buyAssetSetup(id, 'KO', 10000, 60.0);
-        notifier.startTest(id);
-        if (notifier.getSession(id)!.companies.isNotEmpty) {
-          ipoId = id;
-          break;
-        }
-        notifier.deleteSession(id);
-      }
-
-      if (ipoId != null) {
-        print('\n═══ IPO LIFECYCLE ═══');
-        for (int i = 0; i < 15; i++) {
-          notifier.refreshPrices(ipoId);
-          await Future.delayed(const Duration(milliseconds: 20));
-          final s = notifier.getSession(ipoId)!;
-          if (s.companies.isNotEmpty) {
-            for (final company in s.companies.values) {
-              print('  Step $i: ${company.symbol} (${company.companyName})');
-              print('    Phase: ${company.ipoPhase.name}');
-              print('    Age: ${company.ageWeeks} weeks');
-              print(
-                '    Current:  \$${(s.currentPrices[company.symbol] ?? 0).toStringAsFixed(2)}',
-              );
-            }
-            break;
-          }
-        }
-      } else {
-        print('\n═══ IPO: none triggered in 500 attempts (rare) ═══');
-      }
-    });
-  });
+  // Group 6 (IPO System) removed 2026-07-19 along with the IPO lifecycle
+  // mechanism itself (StressTestSession.companies/CompanyStock/IpoPattern/
+  // CompanyIpoPhase) — the mechanism was inert (see project memory's
+  // micro-scenario audit finding #3) and was cut rather than fixed, per
+  // explicit user instruction, pending a future from-scratch redesign.
 
   group('7. Test Completion & Verdict', () {
     test('7.1 Archive exists after test', () async {

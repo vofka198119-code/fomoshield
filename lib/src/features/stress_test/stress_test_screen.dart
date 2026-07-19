@@ -416,18 +416,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── IPO Alert ──────────────────────────────────────
-            // Always at top when present, not reorderable.
-            if (session.companies.values.any(
-              (c) => c.ipoPhase != CompanyIpoPhase.none,
-            )) ...[
-              for (final company in session.companies.values.where(
-                (c) => c.ipoPhase != CompanyIpoPhase.none,
-              ))
-                _buildIpoAlert(company),
-              const SizedBox(height: 12),
-            ],
-
             // ── Verdict / Exit button ──────────────────────────
             // Always at top when applicable, not reorderable.
             if (isExpired)
@@ -514,8 +502,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     switch (id) {
       case 'psychology_meter':
         return PsychologyMeter(data: PsychologyMeterData.fromSession(session));
-      case 'allocation_chart':
-        return const SizedBox.shrink();
       case 'my_assets':
         return _buildMyAssetsSection();
       case 'market_timeline':
@@ -536,6 +522,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             currentEpochIndex: epochIndex,
             activeEpochProgress: epochProgress,
             initialLimit: 3,
+            session: session,
           ),
         );
       case 'corporate_events':
@@ -1403,52 +1390,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 color: ThemeV2.primary,
                 fontWeight: FontWeight.w600,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── IPO Alert ──────────────────────────────────────────────────
-
-  Widget _buildIpoAlert(CompanyStock company) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: ThemeV2.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.rocket_launch_rounded,
-            color: ThemeV2.warning,
-            size: 20,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'BREAKING: ${company.companyName} IPO',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.warning,
-                  ),
-                ),
-                Text(
-                  '${company.symbol} just went public — extreme volatility expected!',
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: ThemeV2.warning.withValues(alpha: 0.8),
-                  ),
-                ),
-              ],
             ),
           ),
         ],

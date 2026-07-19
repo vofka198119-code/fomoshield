@@ -18,7 +18,6 @@ import 'stress_test_models.dart';
 part 'gbm_engine.dart';
 part 'casino_epochs.dart';
 part 'trades_engine.dart';
-part 'speculation/speculation_event.dart';
 part 'hype/hype_event.dart';
 part 'news_event.dart';
 part 'noise_engine.dart';
@@ -42,19 +41,11 @@ const int _tickSeconds = 20;
 /// Max ticks to simulate in catch-up (5 hours = 900 ticks @ 20s each).
 const int _maxCatchUpTicks = 900;
 
-/// 10 fictional companies for IPO events (Infinite mode only, 3% chance).
-const List<Map<String, String>> _fictionalIpoCandidates = [
-  {'symbol': 'NOVA', 'name': 'NovaTech Quantum'},
-  {'symbol': 'ZEN', 'name': 'Zenith Biologics'},
-  {'symbol': 'AURA', 'name': 'Aura Cyber Systems'},
-  {'symbol': 'VERT', 'name': 'VertEx Robotics'},
-  {'symbol': 'CORE', 'name': 'CoreVault Financial'},
-  {'symbol': 'MORF', 'name': 'Morphic Energy'},
-  {'symbol': 'DRIF', 'name': 'Drift Auto'},
-  {'symbol': 'PULS', 'name': 'PulseMed Devices'},
-  {'symbol': 'CASP', 'name': 'Caspian AI'},
-  {'symbol': 'NEXO', 'name': 'NexoSpace Industries'},
-];
+/// Max points kept per symbol in [StressTestSession.priceHistory]. Long
+/// Infinite/Custom tests would otherwise grow this (and its JSON
+/// persistence) unbounded — chart consumers only ever downsample to a few
+/// hundred points at most, so this comfortably covers every real use.
+const int _maxPriceHistoryPoints = 5000;
 
 // ---------------------------------------------------------------------------
 // Storage keys (user-scoped)
@@ -297,14 +288,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       'activeHypeEvents': s.activeHypeEvents.map((e) => e.toJson()).toList(),
       'lastHypeCheckedEpoch': s.lastHypeCheckedEpoch,
       'customDurationDays': s.customDurationDays,
-      'companies': s.companies.map((k, v) => MapEntry(k, v.toJson())),
-      // ── Block 5: Per-company speculation events ─────────────
-      'specEvents': s.specEvents.map((e) => e.toJson()).toList(),
-      'specEventCooldowns': s.specEventCooldowns.map(
-        (k, v) => MapEntry(k, v.toIso8601String()),
-      ),
-      if (s.lastSpecEventCheckAt != null)
-        'lastSpecEventCheckAt': s.lastSpecEventCheckAt!.toIso8601String(),
       // ── Block 6: Casino wall-clock epoch history ──────────
       if (s.lastEpochRollAt != null)
         'lastEpochRollAt': s.lastEpochRollAt!.toIso8601String(),
@@ -416,12 +399,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               .toSet() ??
           const <String>{},
       customDurationDays: json['customDurationDays'] as int?,
-      companies:
-          (json['companies'] as Map<String, dynamic>?)?.map(
-            (k, v) =>
-                MapEntry(k, CompanyStock.fromJson(v as Map<String, dynamic>)),
-          ) ??
-          const {},
 
       // ── Hype: sector-wide trending move (0-2 concurrent) ──────
       activeHypeEvents:
@@ -430,21 +407,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               .toList() ??
           const [],
       lastHypeCheckedEpoch: json['lastHypeCheckedEpoch'] as int? ?? -1,
-
-      // ── Block 5: Per-company speculation events ─────────────
-      specEvents:
-          (json['specEvents'] as List<dynamic>?)
-              ?.map((e) => CompanySpecEvent.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      specEventCooldowns:
-          (json['specEventCooldowns'] as Map<String, dynamic>?)?.map(
-            (k, v) => MapEntry(k, DateTime.parse(v as String)),
-          ) ??
-          const {},
-      lastSpecEventCheckAt: json['lastSpecEventCheckAt'] != null
-          ? DateTime.parse(json['lastSpecEventCheckAt'] as String)
-          : null,
 
       // ── Block 6: Casino wall-clock epoch history ──────────
       lastEpochRollAt: json['lastEpochRollAt'] != null
@@ -598,15 +560,13 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             // _rollScenario) permanently unreachable, since
             // epochsSinceLastCatastrophe is computed against that
             // field. Also silently reset simulationSeed to 0
-            // (breaks RNG determinism), companies to {} (wipes IPO
-            // state), and stabilizationDeadlines to {}.
+            // (breaks RNG determinism) and stabilizationDeadlines to {}.
             casinoCatastropheCooldown: session.casinoCatastropheCooldown,
             casinoDeclineStreak: session.casinoDeclineStreak,
             casinoCatastropheCount: session.casinoCatastropheCount,
             casinoLastCatastropheEpoch: session.casinoLastCatastropheEpoch,
             simulationSeed: session.simulationSeed,
             enableDeveloperTrace: session.enableDeveloperTrace,
-            companies: session.companies,
             stabilizationDeadlines: session.stabilizationDeadlines,
             lastTickTimestamp: session.lastTickTimestamp,
             currentPrices: {...session.currentPrices, symbol: price},
@@ -628,9 +588,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
-            specEvents: session.specEvents,
-            specEventCooldowns: session.specEventCooldowns,
-            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )
@@ -688,9 +645,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
-            specEvents: session.specEvents,
-            specEventCooldowns: session.specEventCooldowns,
-            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )
@@ -725,35 +679,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     for (final s in MarketScenario.values) {
       if (!s.isCatastrophe && !s.isPerCompanyEvent && !s.isScriptedRecovery) {
         fatigueWeights[s.name] = s.weight.toDouble();
-      }
-    }
-
-    // ── IPO generation (Infinite mode, ~3% chance) ──────────────
-    final Map<String, CompanyStock> newCompanies = {};
-    final Map<String, double> ipoPrices = {};
-    if (session.duration == TestDuration.infinite && rng.nextDouble() < 0.03) {
-      final heldSymbols = session.holdings.map((h) => h.symbol).toSet();
-      final candidates = _fictionalIpoCandidates
-          .where((c) => !heldSymbols.contains(c['symbol']))
-          .toList();
-      if (candidates.isNotEmpty) {
-        final pick = candidates[rng.nextInt(candidates.length)];
-        final sector = _getSector(pick['symbol']!);
-        final pattern = rng.nextDouble() < 0.5
-            ? IpoPattern.tesla
-            : IpoPattern.reverse;
-        newCompanies[pick['symbol']!] = CompanyStock(
-          symbol: pick['symbol']!,
-          companyName: pick['name']!,
-          sector: sector,
-          ipoPattern: pattern,
-          ipoPhase: CompanyIpoPhase.shakeout,
-          phaseWeeks: 0,
-        );
-        final ipoPrice = 30.0 + rng.nextDouble() * 120.0;
-        ipoPrices[pick['symbol']!] = pattern == IpoPattern.tesla
-            ? ipoPrice * (1 - (rng.nextDouble() * 0.15 + 0.15))
-            : ipoPrice * (1 + (rng.nextDouble() * 0.30 + 0.30));
       }
     }
 
@@ -793,9 +718,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       blackSwanSurvived: session.blackSwanSurvived,
       hasExperiencedCatastrophe: session.hasExperiencedCatastrophe,
       catastropheCooldown: session.catastropheCooldown,
-      currentPrices: {...Map.from(session.currentPrices), ...ipoPrices},
-      basePrices: {...Map.from(session.basePrices), ...ipoPrices},
-      companies: newCompanies,
+      currentPrices: Map.from(session.currentPrices),
+      basePrices: Map.from(session.basePrices),
       currentWeights: fatigueWeights,
       psychologyProfile: session.psychologyProfile,
       simulationSeed: rng.nextInt(99999999) + 1,
@@ -817,9 +741,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       soldDuringCatastrophe: session.soldDuringCatastrophe,
       diversificationBonusRecorded: session.diversificationBonusRecorded,
       // ── Block 5 + 6 + News: Fresh for new test ──
-      specEvents: const [],
-      specEventCooldowns: {},
-      lastSpecEventCheckAt: now,
       lastEpochRollAt: now,
       epochHistory: [firstRecord],
       activeNewsEvent: null,
@@ -877,7 +798,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             epochPriceRanges: session.epochPriceRanges,
             stabilizationDeadlines: session.stabilizationDeadlines,
             simulationSeed: session.simulationSeed,
-            companies: session.companies,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             psychologyProfile: session.psychologyProfile,
@@ -889,9 +809,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
-            specEvents: session.specEvents,
-            specEventCooldowns: session.specEventCooldowns,
-            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )
@@ -1128,54 +1045,63 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
   // ── Chart Data ──────────────────────────────────────────────────
 
-  /// Compute historical portfolio value data points for charting.
-  /// Returns a list of (timestamp, totalValue) pairs sorted ascending.
+  /// Compute historical portfolio value data points for the Market Timeline
+  /// chart, from REAL per-tick simulation data (`session.priceHistory`) —
+  /// not a reverse-calculation from each epoch's static `.drift`/
+  /// `.priceVolatility` getters (the old approach here, which was never
+  /// actually wired to any visible chart and produced numbers unrelated to
+  /// what the simulation actually did tick-by-tick).
+  ///
+  /// Alignment: each held symbol's price history is appended once per
+  /// simulated tick, but a symbol bought partway through the test has a
+  /// SHORTER history than one held from the start. Every symbol's array
+  /// ends at "now" (the most recent tick), so they're aligned from the
+  /// END, truncated to the shortest current holding's history — before
+  /// that point, the newest holding simply wasn't part of the portfolio.
+  ///
+  /// Known limitation, accepted rather than solved: this uses CURRENT
+  /// share counts and CURRENT cash for every historical point, because the
+  /// engine doesn't track historical share-count changes from buys/sells
+  /// over time. This is an honest "how would my current portfolio have
+  /// performed" retrospective, not a perfectly reconstructed historical
+  /// NAV that accounts for trade timing.
   List<ChartDataPoint> computeChartData(String sessionId) {
     final session = getSession(sessionId);
-    if (session == null ||
-        session.epochHistory.isEmpty ||
-        session.holdings.isEmpty) {
-      return [];
-    }
+    if (session == null || session.holdings.isEmpty) return [];
 
-    final points = <ChartDataPoint>[];
-    double cumulativeMul = 1.0;
-    final now = DateTime.now();
-
-    // Add current point
-    points.add(ChartDataPoint(now, session.totalValue));
-
-    // Walk epoch history backwards, applying reverse drift
-    final reversedEpochs = session.epochHistory.toList()
-      ..sort((a, b) => b.index.compareTo(a.index));
-
-    for (final record in reversedEpochs) {
-      final startAt = record.startedAt;
-      final endAt = record.endedAt ?? now;
-      if (now.isAfter(endAt) || now.isBefore(startAt)) {
-        cumulativeMul /= (1 + record.scenario.drift);
-        final historicalTotal = _valueAtMultiplier(session, cumulativeMul);
-        points.add(ChartDataPoint(endAt, historicalTotal));
-        points.add(
-          ChartDataPoint(
-            startAt,
-            historicalTotal * (1 - record.scenario.priceVolatility * 0.5),
-          ),
-        );
-      }
-    }
-
-    points.sort((a, b) => a.time.compareTo(b.time));
-    return points;
-  }
-
-  double _valueAtMultiplier(StressTestSession session, double multiplier) {
-    double holdingsValue = 0;
+    final histories = <List<double>>[];
     for (final h in session.holdings) {
-      final currentPrice = session.currentPrices[h.symbol] ?? h.entryPrice;
-      holdingsValue += h.shares * (currentPrice / multiplier);
+      final hist = session.priceHistory[h.symbol];
+      if (hist == null || hist.isEmpty) return [];
+      histories.add(hist);
     }
-    return holdingsValue + session.cash;
+    final minLen = histories.map((h) => h.length).reduce(min);
+    if (minLen < 2) return [];
+
+    final now = DateTime.now();
+    final points = <ChartDataPoint>[];
+    for (int k = 0; k < minLen; k++) {
+      double value = session.cash;
+      for (int i = 0; i < session.holdings.length; i++) {
+        final hist = histories[i];
+        // Right-aligned: count from the end so every symbol's k-th-from-
+        // last point corresponds to the same simulated tick.
+        final idx = hist.length - minLen + k;
+        value += session.holdings[i].shares * hist[idx];
+      }
+      // Ticks are nominally _tickSeconds apart in wall-clock time (catch-up
+      // batches compress real gaps, so this is an approximation, not an
+      // exact replay clock) — used only for relative ordering/spacing and
+      // for the timeframe tabs' elapsed-time cutoffs, not precise recall.
+      final ticksAgo = minLen - 1 - k;
+      points.add(
+        ChartDataPoint(
+          now.subtract(Duration(seconds: ticksAgo * _tickSeconds)),
+          value,
+        ),
+      );
+    }
+    return points;
   }
 }
 

@@ -215,24 +215,6 @@ extension NoiseEngine on StressTestNotifier {
       session.currentPrices,
     );
 
-    // ── Block 5: Spec/Hype weekly wall-clock check ──────────────────
-    // Runs at most once per call (regardless of the `ticks` batch size),
-    // gated on real elapsed time rather than epoch rolls — epoch length
-    // varies per test type (Block 6: 12h/24h/7d/5d), so tying this to the
-    // epoch counter would fire far more often than the intended weekly
-    // cadence. Mirrors the lastEpochRollAt pattern used for casino state.
-    final lastSpecCheck =
-        session.lastSpecEventCheckAt ?? session.startedAt ?? now;
-    if (now.difference(lastSpecCheck) >= const Duration(days: 7)) {
-      for (final h in session.holdings) {
-        final newSpecEvent = _maybeFireSpecEvent(session, h.symbol, rng, now);
-        if (newSpecEvent != null) {
-          session.specEvents = [...session.specEvents, newSpecEvent];
-        }
-      }
-      session.lastSpecEventCheckAt = now;
-    }
-
     // ── News micro-scenario: single-company random headline event ──
     // Checked once per EPOCH (not per tick/day) — gated on the current
     // epoch's index vs lastNewsCheckedEpoch, so re-entering the screen
@@ -324,9 +306,8 @@ extension NoiseEngine on StressTestNotifier {
 
         // ── News micro-scenario: apply if this holding is the one hit ──
         // Mutates session.activeNewsEvent in place (advances currentTick,
-        // clears to null on expiry) — same direct-mutation pattern as
-        // _applySpecEvents below, so multi-tick catch-up batches (ticks>1)
-        // progress correctly call-by-call.
+        // clears to null on expiry) so multi-tick catch-up batches
+        // (ticks>1) progress correctly call-by-call.
         final newsIncrement = _applyNewsEvent(session, h.symbol);
         if (newsIncrement.abs() > 0.0001) {
           currentPrice *= (1.0 + newsIncrement);
@@ -349,15 +330,6 @@ extension NoiseEngine on StressTestNotifier {
         }
         if (hypeIncrement.abs() > 0.0001) {
           currentPrice *= (1.0 + hypeIncrement);
-        }
-
-        // ── Block 5: Apply per-company speculation bell-shape event ──
-        // Firing is decided once per weekly wall-clock window, before this
-        // loop (see the lastSpecEventCheckAt check above). Here we only
-        // advance/apply the amplitude of whatever is currently active.
-        final specAmplitude = _applySpecEvents(session, h.symbol);
-        if (specAmplitude.abs() > 0.0001) {
-          currentPrice *= (1.0 + specAmplitude);
         }
 
         // ── Sandbox Isolation (Step 3): Per-regime price bounds ──
@@ -416,7 +388,6 @@ extension NoiseEngine on StressTestNotifier {
           marketDriftRaw: params.annualDrift * dtPerTick,
           sectorDriftRaw: (params.annualDrift - avgDrift) * dtPerTick,
           noiseRaw: noise,
-          companyDriftRaw: specAmplitude,
           newsRaw: newsIncrement,
         );
         final symLog = <TickExplanation>[
@@ -540,7 +511,6 @@ extension NoiseEngine on StressTestNotifier {
             epochPriceRanges: newRanges,
             stabilizationDeadlines: session.stabilizationDeadlines,
             simulationSeed: session.simulationSeed,
-            companies: session.companies,
             explanationLog: explanations,
             devMarketPhase: currentEpoch.scenario.name,
             devFearIndex: currentEpoch.scenario.contrarianScore,
@@ -577,13 +547,19 @@ extension NoiseEngine on StressTestNotifier {
                   hist[sym] = [newPrices[sym]!];
                 }
               }
+              // Cap per-symbol history — see _maxPriceHistoryPoints.
+              for (final sym in hist.keys.toList()) {
+                final points = hist[sym]!;
+                if (points.length > _maxPriceHistoryPoints) {
+                  hist[sym] = points.sublist(
+                    points.length - _maxPriceHistoryPoints,
+                  );
+                }
+              }
               return hist;
             }(),
             lastTickTimestamp: now,
             // ── Block 5 + 6: Per-company events & casino state ─
-            specEvents: session.specEvents,
-            specEventCooldowns: session.specEventCooldowns,
-            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt ?? now,
             epochHistory: session.epochHistory,
           )

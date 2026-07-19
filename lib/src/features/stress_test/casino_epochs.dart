@@ -250,12 +250,6 @@ extension CasinoEpochsEngine on StressTestNotifier {
     // ignore: avoid_print
     print('  currentPrices=${session.currentPrices}');
     // ignore: avoid_print
-    print(
-      '  specEvents=${session.specEvents.map((e) => "${e.symbol} tick=${e.currentTick}/${e.rampDurationTicks} peak=${e.peakAmplitude}").toList()}',
-    );
-    // ignore: avoid_print
-    print('  lastSpecEventCheckAt=${session.lastSpecEventCheckAt}');
-    // ignore: avoid_print
     print('  missedRolls=$missedRolls');
 
     // Apply missed macro-step rolls
@@ -367,10 +361,6 @@ extension CasinoEpochsEngine on StressTestNotifier {
     );
     // ignore: avoid_print
     print('  currentPrices=${session.currentPrices}');
-    // ignore: avoid_print
-    print(
-      '  specEvents=${session.specEvents.map((e) => "${e.symbol} tick=${e.currentTick}/${e.rampDurationTicks}").toList()}',
-    );
   }
 
   // ── Block 6: Casino Wall-Clock Epoch Recording ─────────────────────

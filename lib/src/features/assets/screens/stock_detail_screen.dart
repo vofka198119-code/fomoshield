@@ -168,6 +168,10 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   }
 
   /// Returns available sparkline periods based on session duration.
+  /// Fixed-length tests (week1/month1/months3) show their whole
+  /// progressive set upfront — the test's total length is known. For
+  /// Infinite/Custom, only periods that have actually elapsed so far are
+  /// shown (no "3M" tab on a test that's 4 days old).
   List<_SparkPeriod> _availablePeriods(StressTestSession session) {
     return switch (session.duration) {
       TestDuration.week1 => [_SparkPeriod.d1, _SparkPeriod.w1],
@@ -182,21 +186,31 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
         _SparkPeriod.m1,
         _SparkPeriod.m3,
       ],
-      TestDuration.infinite => [
-        _SparkPeriod.d1,
-        _SparkPeriod.w1,
-        _SparkPeriod.m1,
-        _SparkPeriod.m3,
-        _SparkPeriod.y1,
-      ],
-      TestDuration.custom => [
-        _SparkPeriod.d1,
-        _SparkPeriod.w1,
-        _SparkPeriod.m1,
-        _SparkPeriod.m3,
-        _SparkPeriod.y1,
-      ],
+      TestDuration.infinite ||
+      TestDuration.custom => _elapsedGatedPeriods(session),
     };
+  }
+
+  static const Map<_SparkPeriod, Duration> _periodElapsedCutoffs = {
+    _SparkPeriod.w1: Duration(days: 7),
+    _SparkPeriod.m1: Duration(days: 30),
+    _SparkPeriod.m3: Duration(days: 90),
+    _SparkPeriod.y1: Duration(days: 365),
+  };
+
+  List<_SparkPeriod> _elapsedGatedPeriods(StressTestSession session) {
+    final start = session.startedAt ?? session.createdAt;
+    final elapsed = DateTime.now().difference(start);
+    final periods = [_SparkPeriod.d1];
+    for (final p in [
+      _SparkPeriod.w1,
+      _SparkPeriod.m1,
+      _SparkPeriod.m3,
+      _SparkPeriod.y1,
+    ]) {
+      if (elapsed >= _periodElapsedCutoffs[p]!) periods.add(p);
+    }
+    return periods;
   }
 
   StressTestHolding? _findHolding(StressTestSession session) {

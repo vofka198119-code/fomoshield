@@ -14,6 +14,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
+import '../../features/stress_test/widgets/market_value_chart.dart';
 
 /// Compact vertical timeline of market epochs.
 ///
@@ -30,12 +31,19 @@ class MarketTimeline extends StatefulWidget {
   /// How many epochs to show when collapsed. Default: 5.
   final int initialLimit;
 
+  /// Full session — feeds the real tick-data-driven [MarketValueChart]
+  /// shown above the epoch list. Optional only so existing call sites/
+  /// tests that don't need the chart don't break; when null, the chart
+  /// section is simply omitted.
+  final StressTestSession? session;
+
   const MarketTimeline({
     super.key,
     required this.epochs,
     this.currentEpochIndex,
     this.activeEpochProgress,
     this.initialLimit = 10,
+    this.session,
   });
 
   /// Find the current (active) epoch index: the one with endedAt == null.
@@ -88,6 +96,11 @@ class _MarketTimelineState extends State<MarketTimeline> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (widget.session != null) ...[
+          MarketValueChart(session: widget.session!),
+          const SizedBox(height: 8),
+          const Divider(height: 1, indent: 20, endIndent: 20, color: ThemeV2.divider),
+        ],
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
           child: Row(

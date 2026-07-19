@@ -89,9 +89,6 @@ extension TradesEngine on StressTestNotifier {
       currentWeights: session.currentWeights,
       soldDuringCatastrophe: session.soldDuringCatastrophe,
       catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
-      specEvents: session.specEvents,
-      specEventCooldowns: session.specEventCooldowns,
-      lastSpecEventCheckAt: session.lastSpecEventCheckAt,
       lastEpochRollAt: session.lastEpochRollAt,
       epochHistory: session.epochHistory,
     );
@@ -177,9 +174,6 @@ extension TradesEngine on StressTestNotifier {
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
-            specEvents: session.specEvents,
-            specEventCooldowns: session.specEventCooldowns,
-            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )
@@ -497,7 +491,6 @@ extension TradesEngine on StressTestNotifier {
             psychologyProfile: session.psychologyProfile,
             simulationSeed: session.simulationSeed,
             enableDeveloperTrace: session.enableDeveloperTrace,
-            companies: session.companies,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             priceHistory: session.priceHistory,
@@ -514,9 +507,6 @@ extension TradesEngine on StressTestNotifier {
             lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
             activeHypeEvents: session.activeHypeEvents,
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
-            specEvents: session.specEvents,
-            specEventCooldowns: session.specEventCooldowns,
-            lastSpecEventCheckAt: session.lastSpecEventCheckAt,
             lastEpochRollAt: session.lastEpochRollAt,
             epochHistory: session.epochHistory,
           )

@@ -61,10 +61,12 @@ enum _MacroRegime { sideways, volatility, bull, bear, crash, blackSwan, recovery
 
 /// Maps a [MarketScenario] to its [_MacroRegime] for matrix lookup.
 /// ── Block 5: hype/speculation are no longer global regimes ────
-/// They now operate as per-company bell-shape events (see _maybeFireSpecEvent).
+/// Hype now operates sector-wide (see ../hype/hype_event.dart); Speculation
+/// was per-company but its implementation was removed 2026-07-19 (see
+/// repair queue in project memory for the "add back later" list).
 /// When a test rolls hype/speculation as a global scenario, it behaves like
-/// sideways — the company events do the actual price impact. In practice
-/// this branch is unreachable: both are excluded from the epoch roulette's
+/// sideways. In practice this branch is unreachable: both are excluded from
+/// the epoch roulette's
 /// pool (see [MarketScenario.isPerCompanyEvent]), kept only so this switch
 /// stays exhaustive.
 ///

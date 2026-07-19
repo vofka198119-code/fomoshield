@@ -22,8 +22,6 @@ class StressTestWidgetConfig {
     switch (id) {
       case 'psychology_meter':
         return 'Psychology Meter';
-      case 'allocation_chart':
-        return 'Portfolio Allocation';
       case 'my_assets':
         return 'My Assets';
       case 'market_timeline':
@@ -44,7 +42,6 @@ class StressTestWidgetConfig {
 /// Default order of reorderable widgets.
 const List<String> _defaultOrder = [
   'psychology_meter',
-  'allocation_chart',
   'my_assets',
   'market_timeline',
   'corporate_events',
