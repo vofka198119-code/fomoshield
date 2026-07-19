@@ -1024,58 +1024,105 @@ class EpochPriceRange {
   double get range => max - min;
 }
 
-/// Temporary market shock with exponential decay (Step 3: Sandbox Isolation).
+/// A single-company random "News" event — one headline from
+/// [newsScenarios] (news_event.dart) picked for one holding, moving that
+/// holding's own price by a signed total amount over a gradual ramp.
 ///
-/// Applied as a per-tick multiplier: price *= (1 + amplitude × decay).
-/// The decay follows a half-life model: after [halfLife] duration,
-/// the amplitude is halved. After ~5 half-lives, the shock is negligible.
-class MarketShock {
-  /// Human-readable identifier (e.g., "fomc_hike", "earnings_surprise").
-  final String id;
+/// Replaces the old `MarketShock` (half-life decay, applied uniformly to
+/// EVERY holding) — that class was fully wired but never once triggered
+/// anywhere in the codebase (confirmed via a full-repo grep for
+/// `MarketShock(`), and its shape (instant peak + exponential decay onto
+/// every holding) didn't match the intended design: one company, gradual
+/// ramp, no reversal back to zero (a real news-driven move mostly sticks).
+///
+/// Shape: a front-loaded ease-out curve (`1-(1-t)^3`) over
+/// [rampDurationTicks] — most of [targetAmplitude] lands early, tapering
+/// to ~flat by the end, never reversing. Applied as a per-TICK INCREMENT
+/// (the difference in eased-progress between this tick and the last),
+/// not by re-applying the full amplitude every tick — that per-tick-vs-
+/// cumulative confusion is exactly the bug found in the sibling
+/// speculation/hype mechanism (speculation_event.dart), left alone
+/// per explicit instruction but not repeated here.
+class NewsEvent {
+  final String symbol;
+  final String headline;
+  final bool isPositive;
 
-  /// Maximum price multiplier at the moment of impact.
-  /// Positive = boost, negative = drag (e.g., -0.15 = -15%).
-  final double amplitude;
+  /// Total signed price move over the event's full life (e.g. 0.15 = +15%,
+  /// -0.22 = -22%). Matches [isPositive]'s sign.
+  final double targetAmplitude;
 
-  /// Time when the shock was triggered.
-  final DateTime appliedAt;
+  final DateTime startedAt;
+  final int rampDurationTicks;
 
-  /// Time needed for the amplitude to halve.
-  final Duration halfLife;
+  /// Ticks elapsed since [startedAt]. Advances once per tick this event
+  /// is applied to its symbol; the event expires once this reaches
+  /// [rampDurationTicks].
+  int currentTick;
 
-  const MarketShock({
-    required this.id,
-    required this.amplitude,
-    required this.appliedAt,
-    this.halfLife = const Duration(minutes: 10),
+  NewsEvent({
+    required this.symbol,
+    required this.headline,
+    required this.isPositive,
+    required this.targetAmplitude,
+    required this.startedAt,
+    required this.rampDurationTicks,
+    this.currentTick = 0,
   });
 
-  /// Current effective amplitude after decay.
-  double get currentAmplitude {
-    final elapsed = DateTime.now().difference(appliedAt);
-    if (elapsed <= Duration.zero) return amplitude;
-    final halfLives = elapsed.inMilliseconds / halfLife.inMilliseconds;
-    // pow(0.5, halfLives) gives the decay factor
-    // After 1 half-life: amplitude × 0.5
-    // After 2 half-lives: amplitude × 0.25
-    return amplitude * pow(0.5, halfLives);
+  /// Front-loaded ease-out progress curve, 0.0 → 1.0, never decreasing.
+  static double _ease(double t) {
+    final clamped = t.clamp(0.0, 1.0);
+    final inv = 1.0 - clamped;
+    return 1.0 - inv * inv * inv;
   }
 
-  /// Whether the shock has fully decayed (amplitude < 0.1%).
-  bool get isExpired => currentAmplitude.abs() < 0.001;
+  /// Fraction of [targetAmplitude] that should be "in" the price by the
+  /// given tick (0.0 before start, 1.0 once fully ramped in).
+  double _progressAt(int tick) {
+    if (rampDurationTicks <= 0) return 1.0;
+    return _ease(tick / rampDurationTicks);
+  }
+
+  /// The price multiplier to apply THIS tick — the incremental slice of
+  /// [targetAmplitude] between the previous tick's progress and this
+  /// one's. Sums to exactly [targetAmplitude] across the whole ramp.
+  double get tickIncrement =>
+      (_progressAt(currentTick + 1) - _progressAt(currentTick)) *
+      targetAmplitude;
+
+  /// Whether the ramp has fully completed — the move is now permanently
+  /// part of the price, nothing left to apply.
+  bool get isExpired => currentTick >= rampDurationTicks;
+
+  NewsEvent copy() => NewsEvent(
+    symbol: symbol,
+    headline: headline,
+    isPositive: isPositive,
+    targetAmplitude: targetAmplitude,
+    startedAt: startedAt,
+    rampDurationTicks: rampDurationTicks,
+    currentTick: currentTick,
+  );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'amplitude': amplitude,
-    'appliedAt': appliedAt.toIso8601String(),
-    'halfLifeMs': halfLife.inMilliseconds,
+    'symbol': symbol,
+    'headline': headline,
+    'isPositive': isPositive,
+    'targetAmplitude': targetAmplitude,
+    'startedAt': startedAt.toIso8601String(),
+    'rampDurationTicks': rampDurationTicks,
+    'currentTick': currentTick,
   };
 
-  factory MarketShock.fromJson(Map<String, dynamic> json) => MarketShock(
-    id: json['id'] as String,
-    amplitude: (json['amplitude'] as num).toDouble(),
-    appliedAt: DateTime.parse(json['appliedAt'] as String),
-    halfLife: Duration(milliseconds: json['halfLifeMs'] as int),
+  factory NewsEvent.fromJson(Map<String, dynamic> json) => NewsEvent(
+    symbol: json['symbol'] as String,
+    headline: json['headline'] as String,
+    isPositive: json['isPositive'] as bool,
+    targetAmplitude: (json['targetAmplitude'] as num).toDouble(),
+    startedAt: DateTime.parse(json['startedAt'] as String),
+    rampDurationTicks: json['rampDurationTicks'] as int,
+    currentTick: json['currentTick'] as int? ?? 0,
   );
 }
 
@@ -1263,11 +1310,16 @@ class StressTestSession {
   /// Task 1.5: символы, проданные во время текущей катастрофы.
   Set<String> soldDuringCatastrophe;
 
-  /// ── Sandbox Isolation (Step 3): Active market shock ────────────
-  /// Temporary price modifier with exponential decay. Applied in
-  /// _simulateCurrentPrices as a per-tick multiplier. When expired
-  /// (amplitude < 0.1%), set to null.
-  MarketShock? activeShock;
+  /// ── News micro-scenario (news_event.dart) ───────────────────────
+  /// The one active random single-company News event, if any. Applied in
+  /// _simulateCurrentPrices as a per-tick incremental multiplier, only to
+  /// the matching holding. Set to null once its ramp completes.
+  NewsEvent? activeNewsEvent;
+
+  /// Epoch index this session last rolled the 5%-per-epoch News check at
+  /// (whether or not it actually fired) — prevents re-rolling every tick
+  /// within the same epoch. -1 = never checked.
+  int lastNewsCheckedEpoch;
 
   // ── Block 5: Per-Company Spec/Hype Events ────────────────────
   /// Active per-company speculation/hype events (bell-shape price impact).
@@ -1337,7 +1389,8 @@ class StressTestSession {
     this.catastropheSurvivalRecorded = false,
     this.diversificationBonusRecorded = false,
     this.soldDuringCatastrophe = const <String>{},
-    this.activeShock,
+    this.activeNewsEvent,
+    this.lastNewsCheckedEpoch = -1,
     this.specEvents = const [],
     this.specEventCooldowns = const {},
     this.lastSpecEventCheckAt,

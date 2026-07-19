@@ -48,13 +48,20 @@ extension NoiseEngine on StressTestNotifier {
     double? sectorDriftRaw,
     double? noiseRaw,
     double? companyDriftRaw,
+    double? newsRaw,
   }) {
     // Raw weights for each factor (all per-tick scaled)
     double mW = (marketDriftRaw?.abs() ?? 0.0);
     double sW = (sectorDriftRaw?.abs() ?? 0.0);
     double nW = (noiseRaw?.abs() ?? 0.0);
     double cW = (companyDriftRaw?.abs() ?? 0.0);
-    final double newsW = hasCorrection ? 0.15 : 0.0;
+    // Real News event (news_event.dart) takes priority when this symbol is
+    // the one it's targeting; otherwise fall back to the old synthetic
+    // proxy (any >5% correction gets SOME "News" attribution) for organic
+    // large moves that aren't from a real News event.
+    final double newsW = (newsRaw != null && newsRaw.abs() > 0.0001)
+        ? newsRaw.abs()
+        : (hasCorrection ? 0.15 : 0.0);
 
     final double totalW = mW + sW + nW + cW + newsW;
     if (totalW < 1e-12) {
@@ -226,6 +233,22 @@ extension NoiseEngine on StressTestNotifier {
       session.lastSpecEventCheckAt = now;
     }
 
+    // ── News micro-scenario: single-company random headline event ──
+    // Checked once per EPOCH (not per tick/day) — gated on the current
+    // epoch's index vs lastNewsCheckedEpoch, so re-entering the screen
+    // (or the ongoing 20s ticker) within the same epoch doesn't re-roll.
+    // See news_event.dart for the trigger conditions (8+ holdings, no
+    // event already active, 5% chance) and the 25-scenario table.
+    if (session.lastNewsCheckedEpoch != currentEpoch.index) {
+      session.lastNewsCheckedEpoch = currentEpoch.index;
+      if (session.activeNewsEvent == null) {
+        final newsEvent = _maybeFireNewsEvent(session, rng, now);
+        if (newsEvent != null) {
+          session.activeNewsEvent = newsEvent;
+        }
+      }
+    }
+
     final explanations = Map<String, List<TickExplanation>>.from(
       session.explanationLog,
     );
@@ -237,9 +260,6 @@ extension NoiseEngine on StressTestNotifier {
                   .map((h) => _getSectorParams(h.symbol, scenario).annualDrift)
                   .reduce((a, b) => a + b) /
               session.holdings.length;
-
-    // ── Sandbox Isolation (Step 3): Shock decay tracking ────────
-    MarketShock? newActiveShock = session.activeShock;
 
     for (int tick = 0; tick < ticks; tick++) {
       for (final h in session.holdings) {
@@ -277,14 +297,14 @@ extension NoiseEngine on StressTestNotifier {
           '[TICK] ${h.symbol} basePrice=${basePrice.toStringAsFixed(4)} beforeGbm=${beforeGbm.toStringAsFixed(4)} afterGbm=${currentPrice.toStringAsFixed(4)} regime=${regime.name}',
         );
 
-        // ── Sandbox Isolation (Step 3): Apply active market shock ──
-        final shock = session.activeShock;
-        if (shock != null) {
-          if (shock.isExpired) {
-            newActiveShock = null; // clear expired shock
-          } else {
-            currentPrice *= (1.0 + shock.currentAmplitude);
-          }
+        // ── News micro-scenario: apply if this holding is the one hit ──
+        // Mutates session.activeNewsEvent in place (advances currentTick,
+        // clears to null on expiry) — same direct-mutation pattern as
+        // _applySpecEvents below, so multi-tick catch-up batches (ticks>1)
+        // progress correctly call-by-call.
+        final newsIncrement = _applyNewsEvent(session, h.symbol);
+        if (newsIncrement.abs() > 0.0001) {
+          currentPrice *= (1.0 + newsIncrement);
         }
 
         // ── Block 5: Apply per-company spec/hype bell-shape event ──
@@ -353,6 +373,7 @@ extension NoiseEngine on StressTestNotifier {
           sectorDriftRaw: (params.annualDrift - avgDrift) * dtPerTick,
           noiseRaw: noise,
           companyDriftRaw: specAmplitude,
+          newsRaw: newsIncrement,
         );
         final symLog = <TickExplanation>[
           ...(explanations[h.symbol] ?? []),
@@ -490,7 +511,8 @@ extension NoiseEngine on StressTestNotifier {
             catastropheSurvivalRecorded: newCatastropheSurvivalRecorded,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
-            activeShock: newActiveShock,
+            activeNewsEvent: session.activeNewsEvent,
+            lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
             priceHistory: () {
               final hist = Map<String, List<double>>.from(session.priceHistory);
               for (final h in session.holdings) {

@@ -18,6 +18,7 @@ part 'gbm_engine.dart';
 part 'casino_epochs.dart';
 part 'trades_engine.dart';
 part 'speculation_event.dart';
+part 'news_event.dart';
 part 'noise_engine.dart';
 
 // ---------------------------------------------------------------------------
@@ -287,7 +288,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       'diversificationBonusRecorded': s.diversificationBonusRecorded,
       'catastropheSurvivalRecorded': s.catastropheSurvivalRecorded,
       'soldDuringCatastrophe': s.soldDuringCatastrophe.toList(),
-      if (s.activeShock != null) 'activeShock': s.activeShock!.toJson(),
+      if (s.activeNewsEvent != null)
+        'activeNewsEvent': s.activeNewsEvent!.toJson(),
+      'lastNewsCheckedEpoch': s.lastNewsCheckedEpoch,
       'customDurationDays': s.customDurationDays,
       'companies': s.companies.map((k, v) => MapEntry(k, v.toJson())),
       // ── Block 5: Per-company spec/hype events ──────────────
@@ -439,11 +442,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               ?.map((e) => EpochRecord.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      lastNewsCheckedEpoch: json['lastNewsCheckedEpoch'] as int? ?? -1,
     );
-    // Restore active shock if present
-    if (json['activeShock'] != null) {
-      s.activeShock = MarketShock.fromJson(
-        json['activeShock'] as Map<String, dynamic>,
+    // Restore active News event if present
+    if (json['activeNewsEvent'] != null) {
+      s.activeNewsEvent = NewsEvent.fromJson(
+        json['activeNewsEvent'] as Map<String, dynamic>,
       );
     }
     // Restore epoch price ranges
@@ -598,7 +602,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             realizedPnl: session.realizedPnl,
             customDurationDays: session.customDurationDays,
             psychologyProfile: session.psychologyProfile,
-            activeShock: session.activeShock,
+            activeNewsEvent: session.activeNewsEvent,
+            lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
             priceHistory: {
               ...session.priceHistory,
               symbol: [...(session.priceHistory[symbol] ?? []), price],
@@ -658,7 +663,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             customDurationDays:
                 customDurationDays ?? session.customDurationDays,
             psychologyProfile: session.psychologyProfile,
-            activeShock: session.activeShock,
+            activeNewsEvent: session.activeNewsEvent,
+            lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
             priceHistory: session.priceHistory,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
@@ -793,13 +799,14 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       explanationLog: session.explanationLog,
       soldDuringCatastrophe: session.soldDuringCatastrophe,
       diversificationBonusRecorded: session.diversificationBonusRecorded,
-      activeShock: session.activeShock,
-      // ── Block 5 + 6: Fresh for new test ──
+      // ── Block 5 + 6 + News: Fresh for new test ──
       specEvents: const [],
       specEventCooldowns: {},
       lastSpecEventCheckAt: now,
       lastEpochRollAt: now,
       epochHistory: [firstRecord],
+      activeNewsEvent: null,
+      lastNewsCheckedEpoch: -1,
     );
     newSession.epochPriceRanges = {};
     for (final h in session.holdings) {
@@ -855,7 +862,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             psychologyProfile: session.psychologyProfile,
-            activeShock: session.activeShock,
+            activeNewsEvent: session.activeNewsEvent,
+            lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
             priceHistory: session.priceHistory,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,

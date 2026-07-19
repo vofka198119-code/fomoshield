@@ -113,6 +113,12 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     // 1. Header (Steps 204–207)
                     _buildHeader(),
 
+                    // News micro-scenario headline (news_event.dart) —
+                    // only shown when THIS symbol is the one currently
+                    // targeted by an active News event.
+                    if (session.activeNewsEvent?.symbol == widget.symbol)
+                      _buildNewsHeadline(session.activeNewsEvent!),
+
                     // 2. Summary Card (Steps 208–213)
                     _buildSummaryCard(changePercent, isPositive, latest),
 
@@ -223,6 +229,61 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     'AI explanation based on current simulation.',
                     style: GoogleFonts.inter(
                       fontSize: 13,
+                      color: ThemeV2.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── News headline banner (news_event.dart) ──────────────────────────
+  Widget _buildNewsHeadline(NewsEvent event) {
+    final color = event.isPositive ? ThemeV2.success : ThemeV2.loss;
+    return _FadeSlide(
+      index: 1,
+      controller: _staggerController,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              event.isPositive
+                  ? Icons.trending_up_rounded
+                  : Icons.trending_down_rounded,
+              color: color,
+              size: 22,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event.headline,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: ThemeV2.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${event.isPositive ? '+' : ''}'
+                    '${(event.targetAmplitude * 100).toStringAsFixed(1)}% target impact on ${widget.symbol}',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
                       color: ThemeV2.textSecondary,
                     ),
                   ),
