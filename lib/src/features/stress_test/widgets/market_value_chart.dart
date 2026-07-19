@@ -52,8 +52,35 @@ class MarketValueChart extends ConsumerStatefulWidget {
   ConsumerState<MarketValueChart> createState() => _MarketValueChartState();
 }
 
+/// How often the chart's data is recomputed/redrawn — deliberately far
+/// coarser than the engine's own 20s tick cadence (the algorithm/engine
+/// itself is untouched; this only throttles what gets displayed). A
+/// portfolio-value overview chart doesn't need to visibly refresh every
+/// tick — user's explicit ask after seeing it redraw too often on device.
+const Duration _chartRefreshInterval = Duration(minutes: 10);
+
 class _MarketValueChartState extends ConsumerState<MarketValueChart> {
   _ValuePeriod _selected = _ValuePeriod.d1;
+  List<ChartDataPoint>? _cachedPoints;
+  DateTime? _lastComputedAt;
+
+  /// Returns the last-computed point series, recomputing from the engine
+  /// only once [_chartRefreshInterval] has actually elapsed — mutating
+  /// plain fields (not calling setState) during build is safe here since
+  /// it's a pure memoization, not a state change that needs its own
+  /// rebuild trigger.
+  List<ChartDataPoint> _getPoints() {
+    final now = DateTime.now();
+    if (_cachedPoints == null ||
+        _lastComputedAt == null ||
+        now.difference(_lastComputedAt!) >= _chartRefreshInterval) {
+      _cachedPoints = ref
+          .read(stressTestProvider.notifier)
+          .computeChartData(widget.session.id);
+      _lastComputedAt = now;
+    }
+    return _cachedPoints!;
+  }
 
   /// Duration-scaled tabs. Fixed-length tests show their whole progressive
   /// set upfront (the test's total length is known); Infinite/Custom only
@@ -83,9 +110,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
 
   @override
   Widget build(BuildContext context) {
-    final points = ref
-        .read(stressTestProvider.notifier)
-        .computeChartData(widget.session.id);
+    final points = _getPoints();
 
     if (points.length < 2) {
       return Container(
@@ -122,18 +147,18 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
       return FlSpot(x, p.value);
     }).toList();
 
-    final peak = filtered.map((p) => p.value).reduce((a, b) => a > b ? a : b);
-    final avg =
-        filtered.map((p) => p.value).reduce((a, b) => a + b) /
-        filtered.length;
     final isUp = spots.last.y >= spots.first.y;
     final lineColor = isUp ? ThemeV2.success : ThemeV2.loss;
     final changePercent = spots.first.y != 0
         ? ((spots.last.y - spots.first.y) / spots.first.y) * 100
         : 0.0;
 
-    final minY = (filtered.map((p) => p.value).reduce((a, b) => a < b ? a : b)) * 0.97;
-    final maxY = peak * 1.06; // headroom so the PEAK label doesn't clip
+    // Plain min/max headroom — no PEAK/AVG reference lines. User's explicit
+    // call: this chart should show only the portfolio value itself, no
+    // side annotations.
+    final values = filtered.map((p) => p.value);
+    final minY = values.reduce((a, b) => a < b ? a : b) * 0.97;
+    final maxY = values.reduce((a, b) => a > b ? a : b) * 1.03;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,46 +231,6 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                 borderData: FlBorderData(show: false),
                 minY: minY,
                 maxY: maxY,
-                extraLinesData: ExtraLinesData(
-                  horizontalLines: [
-                    HorizontalLine(
-                      y: peak,
-                      color: ThemeV2.textSecondary.withValues(alpha: 0.35),
-                      strokeWidth: 1,
-                      dashArray: [4, 4],
-                      label: HorizontalLineLabel(
-                        show: true,
-                        alignment: Alignment.topRight,
-                        padding: const EdgeInsets.only(bottom: 2, right: 4),
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: ThemeV2.textPrimary.withValues(alpha: 0.7),
-                        ),
-                        labelResolver: (_) =>
-                            'PEAK \$${NumberFormat('#,##0', 'en_US').format(peak)}',
-                      ),
-                    ),
-                    HorizontalLine(
-                      y: avg,
-                      color: ThemeV2.textSecondary.withValues(alpha: 0.3),
-                      strokeWidth: 1,
-                      dashArray: [4, 4],
-                      label: HorizontalLineLabel(
-                        show: true,
-                        alignment: Alignment.topRight,
-                        padding: const EdgeInsets.only(bottom: 2, right: 4),
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: ThemeV2.textSecondary.withValues(alpha: 0.8),
-                        ),
-                        labelResolver: (_) =>
-                            'AVG \$${NumberFormat('#,##0', 'en_US').format(avg)}',
-                      ),
-                    ),
-                  ],
-                ),
                 lineBarsData: [
                   LineChartBarData(
                     spots: spots,
