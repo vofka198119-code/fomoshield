@@ -22,19 +22,22 @@ const double _microNoiseRange = 0.003; // ±0.3% intra-epoch micro-fluctuation
 //   where ε ~ Uniform(-0.5, +0.5)  (zero-mean, symmetric)
 //
 // dt = fraction of a simulated period per 20-second UI tick.
-// With dt=0.005: 200 ticks ≈ 1 simulated period (~67 min gameplay).
-//   Bull KO:     ±0.06% after 15 min (45 ticks)
-//   Spec KO:     ±0.8%  after 15 min (1σ), ±2.4% worst-case (3σ)
-//   Spec AMD:    ±1.1%  after 15 min (1σ), ±3.3% worst-case (3σ)
-const double _dtPerTick = 0.005;
+//
+// dt is NOT a fixed constant — it's computed per call in
+// noise_engine.dart's `_simulateCurrentPrices` as
+// `1.0 / ticksPerEpoch(session.duration.rollInterval)`, so the full
+// annual-equivalent drift/volatility for the active scenario is spread
+// evenly across that epoch's actual real-world length (12h/24h/5d/7d),
+// not a fixed ~67 real minutes regardless of epoch length. A fixed dt
+// (previously 0.005, tuned for a 12h epoch) let every scenario's full
+// designed magnitude "burn through" in ~200 ticks and then keep randomly
+// walking — unanchored — for the rest of whatever real time the epoch
+// actually spanned, until it hit the regime's price clamp and sat pinned
+// there (confirmed on-device: a Bull epoch parked at exactly its +100%
+// ceiling, oscillating ±1-2%/tick against it).
 
 /// Whether we've already printed the dt calibration header this session.
 bool _dtCalibrationLogged = false;
-
-/// Precomputed sqrt(_dtPerTick) to avoid calling sqrt() on every tick.
-final double _sqrtDt = _sqrtDtCompute();
-
-double _sqrtDtCompute() => sqrt(_dtPerTick);
 
 // ---------------------------------------------------------------------------
 // Definitive Market Simulation Matrix — Multi-Sector & Multi-Scenario
@@ -43,30 +46,52 @@ double _sqrtDtCompute() => sqrt(_dtPerTick);
 // Every asset is classified into an [AssetSector]. Drift (μ) and Volatility (σ)
 // are ANNUALIZED values strictly determined by the active [MarketScenario].
 //
-// GBM formula (per tick, dt = 0.005):
+// GBM formula (per tick, dt = 1 / ticks in the current epoch):
 //   P_new = P_old × (1 + μ×dt + σ×ε×√dt + microNoise×ε₂×√dt)
 //   where ε ~ Uniform(-0.5, +0.5)
 //
 // Micro-noise is sector-aware: reduced by 75% for ETFs for smooth charts.
 
-/// Internal 5-scenario classification that maps MarketScenario → matrix row.
-enum _MacroRegime { sideways, speculation, volatility, bull, bear }
+/// Internal scenario classification that maps MarketScenario → matrix row.
+/// [speculation] (the old global-regime row) was removed — dead code, see
+/// below: MarketScenario.speculation has mapped to [sideways] since Block 5
+/// and nothing ever reached the old [speculation] row through
+/// [_toMacroRegime].
+enum _MacroRegime { sideways, volatility, bull, bear, crash, blackSwan, recovery }
 
 /// Maps a [MarketScenario] to its [_MacroRegime] for matrix lookup.
 /// ── Block 5: hype/speculation are no longer global regimes ────
 /// They now operate as per-company bell-shape events (see _maybeFireSpecEvent).
 /// When a test rolls hype/speculation as a global scenario, it behaves like
-/// sideways — the company events do the actual price impact.
+/// sideways — the company events do the actual price impact. In practice
+/// this branch is unreachable: both are excluded from the epoch roulette's
+/// pool (see [MarketScenario.isPerCompanyEvent]), kept only so this switch
+/// stays exhaustive.
+///
+/// Recovery has its OWN row (not sideways) — real post-crash recovery isn't
+/// flat/calm, it has genuine swings, and it's not guaranteed to net positive
+/// (see _MacroRegime.recovery row below: half of Bull's drift, same
+/// volatility as Bull, so a run of bad ticks can still leave a holding down
+/// even during the "recovery" window — a company can fail to recover, same
+/// as in real life).
+///
+/// bear/crash/blackSwan each get their OWN row now — they used to all
+/// share [bear]'s row (identical price math for three scenarios with very
+/// different declared severities: bear "gradual decline" ~-1%/epoch, crash
+/// "heavy drop" ~-11%/epoch, blackSwan "everything crashes hard"
+/// ~-29%/epoch per [MarketScenario.drift] — confirmed via harness: two
+/// forced epochs with the same seed landed on the exact same price because
+/// they used to resolve to identical GBM params).
 _MacroRegime _toMacroRegime(MarketScenario s) => switch (s) {
   MarketScenario.sideways ||
-  MarketScenario.recovery ||
   MarketScenario.hype ||
   MarketScenario.speculation => _MacroRegime.sideways,
   MarketScenario.volatility => _MacroRegime.volatility,
   MarketScenario.bull => _MacroRegime.bull,
-  MarketScenario.bear ||
-  MarketScenario.blackSwan ||
-  MarketScenario.crash => _MacroRegime.bear,
+  MarketScenario.recovery => _MacroRegime.recovery,
+  MarketScenario.bear => _MacroRegime.bear,
+  MarketScenario.crash => _MacroRegime.crash,
+  MarketScenario.blackSwan => _MacroRegime.blackSwan,
 };
 
 /// Annualized drift (μ) and volatility (σ) for a sector under a regime.
@@ -95,11 +120,29 @@ class _SectorParams {
 /// |               | cyclicalConsumer  | 0.18       | 0.12       |
 /// |               | realEstateREIT    | 0.10       | 0.05       |
 /// |               | etfBroadMarket    | 0.12       | 0.08       |
-/// | BEAR          | techSpeculative   | -0.45      | 0.50       |
-/// |               | consumerStaples   | -0.05      | 0.12       |
-/// |               | cyclicalConsumer  | -0.30      | 0.30       |
-/// |               | realEstateREIT    | -0.15      | 0.18       |
-/// |               | etfBroadMarket    | -0.22      | 0.20       |
+/// | BEAR          | techSpeculative   | -0.08      | 0.12       |
+/// |               | consumerStaples   | -0.01      | 0.03       |
+/// |               | cyclicalConsumer  | -0.05      | 0.07       |
+/// |               | realEstateREIT    | -0.03      | 0.04       |
+/// |               | etfBroadMarket    | -0.04      | 0.05       |
+/// | CRASH         | techSpeculative   | -0.25      | 0.28       |
+/// |               | consumerStaples   | -0.03      | 0.07       |
+/// |               | cyclicalConsumer  | -0.17      | 0.17       |
+/// |               | realEstateREIT    | -0.08      | 0.10       |
+/// |               | etfBroadMarket    | -0.12      | 0.11       |
+/// | BLACK SWAN    | techSpeculative   | -0.50      | 0.55       |
+/// |               | consumerStaples   | -0.06      | 0.13       |
+/// |               | cyclicalConsumer  | -0.33      | 0.33       |
+/// |               | realEstateREIT    | -0.17      | 0.20       |
+/// |               | etfBroadMarket    | -0.24      | 0.22       |
+///
+/// bear/crash/blackSwan used to share ONE row (identical price math for
+/// three scenarios with very different declared severities — see
+/// [_toMacroRegime]'s doc comment). Now scaled to roughly match their
+/// declared per-epoch averages ([MarketScenario.drift]: bear ~-1.1%,
+/// crash ~-11%, blackSwan ~-29% — a ~1:10:26 ratio on drift), with a
+/// gentler ~1:3:5 ratio on volatility (a "gradual decline" bear market
+/// still has real day-to-day noise, just far less than a crash/blackSwan).
 const Map<_MacroRegime, Map<AssetSector, _SectorParams>> _masterMatrix = {
   _MacroRegime.sideways: {
     AssetSector.techSpeculative: _SectorParams(0.00, 0.06),
@@ -107,13 +150,6 @@ const Map<_MacroRegime, Map<AssetSector, _SectorParams>> _masterMatrix = {
     AssetSector.cyclicalConsumer: _SectorParams(0.00, 0.04),
     AssetSector.realEstateREIT: _SectorParams(0.02, 0.02),
     AssetSector.etfBroadMarket: _SectorParams(0.00, 0.03),
-  },
-  _MacroRegime.speculation: {
-    AssetSector.techSpeculative: _SectorParams(0.40, 0.45),
-    AssetSector.consumerStaples: _SectorParams(0.02, 0.06),
-    AssetSector.cyclicalConsumer: _SectorParams(0.15, 0.20),
-    AssetSector.realEstateREIT: _SectorParams(-0.05, 0.08),
-    AssetSector.etfBroadMarket: _SectorParams(0.10, 0.15),
   },
   _MacroRegime.bull: {
     AssetSector.techSpeculative: _SectorParams(0.25, 0.18),
@@ -129,12 +165,45 @@ const Map<_MacroRegime, Map<AssetSector, _SectorParams>> _masterMatrix = {
     AssetSector.realEstateREIT: _SectorParams(0.00, 0.18),
     AssetSector.etfBroadMarket: _SectorParams(0.00, 0.20),
   },
+  // Bear: mild, "gradual decline, staples resilient" — the calmest of the
+  // three decline scenarios.
   _MacroRegime.bear: {
-    AssetSector.techSpeculative: _SectorParams(-0.45, 0.50),
-    AssetSector.consumerStaples: _SectorParams(-0.05, 0.12),
-    AssetSector.cyclicalConsumer: _SectorParams(-0.30, 0.30),
-    AssetSector.realEstateREIT: _SectorParams(-0.15, 0.18),
-    AssetSector.etfBroadMarket: _SectorParams(-0.22, 0.20),
+    AssetSector.techSpeculative: _SectorParams(-0.08, 0.12),
+    AssetSector.consumerStaples: _SectorParams(-0.01, 0.03),
+    AssetSector.cyclicalConsumer: _SectorParams(-0.05, 0.07),
+    AssetSector.realEstateREIT: _SectorParams(-0.03, 0.04),
+    AssetSector.etfBroadMarket: _SectorParams(-0.04, 0.05),
+  },
+  // Crash: "heavy sector-wide drop" — meaningfully worse than Bear,
+  // clearly milder than blackSwan.
+  _MacroRegime.crash: {
+    AssetSector.techSpeculative: _SectorParams(-0.25, 0.28),
+    AssetSector.consumerStaples: _SectorParams(-0.03, 0.07),
+    AssetSector.cyclicalConsumer: _SectorParams(-0.17, 0.17),
+    AssetSector.realEstateREIT: _SectorParams(-0.08, 0.10),
+    AssetSector.etfBroadMarket: _SectorParams(-0.12, 0.11),
+  },
+  // Black swan: "everything crashes hard" — the most extreme scenario in
+  // the whole matrix (previously this same magnitude was also applied to
+  // Bear and Crash, which is what made all three indistinguishable).
+  _MacroRegime.blackSwan: {
+    AssetSector.techSpeculative: _SectorParams(-0.50, 0.55),
+    AssetSector.consumerStaples: _SectorParams(-0.06, 0.13),
+    AssetSector.cyclicalConsumer: _SectorParams(-0.33, 0.33),
+    AssetSector.realEstateREIT: _SectorParams(-0.17, 0.20),
+    AssetSector.etfBroadMarket: _SectorParams(-0.24, 0.22),
+  },
+  // Recovery: half of Bull's drift (a lean toward recovering, not a
+  // guarantee), same volatility as Bull (real swings — the same magnitude
+  // already in production for the Bull regime, not a new untested number).
+  // A run of bad ticks can still leave a holding net negative by the end
+  // of the 2 scripted recovery epochs — a company can fail to recover.
+  _MacroRegime.recovery: {
+    AssetSector.techSpeculative: _SectorParams(0.125, 0.18),
+    AssetSector.consumerStaples: _SectorParams(0.04, 0.06),
+    AssetSector.cyclicalConsumer: _SectorParams(0.09, 0.12),
+    AssetSector.realEstateREIT: _SectorParams(0.05, 0.05),
+    AssetSector.etfBroadMarket: _SectorParams(0.06, 0.08),
   },
 };
 
@@ -178,12 +247,6 @@ const _driftBounds = <_MacroRegime, _DriftBounds>{
     maxPriceMultiplier: 1.3,
     minPriceMultiplier: 0.6,
   ),
-  _MacroRegime.speculation: _DriftBounds(
-    -0.08,
-    0.08,
-    maxPriceMultiplier: 2.5,
-    minPriceMultiplier: 0.2,
-  ),
   _MacroRegime.bull: _DriftBounds(
     -0.05,
     0.05,
@@ -196,10 +259,37 @@ const _driftBounds = <_MacroRegime, _DriftBounds>{
     maxPriceMultiplier: 2.0,
     minPriceMultiplier: 0.3,
   ),
+  // Bear: mildest floor of the three decline regimes — "gradual decline",
+  // shouldn't be able to fall as far as a crash/blackSwan within one epoch.
   _MacroRegime.bear: _DriftBounds(
+    -0.03,
+    0.02,
+    maxPriceMultiplier: 1.2,
+    minPriceMultiplier: 0.6,
+  ),
+  // Crash: between Bear and blackSwan.
+  _MacroRegime.crash: _DriftBounds(
+    -0.05,
+    0.025,
+    maxPriceMultiplier: 1.25,
+    minPriceMultiplier: 0.4,
+  ),
+  // Black swan: the deepest floor in the whole matrix — "everything
+  // crashes hard". Same numbers the old shared bear/crash/blackSwan row
+  // used, kept here since blackSwan is the scenario that actually earns
+  // this severity.
+  _MacroRegime.blackSwan: _DriftBounds(
     -0.06,
     0.03,
     maxPriceMultiplier: 1.3,
+    minPriceMultiplier: 0.3,
+  ),
+  // Same bounds as Bull — recovery shares Bull's volatility character,
+  // just a weaker (non-guaranteed) upward lean. See _masterMatrix above.
+  _MacroRegime.recovery: _DriftBounds(
+    -0.05,
+    0.05,
+    maxPriceMultiplier: 2.0,
     minPriceMultiplier: 0.3,
   ),
 };

@@ -48,13 +48,18 @@ enum TestDuration {
   bool get isTimeLimited => totalDuration != null;
 
   /// How often the casino rolls a new macro scenario on wall-clock.
+  /// [custom] was previously hard-coded to a flat 5 days regardless of the
+  /// actual [StressTestSession.customDurationDays] the user picked — a
+  /// 2-day custom test would never see a second epoch, a 30-day one would
+  /// get only 6. Matched to month1/months3's cadence instead (1 roll/day)
+  /// so any custom length gets a sane, proportional number of epochs.
   Duration get rollInterval {
     return switch (this) {
       TestDuration.week1 => const Duration(hours: 12),
       TestDuration.month1 => const Duration(hours: 24),
       TestDuration.months3 => const Duration(hours: 24),
       TestDuration.infinite => const Duration(days: 7),
-      TestDuration.custom => const Duration(days: 5),
+      TestDuration.custom => const Duration(hours: 24),
     };
   }
 }
@@ -305,7 +310,7 @@ enum MarketScenario {
       MarketScenario.sideways => 0.001, // ~0% avg, narrow channel ±1-2%
       MarketScenario.bear => -0.011, // −1.1% avg (range −0.5…−2.0%)
       MarketScenario.volatility => 0.0, // 0% avg, high-amplitude noise
-      MarketScenario.recovery => 0.022, // +2.2% avg (range +1.5…+3.5%)
+      MarketScenario.recovery => 0.010, // +1.0% avg lean, NOT guaranteed
       MarketScenario.hype => 0.023, // +2.3% avg (tech +8.5%, others flat)
       MarketScenario.speculation => 0.0, // 0% avg (range −5…+5%)
       MarketScenario.blackSwan => -0.29, // −29% avg (range −20…−40%)
@@ -321,7 +326,7 @@ enum MarketScenario {
       MarketScenario.sideways => 0.010,
       MarketScenario.bear => 0.009,
       MarketScenario.volatility => 0.060,
-      MarketScenario.recovery => 0.012,
+      MarketScenario.recovery => 0.018, // same swing character as Bull
       MarketScenario.hype => 0.020,
       MarketScenario.speculation => 0.074,
       MarketScenario.blackSwan => 0.083,

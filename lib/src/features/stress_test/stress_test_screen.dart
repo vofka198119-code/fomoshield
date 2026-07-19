@@ -416,11 +416,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Market Status Card ────────────────────────
-            // Always at top, not reorderable.
-            _buildMarketStatusCard(session),
-            const SizedBox(height: 12),
-
             // ── IPO Alert ──────────────────────────────────────
             // Always at top when present, not reorderable.
             if (session.companies.values.any(
@@ -573,7 +568,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 GestureDetector(
                   onTap: () => setState(() => _showAllTrades = !_showAllTrades),
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
@@ -706,101 +701,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       saturation / 100,
       lightness / 100,
     ).toColor();
-  }
-
-  /// Market Status Card — Steps 50–54.
-  /// Replaces the old HeroBlock + Guardian. Height 92 px.
-  /// Shows market icon, phase name, description, and temperature badge.
-  Widget _buildMarketStatusCard(StressTestSession session) {
-    final phase = session.devMarketPhase;
-    final temp = session.devMarketTemperature;
-    final isBull = temp >= 0;
-    final phaseLabel = phase.isNotEmpty
-        ? '${phase[0].toUpperCase()}${phase.substring(1)}'
-        : 'Unknown';
-
-    return Container(
-      height: 92,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: FomoShieldTheme.cardDecoration,
-      child: Row(
-        children: [
-          // Market icon
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: (isBull ? ThemeV2.success : ThemeV2.loss).withValues(
-                alpha: 0.10,
-              ),
-              borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
-            ),
-            alignment: Alignment.center,
-            child: Icon(
-              isBull ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-              color: isBull ? ThemeV2.success : ThemeV2.loss,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 14),
-          // Phase name + description
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  phaseLabel,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  isBull ? 'Optimism is high' : 'Caution is warranted',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: ThemeV2.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Temperature badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: ThemeV2.primaryBg,
-              borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Temperature',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: ThemeV2.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${isBull ? '+' : ''}$temp',
-                  style: interNums(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   /// Thin elegant donut chart with portfolio metrics centered inside the ring.
@@ -1116,7 +1016,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.inter(
-                                        fontSize: 13,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: ThemeV2.textPrimary,
                                       ),
@@ -1207,7 +1107,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     onTap: () =>
                         setState(() => _showAllAssets = !_showAllAssets),
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
@@ -1620,7 +1520,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: ThemeV2.textPrimary,
                   ),
@@ -1686,10 +1586,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          // ── Market Status Card ────────────────────────
-          _buildMarketStatusCard(session),
-          const SizedBox(height: 12),
-
           // ── Psychology Meter ────────────────────────────
           PsychologyMeter(data: PsychologyMeterData.fromSession(session)),
           const SizedBox(height: 16),

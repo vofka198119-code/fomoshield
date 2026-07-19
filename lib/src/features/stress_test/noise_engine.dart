@@ -171,6 +171,25 @@ extension NoiseEngine on StressTestNotifier {
     final currentEpoch = _getCurrentEpoch(session);
     if (currentEpoch == null) return;
 
+    // ── Epoch-relative time scaling ──────────────────────────────
+    // dt used to be a fixed 0.005/tick regardless of the epoch's actual
+    // real-world length (12h/24h/5d/7d) — meaning the full annual-
+    // equivalent drift/volatility for ANY scenario fully "burned through"
+    // in ~200 ticks (~67 real minutes), no matter how long the epoch was
+    // nominally supposed to last. For every tick after that (which is
+    // most of a 12h+ epoch), the price just kept randomly walking with
+    // nothing anchoring it to the epoch's remaining time, until it hit
+    // the regime's own price clamp and sat pinned there — confirmed on a
+    // real device: a Bull epoch sitting at exactly its +100% ceiling,
+    // ticks oscillating ±1-2% right against it. Scaling dt to the
+    // CURRENT epoch's real tick count spreads the scenario's full
+    // designed magnitude evenly across the whole epoch instead.
+    final ticksPerEpoch = (rollInterval.inSeconds / _tickSeconds)
+        .round()
+        .clamp(1, 1 << 30);
+    final dtPerTick = 1.0 / ticksPerEpoch;
+    final sqrtDt = sqrt(dtPerTick);
+
     // ── Per-session RNG ─────────────────────────────────────────
     final rng = _sessionRandom[session.id] ?? Random(session.simulationSeed);
     _sessionRandom[session.id] = rng;
@@ -236,8 +255,8 @@ extension NoiseEngine on StressTestNotifier {
 
         // ── Geometric Brownian Motion with dt scaling ─────────────
         // P_new = P_old × (1 + μ×dt + σ×ε×√dt + microNoiseFactor×ε₂×√dt)
-        // All μ,σ are ANNUAL. dt=0.005 scales them to per-tick.
-        final sqrtDt = _sqrtDt;
+        // All μ,σ are ANNUAL. dt (computed above from this epoch's real
+        // duration) scales them to per-tick.
         final noise =
             (rng.nextDouble() - 0.5) * params.annualVolatility * sqrtDt;
 
@@ -250,7 +269,7 @@ extension NoiseEngine on StressTestNotifier {
         // ── Sandbox Isolation (Step 3): Drift clamping per regime ──
         final regime = _toMacroRegime(scenario);
         final beforeGbm = currentPrice;
-        final rawChange = params.annualDrift * _dtPerTick + noise + microNoise;
+        final rawChange = params.annualDrift * dtPerTick + noise + microNoise;
         final clampedChange = _clampDrift(rawChange, regime);
         currentPrice = currentPrice * (1 + clampedChange);
         // ignore: avoid_print
@@ -298,52 +317,16 @@ extension NoiseEngine on StressTestNotifier {
         // ── Debug: log dt calibration once per app session ──────
         if (!_dtCalibrationLogged) {
           _dtCalibrationLogged = true;
-          final dtDrift = params.annualDrift * _dtPerTick;
+          final dtDrift = params.annualDrift * dtPerTick;
           final dtVol = params.annualVolatility * sqrtDt;
           // ignore: avoid_print
           print(
-            '[FOMO-DT] dt=$_dtPerTick  sqrt(dt)=${sqrtDt.toStringAsFixed(6)}  '
+            '[FOMO-DT] dt=$dtPerTick (ticksPerEpoch=$ticksPerEpoch)  sqrt(dt)=${sqrtDt.toStringAsFixed(6)}  '
             'drift×dt=${dtDrift.toStringAsFixed(6)}  '
             'vol×√dt=${dtVol.toStringAsFixed(6)}  '
             '(μ,σ)=(${params.annualDrift.toStringAsFixed(4)},${params.annualVolatility.toStringAsFixed(4)}) '
             'sector=${assetSector.name}  regime=${_toMacroRegime(scenario).name}',
           );
-        }
-
-        // Gradual recovery: bounce decays over 3 epochs after a catastrophe.
-        // Each subsequent epoch gets a smaller bounce (full → 60% → 30%).
-        // Rates calibrated for realistic blackSwan (−20…−40%) / crash (−8…−15%).
-        final epochIdx = session.epochHistory.indexWhere(
-          (e) => e.index == currentEpoch.index,
-        );
-        for (int dist = 1; dist <= 3; dist++) {
-          if (epochIdx >= dist &&
-              session.epochHistory[epochIdx - dist].scenario.isCatastrophe) {
-            double recoveryRate;
-            switch (sector) {
-              case MarketSector.consumerStaples:
-              case MarketSector.healthcare:
-                recoveryRate = 0.020 + rng.nextDouble() * 0.020; // 2-4%
-              case MarketSector.finance:
-              case MarketSector.realEstate:
-                recoveryRate = 0.015 + rng.nextDouble() * 0.025; // 1.5-4%
-              case MarketSector.technology:
-                recoveryRate = 0.015 + rng.nextDouble() * 0.025; // 1.5-4%
-              case MarketSector.energy:
-                recoveryRate = 0.015 + rng.nextDouble() * 0.025; // 1.5-4%
-              case MarketSector.biotech:
-                recoveryRate = 0.010 + rng.nextDouble() * 0.020; // 1-3%
-              case MarketSector.cyclical:
-                recoveryRate = 0.015 + rng.nextDouble() * 0.025; // 1.5-4%
-              default:
-                recoveryRate = 0.015 + rng.nextDouble() * 0.020; // 1.5-3.5%
-            }
-            // Decay factor: 1.0 (immediate), 0.6 (one epoch later), 0.3 (two epochs later)
-            final decay = (4 - dist) / 3.0;
-            currentPrice *= (1 + recoveryRate * decay);
-            currentPrice = currentPrice.clamp(basePrice * 0.3, basePrice * 3.0);
-            break; // only the nearest catastrophe counts
-          }
         }
 
         // ── Stabilization Period ───────────────────────────────────
@@ -366,8 +349,8 @@ extension NoiseEngine on StressTestNotifier {
           scenario: scenario,
           sector: sector,
           hasCorrection: hasCorrection,
-          marketDriftRaw: params.annualDrift * _dtPerTick,
-          sectorDriftRaw: (params.annualDrift - avgDrift) * _dtPerTick,
+          marketDriftRaw: params.annualDrift * dtPerTick,
+          sectorDriftRaw: (params.annualDrift - avgDrift) * dtPerTick,
           noiseRaw: noise,
           companyDriftRaw: specAmplitude,
         );

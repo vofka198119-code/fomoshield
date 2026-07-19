@@ -571,6 +571,27 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             blackSwanSurvived: session.blackSwanSurvived,
             hasExperiencedCatastrophe: session.hasExperiencedCatastrophe,
             catastropheCooldown: session.catastropheCooldown,
+            // ── Casino Wall-Clock State + other engine state — must ──
+            // survive every call, same fix as executeTrade's rebuild
+            // (trades_engine.dart). Previously omitted here entirely,
+            // silently resetting casinoLastCatastropheEpoch to its
+            // constructor default (-100) every time the user viewed a
+            // stock detail page mid-active-test — which made the
+            // scripted-recovery window (casino_epochs.dart's
+            // _rollScenario) permanently unreachable, since
+            // epochsSinceLastCatastrophe is computed against that
+            // field. Also silently reset simulationSeed to 0
+            // (breaks RNG determinism), companies to {} (wipes IPO
+            // state), and stabilizationDeadlines to {}.
+            casinoCatastropheCooldown: session.casinoCatastropheCooldown,
+            casinoDeclineStreak: session.casinoDeclineStreak,
+            casinoCatastropheCount: session.casinoCatastropheCount,
+            casinoLastCatastropheEpoch: session.casinoLastCatastropheEpoch,
+            simulationSeed: session.simulationSeed,
+            enableDeveloperTrace: session.enableDeveloperTrace,
+            companies: session.companies,
+            stabilizationDeadlines: session.stabilizationDeadlines,
+            lastTickTimestamp: session.lastTickTimestamp,
             currentPrices: {...session.currentPrices, symbol: price},
             basePrices: {...session.basePrices, symbol: price},
             epochPriceRanges: session.epochPriceRanges,
