@@ -177,7 +177,14 @@ extension CasinoEpochsEngine on StressTestNotifier {
   }
 
   void _catchUp(int idx) {
-    final session = state[idx];
+    // Not `final` — the fair-per-epoch-tick-budget loop below calls
+    // _simulateCurrentPrices mid-loop, which rebuilds `state[idx]` as a
+    // brand-new StressTestSession (immutable-update pattern), so this
+    // reference must be re-synced to `state[idx]` after each such call or
+    // every subsequent in-place mutation here (closing the next epoch,
+    // etc.) would land on an orphaned object that state[idx] no longer
+    // points to and silently vanish.
+    var session = state[idx];
     final now = DateTime.now();
 
     // Check if test should be completed (timer expired — time-limited modes)
@@ -261,6 +268,26 @@ extension CasinoEpochsEngine on StressTestNotifier {
     // so `length + r` double-counts. Use fixed baseLength + r instead.
     final baseLength = session.epochHistory.length;
 
+    // ── Fair per-epoch tick budget (device-test bug, 2026-07-20) ──────
+    // Confirmed on-device: epochHistory correctly recorded every missed
+    // epoch (Bull, Crash, BlackSwan, whatever the roulette produced), but
+    // ALL of the catch-up's price simulation used to happen in ONE call
+    // AFTER this loop, under only the LAST (current) epoch's regime — so
+    // every skipped epoch's drift/volatility never touched the price at
+    // all, and the whole gap's tick budget landed on whichever regime
+    // happened to be current when the app was reopened (observed: a
+    // Volatility epoch — zero drift by design — absorbed a gap that had
+    // actually rolled through several regimes, one of which was almost
+    // certainly a decline). Splitting the capped tick budget evenly
+    // across every epoch actually experienced (each missed epoch + the
+    // trailing current one) and simulating each segment while ITS epoch
+    // is the active one fixes this — every regime the roulette landed on
+    // now gets a fair (if attenuated, given the cap) say in the price.
+    final totalSegments = missedRolls + 1; // + the trailing current epoch
+    final ticksPerSegment = (_maxCatchUpTicks / totalSegments)
+        .floor()
+        .clamp(1, _maxCatchUpTicks);
+
     for (int r = 0; r < missedRolls; r++) {
       // ── Scenario-roll RNG: deterministic per epoch, NOT the shared
       // `rng` stream above. `_sessionRandom` (and therefore `rng`) is
@@ -327,30 +354,40 @@ extension CasinoEpochsEngine on StressTestNotifier {
           startedAt: rollTime,
         ),
       ];
+
+      // Simulate this epoch's own fair share of ticks under ITS OWN
+      // regime, right now while it's the active epoch (before the next
+      // iteration's close-previous-epoch step ends it). `lastEpochRollAt`
+      // is pinned to `now` first so _simulateCurrentPrices' own wall-clock
+      // roll-check (`now.difference(lastRollAt) >= rollInterval`) doesn't
+      // fire a SECOND, non-deterministic roll on top of the deterministic
+      // one this loop just performed above.
+      session.lastEpochRollAt = now;
+      _simulateCurrentPrices(idx, ticks: ticksPerSegment);
+      // Re-sync: _simulateCurrentPrices just replaced state[idx] with a
+      // new object — point `session` at it so the next iteration's
+      // mutations (and casino-state fields read below the loop) land on
+      // the object that's actually live in `state`, not an orphan.
+      session = state[idx];
     }
 
     session.lastEpochRollAt = lastRoll.add(rollInterval * missedRolls);
 
-    // ── Granular time-stepping: simulate each missed 20s tick ──
-    // Instead of one mega-tick (which makes GBM explode against the clamp
-    // ceiling), we break the wall-clock gap into standard 20-second quanta
-    // and simulate each tick separately. This produces realistic, smooth
-    // price trajectories instead of instant clamp hits.
-    final lastTick =
-        session.lastTickTimestamp ??
-        session.lastEpochRollAt ??
-        session.startedAt ??
-        now;
-    final missedSeconds = now.difference(lastTick).inSeconds;
-    final missedTicks = (missedSeconds / _tickSeconds).floor().clamp(
-      1,
-      _maxCatchUpTicks,
-    );
+    // ── Trailing partial epoch (the current one) — same fair share ──
+    // Each already-closed missed epoch got its own `ticksPerSegment` above;
+    // give the still-open current epoch the same segment size rather than
+    // deriving it from `lastTickTimestamp` — the interior calls in the
+    // loop above already advanced that timestamp to `now` for their own
+    // segments, so a `now.difference(lastTickTimestamp)` computed here
+    // would read as ~0 and starve this trailing segment down to the
+    // clamp's 1-tick floor.
+    final missedTicks = ticksPerSegment;
     // ignore: avoid_print
     print(
-      '[CATCHUP-TICKS] missedSeconds=$missedSeconds missedTicks=$missedTicks',
+      '[CATCHUP-TICKS] ticksPerSegment=$ticksPerSegment missedTicks=$missedTicks',
     );
     _simulateCurrentPrices(idx, ticks: missedTicks);
+    session = state[idx]; // re-sync for the diagnostic prints below
 
     // ── DIAGNOSTIC DUMP: session state after catch-up ──────────
     // ignore: avoid_print

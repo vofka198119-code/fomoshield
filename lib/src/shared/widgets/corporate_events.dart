@@ -7,9 +7,12 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/services/gics_sector_mapper.dart';
+import '../../features/stress_test/stress_test_engine.dart';
 import '../../features/stress_test/stress_test_models.dart';
 
 // Hardcoded dividend data for popular stocks
@@ -168,9 +171,18 @@ class _DividendInfo {
 // ---------------------------------------------------------------------------
 
 class CorporateEventsWidget extends StatefulWidget {
+  final String sessionId;
   final List<StressTestHolding> holdings;
+  final NewsEvent? activeNewsEvent;
+  final List<HypeEvent> activeHypeEvents;
 
-  const CorporateEventsWidget({super.key, required this.holdings});
+  const CorporateEventsWidget({
+    super.key,
+    required this.sessionId,
+    required this.holdings,
+    this.activeNewsEvent,
+    this.activeHypeEvents = const [],
+  });
 
   @override
   State<CorporateEventsWidget> createState() => _CorporateEventsWidgetState();
@@ -178,6 +190,26 @@ class CorporateEventsWidget extends StatefulWidget {
 
 class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
   bool _showAll = false;
+
+  /// Held symbols currently touched by News (own symbol) or Hype (own
+  /// GICS sector) — one row per (event, symbol) pair so a sector-wide
+  /// Hype event shows separately for each affected holding.
+  List<_LiveEventRow> _buildLiveEventRows() {
+    final rows = <_LiveEventRow>[];
+    final news = widget.activeNewsEvent;
+    if (news != null &&
+        widget.holdings.any((h) => h.symbol == news.symbol)) {
+      rows.add(_LiveEventRow.news(news));
+    }
+    for (final hype in widget.activeHypeEvents) {
+      for (final h in widget.holdings) {
+        if (resolveGicsSector(h.symbol) == hype.sector) {
+          rows.add(_LiveEventRow.hype(hype, h.symbol));
+        }
+      }
+    }
+    return rows;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +222,9 @@ class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
       }
     }
 
-    if (events.isEmpty) return const SizedBox.shrink();
+    final liveEvents = _buildLiveEventRows();
+
+    if (events.isEmpty && liveEvents.isEmpty) return const SizedBox.shrink();
 
     final displayEvents = _showAll ? events : events.take(3).toList();
 
@@ -222,14 +256,22 @@ class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
             color: ThemeV2.divider,
           ),
           const SizedBox(height: 8),
-          Text(
-            'Upcoming ex-dividend dates and payouts',
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              color: ThemeV2.textSecondary,
+          // Live News/Hype rows — active market-moving events, not the
+          // static dividend calendar below.
+          for (final row in liveEvents) ...[
+            _LiveEventTile(sessionId: widget.sessionId, row: row),
+            const SizedBox(height: 8),
+          ],
+          if (events.isNotEmpty) ...[
+            Text(
+              'Upcoming ex-dividend dates and payouts',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                color: ThemeV2.textSecondary,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
+          ],
           // Events list
           ...displayEvents.map(
             (entry) => _EventRow(holding: entry.key, info: entry.value),
@@ -259,6 +301,130 @@ class _CorporateEventsWidgetState extends State<CorporateEventsWidget> {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Live News/Hype event row — active market-moving micro-scenarios, as
+// opposed to the static dividend calendar above. Tapping opens the Why
+// screen for the affected symbol (same detail already shown there).
+// ---------------------------------------------------------------------------
+
+class _LiveEventRow {
+  final String symbol;
+  final bool isNews;
+  final bool isPositive;
+  final String title;
+  final double targetAmplitude;
+  final int currentTick;
+  final int rampDurationTicks;
+
+  const _LiveEventRow({
+    required this.symbol,
+    required this.isNews,
+    required this.isPositive,
+    required this.title,
+    required this.targetAmplitude,
+    required this.currentTick,
+    required this.rampDurationTicks,
+  });
+
+  factory _LiveEventRow.news(NewsEvent event) => _LiveEventRow(
+    symbol: event.symbol,
+    isNews: true,
+    isPositive: event.isPositive,
+    title: event.headline,
+    targetAmplitude: event.targetAmplitude,
+    currentTick: event.currentTick,
+    rampDurationTicks: event.rampDurationTicks,
+  );
+
+  factory _LiveEventRow.hype(HypeEvent event, String symbol) => _LiveEventRow(
+    symbol: symbol,
+    isNews: false,
+    isPositive: event.isPositive,
+    title: '${event.sector.label} sector ${event.isPositive ? 'rally' : 'sell-off'}',
+    targetAmplitude: event.targetAmplitude,
+    currentTick: event.currentTick,
+    rampDurationTicks: event.rampDurationTicks,
+  );
+}
+
+class _LiveEventTile extends StatelessWidget {
+  final String sessionId;
+  final _LiveEventRow row;
+
+  const _LiveEventTile({required this.sessionId, required this.row});
+
+  String _remainingLabel() {
+    final ticksLeft = (row.rampDurationTicks - row.currentTick).clamp(
+      0,
+      row.rampDurationTicks,
+    );
+    final secondsLeft = ticksLeft * tickIntervalSeconds;
+    final hours = secondsLeft ~/ 3600;
+    final minutes = (secondsLeft % 3600) ~/ 60;
+    if (hours > 0) return '≈${hours}h ${minutes}m left';
+    if (minutes > 0) return '≈${minutes}m left';
+    return 'wrapping up';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = row.isPositive ? ThemeV2.success : ThemeV2.loss;
+    return GestureDetector(
+      onTap: () => context.push('/stress-test/$sessionId/stock/${row.symbol}'),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              row.isNews
+                  ? (row.isPositive
+                      ? Icons.trending_up_rounded
+                      : Icons.trending_down_rounded)
+                  : Icons.local_fire_department_rounded,
+              color: color,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${row.symbol} · ${row.title}',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: ThemeV2.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${row.isPositive ? '+' : ''}'
+                    '${(row.targetAmplitude * 100).toStringAsFixed(1)}% target · ${_remainingLabel()}',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: ThemeV2.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, size: 16, color: ThemeV2.textSecondary),
+          ],
+        ),
       ),
     );
   }

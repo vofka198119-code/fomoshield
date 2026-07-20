@@ -14,6 +14,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
+import '../../../core/cache/sector_providers.dart';
 import '../stress_test_engine.dart';
 import '../stress_test_models.dart';
 
@@ -170,6 +171,12 @@ class _StressTestSearchSheetState
     setState(() => _isLoading = false);
 
     if (success) {
+      // Fire-and-forget: fetch+cache this ticker's real sector from
+      // Finnhub now that it's a confirmed holding. Doesn't block the
+      // purchase flow — the engine's static heuristic covers this symbol
+      // until the fetch resolves (see resolveGicsSector's live-cache
+      // check in gics_sector_mapper.dart).
+      ref.read(sectorRepositoryProvider).loadSector(_selectedSymbol);
       Navigator.of(context).pop(true);
     } else {
       setState(() => _errorMessage = 'Not enough cash or unable to trade.');

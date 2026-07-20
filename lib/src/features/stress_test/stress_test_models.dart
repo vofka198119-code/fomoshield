@@ -645,6 +645,9 @@ class PriceContribution {
   /// Вклад новостей/событий — коррекции, катастрофы, восстановления.
   final double newsPct;
 
+  /// Вклад секторного Hype-события (hype/hype_event.dart).
+  final double hypePct;
+
   /// Вклад случайного шума.
   final double noisePct;
 
@@ -653,17 +656,20 @@ class PriceContribution {
     required this.sectorPct,
     required this.companyPct,
     required this.newsPct,
+    this.hypePct = 0,
     required this.noisePct,
   });
 
   /// Сумма всех факторов = 100% (с rounding tolerance).
-  double get total => marketPct + sectorPct + companyPct + newsPct + noisePct;
+  double get total =>
+      marketPct + sectorPct + companyPct + newsPct + hypePct + noisePct;
 
   Map<String, dynamic> toJson() => {
     'marketPct': marketPct,
     'sectorPct': sectorPct,
     'companyPct': companyPct,
     'newsPct': newsPct,
+    'hypePct': hypePct,
     'noisePct': noisePct,
   };
 
@@ -673,6 +679,7 @@ class PriceContribution {
         sectorPct: (json['sectorPct'] as num?)?.toDouble() ?? 0,
         companyPct: (json['companyPct'] as num?)?.toDouble() ?? 0,
         newsPct: (json['newsPct'] as num?)?.toDouble() ?? 0,
+        hypePct: (json['hypePct'] as num?)?.toDouble() ?? 0,
         noisePct: (json['noisePct'] as num?)?.toDouble() ?? 0,
       );
 }
@@ -727,6 +734,9 @@ class TickExplanation {
   /// Сырой noise (стохастический шум) до нормализации.
   final double? noiseRaw;
 
+  /// Сырой Hype-инкремент (hype/hype_event.dart) до нормализации.
+  final double? hypeRaw;
+
   const TickExplanation({
     required this.epochIndex,
     required this.symbol,
@@ -741,6 +751,7 @@ class TickExplanation {
     this.ipoBonusDriftRaw,
     this.recoveryDriftRaw,
     this.noiseRaw,
+    this.hypeRaw,
   });
 }
 
@@ -1103,12 +1114,6 @@ class StressTestSession {
   /// Current volatility multiplier (1.0 = baseline).
   double devVolatilityMultiplier;
 
-  /// Name of the next predicted market event.
-  String devNextEvent;
-
-  /// Days until the next event.
-  int devNextEventDays;
-
   /// Human-readable volatility level (Low, Normal, Elevated, High, Extreme).
   String devVolatilityLabel;
 
@@ -1205,8 +1210,6 @@ class StressTestSession {
     this.devFearIndex = 50,
     this.devRecoveryProgress = 0,
     this.devVolatilityMultiplier = 1.0,
-    this.devNextEvent = '',
-    this.devNextEventDays = 0,
     this.devVolatilityLabel = 'Normal',
     this.stabilizationDeadlines = const {},
     this.currentWeights = const {},
@@ -1684,12 +1687,49 @@ class StressTestAnalytics {
   }
 }
 
+/// Bridges the 11 GICS sectors ([GicsSector], resolved live from Finnhub
+/// where available — see resolveGicsSector in gics_sector_mapper.dart) down
+/// to this engine's 5 coarser [AssetSector] buckets used by the GBM drift/
+/// volatility matrix (gbm_engine.dart).
+const Map<GicsSector, AssetSector> _gicsToAssetSector = {
+  GicsSector.technology: AssetSector.techSpeculative,
+  GicsSector.communicationServices: AssetSector.techSpeculative,
+  GicsSector.healthCare: AssetSector.consumerStaples,
+  GicsSector.consumerStaples: AssetSector.consumerStaples,
+  GicsSector.utilities: AssetSector.consumerStaples,
+  GicsSector.financials: AssetSector.cyclicalConsumer,
+  GicsSector.consumerDiscretionary: AssetSector.cyclicalConsumer,
+  GicsSector.energy: AssetSector.cyclicalConsumer,
+  GicsSector.industrials: AssetSector.cyclicalConsumer,
+  GicsSector.materials: AssetSector.cyclicalConsumer,
+  GicsSector.realEstate: AssetSector.realEstateREIT,
+};
+
 /// Resolves a symbol to its [AssetSector] using the canonical mapping.
 ///
 /// This is the **Single Source of Truth (SSOT)** for sector classification.
-/// Both the simulation engine and all analytics widgets read from this map.
+/// Both the simulation engine and all analytics widgets read from this
+/// function. Prefers the live GICS sector from [resolveGicsSector] (real
+/// Finnhub data when the holding has been bought at least once — see
+/// SectorRepository) via [_gicsToAssetSector]; falls back to the static
+/// per-ticker [_legacyMap] below only for symbols GICS resolution can't
+/// classify (e.g. broad-market ETFs, which have no single GICS sector but
+/// still need an AssetSector bucket for the GBM matrix).
 AssetSector resolveAssetSector(String symbol) {
-  const map = <String, AssetSector>{
+  final gics = resolveGicsSector(symbol);
+  if (gics != null) {
+    final bucket = _gicsToAssetSector[gics];
+    if (bucket != null) return bucket;
+  }
+  return _legacyMap[symbol] ?? AssetSector.cyclicalConsumer;
+}
+
+/// Static fallback — kept only for symbols [resolveGicsSector] can't
+/// classify (mainly broad-market ETFs, which are deliberately excluded
+/// from GICS sector mapping but still need an AssetSector for the GBM
+/// matrix). Historically this was the sole SSOT; now [resolveGicsSector]
+/// (live Finnhub-backed) takes priority — see [resolveAssetSector].
+const Map<String, AssetSector> _legacyMap = {
     // ── Tech / Speculative ─────────────────────────────────────────
     'AAPL': AssetSector.techSpeculative,
     'MSFT': AssetSector.techSpeculative,
@@ -1795,8 +1835,6 @@ AssetSector resolveAssetSector(String symbol) {
     'AGG': AssetSector.etfBroadMarket,
     'BND': AssetSector.etfBroadMarket,
   };
-  return map[symbol] ?? AssetSector.cyclicalConsumer;
-}
 
 /// Reverse mapping from [AssetSector] → representative [MarketSector].
 MarketSector marketSectorToAssetSectorReversed(AssetSector a) => switch (a) {

@@ -306,6 +306,28 @@ double _clampDrift(double rawChange, _MacroRegime regime) {
 /// Get per-regime price bounds for final clamping.
 _DriftBounds _getRegimeBounds(_MacroRegime regime) => _driftBounds[regime]!;
 
+// ── Crash front-loading (device-test feedback 2026-07-20) ────────────
+// On-device: the Crash regime reached its target ~-15% drawdown, but felt
+// "sluggish" for the first stretch of the epoch — the drop only became
+// visible after a long flat-feeling run of noise. Front-load the drift so
+// the first _crashEarlyWindow of the epoch hits harder, then taper to a
+// gentler drift for the remainder. The two multipliers are chosen so the
+// time-weighted average stays 1.0x — same overall epoch magnitude, just
+// reshaped so it *reads* as a crash within the first couple of (simulated)
+// hours instead of a slow, easy-to-miss drift.
+const double _crashEarlyWindow = 0.20; // first 20% of epoch's real time
+const double _crashEarlyBoost = 2.2; // drift multiplier during that window
+
+/// Drift multiplier for the Crash regime at [epochFraction] (0.0–1.0
+/// through the current epoch's real-world duration). 1.0x for every other
+/// regime — this reshaping is Crash-specific, not a general mechanism.
+double _crashDriftMultiplier(double epochFraction) {
+  if (epochFraction < _crashEarlyWindow) return _crashEarlyBoost;
+  // Weighted average across the epoch must stay 1.0x:
+  //   earlyWindow×earlyBoost + (1-earlyWindow)×lateMultiplier = 1.0
+  return (1 - _crashEarlyWindow * _crashEarlyBoost) / (1 - _crashEarlyWindow);
+}
+
 /// Resolve a ticker symbol to its legacy market sector.
 MarketSector _getSector(String symbol) {
   return _symbolSectorMap[symbol] ?? MarketSector.other;

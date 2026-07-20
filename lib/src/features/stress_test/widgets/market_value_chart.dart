@@ -102,9 +102,15 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
       case TestDuration.custom:
         final start = session.startedAt ?? session.createdAt;
         final elapsed = DateTime.now().difference(start);
-        return _ValuePeriod.values
+        final periods = _ValuePeriod.values
             .where((p) => elapsed >= _periodCutoffs[p]!)
             .toList();
+        // A fresh test (elapsed < 1D, the finest cutoff) would otherwise
+        // return an empty list — `available.last` below then throws
+        // "Bad state: No element" on every rebuild until a full day
+        // passes. 1D is always valid to show (it just reflects however
+        // little time has elapsed so far).
+        return periods.isEmpty ? [_ValuePeriod.d1] : periods;
     }
   }
 

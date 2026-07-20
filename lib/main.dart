@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'src/core/cache/sector_providers.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
@@ -28,7 +29,20 @@ void main() async {
     publishableKey: SupabaseConfig.anonKey,
   );
 
-  runApp(const ProviderScope(child: ScanCoApp()));
+  // Hydrate the stress-test engine's synchronous GICS-sector cache from
+  // disk before the UI (and any resumed simulation ticks) can run — see
+  // resolveGicsSector's live-cache check in gics_sector_mapper.dart. A
+  // manual ProviderContainer lets this finish before runApp, instead of
+  // racing the app's first frame with a fire-and-forget read.
+  final container = ProviderContainer();
+  await container.read(sectorRepositoryProvider).hydrateLiveCache();
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const ScanCoApp(),
+    ),
+  );
 }
 
 class ScanCoApp extends ConsumerWidget {

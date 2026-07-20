@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/services/gics_sector_mapper.dart';
 import '../../features/stress_test/stress_test_models.dart';
+import '../../features/stress_test/stress_test_engine.dart';
 
 /// Data for the Bottom Metrics Bar.
 class BottomMetricsData {
@@ -19,8 +21,17 @@ class BottomMetricsData {
   final double recoveryPercent; // 0.0-100.0
   final double volatilityMultiplier; // 0.5-5.0
   final String volatilityLabel;
-  final String nextEventName;
-  final int nextEventDays;
+
+  /// Label for the currently active News/Hype event, or "No event" when
+  /// none is active. Replaces the old `devNextEvent`/`devNextEventDays`
+  /// fields — those were declared and read here but never assigned
+  /// anywhere in the engine, so this column always showed blank/0d.
+  final String eventLabel;
+
+  /// Remaining time on that event (already formatted, e.g. "1h 40m left"),
+  /// or "—" when [hasActiveEvent] is false.
+  final String eventRemaining;
+  final bool hasActiveEvent;
 
   const BottomMetricsData({
     required this.fearIndex,
@@ -28,20 +39,56 @@ class BottomMetricsData {
     required this.recoveryPercent,
     required this.volatilityMultiplier,
     required this.volatilityLabel,
-    required this.nextEventName,
-    required this.nextEventDays,
+    required this.eventLabel,
+    required this.eventRemaining,
+    required this.hasActiveEvent,
   });
 
   factory BottomMetricsData.fromSession(StressTestSession session) {
+    String label = 'No event';
+    String remaining = '—';
+    bool active = false;
+
+    final news = session.activeNewsEvent;
+    final hype = session.activeHypeEvents.isNotEmpty
+        ? session.activeHypeEvents.first
+        : null;
+    if (news != null) {
+      label = '${news.symbol} NEWS';
+      remaining = _remainingLabel(news.currentTick, news.rampDurationTicks);
+      active = true;
+    } else if (hype != null) {
+      label = '${hype.sector.label} HYPE';
+      remaining = _remainingLabel(hype.currentTick, hype.rampDurationTicks);
+      active = true;
+    }
+
     return BottomMetricsData(
       fearIndex: session.devFearIndex,
       fatigue: session.devFatigue,
       recoveryPercent: session.devRecoveryProgress,
       volatilityMultiplier: session.devVolatilityMultiplier,
       volatilityLabel: session.devVolatilityLabel,  // 'Low', 'Normal', 'Elevated', 'High', 'Extreme'
-      nextEventName: session.devNextEvent,
-      nextEventDays: session.devNextEventDays,
+      eventLabel: label,
+      eventRemaining: remaining,
+      hasActiveEvent: active,
     );
+  }
+
+  /// Compact form for this bar's narrow columns — e.g. "1h40m", "42m",
+  /// "now". Longer "Xh Ym left" phrasing lives in why_today_screen.dart's
+  /// roomier event banners.
+  static String _remainingLabel(int currentTick, int rampDurationTicks) {
+    final ticksLeft = (rampDurationTicks - currentTick).clamp(
+      0,
+      rampDurationTicks,
+    );
+    final secondsLeft = ticksLeft * tickIntervalSeconds;
+    final hours = secondsLeft ~/ 3600;
+    final minutes = (secondsLeft % 3600) ~/ 60;
+    if (hours > 0) return '${hours}h${minutes}m';
+    if (minutes > 0) return '${minutes}m';
+    return 'now';
   }
 }
 
@@ -89,9 +136,9 @@ class BottomMetricsBar extends StatelessWidget {
           _verticalDivider(),
           Expanded(child: _buildMetricColumn(
             icon: Icons.calendar_month_rounded,
-            label: data.nextEventName,
-            value: '${data.nextEventDays}d',
-            color: _eventColor(data.nextEventDays),
+            label: data.eventLabel,
+            value: data.eventRemaining,
+            color: _eventColor(data.hasActiveEvent),
           )),
         ],
       ),
@@ -119,6 +166,8 @@ class BottomMetricsBar extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: interNums(
             fontSize: 15,
             fontWeight: FontWeight.w800,
@@ -130,6 +179,8 @@ class BottomMetricsBar extends StatelessWidget {
         Text(
           label,
           textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: GoogleFonts.inter(
             fontSize: 8,
             fontWeight: FontWeight.w600,
@@ -168,9 +219,9 @@ class BottomMetricsBar extends StatelessWidget {
     return FomoShieldTheme.positive;
   }
 
-  Color _eventColor(int days) {
-    if (days <= 2) return FomoShieldTheme.negative;
-    if (days <= 5) return FomoShieldTheme.sideways;
-    return FomoShieldTheme.positive;
+  Color _eventColor(bool hasActiveEvent) {
+    return hasActiveEvent
+        ? FomoShieldTheme.sideways
+        : FomoShieldTheme.textLight;
   }
 }

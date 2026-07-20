@@ -49,6 +49,7 @@ extension NoiseEngine on StressTestNotifier {
     double? noiseRaw,
     double? companyDriftRaw,
     double? newsRaw,
+    double? hypeRaw,
   }) {
     // Raw weights for each factor (all per-tick scaled)
     double mW = (marketDriftRaw?.abs() ?? 0.0);
@@ -62,8 +63,16 @@ extension NoiseEngine on StressTestNotifier {
     final double newsW = (newsRaw != null && newsRaw.abs() > 0.0001)
         ? newsRaw.abs()
         : (hasCorrection ? 0.15 : 0.0);
+    // Real Hype event (hype/hype_event.dart) — previously computed and
+    // applied to the price but never passed in here, so a sector-wide
+    // Hype move had no attribution slot and got silently absorbed into
+    // the other factors' proportions, showing up to the user as "mostly
+    // Noise" even when Hype was the actual driver (confirmed on-device:
+    // holdings 10-15% off from the rest of the portfolio with nothing but
+    // Noise in the Why breakdown).
+    final double hypeW = (hypeRaw?.abs() ?? 0.0);
 
-    final double totalW = mW + sW + nW + cW + newsW;
+    final double totalW = mW + sW + nW + cW + newsW + hypeW;
     if (totalW < 1e-12) {
       // No meaningful move → balanced default split
       return TickExplanation(
@@ -76,6 +85,7 @@ extension NoiseEngine on StressTestNotifier {
           sectorPct: 25,
           companyPct: 15,
           newsPct: 0,
+          hypePct: 0,
           noisePct: 20,
         ),
         marketPhase: scenario.name,
@@ -89,12 +99,13 @@ extension NoiseEngine on StressTestNotifier {
     double cPct = cW / totalW * 100;
     double nPct = nW / totalW * 100;
     double newsPct = newsW / totalW * 100;
+    double hypePct = hypeW / totalW * 100;
 
     // Force exact 100 by adjusting the largest component
-    double sum = mPct + sPct + cPct + nPct + newsPct;
+    double sum = mPct + sPct + cPct + nPct + newsPct + hypePct;
     final double diff = 100.0 - sum;
     if (diff.abs() > 1e-10) {
-      final List<double> components = [mPct, sPct, cPct, nPct, newsPct];
+      final List<double> components = [mPct, sPct, cPct, nPct, newsPct, hypePct];
       final int maxIdx = components.indexOf(
         components.reduce((a, b) => a >= b ? a : b),
       );
@@ -114,6 +125,9 @@ extension NoiseEngine on StressTestNotifier {
         case 4:
           newsPct += diff;
           break;
+        case 5:
+          hypePct += diff;
+          break;
       }
     }
 
@@ -127,6 +141,7 @@ extension NoiseEngine on StressTestNotifier {
         sectorPct: sPct.clamp(0, 100),
         companyPct: cPct.clamp(0, 100),
         newsPct: newsPct.clamp(0, 100),
+        hypePct: hypePct.clamp(0, 100),
         noisePct: nPct.clamp(0, 100),
       ),
       marketPhase: scenario.name,
@@ -263,11 +278,23 @@ extension NoiseEngine on StressTestNotifier {
                   .reduce((a, b) => a + b) /
               session.holdings.length;
 
+    // Ticks in this catch-up batch are the most recent [ticks] ticks
+    // leading up to `now`, each _tickSeconds apart (see stress_test_engine
+    // .dart's catch-up comment). Used below to reshape Crash's drift by
+    // how far into the epoch's real duration each subtick actually falls.
+    final epochElapsedTicksNow =
+        now.difference(currentEpoch.startedAt).inSeconds / _tickSeconds;
+
     for (int tick = 0; tick < ticks; tick++) {
       // Peek once per tick (not once per holding — one Hype event can
       // target many holdings within the same tick); advanced once after
       // the holdings loop below via _advanceHypeEvents.
       final hypeIncrements = _hypeTickIncrements(session);
+
+      final epochFraction = ticksPerEpoch > 0
+          ? ((epochElapsedTicksNow - (ticks - 1 - tick)) / ticksPerEpoch)
+                .clamp(0.0, 1.0)
+          : 0.0;
 
       for (final h in session.holdings) {
         final basePrice = session.basePrices[h.symbol] ?? h.entryPrice;
@@ -296,7 +323,11 @@ extension NoiseEngine on StressTestNotifier {
         // ── Sandbox Isolation (Step 3): Drift clamping per regime ──
         final regime = _toMacroRegime(scenario);
         final beforeGbm = currentPrice;
-        final rawChange = params.annualDrift * dtPerTick + noise + microNoise;
+        final driftMultiplier = regime == _MacroRegime.crash
+            ? _crashDriftMultiplier(epochFraction)
+            : 1.0;
+        final rawChange =
+            params.annualDrift * dtPerTick * driftMultiplier + noise + microNoise;
         final clampedChange = _clampDrift(rawChange, regime);
         currentPrice = currentPrice * (1 + clampedChange);
         // ignore: avoid_print
@@ -385,10 +416,12 @@ extension NoiseEngine on StressTestNotifier {
           scenario: scenario,
           sector: sector,
           hasCorrection: hasCorrection,
-          marketDriftRaw: params.annualDrift * dtPerTick,
-          sectorDriftRaw: (params.annualDrift - avgDrift) * dtPerTick,
+          marketDriftRaw: params.annualDrift * dtPerTick * driftMultiplier,
+          sectorDriftRaw:
+              (params.annualDrift - avgDrift) * dtPerTick * driftMultiplier,
           noiseRaw: noise,
           newsRaw: newsIncrement,
+          hypeRaw: hypeIncrement,
         );
         final symLog = <TickExplanation>[
           ...(explanations[h.symbol] ?? []),
@@ -524,8 +557,6 @@ extension NoiseEngine on StressTestNotifier {
             devCurrentTick: session.devCurrentTick,
             devRecoveryProgress: session.devRecoveryProgress,
             devVolatilityMultiplier: session.devVolatilityMultiplier,
-            devNextEvent: session.devNextEvent,
-            devNextEventDays: session.devNextEventDays,
             devVolatilityLabel: session.devVolatilityLabel,
             catastropheSurvivalRecorded: newCatastropheSurvivalRecorded,
             diversificationBonusRecorded: session.diversificationBonusRecorded,

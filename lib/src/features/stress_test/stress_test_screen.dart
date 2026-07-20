@@ -530,7 +530,12 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         return _buildSectionCard(
           title: '',
           noInnerPadding: true,
-          child: CorporateEventsWidget(holdings: session.holdings),
+          child: CorporateEventsWidget(
+            sessionId: widget.sessionId,
+            holdings: session.holdings,
+            activeNewsEvent: session.activeNewsEvent,
+            activeHypeEvents: session.activeHypeEvents,
+          ),
         );
       case 'trade_history':
         if (session.trades.isEmpty) return const SizedBox.shrink();
@@ -555,7 +560,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 GestureDetector(
                   onTap: () => setState(() => _showAllTrades = !_showAllTrades),
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
@@ -1094,7 +1099,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     onTap: () =>
                         setState(() => _showAllAssets = !_showAllAssets),
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      margin: const EdgeInsets.fromLTRB(16, 6, 16, 16),
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(

@@ -38,6 +38,11 @@ const int _adEveryNOpen = 6; // show ad on every Nth opening
 /// Wall-clock seconds per simulation tick.
 const int _tickSeconds = 20;
 
+/// Public alias for [_tickSeconds] — UI code outside this `part of` library
+/// (e.g. why_today_screen.dart's News/Hype countdown) needs the tick
+/// length to convert `rampDurationTicks - currentTick` into real time.
+const int tickIntervalSeconds = _tickSeconds;
+
 /// Max ticks to simulate in catch-up (5 hours = 900 ticks @ 20s each).
 const int _maxCatchUpTicks = 900;
 

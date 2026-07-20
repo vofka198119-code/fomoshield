@@ -16,6 +16,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
+import '../../../core/services/gics_sector_mapper.dart';
 import '../widgets/asset_row_widget.dart';
 
 /// Asset list sort mode
@@ -242,10 +243,70 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
               const Color(0xFF42A5F5),
               monoStyle,
             ),
+            for (final chip in _activeEventChips(session)) ...[
+              const SizedBox(width: 12),
+              chip,
+            ],
           ],
         ),
       ),
     );
+  }
+
+  /// Dev-trace chips for every currently active News/Hype event — elapsed
+  /// and remaining ticks, converted to real time via [tickIntervalSeconds].
+  /// Replaces the old `devNextEvent`/`devNextEventDays` fields, which were
+  /// declared and displayed (bottom_metrics_bar.dart's "Next Event" column)
+  /// but never actually assigned anywhere in the engine — always empty.
+  List<Widget> _activeEventChips(StressTestSession session) {
+    final monoStyle = GoogleFonts.jetBrainsMono(
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+      height: 1.3,
+    );
+    final chips = <Widget>[];
+
+    final news = session.activeNewsEvent;
+    if (news != null) {
+      chips.add(
+        _devChip(
+          'NEWS ${news.symbol}',
+          '${news.currentTick}/${news.rampDurationTicks} '
+              '(${_remainingLabel(news.currentTick, news.rampDurationTicks)})',
+          news.isPositive
+              ? const Color(0xFF66BB6A)
+              : const Color(0xFFEF5350),
+          monoStyle,
+        ),
+      );
+    }
+    for (final hype in session.activeHypeEvents) {
+      chips.add(
+        _devChip(
+          'HYPE ${hype.sector.label}',
+          '${hype.currentTick}/${hype.rampDurationTicks} '
+              '(${_remainingLabel(hype.currentTick, hype.rampDurationTicks)})',
+          hype.isPositive
+              ? const Color(0xFF66BB6A)
+              : const Color(0xFFEF5350),
+          monoStyle,
+        ),
+      );
+    }
+    return chips;
+  }
+
+  String _remainingLabel(int currentTick, int rampDurationTicks) {
+    final ticksLeft = (rampDurationTicks - currentTick).clamp(
+      0,
+      rampDurationTicks,
+    );
+    final secondsLeft = ticksLeft * tickIntervalSeconds;
+    final hours = secondsLeft ~/ 3600;
+    final minutes = (secondsLeft % 3600) ~/ 60;
+    if (hours > 0) return '${hours}h${minutes}m left';
+    if (minutes > 0) return '${minutes}m left';
+    return 'ending';
   }
 
   Widget _devChip(String label, String value, Color accent, TextStyle mono) {

@@ -145,7 +145,7 @@ class _MarketTimelineState extends State<MarketTimeline> {
           GestureDetector(
             onTap: () => setState(() => _expanded = !_expanded),
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(

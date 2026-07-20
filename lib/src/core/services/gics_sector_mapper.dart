@@ -54,6 +54,16 @@ extension GicsSectorLabel on GicsSector {
 /// callers should treat these as ineligible for sector-based mechanics.
 GicsSector? resolveGicsSector(String symbol, {String? companyName}) {
   final ticker = symbol.trim().toUpperCase();
+
+  // ── Live Finnhub-derived sector (highest priority) ──────────────────
+  // Populated by SectorRepository (lib/core/cache/sector_repository.dart)
+  // when a holding is first bought — real per-company data instead of the
+  // static heuristics below. This map is a synchronous, in-memory mirror
+  // of the persistent SectorDao cache (write-through on every resolve, and
+  // hydrated from disk once at app startup) so the simulation engine's
+  // synchronous tick loop can consult it without awaiting anything.
+  if (_liveCache.containsKey(ticker)) return _liveCache[ticker];
+
   final override = _overrides[ticker];
   if (override != null) return override;
 
@@ -62,6 +72,84 @@ GicsSector? resolveGicsSector(String symbol, {String? companyName}) {
   if (bucket == null) return null;
   return _bucketToGics[bucket];
 }
+
+/// In-memory mirror of the Finnhub-backed sector cache — see doc comment
+/// on [resolveGicsSector]. Written by [setLiveGicsSector] /
+/// [hydrateLiveGicsSectorCache], never populated automatically.
+final Map<String, GicsSector?> _liveCache = {};
+
+/// Write-through: called by SectorRepository right after it resolves (or
+/// fails to resolve) a symbol's sector from Finnhub, so the synchronous
+/// engine sees the result on the very next tick without waiting for a
+/// fresh [resolveGicsSector] call chain.
+void setLiveGicsSector(String symbol, GicsSector? sector) {
+  _liveCache[symbol.trim().toUpperCase()] = sector;
+}
+
+/// Bulk-hydrate the in-memory cache from the persistent DAO — call once at
+/// app startup so tickers bought in a PREVIOUS session are available
+/// synchronously immediately, not just after their next re-purchase.
+void hydrateLiveGicsSectorCache(Map<String, GicsSector?> entries) {
+  _liveCache.addAll(entries);
+}
+
+/// Maps Finnhub's `finnhubIndustry` classification (from `/stock/profile2`)
+/// to one of the 11 GICS sectors. Finnhub's taxonomy is finer-grained and
+/// doesn't line up 1:1 with GICS, so this is deliberately a best-effort
+/// bridge covering the industry strings Finnhub actually returns for
+/// large/mid-cap US equities — an unmatched string returns `null` and the
+/// caller falls back to the static [_overrides]/[CompanyTagMapper] path
+/// rather than caching a wrong guess.
+const Map<String, GicsSector> finnhubIndustryToGics = {
+  'Technology': GicsSector.technology,
+  'Software': GicsSector.technology,
+  'Semiconductors': GicsSector.technology,
+  'Electronic Equipment': GicsSector.technology,
+  'Communications': GicsSector.communicationServices,
+  'Telecommunication': GicsSector.communicationServices,
+  'Media': GicsSector.communicationServices,
+  'Entertainment': GicsSector.communicationServices,
+  'Internet': GicsSector.communicationServices,
+  'Banking': GicsSector.financials,
+  'Financial Services': GicsSector.financials,
+  'Insurance': GicsSector.financials,
+  'Investment Banking & Investment Services': GicsSector.financials,
+  'Asset Management': GicsSector.financials,
+  'Health Care': GicsSector.healthCare,
+  'Healthcare': GicsSector.healthCare,
+  'Biotechnology': GicsSector.healthCare,
+  'Pharmaceuticals': GicsSector.healthCare,
+  'Life Sciences Tools & Services': GicsSector.healthCare,
+  'Medical Devices & Instruments': GicsSector.healthCare,
+  'Retail': GicsSector.consumerDiscretionary,
+  'Automobiles': GicsSector.consumerDiscretionary,
+  'Hotels, Restaurants & Leisure': GicsSector.consumerDiscretionary,
+  'Leisure Products': GicsSector.consumerDiscretionary,
+  'Apparel/Textiles': GicsSector.consumerDiscretionary,
+  'Diversified Consumer Services': GicsSector.consumerDiscretionary,
+  'Airlines': GicsSector.industrials,
+  'Consumer products': GicsSector.consumerStaples,
+  'Beverages': GicsSector.consumerStaples,
+  'Packaged Foods': GicsSector.consumerStaples,
+  'Food Products': GicsSector.consumerStaples,
+  'Household & Personal Products': GicsSector.consumerStaples,
+  'Oil & Gas': GicsSector.energy,
+  'Energy': GicsSector.energy,
+  'Renewable Energy': GicsSector.energy,
+  'Industrial Conglomerates': GicsSector.industrials,
+  'Machinery': GicsSector.industrials,
+  'Aerospace & Defense': GicsSector.industrials,
+  'Transportation': GicsSector.industrials,
+  'Construction': GicsSector.industrials,
+  'Trading Companies & Distributors': GicsSector.industrials,
+  'Metals & Mining': GicsSector.materials,
+  'Chemicals': GicsSector.materials,
+  'Construction Materials': GicsSector.materials,
+  'Paper & Forest Products': GicsSector.materials,
+  'Real Estate': GicsSector.realEstate,
+  'REIT': GicsSector.realEstate,
+  'Utilities': GicsSector.utilities,
+};
 
 /// Per-ticker corrections against [CompanyTagMapper]'s coarse buckets.
 const Map<String, GicsSector> _overrides = {

@@ -12,8 +12,9 @@
 //   - StressTestSession.devMarketTemperature   — Guardian mood selector
 //   - StressTestSession.devMarketPhase         — market context
 //
-// Color mapping (Steps 267–271):
-//   Market -> Blue, Sector -> Green, Company -> Orange, News -> Purple, Noise -> Grey
+// Color mapping (Steps 267–271, +Hype 2026-07-20):
+//   Market -> Blue, Sector -> Green, Company -> Orange, News -> Purple,
+//   Hype -> Deep orange, Noise -> Grey
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ const _marketColor = Color(0xFF6FA7D6);
 const _sectorColor = Color(0xFF77C88A);
 const _companyColor = Color(0xFFF0B04F);
 const _newsColor = Color(0xFF8A76D6);
+const _hypeColor = Color(0xFFE0724A);
 const _noiseColor = Color(0xFFBFB9AE);
 
 class WhyTodayScreen extends ConsumerStatefulWidget {
@@ -247,6 +249,21 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     );
   }
 
+  // ─── Remaining-time countdown (News/Hype banners) ────────────────────
+  /// "≈2h 40m left" style label from ticks remaining on a ramping event.
+  String _formatRemaining(int currentTick, int rampDurationTicks) {
+    final ticksLeft = (rampDurationTicks - currentTick).clamp(
+      0,
+      rampDurationTicks,
+    );
+    final secondsLeft = ticksLeft * tickIntervalSeconds;
+    final hours = secondsLeft ~/ 3600;
+    final minutes = (secondsLeft % 3600) ~/ 60;
+    if (hours > 0) return '≈${hours}h ${minutes}m left';
+    if (minutes > 0) return '≈${minutes}m left';
+    return 'wrapping up';
+  }
+
   // ─── News headline banner (news_event.dart) ──────────────────────────
   Widget _buildNewsHeadline(NewsEvent event) {
     final color = event.isPositive ? ThemeV2.success : ThemeV2.loss;
@@ -291,6 +308,15 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: ThemeV2.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    _formatRemaining(event.currentTick, event.rampDurationTicks),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: color.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -356,6 +382,15 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: ThemeV2.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    _formatRemaining(event.currentTick, event.rampDurationTicks),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: color.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -458,6 +493,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       ('Sector', c.sectorPct),
       ('Company', c.companyPct),
       ('News', c.newsPct),
+      ('Hype', c.hypePct),
       ('Noise', c.noisePct),
     ];
     entries.sort((a, b) => b.$2.compareTo(a.$2));
@@ -487,6 +523,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         isPositive
             ? 'Positive news flow supported prices.'
             : 'Negative headlines affected sentiment.',
+      'Hype' =>
+        isPositive
+            ? 'A sector-wide rally lifted this stock along with its peers.'
+            : 'A sector-wide sell-off dragged this stock down with its peers.',
       'Noise' => 'Short-term volatility had no clear driver.',
       _ => '',
     };
@@ -523,6 +563,13 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         c.newsPct,
         _newsColor,
         'News flow, earnings, and external events.',
+      ),
+      _WhyFactor(
+        'Hype',
+        '🔥',
+        c.hypePct,
+        _hypeColor,
+        'Sector-wide rally or sell-off moving all peers together.',
       ),
       _WhyFactor(
         'Noise',
@@ -766,6 +813,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       ('Sector', c.sectorPct),
       ('Company', c.companyPct),
       ('News', c.newsPct),
+      ('Hype', c.hypePct),
       ('Noise', c.noisePct),
     ];
     entries.sort((a, b) => b.$2.compareTo(a.$2));
@@ -971,6 +1019,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       ('Sector', c.sectorPct),
       ('Company', c.companyPct),
       ('News', c.newsPct),
+      ('Hype', c.hypePct),
       ('Noise', c.noisePct),
     ];
     entries.sort((a, b) => b.$2.compareTo(a.$2));
@@ -1113,6 +1162,12 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                       'News %',
                       '${latest.contributions.newsPct.round()}%',
                       _newsColor,
+                    ),
+                    const SizedBox(height: 10),
+                    _techRow(
+                      'Hype %',
+                      '${latest.contributions.hypePct.round()}%',
+                      _hypeColor,
                     ),
                     const SizedBox(height: 10),
                     _techRow(
