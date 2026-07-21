@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../core/cache/sector_providers.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/guardian/guardian_engine.dart';
@@ -161,6 +162,18 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     }
 
     if (mounted) {
+      if (_isBuy) {
+        // Fire-and-forget: same live Finnhub sector fetch+cache as the
+        // stress-test search sheet's buy flow (stress_test_search_sheet.dart)
+        // — this is the OTHER buy path (order entry / company detail "Buy"
+        // button) and used to skip it entirely, leaving GICS sector
+        // permanently unresolved (null) for any holding bought here until
+        // some other purchase of the same ticker happened to go through the
+        // search sheet instead. Doesn't block the trade — the engine's
+        // static heuristic covers this symbol until the fetch resolves.
+        ref.read(sectorRepositoryProvider).loadSector(widget.symbol);
+      }
+
       // Record the trading action for Guardian intelligence
       ref.read(guardianEngineProvider).whenData((engine) {
         engine.recordAction(

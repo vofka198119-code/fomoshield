@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/services/finnhub_service.dart';
+import '../../../shared/widgets/period_selector.dart';
 
 // ---------------------------------------------------------------------------
 // Period Selection
@@ -116,43 +117,14 @@ class _PriceChartState extends State<PriceChart> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Period selector
-        Row(
-          children: ChartPeriod.values.map((p) {
-            final isSelected = p == _selectedPeriod;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: GestureDetector(
-                onTap: () {
-                  if (p != _selectedPeriod) {
-                    setState(() => _selectedPeriod = p);
-                    _loadCandles();
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? ThemeV2.primary.withValues(alpha: 0.15)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isSelected
-                          ? ThemeV2.primary.withValues(alpha: 0.5)
-                          : ThemeV2.surfaceDark,
-                    ),
-                  ),
-                  child: Text(
-                    p.label,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? ThemeV2.primary : ThemeV2.textSecondary,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+        PeriodSelector<ChartPeriod>(
+          periods: ChartPeriod.values,
+          selected: _selectedPeriod,
+          labelOf: (p) => p.label,
+          onSelected: (period) {
+            setState(() => _selectedPeriod = period);
+            _loadCandles();
+          },
         ),
 
         const SizedBox(height: 16),

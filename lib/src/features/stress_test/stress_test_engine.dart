@@ -707,6 +707,23 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       startedAt: now,
     );
 
+    // ── Casino state for epoch 0 (device-test bug, 2026-07-21) ──────
+    // Every OTHER roll site (_catchUp's loop, _simulateCurrentPrices'
+    // inline live roll, debugForceEpochRoll) updates
+    // casinoLastCatastropheEpoch/casinoCatastropheCooldown/
+    // casinoCatastropheCount/casinoDeclineStreak based on whether the
+    // scenario it just rolled isCatastrophe/isDecline — this one used to
+    // hard-code all four back to their session-start defaults regardless
+    // of what firstScenario actually was. If the very first epoch rolled
+    // Crash/BlackSwan, casinoLastCatastropheEpoch stayed at -100 instead
+    // of 0, so the NEXT roll's scripted-recovery check
+    // (epochIdx - lastCatIdx <= 2) saw a gap of 100+ epochs and silently
+    // fell through to the normal roulette instead of forcing Recovery —
+    // confirmed on-device: Epoch 1 Crash → Epoch 2 Volatility, no
+    // Recovery ever appeared in the timeline widget.
+    final firstIsCatastrophe = firstScenario.isCatastrophe;
+    final firstIsDecline = firstScenario.isDecline;
+
     final newSession = StressTestSession(
       id: session.id,
       duration: session.duration,
@@ -730,10 +747,10 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       simulationSeed: rng.nextInt(99999999) + 1,
       catastropheSurvivalRecorded: false,
       customDurationDays: session.customDurationDays,
-      casinoCatastropheCooldown: 0,
-      casinoDeclineStreak: 0,
-      casinoCatastropheCount: 0,
-      casinoLastCatastropheEpoch: -100,
+      casinoCatastropheCooldown: firstIsCatastrophe ? 2 : 0,
+      casinoDeclineStreak: firstIsDecline ? 1 : 0,
+      casinoCatastropheCount: firstIsCatastrophe ? 1 : 0,
+      casinoLastCatastropheEpoch: firstIsCatastrophe ? 0 : -100,
       priceHistory: () {
         final history = <String, List<double>>{};
         for (final h in session.holdings) {

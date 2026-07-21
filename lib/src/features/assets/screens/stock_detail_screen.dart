@@ -19,6 +19,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
@@ -833,42 +834,42 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
             _factorBar(
               'Market',
               latest.contributions.marketPct / 100,
-              const Color(0xFF6FA7D6),
+              FomoShieldTheme.factorMarket,
             ),
             const SizedBox(height: 10),
             _factorBar(
               'Sector',
               latest.contributions.sectorPct / 100,
-              const Color(0xFF77C88A),
+              FomoShieldTheme.factorSector,
             ),
             const SizedBox(height: 10),
             _factorBar(
               'Company',
               latest.contributions.companyPct / 100,
-              const Color(0xFFF0B04F),
+              FomoShieldTheme.factorCompany,
             ),
             const SizedBox(height: 10),
             _factorBar(
               'News',
               latest.contributions.newsPct / 100,
-              const Color(0xFF8A76D6),
+              FomoShieldTheme.factorNews,
             ),
             const SizedBox(height: 10),
             _factorBar(
               'Noise',
               latest.contributions.noisePct / 100,
-              const Color(0xFFBFB9AE),
+              FomoShieldTheme.factorNoise,
             ),
           ] else ...[
-            _factorBar('Market', 0.40, const Color(0xFF6FA7D6)),
+            _factorBar('Market', 0.40, FomoShieldTheme.factorMarket),
             const SizedBox(height: 10),
-            _factorBar('Sector', 0.25, const Color(0xFF77C88A)),
+            _factorBar('Sector', 0.25, FomoShieldTheme.factorSector),
             const SizedBox(height: 10),
-            _factorBar('Company', 0.15, const Color(0xFFF0B04F)),
+            _factorBar('Company', 0.15, FomoShieldTheme.factorCompany),
             const SizedBox(height: 10),
-            _factorBar('News', 0.12, const Color(0xFF8A76D6)),
+            _factorBar('News', 0.12, FomoShieldTheme.factorNews),
             const SizedBox(height: 10),
-            _factorBar('Noise', 0.08, const Color(0xFFBFB9AE)),
+            _factorBar('Noise', 0.08, FomoShieldTheme.factorNoise),
           ],
           const SizedBox(height: 16),
           // Explanation text

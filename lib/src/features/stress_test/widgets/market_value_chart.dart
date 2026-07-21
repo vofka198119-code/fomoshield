@@ -22,6 +22,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../shared/widgets/period_selector.dart';
 import '../stress_test_engine.dart';
 import '../stress_test_models.dart';
 
@@ -283,44 +284,12 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
         ),
         const SizedBox(height: 10),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: available.map((period) {
-              final isActive = _selected == period;
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                child: GestureDetector(
-                  onTap: () {
-                    if (_selected != period) {
-                      setState(() => _selected = period);
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? ThemeV2.primary.withValues(alpha: 0.12)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
-                    ),
-                    child: Text(
-                      _periodLabels[period]!,
-                      style: ThemeV2.caption.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: isActive
-                            ? ThemeV2.primary
-                            : ThemeV2.textSecondary,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: PeriodSelector<_ValuePeriod>(
+            periods: available,
+            selected: _selected,
+            labelOf: (p) => _periodLabels[p]!,
+            onSelected: (period) => setState(() => _selected = period),
           ),
         ),
       ],

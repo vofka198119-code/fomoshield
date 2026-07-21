@@ -15,6 +15,7 @@ import 'dart:math';
 import '../../core/theme/theme_v2.dart';
 import '../../features/stress_test/stress_test_engine.dart';
 import '../../features/portfolio/portfolio_chart_providers.dart';
+import 'period_selector.dart';
 
 // ---------------------------------------------------------------------------
 // Time range options
@@ -418,54 +419,16 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
           const SizedBox(height: 6),
 
           // ── Range Selector ──────────────────────────────────
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              color: ThemeV2.surfaceDark,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: PortfolioChartRange.values.map((range) {
-                final selected = range == _selectedRange;
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() {
-                      _selectedRange = range;
-                      _applyRange();
-                    }),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: selected ? ThemeV2.surface : Colors.transparent,
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: selected
-                            ? [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.06),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Text(
-                        range.label,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight:
-                              selected ? FontWeight.w700 : FontWeight.w500,
-                          color: selected
-                              ? ThemeV2.textPrimary
-                              : ThemeV2.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: PeriodSelector<PortfolioChartRange>(
+              periods: PortfolioChartRange.values,
+              selected: _selectedRange,
+              labelOf: (r) => r.label,
+              onSelected: (range) => setState(() {
+                _selectedRange = range;
+                _applyRange();
+              }),
             ),
           ),
         ],

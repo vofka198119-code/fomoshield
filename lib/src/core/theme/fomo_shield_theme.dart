@@ -70,6 +70,7 @@ abstract final class FomoShieldTheme {
   static const Color factorSector = Color(0xFF77C88A); // Sector — Green
   static const Color factorCompany = Color(0xFFF0B04F); // Company — Orange
   static const Color factorNews = Color(0xFF8A76D6); // News — Purple
+  static const Color factorHype = Color(0xFFE0724A); // Hype — Deep orange
   static const Color factorNoise = Color(0xFFBFB9AE); // Noise — Grey
 
   static Color factorColor(String name) => switch (name.toLowerCase()) {
@@ -77,6 +78,7 @@ abstract final class FomoShieldTheme {
         'sector' || 'sectorpct' => factorSector,
         'company' || 'companypct' => factorCompany,
         'news' || 'newspct' => factorNews,
+        'hype' || 'hypepct' => factorHype,
         'noise' || 'noisepct' => factorNoise,
         _ => textLight,
       };

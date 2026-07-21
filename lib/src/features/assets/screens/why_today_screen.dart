@@ -22,18 +22,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../../shared/widgets/guardian/guardian_data.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 
-// ── Factor color constants (Steps 267–271) ───────────────────────────────
-const _marketColor = Color(0xFF6FA7D6);
-const _sectorColor = Color(0xFF77C88A);
-const _companyColor = Color(0xFFF0B04F);
-const _newsColor = Color(0xFF8A76D6);
-const _hypeColor = Color(0xFFE0724A);
-const _noiseColor = Color(0xFFBFB9AE);
+// ── Factor colors: canonical source is FomoShieldTheme.factor* (Bible
+// Part 9) — this file used to redeclare the same 5 hex values locally,
+// which would have silently drifted from the canonical set on any future
+// palette change (see docs/VISUAL_AUDIT.md, Группа E).
+const _marketColor = FomoShieldTheme.factorMarket;
+const _sectorColor = FomoShieldTheme.factorSector;
+const _companyColor = FomoShieldTheme.factorCompany;
+const _newsColor = FomoShieldTheme.factorNews;
+const _hypeColor = FomoShieldTheme.factorHype;
+const _noiseColor = FomoShieldTheme.factorNoise;
 
 class WhyTodayScreen extends ConsumerStatefulWidget {
   final String sessionId;

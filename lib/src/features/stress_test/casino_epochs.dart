@@ -24,6 +24,7 @@ part of 'stress_test_engine.dart';
 const double _fatigueDecay = 0.02; // 2% штраф активному сценарию
 const double _fatigueRecovery = 0.005; // 0.5% восстановление за шаг
 const double _fatigueMinWeight = 5.0; // 5% от total=100 — пол стандартных
+const double _bullRepeatTargetProb = 0.20; // target P(Bull | prev was Bull)
 
 extension CasinoEpochsEngine on StressTestNotifier {
   /// Roll a market scenario using session casino state.
@@ -84,6 +85,26 @@ extension CasinoEpochsEngine on StressTestNotifier {
     } else {
       for (final s in pool) {
         weights.add(currentWeights[s.name] ?? s.weight.toDouble());
+      }
+    }
+
+    // ── Anti-repeat Bull correction (device-test feedback 2026-07-21) ──
+    // Bull carries no scripted anti-stuck correction the way Bear does
+    // (see the consecutive-Bear redirect above), and its base weight (35
+    // of ~93) alone gives it a ~20-38% shot every single roll regardless
+    // of history — so a second Bull immediately after a first one was
+    // landing far more often than it should feel. This doesn't touch
+    // Bull's normal weight in any other case; it only re-targets THIS
+    // roll's Bull weight so an immediate repeat lands ~20% of the time,
+    // whatever the pool's current total happens to be (fatigue-adjusted
+    // or not, catastrophe-eligible or not).
+    if (session.epochHistory.lastOrNull?.scenario == MarketScenario.bull) {
+      final bullIdx = pool.indexOf(MarketScenario.bull);
+      if (bullIdx != -1) {
+        final othersSum =
+            weights.fold(0.0, (a, b) => a + b) - weights[bullIdx];
+        weights[bullIdx] =
+            othersSum * (_bullRepeatTargetProb / (1 - _bullRepeatTargetProb));
       }
     }
 
