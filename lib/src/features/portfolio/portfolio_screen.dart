@@ -58,13 +58,32 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             onSelected: (value) {
               final pid = effectiveId;
               if (pid == null) return;
-              if (value == 'reset') {
+              if (value == 'rename') {
+                final current = portfolios.firstWhere((p) => p.id == pid);
+                _showRenamePortfolioDialog(context, pid, current.name);
+              } else if (value == 'reset') {
                 _showResetPortfolioDialog(context, pid);
               } else if (value == 'delete') {
                 _showDeletePortfolioDialog(context, pid, portfolios);
               }
             },
             itemBuilder: (_) => [
+              PopupMenuItem(
+                value: 'rename',
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.edit_rounded,
+                    color: ThemeV2.primary,
+                    size: 20,
+                  ),
+                  title: const Text(
+                    'Rename Portfolio',
+                    style: TextStyle(color: ThemeV2.primary),
+                  ),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
               PopupMenuItem(
                 value: 'reset',
                 child: ListTile(
@@ -207,8 +226,8 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        maxP == 3
-                            ? 'FREE limit: 3 portfolios. Upgrade to Premium (6).'
+                        maxP == 1
+                            ? 'FREE limit: 1 portfolio. Upgrade to Premium (3).'
                             : 'Max $maxP portfolios reached.',
                         style: GoogleFonts.inter(fontSize: 13),
                       ),
@@ -229,6 +248,70 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             },
             child: Text(
               'Create',
+              style: GoogleFonts.inter(
+                color: ThemeV2.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRenamePortfolioDialog(
+    BuildContext context,
+    String portfolioId,
+    String currentName,
+  ) {
+    final controller = TextEditingController(text: currentName);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ThemeV2.surface,
+        title: Text(
+          'Rename Portfolio',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: ThemeV2.textPrimary,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: 'e.g. Tech Growth',
+            hintStyle: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 14),
+            filled: true,
+            fillColor: ThemeV2.surfaceDark,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          style: GoogleFonts.inter(color: ThemeV2.textPrimary, fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(color: ThemeV2.textSecondary),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              final newName = controller.text.trim();
+              if (newName.isNotEmpty) {
+                ref
+                    .read(portfoliosProvider.notifier)
+                    .renamePortfolio(portfolioId, newName);
+                Navigator.pop(ctx);
+              }
+            },
+            child: Text(
+              'Save',
               style: GoogleFonts.inter(
                 color: ThemeV2.primary,
                 fontWeight: FontWeight.w600,

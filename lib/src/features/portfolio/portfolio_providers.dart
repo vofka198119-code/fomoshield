@@ -51,6 +51,7 @@ class Portfolio {
   double startingBalance;
   List<Transaction> transactions;
   DateTime createdAt;
+  double? goalAmount;
 
   Portfolio({
     required this.id,
@@ -58,6 +59,7 @@ class Portfolio {
     double? startingBalance,
     List<Transaction>? transactions,
     DateTime? createdAt,
+    this.goalAmount,
   })  : startingBalance = startingBalance ?? AppConstants.defaultStartingBalance,
         transactions = transactions ?? [],
         createdAt = createdAt ?? DateTime.now();
@@ -121,6 +123,7 @@ class Portfolio {
         'startingBalance': startingBalance,
         'transactions': transactions.map((t) => t.toJson()).toList(),
         'createdAt': createdAt.toIso8601String(),
+        'goalAmount': goalAmount,
       };
 
   factory Portfolio.fromJson(Map<String, dynamic> json) => Portfolio(
@@ -136,6 +139,7 @@ class Portfolio {
         createdAt: json['createdAt'] != null
             ? DateTime.parse(json['createdAt'] as String)
             : DateTime.now(),
+        goalAmount: (json['goalAmount'] as num?)?.toDouble(),
       );
 }
 
@@ -181,7 +185,7 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
       state = [
         Portfolio(
           id: 'default_${DateTime.now().millisecondsSinceEpoch}',
-          name: 'Main Portfolio',
+          name: 'Portfolio',
         ),
       ];
       await _saveLocal();
@@ -217,6 +221,16 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
   void renamePortfolio(String id, String newName) {
     state = state.map((p) {
       if (p.id == id) p.name = newName;
+      return p;
+    }).toList();
+    _saveLocal();
+    _syncToSupabase();
+  }
+
+  /// Sets (or clears, with `null`) the target value goal for a portfolio.
+  void setGoal(String id, double? goal) {
+    state = state.map((p) {
+      if (p.id == id) p.goalAmount = goal;
       return p;
     }).toList();
     _saveLocal();

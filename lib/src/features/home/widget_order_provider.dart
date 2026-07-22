@@ -15,12 +15,8 @@ import '../../core/supabase/supabase_providers.dart';
 const List<String> _defaultOrder = [
   // Bible Part 2 — Main Screen Sections (in order)
   'portfolio',
-  'holdings',
-  'analysis',
-  'verdict',
   // Legacy / utility widgets
   'shield_signal',
-  'markets',
   'stress_test',
   'watchlist',
   'news',
@@ -47,8 +43,6 @@ class HomeWidgetConfig {
     switch (id) {
       case 'shield_signal':
         return 'Shield Signal';
-      case 'markets':
-        return 'Markets';
       case 'watchlist':
         return 'Watchlist';
       case 'upcoming_events':
@@ -59,12 +53,6 @@ class HomeWidgetConfig {
         return 'Stress Test';
       case 'portfolio':
         return 'My Portfolio';
-      case 'holdings':
-        return 'Holdings';
-      case 'analysis':
-        return 'Analysis';
-      case 'verdict':
-        return 'Latest Verdict';
       case 'portfolio_journal':
         return 'Portfolio Journal';
       case 'historical_sim':
@@ -109,7 +97,8 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
   /// Load widget order from Supabase data (replaces local).
   void loadFromSupabase(List<HomeWidgetConfig> configs) {
     if (configs.isEmpty) return;
-    state = configs;
+    // Drop any widget ids retired since this config was saved.
+    state = configs.where((c) => _defaultOrder.contains(c.id)).toList();
     _saveLocal();
   }
 
@@ -122,13 +111,15 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
     final savedOrder = prefs.getStringList(orderKey);
     var order = savedOrder ?? _defaultOrder;
 
-    // Merge: append any default widgets missing from saved order
+    // Merge: append any default widgets missing from saved order,
+    // and drop any saved ids that have since been retired.
     if (savedOrder != null) {
       final savedSet = Set<String>.from(savedOrder);
       final missing = _defaultOrder.where((id) => !savedSet.contains(id));
-      if (missing.isNotEmpty) {
-        order = [...savedOrder, ...missing];
-      }
+      order = [
+        ...savedOrder.where((id) => _defaultOrder.contains(id)),
+        ...missing,
+      ];
     }
 
     // Load visibility

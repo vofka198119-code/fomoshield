@@ -8,6 +8,7 @@ import '../../core/supabase/supabase_providers.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/scoring_engine.dart';
 import '../home/home_providers.dart';
+import '../home/watchlist_limits_provider.dart';
 import '../portfolio/portfolio_providers.dart';
 import '../monetization/monetization_modal.dart';
 import '../../core/cache/logo_dao.dart';
@@ -517,11 +518,27 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             ref
                                 .read(watchlistSymbolsProvider.notifier)
                                 .remove(widget.symbol);
-                          } else {
-                            ref
-                                .read(watchlistSymbolsProvider.notifier)
-                                .add(widget.symbol);
+                            return;
                           }
+                          final maxW = ref.read(maxWatchlistProvider);
+                          if (watchlist.length >= maxW) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  maxW == 30
+                                      ? 'FREE limit: 30 companies. Upgrade to Premium (50).'
+                                      : 'Max $maxW companies reached.',
+                                  style: GoogleFonts.inter(fontSize: 13),
+                                ),
+                                backgroundColor: ThemeV2.primary,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                            return;
+                          }
+                          ref
+                              .read(watchlistSymbolsProvider.notifier)
+                              .add(widget.symbol);
                         },
                       );
                     },

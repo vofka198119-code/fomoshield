@@ -4,12 +4,12 @@ import '../../core/supabase/supabase_providers.dart';
 // ---------------------------------------------------------------------------
 // Portfolio Limits & Capital — based on subscription tier
 // ---------------------------------------------------------------------------
-// FREE:  3 portfolios max, $5,000 capital
-// PREMIUM: 6 portfolios max, $15,000 capital
+// FREE:  1 portfolio max, $5,000 capital
+// PREMIUM: 3 portfolios max (base + 2), $15,000 capital
 // ---------------------------------------------------------------------------
 
-const int _freeMaxPortfolios = 3;
-const int _premiumMaxPortfolios = 6;
+const int _freeMaxPortfolios = 1;
+const int _premiumMaxPortfolios = 3;
 const double _freeStartingCapital = 5000;
 const double _premiumStartingCapital = 15000;
 

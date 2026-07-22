@@ -6,6 +6,8 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/company_logo.dart';
+import '../../../core/cache/sector_providers.dart';
+import '../../../core/services/gics_sector_mapper.dart';
 import '../home_providers.dart';
 
 // ---------------------------------------------------------------------------
@@ -25,7 +27,7 @@ class WatchlistWidget extends ConsumerWidget {
     }
 
     return watchlistQuotesAsync.when(
-      loading: () => _loadingContainer(),
+      loading: () => _loadingContainer(context),
       error: (err, _) {
         debugPrint('❌ WatchlistWidget error: $err');
         return _emptyContainer(context);
@@ -55,10 +57,10 @@ class WatchlistWidget extends ConsumerWidget {
     );
   }
 
-  Widget _loadingContainer() {
+  Widget _loadingContainer(BuildContext context) {
     return WidgetContainer(
       title: 'WATCHLIST',
-      onTap: () {},
+      onTap: () => context.push('/watchlist'),
       children: [
         const Padding(
           padding: EdgeInsets.all(20),
@@ -82,12 +84,12 @@ class WatchlistWidget extends ConsumerWidget {
 // Watchlist Tile — Compact version (no accordion)
 // ---------------------------------------------------------------------------
 
-class _WatchlistTile extends StatelessWidget {
+class _WatchlistTile extends ConsumerWidget {
   final Map<String, dynamic> data;
   const _WatchlistTile({required this.data});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final price = (data['price'] as num?)?.toDouble() ?? 0;
     final change = (data['change'] as num?)?.toDouble() ?? 0;
     final symbol = data['symbol'] as String? ?? '';
@@ -95,6 +97,7 @@ class _WatchlistTile extends StatelessWidget {
     final weburl = data['weburl'] as String?;
     final domain = CompanyLogo.extractDomain(weburl);
     final logoUrl = data['logoUrl'] as String?;
+    final sectorAsync = ref.watch(cachedGicsSectorProvider(symbol));
 
     return InkWell(
       onTap: () => context.push('/company/$symbol'),
@@ -122,7 +125,13 @@ class _WatchlistTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 1),
                   Text(
-                    symbol,
+                    sectorAsync.when(
+                      data: (s) => s?.label ?? symbol,
+                      loading: () => symbol,
+                      error: (_, _) => symbol,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: ThemeV2.textSecondary,
@@ -137,7 +146,7 @@ class _WatchlistTile extends StatelessWidget {
               children: [
                 Text(
                   '\$${price.toStringAsFixed(2)}',
-                  style: GoogleFonts.inter(
+                  style: interNums(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: ThemeV2.textPrimary,
@@ -146,7 +155,7 @@ class _WatchlistTile extends StatelessWidget {
                 const SizedBox(height: 1),
                 Text(
                   '${change >= 0 ? '+' : ''}${change.toStringAsFixed(2)}%',
-                  style: GoogleFonts.inter(
+                  style: interNums(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                     color: change >= 0

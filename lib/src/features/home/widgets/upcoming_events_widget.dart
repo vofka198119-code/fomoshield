@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/widget_container.dart';
@@ -47,7 +48,7 @@ class UpcomingEventsWidget extends ConsumerWidget {
       ]),
       error: (_, _) => WidgetContainer(
         title: 'UPCOMING EVENTS',
-        onTap: () => context.push('/events'),
+        onTap: () => context.push('/watchlist'),
         showFooter: false,
         emptyText: 'Nothing here yet',
       ),
@@ -55,7 +56,7 @@ class UpcomingEventsWidget extends ConsumerWidget {
         if (events.isEmpty) {
           return WidgetContainer(
             title: 'UPCOMING EVENTS',
-            onTap: () => context.push('/events'),
+            onTap: () => context.push('/watchlist'),
             showFooter: false,
             emptyText: 'Nothing here yet',
           );
@@ -66,7 +67,7 @@ class UpcomingEventsWidget extends ConsumerWidget {
 
         return WidgetContainer(
           title: 'UPCOMING EVENTS',
-          onTap: () => context.push('/events'),
+          onTap: () => context.push('/watchlist'),
           showFooter: events.length > 2,
           children: preview.map((e) => _EventTile(event: e)).toList(),
         );
@@ -77,7 +78,7 @@ class UpcomingEventsWidget extends ConsumerWidget {
   Widget _container(BuildContext context, List<Widget> children) {
     return WidgetContainer(
       title: 'UPCOMING EVENTS',
-      onTap: () => context.push('/events'),
+      onTap: () => context.push('/watchlist'),
       showFooter: false,
       children: children,
     );
@@ -92,12 +93,27 @@ class _EventTile extends StatelessWidget {
   final CalendarEvent event;
   const _EventTile({required this.event});
 
+  Future<void> _openArticle() async {
+    final url = event.url;
+    if (url == null) return;
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEarnings = event.type == 'earnings';
+    final isNews = event.type == 'news';
+    final accent = isNews
+        ? ThemeV2.warning
+        : (isEarnings ? ThemeV2.primary : ThemeV2.success);
 
     return InkWell(
-      onTap: () => context.push('/company/${event.symbol}'),
+      onTap: isNews
+          ? _openArticle
+          : () => context.push('/company/${event.symbol}'),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
@@ -107,18 +123,17 @@ class _EventTile extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: (isEarnings ? ThemeV2.primary : ThemeV2.success)
-                    .withValues(alpha: 0.15),
+                color: accent.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
-                isEarnings
-                    ? Icons.bar_chart_rounded
-                    : Icons.payments_rounded,
+                isNews
+                    ? Icons.newspaper_rounded
+                    : (isEarnings
+                        ? Icons.bar_chart_rounded
+                        : Icons.payments_rounded),
                 size: 18,
-                color: isEarnings
-                    ? ThemeV2.primary
-                    : ThemeV2.success,
+                color: accent,
               ),
             ),
             const SizedBox(width: 12),
@@ -175,18 +190,15 @@ class _EventTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: (isEarnings ? ThemeV2.primary : ThemeV2.success)
-                    .withValues(alpha: 0.1),
+                color: accent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                isEarnings ? 'EAR' : 'DIV',
+                isNews ? 'NEWS' : (isEarnings ? 'EAR' : 'DIV'),
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: isEarnings
-                      ? ThemeV2.primary
-                      : ThemeV2.success,
+                  color: accent,
                 ),
               ),
             ),

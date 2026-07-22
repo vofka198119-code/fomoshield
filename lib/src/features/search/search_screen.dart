@@ -8,6 +8,7 @@ import '../../core/cache/logo_providers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../home/home_providers.dart';
+import '../home/watchlist_limits_provider.dart';
 import '../monetization/monetization_modal.dart';
 import 'search_counter_provider.dart';
 import 'search_provider.dart';
@@ -175,13 +176,36 @@ class SearchScreen extends ConsumerWidget {
                                             watchlistSymbolsProvider.notifier,
                                           )
                                           .remove(symbol);
-                                    } else {
-                                      ref
-                                          .read(
-                                            watchlistSymbolsProvider.notifier,
-                                          )
-                                          .add(symbol);
+                                      return;
                                     }
+                                    final maxW = ref.read(
+                                      maxWatchlistProvider,
+                                    );
+                                    final current = ref.read(
+                                      watchlistSymbolsProvider,
+                                    );
+                                    if (current.length >= maxW) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            maxW == 30
+                                                ? 'FREE limit: 30 companies. Upgrade to Premium (50).'
+                                                : 'Max $maxW companies reached.',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          backgroundColor: ThemeV2.primary,
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    ref
+                                        .read(watchlistSymbolsProvider.notifier)
+                                        .add(symbol);
                                   },
                                 );
                               },

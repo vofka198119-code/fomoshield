@@ -13,65 +13,19 @@ import '../../core/services/company_tag_mapper.dart';
 // Types
 // ---------------------------------------------------------------------------
 
-class ShieldSignal {
-  final String level; // 'fear' | 'neutral' | 'greed'
-  final String label;
-  final double spyChange;
-  final double spyPrice;
-
-  const ShieldSignal({
-    required this.level,
-    required this.label,
-    required this.spyChange,
-    required this.spyPrice,
-  });
-
-  factory ShieldSignal.fromQuote(Map<String, dynamic> quote) {
-    final change = ((quote['dp'] as num?)?.toDouble() ?? 0);
-    final price = ((quote['c'] as num?)?.toDouble() ?? 0);
-
-    String level;
-    String label;
-    if (change > 0.5) {
-      level = 'greed';
-      label = 'Greed — market is overheating';
-    } else if (change < -0.5) {
-      level = 'fear';
-      label = 'Fear — market is pessimistic';
-    } else {
-      level = 'neutral';
-      label = 'Neutral — market is calm';
-    }
-
-    return ShieldSignal(
-      level: level,
-      label: label,
-      spyChange: change,
-      spyPrice: price,
-    );
-  }
-
-  factory ShieldSignal.initial() {
-    return const ShieldSignal(
-      level: 'neutral',
-      label: 'Loading...',
-      spyChange: 0.0,
-      spyPrice: 0.0,
-    );
-  }
-}
-
 class MarketIndex {
   final String name;
   final String symbol;
   final double price;
-  final double change;
+  final double change; // percent
+  final double changeAbs; // absolute $ move vs previous close
 
   const MarketIndex({
     required this.name,
     required this.symbol,
     required this.price,
     required this.change,
+    this.changeAbs = 0,
   });
 
   factory MarketIndex.fromQuote(
@@ -79,18 +33,29 @@ class MarketIndex {
     String symbol,
     Map<String, dynamic> quote,
   ) {
+    final price = (quote['c'] as num?)?.toDouble() ?? 0;
+    final prevClose = (quote['pc'] as num?)?.toDouble() ?? 0;
     return MarketIndex(
       name: name,
       symbol: symbol,
-      price: ((quote['c'] as num?)?.toDouble() ?? 0),
+      price: price,
       change: ((quote['dp'] as num?)?.toDouble() ?? 0),
+      changeAbs: price - prevClose,
     );
+  }
+
+  /// Sentiment level derived from the day's percent change.
+  /// 'fear' (< -0.5%) | 'neutral' | 'greed' (> +0.5%)
+  String get level {
+    if (change > 0.5) return 'greed';
+    if (change < -0.5) return 'fear';
+    return 'neutral';
   }
 }
 
 class CalendarEvent {
   final String symbol;
-  final String type; // 'earnings' | 'dividend'
+  final String type; // 'earnings' | 'dividend' | 'news'
   final DateTime date;
   final String title;
   final String? epsEstimate; // for earnings
@@ -98,6 +63,8 @@ class CalendarEvent {
   final String? quarter;
   final int? year;
   final String? hour; // 'bmo' | 'amc' | 'dmh' — before open / after close / during market
+  final String? url; // for news
+  final String? source; // for news
 
   const CalendarEvent({
     required this.symbol,
@@ -109,6 +76,8 @@ class CalendarEvent {
     this.quarter,
     this.year,
     this.hour,
+    this.url,
+    this.source,
   });
 }
 
@@ -127,23 +96,15 @@ class _CacheEntry<T> {
 
 class MarketCache {
   _CacheEntry<List<MarketIndex>>? _indices;
-  _CacheEntry<ShieldSignal>? _signal;
 
   List<MarketIndex>? get cachedIndices =>
       (_indices != null && _indices!.isValid) ? _indices!.data : null;
 
-  ShieldSignal? get cachedSignal =>
-      (_signal != null && _signal!.isValid) ? _signal!.data : null;
-
   void setIndices(List<MarketIndex> data) =>
-      _indices = _CacheEntry(data, DateTime.now());
-
-  void setSignal(ShieldSignal data) =>
-      _signal = _CacheEntry(data, DateTime.now());
+      _indices = _CacheEntry(data, DateTime.now(), ttlHours: 12);
 
   void invalidate() {
     _indices = null;
-    _signal = null;
   }
 }
 
@@ -160,6 +121,23 @@ class EventsCache {
 }
 
 final eventsCacheProvider = Provider<EventsCache>((ref) => EventsCache());
+
+/// News is a rare event compared to prices — cache for a full week to keep
+/// Finnhub call volume trivial.
+class WatchlistNewsCache {
+  _CacheEntry<List<CalendarEvent>>? _news;
+
+  List<CalendarEvent>? get cachedNews =>
+      (_news != null && _news!.isValid) ? _news!.data : null;
+
+  void setNews(List<CalendarEvent> data) =>
+      _news = _CacheEntry(data, DateTime.now(), ttlHours: 24 * 7);
+
+  void invalidate() => _news = null;
+}
+
+final watchlistNewsCacheProvider =
+    Provider<WatchlistNewsCache>((ref) => WatchlistNewsCache());
 
 final marketCacheProvider = Provider<MarketCache>((ref) => MarketCache());
 
@@ -257,30 +235,7 @@ class WatchlistNotifier extends StateNotifier<List<String>> {
 }
 
 // ---------------------------------------------------------------------------
-// Shield Signal Provider (uses yesterday's data + 4h cache)
-// ---------------------------------------------------------------------------
-
-final shieldSignalProvider = FutureProvider<ShieldSignal>((ref) async {
-  final cache = ref.read(marketCacheProvider);
-
-  // Check cache first
-  final cached = cache.cachedSignal;
-  if (cached != null) return cached;
-
-  try {
-    final api = FinnhubService();
-    final quote = await api.previousTradingDayQuote('SPY');
-    final signal = ShieldSignal.fromQuote(quote);
-    cache.setSignal(signal);
-    return signal;
-  } catch (e) {
-    debugPrint('❌ shieldSignalProvider error: $e');
-    return ShieldSignal.initial();
-  }
-});
-
-// ---------------------------------------------------------------------------
-// Market Indices Provider (uses yesterday's data + 4h cache)
+// Market Indices Provider (uses yesterday's data + 12h cache)
 // ---------------------------------------------------------------------------
 
 final marketIndicesProvider = FutureProvider<List<MarketIndex>>((ref) async {
@@ -556,11 +511,72 @@ final calendarEventsProvider = FutureProvider<List<CalendarEvent>>((ref) async {
     }
   }
 
-  // Sort by date ascending and cache
+  // Sort by date ascending
   events.sort((a, b) => a.date.compareTo(b.date));
-  cache.setEvents(events);
-  return events;
+
+  // Recent company news first, then upcoming earnings/dividends
+  final news = await _fetchWatchlistNews(ref, symbols.take(10).toList());
+  final combined = [...news, ...events];
+
+  cache.setEvents(combined);
+  return combined;
 });
+
+// ---------------------------------------------------------------------------
+// Watchlist News (company-specific, capped at 10 symbols, 7-day cache)
+// ---------------------------------------------------------------------------
+
+Future<List<CalendarEvent>> _fetchWatchlistNews(
+  Ref ref,
+  List<String> symbols,
+) async {
+  final cache = ref.read(watchlistNewsCacheProvider);
+  final cached = cache.cachedNews;
+  if (cached != null) return cached;
+
+  final api = FinnhubService();
+  final seenHeadlines = <String>{};
+  final items = <CalendarEvent>[];
+
+  for (final symbol in symbols) {
+    try {
+      final articles = await api.companyNews(symbol, days: 7);
+      for (final raw in articles.take(5)) {
+        final data = Map<String, dynamic>.from(raw as Map);
+        final headline = data['headline'] as String?;
+        final ts = data['datetime'] as int?;
+        if (headline == null ||
+            headline.isEmpty ||
+            ts == null ||
+            !seenHeadlines.add(headline)) {
+          continue;
+        }
+        items.add(
+          CalendarEvent(
+            symbol: symbol,
+            type: 'news',
+            date: DateTime.fromMillisecondsSinceEpoch(ts * 1000),
+            title: headline,
+            url: data['url'] as String?,
+            source: data['source'] as String?,
+          ),
+        );
+      }
+    } catch (_) {
+      // Ignore individual symbol errors
+    }
+
+    // 1-second delay between symbols to prevent API rate-limiting
+    if (symbols.length > 1) {
+      await Future.delayed(const Duration(seconds: 1));
+    }
+  }
+
+  items.sort((a, b) => b.date.compareTo(a.date)); // most recent first
+  final capped = items.take(15).toList();
+  cache.setNews(capped);
+  return capped;
+}
 
 // ---------------------------------------------------------------------------
 // News Provider (Fetches general market news)

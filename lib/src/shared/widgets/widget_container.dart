@@ -39,7 +39,7 @@ class WidgetContainer extends StatelessWidget {
           InkWell(
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
                   Text(

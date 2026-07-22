@@ -10,7 +10,6 @@ import '../../features/auth/forgot_password_screen.dart';
 import '../../features/disclaimer/disclaimer_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
-import '../../features/home/screens/events_full_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/portfolio/portfolio_screen.dart';
 import '../../features/portfolio/screens/portfolio_assets_screen.dart';
@@ -87,13 +86,6 @@ class AppRouter {
         path: '/search',
         name: 'search',
         builder: (context, state) => const SearchScreen(),
-      ),
-
-      // Events full screen
-      GoRoute(
-        path: '/events',
-        name: 'events',
-        builder: (context, state) => const EventsFullScreen(),
       ),
 
       // News — standalone (outside shell)

@@ -9,7 +9,6 @@ import '../monetization/premium_promo_overlay.dart';
 import 'home_providers.dart';
 import 'widget_order_provider.dart';
 import 'widgets/shield_signal_widget.dart';
-import 'widgets/markets_widget.dart';
 import 'widgets/watchlist_widget.dart';
 import 'widgets/upcoming_events_widget.dart';
 import 'widgets/news_widget.dart';
@@ -18,9 +17,6 @@ import 'widgets/portfolio_journal_widget.dart';
 import 'widgets/historical_sim_widget.dart';
 import 'widgets/scenario_compare_widget.dart';
 import 'widgets/stress_test_widget.dart';
-import 'widgets/holdings_widget.dart';
-import 'widgets/analysis_widget.dart';
-import 'widgets/verdict_widget.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 
 // ---------------------------------------------------------------------------
@@ -36,7 +32,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _onRefresh() {
-    ref.invalidate(shieldSignalProvider);
     ref.invalidate(marketIndicesProvider);
     ref.invalidate(watchlistQuotesProvider);
     ref.invalidate(calendarEventsProvider);
@@ -163,8 +158,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     switch (id) {
       case 'shield_signal':
         return const ShieldSignalWidget();
-      case 'markets':
-        return const MarketsWidget();
       case 'watchlist':
         return const WatchlistWidget();
       case 'upcoming_events':
@@ -181,12 +174,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return const ScenarioCompareWidget();
       case 'stress_test':
         return const StressTestWidget();
-      case 'holdings':
-        return const HoldingsWidget();
-      case 'analysis':
-        return const AnalysisWidget();
-      case 'verdict':
-        return const VerdictWidget();
       default:
         return const SizedBox.shrink();
     }
@@ -250,8 +237,6 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
     switch (id) {
       case 'shield_signal':
         return Icons.shield_rounded;
-      case 'markets':
-        return Icons.show_chart_rounded;
       case 'watchlist':
         return Icons.bookmark_rounded;
       case 'upcoming_events':
@@ -268,12 +253,6 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
         return Icons.compare_arrows_rounded;
       case 'stress_test':
         return Icons.psychology_rounded;
-      case 'holdings':
-        return Icons.account_balance_rounded;
-      case 'analysis':
-        return Icons.analytics_rounded;
-      case 'verdict':
-        return Icons.assignment_rounded;
       default:
         return Icons.widgets_rounded;
     }
@@ -321,7 +300,6 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                           id: 'shield_signal',
                           visible: true,
                         ),
-                        const HomeWidgetConfig(id: 'markets', visible: true),
                         const HomeWidgetConfig(id: 'portfolio', visible: true),
                         const HomeWidgetConfig(id: 'watchlist', visible: true),
                         const HomeWidgetConfig(id: 'news', visible: true),
