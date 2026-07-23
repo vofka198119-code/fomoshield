@@ -1067,6 +1067,21 @@ class StressTestSession {
   // Per-symbol epoch price range for peak/bottom detection
   Map<String, EpochPriceRange> epochPriceRanges;
 
+  /// ── Recovery cross-asset tuning (device-test feedback 2026-07-23) ──
+  /// Snapshot of each held symbol's price the moment the preceding
+  /// catastrophe (crash/blackSwan) epoch started — used to measure how
+  /// hard THIS asset fell, so the scripted Recovery regime can weight its
+  /// bounce-back speed per-asset instead of a flat rate for every holding.
+  Map<String, double> preCrashPrices;
+
+  /// Snapshot of each held symbol's price the moment the scripted
+  /// Recovery regime's first epoch started (== the crash's ending price).
+  /// Used as the divergence-limit anchor: during Recovery, no single
+  /// asset is allowed to drop more than [_recoveryDivergenceFloor] below
+  /// this price, so one holding's bad noise-roll can't cancel out the
+  /// regime's designed positive drift for the rest of the portfolio.
+  Map<String, double> recoveryStartPrices;
+
   /// Total realized P&L from all sell trades.
   double realizedPnl;
 
@@ -1197,6 +1212,8 @@ class StressTestSession {
     this.currentPrices = const {},
     this.basePrices = const {},
     this.epochPriceRanges = const {},
+    this.preCrashPrices = const {},
+    this.recoveryStartPrices = const {},
     this.realizedPnl = 0,
     this.customDurationDays,
     this.priceHistory = const {},

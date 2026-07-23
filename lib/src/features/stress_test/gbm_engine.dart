@@ -328,6 +328,36 @@ double _crashDriftMultiplier(double epochFraction) {
   return (1 - _crashEarlyWindow * _crashEarlyBoost) / (1 - _crashEarlyWindow);
 }
 
+// ── Recovery cross-asset tuning (device-test feedback 2026-07-23) ────────
+// On-device: the scripted 2-epoch Recovery window worked correctly in
+// aggregate (portfolio +7.11%, correct beta ordering — AMD/Chubb led,
+// Coca-Cola lagged), but one heavyweight holding (Ecolab) spent ~70% of
+// the window isolated at -19.10% while its peers rallied hard — a single
+// asset's bad noise-roll nearly cancelled out the whole regime's designed
+// positive drift, and the final result only looked good because of a
+// late catch-up rally. Two asks, both scoped to the Recovery regime only:
+// (1) floor how far any ONE asset can diverge below its OWN price at the
+// moment Recovery started (not the regime's normal basePrice-relative
+// bounds, which are far looser — see _driftBounds' recovery row above);
+// (2) assets that fell harder during the preceding crash should recover
+// proportionally faster, instead of every holding getting the same flat
+// per-sector drift regardless of its own drawdown.
+const double _recoveryDivergenceFloor = 0.04; // max -4% below recovery-start
+const double _recoveryWeightingFactor = 1.5; // crash-drop-% → drift boost
+const double _recoveryWeightingMaxBoost = 2.5; // cap on the drift multiplier
+
+/// Drift multiplier for the Recovery regime, scaled by how hard THIS asset
+/// fell during the preceding crash/blackSwan epoch ([crashDropPct],
+/// 0.0-1.0 — see noise_engine.dart's `_recoveryCrashDropPct`). A holding
+/// that barely dropped still gets the regime's baseline drift (1.0x); one
+/// that fell hard gets boosted proportionally, capped so it can't run
+/// away. Returns 1.0 (no-op) for every other regime — this reshaping is
+/// Recovery-only, mirrors [_crashDriftMultiplier]'s pattern.
+double _recoveryDriftMultiplier(double crashDropPct) {
+  final boost = 1.0 + crashDropPct * _recoveryWeightingFactor;
+  return boost.clamp(1.0, _recoveryWeightingMaxBoost);
+}
+
 /// Resolve a ticker symbol to its legacy market sector.
 MarketSector _getSector(String symbol) {
   return _symbolSectorMap[symbol] ?? MarketSector.other;

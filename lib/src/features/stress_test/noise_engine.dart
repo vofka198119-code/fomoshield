@@ -33,6 +33,45 @@ part of 'stress_test_engine.dart';
 // the noise term.
 // ---------------------------------------------------------------------------
 
+// ── Recovery cross-asset tuning (device-test feedback 2026-07-23) ────────
+// Snapshot the price anchors the divergence-limit floor and the crash-
+// depth recovery-drift weighting both depend on (see gbm_engine.dart's
+// `_recoveryDriftMultiplier`/`_recoveryDivergenceFloor` and this file's
+// tick-loop use of them). Called from every site that rolls a new epoch —
+// noise_engine.dart's own wall-clock roll below, casino_epochs.dart's
+// `_catchUp` loop, and `debugForceEpochRoll` — right after that site's
+// existing casino-state if/else block and BEFORE the new epoch is
+// appended to `epochHistory`, so `epochHistory.length` here still equals
+// the new epoch's about-to-be-assigned index (matching whatever value the
+// casino-state block just wrote into `casinoLastCatastropheEpoch` for a
+// catastrophe roll).
+void _captureRecoveryAnchors(
+  StressTestSession session,
+  MarketScenario newScenario,
+) {
+  if (newScenario.isCatastrophe) {
+    session.preCrashPrices = Map<String, double>.from(session.currentPrices);
+  } else if (newScenario == MarketScenario.recovery &&
+      session.epochHistory.length - session.casinoLastCatastropheEpoch == 1) {
+    session.recoveryStartPrices = Map<String, double>.from(
+      session.currentPrices,
+    );
+  }
+}
+
+/// How much [symbol] fell during the crash/blackSwan epoch that preceded
+/// the current scripted Recovery window (0.0-1.0, clamped to non-negative
+/// — a symbol that somehow rose during the "crash" contributes no boost,
+/// not a negative one). Returns 0.0 if either anchor is missing (e.g. the
+/// holding was bought mid-recovery, after the crash already happened, so
+/// there's no real drawdown to weight against).
+double _recoveryCrashDropPct(StressTestSession session, String symbol) {
+  final pre = session.preCrashPrices[symbol];
+  final start = session.recoveryStartPrices[symbol];
+  if (pre == null || start == null || pre <= 0) return 0.0;
+  return ((pre - start) / pre).clamp(0.0, 1.0);
+}
+
 extension NoiseEngine on StressTestNotifier {
   /// Build a price contribution breakdown for explainable simulation.
   /// Factors always sum to exactly 100%.
@@ -185,6 +224,7 @@ extension NoiseEngine on StressTestNotifier {
           session.casinoCatastropheCooldown--;
         }
       }
+      _captureRecoveryAnchors(session, newScenario);
 
       // Close previous active epoch and start new one
       _recordEpochTransition(session, newScenario, now);
@@ -325,6 +365,10 @@ extension NoiseEngine on StressTestNotifier {
         final beforeGbm = currentPrice;
         final driftMultiplier = regime == _MacroRegime.crash
             ? _crashDriftMultiplier(epochFraction)
+            : regime == _MacroRegime.recovery
+            ? _recoveryDriftMultiplier(
+                _recoveryCrashDropPct(session, h.symbol),
+              )
             : 1.0;
         final rawChange =
             params.annualDrift * dtPerTick * driftMultiplier + noise + microNoise;
@@ -379,6 +423,26 @@ extension NoiseEngine on StressTestNotifier {
             '(bounds: ${regimeBounds.minPriceMultiplier.toStringAsFixed(2)}x–'
             '${regimeBounds.maxPriceMultiplier.toStringAsFixed(2)}x)',
           );
+        }
+
+        // ── Recovery divergence limit (device-test feedback 2026-07-23) ──
+        // On top of the regime's normal (much looser) basePrice-relative
+        // bounds above: during Recovery specifically, don't let any ONE
+        // asset drop more than _recoveryDivergenceFloor below its OWN
+        // price at the moment this recovery window started — an isolated
+        // bad noise-roll on one heavyweight holding shouldn't be able to
+        // cancel out the regime's designed positive drift for the rest of
+        // the portfolio (confirmed on-device: Ecolab alone at -19.10% for
+        // ~70% of a window where its peers were up 20-30%). Only ever
+        // raises the price (a floor, not a ceiling) — Recovery's upside is
+        // untouched. No-op if this holding wasn't held yet when the
+        // recovery window started (no anchor to measure against).
+        if (regime == _MacroRegime.recovery) {
+          final recoveryAnchor = session.recoveryStartPrices[h.symbol];
+          if (recoveryAnchor != null && recoveryAnchor > 0) {
+            final floor = recoveryAnchor * (1 - _recoveryDivergenceFloor);
+            if (currentPrice < floor) currentPrice = floor;
+          }
         }
 
         // ── Debug: log dt calibration once per app session ──────
@@ -542,6 +606,8 @@ extension NoiseEngine on StressTestNotifier {
             currentPrices: newPrices,
             basePrices: session.basePrices,
             epochPriceRanges: newRanges,
+            preCrashPrices: session.preCrashPrices,
+            recoveryStartPrices: session.recoveryStartPrices,
             stabilizationDeadlines: session.stabilizationDeadlines,
             simulationSeed: session.simulationSeed,
             explanationLog: explanations,

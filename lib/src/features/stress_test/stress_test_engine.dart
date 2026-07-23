@@ -274,6 +274,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       'casinoLastCatastropheEpoch': s.casinoLastCatastropheEpoch,
       'currentPrices': s.currentPrices,
       'basePrices': s.basePrices,
+      'preCrashPrices': s.preCrashPrices,
+      'recoveryStartPrices': s.recoveryStartPrices,
       'simulationSeed': s.simulationSeed,
       'stabilizationDeadlines': s.stabilizationDeadlines.map(
         (k, v) => MapEntry(k, v.toIso8601String()),
@@ -375,6 +377,16 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           {},
       basePrices:
           (json['basePrices'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, (v as num).toDouble()),
+          ) ??
+          {},
+      preCrashPrices:
+          (json['preCrashPrices'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, (v as num).toDouble()),
+          ) ??
+          {},
+      recoveryStartPrices:
+          (json['recoveryStartPrices'] as Map<String, dynamic>?)?.map(
             (k, v) => MapEntry(k, (v as num).toDouble()),
           ) ??
           {},
@@ -577,6 +589,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             currentPrices: {...session.currentPrices, symbol: price},
             basePrices: {...session.basePrices, symbol: price},
             epochPriceRanges: session.epochPriceRanges,
+            preCrashPrices: session.preCrashPrices,
+            recoveryStartPrices: session.recoveryStartPrices,
             realizedPnl: session.realizedPnl,
             customDurationDays: session.customDurationDays,
             psychologyProfile: session.psychologyProfile,
@@ -637,6 +651,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             catastropheCooldown: session.catastropheCooldown,
             currentPrices: Map.from(session.currentPrices),
             basePrices: Map.from(session.basePrices),
+            preCrashPrices: Map.from(session.preCrashPrices),
+            recoveryStartPrices: Map.from(session.recoveryStartPrices),
             customDurationDays:
                 customDurationDays ?? session.customDurationDays,
             psychologyProfile: session.psychologyProfile,
@@ -742,6 +758,15 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       catastropheCooldown: session.catastropheCooldown,
       currentPrices: Map.from(session.currentPrices),
       basePrices: Map.from(session.basePrices),
+      // Mirrors the epoch-0-catastrophe fix above: if the very first
+      // rolled epoch is itself Crash/BlackSwan, snapshot the pre-crash
+      // anchor now too, so a Recovery pair rolling in right after epoch 0
+      // has a real crash-drop % to weight against (same as any other
+      // catastrophe mid-test — see casino_epochs.dart's roll sites).
+      preCrashPrices: firstIsCatastrophe
+          ? Map.from(session.currentPrices)
+          : {},
+      recoveryStartPrices: const {},
       currentWeights: fatigueWeights,
       psychologyProfile: session.psychologyProfile,
       simulationSeed: rng.nextInt(99999999) + 1,
@@ -818,6 +843,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             currentPrices: session.currentPrices,
             basePrices: session.basePrices,
             epochPriceRanges: session.epochPriceRanges,
+            preCrashPrices: session.preCrashPrices,
+            recoveryStartPrices: session.recoveryStartPrices,
             stabilizationDeadlines: session.stabilizationDeadlines,
             simulationSeed: session.simulationSeed,
             explanationLog: session.explanationLog,

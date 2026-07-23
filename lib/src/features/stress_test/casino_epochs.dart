@@ -343,6 +343,7 @@ extension CasinoEpochsEngine on StressTestNotifier {
           session.casinoCatastropheCooldown--;
         }
       }
+      _captureRecoveryAnchors(session, scenario);
 
       // ── Bug #2 fix: close previous active epoch BEFORE adding new one ──
       // In normal flow, _recordEpochTransition() closes the active epoch
@@ -463,6 +464,7 @@ extension CasinoEpochsEngine on StressTestNotifier {
         session.casinoCatastropheCooldown--;
       }
     }
+    _captureRecoveryAnchors(session, newScenario);
 
     // Close previous epoch, open new one.
     _recordEpochTransition(session, newScenario, now);
