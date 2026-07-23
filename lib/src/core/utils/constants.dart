@@ -14,6 +14,14 @@ class AppConstants {
   static const int finnhubRateLimit = 60; // req/min
   static const int cacheTTLMinutes = 240; // 4 hours for market data
 
+  /// scanco-backend (Finnhub proxy/cache) base URL — shares one
+  /// rate-limited Finnhub connection across all users instead of every
+  /// device hitting Finnhub directly with the same embedded key. Only
+  /// quote/news(general)/candles are proxied so far — see
+  /// FinnhubService's doc comment for which calls still go direct.
+  static String get backendBaseUrl =>
+      dotenv.env['BACKEND_BASE_URL'] ?? 'http://localhost:3000';
+
   // Wikipedia
   static const String wikiBaseEN = 'https://en.wikipedia.org/api/rest_v1/page/summary';
   static const String wikiBaseRU = 'https://ru.wikipedia.org/api/rest_v1/page/summary';
