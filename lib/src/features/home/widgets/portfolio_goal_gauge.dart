@@ -32,7 +32,6 @@ class PortfolioGoalGauge extends ConsumerWidget {
       onTap: () => _showGoalSheet(context, ref, goal),
       child: Container(
         width: double.infinity,
-        height: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),

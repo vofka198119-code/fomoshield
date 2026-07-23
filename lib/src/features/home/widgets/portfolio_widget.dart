@@ -255,36 +255,38 @@ class _PortfolioPerformanceView extends ConsumerWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    children: [
-                      _cell(
-                        label: 'PORTFOLIO BALANCE',
-                        value: '\$${perf.currentValue.toStringAsFixed(2)}',
-                        bgColor: ThemeV2.primaryBg,
-                      ),
-                      const SizedBox(height: 8),
-                      _cell(
-                        label: 'CASH AVAILABLE',
-                        value: '\$${perf.cash.toStringAsFixed(2)}',
-                        bgColor: ThemeV2.primaryBg,
-                      ),
-                    ],
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      children: [
+                        _cell(
+                          label: 'PORTFOLIO BALANCE',
+                          value: '\$${perf.currentValue.toStringAsFixed(2)}',
+                          bgColor: ThemeV2.primaryBg,
+                        ),
+                        const SizedBox(height: 8),
+                        _cell(
+                          label: 'CASH AVAILABLE',
+                          value: '\$${perf.cash.toStringAsFixed(2)}',
+                          bgColor: ThemeV2.primaryBg,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 2,
-                  child: PortfolioGoalGauge(
-                    portfolioId: portfolioId,
-                    currentValue: perf.currentValue,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 2,
+                    child: PortfolioGoalGauge(
+                      portfolioId: portfolioId,
+                      currentValue: perf.currentValue,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             Row(
