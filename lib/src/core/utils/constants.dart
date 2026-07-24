@@ -22,6 +22,11 @@ class AppConstants {
   static String get backendBaseUrl =>
       dotenv.env['BACKEND_BASE_URL'] ?? 'http://localhost:3000';
 
+  /// Shared secret sent as the X-API-Key header on every backend call —
+  /// must match the server's API_KEY. Empty until the server enables
+  /// enforcement (see scanco-backend's apiKeyAuth middleware).
+  static String get backendApiKey => dotenv.env['BACKEND_API_KEY'] ?? '';
+
   // Wikipedia
   static const String wikiBaseEN = 'https://en.wikipedia.org/api/rest_v1/page/summary';
   static const String wikiBaseRU = 'https://ru.wikipedia.org/api/rest_v1/page/summary';

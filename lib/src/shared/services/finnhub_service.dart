@@ -17,7 +17,10 @@ import '../../core/utils/constants.dart';
 /// [companyProfile], [metrics], [companyNews] (per-symbol — the backend
 /// only pre-caches news for its fixed `HOT_TICKERS` list, so an arbitrary
 /// watchlist symbol wouldn't get real news back from it yet),
-/// [earningsCalendar], [dividendsCalendar], [earningsSurprises].
+/// [earningsCalendar], [earningsSurprises].
+///
+/// Blocked entirely, zero network calls (Finnhub paid-tier-only, confirmed
+/// via live 403): [candles], [dividendsCalendar].
 class FinnhubService {
   final Dio _dio;
   final Dio _backendDio;
@@ -37,6 +40,9 @@ class FinnhubService {
           baseUrl: '${AppConstants.backendBaseUrl}/api/v1',
           connectTimeout: const Duration(seconds: 5),
           receiveTimeout: const Duration(seconds: 5),
+          headers: AppConstants.backendApiKey.isEmpty
+              ? null
+              : {'X-API-Key': AppConstants.backendApiKey},
         ),
       ) {
     _dio.interceptors.add(
@@ -439,16 +445,19 @@ class FinnhubService {
     return data['earningsCalendar'] as List<dynamic>? ?? [];
   }
 
+  /// `/stock/dividend` is a Finnhub PAID-tier endpoint — confirmed via a
+  /// live 403 on every company-detail-page open (2026-07-24), same
+  /// pattern as [candles]. Blocked here with zero network calls for the
+  /// same reason: a permanently-403 call still costs a slot against the
+  /// shared rate-limit budget. Caller (`home_providers.dart`) already
+  /// wraps this in a try/catch. Flip back on if the Finnhub plan is ever
+  /// upgraded.
   Future<List<dynamic>> dividendsCalendar({
     required String symbol,
     int daysAhead = 30,
   }) async {
-    final now = DateTime.now();
-    final from = _fmtDate(now);
-    final to = _fmtDate(now.add(Duration(days: daysAhead)));
-    return _getRaw(
-      '/stock/dividend',
-      params: {'symbol': symbol, 'from': from, 'to': to},
+    throw Exception(
+      'Dividend data requires a paid Finnhub plan — not available.',
     );
   }
 
