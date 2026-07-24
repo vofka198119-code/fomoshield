@@ -43,6 +43,9 @@ String _ordersPrefsKey(String? uid) =>
 class OrderNotifier extends StateNotifier<List<Order>> {
   final UserDataService _service;
   final String? _userId;
+  // Guards against _loadLocal()'s async SharedPreferences read finishing
+  // AFTER loadFromSupabase() and clobbering the just-synced server data.
+  bool _loadedFromSupabase = false;
 
   OrderNotifier(this._service, {required String? userId})
       : _userId = userId,
@@ -56,6 +59,7 @@ class OrderNotifier extends StateNotifier<List<Order>> {
 
   Future<void> _loadLocal() async {
     final prefs = await SharedPreferences.getInstance();
+    if (_loadedFromSupabase) return;
     final key = _ordersPrefsKey(_userId);
     final raw = prefs.getString(key);
     if (raw == null) return;
@@ -255,6 +259,7 @@ class OrderNotifier extends StateNotifier<List<Order>> {
 
   /// Load orders from Supabase (on login)
   void loadFromSupabase(List<Map<String, dynamic>> jsonList) {
+    _loadedFromSupabase = true;
     state = jsonList.map((e) => Order.fromJson(e)).toList();
     _saveLocal();
   }

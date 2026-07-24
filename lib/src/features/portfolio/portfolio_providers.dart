@@ -150,6 +150,10 @@ class Portfolio {
 class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
   final UserDataService _supabaseService;
   String? _userId;
+  // Guards against _load()'s async SharedPreferences read finishing AFTER
+  // loadFromSupabase() and clobbering the just-synced server data with an
+  // empty/stale local cache (or worse, creating a spurious default portfolio).
+  bool _loadedFromSupabase = false;
 
   PortfolioNotifier(this._supabaseService, {this._userId})
       : super([]) {
@@ -165,6 +169,7 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
   /// Load portfolios from Supabase data (replaces local).
   void loadFromSupabase(List<Portfolio> portfolios) {
     if (portfolios.isEmpty) return;
+    _loadedFromSupabase = true;
     state = portfolios;
     _saveLocal(); // Cache locally
   }
@@ -174,6 +179,7 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    if (_loadedFromSupabase) return;
     final raw = prefs.getString(_storageKey);
     if (raw != null) {
       final list = (jsonDecode(raw) as List<dynamic>)

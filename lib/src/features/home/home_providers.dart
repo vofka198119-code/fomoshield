@@ -176,6 +176,10 @@ final watchlistSymbolsProvider =
 class WatchlistNotifier extends StateNotifier<List<String>> {
   final UserDataService _supabaseService;
   String? _userId;
+  // Guards against _load()'s async SharedPreferences read finishing AFTER
+  // loadFromSupabase() and clobbering the just-synced server data with an
+  // empty/stale local cache.
+  bool _loadedFromSupabase = false;
 
   WatchlistNotifier(this._supabaseService, {this._userId})
       : super([]) {
@@ -194,12 +198,14 @@ class WatchlistNotifier extends StateNotifier<List<String>> {
   /// Load watchlist from Supabase data (replaces local).
   void loadFromSupabase(List<String> symbols) {
     if (symbols.isEmpty) return;
+    _loadedFromSupabase = true;
     state = symbols;
     _saveLocal();
   }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    if (_loadedFromSupabase) return;
     final list = prefs.getStringList(_key) ?? [];
     state = list;
   }

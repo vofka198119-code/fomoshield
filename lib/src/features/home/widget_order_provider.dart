@@ -82,6 +82,9 @@ class HomeWidgetConfig {
 class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
   final UserDataService _supabaseService;
   String? _userId;
+  // Guards against _load()'s async SharedPreferences read finishing AFTER
+  // loadFromSupabase() and clobbering the just-synced server data.
+  bool _loadedFromSupabase = false;
 
   HomeWidgetsNotifier(this._supabaseService, {this._userId})
       : super([]) {
@@ -97,6 +100,7 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
   /// Load widget order from Supabase data (replaces local).
   void loadFromSupabase(List<HomeWidgetConfig> configs) {
     if (configs.isEmpty) return;
+    _loadedFromSupabase = true;
     // Drop any widget ids retired since this config was saved.
     state = configs.where((c) => _defaultOrder.contains(c.id)).toList();
     _saveLocal();
@@ -104,6 +108,7 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    if (_loadedFromSupabase) return;
     final orderKey = _prefsKey(_userId);
     final visKey = _prefsVisibilityKey(_userId);
 

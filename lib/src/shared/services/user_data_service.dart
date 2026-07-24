@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/supabase/supabase_client.dart';
@@ -46,7 +47,8 @@ class UserDataService {
         'orders': _decodeJsonList(response['orders']),
       };
     } catch (e) {
-      return {'portfolios': [], 'watchlist': [], 'widget_order': []};
+      debugPrint('🔄 userDataService.loadAll($userId) failed: $e');
+      return {'portfolios': [], 'watchlist': [], 'widget_order': [], 'orders': []};
     }
   }
 
@@ -56,7 +58,7 @@ class UserDataService {
     try {
       await _client.from('user_data').upsert({
         'id': userId,
-        'portfolios': jsonEncode(portfolios.map((p) => p.toJson()).toList()),
+        'portfolios': portfolios.map((p) => p.toJson()).toList(),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (_) {
@@ -70,7 +72,7 @@ class UserDataService {
     try {
       await _client.from('user_data').upsert({
         'id': userId,
-        'watchlist': jsonEncode(symbols),
+        'watchlist': symbols,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (_) {}
@@ -82,7 +84,7 @@ class UserDataService {
     try {
       await _client.from('user_data').upsert({
         'id': userId,
-        'orders': jsonEncode(orders),
+        'orders': orders,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (_) {}
@@ -98,7 +100,7 @@ class UserDataService {
           .toList();
       await _client.from('user_data').upsert({
         'id': userId,
-        'widget_order': jsonEncode(data),
+        'widget_order': data,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (_) {}
