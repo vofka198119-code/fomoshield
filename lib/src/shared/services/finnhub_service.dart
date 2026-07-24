@@ -13,14 +13,18 @@ import '../../core/utils/constants.dart';
 /// therefore [previousTradingDayQuote], which calls it), [candles],
 /// [generalNews].
 ///
-/// Still direct to Finnhub (backend has no matching route yet): [search],
-/// [companyProfile], [metrics], [companyNews] (per-symbol — the backend
-/// only pre-caches news for its fixed `HOT_TICKERS` list, so an arbitrary
-/// watchlist symbol wouldn't get real news back from it yet),
-/// [earningsCalendar], [earningsSurprises].
+/// Routed through the backend, all with direct-Finnhub fallback on error
+/// (backend down/unreachable): [search], [companyProfile], [metrics],
+/// [companyNews] (any symbol, not just hot tickers — the backend fetches
+/// and caches on a cold miss), [earningsCalendar], [earningsSurprises].
 ///
 /// Blocked entirely, zero network calls (Finnhub paid-tier-only, confirmed
 /// via live 403): [candles], [dividendsCalendar].
+///
+/// [AppConstants.finnhubKey] stays embedded as the fallback path's
+/// credential (same reasoning as [quote]/[generalNews] already had) —
+/// under normal operation nothing uses it, but it's what keeps the app
+/// working if the backend is ever down.
 class FinnhubService {
   final Dio _dio;
   final Dio _backendDio;
@@ -283,7 +287,13 @@ class FinnhubService {
   Future<List<Map<String, dynamic>>> search(String query) async {
     if (query.length < AppConstants.minSearchChars) return [];
     // Finnhub /search returns { "count": N, "result": [...] }
-    final data = await _get('/search', params: {'q': query});
+    Map<String, dynamic> data;
+    try {
+      data = await _getFromBackend('/search', params: {'q': query});
+    } catch (e) {
+      debugPrint('⚠️ Backend search($query) failed, falling back direct: $e');
+      data = await _get('/search', params: {'q': query});
+    }
     final items = data['result'] as List<dynamic>? ?? [];
     final List<Map<String, dynamic>> results = [];
     final seen = <String>{};
@@ -330,8 +340,16 @@ class FinnhubService {
   // Company Profile
   // ---------------------------------------------------------------------------
 
-  Future<Map<String, dynamic>> companyProfile(String symbol) async =>
-      _get('/stock/profile2', params: {'symbol': symbol});
+  Future<Map<String, dynamic>> companyProfile(String symbol) async {
+    try {
+      return await _getFromBackend('/profile/$symbol');
+    } catch (e) {
+      debugPrint(
+        '⚠️ Backend companyProfile($symbol) failed, falling back direct: $e',
+      );
+      return _get('/stock/profile2', params: {'symbol': symbol});
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Quote
@@ -392,22 +410,37 @@ class FinnhubService {
   // Financials / Metrics
   // ---------------------------------------------------------------------------
 
-  Future<Map<String, dynamic>> metrics(String symbol) async =>
-      _get('/stock/metric', params: {'symbol': symbol, 'metric': 'all'});
+  Future<Map<String, dynamic>> metrics(String symbol) async {
+    try {
+      return await _getFromBackend('/metrics/$symbol');
+    } catch (e) {
+      debugPrint(
+        '⚠️ Backend metrics($symbol) failed, falling back direct: $e',
+      );
+      return _get('/stock/metric', params: {'symbol': symbol, 'metric': 'all'});
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // News
   // ---------------------------------------------------------------------------
 
   Future<List<dynamic>> companyNews(String symbol, {int days = 7}) async {
-    final now = DateTime.now();
-    final from = now.subtract(Duration(days: days));
-    final toStr = _fmtDate(now);
-    final fromStr = _fmtDate(from);
-    return _getRaw(
-      '/company-news',
-      params: {'symbol': symbol, 'from': fromStr, 'to': toStr},
-    );
+    try {
+      return await _getRawFromBackend('/news', params: {'symbol': symbol});
+    } catch (e) {
+      debugPrint(
+        '⚠️ Backend companyNews($symbol) failed, falling back direct: $e',
+      );
+      final now = DateTime.now();
+      final from = now.subtract(Duration(days: days));
+      final toStr = _fmtDate(now);
+      final fromStr = _fmtDate(from);
+      return _getRaw(
+        '/company-news',
+        params: {'symbol': symbol, 'from': fromStr, 'to': toStr},
+      );
+    }
   }
 
   Future<List<dynamic>> generalNews() async {
@@ -441,7 +474,14 @@ class FinnhubService {
     final to = _fmtDate(now.add(Duration(days: daysAhead)));
     final params = <String, dynamic>{'from': from, 'to': to};
     if (symbol != null) params['symbol'] = symbol;
-    final data = await _get('/calendar/earnings', params: params);
+
+    Map<String, dynamic> data;
+    try {
+      data = await _getFromBackend('/earnings/calendar', params: params);
+    } catch (e) {
+      debugPrint('⚠️ Backend earningsCalendar failed, falling back direct: $e');
+      data = await _get('/calendar/earnings', params: params);
+    }
     return data['earningsCalendar'] as List<dynamic>? ?? [];
   }
 
@@ -465,8 +505,16 @@ class FinnhubService {
   // Earnings / Revenue trends
   // ---------------------------------------------------------------------------
 
-  Future<List<dynamic>> earningsSurprises(String symbol) async =>
-      _getRaw('/stock/earnings', params: {'symbol': symbol, 'limit': 5});
+  Future<List<dynamic>> earningsSurprises(String symbol) async {
+    try {
+      return await _getRawFromBackend('/earnings/surprises/$symbol');
+    } catch (e) {
+      debugPrint(
+        '⚠️ Backend earningsSurprises($symbol) failed, falling back direct: $e',
+      );
+      return _getRaw('/stock/earnings', params: {'symbol': symbol, 'limit': 5});
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Historical Candles
