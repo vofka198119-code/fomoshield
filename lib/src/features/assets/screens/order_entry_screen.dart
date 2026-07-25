@@ -13,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/guardian/guardian_engine.dart';
 import '../../../shared/guardian/guardian_providers.dart';
 import '../../stress_test/stress_test_models.dart';

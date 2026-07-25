@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import '../../core/theme/theme_v2.dart';
-import '../../core/theme/typography_helpers.dart';
 import '../../shared/services/scoring_engine.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';

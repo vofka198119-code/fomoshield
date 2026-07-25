@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme/theme_v2.dart';
-import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_client.dart';
 
 /// Rate-limiting guard: track last request time per email to prevent spam.

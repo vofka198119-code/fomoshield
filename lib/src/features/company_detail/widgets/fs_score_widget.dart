@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../../core/theme/typography_helpers.dart';
 
 // ---------------------------------------------------------------------------
 // FS Score Widget — gauge + radar chart + 6 marker details

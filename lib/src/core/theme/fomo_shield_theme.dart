@@ -7,7 +7,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'app_theme.dart';
 import 'theme_v2.dart';
 import 'typography_helpers.dart';
 

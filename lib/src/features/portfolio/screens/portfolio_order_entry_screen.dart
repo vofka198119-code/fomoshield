@@ -17,7 +17,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../portfolio_providers.dart';
 import '../../orders/order_model.dart' as orders;

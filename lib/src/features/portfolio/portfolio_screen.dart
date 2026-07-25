@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/theme_v2.dart';
-import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';

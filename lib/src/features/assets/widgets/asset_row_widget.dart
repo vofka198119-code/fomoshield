@@ -9,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../../core/theme/typography_helpers.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../stress_test/stress_test_models.dart';
