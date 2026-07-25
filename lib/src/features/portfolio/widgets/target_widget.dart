@@ -370,7 +370,9 @@ class _GoalFlag extends StatelessWidget {
   }
 }
 
-/// Row of small color-graded segments: red (-100%) -> yellow (0%) -> green (+100%).
+/// Row of small segments, color-graded red (-100%) -> yellow (0%) ->
+/// green (+100%). Only the segments between 0% and the current position
+/// are colored (progressive fill); the rest sit grey.
 class _SegmentedBar extends StatelessWidget {
   final double currentPercent; // -100..100
   const _SegmentedBar({required this.currentPercent});
@@ -379,11 +381,22 @@ class _SegmentedBar extends StatelessWidget {
   static const Color _red = Color(0xFFFF3B30);
   static const Color _yellow = Color(0xFFFFD600);
   static const Color _green = Color(0xFF00C853);
+  static const Color _unfilled = Color(0x33FFFFFF); // white @ 20%
+
+  static double _percentForIndex(int index) =>
+      -100 + (index / (_segmentCount - 1)) * 200;
 
   static Color _colorForIndex(int index) {
     final t = index / (_segmentCount - 1); // 0..1
     if (t <= 0.5) return Color.lerp(_red, _yellow, t / 0.5)!;
     return Color.lerp(_yellow, _green, (t - 0.5) / 0.5)!;
+  }
+
+  bool _isFilled(int index) {
+    final segPercent = _percentForIndex(index);
+    return currentPercent >= 0
+        ? (segPercent >= 0 && segPercent <= currentPercent)
+        : (segPercent <= 0 && segPercent >= currentPercent);
   }
 
   @override
@@ -398,7 +411,7 @@ class _SegmentedBar extends StatelessWidget {
                 right: i == _segmentCount - 1 ? 0 : 3,
               ),
               decoration: BoxDecoration(
-                color: _colorForIndex(i),
+                color: _isFilled(i) ? _colorForIndex(i) : _unfilled,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
