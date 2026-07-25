@@ -220,3 +220,51 @@ UPDATE public.users
 SET subscription_tier = 'premium',
     subscription_expires_at = now() + INTERVAL '5 years'
 WHERE email = 'vofka198119@gmail.com';
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 004
+-- Table: user_data (ALTER)
+-- Description: Adds stress-test session sync, so active stress-test progress
+--              survives reinstall the same way portfolios/watchlist do.
+-- =============================================================================
+
+ALTER TABLE public.user_data
+ADD COLUMN IF NOT EXISTS stress_test_sessions JSONB NOT NULL DEFAULT '[]'::jsonb;
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 005
+-- Table: auth.users (DROP TRIGGER)
+-- Description: Removes the auto_confirm_email trigger from Migration 001.
+--              That trigger was labeled "for dev environment" but was live
+--              in production, silently confirming every signup's email
+--              without the user ever clicking a confirmation link — i.e.
+--              anyone could register with an email they don't own.
+--
+-- Supabase's own Auth setting (mailer_autoconfirm) is already `false` on
+-- this project (confirmed via GET /auth/v1/settings) — real confirmation
+-- emails will now actually be required and sent once this trigger is gone.
+-- The Flutter app's signup flow (auth_screen.dart) already handles this
+-- correctly: if signUp() returns no session, it shows "Please check your
+-- email to confirm registration." and does not auto-login. No app change
+-- needed for this migration to take effect.
+-- =============================================================================
+
+DROP TRIGGER IF EXISTS on_auth_user_created_auto_confirm ON auth.users;
+DROP FUNCTION IF EXISTS public.auto_confirm_email();
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 006
+-- Table: auth.users (DROP TRIGGER)
+-- Description: Migration 005 didn't fully close the gap — live DB had a
+--              SECOND, differently-named auto-confirm trigger
+--              (on_auth_user_created_confirm) not present anywhere in this
+--              file, i.e. created out-of-band (dashboard/an earlier draft),
+--              never tracked here. Found by listing every trigger on
+--              auth.users directly, since a fresh throwaway signup still
+--              auto-confirmed immediately after Migration 005 ran.
+-- =============================================================================
+
+DROP TRIGGER IF EXISTS on_auth_user_created_confirm ON auth.users;

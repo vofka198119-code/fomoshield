@@ -8,6 +8,7 @@ import '../../features/portfolio/portfolio_providers.dart';
 import '../../features/home/home_providers.dart';
 import '../../features/home/widget_order_provider.dart';
 import '../../features/orders/order_provider.dart';
+import '../../features/stress_test/stress_test_engine.dart';
 
 // ---------------------------------------------------------------------------
 // UserDataService — syncs user data between Supabase and local providers
@@ -34,21 +35,36 @@ class UserDataService {
     try {
       final response = await _client
           .from('user_data')
-          .select('portfolios, watchlist, widget_order, orders')
+          .select('portfolios, watchlist, widget_order, orders, stress_test_sessions')
           .eq('id', userId)
           .maybeSingle();
 
-      if (response == null) return {'portfolios': [], 'watchlist': [], 'widget_order': [], 'orders': []};
+      if (response == null) {
+        return {
+          'portfolios': [],
+          'watchlist': [],
+          'widget_order': [],
+          'orders': [],
+          'stress_test_sessions': [],
+        };
+      }
 
       return {
         'portfolios': _decodeJsonList(response['portfolios']),
         'watchlist': _decodeJsonList(response['watchlist']),
         'widget_order': _decodeJsonList(response['widget_order']),
         'orders': _decodeJsonList(response['orders']),
+        'stress_test_sessions': _decodeJsonList(response['stress_test_sessions']),
       };
     } catch (e) {
       debugPrint('🔄 userDataService.loadAll($userId) failed: $e');
-      return {'portfolios': [], 'watchlist': [], 'widget_order': [], 'orders': []};
+      return {
+        'portfolios': [],
+        'watchlist': [],
+        'widget_order': [],
+        'orders': [],
+        'stress_test_sessions': [],
+      };
     }
   }
 
@@ -85,6 +101,21 @@ class UserDataService {
       await _client.from('user_data').upsert({
         'id': userId,
         'orders': orders,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    } catch (_) {}
+  }
+
+  // ── Save stress-test sessions ─────────────────────────────────────
+  // Pushed only on significant events (trade, start, complete, delete),
+  // not on every ~20s simulation tick — see stress_test_engine.dart.
+
+  Future<void> saveStressTestSessions(
+      String userId, List<Map<String, dynamic>> sessions) async {
+    try {
+      await _client.from('user_data').upsert({
+        'id': userId,
+        'stress_test_sessions': sessions,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (_) {}
@@ -173,5 +204,11 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
     ref.read(ordersProvider.notifier).loadFromSupabase(
           ordersList.cast<Map<String, dynamic>>(),
         );
+  }
+
+  // Load stress-test sessions
+  final stressTestSessions = data['stress_test_sessions'] as List<dynamic>;
+  if (stressTestSessions.isNotEmpty) {
+    ref.read(stressTestProvider.notifier).loadFromSupabase(stressTestSessions);
   }
 });

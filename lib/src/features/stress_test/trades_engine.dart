@@ -521,6 +521,7 @@ extension TradesEngine on StressTestNotifier {
           state[i],
     ];
     _save();
+    _syncToSupabase();
     return TradeResult(success: true, reason: '');
   }
 

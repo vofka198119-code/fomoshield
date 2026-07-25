@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/services/gics_sector_mapper.dart';
+import '../../shared/services/user_data_service.dart';
 import 'stress_test_models.dart';
 
 part 'gbm_engine.dart';
@@ -111,6 +112,14 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   int _openCounter = 0; // times the stress test screen has been opened
   List<VerdictArchiveEntry> _verdictArchive = [];
 
+  final UserDataService? _supabaseService;
+  // Guards against _load()'s async SharedPreferences read finishing AFTER
+  // loadFromSupabase() and clobbering the just-synced server data with an
+  // empty/stale local cache — same race fixed for the other 4 sync
+  // notifiers (Watchlist/Portfolio/Order/HomeWidgets), see
+  // project_fomo_shield_premium_subscription_system memory.
+  bool _loadedFromSupabase = false;
+
   /// Per-session RNG map: sessionId → Random(simulationSeed).
   /// Каждая сессия использует свой изолированный генератор,
   /// что гарантирует детерминизм и отсутствие cross-session утечек.
@@ -125,9 +134,37 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// Used in test suites to avoid setting marketOpenOverride per-instance.
   static bool Function(DateTime)? globalMarketOpenOverride;
 
-  StressTestNotifier({this._userId, int? seed}) : super([]) {
+  StressTestNotifier({this._userId, int? seed, this._supabaseService})
+      : super([]) {
     _random = (seed != null) ? Random(seed) : Random();
     _load();
+  }
+
+  /// Load sessions from Supabase (replaces local). Called on login.
+  void loadFromSupabase(List<dynamic> rawSessions) {
+    if (rawSessions.isEmpty) return;
+    _loadedFromSupabase = true;
+    try {
+      state = rawSessions
+          .map((e) => _sessionFromJson(e as Map<String, dynamic>))
+          .toList();
+      _catchUpAll();
+      _save();
+    } catch (_) {}
+  }
+
+  /// Pushes the current active sessions to Supabase. Called only from
+  /// significant events (trade, start, complete, delete) — NOT from the
+  /// ~20s tick-simulation _save(), which would hammer Supabase with writes
+  /// for every user with the screen open.
+  void _syncToSupabase() {
+    final uid = _userId;
+    final service = _supabaseService;
+    if (uid == null || service == null) return;
+    service.saveStressTestSessions(
+      uid,
+      state.map((s) => _sessionToJson(s)).toList(),
+    );
   }
 
   void setUserId(String? uid) {
@@ -160,7 +197,10 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     // appends on top of the real, already-current archive.
     _loadArchive(prefs);
     // ── Ephemeral active sessions (heavy) ────────────────────────
-    final raw = prefs.getString(_storageKey);
+    // If loadFromSupabase() already landed (async race — see
+    // _loadedFromSupabase docs above), don't let a stale/empty local
+    // cache clobber the just-synced server data.
+    final raw = _loadedFromSupabase ? null : prefs.getString(_storageKey);
     bool ranCatchUp = false;
     if (raw != null) {
       try {
@@ -476,6 +516,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     );
     state = [...state, session];
     _save();
+    _syncToSupabase();
     return id;
   }
 
@@ -517,6 +558,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     state = state.where((s) => s.id != id).toList();
     _sessionRandom.remove(id);
     _save();
+    _syncToSupabase();
   }
 
   /// ── Task 1.7: Delete ALL sessions — wipes both caches ─────────
@@ -528,6 +570,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _testCounter = 0;
     _sessionRandom.clear();
     _save();
+    _syncToSupabase();
   }
 
   /// Get a session by ID.
@@ -806,6 +849,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         if (i == idx) newSession else state[i],
     ];
     _save();
+    _syncToSupabase();
   }
 
   /// Refresh prices (called when user opens the stress test screen).
@@ -894,6 +938,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     state = state.where((s) => s.id != session.id).toList();
     _sessionRandom.remove(session.id);
     _save();
+    _syncToSupabase();
   }
 
   /// Manually complete a test before its natural end. Only Infinite ("until
@@ -1161,7 +1206,11 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 final stressTestProvider =
     StateNotifierProvider<StressTestNotifier, List<StressTestSession>>((ref) {
       final user = ref.watch(currentUserProvider);
-      return StressTestNotifier(userId: user?.id);
+      final supabaseService = ref.watch(userDataServiceProvider);
+      return StressTestNotifier(
+        userId: user?.id,
+        supabaseService: supabaseService,
+      );
     });
 
 /// Reactive provider for a stress test session by ID (family).

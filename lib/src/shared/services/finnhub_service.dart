@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import '../../core/utils/constants.dart';
+import '../../core/supabase/supabase_client.dart';
 
 /// Talks to Finnhub — partly directly, partly via `scanco-backend` (the
 /// Finnhub proxy/cache server, see d:/Projects/scanco-backend), which
@@ -85,6 +86,15 @@ class FinnhubService {
     _backendDio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
+          // Read the CURRENT session token fresh on every request (not
+          // cached at Dio-construction time) — supabase_flutter auto-
+          // refreshes it in the background, so a stale copy would start
+          // failing the backend's JWT verification after expiry.
+          final accessToken =
+              SupabaseConfig.client.auth.currentSession?.accessToken;
+          if (accessToken != null) {
+            options.headers['Authorization'] = 'Bearer $accessToken';
+          }
           debugPrint('🖥️ ➡️ Backend REQ: ${options.uri}');
           handler.next(options);
         },
