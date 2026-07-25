@@ -12,6 +12,7 @@ import 'portfolio_limits_provider.dart';
 import 'portfolio_ad_provider.dart';
 import 'portfolio_widget_order_provider.dart';
 import 'widgets/portfolio_summary_widget.dart';
+import 'widgets/target_widget.dart';
 import 'widgets/portfolio_allocation_widget.dart';
 import 'widgets/portfolio_holdings_widget.dart';
 import '../home/widgets/portfolio_journal_widget.dart';
@@ -133,7 +134,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
   }
 
   Widget _emptyState(BuildContext context) {
-    final startingCapital = ref.watch(startingCapitalProvider);
+    final startingCapital = startingCapitalForIndex(0);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -242,7 +243,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                     .read(portfoliosProvider.notifier)
                     .addPortfolio(
                       controller.text.trim(),
-                      startingBalance: ref.read(startingCapitalProvider),
+                      startingBalance: startingCapitalForIndex(currentCount),
                     );
                 Navigator.pop(ctx);
               }
@@ -414,6 +415,9 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               ref
                   .read(portfoliosProvider.notifier)
                   .deletePortfolio(portfolioId);
+              if (ref.read(activePortfolioIdProvider) == portfolioId) {
+                ref.read(activePortfolioIdProvider.notifier).state = null;
+              }
               Navigator.pop(ctx);
             },
             child: Text(
@@ -634,6 +638,16 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             hasError: hasError,
           ),
         );
+      case 'target':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: TargetWidget(
+            portfolioId: widget.portfolioId,
+            performance: performance,
+            isLoading: isLoading,
+            hasError: hasError,
+          ),
+        );
       case 'portfolio_allocation':
         if (isLoading ||
             hasError ||
@@ -810,6 +824,9 @@ class _PortfolioSelector extends ConsumerWidget {
           TextButton(
             onPressed: () {
               ref.read(portfoliosProvider.notifier).deletePortfolio(id);
+              if (ref.read(activePortfolioIdProvider) == id) {
+                ref.read(activePortfolioIdProvider.notifier).state = null;
+              }
               Navigator.pop(ctx);
             },
             child: Text(
@@ -884,6 +901,8 @@ class _PortfolioWidgetsSettingsSheetState
     switch (id) {
       case 'portfolio_summary':
         return Icons.account_balance_rounded;
+      case 'target':
+        return Icons.track_changes_rounded;
       case 'portfolio_allocation':
         return Icons.pie_chart_rounded;
       case 'portfolio_holdings':
@@ -939,6 +958,10 @@ class _PortfolioWidgetsSettingsSheetState
                       _configs = [
                         const PortfolioWidgetConfig(
                           id: 'portfolio_summary',
+                          visible: true,
+                        ),
+                        const PortfolioWidgetConfig(
+                          id: 'target',
                           visible: true,
                         ),
                         const PortfolioWidgetConfig(

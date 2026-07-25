@@ -5,6 +5,7 @@ import '../../core/utils/constants.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/user_data_service.dart';
+import 'portfolio_limits_provider.dart';
 
 // ---------------------------------------------------------------------------
 // Models
@@ -192,6 +193,7 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
         Portfolio(
           id: 'default_${DateTime.now().millisecondsSinceEpoch}',
           name: 'Portfolio',
+          startingBalance: firstPortfolioStartingCapital,
         ),
       ];
       await _saveLocal();
@@ -295,6 +297,8 @@ class PortfolioPerformance {
   final double currentValue;
   final double pnl;
   final double pnlPercent;
+  final double startingBalance;
+  final double? goalAmount;
   final List<HoldingPerformance> holdings;
   final bool isLoading;
   final String? error;
@@ -307,6 +311,8 @@ class PortfolioPerformance {
     required this.currentValue,
     required this.pnl,
     required this.pnlPercent,
+    required this.startingBalance,
+    this.goalAmount,
     required this.holdings,
     this.isLoading = false,
     this.error,
@@ -352,6 +358,8 @@ final portfolioPerformanceProvider =
       currentValue: portfolio.cash,
       pnl: 0,
       pnlPercent: 0,
+      startingBalance: portfolio.startingBalance,
+      goalAmount: portfolio.goalAmount,
       holdings: [],
     );
   }
@@ -379,7 +387,9 @@ final portfolioPerformanceProvider =
         currentPrice: currentPrice,
         currentValue: currentValue,
         pnl: currentValue - totalCost,
-        pnlPercent: ((currentValue - totalCost) / totalCost) * 100,
+        pnlPercent: totalCost > 0
+            ? ((currentValue - totalCost) / totalCost) * 100
+            : 0.0,
       ));
     } catch (_) {
       // If quote fails, use avgCost as current price
@@ -410,6 +420,8 @@ final portfolioPerformanceProvider =
     currentValue: totalCurrentValue,
     pnl: pnl,
     pnlPercent: pnlPercent,
+    startingBalance: portfolio.startingBalance,
+    goalAmount: portfolio.goalAmount,
     holdings: holdingPerformances,
   );
 });

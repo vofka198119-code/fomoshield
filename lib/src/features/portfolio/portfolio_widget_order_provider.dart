@@ -12,6 +12,7 @@ import '../../core/supabase/supabase_providers.dart';
 
 const List<String> _defaultPortfolioWidgetOrder = [
   'portfolio_summary',
+  'target',
   'portfolio_allocation',
   'portfolio_holdings',
   'portfolio_journal',
@@ -35,6 +36,8 @@ class PortfolioWidgetConfig {
     switch (id) {
       case 'portfolio_summary':
         return 'Portfolio Summary';
+      case 'target':
+        return 'Target';
       case 'portfolio_allocation':
         return 'Allocation';
       case 'portfolio_holdings':

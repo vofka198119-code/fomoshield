@@ -179,24 +179,6 @@ class _PortfolioOrderEntryScreenState
       }
     }
 
-    // ── Market order warning for closed market ───────────────────
-    if (orderType == orders.OrderType.market &&
-        session == orders.MarketSession.closed) {
-      _showMarketClosedWarning(
-        onConfirm: () {
-          _executeOrder(
-            orderType: orderType,
-            session: session,
-            side: side,
-            shares: shares,
-            amount: amount,
-            limitPrice: limitPrice,
-          );
-        },
-      );
-      return;
-    }
-
     _executeOrder(
       orderType: orderType,
       session: session,
@@ -259,83 +241,6 @@ class _PortfolioOrderEntryScreenState
         );
         context.pop();
       }
-    }
-  }
-
-  /// Show warning dialog when placing a market order while market is closed
-  Future<void> _showMarketClosedWarning({
-    required VoidCallback onConfirm,
-  }) async {
-    final session = _extendedHours
-        ? orders.MarketSession.afterHours
-        : orders.currentMarketSession();
-
-    final sessionLabel = session.label;
-
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: ThemeV2.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: Row(
-          children: [
-            const Icon(
-              Icons.access_time_rounded,
-              color: ThemeV2.primary,
-              size: 22,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Market is $sessionLabel',
-                style: GoogleFonts.inter(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: ThemeV2.textPrimary,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          'The market is currently $sessionLabel. '
-          'Your Market order will be queued and executed when the market opens. '
-          'You can cancel it anytime before execution.',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: ThemeV2.textSecondary,
-            height: 1.5,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: ThemeV2.textSecondary,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
-              'Place Order Anyway',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: ThemeV2.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      onConfirm();
     }
   }
 

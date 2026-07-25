@@ -14,6 +14,7 @@ import '../../features/search/search_screen.dart';
 import '../../features/portfolio/portfolio_screen.dart';
 import '../../features/portfolio/screens/portfolio_assets_screen.dart';
 import '../../features/portfolio/screens/portfolio_order_entry_screen.dart';
+import '../../features/portfolio/screens/set_goal_screen.dart';
 import '../../features/news/news_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
@@ -199,6 +200,14 @@ class AppRouter {
             symbol: symbol.toUpperCase(),
             orderType: (extra['type'] as String?) ?? 'buy',
           );
+        },
+      ),
+      GoRoute(
+        path: '/portfolio/:id/goal',
+        name: 'portfolioSetGoal',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return SetGoalScreen(portfolioId: id);
         },
       ),
 

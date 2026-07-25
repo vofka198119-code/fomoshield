@@ -117,18 +117,9 @@ class OrderNotifier extends StateNotifier<List<Order>> {
       session: session,
     );
 
-    // For market orders:
-    //   - If market is open (regular/pre/after-hours): execute immediately
-    //   - If market is closed (weekend/night): add as PENDING, will execute
-    //     when the market opens via processPendingOrders()
+    // Market orders always execute immediately, regardless of real-world
+    // market hours — this is a paper-trading simulator, not a live broker.
     if (type == OrderType.market) {
-      if (session == MarketSession.closed) {
-        state = [...state, order];
-        _saveLocal();
-        _syncToSupabase();
-        return order;
-      }
-
       final engine = OrderExecutionService();
       final result = engine.evaluateOrder(
         order: order,

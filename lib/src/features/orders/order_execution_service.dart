@@ -97,15 +97,6 @@ class OrderExecutionService {
       );
     }
 
-    // Check if market is closed
-    if (session == MarketSession.closed && order.type == OrderType.market) {
-      return OrderExecutionResult(
-        updatedOrder: order,
-        wasExecuted: false,
-        message: 'Market is closed. Order will wait for opening.',
-      );
-    }
-
     // Evaluate based on order type
     switch (order.type) {
       case OrderType.market:

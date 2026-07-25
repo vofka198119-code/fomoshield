@@ -236,6 +236,8 @@ class ProfileScreen extends ConsumerWidget {
                             .read(portfoliosProvider.notifier)
                             .deletePortfolio(p.id);
                       }
+                      ref.read(activePortfolioIdProvider.notifier).state =
+                          null;
                       _showSnack(context, 'All portfolios cleared');
                     },
                   ),
