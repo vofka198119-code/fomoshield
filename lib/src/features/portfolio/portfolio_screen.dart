@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
@@ -133,6 +134,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
   }
 
   Widget _emptyState(BuildContext context) {
+    final startingCapital = ref.watch(startingCapitalProvider);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -155,7 +157,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Create your first virtual portfolio\nwith \$10,000 starting balance',
+              'Create your first virtual portfolio\nwith \$${NumberFormat('#,##0', 'en_US').format(startingCapital)} starting balance',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
             ),

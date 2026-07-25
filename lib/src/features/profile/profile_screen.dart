@@ -600,9 +600,9 @@ class _PremiumStatusCard extends ConsumerWidget {
         // Benefits list
         _benefitRow(Icons.search_rounded, 'Unlimited daily searches'),
         const SizedBox(height: 6),
-        _benefitRow(Icons.account_balance_rounded, 'Up to 6 portfolios'),
+        _benefitRow(Icons.account_balance_rounded, 'Up to 3 portfolios'),
         const SizedBox(height: 6),
-        _benefitRow(Icons.monetization_on_rounded, '\$15,000 starting capital'),
+        _benefitRow(Icons.monetization_on_rounded, '\$50,000 starting capital'),
         const SizedBox(height: 6),
         _benefitRow(Icons.psychology_rounded, 'Up to 5 stress tests'),
         const SizedBox(height: 6),

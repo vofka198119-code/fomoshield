@@ -195,12 +195,12 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                 const SizedBox(height: 10),
                 _featureRow(
                   Icons.account_balance_rounded,
-                  'Up to 6 portfolios',
+                  'Up to 3 portfolios',
                 ),
                 const SizedBox(height: 10),
                 _featureRow(
                   Icons.monetization_on_rounded,
-                  '\$15,000 starting capital',
+                  '\$50,000 starting capital',
                 ),
                 const SizedBox(height: 10),
                 _featureRow(Icons.psychology_rounded, 'Up to 5 stress tests'),

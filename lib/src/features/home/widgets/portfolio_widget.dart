@@ -7,7 +7,6 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../portfolio/portfolio_providers.dart';
-import 'portfolio_goal_gauge.dart';
 
 // ---------------------------------------------------------------------------
 // Portfolio Widget — Live portfolio summary for Home screen
@@ -21,10 +20,11 @@ class PortfolioWidget extends ConsumerStatefulWidget {
 }
 
 class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
-  // Generous fixed height for the swipeable page area — the 4-cell layout's
-  // text is all fixed-size numbers/labels, so real content height barely
-  // varies between portfolios; top-aligned content absorbs the rest.
-  static const double _pageAreaHeight = 230;
+  // Fixed height for the swipeable page area, sized to the actual 4-cell
+  // content: top row (Balance/Cash stack, ~132) + 8 spacer + P&L/Change
+  // stack (~122). Text is all fixed-size numbers/labels, so real content
+  // height barely varies between portfolios.
+  static const double _pageAreaHeight = 270;
 
   late final PageController _pageController;
   int _currentIndex = 0;
@@ -245,7 +245,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
       error: (_, _) => Text('\$– – –',
           style: interNums(
               fontSize: 28,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: ThemeV2.textPrimary)),
       data: (perf) {
         final isUp = perf.pnl >= 0;
@@ -253,67 +253,34 @@ class _PortfolioPerformanceView extends ConsumerWidget {
         final pnlBg = isUp ? ThemeV2.successBg : ThemeV2.lossBg;
 
         return Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      children: [
-                        _cell(
-                          label: 'PORTFOLIO BALANCE',
-                          value: '\$${perf.currentValue.toStringAsFixed(2)}',
-                          bgColor: ThemeV2.primaryBg,
-                        ),
-                        const SizedBox(height: 8),
-                        _cell(
-                          label: 'CASH AVAILABLE',
-                          value: '\$${perf.cash.toStringAsFixed(2)}',
-                          bgColor: ThemeV2.primaryBg,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 2,
-                    child: PortfolioGoalGauge(
-                      portfolioId: portfolioId,
-                      currentValue: perf.currentValue,
-                    ),
-                  ),
-                ],
-              ),
+            _cell(
+              label: 'PORTFOLIO BALANCE',
+              value: '\$${perf.currentValue.toStringAsFixed(2)}',
+              bgColor: ThemeV2.primaryBg,
             ),
-            const SizedBox(height: 8),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _cell(
-                    label: 'UNREALIZED P&L',
-                    value:
-                        '${isUp ? '+' : ''}\$${perf.pnl.toStringAsFixed(2)}',
-                    valueFontSize: 14,
-                    bgColor: pnlBg,
-                    valueColor: pnlColor,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _cell(
-                    label: 'CHANGE',
-                    value:
-                        '${isUp ? '+' : ''}${perf.pnlPercent.toStringAsFixed(2)}%',
-                    valueFontSize: 14,
-                    bgColor: pnlBg,
-                    valueColor: pnlColor,
-                  ),
-                ),
-              ],
+            const SizedBox(height: 6),
+            _cell(
+              label: 'CASH AVAILABLE',
+              value: '\$${perf.cash.toStringAsFixed(2)}',
+              bgColor: ThemeV2.primaryBg,
+            ),
+            const SizedBox(height: 6),
+            _cell(
+              label: 'UNREALIZED P&L',
+              value: '${isUp ? '+' : ''}\$${perf.pnl.toStringAsFixed(2)}',
+              valueFontSize: 14,
+              bgColor: pnlBg,
+              valueColor: pnlColor,
+            ),
+            const SizedBox(height: 6),
+            _cell(
+              label: 'CHANGE',
+              value:
+                  '${isUp ? '+' : ''}${perf.pnlPercent.toStringAsFixed(2)}%',
+              valueFontSize: 14,
+              bgColor: pnlBg,
+              valueColor: pnlColor,
             ),
           ],
         );
@@ -330,7 +297,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(16),
@@ -356,7 +323,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
               value,
               style: interNums(
                 fontSize: valueFontSize,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: valueColor ?? ThemeV2.textPrimary,
                 letterSpacing: -0.3,
               ),
