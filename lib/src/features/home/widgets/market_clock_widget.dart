@@ -76,7 +76,19 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
               color: Colors.white.withValues(alpha: 0.1),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Text(
+                'NEW YORK TIME',
+                style: GoogleFonts.inter(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  color: dialBrassLight.withValues(alpha: 0.7),
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

@@ -205,6 +205,27 @@ const List<MarketWindow> marketWindows = [
   ),
 ];
 
+/// Shown all day on weekends/holidays instead of the nightly `closed`
+/// window above — that one's `timeRangeLabel` ("20:00 – 04:00") is only
+/// accurate for the overnight gap on a normal trading day and reads as
+/// wrong/confusing if shown at, say, 11:00 AM on a Sunday (real bug caught
+/// by the user 2026-07-26: dial correctly showed 11:29 ET but the copy said
+/// "20:00 – 04:00"). This window's label covers the whole day instead.
+const weekendClosedWindow = MarketWindow(
+  id: 'weekend-closed',
+  emoji: '📅',
+  shortHeadline: 'Биржа закрыта',
+  shortDetail: 'Нерабочий день — торгов нет весь день',
+  fullTitle: 'Нерабочий день (Weekend / Holiday)',
+  timeRangeLabel: 'Весь день',
+  phase: MarketPhase.closed,
+  startMinute: 0,
+  endMinute: 1440,
+  whatHappens: 'Сегодня выходной или биржевой праздник — торги не проводятся весь день.',
+  whyItMatters: 'Никакие заявки не исполняются, цены не двигаются до открытия премаркета в следующий рабочий день (04:00 ET).',
+  whatToDo: 'Использовать время для анализа портфеля и планирования сделок на следующую сессию.',
+);
+
 /// Shown instead of the normal Market-Open sub-windows on an early-close day
 /// (Black Friday / Christmas Eve), covering the compressed 12:00–13:00 ET
 /// stretch right before the 1:00 PM close. This is a v1 simplification —
@@ -228,6 +249,7 @@ const earlyCloseWindow = MarketWindow(
 
 MarketWindow? findWindowById(String id) {
   if (id == earlyCloseWindow.id) return earlyCloseWindow;
+  if (id == weekendClosedWindow.id) return weekendClosedWindow;
   for (final w in marketWindows) {
     if (w.id == id) return w;
   }
@@ -350,7 +372,7 @@ MarketClockState resolveMarketClockState(DateTime nowEt) {
     return MarketClockState(
       nowEt: nowEt,
       phase: MarketPhase.closed,
-      window: marketWindows.last,
+      window: weekendClosedWindow,
       isHoliday: true,
       isEarlyCloseDay: false,
     );
