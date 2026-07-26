@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Set Goal Screen — full-screen profit-goal input for the TARGET widget
+// Set Goal Screen — full-screen total-balance-goal input for the TARGET widget
 // ---------------------------------------------------------------------------
 // Pushed as a real route (not a showDialog/showModalBottomSheet overlay) —
 // see project memory on the invisible-dialog bug: overlays in this app
@@ -15,6 +15,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../portfolio_providers.dart';
+
+// Fallback only — normally the min goal is the portfolio's own
+// startingBalance ($15k for the first portfolio, $50k for the 2nd/3rd).
+const double _fallbackMinGoal = 15000;
 
 class SetGoalScreen extends ConsumerStatefulWidget {
   final String portfolioId;
@@ -47,11 +51,22 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
     super.dispose();
   }
 
+  double get _minGoal {
+    final portfolios = ref.read(portfoliosProvider);
+    final portfolio = portfolios.where((p) => p.id == widget.portfolioId);
+    return portfolio.isEmpty ? _fallbackMinGoal : portfolio.first.startingBalance;
+  }
+
   void _save() {
     final amount = double.tryParse(_controller.text);
-    if (amount == null || amount <= 0) {
+    final minGoal = _minGoal;
+    if (amount == null || amount < minGoal) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid profit goal')),
+        SnackBar(
+          content: Text(
+            'Minimum target is \$${minGoal.toStringAsFixed(0)}',
+          ),
+        ),
       );
       return;
     }
@@ -61,6 +76,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final minGoal = _minGoal;
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -86,7 +102,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'How much profit do you want to make?',
+                'What total portfolio value do you want to reach?',
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -95,7 +111,8 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'This is a profit target, not your total portfolio balance.',
+                'This is your target total balance, not extra profit on top. '
+                'Minimum \$${minGoal.toStringAsFixed(0)}.',
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: ThemeV2.textSecondary,
@@ -121,7 +138,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                     fontWeight: FontWeight.w600,
                     color: ThemeV2.textPrimary,
                   ),
-                  hintText: '5,000',
+                  hintText: minGoal.toStringAsFixed(0),
                   hintStyle: GoogleFonts.inter(color: ThemeV2.textSecondary),
                   filled: true,
                   fillColor: ThemeV2.surface,

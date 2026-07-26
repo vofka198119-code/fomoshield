@@ -7,6 +7,7 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../portfolio/portfolio_providers.dart';
+import '../../portfolio/widgets/target_widget.dart' show targetDisplayPercent;
 
 // ---------------------------------------------------------------------------
 // Portfolio Widget — Live portfolio summary for Home screen
@@ -251,38 +252,61 @@ class _PortfolioPerformanceView extends ConsumerWidget {
         final isUp = perf.pnl >= 0;
         final pnlColor = isUp ? ThemeV2.success : ThemeV2.loss;
         final pnlBg = isUp ? ThemeV2.successBg : ThemeV2.lossBg;
+        final barPercent = targetDisplayPercent(
+          currentValue: perf.currentValue,
+          startingBalance: perf.startingBalance,
+          goalAmount: perf.goalAmount,
+        );
 
-        return Column(
-          children: [
-            _cell(
-              label: 'PORTFOLIO BALANCE',
-              value: '\$${perf.currentValue.toStringAsFixed(2)}',
-              bgColor: ThemeV2.primaryBg,
-            ),
-            const SizedBox(height: 6),
-            _cell(
-              label: 'CASH AVAILABLE',
-              value: '\$${perf.cash.toStringAsFixed(2)}',
-              bgColor: ThemeV2.primaryBg,
-            ),
-            const SizedBox(height: 6),
-            _cell(
-              label: 'UNREALIZED P&L',
-              value: '${isUp ? '+' : ''}\$${perf.pnl.toStringAsFixed(2)}',
-              valueFontSize: 14,
-              bgColor: pnlBg,
-              valueColor: pnlColor,
-            ),
-            const SizedBox(height: 6),
-            _cell(
-              label: 'CHANGE',
-              value:
-                  '${isUp ? '+' : ''}${perf.pnlPercent.toStringAsFixed(2)}%',
-              valueFontSize: 14,
-              bgColor: pnlBg,
-              valueColor: pnlColor,
-            ),
-          ],
+        // IntrinsicHeight so the Row (with a stretch child) gets a real
+        // bounded height from the 4-cell column instead of an unbounded
+        // one — see project memory on the infinite-height Row+stretch bug
+        // that previously blanked this exact widget.
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    _cell(
+                      label: 'PORTFOLIO BALANCE',
+                      value: '\$${perf.currentValue.toStringAsFixed(2)}',
+                      bgColor: ThemeV2.primaryBg,
+                    ),
+                    const SizedBox(height: 6),
+                    _cell(
+                      label: 'CASH AVAILABLE',
+                      value: '\$${perf.cash.toStringAsFixed(2)}',
+                      bgColor: ThemeV2.primaryBg,
+                    ),
+                    const SizedBox(height: 6),
+                    _cell(
+                      label: 'UNREALIZED P&L',
+                      value:
+                          '${isUp ? '+' : ''}\$${perf.pnl.toStringAsFixed(2)}',
+                      valueFontSize: 14,
+                      bgColor: pnlBg,
+                      valueColor: pnlColor,
+                    ),
+                    const SizedBox(height: 6),
+                    _cell(
+                      label: 'CHANGE',
+                      value:
+                          '${isUp ? '+' : ''}${perf.pnlPercent.toStringAsFixed(2)}%',
+                      valueFontSize: 14,
+                      bgColor: pnlBg,
+                      valueColor: pnlColor,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _VerticalProgressBar(currentPercent: barPercent),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -330,6 +354,156 @@ class _PortfolioPerformanceView extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Vertical mirror of TARGET's `_GraphWindow` (`target_widget.dart`) — same
+/// gradient panel, same 20-segment red/yellow/green fill, same pill and
+/// tick styling, just rotated: pill on the left, bar in the middle,
+/// -100%/0%/+100% ticks on the right (instead of marker-above,
+/// bar-below, ticks-below). The panel fills its whole half of the Home
+/// card — no extra whitespace around a narrower track.
+class _VerticalProgressBar extends StatelessWidget {
+  final double currentPercent; // -100..100
+
+  const _VerticalProgressBar({required this.currentPercent});
+
+  static const int _segmentCount = 20;
+  static const double _rangeWidth = 200 / _segmentCount; // 10%
+  static const Color _red = Color(0xFFFF3B30);
+  static const Color _yellow = Color(0xFFFFD600);
+  static const Color _green = Color(0xFF00C853);
+  static const Color _unfilled = Color(0x33FFFFFF); // white @ 20%
+
+  static double _rangeStart(int index) => -100 + index * _rangeWidth;
+
+  // index 0 = bottom (-100%, red) .. last index = top (+100%, green).
+  static Color _colorForIndex(int index) {
+    final t = (index + 0.5) / _segmentCount;
+    if (t <= 0.5) return Color.lerp(_red, _yellow, t / 0.5)!;
+    return Color.lerp(_yellow, _green, (t - 0.5) / 0.5)!;
+  }
+
+  double _fillFraction(int index) {
+    final start = _rangeStart(index);
+    if (currentPercent <= start) return 0.0;
+    if (currentPercent >= start + _rangeWidth) return 1.0;
+    return (currentPercent - start) / _rangeWidth;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = ((currentPercent + 100) / 200).clamp(0.0, 1.0); // 0 bottom..1 top
+    // Fractional Alignment.y: -1 = top, +1 = bottom. t=0 (bottom) -> y=1,
+    // t=1 (top) -> y=-1. No LayoutBuilder (and no pixel math from a
+    // constraints.maxHeight) — IntrinsicHeight (used by the parent Row)
+    // can't be wrapped around a LayoutBuilder, since LayoutBuilder can't
+    // answer intrinsic-size queries; that combination threw "LayoutBuilder
+    // does not support returning intrinsic dimensions" and silently
+    // blanked this whole card. Align sidesteps the problem entirely.
+    final pillAlignY = (1 - 2 * t).clamp(-1.0, 1.0);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(10, 14, 12, 14),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2A6B4C), Color(0xFF163D2C)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          // Marker pill, floating beside the bar at the current position.
+          SizedBox(
+            width: 34,
+            child: Align(
+              alignment: Alignment(0, pillAlignY),
+              child: Container(
+                height: 20,
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: ThemeV2.primary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          // The segmented bar itself, narrowed to 80% width (centered).
+          Expanded(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              child: Column(
+                verticalDirection: VerticalDirection.up,
+                children: List.generate(_segmentCount, (i) {
+                  final fraction = _fillFraction(i);
+                  return Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        top: i == _segmentCount - 1 ? 0 : 3,
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        color: _unfilled,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: fraction > 0
+                          ? Align(
+                              alignment: Alignment.bottomCenter,
+                              child: FractionallySizedBox(
+                                heightFactor: fraction,
+                                child: Container(color: _colorForIndex(i)),
+                              ),
+                            )
+                          : null,
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          // -100%/0%/+100% ticks, bottom to top.
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              _VerticalTick('+100%'),
+              _VerticalTick('0%'),
+              _VerticalTick('-100%'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VerticalTick extends StatelessWidget {
+  final String label;
+  const _VerticalTick(this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: GoogleFonts.inter(
+        fontSize: 10,
+        fontWeight: FontWeight.w600,
+        color: Colors.white.withValues(alpha: 0.5),
       ),
     );
   }

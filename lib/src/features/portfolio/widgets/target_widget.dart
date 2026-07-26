@@ -18,10 +18,38 @@ const List<Color> _indicatorGradient = [
 String _fmtCurrency(double amount) =>
     '\$${NumberFormat('#,##0', 'en_US').format(amount)}';
 
-/// Bidirectional progress bar: -100% / 0% / +100%, where 0% is the
-/// portfolio's starting capital and +/-100% is the capital doubled/wiped
-/// out. The user's profit goal is a fixed dollar amount, plotted as a flag
-/// on this same fixed scale (clamped to the edge if it exceeds ±100%).
+/// Maps a portfolio's current total value onto the -100%/0%/+100% scale.
+/// Below starting capital: -100%..0% spans $0..startingBalance (fixed).
+/// Above starting capital: 0%..+100% spans startingBalance..goalAmount —
+/// rescaling to whatever goal is set, or startingBalance doubled as a
+/// fallback when no goal exists yet. Public — also used by the Home
+/// screen's compact vertical bar (`portfolio_widget.dart`) so both bars
+/// agree on the same scale.
+double targetDisplayPercent({
+  required double currentValue,
+  required double startingBalance,
+  required double? goalAmount,
+}) {
+  if (startingBalance <= 0) return 0.0;
+  final diff = currentValue - startingBalance;
+  if (diff <= 0) {
+    return (diff / startingBalance) * 100;
+  }
+  final upperSpan = (goalAmount != null && goalAmount > startingBalance)
+      ? (goalAmount - startingBalance)
+      : startingBalance;
+  return (diff / upperSpan) * 100;
+}
+
+/// Bidirectional progress bar: -100% / 0% / +100%, where 0% is always the
+/// portfolio's starting capital and -100% is always $0 (wiped out). The
+/// right side is NOT fixed: +100% is the portfolio's total-value goal
+/// (an absolute dollar target the user sets, e.g. "reach $15,685" — not a
+/// profit amount), so the bar's positive half rescales to whatever goal
+/// is set. Before a goal is set, the positive half falls back to
+/// "starting capital doubled" so the bar still has a sensible right edge.
+/// No flag/marker is drawn for the goal itself — since it's always
+/// exactly the right edge by definition, a marker there is redundant.
 class TargetWidget extends ConsumerWidget {
   final String portfolioId;
   final PortfolioPerformance? performance;
@@ -41,15 +69,16 @@ class TargetWidget extends ConsumerWidget {
     final perf = performance;
     final hasData = perf != null && !isLoading && !hasError;
 
-    final currentPercent = hasData ? perf.pnlPercent : 0.0;
+    final currentValue = hasData ? perf.currentValue : 0.0;
     final goalAmount = hasData ? perf.goalAmount : null;
     final startingBalance = hasData ? perf.startingBalance : 0.0;
-    final pnl = hasData ? perf.pnl : 0.0;
 
-    final goalPercent = (goalAmount != null && startingBalance > 0)
-        ? (goalAmount / startingBalance * 100).clamp(-100.0, 100.0)
-        : null;
-    final remaining = goalAmount != null ? goalAmount - pnl : null;
+    final currentPercent = targetDisplayPercent(
+      currentValue: currentValue,
+      startingBalance: startingBalance,
+      goalAmount: goalAmount,
+    );
+    final remaining = goalAmount != null ? goalAmount - currentValue : null;
 
     return CardFrame(
       showTopBar: false,
@@ -65,7 +94,6 @@ class TargetWidget extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
             child: _GraphWindow(
               currentPercent: currentPercent,
-              goalPercent: goalPercent,
             ),
           ),
           Padding(
@@ -88,8 +116,10 @@ class TargetWidget extends ConsumerWidget {
   }
 }
 
-/// Goal amount (left) / amount left to reach it (right) — same cell style
-/// (fonts, olive fill) as the Home Portfolio widget's Balance/Cash cells.
+/// Goal amount (left) / amount left to reach it (right) — two separate
+/// boxes, same cell style (fonts, olive fill) as the Home Portfolio
+/// widget's Balance/Cash cells. The right box is tinted red while short
+/// of the goal, green once it's met or exceeded.
 class _GoalSummaryRow extends StatelessWidget {
   final double? goalAmount;
   final double? remaining; // >0: still short, <=0: goal met/exceeded
@@ -102,42 +132,62 @@ class _GoalSummaryRow extends StatelessWidget {
 
     String remainingText = '—';
     Color remainingColor = ThemeV2.textPrimary;
+    Color remainingBg = ThemeV2.primaryBg;
     if (remaining != null) {
       if (remaining! > 0) {
         remainingText = '-${_fmtCurrency(remaining!)}';
         remainingColor = ThemeV2.loss;
+        remainingBg = ThemeV2.lossBg;
       } else {
         remainingText = '+${_fmtCurrency(-remaining!)}';
         remainingColor = ThemeV2.success;
+        remainingBg = ThemeV2.successBg;
       }
     }
 
+    return Row(
+      children: [
+        Expanded(
+          child: _summaryBox(
+            label: 'GOAL',
+            value: goalText,
+            alignEnd: false,
+            bgColor: ThemeV2.primaryBg,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _summaryBox(
+            label: 'LEFT TO GOAL',
+            value: remainingText,
+            valueColor: remainingColor,
+            alignEnd: true,
+            bgColor: remainingBg,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _summaryBox({
+    required String label,
+    required String value,
+    required bool alignEnd,
+    required Color bgColor,
+    Color valueColor = ThemeV2.textPrimary,
+  }) {
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: ThemeV2.primaryBg,
+        color: bgColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: ThemeV2.divider),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _summaryCell(
-              label: 'GOAL',
-              value: goalText,
-              alignEnd: false,
-            ),
-          ),
-          Expanded(
-            child: _summaryCell(
-              label: 'LEFT TO GOAL',
-              value: remainingText,
-              valueColor: remainingColor,
-              alignEnd: true,
-            ),
-          ),
-        ],
+      child: _summaryCell(
+        label: label,
+        value: value,
+        alignEnd: alignEnd,
+        valueColor: valueColor,
       ),
     );
   }
@@ -227,12 +277,11 @@ class _SelectGoalButton extends StatelessWidget {
 }
 
 /// The graph "window" — its own gradient-backed panel nested inside the
-/// standard card, holding the marker, bar (+ goal flag), and tick labels.
+/// standard card, holding the marker, bar, and tick labels.
 class _GraphWindow extends StatelessWidget {
   final double currentPercent;
-  final double? goalPercent;
 
-  const _GraphWindow({required this.currentPercent, required this.goalPercent});
+  const _GraphWindow({required this.currentPercent});
 
   @override
   Widget build(BuildContext context) {
@@ -252,12 +301,7 @@ class _GraphWindow extends StatelessWidget {
         children: [
           _MarkerRow(currentPercent: currentPercent),
           const SizedBox(height: 4),
-          Stack(
-            children: [
-              _SegmentedBar(currentPercent: currentPercent),
-              if (goalPercent != null) _GoalFlag(goalPercent: goalPercent!),
-            ],
-          ),
+          _SegmentedBar(currentPercent: currentPercent),
           const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -337,66 +381,37 @@ class _MarkerRow extends StatelessWidget {
   }
 }
 
-/// Thin vertical line marking the profit-goal position on the bar.
-class _GoalFlag extends StatelessWidget {
-  final double goalPercent; // any range, clamped for position only
-  const _GoalFlag({required this.goalPercent});
-
-  @override
-  Widget build(BuildContext context) {
-    final t = ((goalPercent + 100) / 200).clamp(0.0, 1.0); // 0..1
-    return SizedBox(
-      height: 28,
-      width: double.infinity,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final x = (t * constraints.maxWidth - 1).clamp(
-            0.0,
-            constraints.maxWidth - 2,
-          );
-          return Stack(
-            children: [
-              Positioned(
-                left: x,
-                top: 0,
-                bottom: 0,
-                child: Container(width: 2, color: Colors.white),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
 /// Row of small segments, color-graded red (-100%) -> yellow (0%) ->
-/// green (+100%). Only the segments between 0% and the current position
-/// are colored (progressive fill); the rest sit grey.
+/// green (+100%). Each segment spans a fixed 10%-wide range of the
+/// -100%..+100% scale; the segment the current position falls inside
+/// is only partially colored, proportional to how far through its
+/// range the position sits (e.g. +5% lights up half of the 0%-10%
+/// segment). Segments fully below the current position are fully
+/// colored, segments above stay grey.
 class _SegmentedBar extends StatelessWidget {
   final double currentPercent; // -100..100
   const _SegmentedBar({required this.currentPercent});
 
-  static const int _segmentCount = 21;
+  static const int _segmentCount = 20;
+  static const double _rangeWidth = 200 / _segmentCount; // 10%
   static const Color _red = Color(0xFFFF3B30);
   static const Color _yellow = Color(0xFFFFD600);
   static const Color _green = Color(0xFF00C853);
   static const Color _unfilled = Color(0x33FFFFFF); // white @ 20%
 
-  static double _percentForIndex(int index) =>
-      -100 + (index / (_segmentCount - 1)) * 200;
+  static double _rangeStart(int index) => -100 + index * _rangeWidth;
 
   static Color _colorForIndex(int index) {
-    final t = index / (_segmentCount - 1); // 0..1
+    final t = (index + 0.5) / _segmentCount; // midpoint, 0..1
     if (t <= 0.5) return Color.lerp(_red, _yellow, t / 0.5)!;
     return Color.lerp(_yellow, _green, (t - 0.5) / 0.5)!;
   }
 
-  bool _isFilled(int index) {
-    final segPercent = _percentForIndex(index);
-    return currentPercent >= 0
-        ? (segPercent >= 0 && segPercent <= currentPercent)
-        : (segPercent <= 0 && segPercent >= currentPercent);
+  double _fillFraction(int index) {
+    final start = _rangeStart(index);
+    if (currentPercent <= start) return 0.0;
+    if (currentPercent >= start + _rangeWidth) return 1.0;
+    return (currentPercent - start) / _rangeWidth;
   }
 
   @override
@@ -405,15 +420,24 @@ class _SegmentedBar extends StatelessWidget {
       height: 28,
       child: Row(
         children: List.generate(_segmentCount, (i) {
+          final fraction = _fillFraction(i);
           return Expanded(
             child: Container(
               margin: EdgeInsets.only(
                 right: i == _segmentCount - 1 ? 0 : 3,
               ),
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: _isFilled(i) ? _colorForIndex(i) : _unfilled,
+                color: _unfilled,
                 borderRadius: BorderRadius.circular(4),
               ),
+              child: fraction > 0
+                  ? FractionallySizedBox(
+                      widthFactor: fraction,
+                      alignment: Alignment.centerLeft,
+                      child: Container(color: _colorForIndex(i)),
+                    )
+                  : null,
             ),
           );
         }),
