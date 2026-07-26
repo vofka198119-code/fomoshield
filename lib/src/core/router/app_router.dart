@@ -15,7 +15,8 @@ import '../../features/portfolio/portfolio_screen.dart';
 import '../../features/portfolio/screens/portfolio_assets_screen.dart';
 import '../../features/portfolio/screens/portfolio_order_entry_screen.dart';
 import '../../features/portfolio/screens/set_goal_screen.dart';
-import '../../features/news/news_screen.dart';
+import '../../features/market_clock/market_clock_screen.dart';
+import '../../features/market_clock/market_period_detail_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
 import '../../features/stress_test/stress_test_setup_screen.dart';
@@ -89,11 +90,19 @@ class AppRouter {
         builder: (context, state) => const SearchScreen(),
       ),
 
-      // News — standalone (outside shell)
+      // Market Clock — standalone (outside shell)
       GoRoute(
-        path: '/news',
-        name: 'news',
-        builder: (context, state) => const NewsScreen(),
+        path: '/market-clock',
+        name: 'marketClock',
+        builder: (context, state) => const MarketClockScreen(),
+      ),
+      GoRoute(
+        path: '/market-clock/period/:id',
+        name: 'marketClockPeriod',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return MarketPeriodDetailScreen(windowId: id);
+        },
       ),
 
       // ── Stress Test (full screen, no bottom nav) ──────────────────

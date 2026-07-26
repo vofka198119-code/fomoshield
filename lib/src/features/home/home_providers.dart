@@ -585,24 +585,6 @@ Future<List<CalendarEvent>> _fetchWatchlistNews(
 }
 
 // ---------------------------------------------------------------------------
-// News Provider (Fetches general market news)
-// ---------------------------------------------------------------------------
-
-final newsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  try {
-    final api = FinnhubService();
-    final raw = await api.generalNews();
-    return raw
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .take(5)
-        .toList();
-  } catch (e) {
-    debugPrint('❌ newsProvider error: $e');
-    return [];
-  }
-});
-
-// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

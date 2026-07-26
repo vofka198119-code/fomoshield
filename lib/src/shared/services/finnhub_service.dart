@@ -11,8 +11,7 @@ import '../../core/supabase/supabase_client.dart';
 ///
 /// Routed through the backend (works for ANY symbol, not just a fixed
 /// list — see the backend's `/quote` fallback path): [quote] (and
-/// therefore [previousTradingDayQuote], which calls it), [candles],
-/// [generalNews].
+/// therefore [previousTradingDayQuote], which calls it), [candles].
 ///
 /// Routed through the backend, all with direct-Finnhub fallback on error
 /// (backend down/unreachable): [search], [companyProfile], [metrics],
@@ -23,9 +22,9 @@ import '../../core/supabase/supabase_client.dart';
 /// via live 403): [candles], [dividendsCalendar].
 ///
 /// [AppConstants.finnhubKey] stays embedded as the fallback path's
-/// credential (same reasoning as [quote]/[generalNews] already had) —
-/// under normal operation nothing uses it, but it's what keeps the app
-/// working if the backend is ever down.
+/// credential (same reasoning as [quote] already had) — under normal
+/// operation nothing uses it, but it's what keeps the app working if the
+/// backend is ever down.
 class FinnhubService {
   final Dio _dio;
   final Dio _backendDio;
@@ -453,14 +452,6 @@ class FinnhubService {
     }
   }
 
-  Future<List<dynamic>> generalNews() async {
-    try {
-      return await _getRawFromBackend('/news');
-    } catch (e) {
-      debugPrint('⚠️ Backend generalNews() failed, falling back direct: $e');
-      return _getRaw('/news', params: {'category': 'general'});
-    }
-  }
 
   // ---------------------------------------------------------------------------
   // Market Index
