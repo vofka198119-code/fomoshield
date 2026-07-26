@@ -29,10 +29,11 @@ part 'noise_engine.dart';
 
 const double _freeStartingCash = 5000;
 const double _premiumStartingCash = 15000;
-const int _freeMaxSessions = 1;
+// Concurrent active slots — free: 1 ad-free + 1 ad-gated (stubbed as a
+// "Go Premium" nudge until ad integration exists). No lifetime cap on
+// total tests ever created — completing/deleting a test frees its slot.
+const int _freeMaxSessions = 2;
 const int _premiumMaxSessions = 5;
-const int _freeMaxTotalSessions = 2; // free: 1 ad-free + 1 with ads
-const int _premiumMaxTotalSessions = 5; // premium: 5 total
 const int _adEveryNTrades = 5; // show ad after every N trades for free users
 const int _adEveryNOpen = 6; // show ad on every Nth opening
 
@@ -82,14 +83,6 @@ final maxStressTestSessionsProvider = Provider<int>((ref) {
   return (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
       ? _premiumMaxSessions
       : _freeMaxSessions;
-});
-
-/// Max total stress test sessions a user can ever create based on tier.
-final maxStressTestTotalProvider = Provider<int>((ref) {
-  final tier = ref.watch(subscriptionTierProvider);
-  return (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
-      ? _premiumMaxTotalSessions
-      : _freeMaxTotalSessions;
 });
 
 /// Starting cash for a stress test based on subscription tier.
@@ -518,11 +511,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _save();
     _syncToSupabase();
     return id;
-  }
-
-  /// Check if the user can create a new session based on the given max.
-  bool canCreateSession(int maxTotal) {
-    return _testCounter < maxTotal;
   }
 
   /// Whether this is the user's first ever session (ad-free for free users).

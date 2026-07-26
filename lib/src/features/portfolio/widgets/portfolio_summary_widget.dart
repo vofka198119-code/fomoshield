@@ -25,7 +25,6 @@ class PortfolioSummaryWidget extends StatelessWidget {
     if (isLoading || hasError || performance == null) {
       return WidgetContainer(
         title: 'PORTFOLIO SUMMARY',
-        onTap: () {},
         showFooter: false,
         children: [
           const Padding(
@@ -51,7 +50,6 @@ class PortfolioSummaryWidget extends StatelessWidget {
 
     return WidgetContainer(
       title: 'PORTFOLIO SUMMARY',
-      onTap: () {},
       showFooter: false,
       children: [
         Padding(

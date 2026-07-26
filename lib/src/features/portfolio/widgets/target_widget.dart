@@ -90,8 +90,14 @@ class TargetWidget extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
             child: Text('TARGET', style: FomoShieldTheme.cardTitle()),
           ),
+          Divider(
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Colors.black.withValues(alpha: 0.06),
+          ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
             child: _GraphWindow(
               currentPercent: currentPercent,
             ),

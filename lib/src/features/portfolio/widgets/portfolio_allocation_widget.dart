@@ -32,7 +32,6 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
     if (holdings == null || holdings.isEmpty) {
       return WidgetContainer(
         title: 'ALLOCATION',
-        onTap: () {},
         showFooter: false,
         emptyText: 'No holdings to show',
       );
@@ -48,7 +47,6 @@ class _PortfolioAllocationWidgetState extends State<PortfolioAllocationWidget> {
 
     return WidgetContainer(
       title: 'ALLOCATION',
-      onTap: () {},
       showFooter: false,
       children: [
         Padding(

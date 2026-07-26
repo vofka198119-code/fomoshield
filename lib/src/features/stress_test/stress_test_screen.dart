@@ -791,7 +791,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     '\$${_fmtFull(portfolioTotal)}',
                     style: interNums(
                       fontSize: 34,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: ThemeV2.textPrimary,
                     ),
                   ),
@@ -815,7 +815,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
             color: ThemeV2.primaryBg,
-            borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: ThemeV2.divider),
           ),
           child: Text(
             'Cash: \$${_fmtFull(session.cash)} available',
@@ -1545,26 +1546,33 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: FomoShieldTheme.cardDecoration,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: ThemeV2.primaryBg,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: ThemeV2.divider),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'FINAL BALANCE',
                         style: GoogleFonts.inter(
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: ThemeV2.textSecondary,
-                          letterSpacing: 1,
+                          color: ThemeV2.primary,
+                          letterSpacing: 0.6,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
                         '\$${session.totalValue.toStringAsFixed(2)}',
                         style: interNums(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                           color: ThemeV2.textPrimary,
                         ),
                       ),

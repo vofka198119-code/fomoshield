@@ -12,7 +12,10 @@ import 'card_frame.dart';
 
 class WidgetContainer extends StatelessWidget {
   final String title;
-  final VoidCallback onTap;
+  // Null means "this header doesn't navigate anywhere" — no chevron, no
+  // tap ripple. Passing a no-op `() {}` used to render a chevron that
+  // promised navigation and did nothing, which read as a stray artifact.
+  final VoidCallback? onTap;
   final List<Widget> children;
   final String footerText;
   final bool showFooter;
@@ -21,7 +24,7 @@ class WidgetContainer extends StatelessWidget {
   const WidgetContainer({
     super.key,
     required this.title,
-    required this.onTap,
+    this.onTap,
     this.children = const [],
     this.footerText = 'More',
     this.showFooter = true,
@@ -30,8 +33,10 @@ class WidgetContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasTap = onTap != null;
     return CardFrame(
       showTopBar: false,
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -52,15 +57,25 @@ class WidgetContainer extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: ThemeV2.textSecondary,
-                    size: 20,
-                  ),
+                  if (hasTap)
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: ThemeV2.textSecondary,
+                      size: 20,
+                    ),
                 ],
               ),
             ),
           ),
+
+          // --- Title/content separator (matches TRADE HISTORY reference) ---
+          if (children.isNotEmpty || emptyText != null)
+            Divider(
+              height: 1,
+              indent: 16,
+              endIndent: 16,
+              color: Colors.black.withValues(alpha: 0.06),
+            ),
 
           // --- Items with thin dividers (indented) ---
           if (children.isNotEmpty)
@@ -77,7 +92,7 @@ class WidgetContainer extends StatelessWidget {
             }),
 
           // --- Footer "More" button ---
-          if (children.isNotEmpty && showFooter)
+          if (children.isNotEmpty && showFooter && hasTap)
             Container(
               width: double.infinity,
               decoration: BoxDecoration(

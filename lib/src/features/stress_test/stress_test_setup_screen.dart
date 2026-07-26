@@ -218,9 +218,15 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) {
       return const SizedBox.shrink();
     }
-    final notifier = ref.read(stressTestProvider.notifier);
-    final totalCreated = notifier.totalSessionsCreated;
-    final isFirst = notifier.isFirstFreeSession();
+    // Which concurrent slot this session (still in setup, not yet
+    // counted as active) will occupy once started — slot 1 is always
+    // ad-free, slot 2 is the ad-gated extra (no ad integration yet, so
+    // just a "Go Premium" nudge for now).
+    final activeCount = ref
+        .read(stressTestProvider)
+        .where((s) => s.status == StressTestStatus.active)
+        .length;
+    final isFirst = activeCount == 0;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -251,8 +257,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           Expanded(
             child: Text(
               isFirst
-                  ? 'Test ${totalCreated + 1}/2 free · Upgrade for 5 tests & no ads'
-                  : 'Test ${totalCreated + 1}/2 free · Premium = 5 tests, no ads',
+                  ? 'Test slot 1/2 free · Upgrade for 5 at once & no ads'
+                  : 'Test slot 2/2 free · Premium = 5 at once, no ads',
               style: GoogleFonts.inter(
                 fontSize: 12,
                 color: ThemeV2.primary,

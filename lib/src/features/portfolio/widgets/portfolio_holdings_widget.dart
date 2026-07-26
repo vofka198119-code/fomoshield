@@ -36,7 +36,6 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
     if (holdings == null) {
       return WidgetContainer(
         title: 'HOLDINGS',
-        onTap: () {},
         showFooter: false,
         children: [
           const Padding(

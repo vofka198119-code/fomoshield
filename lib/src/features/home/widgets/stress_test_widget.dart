@@ -10,8 +10,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../shared/widgets/widget_container.dart';
+import '../../monetization/monetization_modal.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 
@@ -75,7 +77,7 @@ class StressTestWidget extends ConsumerWidget {
                     ),
                     itemBuilder: (_, i) {
                       final s = activeSessions[i];
-                      return _buildActiveSessionTile(sheetContext, ref, s);
+                      return _buildActiveSessionTile(sheetContext, ref, s, i);
                     },
                   ),
                 ),
@@ -104,8 +106,10 @@ class StressTestWidget extends ConsumerWidget {
 
     // ── Active sessions ────────────────────────────────────────────
     if (activeSessions.isNotEmpty) {
-      final preview = activeSessions.take(2).map((session) {
-        return _buildActiveSessionTile(context, ref, session);
+      final preview = activeSessions.take(2).toList().asMap().entries.map((
+        e,
+      ) {
+        return _buildActiveSessionTile(context, ref, e.value, e.key);
       }).toList();
       children.addAll(preview);
     }
@@ -127,7 +131,7 @@ class StressTestWidget extends ConsumerWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   color: ThemeV2.primary,
-                  letterSpacing: 1.5,
+                  letterSpacing: 0.6,
                 ),
               ),
               const SizedBox(width: 6),
@@ -185,7 +189,6 @@ class StressTestWidget extends ConsumerWidget {
     if (children.isEmpty) {
       return WidgetContainer(
         title: 'MY STRESS TEST',
-        onTap: () {},
         showFooter: false,
         children: [
           Padding(
@@ -227,9 +230,66 @@ class StressTestWidget extends ConsumerWidget {
       title: 'MY STRESS TEST',
       onTap: activeSessions.length > 2
           ? () => _showAllTestsSheet(context, ref)
-          : () {},
+          : null,
       showFooter: activeSessions.length > 2,
       children: children,
+    );
+  }
+
+  // Tier badge, keyed by slot position (index) among the user's active
+  // tests, not the user's own tier alone — slot 1 is always free (no
+  // badge), slot 2 is the free tier's ad-unlockable extra test (no ad
+  // integration yet, so it's a "Go Premium" nudge for free users, a
+  // normal premium badge once actually on premium), slots 3-5 are
+  // premium-only so any session there always belongs to a premium/admin
+  // user. Uses the session's position within the currently-active list,
+  // which is a good-enough proxy but isn't authoritative if an earlier
+  // session was deleted — flag if a slot ever looks mislabeled.
+  Widget? _tierBadge(WidgetRef ref, BuildContext context, int index) {
+    if (index == 0) return null;
+
+    final tier = ref.watch(subscriptionTierProvider);
+    final isPremiumTier =
+        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+
+    if (index == 1 && !isPremiumTier) {
+      return InkWell(
+        onTap: () => showMonetizationModal(context, ref),
+        borderRadius: BorderRadius.circular(5),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+          decoration: BoxDecoration(
+            color: ThemeV2.primary,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(
+            'GO PREMIUM',
+            style: GoogleFonts.inter(
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              letterSpacing: 0.4,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+      decoration: BoxDecoration(
+        color: ThemeV2.primary.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Text(
+        'premium',
+        style: GoogleFonts.inter(
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+          color: ThemeV2.primary,
+          letterSpacing: 0.8,
+        ),
+      ),
     );
   }
 
@@ -237,9 +297,9 @@ class StressTestWidget extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     StressTestSession session,
+    int index,
   ) {
-    final tier = ref.watch(subscriptionTierProvider);
-    final tierLabel = tier == SubscriptionTier.free ? 'free' : 'premium';
+    final tierBadge = _tierBadge(ref, context, index);
 
     return InkWell(
       key: ValueKey('st_${session.id}'),
@@ -276,30 +336,10 @@ class StressTestWidget extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 1.5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: tier == SubscriptionTier.free
-                          ? ThemeV2.textSecondary.withValues(alpha: 0.15)
-                          : ThemeV2.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      tierLabel,
-                      style: GoogleFonts.inter(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: tier == SubscriptionTier.free
-                            ? ThemeV2.textSecondary
-                            : ThemeV2.primary,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
+                  if (tierBadge != null) ...[
+                    const SizedBox(width: 6),
+                    tierBadge,
+                  ],
                 ],
               ),
             ),
@@ -308,16 +348,16 @@ class StressTestWidget extends ConsumerWidget {
               children: [
                 Text(
                   '\$${session.totalValue.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
+                  style: interNums(
                     fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: ThemeV2.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${session.profitLoss >= 0 ? '+' : ''}\$${session.profitLoss.abs().toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(
+                  '${session.profitLoss >= 0 ? '+' : '-'}\$${session.profitLoss.abs().toStringAsFixed(0)}',
+                  style: interNums(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: session.profitLoss >= 0
@@ -374,9 +414,9 @@ class StressTestWidget extends ConsumerWidget {
               alignment: Alignment.center,
               child: Text(
                 '$fsScore',
-                style: GoogleFonts.inter(
+                style: interNums(
                   fontSize: 13,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
               ),
@@ -408,9 +448,9 @@ class StressTestWidget extends ConsumerWidget {
             // P&L
             Text(
               '${session.profitLoss >= 0 ? '+' : ''}${session.profitLossPercent.toStringAsFixed(1)}%',
-              style: GoogleFonts.inter(
+              style: interNums(
                 fontSize: 13,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: pnlColor,
               ),
             ),

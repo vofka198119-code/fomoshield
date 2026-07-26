@@ -20,10 +20,11 @@ class ShieldSignalWidget extends ConsumerStatefulWidget {
 }
 
 class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
-  // Generous fixed height for the swipeable page area — content is always
-  // a price cell + two small cells + an explanation paragraph of similar
-  // length across all three indices.
-  static const double _pageAreaHeight = 300;
+  // Fixed height for the swipeable page area — content is always a price
+  // cell + two small cells + an explanation paragraph of similar length
+  // across all three indices. Was 300 (too generous, left a visible gap
+  // above the swipe dots); trimmed down to match actual content height.
+  static const double _pageAreaHeight = 250;
 
   late final PageController _pageController;
   int _index = 0;
@@ -73,7 +74,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
         error: (_, _) => Text('\$– – –',
             style: interNums(
                 fontSize: 28,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: ThemeV2.textPrimary)),
         data: (indices) {
           if (indices.isEmpty) return const SizedBox.shrink();
@@ -117,8 +118,14 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
             child: Text('SHIELD SIGNAL', style: FomoShieldTheme.cardTitle()),
           ),
+          Divider(
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Colors.black.withValues(alpha: 0.06),
+          ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: child,
           ),
         ],
@@ -173,7 +180,9 @@ class _IndexView extends StatelessWidget {
         _cell(
           label: index.name,
           value: '\$${index.price.toStringAsFixed(2)}',
-          valueFontSize: 20,
+          valueFontSize: 18,
+          labelFontSize: 14,
+          bgColor: ThemeV2.primaryBg,
           horizontalLayout: true,
         ),
         const SizedBox(height: 8),
@@ -185,7 +194,7 @@ class _IndexView extends StatelessWidget {
                 label: 'CHANGE',
                 value:
                     '${isUp ? '+' : ''}\$${index.changeAbs.toStringAsFixed(2)}',
-                valueFontSize: 18,
+                valueFontSize: 14,
                 bgColor: changeBg,
                 valueColor: changeColor,
               ),
@@ -195,7 +204,7 @@ class _IndexView extends StatelessWidget {
               child: _cell(
                 label: 'CHANGE %',
                 value: '${isUp ? '+' : ''}${index.change.toStringAsFixed(2)}%',
-                valueFontSize: 18,
+                valueFontSize: 14,
                 bgColor: changeBg,
                 valueColor: changeColor,
               ),
@@ -228,13 +237,14 @@ class _IndexView extends StatelessWidget {
     required String value,
     Color? bgColor,
     Color? valueColor,
-    double valueFontSize = 24,
+    double valueFontSize = 18,
+    double labelFontSize = 10,
     bool horizontalLayout = false,
   }) {
     final labelText = Text(
       label,
       style: GoogleFonts.inter(
-        fontSize: 10,
+        fontSize: labelFontSize,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.6,
         color: ThemeV2.primary,
@@ -244,7 +254,7 @@ class _IndexView extends StatelessWidget {
       value,
       style: interNums(
         fontSize: valueFontSize,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w600,
         color: valueColor ?? ThemeV2.textPrimary,
         letterSpacing: -0.3,
       ),

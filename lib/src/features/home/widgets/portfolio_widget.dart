@@ -60,7 +60,7 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
       return _shell(
         context,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           child: Text('No portfolio',
               style: GoogleFonts.inter(
                   fontSize: 14, color: ThemeV2.textSecondary)),
@@ -93,7 +93,7 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
       title: portfolios[index].name.toUpperCase(),
       showPremiumBadge: index > 0,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
         child: Column(
           children: [
             SizedBox(
@@ -161,6 +161,12 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
                   ],
                 ],
               ),
+            ),
+            Divider(
+              height: 1,
+              indent: 16,
+              endIndent: 16,
+              color: Colors.black.withValues(alpha: 0.06),
             ),
             child,
           ],
@@ -407,7 +413,7 @@ class _VerticalProgressBar extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(10, 14, 12, 14),
+      padding: const EdgeInsets.fromLTRB(10, 10, 12, 14),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -416,75 +422,99 @@ class _VerticalProgressBar extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
+      // Same window title treatment as the cells to the left (label above
+      // content), just in white — the cells' primary-green label color
+      // would be invisible against this dark gradient. The window itself
+      // doesn't grow: the title eats into the same space the bar used to
+      // have, so the bar segments got a bit shorter and are narrowed
+      // further (0.8 -> 0.65 width factor) to keep their proportions.
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Marker pill, floating beside the bar at the current position.
-          SizedBox(
-            width: 34,
-            child: Align(
-              alignment: Alignment(0, pillAlignY),
-              child: Container(
-                height: 20,
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.primary,
+          Text(
+            'TARGET',
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Expanded(
+            child: Row(
+              children: [
+                // Marker pill, floating beside the bar at the current position.
+                SizedBox(
+                  width: 34,
+                  child: Align(
+                    alignment: Alignment(0, pillAlignY),
+                    child: Container(
+                      height: 20,
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: ThemeV2.primary,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
-          // The segmented bar itself, narrowed to 80% width (centered).
-          Expanded(
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
-              child: Column(
-                verticalDirection: VerticalDirection.up,
-                children: List.generate(_segmentCount, (i) {
-                  final fraction = _fillFraction(i);
-                  return Expanded(
-                    child: Container(
-                      margin: EdgeInsets.only(
-                        top: i == _segmentCount - 1 ? 0 : 3,
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        color: _unfilled,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: fraction > 0
-                          ? Align(
-                              alignment: Alignment.bottomCenter,
-                              child: FractionallySizedBox(
-                                heightFactor: fraction,
-                                child: Container(color: _colorForIndex(i)),
-                              ),
-                            )
-                          : null,
+                const SizedBox(width: 4),
+                // The segmented bar itself, narrowed (centered).
+                Expanded(
+                  child: FractionallySizedBox(
+                    widthFactor: 0.65,
+                    child: Column(
+                      verticalDirection: VerticalDirection.up,
+                      children: List.generate(_segmentCount, (i) {
+                        final fraction = _fillFraction(i);
+                        return Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(
+                              top: i == _segmentCount - 1 ? 0 : 3,
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                              color: _unfilled,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: fraction > 0
+                                ? Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: FractionallySizedBox(
+                                      heightFactor: fraction,
+                                      child:
+                                          Container(color: _colorForIndex(i)),
+                                    ),
+                                  )
+                                : null,
+                          ),
+                        );
+                      }),
                     ),
-                  );
-                }),
-              ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                // -100%/0%/+100% ticks, bottom to top.
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    _VerticalTick('+100%'),
+                    _VerticalTick('0%'),
+                    _VerticalTick('-100%'),
+                  ],
+                ),
+              ],
             ),
-          ),
-          const SizedBox(width: 6),
-          // -100%/0%/+100% ticks, bottom to top.
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              _VerticalTick('+100%'),
-              _VerticalTick('0%'),
-              _VerticalTick('-100%'),
-            ],
           ),
         ],
       ),

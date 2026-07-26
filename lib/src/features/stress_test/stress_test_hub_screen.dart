@@ -22,6 +22,75 @@ import 'stress_test_engine.dart';
 class StressTestHubScreen extends ConsumerWidget {
   const StressTestHubScreen({super.key});
 
+  // Only the most recent 5 completed tests show inline; "More" opens a
+  // sheet with the full archive instead of the card growing without limit.
+  static const int _archivePreviewLimit = 5;
+
+  void _showAllArchiveSheet(
+    BuildContext context,
+    List<VerdictArchiveEntry> archive,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ThemeV2.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Completed Tests',
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: ThemeV2.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(sheetContext).size.height * 0.6,
+                  ),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: archive.length,
+                    separatorBuilder: (_, _) => Divider(
+                      height: 1,
+                      indent: 16,
+                      endIndent: 16,
+                      color: Colors.black.withValues(alpha: 0.06),
+                    ),
+                    itemBuilder: (_, i) =>
+                        _buildArchiveTile(sheetContext, archive[i]),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sessions = ref.watch(stressTestProvider);
@@ -59,10 +128,18 @@ class StressTestHubScreen extends ConsumerWidget {
             if (activeSessions.isNotEmpty) ...[
               WidgetContainer(
                 title: 'ACTIVE TESTS',
-                onTap: () {},
                 showFooter: false,
                 children: activeSessions
-                    .map((s) => _buildActiveSessionTile(context, ref, s))
+                    .asMap()
+                    .entries
+                    .map(
+                      (e) => _buildActiveSessionTile(
+                        context,
+                        ref,
+                        e.value,
+                        e.key,
+                      ),
+                    )
                     .toList(),
               ),
               const SizedBox(height: 24),
@@ -71,11 +148,13 @@ class StressTestHubScreen extends ConsumerWidget {
             // ── Verdict Archive (WidgetContainer — always visible) ─
             WidgetContainer(
               title: 'COMPLETED TESTS',
-              onTap: () {},
-              showFooter: archive.length > 2,
+              onTap: archive.length > _archivePreviewLimit
+                  ? () => _showAllArchiveSheet(context, archive)
+                  : null,
+              showFooter: archive.length > _archivePreviewLimit,
               children: archive.isNotEmpty
                   ? archive
-                        .take(20)
+                        .take(_archivePreviewLimit)
                         .map((entry) => _buildArchiveTile(context, entry))
                         .toList()
                   : [
@@ -141,10 +220,11 @@ class StressTestHubScreen extends ConsumerWidget {
   // ── New Test Card ────────────────────────────────────────────────
 
   Widget _buildNewTestCard(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(stressTestProvider.notifier);
-    final maxTotal = ref.read(maxStressTestTotalProvider);
-    final totalUsed = notifier.totalSessionsCreated;
-    final remaining = (maxTotal - totalUsed).clamp(0, maxTotal);
+    final sessions = ref.read(stressTestProvider);
+    final activeCount = sessions
+        .where((s) => s.status == StressTestStatus.active)
+        .length;
+    final maxSessions = ref.read(maxStressTestSessionsProvider);
     final tier = ref.read(subscriptionTierProvider);
     final isFree = tier == SubscriptionTier.free;
 
@@ -199,7 +279,7 @@ class StressTestHubScreen extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     isFree
-                        ? '$remaining/$maxTotal remaining · Premium = 5'
+                        ? '$activeCount/$maxSessions active · Premium = 5 at once'
                         : 'Test your emotional resilience',
                     style: GoogleFonts.inter(
                       fontSize: 12,
@@ -245,30 +325,12 @@ class StressTestHubScreen extends ConsumerWidget {
         .where((s) => s.status == StressTestStatus.active)
         .length;
     final maxSessions = ref.read(maxStressTestSessionsProvider);
-    final maxTotal = ref.read(maxStressTestTotalProvider);
     final tier = ref.read(subscriptionTierProvider);
     final notifier = ref.read(stressTestProvider.notifier);
 
-    // Check total sessions created limit (2 for free, 5 for premium)
-    if (notifier.totalSessionsCreated >= maxTotal) {
-      if (tier == SubscriptionTier.free) {
-        showPremiumPromoOverlay(
-          context: context,
-          title: 'Stress test limit reached',
-          durationSeconds: 5,
-          onComplete: () {
-            if (context.mounted) showMonetizationModal(context, ref);
-          },
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Maximum test sessions reached')),
-        );
-      }
-      return;
-    }
-
-    // Check active sessions limit
+    // Only the concurrent-slot limit gates creation (free: 2 at once,
+    // premium: 5 at once) — no lifetime cap. Completing or deleting a
+    // test frees its slot for a new one.
     if (activeCount >= maxSessions) {
       if (tier == SubscriptionTier.free) {
         showPremiumPromoOverlay(
@@ -296,15 +358,69 @@ class StressTestHubScreen extends ConsumerWidget {
 
   // ── Active Session Tile (Home style) ────────────────────────────
 
+  // Same slot-position badge rules as the Home "MY STRESS TEST" widget's
+  // _buildActiveSessionTile — see the comment there for the full
+  // rationale (slot 1 = free, no badge; slot 2 = free tier's
+  // ad-unlockable extra, shown as a "Go Premium" nudge until ad
+  // integration exists; slots 3-5 = premium-only, always a premium
+  // badge).
+  Widget? _tierBadge(WidgetRef ref, BuildContext context, int index) {
+    if (index == 0) return null;
+
+    final tier = ref.watch(subscriptionTierProvider);
+    final isPremiumTier =
+        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+
+    if (index == 1 && !isPremiumTier) {
+      return InkWell(
+        onTap: () => showMonetizationModal(context, ref),
+        borderRadius: BorderRadius.circular(5),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+          decoration: BoxDecoration(
+            color: ThemeV2.primary,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(
+            'GO PREMIUM',
+            style: GoogleFonts.inter(
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              letterSpacing: 0.4,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+      decoration: BoxDecoration(
+        color: ThemeV2.primary.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Text(
+        'premium',
+        style: GoogleFonts.inter(
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+          color: ThemeV2.primary,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+
   Widget _buildActiveSessionTile(
     BuildContext context,
     WidgetRef ref,
     StressTestSession session,
+    int index,
   ) {
-    final tier = ref.watch(subscriptionTierProvider);
-    final tierLabel = tier == SubscriptionTier.free ? 'free' : 'premium';
+    final tierBadge = _tierBadge(ref, context, index);
     final plDollar = session.profitLoss;
-    final plSign = plDollar >= 0 ? '+' : '';
+    final plSign = plDollar >= 0 ? '+' : '-';
     final plColor = plDollar >= 0 ? ThemeV2.success : ThemeV2.loss;
 
     return InkWell(
@@ -342,30 +458,10 @@ class StressTestHubScreen extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 1.5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: tier == SubscriptionTier.free
-                          ? ThemeV2.textSecondary.withValues(alpha: 0.15)
-                          : ThemeV2.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      tierLabel,
-                      style: GoogleFonts.inter(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: tier == SubscriptionTier.free
-                            ? ThemeV2.textSecondary
-                            : ThemeV2.primary,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
+                  if (tierBadge != null) ...[
+                    const SizedBox(width: 6),
+                    tierBadge,
+                  ],
                 ],
               ),
             ),
@@ -376,7 +472,7 @@ class StressTestHubScreen extends ConsumerWidget {
                   '\$${session.totalValue.toStringAsFixed(0)}',
                   style: interNums(
                     fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: ThemeV2.textPrimary,
                   ),
                 ),
@@ -452,7 +548,7 @@ class StressTestHubScreen extends ConsumerWidget {
               '${entry.pnlPercent >= 0 ? '+' : ''}${entry.pnlPercent.toStringAsFixed(1)}%',
               style: interNums(
                 fontSize: 14,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: pnlColor,
               ),
             ),
