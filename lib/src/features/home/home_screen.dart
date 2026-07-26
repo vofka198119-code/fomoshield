@@ -10,7 +10,7 @@ import 'widget_order_provider.dart';
 import 'widgets/shield_signal_widget.dart';
 import 'widgets/watchlist_widget.dart';
 import 'widgets/upcoming_events_widget.dart';
-import 'widgets/news_widget.dart';
+import 'widgets/market_clock_widget.dart';
 import 'widgets/portfolio_widget.dart';
 import 'widgets/portfolio_journal_widget.dart';
 import 'widgets/historical_sim_widget.dart';
@@ -162,7 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       case 'upcoming_events':
         return const UpcomingEventsWidget();
       case 'news':
-        return const NewsWidget();
+        return const MarketClockWidget();
       case 'portfolio':
         return const PortfolioWidget();
       case 'portfolio_journal':
@@ -241,7 +241,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
       case 'upcoming_events':
         return Icons.event_rounded;
       case 'news':
-        return Icons.newspaper_rounded;
+        return Icons.access_time_filled_rounded;
       case 'portfolio':
         return Icons.account_balance_rounded;
       case 'portfolio_journal':

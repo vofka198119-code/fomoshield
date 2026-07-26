@@ -48,7 +48,7 @@ class HomeWidgetConfig {
       case 'upcoming_events':
         return 'Upcoming Events';
       case 'news':
-        return 'News';
+        return 'Market Clock';
       case 'stress_test':
         return 'Stress Test';
       case 'portfolio':

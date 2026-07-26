@@ -7,13 +7,12 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../market_clock/market_clock_dial.dart';
 import '../portfolio_providers.dart';
 
-// Shared gradient for the graph window and the CTA button below it.
-const List<Color> _indicatorGradient = [
-  Color(0xFF2A6B4C),
-  Color(0xFF163D2C),
-];
+// Shared gradient for the graph window and the CTA button below it —
+// same instrument-panel dial colors as the Market Clock widget.
+const List<Color> _indicatorGradient = [dialLight, dialDark];
 
 String _fmtCurrency(double amount) =>
     '\$${NumberFormat('#,##0', 'en_US').format(amount)}';

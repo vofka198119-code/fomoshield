@@ -6,6 +6,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../market_clock/market_clock_dial.dart';
 import '../../portfolio/portfolio_providers.dart';
 import '../../portfolio/widgets/target_widget.dart' show targetDisplayPercent;
 
@@ -418,7 +419,7 @@ class _VerticalProgressBar extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2A6B4C), Color(0xFF163D2C)],
+          colors: [dialLight, dialDark],
         ),
         borderRadius: BorderRadius.circular(16),
       ),

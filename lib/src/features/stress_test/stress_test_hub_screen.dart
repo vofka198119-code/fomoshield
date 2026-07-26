@@ -16,6 +16,7 @@ import '../../core/supabase/supabase_providers.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import '../../shared/widgets/widget_container.dart';
+import '../market_clock/market_clock_dial.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 
@@ -235,14 +236,14 @@ class StressTestHubScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [ThemeV2.primary, Color(0xFF0055CC)],
+            colors: [dialLight, dialDark],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: ThemeV2.primary.withValues(alpha: 0.3),
+              color: dialDark.withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
