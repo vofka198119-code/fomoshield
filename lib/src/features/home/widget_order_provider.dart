@@ -14,12 +14,12 @@ import '../../core/supabase/supabase_providers.dart';
 
 const List<String> _defaultOrder = [
   // Bible Part 2 — Main Screen Sections (in order)
+  'news', // Market Clock
   'portfolio',
-  // Legacy / utility widgets
   'shield_signal',
   'stress_test',
   'watchlist',
-  'news',
+  // Legacy / utility widgets
   'upcoming_events',
   // Premium widgets (hidden by default for FREE, shown with 🔒)
   'portfolio_journal',

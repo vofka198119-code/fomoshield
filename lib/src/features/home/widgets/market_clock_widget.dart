@@ -92,7 +92,7 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  MarketClockDial(state: _state, size: 88, ringStroke: 8),
+                  MarketClockDial(state: _state, size: 88, ringStroke: 4),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(

@@ -295,17 +295,17 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                     widget.notifier.resetToDefaults();
                     setState(() {
                       _configs = [
+                        const HomeWidgetConfig(id: 'news', visible: true),
+                        const HomeWidgetConfig(id: 'portfolio', visible: true),
                         const HomeWidgetConfig(
                           id: 'shield_signal',
                           visible: true,
                         ),
-                        const HomeWidgetConfig(id: 'portfolio', visible: true),
-                        const HomeWidgetConfig(id: 'watchlist', visible: true),
-                        const HomeWidgetConfig(id: 'news', visible: true),
                         const HomeWidgetConfig(
                           id: 'stress_test',
                           visible: true,
                         ),
+                        const HomeWidgetConfig(id: 'watchlist', visible: true),
                         const HomeWidgetConfig(
                           id: 'upcoming_events',
                           visible: true,

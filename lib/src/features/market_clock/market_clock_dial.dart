@@ -1,6 +1,7 @@
 import 'dart:math' show pi, cos, sin;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/theme_v2.dart';
 import 'market_clock_engine.dart';
@@ -36,37 +37,43 @@ class MarketClockDial extends StatelessWidget {
   final MarketClockState state;
   final double size;
   final double ringStroke;
+  final bool showDigitalReadout;
 
   const MarketClockDial({
     super.key,
     required this.state,
     this.size = 240,
-    this.ringStroke = 14,
+    this.ringStroke = 7,
+    this.showDigitalReadout = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final minuteOfDay = state.nowEt.hour * 60 + state.nowEt.minute;
-    final ringRadius = (size - ringStroke) / 2;
-    final angle = angleForMinuteOfDay(minuteOfDay);
-    final markerOffset = Offset(ringRadius * cos(angle), ringRadius * sin(angle));
-    final markerSize = size * 0.117;
-
+    final faceSize = size - ringStroke * 2 - size * 0.067;
     return SizedBox(
       width: size,
       height: size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CustomPaint(size: Size(size, size), painter: _RingPainter(strokeWidth: ringStroke)),
-          SizedBox(
-            width: size - ringStroke * 2 - size * 0.067,
-            height: size - ringStroke * 2 - size * 0.067,
-            child: CustomPaint(painter: _ClockFacePainter(state.nowEt)),
+          CustomPaint(
+            size: Size(size, size),
+            painter: _RingPainter(strokeWidth: ringStroke, color: dialBrassLight),
           ),
-          Transform.translate(
-            offset: markerOffset,
-            child: _PhaseMarker(phase: state.phase, size: markerSize),
+          SizedBox(
+            width: faceSize,
+            height: faceSize,
+            child: CustomPaint(painter: _ClockFaceBackgroundPainter()),
+          ),
+          if (showDigitalReadout)
+            Transform.translate(
+              offset: Offset(0, size * 0.12),
+              child: _DigitalReadout(nowEt: state.nowEt, phase: state.phase, size: size),
+            ),
+          SizedBox(
+            width: faceSize,
+            height: faceSize,
+            child: CustomPaint(painter: _ClockHandsPainter(state.nowEt)),
           ),
         ],
       ),
@@ -74,92 +81,98 @@ class MarketClockDial extends StatelessWidget {
   }
 }
 
-class _PhaseMarker extends StatelessWidget {
+/// Electronic-display style 24h readout shown inside the dial, tinted by the
+/// current trading phase (calendar closures already fold into `phase` via
+/// `resolveMarketClockState` — a weekend/holiday resolves to `closed` same
+/// as an ordinary overnight close, so no separate calendar check is needed).
+class _DigitalReadout extends StatelessWidget {
+  final DateTime nowEt;
   final MarketPhase phase;
   final double size;
-  const _PhaseMarker({required this.phase, required this.size});
+  const _DigitalReadout({required this.nowEt, required this.phase, required this.size});
 
-  static const _icons = {
-    MarketPhase.closed: Icons.bedtime_rounded,
-    MarketPhase.preMarket: Icons.wb_twilight,
-    MarketPhase.marketOpen: Icons.wb_sunny_rounded,
-    MarketPhase.afterHours: Icons.nightlight_round,
-  };
+  static Color _colorForPhase(MarketPhase phase) {
+    switch (phase) {
+      case MarketPhase.preMarket:
+        return dialBrassLight;
+      case MarketPhase.marketOpen:
+        return ThemeV2.success;
+      case MarketPhase.afterHours:
+        return const Color(0xFF5DA9E0);
+      case MarketPhase.closed:
+        return Colors.white;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final hh = nowEt.hour.toString().padLeft(2, '0');
+    final mm = nowEt.minute.toString().padLeft(2, '0');
+    final color = _colorForPhase(phase);
+    final fontSize = size * 0.065;
     return Container(
-      width: size,
-      height: size,
+      padding: EdgeInsets.symmetric(horizontal: size * 0.035, vertical: size * 0.012),
       decoration: BoxDecoration(
-        color: ThemeV2.surface,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 4, offset: const Offset(0, 1)),
-        ],
+        color: dialDark.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(size * 0.025),
+        border: Border.all(color: dialBrassLight.withValues(alpha: 0.4), width: size * 0.004),
       ),
-      child: Icon(_icons[phase], size: size * 0.58, color: ringColorForPhase(phase)),
+      child: Text(
+        '$hh:$mm',
+        style: GoogleFonts.inter(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w700,
+          color: color,
+          letterSpacing: 1.0,
+          shadows: [
+            Shadow(color: color.withValues(alpha: 0.8), blurRadius: fontSize * 0.35),
+            Shadow(color: color.withValues(alpha: 0.5), blurRadius: fontSize * 0.7),
+          ],
+        ),
+      ),
     );
-  }
-}
-
-Color ringColorForPhase(MarketPhase phase) {
-  switch (phase) {
-    case MarketPhase.preMarket:
-      return const Color(0xFFE3B341);
-    case MarketPhase.marketOpen:
-      return ThemeV2.success;
-    case MarketPhase.afterHours:
-      return const Color(0xFF3E7CB8);
-    case MarketPhase.closed:
-      return ThemeV2.textSecondary;
   }
 }
 
 class _RingPainter extends CustomPainter {
   final double strokeWidth;
-  _RingPainter({required this.strokeWidth});
-
-  static final _segments = <(int, int, Color)>[
-    (240, 570, Color(0xFFE3B341)),
-    (570, 960, ThemeV2.success),
-    (960, 1200, Color(0xFF3E7CB8)),
-    (1200, 1440, ThemeV2.textSecondary),
-    (0, 240, ThemeV2.textSecondary),
-  ];
+  final Color color;
+  _RingPainter({required this.strokeWidth, required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.shortestSide - strokeWidth) / 2;
-    final rect = Rect.fromCircle(center: center, radius: radius);
 
-    for (final (start, end, color) in _segments) {
-      final paint = Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.butt;
-      final startAngle = angleForMinuteOfDay(start);
-      final sweepAngle = angleForMinuteOfDay(end) - startAngle;
-      canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
-    }
+    final glowPaint = Paint()
+      ..color = color.withValues(alpha: 0.35)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth * 2.2
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, strokeWidth * 1.1);
+    canvas.drawCircle(center, radius, glowPaint);
+
+    final ringPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+    canvas.drawCircle(center, radius, ringPaint);
   }
 
   @override
-  bool shouldRepaint(covariant _RingPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _RingPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth;
 }
 
-class _ClockFacePainter extends CustomPainter {
-  final DateTime time;
-  _ClockFacePainter(this.time);
+Offset _polar(Offset center, double radius, double degrees) {
+  final rad = (degrees - 90) * pi / 180;
+  return Offset(center.dx + radius * cos(rad), center.dy + radius * sin(rad));
+}
 
+/// Dial gradient + ticks + numerals only — painted behind the digital
+/// readout so [_ClockHandsPainter] can be layered on top of it.
+class _ClockFaceBackgroundPainter extends CustomPainter {
   static const _tickMinor = Color(0xFF5C6E64);
-
-  Offset _polar(Offset center, double radius, double degrees) {
-    final rad = (degrees - 90) * pi / 180;
-    return Offset(center.dx + radius * cos(rad), center.dy + radius * sin(rad));
-  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -203,6 +216,23 @@ class _ClockFacePainter extends CustomPainter {
       )..layout();
       tp.paint(canvas, pos - Offset(tp.width / 2, tp.height / 2));
     }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ClockFaceBackgroundPainter oldDelegate) => false;
+}
+
+/// Hour/minute hands + center pivot cap only — painted on top of the digital
+/// readout so the hands visually pass over it, matching a real watch's
+/// date-window layering.
+class _ClockHandsPainter extends CustomPainter {
+  final DateTime time;
+  _ClockHandsPainter(this.time);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2;
 
     final hourDeg = (time.hour % 12) * 30.0 + time.minute * 0.5;
     final hourTip = _polar(center, r * 0.42, hourDeg);
@@ -238,5 +268,5 @@ class _ClockFacePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ClockFacePainter oldDelegate) => oldDelegate.time != time;
+  bool shouldRepaint(covariant _ClockHandsPainter oldDelegate) => oldDelegate.time != time;
 }
