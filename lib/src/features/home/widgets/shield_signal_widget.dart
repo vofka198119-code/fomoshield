@@ -205,7 +205,8 @@ class _IndexView extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: _priceCellGradient,
           ),
-          labelColor: Colors.white.withValues(alpha: 0.7),
+          labelColor: changeColor,
+          labelGlowColor: changeColor,
           valueColor: Colors.white,
           leadingIcon: isUp ? Icons.trending_up : Icons.trending_down,
           leadingIconColor: changeColor,
@@ -283,6 +284,7 @@ class _IndexView extends StatelessWidget {
     Gradient? gradient,
     Color? valueColor,
     Color? labelColor,
+    Color? labelGlowColor,
     IconData? leadingIcon,
     Color? leadingIconColor,
     double valueFontSize = 18,
@@ -296,6 +298,12 @@ class _IndexView extends StatelessWidget {
         fontWeight: FontWeight.w700,
         letterSpacing: 0.6,
         color: labelColor ?? ThemeV2.primary,
+        shadows: labelGlowColor == null
+            ? null
+            : [
+                Shadow(color: labelGlowColor.withValues(alpha: 0.9), blurRadius: 10),
+                Shadow(color: labelGlowColor.withValues(alpha: 0.5), blurRadius: 20),
+              ],
       ),
     );
     final labelWidget = leadingIcon == null
