@@ -513,6 +513,18 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     return id;
   }
 
+  /// Whether the user can create a new session given a concurrent-slot cap.
+  /// Counts only currently ACTIVE sessions — NOT lifetime total. An earlier
+  /// version gated on the lifetime `_testCounter`, which permanently locked
+  /// users out once they'd ever created 5 sessions, even after completing
+  /// or deleting them (real bug, fixed in 45d8d77 — see
+  /// project_fomo_shield_widget_polish_and_stress_test_fixes memory).
+  bool canCreateSession(int maxConcurrent) {
+    final activeCount =
+        state.where((s) => s.status == StressTestStatus.active).length;
+    return activeCount < maxConcurrent;
+  }
+
   /// Whether this is the user's first ever session (ad-free for free users).
   bool isFirstFreeSession() => _testCounter <= 1;
 

@@ -69,9 +69,11 @@ void main() {
     test('1.2 Can create session respects limits', () async {
       final notifier = await createNotifier();
       expect(notifier.canCreateSession(2), isTrue);
-      notifier.createSession(TestDuration.week1, 5000);
+      final id1 = notifier.createSession(TestDuration.week1, 5000);
+      notifier.startTest(id1); // only ACTIVE sessions count against the cap
       expect(notifier.canCreateSession(2), isTrue);
-      notifier.createSession(TestDuration.week1, 5000);
+      final id2 = notifier.createSession(TestDuration.week1, 5000);
+      notifier.startTest(id2);
       expect(notifier.canCreateSession(2), isFalse);
     });
 
