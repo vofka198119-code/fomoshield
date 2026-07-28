@@ -180,7 +180,11 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: ThemeV2.primary,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [dialLight, dialDark],
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -188,8 +192,11 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
         style: GoogleFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w800,
-          color: Colors.white,
+          color: dialBrassLight,
           letterSpacing: 1.5,
+          shadows: [
+            Shadow(color: dialBrassLight.withValues(alpha: 0.5), blurRadius: 6),
+          ],
         ),
       ),
     );

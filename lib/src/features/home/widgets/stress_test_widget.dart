@@ -14,8 +14,16 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../monetization/monetization_modal.dart';
+import '../../market_clock/market_clock_dial.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
+
+// Brand dark-green gradient (same as TARGET/Shield Signal) and the Market
+// Clock ring's gold accent — used for the play-button badge and every
+// "PREMIUM" tag below.
+const List<Color> _brandGradient = [dialLight, dialDark];
+List<Shadow> _goldGlow(Color color) =>
+    [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6)];
 
 class StressTestWidget extends ConsumerWidget {
   const StressTestWidget({super.key});
@@ -149,7 +157,11 @@ class StressTestWidget extends ConsumerWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: ThemeV2.primary,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: _brandGradient,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -157,8 +169,9 @@ class StressTestWidget extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 8,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: dialBrassLight,
                       letterSpacing: 1.2,
+                      shadows: _goldGlow(dialBrassLight),
                     ),
                   ),
                 ),
@@ -236,6 +249,18 @@ class StressTestWidget extends ConsumerWidget {
     );
   }
 
+  // Play-button icon color, same slot rules as [_tierBadge]: slot 1 is
+  // always free (white), slot 2 is white on free tier / gold once premium,
+  // slots 3-5 are premium-only so always gold.
+  Color _playIconColor(WidgetRef ref, int index) {
+    if (index == 0) return Colors.white;
+    final tier = ref.watch(subscriptionTierProvider);
+    final isPremiumTier =
+        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    if (index == 1) return isPremiumTier ? dialBrassLight : Colors.white;
+    return dialBrassLight;
+  }
+
   // Tier badge, keyed by slot position (index) among the user's active
   // tests, not the user's own tier alone — slot 1 is always free (no
   // badge), slot 2 is the free tier's ad-unlockable extra test (no ad
@@ -278,7 +303,11 @@ class StressTestWidget extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
       decoration: BoxDecoration(
-        color: ThemeV2.primary.withValues(alpha: 0.15),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: _brandGradient,
+        ),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Text(
@@ -286,8 +315,9 @@ class StressTestWidget extends ConsumerWidget {
         style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w700,
-          color: ThemeV2.primary,
+          color: dialBrassLight,
           letterSpacing: 0.8,
+          shadows: _goldGlow(dialBrassLight),
         ),
       ),
     );
@@ -312,12 +342,16 @@ class StressTestWidget extends ConsumerWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: ThemeV2.primary.withValues(alpha: 0.15),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: _brandGradient,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.play_circle_rounded,
-                color: ThemeV2.primary,
+                color: _playIconColor(ref, index),
                 size: 22,
               ),
             ),
@@ -387,7 +421,6 @@ class StressTestWidget extends ConsumerWidget {
     } catch (_) {}
 
     final verdictTitle = verdict?.title ?? '—';
-    final fsScore = verdict?.fsScore ?? 0;
     final pnlColor = session.profitLoss >= 0
         ? ThemeV2.success
         : ThemeV2.loss;
@@ -399,26 +432,23 @@ class StressTestWidget extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            // FS Score circle
+            // Completed-test icon — same badge style as the active-test
+            // play button, stop square instead of a play triangle.
             Container(
-              width: 38,
-              height: 38,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [ThemeV2.primary, Color(0xFF006634)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
+                  colors: _brandGradient,
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              alignment: Alignment.center,
-              child: Text(
-                '$fsScore',
-                style: interNums(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+              child: const Icon(
+                Icons.stop_circle_rounded,
+                color: dialBrassLight,
+                size: 22,
               ),
             ),
             const SizedBox(width: 12),

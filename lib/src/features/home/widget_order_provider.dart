@@ -7,8 +7,7 @@ import '../../core/supabase/supabase_providers.dart';
 // Home Widget Order Provider (SharedPreferences-backed)
 // ---------------------------------------------------------------------------
 // Stores the visible order of widgets on the Home Screen.
-// Default order: shield_signal, markets, watchlist, upcoming_events,
-//                news, portfolio.
+// Default order: shield_signal, markets, watchlist, news, portfolio.
 // Any changes are immediately persisted to SharedPreferences.
 // ---------------------------------------------------------------------------
 
@@ -19,8 +18,6 @@ const List<String> _defaultOrder = [
   'shield_signal',
   'stress_test',
   'watchlist',
-  // Legacy / utility widgets
-  'upcoming_events',
   // Premium widgets (hidden by default for FREE, shown with 🔒)
   'portfolio_journal',
   'historical_sim',
@@ -45,8 +42,6 @@ class HomeWidgetConfig {
         return 'Shield Signal';
       case 'watchlist':
         return 'Watchlist';
-      case 'upcoming_events':
-        return 'Upcoming Events';
       case 'news':
         return 'Market Clock';
       case 'stress_test':

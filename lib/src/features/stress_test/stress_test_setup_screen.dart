@@ -15,10 +15,17 @@ import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
+import '../market_clock/market_clock_dial.dart';
 import '../../shared/guardian/guardian_engine.dart';
 import '../../shared/guardian/guardian_providers.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
+
+// Brand dark-green gradient and the Market Clock ring's gold accent — used
+// for every "PREMIUM" tag on this screen.
+const List<Color> _brandGradient = [dialLight, dialDark];
+List<Shadow> _goldGlow(Color color) =>
+    [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6)];
 
 class StressTestSetupScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -240,7 +247,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: ThemeV2.primary,
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: _brandGradient,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -248,8 +259,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               style: GoogleFonts.inter(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: dialBrassLight,
                 letterSpacing: 1.5,
+                shadows: _goldGlow(dialBrassLight),
               ),
             ),
           ),
@@ -318,8 +330,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: dialBrassLight,
                       letterSpacing: 1.2,
+                      shadows: _goldGlow(dialBrassLight),
                     ),
                   ),
                 ),
@@ -442,7 +455,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: ThemeV2.primary,
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: _brandGradient,
+                        ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -450,8 +467,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: dialBrassLight,
                           letterSpacing: 1.2,
+                          shadows: _goldGlow(dialBrassLight),
                         ),
                       ),
                     )
@@ -462,7 +480,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD4AF37),
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: _brandGradient,
+                        ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -470,8 +492,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: dialBrassLight,
                           letterSpacing: 1.2,
+                          shadows: _goldGlow(dialBrassLight),
                         ),
                       ),
                     )

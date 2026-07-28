@@ -12,6 +12,7 @@ import '../search/search_counter_provider.dart';
 import '../search/search_provider.dart';
 import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
+import '../market_clock/market_clock_dial.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -100,28 +101,29 @@ class ProfileScreen extends ConsumerWidget {
                                   horizontal: 8,
                                   vertical: 3,
                                 ),
-                                decoration: BoxDecoration(
-                                  color: isAdmin
-                                      ? ThemeV2.primary.withValues(alpha: 0.15)
-                                      : ThemeV2.primary.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: isAdmin
-                                        ? ThemeV2.primary.withValues(alpha: 0.5)
-                                        : ThemeV2.primary.withValues(
-                                            alpha: 0.5,
-                                          ),
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [dialLight, dialDark],
                                   ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(6)),
                                 ),
                                 child: Text(
                                   isAdmin ? 'ADMIN' : 'PREMIUM',
                                   style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
-                                    color: isAdmin
-                                        ? ThemeV2.primary
-                                        : ThemeV2.primary,
+                                    color: dialBrassLight,
                                     letterSpacing: 1,
+                                    shadows: [
+                                      Shadow(
+                                        color:
+                                            dialBrassLight.withValues(alpha: 0.5),
+                                        blurRadius: 6,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),

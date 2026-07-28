@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scanco/src/core/theme/app_theme.dart';
 import 'package:scanco/src/shared/widgets/widget_container.dart';
 import 'package:scanco/src/features/home/widgets/watchlist_widget.dart';
-import 'package:scanco/src/features/home/widgets/upcoming_events_widget.dart';
 import 'package:scanco/src/features/home/home_providers.dart';
 
 // =============================================================================
@@ -48,48 +47,6 @@ Future<List<Map<String, dynamic>>> _mockWatchlistQuotes() async {
       'price': 248.90,
       'change': -1.50,
     },
-  ];
-}
-
-/// 5 calendar events — overrides calendarEventsProvider.
-Future<List<CalendarEvent>> _mockCalendarEvents() async {
-  final now = DateTime.now();
-  return [
-    CalendarEvent(
-      symbol: 'AAPL',
-      type: 'earnings',
-      date: now,
-      title: 'Q1 Earnings',
-      epsEstimate: '2.10',
-    ),
-    CalendarEvent(
-      symbol: 'GOOGL',
-      type: 'earnings',
-      date: now,
-      title: 'Q1 Earnings',
-      epsEstimate: '1.85',
-    ),
-    CalendarEvent(
-      symbol: 'MSFT',
-      type: 'dividend',
-      date: now,
-      title: 'Dividend',
-      amount: 0.75,
-    ),
-    CalendarEvent(
-      symbol: 'AMZN',
-      type: 'earnings',
-      date: now,
-      title: 'Q1 Earnings',
-      epsEstimate: '1.20',
-    ),
-    CalendarEvent(
-      symbol: 'TSLA',
-      type: 'dividend',
-      date: now,
-      title: 'Dividend',
-      amount: 0.50,
-    ),
   ];
 }
 
@@ -241,38 +198,4 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // 5. UpcomingEventsWidget — Compact mode (only 2 of 5 events)
-  // ---------------------------------------------------------------------------
-  group('UpcomingEventsWidget — Compact mode', () {
-    testWidgets('renders only 2 event tiles out of 5 via .take(2)',
-        (WidgetTester tester) async {
-      // Seed watchlist symbols so real provider returns non-empty list
-      await _seedWatchlistSymbols(['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA']);
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            calendarEventsProvider
-                .overrideWith((ref) => _mockCalendarEvents()),
-          ],
-          child: _wrapWithTheme(const UpcomingEventsWidget()),
-        ),
-      );
-
-      // Pump frames to let FutureProvider resolve
-      await tester.pump(const Duration(milliseconds: 50));
-      await tester.pump(const Duration(milliseconds: 50));
-      await tester.pump(const Duration(milliseconds: 50));
-
-      // First 2 event symbols should be on screen
-      expect(find.text('AAPL'), findsOneWidget);
-      expect(find.text('GOOGL'), findsOneWidget);
-
-      // Remaining 3 must NOT be rendered
-      expect(find.text('MSFT'), findsNothing);
-      expect(find.text('AMZN'), findsNothing);
-      expect(find.text('TSLA'), findsNothing);
-    });
-  });
 }

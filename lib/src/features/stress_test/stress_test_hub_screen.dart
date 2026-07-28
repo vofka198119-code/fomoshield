@@ -20,6 +20,12 @@ import '../market_clock/market_clock_dial.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 
+// Brand dark-green gradient and the Market Clock ring's gold accent — used
+// for the play-button badge and the "premium" tag below.
+const List<Color> _brandGradient = [dialLight, dialDark];
+List<Shadow> _goldGlow(Color color) =>
+    [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6)];
+
 class StressTestHubScreen extends ConsumerWidget {
   const StressTestHubScreen({super.key});
 
@@ -398,7 +404,11 @@ class StressTestHubScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
       decoration: BoxDecoration(
-        color: ThemeV2.primary.withValues(alpha: 0.15),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: _brandGradient,
+        ),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Text(
@@ -406,11 +416,24 @@ class StressTestHubScreen extends ConsumerWidget {
         style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w700,
-          color: ThemeV2.primary,
+          color: dialBrassLight,
           letterSpacing: 0.8,
+          shadows: _goldGlow(dialBrassLight),
         ),
       ),
     );
+  }
+
+  // Play-button icon color, same slot rules as [_tierBadge]: slot 1 is
+  // always free (white), slot 2 is white on free tier / gold once premium,
+  // slots 3-5 are premium-only so always gold.
+  Color _playIconColor(WidgetRef ref, int index) {
+    if (index == 0) return Colors.white;
+    final tier = ref.watch(subscriptionTierProvider);
+    final isPremiumTier =
+        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    if (index == 1) return isPremiumTier ? dialBrassLight : Colors.white;
+    return dialBrassLight;
   }
 
   Widget _buildActiveSessionTile(
@@ -435,12 +458,16 @@ class StressTestHubScreen extends ConsumerWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: ThemeV2.primary.withValues(alpha: 0.15),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: _brandGradient,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.play_circle_rounded,
-                color: ThemeV2.primary,
+                color: _playIconColor(ref, index),
                 size: 22,
               ),
             ),

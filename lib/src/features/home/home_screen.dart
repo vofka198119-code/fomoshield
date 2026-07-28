@@ -9,7 +9,6 @@ import 'home_providers.dart';
 import 'widget_order_provider.dart';
 import 'widgets/shield_signal_widget.dart';
 import 'widgets/watchlist_widget.dart';
-import 'widgets/upcoming_events_widget.dart';
 import 'widgets/market_clock_widget.dart';
 import 'widgets/portfolio_widget.dart';
 import 'widgets/portfolio_journal_widget.dart';
@@ -159,8 +158,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return const ShieldSignalWidget();
       case 'watchlist':
         return const WatchlistWidget();
-      case 'upcoming_events':
-        return const UpcomingEventsWidget();
       case 'news':
         return const MarketClockWidget();
       case 'portfolio':
@@ -238,8 +235,6 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
         return Icons.shield_rounded;
       case 'watchlist':
         return Icons.bookmark_rounded;
-      case 'upcoming_events':
-        return Icons.event_rounded;
       case 'news':
         return Icons.access_time_filled_rounded;
       case 'portfolio':
@@ -306,10 +301,6 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                           visible: true,
                         ),
                         const HomeWidgetConfig(id: 'watchlist', visible: true),
-                        const HomeWidgetConfig(
-                          id: 'upcoming_events',
-                          visible: true,
-                        ),
                         const HomeWidgetConfig(
                           id: 'portfolio_journal',
                           visible: true,

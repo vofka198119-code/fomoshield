@@ -105,8 +105,15 @@ class _WatchlistTile extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            // Company Logo (cached)
-            CompanyLogo(ticker: symbol, logoUrl: logoUrl, domain: domain),
+            // Company Logo (cached) — thin brand-green ring around it
+            Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: ThemeV2.primary, width: 1.5),
+              ),
+              child: CompanyLogo(ticker: symbol, logoUrl: logoUrl, domain: domain),
+            ),
             const SizedBox(width: 12),
             // Name + Symbol
             Expanded(

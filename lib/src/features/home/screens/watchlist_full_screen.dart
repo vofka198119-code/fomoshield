@@ -54,13 +54,6 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
             letterSpacing: 1.5,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_rounded, color: ThemeV2.primary),
-            tooltip: 'Add company',
-            onPressed: _isNavigating ? null : _navigateToSearch,
-          ),
-        ],
       ),
       body: watchlistSymbols.isEmpty
           ? _emptyState()
@@ -87,6 +80,36 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(22, 14, 22, 14),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'WATCHLIST',
+                                    style: FomoShieldTheme.cardTitle(),
+                                  ),
+                                  const Spacer(),
+                                  InkWell(
+                                    onTap: _isNavigating
+                                        ? null
+                                        : _navigateToSearch,
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: const Icon(
+                                      Icons.add_rounded,
+                                      color: ThemeV2.primary,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Divider(
+                              height: 1,
+                              indent: 16,
+                              endIndent: 16,
+                              color: Colors.black.withValues(alpha: 0.06),
+                            ),
                             for (int i = 0; i < companies.length; i++)
                               _WatchlistRow(
                                 key: ValueKey(companies[i]['symbol']),
@@ -130,9 +153,15 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
                     child: Text(
-                      'EVENTS & NEWS',
+                      'CORPORATE EVENTS',
                       style: FomoShieldTheme.cardTitle(),
                     ),
+                  ),
+                  Divider(
+                    height: 1,
+                    indent: 16,
+                    endIndent: 16,
+                    color: Colors.black.withValues(alpha: 0.06),
                   ),
                   for (int i = 0; i < display.length; i++)
                     _EventRow(
@@ -258,11 +287,18 @@ class _WatchlistRow extends ConsumerWidget {
             : null,
         child: Row(
           children: [
-            CompanyLogo(
-              ticker: symbol,
-              logoUrl: logoUrl,
-              domain: domain,
-              radius: 18,
+            Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: ThemeV2.primary, width: 1.5),
+              ),
+              child: CompanyLogo(
+                ticker: symbol,
+                logoUrl: logoUrl,
+                domain: domain,
+                radius: 18,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
