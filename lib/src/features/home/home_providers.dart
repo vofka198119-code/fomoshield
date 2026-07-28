@@ -43,14 +43,6 @@ class MarketIndex {
       changeAbs: price - prevClose,
     );
   }
-
-  /// Sentiment level derived from the day's percent change.
-  /// 'fear' (< -0.5%) | 'neutral' | 'greed' (> +0.5%)
-  String get level {
-    if (change > 0.5) return 'greed';
-    if (change < -0.5) return 'fear';
-    return 'neutral';
-  }
 }
 
 class CalendarEvent {

@@ -5,7 +5,12 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../market_clock/market_clock_dial.dart';
 import '../home_providers.dart';
+
+// Same dark-green instrument-panel gradient as the TARGET widget's graph
+// window (market_clock_dial.dart's dialLight/dialDark).
+const List<Color> _priceCellGradient = [dialLight, dialDark];
 
 // ---------------------------------------------------------------------------
 // Shield Signal Widget — S&P 500 / NASDAQ / Dow Jones sentiment, swipeable
@@ -20,12 +25,6 @@ class ShieldSignalWidget extends ConsumerStatefulWidget {
 }
 
 class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
-  // Fixed height for the swipeable page area — content is always a price
-  // cell + two small cells + an explanation paragraph of similar length
-  // across all three indices. Was 300 (too generous, left a visible gap
-  // above the swipe dots); trimmed down to match actual content height.
-  static const double _pageAreaHeight = 250;
-
   late final PageController _pageController;
   int _index = 0;
 
@@ -82,17 +81,35 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
 
           return Column(
             children: [
-              SizedBox(
-                height: _pageAreaHeight,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: indices.length,
-                  onPageChanged: (i) => setState(() => _index = i),
-                  itemBuilder: (context, i) => Align(
-                    alignment: Alignment.topCenter,
-                    child: _IndexView(index: indices[i]),
+              Stack(
+                children: [
+                  // Invisible but fully laid-out — forces the Stack to size
+                  // itself to the tallest index's content so the real
+                  // PageView below never clips regardless of copy length.
+                  Visibility(
+                    visible: false,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child: IndexedStack(
+                      index: 0,
+                      children: [
+                        for (final idx in indices) _IndexView(index: idx),
+                      ],
+                    ),
                   ),
-                ),
+                  Positioned.fill(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: indices.length,
+                      onPageChanged: (i) => setState(() => _index = i),
+                      itemBuilder: (context, i) => Align(
+                        alignment: Alignment.topCenter,
+                        child: _IndexView(index: indices[i]),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               _dots(
@@ -173,6 +190,7 @@ class _IndexView extends StatelessWidget {
     final isUp = index.change >= 0;
     final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
     final changeBg = isUp ? ThemeV2.successBg : ThemeV2.lossBg;
+    final mood = _moodFor(index.change);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -182,7 +200,15 @@ class _IndexView extends StatelessWidget {
           value: '\$${index.price.toStringAsFixed(2)}',
           valueFontSize: 18,
           labelFontSize: 14,
-          bgColor: ThemeV2.primaryBg,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: _priceCellGradient,
+          ),
+          labelColor: Colors.white.withValues(alpha: 0.7),
+          valueColor: Colors.white,
+          leadingIcon: isUp ? Icons.trending_up : Icons.trending_down,
+          leadingIconColor: changeColor,
           horizontalLayout: true,
         ),
         const SizedBox(height: 8),
@@ -216,16 +242,34 @@ class _IndexView extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: ThemeV2.surfaceDark.withValues(alpha: 0.5),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: _priceCellGradient,
+            ),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Text(
-            _explanation(index.name, index.level),
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: ThemeV2.textSecondary,
-              height: 1.5,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                mood.title,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                mood.body,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.85),
+                  height: 1.5,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -236,7 +280,11 @@ class _IndexView extends StatelessWidget {
     required String label,
     required String value,
     Color? bgColor,
+    Gradient? gradient,
     Color? valueColor,
+    Color? labelColor,
+    IconData? leadingIcon,
+    Color? leadingIconColor,
     double valueFontSize = 18,
     double labelFontSize = 10,
     bool horizontalLayout = false,
@@ -247,9 +295,20 @@ class _IndexView extends StatelessWidget {
         fontSize: labelFontSize,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.6,
-        color: ThemeV2.primary,
+        color: labelColor ?? ThemeV2.primary,
       ),
     );
+    final labelWidget = leadingIcon == null
+        ? labelText
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(leadingIcon,
+                  size: 16, color: leadingIconColor ?? (labelColor ?? ThemeV2.primary)),
+              const SizedBox(width: 6),
+              labelText,
+            ],
+          );
     final valueText = Text(
       value,
       style: interNums(
@@ -264,15 +323,16 @@ class _IndexView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: gradient == null ? bgColor : null,
+        gradient: gradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeV2.divider),
+        border: gradient == null ? Border.all(color: ThemeV2.divider) : null,
       ),
       child: horizontalLayout
           ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: [labelText, valueText],
+              children: [labelWidget, valueText],
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,56 +345,59 @@ class _IndexView extends StatelessWidget {
     );
   }
 
-  /// Plain-language explanation, keyed by index + sentiment level.
-  String _explanation(String name, String level) {
-    final key = name.toUpperCase();
-    final isNasdaq = key.contains('NASDAQ');
-    final isDow = key.contains('DOW');
-
-    switch (level) {
-      case 'greed':
-        if (isNasdaq) {
-          return 'Nasdaq is rising because technology companies are gaining '
-              'the most. This usually happens when investors believe in '
-              'continued growth in technology and AI.';
-        }
-        if (isDow) {
-          return 'Dow Jones is rising as the value of the largest, most '
-              'stable companies increases. This signals positive '
-              'expectations for the US economy.';
-        }
-        return 'The index is rising because investors are actively buying '
-            'shares of large companies. This means market participants '
-            'expect strong financial results from businesses and the '
-            'economy.';
-      case 'fear':
-        if (isNasdaq) {
-          return 'Nasdaq is falling as investors cut back on technology '
-              'holdings. This usually happens when uncertainty rises or '
-              'market sentiment worsens.';
-        }
-        if (isDow) {
-          return 'Dow Jones is declining as investors exit large-company '
-              'stocks, worried about a slowing economy or other negative '
-              'factors.';
-        }
-        return 'The index is falling because investors are selling shares. '
-            'This can be caused by concerns about the economy, weak company '
-            'earnings, or negative news.';
-      default:
-        if (isNasdaq) {
-          return 'Nasdaq is trading without a clear trend. Investors are '
-              'assessing the current situation and aren\'t rushing into new '
-              'decisions.';
-        }
-        if (isDow) {
-          return 'Dow Jones is holding near previous levels. The market is '
-              'waiting for major economic events or company earnings '
-              'reports.';
-        }
-        return 'The index is barely moving. Buyers and sellers are roughly '
-            'balanced, so the market is waiting for news and hasn\'t picked '
-            'a direction.';
+  /// Emotional headline + body, keyed by the day's percent move. Thresholds
+  /// split each direction into a "small" and "strong" band, with a ±0.1%
+  /// dead zone in the middle counting as neutral.
+  _Mood _moodFor(double changePercent) {
+    if (changePercent >= 1.0) {
+      return const _Mood(
+        'Bullish Momentum',
+        'Buyers are clearly leading today\'s market. Strong demand is '
+            'pushing prices higher across many companies, and positive news '
+            'or growing optimism is encouraging investors to keep buying. '
+            'Momentum is on the bulls\' side — just remember, even strong '
+            'trends eventually slow down, so avoid chasing prices out of '
+            'excitement.',
+      );
     }
+    if (changePercent > 0.1) {
+      return const _Mood(
+        'Steady Climb',
+        'Buyers have a slight advantage today. Demand is a little stronger '
+            'than selling pressure, pushing the index higher. The move is '
+            'healthy and controlled, with no signs of panic or excessive '
+            'excitement — confidence is slowly building.',
+      );
+    }
+    if (changePercent >= -0.1) {
+      return const _Mood(
+        'Waiting for Direction',
+        'The market is taking a breath. Buyers and sellers are evenly '
+            'matched, so prices are moving very little. Nothing unusual is '
+            'happening right now — investors are simply waiting for the '
+            'next piece of important news before choosing a direction.',
+      );
+    }
+    if (changePercent >= -1.0) {
+      return const _Mood(
+        'Growing Caution',
+        'Sellers have gained a small advantage. The market is drifting '
+            'lower, but there are no signs of panic. Small pullbacks like '
+            'this are a normal part of investing.',
+      );
+    }
+    return const _Mood(
+      'Storm Warning',
+      'Fear is spreading through the market. Selling pressure is much '
+          'stronger than buying, causing prices to fall quickly. Sharp '
+          'declines can feel uncomfortable, but emotional decisions often '
+          'make difficult days even worse.',
+    );
   }
+}
+
+class _Mood {
+  final String title;
+  final String body;
+  const _Mood(this.title, this.body);
 }
