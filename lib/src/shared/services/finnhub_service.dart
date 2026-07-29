@@ -461,6 +461,19 @@ class FinnhubService {
       _get('/quote', params: {'symbol': symbol});
 
   // ---------------------------------------------------------------------------
+  // Top Companies (backend-computed, no direct-Finnhub equivalent)
+  // ---------------------------------------------------------------------------
+
+  /// Top ~47 S&P 500 companies by market cap, refreshed quarterly on the
+  /// backend (Wikipedia constituent scrape + Finnhub market-cap ranking —
+  /// Finnhub's own index-constituents endpoint is paid-tier only, see
+  /// scanco-backend/src/services/sp500Service.js). No direct-Finnhub
+  /// fallback exists for this one — it's purely our own backend's data.
+  /// Shape: `{updatedAt, companies: [{symbol, name, marketCap}]}`.
+  Future<Map<String, dynamic>> topCompanies() async =>
+      _getFromBackend('/top-companies');
+
+  // ---------------------------------------------------------------------------
   // Calendar
   // ---------------------------------------------------------------------------
 

@@ -20,6 +20,8 @@ import 'company_widget_order_provider.dart';
 import 'widgets/price_chart.dart';
 import 'widgets/fs_score_widget.dart';
 import '../../core/services/gics_sector_mapper.dart';
+import '../../shared/widgets/company_logo.dart';
+import '../search/recently_viewed_provider.dart';
 
 // ---------------------------------------------------------------------------
 // Providers — with layered cache: 4h (main) + 30d (score + metrics)
@@ -164,8 +166,9 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   Future<void> _checkAd() async {
     final tier = ref.read(subscriptionTierProvider);
     // Admin/premium bypass ads entirely
-    if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
+    if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) {
       return;
+    }
     try {
       final shouldShow = await ref
           .read(watchlistAdProvider.notifier)
@@ -285,6 +288,19 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
     }
 
     final asyncData = ref.watch(companyDetailProvider(widget.symbol));
+
+    ref.listen<AsyncValue<Map<String, dynamic>>>(
+      companyDetailProvider(widget.symbol),
+      (previous, next) {
+        next.whenData((data) {
+          final profile = data['profile'] as Map<String, dynamic>? ?? {};
+          final name = profile['name'] as String? ?? widget.symbol;
+          ref
+              .read(recentlyViewedProvider.notifier)
+              .recordView(widget.symbol, name);
+        });
+      },
+    );
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -760,26 +776,7 @@ class _PriceHeader extends StatelessWidget {
           // Company name + ticker
           Row(
             children: [
-              if (logo != null && logo!.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    logo!,
-                    width: 44,
-                    height: 44,
-                    errorBuilder: (_, _, _) => const Icon(
-                      Icons.business_rounded,
-                      size: 44,
-                      color: ThemeV2.primary,
-                    ),
-                  ),
-                )
-              else
-                const Icon(
-                  Icons.business_rounded,
-                  size: 44,
-                  color: ThemeV2.primary,
-                ),
+              CompanyLogo(ticker: symbol, logoUrl: logo, radius: 22),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
