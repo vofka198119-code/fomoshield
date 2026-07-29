@@ -34,7 +34,6 @@ import '../../../core/services/gics_sector_mapper.dart';
 // palette change (see docs/VISUAL_AUDIT.md, Группа E).
 const _marketColor = FomoShieldTheme.factorMarket;
 const _sectorColor = FomoShieldTheme.factorSector;
-const _companyColor = FomoShieldTheme.factorCompany;
 const _newsColor = FomoShieldTheme.factorNews;
 const _hypeColor = FomoShieldTheme.factorHype;
 const _noiseColor = FomoShieldTheme.factorNoise;
@@ -490,7 +489,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final entries = [
       ('Market', c.marketPct),
       ('Sector', c.sectorPct),
-      ('Company', c.companyPct),
       ('News', c.newsPct),
       ('Hype', c.hypePct),
       ('Noise', c.noisePct),
@@ -514,10 +512,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         isPositive
             ? 'Sector tailwinds boosted performance.'
             : 'Sector rotation created headwinds.',
-      'Company' =>
-        isPositive
-            ? 'Company-specific developments drove gains.'
-            : 'Company headwinds pressured the stock.',
       'News' =>
         isPositive
             ? 'Positive news flow supported prices.'
@@ -548,13 +542,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         c.sectorPct,
         _sectorColor,
         'Industry-specific trends and rotation.',
-      ),
-      _WhyFactor(
-        'Company',
-        '🏢',
-        c.companyPct,
-        _companyColor,
-        'Company-specific events and fundamentals.',
       ),
       _WhyFactor(
         'News',
@@ -810,7 +797,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final entries = [
       ('Market', c.marketPct),
       ('Sector', c.sectorPct),
-      ('Company', c.companyPct),
       ('News', c.newsPct),
       ('Hype', c.hypePct),
       ('Noise', c.noisePct),
@@ -1016,7 +1002,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final entries = [
       ('Market', c.marketPct),
       ('Sector', c.sectorPct),
-      ('Company', c.companyPct),
       ('News', c.newsPct),
       ('Hype', c.hypePct),
       ('Noise', c.noisePct),
@@ -1149,12 +1134,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                       'Sector %',
                       '${latest.contributions.sectorPct.round()}%',
                       _sectorColor,
-                    ),
-                    const SizedBox(height: 10),
-                    _techRow(
-                      'Company %',
-                      '${latest.contributions.companyPct.round()}%',
-                      _companyColor,
                     ),
                     const SizedBox(height: 10),
                     _techRow(

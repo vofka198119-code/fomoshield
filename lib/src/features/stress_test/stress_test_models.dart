@@ -639,10 +639,6 @@ class PriceContribution {
   /// Вклад сектора — отклонение drift сектора от среднерыночного.
   final double sectorPct;
 
-  /// Вклад компании — специфичный для компании drift (см. noise_engine.dart's
-  /// companyDriftRaw) и специфичные события.
-  final double companyPct;
-
   /// Вклад новостей/событий — коррекции, катастрофы, восстановления.
   final double newsPct;
 
@@ -655,20 +651,17 @@ class PriceContribution {
   const PriceContribution({
     required this.marketPct,
     required this.sectorPct,
-    required this.companyPct,
     required this.newsPct,
     this.hypePct = 0,
     required this.noisePct,
   });
 
   /// Сумма всех факторов = 100% (с rounding tolerance).
-  double get total =>
-      marketPct + sectorPct + companyPct + newsPct + hypePct + noisePct;
+  double get total => marketPct + sectorPct + newsPct + hypePct + noisePct;
 
   Map<String, dynamic> toJson() => {
     'marketPct': marketPct,
     'sectorPct': sectorPct,
-    'companyPct': companyPct,
     'newsPct': newsPct,
     'hypePct': hypePct,
     'noisePct': noisePct,
@@ -678,7 +671,6 @@ class PriceContribution {
       PriceContribution(
         marketPct: (json['marketPct'] as num?)?.toDouble() ?? 0,
         sectorPct: (json['sectorPct'] as num?)?.toDouble() ?? 0,
-        companyPct: (json['companyPct'] as num?)?.toDouble() ?? 0,
         newsPct: (json['newsPct'] as num?)?.toDouble() ?? 0,
         hypePct: (json['hypePct'] as num?)?.toDouble() ?? 0,
         noisePct: (json['noisePct'] as num?)?.toDouble() ?? 0,

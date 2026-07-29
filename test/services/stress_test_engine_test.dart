@@ -1126,7 +1126,6 @@ void main() {
             '    Before: '
             'M=${before.marketPct.toStringAsFixed(1)} '
             'S=${before.sectorPct.toStringAsFixed(1)} '
-            'C=${before.companyPct.toStringAsFixed(1)} '
             'N=${before.newsPct.toStringAsFixed(1)} '
             'Noise=${before.noisePct.toStringAsFixed(1)}',
           );
@@ -1134,7 +1133,6 @@ void main() {
             '    After:  '
             'M=${after.marketPct.toStringAsFixed(1)} '
             'S=${after.sectorPct.toStringAsFixed(1)} '
-            'C=${after.companyPct.toStringAsFixed(1)} '
             'N=${after.newsPct.toStringAsFixed(1)} '
             'Noise=${after.noisePct.toStringAsFixed(1)}',
           );

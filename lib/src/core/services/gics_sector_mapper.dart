@@ -100,6 +100,17 @@ void hydrateLiveGicsSectorCache(Map<String, GicsSector?> entries) {
 /// large/mid-cap US equities — an unmatched string returns `null` and the
 /// caller falls back to the static [_overrides]/[CompanyTagMapper] path
 /// rather than caching a wrong guess.
+///
+/// A lookup miss here is silent by design (see [SectorRepository.loadSector]
+/// — only a `debugPrint`, never surfaced to the user), so a wrong/missing
+/// key doesn't crash anything, it just quietly falls back to the coarser
+/// static heuristic. Spot-checked against the LIVE API 2026-07-29 across
+/// ~48 tickers spanning every key below — 2 real mismatches found and
+/// fixed (`'Apparel/Textiles'` never matched anything real; `'Transportation'`
+/// alone missed UPS's actual "Logistics & Transportation"), see inline
+/// comments. Not exhaustively verified — only the categories sampled that
+/// day were confirmed; treat other keys as best-effort until similarly
+/// spot-checked.
 const Map<String, GicsSector> finnhubIndustryToGics = {
   'Technology': GicsSector.technology,
   'Software': GicsSector.technology,
@@ -125,7 +136,10 @@ const Map<String, GicsSector> finnhubIndustryToGics = {
   'Automobiles': GicsSector.consumerDiscretionary,
   'Hotels, Restaurants & Leisure': GicsSector.consumerDiscretionary,
   'Leisure Products': GicsSector.consumerDiscretionary,
-  'Apparel/Textiles': GicsSector.consumerDiscretionary,
+  // 'Apparel/Textiles' never matched anything — confirmed 2026-07-29 by
+  // sampling the live API (NKE actually returns "Textiles, Apparel &
+  // Luxury Goods"). Replaced with the real string.
+  'Textiles, Apparel & Luxury Goods': GicsSector.consumerDiscretionary,
   'Diversified Consumer Services': GicsSector.consumerDiscretionary,
   'Airlines': GicsSector.industrials,
   'Consumer products': GicsSector.consumerStaples,
@@ -140,6 +154,16 @@ const Map<String, GicsSector> finnhubIndustryToGics = {
   'Machinery': GicsSector.industrials,
   'Aerospace & Defense': GicsSector.industrials,
   'Transportation': GicsSector.industrials,
+  // Confirmed 2026-07-29 by sampling the live API — UPS actually returns the
+  // combined phrase below, not plain "Transportation"; 'Transportation' is
+  // kept too in case some other company returns it standalone (unconfirmed
+  // either way), but this is the one real companies were observed to use.
+  'Logistics & Transportation': GicsSector.industrials,
+  // Confirmed 2026-07-29 — UBER's real value (bypassed in practice by its
+  // own entry in [_overrides], but any other ground-transport company
+  // without a manual override would have silently fallen through to null
+  // without this key).
+  'Road & Rail': GicsSector.industrials,
   'Construction': GicsSector.industrials,
   'Trading Companies & Distributors': GicsSector.industrials,
   'Metals & Mining': GicsSector.materials,

@@ -55,7 +55,6 @@ class ExplainableData {
     final all = [
       _FactorEntry('Market', contributions.marketPct, FomoShieldTheme.factorMarket),
       _FactorEntry('Sector', contributions.sectorPct, FomoShieldTheme.factorSector),
-      _FactorEntry('Company', contributions.companyPct, FomoShieldTheme.factorCompany),
       _FactorEntry('News', contributions.newsPct, FomoShieldTheme.factorNews),
       _FactorEntry('Noise', contributions.noisePct, FomoShieldTheme.factorNoise),
     ];

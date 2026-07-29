@@ -844,12 +844,6 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
             ),
             const SizedBox(height: 10),
             _factorBar(
-              'Company',
-              latest.contributions.companyPct / 100,
-              FomoShieldTheme.factorCompany,
-            ),
-            const SizedBox(height: 10),
-            _factorBar(
               'News',
               latest.contributions.newsPct / 100,
               FomoShieldTheme.factorNews,
@@ -861,15 +855,13 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
               FomoShieldTheme.factorNoise,
             ),
           ] else ...[
-            _factorBar('Market', 0.40, FomoShieldTheme.factorMarket),
+            _factorBar('Market', 0.47, FomoShieldTheme.factorMarket),
             const SizedBox(height: 10),
-            _factorBar('Sector', 0.25, FomoShieldTheme.factorSector),
+            _factorBar('Sector', 0.29, FomoShieldTheme.factorSector),
             const SizedBox(height: 10),
-            _factorBar('Company', 0.15, FomoShieldTheme.factorCompany),
+            _factorBar('News', 0.14, FomoShieldTheme.factorNews),
             const SizedBox(height: 10),
-            _factorBar('News', 0.12, FomoShieldTheme.factorNews),
-            const SizedBox(height: 10),
-            _factorBar('Noise', 0.08, FomoShieldTheme.factorNoise),
+            _factorBar('Noise', 0.10, FomoShieldTheme.factorNoise),
           ],
           const SizedBox(height: 16),
           // Explanation text

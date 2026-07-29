@@ -86,7 +86,6 @@ extension NoiseEngine on StressTestNotifier {
     double? marketDriftRaw,
     double? sectorDriftRaw,
     double? noiseRaw,
-    double? companyDriftRaw,
     double? newsRaw,
     double? hypeRaw,
   }) {
@@ -94,7 +93,6 @@ extension NoiseEngine on StressTestNotifier {
     double mW = (marketDriftRaw?.abs() ?? 0.0);
     double sW = (sectorDriftRaw?.abs() ?? 0.0);
     double nW = (noiseRaw?.abs() ?? 0.0);
-    double cW = (companyDriftRaw?.abs() ?? 0.0);
     // Real News event (news_event.dart) takes priority when this symbol is
     // the one it's targeting; otherwise fall back to the old synthetic
     // proxy (any >5% correction gets SOME "News" attribution) for organic
@@ -111,7 +109,7 @@ extension NoiseEngine on StressTestNotifier {
     // Noise in the Why breakdown).
     final double hypeW = (hypeRaw?.abs() ?? 0.0);
 
-    final double totalW = mW + sW + nW + cW + newsW + hypeW;
+    final double totalW = mW + sW + nW + newsW + hypeW;
     if (totalW < 1e-12) {
       // No meaningful move → balanced default split
       return TickExplanation(
@@ -120,12 +118,11 @@ extension NoiseEngine on StressTestNotifier {
         priceBefore: priceBefore,
         priceAfter: priceAfter,
         contributions: const PriceContribution(
-          marketPct: 40,
-          sectorPct: 25,
-          companyPct: 15,
+          marketPct: 47,
+          sectorPct: 29,
           newsPct: 0,
           hypePct: 0,
-          noisePct: 20,
+          noisePct: 24,
         ),
         marketPhase: scenario.name,
         scenario: scenario.name,
@@ -135,16 +132,15 @@ extension NoiseEngine on StressTestNotifier {
     // Compute exact percentages
     double mPct = mW / totalW * 100;
     double sPct = sW / totalW * 100;
-    double cPct = cW / totalW * 100;
     double nPct = nW / totalW * 100;
     double newsPct = newsW / totalW * 100;
     double hypePct = hypeW / totalW * 100;
 
     // Force exact 100 by adjusting the largest component
-    double sum = mPct + sPct + cPct + nPct + newsPct + hypePct;
+    double sum = mPct + sPct + nPct + newsPct + hypePct;
     final double diff = 100.0 - sum;
     if (diff.abs() > 1e-10) {
-      final List<double> components = [mPct, sPct, cPct, nPct, newsPct, hypePct];
+      final List<double> components = [mPct, sPct, nPct, newsPct, hypePct];
       final int maxIdx = components.indexOf(
         components.reduce((a, b) => a >= b ? a : b),
       );
@@ -156,15 +152,12 @@ extension NoiseEngine on StressTestNotifier {
           sPct += diff;
           break;
         case 2:
-          cPct += diff;
-          break;
-        case 3:
           nPct += diff;
           break;
-        case 4:
+        case 3:
           newsPct += diff;
           break;
-        case 5:
+        case 4:
           hypePct += diff;
           break;
       }
@@ -178,7 +171,6 @@ extension NoiseEngine on StressTestNotifier {
       contributions: PriceContribution(
         marketPct: mPct.clamp(0, 100),
         sectorPct: sPct.clamp(0, 100),
-        companyPct: cPct.clamp(0, 100),
         newsPct: newsPct.clamp(0, 100),
         hypePct: hypePct.clamp(0, 100),
         noisePct: nPct.clamp(0, 100),
