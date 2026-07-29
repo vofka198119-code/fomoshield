@@ -18,52 +18,32 @@ import 'market_clock_risk_engine.dart';
 // separate so this file stays purely visual.
 // ---------------------------------------------------------------------------
 
+/// Tier only drives the color/label banner now — the actual explanation
+/// text is per-WINDOW (see RiskMetrics.description in
+/// market_clock_risk_engine.dart), not per-tier, so two different windows
+/// landing in the same tier show their own distinct text.
 class TierStyle {
   final Color color;
   final String label;
 
-  /// Full-length explanation for this tier. The widget only shows as much
-  /// of this as fits (3 lines, ellipsis) — the detail card
-  /// (market_clock_risk_detail_screen.dart) shows it in full. Currently
-  /// short placeholder copy; swap in the longer real text here once it's
-  /// written — no other code needs to change.
-  final String description;
-
-  const TierStyle({
-    required this.color,
-    required this.label,
-    required this.description,
-  });
+  const TierStyle({required this.color, required this.label});
 }
 
 const Map<RiskTier, TierStyle> _tierStyles = {
-  RiskTier.low: TierStyle(
-    color: ThemeV2.success,
-    label: 'LOW RISK',
-    description: 'Calm conditions — a good window for a planned trade.',
-  ),
+  RiskTier.low: TierStyle(color: ThemeV2.success, label: 'LOW RISK'),
   RiskTier.moderate: TierStyle(
     color: ThemeV2.warning,
     label: 'MODERATE RISK',
-    description:
-        'Some risk factors elevated — a Limit Order is safer here.',
   ),
-  RiskTier.high: TierStyle(
-    color: ThemeV2.loss,
-    label: 'HIGH RISK',
-    description:
-        'Multiple risk factors elevated — consider waiting this out.',
-  ),
+  RiskTier.high: TierStyle(color: ThemeV2.loss, label: 'HIGH RISK'),
   RiskTier.closed: TierStyle(
     color: Colors.white70,
     label: 'MARKET CLOSED',
-    description: 'No live trading right now — nothing to time.',
   ),
 };
 
 /// Public accessor so market_clock_risk_detail_screen.dart can show the
-/// same label/color/description the widget uses, without exposing the
-/// whole map.
+/// same label/color the widget uses, without exposing the whole map.
 TierStyle tierStyleFor(RiskTier tier) => _tierStyles[tier]!;
 
 /// Thin gold-bordered "window" — same instrument-panel language as the
@@ -141,7 +121,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                 const SizedBox(height: 10),
                 _metricBar('News Risk', metrics.newsRisk),
                 const SizedBox(height: 10),
-                _metricBar('Beginner Safe', metrics.beginnerSafe),
+                _metricBar('F.O.M.O. Shield', metrics.fomoShield),
                 const SizedBox(height: 16),
 
                 // ── Description window + Risk Score window, side by
@@ -187,7 +167,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    style.description,
+                                    metrics.whyNow,
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.inter(

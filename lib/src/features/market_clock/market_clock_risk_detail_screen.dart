@@ -8,11 +8,10 @@ import 'market_clock_timing_widget.dart' show tierStyleFor;
 // ---------------------------------------------------------------------------
 // FOMO Shield Status — description detail card. Reached by tapping the
 // description window on the FOMO Shield Status widget (Market Clock).
-// Shows that tier's full, untruncated description — the widget itself only
-// shows as much as fits in 3 lines. Currently reuses the same short
-// placeholder copy as the widget; once the user supplies the real, longer
-// per-tier text, it only needs to change in one place (tierStyleFor's
-// description field in market_clock_timing_widget.dart).
+// Shows THIS WINDOW's full "Почему сейчас так?" / "Что лучше делать?" text
+// (RiskMetrics.whyNow/whatToDo in market_clock_risk_engine.dart) — the
+// widget itself only shows a 3-line truncated preview of whyNow. Label/
+// color still come from the tier (tierStyleFor).
 // ---------------------------------------------------------------------------
 
 class RiskStatusDetailScreen extends StatelessWidget {
@@ -68,14 +67,16 @@ class RiskStatusDetailScreen extends StatelessWidget {
                               color: ThemeV2.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            style.description,
-                            style: GoogleFonts.inter(
-                              fontSize: 15,
-                              color: ThemeV2.textPrimary,
-                              height: 1.6,
-                            ),
+                          const SizedBox(height: 20),
+                          _Section(
+                            label: 'Почему сейчас так?',
+                            body: window.riskMetrics.whyNow,
+                          ),
+                          const SizedBox(height: 18),
+                          _Section(
+                            label: 'Что лучше делать?',
+                            body: window.riskMetrics.whatToDo,
+                            isLast: true,
                           ),
                         ],
                       );
@@ -84,6 +85,47 @@ class RiskStatusDetailScreen extends StatelessWidget {
                 ],
               ),
             ),
+    );
+  }
+}
+
+class _Section extends StatelessWidget {
+  final String label;
+  final String body;
+  final bool isLast;
+  const _Section({
+    required this.label,
+    required this.body,
+    this.isLast = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: ThemeV2.primary,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            body,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textPrimary,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
