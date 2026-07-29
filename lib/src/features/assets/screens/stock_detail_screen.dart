@@ -832,13 +832,13 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
           // Factor bars
           if (latest != null) ...[
             _factorBar(
-              'Market',
+              'Scenario',
               latest.contributions.marketPct / 100,
               FomoShieldTheme.factorMarket,
             ),
             const SizedBox(height: 10),
             _factorBar(
-              'Sector',
+              'Sector Skew',
               latest.contributions.sectorPct / 100,
               FomoShieldTheme.factorSector,
             ),
@@ -855,9 +855,9 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
               FomoShieldTheme.factorNoise,
             ),
           ] else ...[
-            _factorBar('Market', 0.47, FomoShieldTheme.factorMarket),
+            _factorBar('Scenario', 0.47, FomoShieldTheme.factorMarket),
             const SizedBox(height: 10),
-            _factorBar('Sector', 0.29, FomoShieldTheme.factorSector),
+            _factorBar('Sector Skew', 0.29, FomoShieldTheme.factorSector),
             const SizedBox(height: 10),
             _factorBar('News', 0.14, FomoShieldTheme.factorNews),
             const SizedBox(height: 10),

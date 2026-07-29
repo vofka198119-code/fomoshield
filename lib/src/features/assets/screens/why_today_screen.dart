@@ -12,9 +12,11 @@
 //   - StressTestSession.devMarketTemperature   — Guardian mood selector
 //   - StressTestSession.devMarketPhase         — market context
 //
-// Color mapping (Steps 267–271, +Hype 2026-07-20):
-//   Market -> Blue, Sector -> Green, Company -> Orange, News -> Purple,
-//   Hype -> Deep orange, Noise -> Grey
+// Color mapping (Steps 267–271, +Hype 2026-07-20; Company factor removed and
+// Market/Sector/Hype relabeled to Scenario/Sector Skew/Sector Trend
+// 2026-07-29 — see PriceContribution's doc in stress_test_models.dart):
+//   Scenario -> Blue, Sector Skew -> Green, News -> Purple,
+//   Sector Trend -> Deep orange, Noise -> Grey
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -487,10 +489,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     // Use existing engine data — find dominant factor
     final c = latest.contributions;
     final entries = [
-      ('Market', c.marketPct),
-      ('Sector', c.sectorPct),
+      ('Scenario', c.marketPct),
+      ('Sector Skew', c.sectorPct),
       ('News', c.newsPct),
-      ('Hype', c.hypePct),
+      ('Sector Trend', c.hypePct),
       ('Noise', c.noisePct),
     ];
     entries.sort((a, b) => b.$2.compareTo(a.$2));
@@ -502,21 +504,34 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         '${_factorSentence(top.$1, isPositive)}';
   }
 
+  /// Factor meanings (see PriceContribution's doc in stress_test_models.dart
+  /// for the full explanation of each):
+  /// - Scenario: the epoch's Bull/Bear/Crash/... regime, applied through
+  ///   THIS asset's own AssetSector — not a single number shared by every
+  ///   holding.
+  /// - Sector Skew: how far this asset's AssetSector drift deviates from
+  ///   the average across everything else in THIS portfolio — a relative
+  ///   measure, not a live event.
+  /// - News: a real single-company headline event (news_event.dart).
+  /// - Sector Trend: a real sector-wide rally/sell-off event
+  ///   (hype/hype_event.dart) — uses GICS sectors, a DIFFERENT
+  ///   classification than Sector Skew's AssetSector.
+  /// - Noise: random tick-level fluctuation, no identifiable driver.
   String _factorSentence(String factor, bool isPositive) {
     return switch (factor) {
-      'Market' =>
+      'Scenario' =>
         isPositive
             ? 'Broad optimism lifted all assets.'
             : 'Macro concerns dragged the market.',
-      'Sector' =>
+      'Sector Skew' =>
         isPositive
-            ? 'Sector tailwinds boosted performance.'
-            : 'Sector rotation created headwinds.',
+            ? 'This sector is outperforming the rest of your portfolio.'
+            : 'This sector is lagging behind the rest of your portfolio.',
       'News' =>
         isPositive
             ? 'Positive news flow supported prices.'
             : 'Negative headlines affected sentiment.',
-      'Hype' =>
+      'Sector Trend' =>
         isPositive
             ? 'A sector-wide rally lifted this stock along with its peers.'
             : 'A sector-wide sell-off dragged this stock down with its peers.',
@@ -530,18 +545,18 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final c = latest.contributions;
     final factors = <_WhyFactor>[
       _WhyFactor(
-        'Market',
+        'Scenario',
         '🌍',
         c.marketPct,
         _marketColor,
-        'Macro-economic forces affecting all stocks.',
+        "Today's Bull/Bear/Crash regime, applied to this asset's sector.",
       ),
       _WhyFactor(
-        'Sector',
+        'Sector Skew',
         '🏭',
         c.sectorPct,
         _sectorColor,
-        'Industry-specific trends and rotation.',
+        'How this sector compares to the rest of your portfolio.',
       ),
       _WhyFactor(
         'News',
@@ -551,7 +566,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         'News flow, earnings, and external events.',
       ),
       _WhyFactor(
-        'Hype',
+        'Sector Trend',
         '🔥',
         c.hypePct,
         _hypeColor,
@@ -795,10 +810,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
   String _tickEventDescription(TickExplanation tick) {
     final c = tick.contributions;
     final entries = [
-      ('Market', c.marketPct),
-      ('Sector', c.sectorPct),
+      ('Scenario', c.marketPct),
+      ('Sector Skew', c.sectorPct),
       ('News', c.newsPct),
-      ('Hype', c.hypePct),
+      ('Sector Trend', c.hypePct),
       ('Noise', c.noisePct),
     ];
     entries.sort((a, b) => b.$2.compareTo(a.$2));
@@ -1000,10 +1015,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
 
     // Dominant factor insight
     final entries = [
-      ('Market', c.marketPct),
-      ('Sector', c.sectorPct),
+      ('Scenario', c.marketPct),
+      ('Sector Skew', c.sectorPct),
       ('News', c.newsPct),
-      ('Hype', c.hypePct),
+      ('Sector Trend', c.hypePct),
       ('Noise', c.noisePct),
     ];
     entries.sort((a, b) => b.$2.compareTo(a.$2));
@@ -1125,13 +1140,13 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     Divider(height: 1, color: ThemeV2.divider),
                     const SizedBox(height: 16),
                     _techRow(
-                      'Market %',
+                      'Scenario %',
                       '${latest.contributions.marketPct.round()}%',
                       _marketColor,
                     ),
                     const SizedBox(height: 10),
                     _techRow(
-                      'Sector %',
+                      'Sector Skew %',
                       '${latest.contributions.sectorPct.round()}%',
                       _sectorColor,
                     ),
@@ -1143,7 +1158,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     ),
                     const SizedBox(height: 10),
                     _techRow(
-                      'Hype %',
+                      'Sector Trend %',
                       '${latest.contributions.hypePct.round()}%',
                       _hypeColor,
                     ),

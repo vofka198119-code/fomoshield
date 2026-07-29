@@ -1,15 +1,17 @@
 // ---------------------------------------------------------------------------
 // ExplainableCard — "Why?" Engine UI (Design Bible Part 9)
 // ---------------------------------------------------------------------------
-// Показывает разложение изменения цены на 5 факторов:
-//   Market (#6FA7D6), Sector (#77C88A), Company (#F0B04F),
-//   News (#8A76D6), Noise (#BFB9AE)
+// Показывает разложение изменения цены на факторы:
+//   Scenario (#6FA7D6), Sector Skew (#77C88A), News (#8A76D6), Noise (#BFB9AE)
+// (Company factor removed 2026-07-29 — was always 0%, see PriceContribution's
+// doc in stress_test_models.dart. Labels renamed same day to avoid confusion
+// with the unrelated Hype/"Sector Trend" mechanism.)
 //
 //   ┌────────────────────────────────────┐
 //   │          WHY TODAY?                │
 //   │      AAPL +3.28%                   │
-//   │ ████████████ 46% Market            │
-//   │ ████████     27% Sector            │
+//   │ ████████████ 46% Scenario          │
+//   │ ████████     27% Sector Skew       │
 //   │ █████        18% News              │
 //   │ ██            9% Noise             │
 //   │ Market remained optimistic today.  │
@@ -53,8 +55,8 @@ class ExplainableData {
   /// Top 3 factors + Noise (skipping the smallest non-noise factor).
   List<_FactorEntry> get displayFactors {
     final all = [
-      _FactorEntry('Market', contributions.marketPct, FomoShieldTheme.factorMarket),
-      _FactorEntry('Sector', contributions.sectorPct, FomoShieldTheme.factorSector),
+      _FactorEntry('Scenario', contributions.marketPct, FomoShieldTheme.factorMarket),
+      _FactorEntry('Sector Skew', contributions.sectorPct, FomoShieldTheme.factorSector),
       _FactorEntry('News', contributions.newsPct, FomoShieldTheme.factorNews),
       _FactorEntry('Noise', contributions.noisePct, FomoShieldTheme.factorNoise),
     ];
