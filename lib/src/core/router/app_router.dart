@@ -17,6 +17,7 @@ import '../../features/portfolio/screens/portfolio_order_entry_screen.dart';
 import '../../features/portfolio/screens/set_goal_screen.dart';
 import '../../features/market_clock/market_clock_screen.dart';
 import '../../features/market_clock/market_period_detail_screen.dart';
+import '../../features/market_clock/market_clock_risk_detail_screen.dart';
 import '../../features/market_clock/market_phases_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
@@ -109,6 +110,14 @@ class AppRouter {
         path: '/market-clock/phases',
         name: 'marketClockPhases',
         builder: (context, state) => const MarketPhasesScreen(),
+      ),
+      GoRoute(
+        path: '/market-clock/risk-status/:id',
+        name: 'marketClockRiskStatus',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return RiskStatusDetailScreen(windowId: id);
+        },
       ),
 
       // ── Stress Test (full screen, no bottom nav) ──────────────────
