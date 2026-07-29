@@ -154,10 +154,6 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           ),
           onPressed: () => context.go('/stress-test-hub'),
         ),
-        actions: [
-          // ── DEBUG: Admin testing tools ──────────────────────────
-          _buildDebugMenu(),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -189,22 +185,35 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
             // ── Start Button ────────────────────────────────────
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _startTest,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1B365D),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(14),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: _brandGradient,
+                    ),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                ),
-                child: Text(
-                  'START STRESS TEST',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1,
+                  child: InkWell(
+                    onTap: _startTest,
+                    borderRadius: BorderRadius.circular(14),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Center(
+                        child: Text(
+                          'START STRESS TEST',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -512,124 +521,6 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           );
         }).toList(),
       ),
-    );
-  }
-
-  /// DEBUG: Admin-only popup menu to test Free mode, ad overlays, etc.
-  Widget _buildDebugMenu() {
-    final tier = ref.watch(subscriptionTierProvider);
-    final isCurrentlyAdmin =
-        ref.watch(debugTierOverrideProvider) == null &&
-        ref.watch(currentUserProvider)?.email == adminEmail;
-    if (!isCurrentlyAdmin) return const SizedBox.shrink();
-
-    return PopupMenuButton<String>(
-      icon: Icon(Icons.bug_report_rounded, color: ThemeV2.textSecondary, size: 20),
-      tooltip: 'Debug tools',
-      onSelected: (value) {
-        switch (value) {
-          case 'test_free':
-            ref.read(debugTierOverrideProvider.notifier).state =
-                SubscriptionTier.free;
-            setState(() {});
-            break;
-          case 'restore_admin':
-            ref.read(debugTierOverrideProvider.notifier).state = null;
-            setState(() {});
-            break;
-          case 'simulate_ad':
-            showPremiumPromoOverlay(
-              context: context,
-              title: 'Ad Simulation',
-              durationSeconds: 5,
-              onComplete: () {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Ad simulation complete'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              },
-            );
-            break;
-          case 'simulate_monetization':
-            showMonetizationModal(context, ref);
-            break;
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'test_free',
-          child: Row(
-            children: [
-              Icon(
-                Icons.visibility_rounded,
-                size: 18,
-                color: tier == SubscriptionTier.free
-                    ? ThemeV2.textPrimary
-                    : ThemeV2.textSecondary,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                tier == SubscriptionTier.free
-                    ? '✅ Testing as Free'
-                    : 'Test as Free',
-                style: GoogleFonts.inter(fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'restore_admin',
-          child: Row(
-            children: [
-              Icon(
-                Icons.admin_panel_settings_rounded,
-                size: 18,
-                color: tier != SubscriptionTier.free
-                    ? ThemeV2.primary
-                    : ThemeV2.textSecondary,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                tier != SubscriptionTier.free
-                    ? '✅ Admin mode'
-                    : 'Restore Admin',
-                style: GoogleFonts.inter(fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-        const PopupMenuDivider(),
-        PopupMenuItem(
-          value: 'simulate_ad',
-          child: Row(
-            children: [
-              Icon(Icons.tv_rounded, size: 18, color: ThemeV2.textSecondary),
-              const SizedBox(width: 10),
-              Text(
-                'Simulate Ad Overlay',
-                style: GoogleFonts.inter(fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'simulate_monetization',
-          child: Row(
-            children: [
-              Icon(Icons.sell_rounded, size: 18, color: ThemeV2.textSecondary),
-              const SizedBox(width: 10),
-              Text(
-                'Simulate Purchase Modal',
-                style: GoogleFonts.inter(fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 

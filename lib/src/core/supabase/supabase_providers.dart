@@ -66,22 +66,11 @@ final _premiumLoaderProvider = FutureProvider<void>((ref) async {
   }
 });
 
-/// Debug override — allows admin to temporarily test as Free/Premium.
-/// Set to `null` (default) to use real tier logic.
-final debugTierOverrideProvider = StateProvider<SubscriptionTier?>(
-  (ref) => null,
-);
-
 /// Returns the subscription tier for the current user.
-/// 1. [debugTierOverrideProvider] wins when non-null (admin testing)
-/// 2. Admin email → admin (hardcoded)
-/// 3. DB-fetched premium → premium (from public.users table)
-/// 4. Everything else → free
+/// 1. Admin email → admin (hardcoded)
+/// 2. DB-fetched premium → premium (from public.users table)
+/// 3. Everything else → free
 final subscriptionTierProvider = Provider<SubscriptionTier>((ref) {
-  // Debug override takes precedence (admin testing)
-  final override = ref.watch(debugTierOverrideProvider);
-  if (override != null) return override;
-
   final user = ref.watch(currentUserProvider);
   if (user == null) return SubscriptionTier.free;
   if (user.email == adminEmail) return SubscriptionTier.admin;

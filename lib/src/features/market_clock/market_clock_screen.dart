@@ -7,6 +7,7 @@ import '../../core/theme/theme_v2.dart';
 import 'market_clock_engine.dart';
 import 'market_clock_new_york_time_widget.dart';
 import 'market_clock_phase_widget.dart';
+import 'market_clock_timing_widget.dart';
 import 'market_clock_widget_order_provider.dart';
 import 'market_clock_widgets_settings_sheet.dart';
 
@@ -65,6 +66,8 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
           window: _state.window,
           isEarlyClose: _state.isEarlyCloseDay,
         );
+      case 'timing_indicator':
+        return BuyTimingWidget(window: _state.window);
       default:
         return const SizedBox.shrink();
     }

@@ -1,175 +1,201 @@
-# FOMO Shield — Design Tokens Reference
+# FOMO Shield — Design Standard (Home / Market Clock card style)
+
+> **Rewritten**: 2026-07-29 — the previous version of this file (dated 07-14) had drifted from
+> the actual code (wrong hex values for `primary`/`success`/`loss`/`warning`/`textPrimary` etc.).
+> Every value below was re-read from the live source files on 2026-07-29, not carried over.
 >
-> Рабочий справочник токенов для правок UI.
-> Источник: ThemeV2 (`theme_v2.dart`), `guardian_data.dart`, существующий код.
->
-> **Обновлён**: 2026-07-14
+> **Scope**: this is the practical "what do we actually follow" reference for card-style widgets
+> (Home screen widgets, Market Clock widgets, and anything built to match them). For the full
+> app-wide consistency audit (which screens DON'T follow this, hardcoded-color hotspots, dead
+> code, orphaned themes) see `docs/VISUAL_AUDIT.md` instead — that's the "what's broken" doc,
+> this is the "what's correct" doc.
 
 ---
 
-## 1. ЦВЕТА (из ThemeV2)
+## 1. The short version
 
-| Токен | HEX | Где используется |
-|-------|-----|-----------------|
-| `background` | `#F8F5EC` | Фон экранов |
-| `surface` | `#FFFFFF` | Карточки |
-| `primary` | `#355C7D` | Акцентный текст, иконки |
-| `primaryBg` | `#EBF0F5` | Фон акцентных зон |
-| `textPrimary` | `#1B365D` | Основной текст |
-| `textSecondary` | `#6B7B8D` | Второстепенный текст |
-| `textDim` | `#9AA5B1` | Приглушённый |
-| `divider` | `#E8E5DF` | Разделители |
-| `success` | `#2D8C4A` | Рост, прибыль |
-| `loss` | `#C0392B` | Падение, убыток |
-| `warning` | `#D4A843` | Предупреждения |
+When building or editing a Home/Market Clock-style card widget, use:
+
+- **Card shell**: `FomoShieldTheme.cardDecoration` (from `lib/src/core/theme/fomo_shield_theme.dart`)
+- **Colors**: `ThemeV2` (from `lib/src/core/theme/theme_v2.dart`) — **not** `FomoShieldTheme`'s own
+  color constants, which are legacy/unused for this purpose (see §4 for why both exist)
+- **Card title text style**: `FomoShieldTheme.cardTitle()`
+- **Divider**: hand-rolled `Divider(color: Colors.black.withValues(alpha: 0.06))`, not `ThemeV2.divider`
+- **Numeric values**: always `FontWeight.w600` (Semibold) — never `w800`/bold
+- **Brand CTA / PREMIUM badge gradient**: `dialLight` → `dialDark` (see §5) — not `ThemeV2.primary`
+  as a flat fill
+
+Two real files already do this correctly and are good copy-paste references:
+`lib/src/features/market_clock/market_clock_phase_widget.dart` and
+`lib/src/features/market_clock/market_clock_timing_widget.dart`.
 
 ---
 
-## 2. ГРАДИЕНТЫ
+## 2. Card shell
 
-### Фоновый градиент (применяется ВЕЗДЕ)
-- Источник: `ThemeV2.backgroundGradient` в `theme_v2.dart`
-- Наносится: через `Container` с `BoxDecoration(gradient: ThemeV2.backgroundGradient)` в `main.dart`
-- Где используется: **все экраны** — Home, Stress Test, Auth, Disclaimer, Profile, Settings, History, News, Scanner, Search, Portfolio, Assets, Company Detail, Events, Watchlist, Order Entry, Splash, Monetization
-- **Правило**: все Scaffold и AppBar должны иметь `backgroundColor: Colors.transparent`, чтобы не перекрывать этот градиент
-- **Состав**:
-  ```dart
-  LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFFFDFBF5), // верх — 3 тона светлее #F8F5EC
-      Color(0xFFC8BFA8), // низ — средне-тёмный бежевыйее #F8F5EC + серый отлив
+```dart
+Container(
+  decoration: FomoShieldTheme.cardDecoration,
+  child: Column(
+    children: [
+      // header row
+      Padding(
+        padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+        child: Row(children: [
+          Text('TITLE', style: FomoShieldTheme.cardTitle()),
+          const Spacer(),
+          // optional chevron if the header is tappable/navigates:
+          const Icon(Icons.chevron_right_rounded, color: ThemeV2.textSecondary, size: 20),
+        ]),
+      ),
+      Divider(height: 1, indent: 16, endIndent: 16, color: Colors.black.withValues(alpha: 0.06)),
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: /* body content */,
+      ),
     ],
-  );
-  ```
-
-### Guardian RadialGradient (тень)
-```dart
-RadialGradient(
-  center: Alignment.center,
-  radius: 0.8,
-  colors: [
-    Colors.black.withValues(alpha: 0.35),
-    Colors.black.withValues(alpha: 0.15),
-    Colors.transparent,
-  ],
-  stops: [0.0, 0.4, 1.0],
+  ),
 )
 ```
 
-### Карточка — верхняя декоративная полоса (CardFrame)
+| Property | Value | Source |
+|---|---|---|
+| Card background | `#FFFDF9` | `FomoShieldTheme.card` |
+| Card border | `#E8E1D5`, 1px | `FomoShieldTheme.border` |
+| Card radius | `22px` | `FomoShieldTheme.radius` / `cardRadius` |
+| Card shadow | **none** | `cardDecoration` sets no `boxShadow` |
+| Header padding | `EdgeInsets.fromLTRB(22, 14, 22, 14)` | confirmed pattern, not a named constant |
+| Body padding | `EdgeInsets.all(16)` | confirmed pattern, not a named constant |
+| Divider | `Colors.black.withValues(alpha: 0.06)`, `indent`/`endIndent: 16` | confirmed pattern — **not** `ThemeV2.divider` (`#ECECEC`), that token exists but this is what's actually used |
+
+`WidgetContainer` (`lib/src/shared/widgets/widget_container.dart`) is an older, still-used
+implementation of this same visual shell for Home-screen widgets specifically. Market Clock's
+widgets (and this doc) build the shell by hand instead of wrapping `WidgetContainer`, but the
+rendered result is meant to look identical — if the two ever visually diverge, that's a bug, not
+an intentional difference.
+
+---
+
+## 3. Colors (ground truth: `ThemeV2`, `lib/src/core/theme/theme_v2.dart`)
+
+| Token | Hex | Usage |
+|---|---|---|
+| `ThemeV2.primary` | `#215C42` | Brand accent — card titles, icons, links, selected states |
+| `ThemeV2.success` | `#2DBE63` | Gains, positive change, "safe" states |
+| `ThemeV2.loss` | `#C64545` | Losses, negative change, "risky" states |
+| `ThemeV2.warning` | `#D7AE42` | Neutral/caution states (sideways market, pending) |
+| `ThemeV2.background` | `#F8F5EC` | Scaffold base (before gradient overlay) |
+| `ThemeV2.surface` | `#FFFFFF` | Plain white surface — **not** the card standard, see §4 |
+| `ThemeV2.surfaceDark` | `#E8E4D6` | Secondary surfaces, grid lines, range selectors |
+| `ThemeV2.textPrimary` | `#202020` | Primary text (near-black) |
+| `ThemeV2.textSecondary` | `#8B8B8B` | Secondary/muted text |
+| `ThemeV2.divider` | `#ECECEC` | Declared divider token — largely bypassed in practice, see §2 |
+
+### App-wide background gradient
+Applied once in `main.dart` behind every Scaffold (which must set `backgroundColor: Colors.transparent`):
+
 ```dart
+ThemeV2.backgroundGradient // top→bottom
 LinearGradient(
-  colors: [Color(0xFF6FA7D6), Color(0xFF4E6D8D)],
-  // opacity: 0.12 на всём градиенте
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [Color(0xFFFDFBF5), Color(0xFFC8BFA8)],
 )
-// Размер: 5px высота, полная ширина карточки
 ```
 
 ---
 
-## 3. КАРТОЧКИ
+## 4. Why there are two theme files (and which one wins)
 
-| Параметр | Значение |
-|----------|---------|
-| `borderRadius` | `24px` |
-| `padding` | `24px` (все стороны) |
-| `boxShadow` | `0 2px 12px rgba(0,0,0,0.04)` — cardShadow |
-| `color` | `surface` (#FFFFFF) |
-| Декоративная полоса | `5px` высота, градиент (см. выше), opacity 0.12 |
+`ThemeV2` (`theme_v2.dart`) is the theme actually registered in `main.dart` (`theme: ThemeV2.lightTheme`).
+`FomoShieldTheme` (`fomo_shield_theme.dart`) is a second, older token set ("Design Bible") that
+declares its **own** `primary` (`#355C7D`, a blue — unused for the brand accent in practice),
+its own success/loss (`#37B86B` / `#D04E4E`), and its own background (`#F6F1E7`). Notably,
+`FomoShieldTheme.cardTitle()` itself defaults to `ThemeV2.primary`, not `FomoShieldTheme.primary`
+— even the "canonical" file leaks a value from the other system.
 
-### Варианты padding
-| Тип карточки | padding |
-|-------------|---------|
-| Стандартная | 24px |
-| Chart Card | 20px |
-| Summary Card | 24px + левая полоса 5px |
+**In practice**: use `FomoShieldTheme` only for its card *shell* geometry (`cardDecoration`,
+`cardTitle()`, `cardRadius`) — use `ThemeV2` for every actual color. This split is real
+technical debt, not a design choice worth defending; it's documented here so it's applied
+consistently rather than "fixed" ad hoc one file at a time. Full inventory of where this causes
+visible inconsistency (screens that use neither correctly) is in `docs/VISUAL_AUDIT.md`.
 
----
-
-## 4. РАДИУСЫ
-
-| Элемент | Радиус |
-|---------|--------|
-| `radiusSmall` | `8px` |
-| `radiusMedium` | `14px` |
-| `radiusLarge` | `24px` |
-| `radiusXL` | `34px` |
+A third file, `app_theme.dart` ("Editorial Heritage"), is legacy and used only by
+`monetization_modal.dart` + `premium_promo_overlay.dart` — do not use it for new work.
 
 ---
 
-## 5. ТЕНИ
+## 5. Brand CTA / Premium gradient ("dial" gradient)
 
-| Токен | Значение |
-|-------|---------|
-| `cardShadow` | `0 2px 12px rgba(0,0,0,0.04)` |
-| `mediumShadow` | `0 4px 24px rgba(0,0,0,0.08)` |
-| `heavyShadow` | `0 8px 40px rgba(0,0,0,0.12)` |
+Used for primary action buttons and every "PREMIUM" badge across Home, Market Clock, Stress
+Test, Profile, and Portfolio widgets. Defined once in
+`lib/src/features/market_clock/market_clock_dial.dart`:
 
----
+```dart
+const dialLight = Color(0xFF173A2E);   // gradient start (topLeft)
+const dialMid   = Color(0xFF0F281F);   // used for the round dial face only
+const dialDark  = Color(0xFF0A1B15);   // gradient end (bottomRight)
+const dialBrassLight = Color(0xFFE8C468); // gold accent — text/icon on top of the gradient
+```
 
-## 6. ТИПОГРАФИКА
+Standard usage:
 
-| Стиль | font | size | weight |
-|-------|------|------|--------|
-| `displayXL` | Playfair Display | 32 | w800 |
-| `display` | Playfair Display | 24 | w700 |
-| `h1` | Inter | 22 | w700 |
-| `h2` | Inter | 18 | w700 |
-| `body` | Inter | 15 | w400 |
-| `caption` | Inter | 13 | w500 |
-| `small` | Inter | 11 | w400 |
-| `section` | Inter | 13 | w700 / UPPERCASE / letterSpacing: 1.2 |
+```dart
+const List<Color> _brandGradient = [dialLight, dialDark];
 
----
+BoxDecoration(
+  gradient: const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: _brandGradient,
+  ),
+)
+```
 
-## 7. ЦВЕТА ФАКТОРОВ (Explainable Cards)
-
-| Фактор | HEX |
-|--------|-----|
-| Market | `#6FA7D6` |
-| Sector | `#77C88A` |
-| Company | `#F0B04F` |
-| News | `#8A76D6` |
-| Noise | `#BFB9AE` |
-
----
-
-## 8. ЦВЕТА ФАЗ GUARDIAN (щит + аура)
-
-| Состояние | HEX щита | HEX ауры |
-|-----------|---------|---------|
-| Bull | `#2D8C4A` | `#2D8C4A` |
-| Sideways | `#8B9DAF` | `#8B9DAF` |
-| Bear | `#C0392B` | `#C0392B` |
-| Volatility | `#D4A843` | `#D4A843` |
-| BlackSwan | `#6C3483` | `#6C3483` |
-| Crash | `#922B21` | `#922B21` |
-| Recovery | `#1ABC9C` | `#1ABC9C` |
+**Known duplication**: `const List<Color> _brandGradient = [dialLight, dialDark];` (or an
+equivalent inline `colors: [dialLight, dialDark]`) is currently copy-pasted as a private constant
+in at least 7 separate files (`stress_test_setup_screen.dart`, `stress_test_hub_screen.dart`,
+`home/widgets/stress_test_widget.dart`, `home/widgets/shield_signal_widget.dart`,
+`home/widgets/portfolio_widget.dart`, `portfolio/widgets/target_widget.dart`, `profile_screen.dart`)
+instead of being exported once from `market_clock_dial.dart` and imported everywhere. Not fixed
+as part of this pass — flagging it here so a future centralization doesn't come as a surprise.
 
 ---
 
-## 9. АНИМАЦИИ
+## 6. Typography
 
-| Токен | ms |
-|-------|-----|
-| `animFast` | 180 |
-| `animNormal` | 320 |
-| `animSlow` | 650 |
-| `animCardAppear` | 450 |
-| `animChartGrow` | 600 |
-| `animValueFlash` | 400 |
-| `animSuccessRise` | 800 |
-| `animFearGlow` | 1200 |
+| Use | Style |
+|---|---|
+| Card title (section header) | `FomoShieldTheme.cardTitle()` — Inter 13px, w700, letterSpacing 1.2, color `ThemeV2.primary` |
+| Body text | Inter, size varies by context (13–16px seen in practice — no single enforced body style) |
+| **Any numeric value** (price, P&L, %, balance, score) | `FontWeight.w600` (Semibold) — **never** `w800`/bold. See `interNums()` helper in `typography_helpers.dart`. This was a deliberate app-wide de-bolding pass (2026-07-25); if you see a bold number while editing a widget, fix it in place. |
 
 ---
 
-## 10. ОТСТУПЫ
+## 7. Radii & spacing quick reference
 
-| Элемент | Значение |
-|---------|---------|
-| Горизонтальный отступ экрана | `16px` |
-| Зазор между карточками | `12px` |
-| AppBar height | `64px` |
-| AppBar leading padding left | `22px` |
+| Token | Value | Source |
+|---|---|---|
+| Card radius (standard) | `22px` | `FomoShieldTheme.radius` |
+| Small/badge radius | `14px` | `FomoShieldTheme.radiusSm` |
+| Extra-large radius | `34px` | `FomoShieldTheme.radiusXl` |
+| Gap between cards | `24px` | `FomoShieldTheme.cardGap` |
+| Header padding | `fromLTRB(22, 14, 22, 14)` | confirmed pattern (§2) |
+| Body padding | `all(16)` | confirmed pattern (§2) |
+| Divider indent | `16px` both sides | confirmed pattern (§2) |
+
+`ThemeV2` also declares its own radius scale (`radiusSmall: 12`, `radiusMedium: 18`,
+`radiusLarge: 24`) and its own spacing scale (`space4`…`space40`) — per `VISUAL_AUDIT.md`,
+`ThemeV2.space*` has **zero** call sites in the app. Don't reach for it; the confirmed pattern
+above is what's actually in use.
+
+---
+
+## 8. Where this doc's guidance was confirmed
+
+- Card shell, divider, and padding values: confirmed against `market_clock_phase_widget.dart`
+  and `market_clock_timing_widget.dart` (both current, 2026-07-29).
+- Numeric weight rule: confirmed 2026-07-25 (Portfolio widget pass).
+- `ThemeV2` vs `FomoShieldTheme` split: confirmed against `docs/VISUAL_AUDIT.md` (2026-07-20)
+  and re-verified directly against both theme files 2026-07-29 — still accurate.
+- Brand gradient duplication count: re-grepped 2026-07-29.

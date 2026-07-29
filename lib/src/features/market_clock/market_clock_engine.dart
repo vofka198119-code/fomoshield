@@ -526,6 +526,38 @@ const earlyCloseWindow = MarketWindow(
       'A shortened, faster-moving session can feel unfamiliar. Practice it in Stress Test — no real money on the line, just real market conditions to learn from.',
 );
 
+// ---------------------------------------------------------------------------
+// Buy-timing safety classification
+// ---------------------------------------------------------------------------
+// Flags whether the CURRENT window is a calm, planned-trade moment or a
+// volatile/illiquid one worth waiting out — feeds the "Buy Timing" widget.
+// Pure classification of the existing windows above; no new market data.
+// ---------------------------------------------------------------------------
+
+enum TradeSafety { safe, caution, risky, closed }
+
+extension MarketWindowSafety on MarketWindow {
+  TradeSafety get tradeSafety {
+    if (phase == MarketPhase.closed) return TradeSafety.closed;
+    switch (id) {
+      case 'morning-session':
+      case 'lunch-hour':
+        return TradeSafety.safe;
+      case 'mid-afternoon':
+      case 'early-close-session':
+        return TradeSafety.caution;
+      case 'early-pre-market':
+      case 'pre-market-reports':
+      case 'opening-bell':
+      case 'power-hour':
+      case 'after-hours':
+        return TradeSafety.risky;
+      default:
+        return TradeSafety.caution;
+    }
+  }
+}
+
 MarketWindow? findWindowById(String id) {
   if (id == earlyCloseWindow.id) return earlyCloseWindow;
   if (id == weekendClosedWindow.id) return weekendClosedWindow;

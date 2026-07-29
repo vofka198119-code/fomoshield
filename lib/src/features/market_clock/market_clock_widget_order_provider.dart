@@ -6,10 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ---------------------------------------------------------------------------
 // Mirrors home/widget_order_provider.dart's pattern, scoped to the Market
 // Clock screen instead of the Home screen. Default order: ny_time,
-// market_phase — more widgets land here in a later stage.
+// market_phase, timing_indicator.
 // ---------------------------------------------------------------------------
 
-const List<String> marketClockDefaultOrder = ['ny_time', 'market_phase'];
+const List<String> marketClockDefaultOrder = [
+  'ny_time',
+  'market_phase',
+  'timing_indicator',
+];
 
 const _prefsOrderKey = 'market_clock_widget_order';
 const _prefsVisibilityKey = 'market_clock_widget_visibility';
@@ -27,6 +31,8 @@ class MarketClockWidgetConfig {
         return 'New York Time';
       case 'market_phase':
         return 'Market Phase';
+      case 'timing_indicator':
+        return 'Buy Timing';
       default:
         return id;
     }
