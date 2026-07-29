@@ -2,7 +2,7 @@
 // Stress Test — Data Models
 // ---------------------------------------------------------------------------
 // All domain models for the Stress Test engine: sessions, trades, epochs,
-// scenarios, IPO events, and the psychological verdict.
+// scenarios, and the psychological verdict.
 // ---------------------------------------------------------------------------
 
 import 'dart:math';
@@ -639,7 +639,8 @@ class PriceContribution {
   /// Вклад сектора — отклонение drift сектора от среднерыночного.
   final double sectorPct;
 
-  /// Вклад компании — IPO bonus drift, специфичные события.
+  /// Вклад компании — специфичный для компании drift (см. noise_engine.dart's
+  /// companyDriftRaw) и специфичные события.
   final double companyPct;
 
   /// Вклад новостей/событий — коррекции, катастрофы, восстановления.
@@ -725,9 +726,6 @@ class TickExplanation {
   /// Сырой sector drift (отклонение от среднерыночного) до нормализации.
   final double? sectorDriftRaw;
 
-  /// Сырой IPO bonus drift компании до нормализации.
-  final double? ipoBonusDriftRaw;
-
   /// Сырой recovery drift (пост-катастрофное восстановление) до нормализации.
   final double? recoveryDriftRaw;
 
@@ -748,7 +746,6 @@ class TickExplanation {
     this.tickId,
     this.marketDriftRaw,
     this.sectorDriftRaw,
-    this.ipoBonusDriftRaw,
     this.recoveryDriftRaw,
     this.noiseRaw,
     this.hypeRaw,
@@ -786,9 +783,8 @@ class EpochPriceRange {
 /// to ~flat by the end, never reversing. Applied as a per-TICK INCREMENT
 /// (the difference in eased-progress between this tick and the last),
 /// not by re-applying the full amplitude every tick — that per-tick-vs-
-/// cumulative confusion is exactly the bug found in the sibling
-/// speculation/hype mechanism (speculation_event.dart), left alone
-/// per explicit instruction but not repeated here.
+/// cumulative confusion was a real bug class found while building this
+/// mechanism, not repeated here.
 class NewsEvent {
   final String symbol;
   final String headline;
@@ -874,20 +870,17 @@ class NewsEvent {
 
 /// ── Hype — a sector-wide trending move (hype/hype_event.dart) ─────────
 ///
-/// Unlike [NewsEvent] (one company, sharp ramp, no reversal) or the
-/// per-company Speculation bell curve (speculation/speculation_event.dart),
-/// Hype targets an entire GICS sector at once — every holding in that
-/// sector trends the same direction together, the way a real sector-wide
-/// rally or sell-off would move a diversified portfolio.
+/// Unlike [NewsEvent] (one company, sharp ramp, no reversal), Hype targets
+/// an entire GICS sector at once — every holding in that sector trends the
+/// same direction together, the way a real sector-wide rally or sell-off
+/// would move a diversified portfolio.
 ///
 /// Progress curve: smooth ease-in-out ramp that OVERSHOOTS to 115% of
 /// [targetAmplitude] around 70% of the way through, then eases back down
 /// to exactly 100% by the end — a gentle "small pullback before settling"
 /// correction, per explicit design ask, rather than a flat plateau or an
 /// instant snap. Applied as a per-TICK INCREMENT (like [NewsEvent]), never
-/// by re-applying the full amplitude every tick — the bug class found (and
-/// left alone, by explicit instruction) in the sibling Speculation
-/// mechanism.
+/// by re-applying the full amplitude every tick.
 class HypeEvent {
   final GicsSector sector;
   final bool isPositive;
@@ -1098,7 +1091,7 @@ class StressTestSession {
 
   /// Seed генератора случайных чисел для детерминированной симуляции.
   /// Любой перезапуск сессии с одинаковым [simulationSeed] гарантирует
-  /// идентичные графики цен, фазы рынка и IPO-паттерны.
+  /// идентичные графики цен и фазы рынка.
   final int simulationSeed;
 
   /// Флаг включения Developer Trace Layer.

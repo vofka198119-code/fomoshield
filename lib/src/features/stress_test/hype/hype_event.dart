@@ -1,23 +1,25 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-// `state` is StateNotifier's own protected/visibleForTesting field — see
-// the matching comment in speculation/speculation_event.dart for why this
-// ignore is needed on every `part of` mechanism file.
+// `state` is StateNotifier's own protected/visibleForTesting field — needed
+// on every `part of` mechanism file (see the matching comment in
+// ../news_event.dart).
 part of '../stress_test_engine.dart';
 
 // ---------------------------------------------------------------------------
 // Hype — a sector-wide trending move.
 // ---------------------------------------------------------------------------
-// Own file/folder, separate from the sibling per-company Speculation
-// mechanism (../speculation/speculation_event.dart) and from the
-// single-company News mechanism (../news_event.dart) — different trigger
-// conditions, different target (a whole GICS sector, not one company),
-// different shape, per explicit instruction to keep each micro-scenario
-// mechanism physically isolated.
+// Own file/folder, separate from the single-company News mechanism
+// (../news_event.dart) — different trigger conditions, different target (a
+// whole GICS sector, not one company), different shape, per explicit
+// instruction to keep each micro-scenario mechanism physically isolated.
+// (A third sibling, "Speculation", existed briefly and was removed
+// 2026-07-19 — see repair queue in project memory for the "add back later"
+// list. It is NOT currently live in any form.)
 //
 // Trigger (checked once per epoch, from noise_engine.dart's
 // _simulateCurrentPrices, right next to the News check):
-//   - Portfolio needs 8+ holdings, or the mechanism is disabled entirely
-//     for that session — same threshold as News.
+//   - Portfolio needs 8+ holdings — same threshold as News, and same as
+//     News, the ONLY eligibility gate. There is no separate per-session
+//     on/off switch anywhere in the code.
 //   - Only rolled while 0 Hype events are currently active (a fresh check
 //     is skipped entirely — not even attempted — while 1 or 2 are live).
 //   - Two independent 7% draws per check. Both firing with the SAME sign

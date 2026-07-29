@@ -2,8 +2,8 @@
 // Stress Test Engine — Riverpod State + Market Simulation + Scoring
 // ---------------------------------------------------------------------------
 // Manages stress test sessions, epoch-based market simulation, price
-// generation, IPO events, anti-catastrophe protection, and the final
-// psychological verdict calculation.
+// generation, anti-catastrophe protection, and the final psychological
+// verdict calculation.
 // ---------------------------------------------------------------------------
 
 import 'dart:math';

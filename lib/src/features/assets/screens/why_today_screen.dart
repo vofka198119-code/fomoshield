@@ -268,66 +268,105 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     return 'wrapping up';
   }
 
+  // ─── Additional-event card shell (News + Hype banners share this) ────
+  // Redesigned 2026-07-29 to the FomoShieldTheme card standard (see
+  // docs/DESIGN_TOKENS.md) — was previously a raw color-tinted Container,
+  // the only spot on this screen not using the canonical card shell.
+  Widget _buildEventCard({
+    required String cardTitle,
+    required IconData icon,
+    required Color color,
+    required String headline,
+    required String detail,
+    required String countdown,
+  }) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      decoration: FomoShieldTheme.cardDecoration,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+            child: Text(cardTitle, style: FomoShieldTheme.cardTitle()),
+          ),
+          Divider(
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Colors.black.withValues(alpha: 0.06),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: color, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        headline,
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: ThemeV2.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        detail,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: ThemeV2.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        countdown,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ─── News headline banner (news_event.dart) ──────────────────────────
   Widget _buildNewsHeadline(NewsEvent event) {
     final color = event.isPositive ? ThemeV2.success : ThemeV2.loss;
     return _FadeSlide(
       index: 1,
       controller: _staggerController,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
-          border: Border.all(color: color.withValues(alpha: 0.25)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              event.isPositive
-                  ? Icons.trending_up_rounded
-                  : Icons.trending_down_rounded,
-              color: color,
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    event.headline,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    '${event.isPositive ? '+' : ''}'
-                    '${(event.targetAmplitude * 100).toStringAsFixed(1)}% target impact on ${widget.symbol}',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: ThemeV2.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    _formatRemaining(event.currentTick, event.rampDurationTicks),
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: color.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      child: _buildEventCard(
+        cardTitle: 'ACTIVE NEWS EVENT',
+        icon: event.isPositive
+            ? Icons.trending_up_rounded
+            : Icons.trending_down_rounded,
+        color: color,
+        headline: event.headline,
+        detail: '${event.isPositive ? '+' : ''}'
+            '${(event.targetAmplitude * 100).toStringAsFixed(1)}% target impact on ${widget.symbol}',
+        countdown: _formatRemaining(event.currentTick, event.rampDurationTicks),
       ),
     );
   }
@@ -347,61 +386,17 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     return _FadeSlide(
       index: 1,
       controller: _staggerController,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
-          border: Border.all(color: color.withValues(alpha: 0.25)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              event.isPositive
-                  ? Icons.local_fire_department_rounded
-                  : Icons.trending_down_rounded,
-              color: color,
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sector: ${event.sector.label} '
-                    '${event.isPositive ? 'rallying' : 'declining'}',
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    '${event.isPositive ? '+' : ''}'
-                    '${(event.targetAmplitude * 100).toStringAsFixed(1)}% sector-wide target impact',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: ThemeV2.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    _formatRemaining(event.currentTick, event.rampDurationTicks),
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: color.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      child: _buildEventCard(
+        cardTitle: 'ACTIVE SECTOR EVENT',
+        icon: event.isPositive
+            ? Icons.local_fire_department_rounded
+            : Icons.trending_down_rounded,
+        color: color,
+        headline: 'Sector: ${event.sector.label} '
+            '${event.isPositive ? 'rallying' : 'declining'}',
+        detail: '${event.isPositive ? '+' : ''}'
+            '${(event.targetAmplitude * 100).toStringAsFixed(1)}% sector-wide target impact',
+        countdown: _formatRemaining(event.currentTick, event.rampDurationTicks),
       ),
     );
   }

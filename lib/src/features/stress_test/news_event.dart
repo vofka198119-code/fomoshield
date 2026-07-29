@@ -1,31 +1,32 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
-// `state` is StateNotifier's own protected/visibleForTesting field — see
-// the matching comment in speculation_event.dart for why this ignore is
-// needed on every `part of` mechanism file.
+// `state` is StateNotifier's own protected/visibleForTesting field — needed
+// on every `part of` mechanism file (see the matching comment in
+// hype/hype_event.dart).
 part of 'stress_test_engine.dart';
 
 // ---------------------------------------------------------------------------
 // News — a random single-company headline event.
 // ---------------------------------------------------------------------------
-// Deliberately its own file, separate from the sibling per-company
-// speculation/hype mechanism (speculation_event.dart) — different trigger
-// conditions, different shape, different content — per explicit
-// instruction to keep each micro-scenario mechanism isolated so any one
-// of them can be fixed without touching the others.
+// Deliberately its own file, separate from the Hype mechanism
+// (hype/hype_event.dart) — different trigger conditions, different shape,
+// different content — per explicit instruction to keep each micro-scenario
+// mechanism isolated so any one of them can be fixed without touching the
+// others. (A third sibling, "Speculation", existed briefly and was removed
+// 2026-07-19 — see repair queue in project memory for the "add back later"
+// list. It is NOT currently live in any form.)
 //
 // Trigger (checked once per epoch, from noise_engine.dart's
-// _simulateCurrentPrices, right next to the weekly spec/hype check):
-//   - Portfolio needs 8+ holdings, or the mechanism is disabled entirely
-//     for that session (a single-company move matters too much in a
-//     small, concentrated portfolio).
+// _simulateCurrentPrices, right next to the Hype check):
+//   - Portfolio needs 8+ holdings. That's the ONLY eligibility gate — there
+//     is no separate per-session on/off switch anywhere in the code.
 //   - Skipped if a News event is already active (one at a time).
 //   - 5% roll chance when checked.
 // If it fires: one random holding, one random headline from
 // [newsScenarios] (sign matches the headline's own positive/negative
 // list), a signed total move of 10-25%, ramped in over a random
 // 2-6 hour window with NO reversal — a real news-driven move mostly
-// sticks, it doesn't mechanically snap back to zero the way the
-// speculation/hype bell curve does.
+// sticks, it doesn't mechanically snap back to zero the way Hype's
+// overshoot-then-correct curve does.
 // ---------------------------------------------------------------------------
 
 /// One canned headline + its direction. Magnitude is rolled separately
