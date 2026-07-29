@@ -64,7 +64,7 @@ class _MarketClockWidgetsSettingsSheetState
       case 'market_phase':
         return Icons.schedule_rounded;
       case 'timing_indicator':
-        return Icons.speed_rounded;
+        return Icons.shield_rounded;
       default:
         return Icons.widgets_rounded;
     }

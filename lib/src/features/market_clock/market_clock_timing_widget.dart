@@ -1,142 +1,241 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import 'market_clock_dial.dart';
 import 'market_clock_engine.dart';
+import 'market_clock_risk_engine.dart';
 
 // ---------------------------------------------------------------------------
-// Buy Timing widget (id: 'timing_indicator') — 3rd Market Clock widget.
-// Reads the current window's [TradeSafety] classification (see
-// market_clock_engine.dart) and shows a simple, non-technical readout: is
-// right now a calm moment for a planned trade, or a volatile/illiquid one
-// worth waiting out. Same card shell as MarketPhaseWidget.
+// FOMO Shield Status widget (id: 'timing_indicator') — 3rd Market Clock
+// widget. Modeled on a user-provided reference mockup: a dark instrument-
+// panel card with a composite Risk Score, 4 sub-metric bars (Liquidity /
+// Volatility / News Risk / Beginner Safe), and a plain-language risk label
+// + tip. Layout adapted for phone width per explicit feedback — the
+// reference's side-by-side columns became bars-on-top, label+advice below.
+// Risk-metrics data/logic lives in market_clock_risk_engine.dart, kept
+// separate so this file stays purely visual.
 // ---------------------------------------------------------------------------
 
-class _SafetyStyle {
+class _TierStyle {
   final Color color;
-  final IconData icon;
   final String label;
-  final String description;
+  final String advice;
 
-  const _SafetyStyle({
+  const _TierStyle({
     required this.color,
-    required this.icon,
     required this.label,
-    required this.description,
+    required this.advice,
   });
 }
 
-const Map<TradeSafety, _SafetyStyle> _safetyStyles = {
-  TradeSafety.safe: _SafetyStyle(
+const Map<RiskTier, _TierStyle> _tierStyles = {
+  RiskTier.low: _TierStyle(
     color: ThemeV2.success,
-    icon: Icons.check_circle_rounded,
-    label: 'SAFE TO TRADE',
-    description: 'Calm, stable session — a good window for a planned trade.',
+    label: 'LOW RISK',
+    advice: 'Calm conditions — a good window for a planned trade.',
   ),
-  TradeSafety.caution: _SafetyStyle(
+  RiskTier.moderate: _TierStyle(
     color: ThemeV2.warning,
-    icon: Icons.error_outline_rounded,
-    label: 'USE CAUTION',
-    description: 'Some volatility possible — a Limit Order is safer here.',
+    label: 'MODERATE RISK',
+    advice: 'Some risk factors elevated — a Limit Order is safer here.',
   ),
-  TradeSafety.risky: _SafetyStyle(
+  RiskTier.high: _TierStyle(
     color: ThemeV2.loss,
-    icon: Icons.bolt_rounded,
-    label: 'HIGH RISK — WAIT',
-    description: 'Wide spreads and sharp swings — consider waiting it out.',
+    label: 'HIGH RISK',
+    advice: 'Multiple risk factors elevated — consider waiting this out.',
   ),
-  TradeSafety.closed: _SafetyStyle(
-    color: ThemeV2.textSecondary,
-    icon: Icons.nights_stay_rounded,
+  RiskTier.closed: _TierStyle(
+    color: Colors.white70,
     label: 'MARKET CLOSED',
-    description: 'No live trading right now — nothing to time.',
+    advice: 'No live trading right now — nothing to time.',
   ),
 };
 
-class BuyTimingWidget extends StatelessWidget {
+/// Thin gold-bordered "window" — same instrument-panel language as the
+/// clock's digital readout / corner panels (dialBrassLight border on a
+/// dark, semi-transparent fill).
+Widget _goldWindow({required Widget child}) {
+  return Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: dialDark.withValues(alpha: 0.35),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: dialBrassLight.withValues(alpha: 0.4)),
+    ),
+    child: child,
+  );
+}
+
+class FomoShieldStatusWidget extends StatelessWidget {
   final MarketWindow window;
-  const BuyTimingWidget({super.key, required this.window});
+  const FomoShieldStatusWidget({super.key, required this.window});
 
   @override
   Widget build(BuildContext context) {
-    final safety = window.tradeSafety;
-    final style = _safetyStyles[safety]!;
+    final metrics = window.riskMetrics;
+    final tier = window.riskTier;
+    final style = _tierStyles[tier]!;
 
     return Container(
-      decoration: FomoShieldTheme.cardDecoration,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [dialLight, dialDark],
+        ),
+        borderRadius: FomoShieldTheme.cardRadius,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: () => context.push('/market-clock/period/${window.id}'),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-              child: Row(
-                children: [
-                  Text('BUY TIMING', style: FomoShieldTheme.cardTitle()),
-                  const Spacer(),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: ThemeV2.textSecondary,
-                    size: 20,
+          // ── Header: shield + title ────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+            child: Row(
+              children: [
+                Icon(Icons.shield_rounded, color: dialBrassLight, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'FOMO SHIELD STATUS',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: Colors.white,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           Divider(
             height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
+            indent: 20,
+            endIndent: 20,
+            color: dialBrassLight.withValues(alpha: 0.3),
           ),
+
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                // ── Bars first (phone-friendly — full width) ────────
+                _metricBar('Liquidity', metrics.liquidity, ThemeV2.success),
+                const SizedBox(height: 10),
+                _metricBar(
+                  'Volatility',
+                  metrics.volatility,
+                  FomoShieldTheme.factorHype,
+                ),
+                const SizedBox(height: 10),
+                _metricBar('News Risk', metrics.newsRisk, ThemeV2.loss),
+                const SizedBox(height: 10),
+                _metricBar(
+                  'Beginner Safe',
+                  metrics.beginnerSafe,
+                  ThemeV2.warning,
+                ),
+                const SizedBox(height: 16),
+
+                // ── Description window + Risk Score window, side by
+                // side with a gap ───────────────────────────────────
+                IntrinsicHeight(
+                  child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: style.color.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(style.icon, color: style.color, size: 22),
-                    ),
-                    const SizedBox(width: 14),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            style.label,
-                            style: GoogleFonts.inter(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: style.color,
+                      flex: 3,
+                      child: _goldWindow(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              style.label,
+                              style: GoogleFonts.inter(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: style.color,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            style.description,
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              color: ThemeV2.textSecondary,
-                              height: 1.4,
+                            const SizedBox(height: 4),
+                            Text(
+                              style.advice,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.white70,
+                                height: 1.35,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      // Same tap affordance as the Market Phase widget's
+                      // per-window rows — but scoped to only the CURRENT
+                      // active tier's detail, not a full list of every
+                      // tier. Copy for that detail view isn't written yet
+                      // (coming in parts) — onTap is wired once it lands.
+                      child: _goldWindow(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'RISK SCORE',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.8,
+                                      color: Colors.white54,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 16,
+                                  color: Colors.white38,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: tier == RiskTier.closed
+                                        ? '—'
+                                        : '${metrics.score}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w800,
+                                      color: style.color,
+                                    ),
+                                  ),
+                                  if (tier != RiskTier.closed)
+                                    TextSpan(
+                                      text: '/100',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white54,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
+                  ),
                 ),
-                const SizedBox(height: 14),
-                _SafetyBar(current: safety),
               ],
             ),
           ),
@@ -144,39 +243,32 @@ class BuyTimingWidget extends StatelessWidget {
       ),
     );
   }
-}
 
-/// Traffic-light style bar: Risky — Caution — Safe. The segment matching
-/// the current [TradeSafety] is highlighted; the rest are dimmed. When the
-/// market is closed, all three dim equally (there's no "position" to show).
-class _SafetyBar extends StatelessWidget {
-  final TradeSafety current;
-  const _SafetyBar({required this.current});
-
-  @override
-  Widget build(BuildContext context) {
-    const segments = [
-      (TradeSafety.risky, ThemeV2.loss),
-      (TradeSafety.caution, ThemeV2.warning),
-      (TradeSafety.safe, ThemeV2.success),
-    ];
-
+  Widget _metricBar(String label, int value, Color color) {
     return Row(
       children: [
-        for (int i = 0; i < segments.length; i++) ...[
-          if (i > 0) const SizedBox(width: 4),
-          Expanded(
-            child: Container(
-              height: 6,
-              decoration: BoxDecoration(
-                color: segments[i].$1 == current
-                    ? segments[i].$2
-                    : segments[i].$2.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(3),
-              ),
+        SizedBox(
+          width: 92,
+          child: Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
             ),
           ),
-        ],
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: value / 100,
+              minHeight: 8,
+              backgroundColor: Colors.white.withValues(alpha: 0.12),
+              valueColor: AlwaysStoppedAnimation(color),
+            ),
+          ),
+        ),
       ],
     );
   }

@@ -67,7 +67,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
           isEarlyClose: _state.isEarlyCloseDay,
         );
       case 'timing_indicator':
-        return BuyTimingWidget(window: _state.window);
+        return FomoShieldStatusWidget(window: _state.window);
       default:
         return const SizedBox.shrink();
     }

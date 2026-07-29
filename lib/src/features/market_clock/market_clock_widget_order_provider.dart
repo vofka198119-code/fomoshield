@@ -32,7 +32,7 @@ class MarketClockWidgetConfig {
       case 'market_phase':
         return 'Market Phase';
       case 'timing_indicator':
-        return 'Buy Timing';
+        return 'FOMO Shield Status';
       default:
         return id;
     }
