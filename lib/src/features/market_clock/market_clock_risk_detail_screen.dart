@@ -8,7 +8,7 @@ import 'market_clock_timing_widget.dart' show tierStyleFor;
 // ---------------------------------------------------------------------------
 // FOMO Shield Status — description detail card. Reached by tapping the
 // description window on the FOMO Shield Status widget (Market Clock).
-// Shows THIS WINDOW's full "Почему сейчас так?" / "Что лучше делать?" text
+// Shows THIS WINDOW's full "Why Now?" / "What Should You Do?" text
 // (RiskMetrics.whyNow/whatToDo in market_clock_risk_engine.dart) — the
 // widget itself only shows a 3-line truncated preview of whyNow. Label/
 // color still come from the tier (tierStyleFor).
@@ -69,12 +69,12 @@ class RiskStatusDetailScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           _Section(
-                            label: 'Почему сейчас так?',
+                            label: 'Why Now?',
                             body: window.riskMetrics.whyNow,
                           ),
                           const SizedBox(height: 18),
                           _Section(
-                            label: 'Что лучше делать?',
+                            label: 'What Should You Do?',
                             body: window.riskMetrics.whatToDo,
                             isLast: true,
                           ),

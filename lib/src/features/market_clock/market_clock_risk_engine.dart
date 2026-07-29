@@ -35,12 +35,12 @@ class RiskMetrics {
   /// match the widget's own "F.O.M.O. Shield" branding — same meaning).
   final int fomoShield;
 
-  /// "Почему сейчас так?" — why conditions look like this right now.
-  /// The widget shows a 3-line truncated preview of THIS field; the detail
-  /// card (market_clock_risk_detail_screen.dart) shows it in full.
+  /// "Why Now?" — why conditions look like this right now. The widget
+  /// shows a 3-line truncated preview of THIS field; the detail card
+  /// (market_clock_risk_detail_screen.dart) shows it in full.
   final String whyNow;
 
-  /// "Что лучше делать?" — plain-language advice for this window. Only
+  /// "What Should You Do?" — plain-language advice for this window. Only
   /// shown on the full detail card, not in the widget's preview.
   final String whatToDo;
 
