@@ -435,7 +435,10 @@ class _ExchangeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isEtf = type.toUpperCase() == 'ETF';
+    // Finnhub/our local index label ETFs "ETP" (Exchange Traded Product),
+    // not "ETF" — checking only 'ETF' silently hid the badge for almost
+    // every real fund (confirmed live 2026-07-29: SPY/QQQ/VOO all "ETP").
+    final isEtf = type.toUpperCase() == 'ETF' || type.toUpperCase() == 'ETP';
     final exchange = symbol.contains('.')
         ? symbol.split('.').last.toUpperCase()
         : 'US';

@@ -345,6 +345,35 @@ class FinnhubService {
     return results;
   }
 
+  /// Ranked search over our own backend-cached list of ~11k real US
+  /// tickers (see scanco-backend's localSymbolsService.js) instead of
+  /// Finnhub's own /search, which caps at 11 results and often omits the
+  /// obviously-right match for short/partial queries (confirmed live
+  /// 2026-07-29 — e.g. "Realty Income" never appeared for "re"/"real").
+  /// Falls back to the direct-Finnhub [search] above only if the backend
+  /// call itself fails (down/unreachable), same resilience pattern as
+  /// every other backend-routed call in this class.
+  Future<List<Map<String, dynamic>>> searchLocal(String query) async {
+    if (query.length < AppConstants.minSearchChars) return [];
+    try {
+      final data = await _getFromBackend('/search-local', params: {'q': query});
+      final items = data['results'] as List<dynamic>? ?? [];
+      return [
+        for (final item in items)
+          {
+            'symbol': (item as Map)['symbol'],
+            'description': item['name'],
+            'type': item['type'],
+          },
+      ];
+    } catch (e) {
+      debugPrint(
+        '⚠️ Backend searchLocal($query) failed, falling back to direct Finnhub search: $e',
+      );
+      return search(query);
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Company Profile
   // ---------------------------------------------------------------------------

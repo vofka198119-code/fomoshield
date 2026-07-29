@@ -41,7 +41,7 @@ class SearchNotifier extends ChangeNotifier {
 
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       try {
-        results = await _api.search(q);
+        results = await _api.searchLocal(q);
         errorMessage = null;
       } catch (e) {
         debugPrint('❌ Search error for "$q": $e');
