@@ -319,7 +319,10 @@ class _PortfolioAssetRow extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        context.push('/company/${holding.symbol}');
+        context.push(
+          '/company/${holding.symbol}',
+          extra: {'portfolioId': portfolioId},
+        );
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),

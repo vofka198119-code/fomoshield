@@ -46,6 +46,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(searchProvider);
 
+    // Set when opened via a specific portfolio's "+" (e.g. Holdings widget)
+    // — buying a result then skips company_detail_screen's portfolio picker
+    // and trades straight into this portfolio (see contextPortfolioId).
+    final routeExtra = GoRouterState.of(context).extra as Map<String, dynamic>?;
+    final portfolioId = routeExtra?['portfolioId'] as String?;
+
     // First back press while a query is active just clears search (back to
     // the browse lanes); only a second press with no query actually leaves
     // the screen — matches the standard "search then back" pattern.
@@ -111,8 +117,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   )
                 : state.query.isEmpty
                 ? _BrowseLanes(
-                    onTapSymbol: (symbol) =>
-                        context.push('/company/$symbol'),
+                    onTapSymbol: (symbol) => context.push(
+                      '/company/$symbol',
+                      extra: portfolioId != null
+                          ? {'portfolioId': portfolioId}
+                          : null,
+                    ),
                   )
                 : state.results.isEmpty && state.query.isNotEmpty
                 ? Center(
@@ -164,23 +174,35 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
                       return ListTile(
                         key: ValueKey(symbol),
-                        leading: Consumer(
-                          builder: (context, ref, _) {
-                            final logoAsync = ref.watch(
-                              cachedLogoProvider(symbol),
-                            );
-                            final logoUrl = logoAsync.valueOrNull;
-                            return CompanyLogo(
-                              ticker: symbol,
-                              logoUrl: logoUrl,
-                            );
-                          },
+                        leading: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: ThemeV2.primary,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Consumer(
+                            builder: (context, ref, _) {
+                              final logoAsync = ref.watch(
+                                cachedLogoProvider(symbol),
+                              );
+                              final logoUrl = logoAsync.valueOrNull;
+                              return CompanyLogo(
+                                ticker: symbol,
+                                logoUrl: logoUrl,
+                                radius: 22,
+                              );
+                            },
+                          ),
                         ),
                         title: Row(
                           children: [
                             Text(
                               symbol,
                               style: GoogleFonts.inter(
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
                                 color: ThemeV2.textPrimary,
                               ),
@@ -305,7 +327,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           } else {
                             ref
                                 .read(debouncerProvider)
-                                .run(() => context.push('/company/$symbol'));
+                                .run(() => context.push(
+                                      '/company/$symbol',
+                                      extra: portfolioId != null
+                                          ? {'portfolioId': portfolioId}
+                                          : null,
+                                    ));
                           }
                         },
                       );

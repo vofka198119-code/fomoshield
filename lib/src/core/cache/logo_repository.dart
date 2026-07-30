@@ -54,9 +54,19 @@ class LogoRepository {
         } catch (_) {}
       }
 
-      // Приоритет: Finnhub logo > Clearbit по домену
+      // Приоритет: Finnhub logo > Clearbit по домену > ticker-keyed CDN.
+      // ETFs (SPY, QQQ, ...) almost never have a Finnhub profile/weburl —
+      // Finnhub's profile2 is company-only — so without this last tier
+      // every ETF fell through to the letter-avatar placeholder. FMP's
+      // image-stock endpoint is free/keyless and keyed by ticker directly,
+      // so it works for exactly the case Clearbit (domain-based) can't.
+      final tickerLogoUrl = company.ticker.isNotEmpty
+          ? 'https://financialmodelingprep.com/image-stock/'
+                '${company.ticker.toUpperCase()}.png'
+          : null;
       final logoUrl = finnhubLogo ??
-          (domain != null ? 'https://logo.clearbit.com/$domain' : null);
+          (domain != null ? 'https://logo.clearbit.com/$domain' : null) ??
+          tickerLogoUrl;
 
       if (logoUrl == null || logoUrl.isEmpty) {
         debugPrint('⚠️ LogoRepository: no logo URL for ${company.ticker}');

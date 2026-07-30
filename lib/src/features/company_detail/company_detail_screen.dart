@@ -22,6 +22,8 @@ import 'widgets/fs_score_widget.dart';
 import '../../core/services/gics_sector_mapper.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../search/recently_viewed_provider.dart';
+import '../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
+import '../portfolio/portfolio_limits_provider.dart' show firstPortfolioStartingCapital;
 
 // ---------------------------------------------------------------------------
 // Providers — with layered cache: 4h (main) + 30d (score + metrics)
@@ -146,8 +148,18 @@ Future<void> _cacheLogo(String symbol, Map<String, dynamic> profile) async {
 
 class CompanyDetailScreen extends ConsumerStatefulWidget {
   final String symbol;
+  // Set when navigated here from inside a specific portfolio (e.g. tapping
+  // a holding row) so Buy skips the "Select Portfolio" sheet and trades
+  // straight into that portfolio. Null means an ambiguous entry point
+  // (Search, Watchlist, Recently Viewed) — the picker is the right call
+  // there since we don't know which portfolio the user means.
+  final String? contextPortfolioId;
 
-  const CompanyDetailScreen({super.key, required this.symbol});
+  const CompanyDetailScreen({
+    super.key,
+    required this.symbol,
+    this.contextPortfolioId,
+  });
 
   @override
   ConsumerState<CompanyDetailScreen> createState() =>
@@ -361,7 +373,11 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             ),
           ),
         ),
-        data: (data) => _CompanyDetailBody(symbol: widget.symbol, data: data),
+        data: (data) => _CompanyDetailBody(
+          symbol: widget.symbol,
+          data: data,
+          contextPortfolioId: widget.contextPortfolioId,
+        ),
       ),
     );
   }
@@ -370,8 +386,13 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
 class _CompanyDetailBody extends ConsumerStatefulWidget {
   final String symbol;
   final Map<String, dynamic> data;
+  final String? contextPortfolioId;
 
-  const _CompanyDetailBody({required this.symbol, required this.data});
+  const _CompanyDetailBody({
+    required this.symbol,
+    required this.data,
+    this.contextPortfolioId,
+  });
 
   @override
   ConsumerState<_CompanyDetailBody> createState() => _CompanyDetailBodyState();
@@ -411,6 +432,17 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
       return;
     }
 
+    // Came from a specific portfolio (e.g. tapped a holding row) — trade
+    // straight into it, no picker.
+    final contextId = widget.contextPortfolioId;
+    if (contextId != null && portfolios.any((p) => p.id == contextId)) {
+      context.push(
+        '/portfolio/$contextId/stock/${widget.symbol}/order',
+        extra: {'type': type},
+      );
+      return;
+    }
+
     if (portfolios.length == 1) {
       context.push(
         '/portfolio/${portfolios.first.id}/stock/${widget.symbol}/order',
@@ -423,12 +455,13 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
       context: context,
       backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(16),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
               width: 36,
@@ -438,40 +471,40 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               'Select Portfolio',
               style: GoogleFonts.inter(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: ThemeV2.textPrimary,
+                color: ThemeV2.primary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
+            Text(
+              'Where do you want to ${type == 'buy' ? 'buy' : 'sell'} '
+              '${widget.symbol}?',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 16),
             ...portfolios.map(
-              (p) => ListTile(
-                title: Text(
-                  p.name,
-                  style: GoogleFonts.inter(color: ThemeV2.textPrimary),
+              (p) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _PortfolioOptionTile(
+                  name: p.name,
+                  cash: p.cash,
+                  isPremium: p.startingBalance > firstPortfolioStartingCapital,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context.push(
+                      '/portfolio/${p.id}/stock/${widget.symbol}/order',
+                      extra: {'type': type},
+                    );
+                  },
                 ),
-                subtitle: Text(
-                  '\$${p.cash.toStringAsFixed(2)} available',
-                  style: GoogleFonts.inter(
-                    color: ThemeV2.textSecondary,
-                    fontSize: 12,
-                  ),
-                ),
-                trailing: Icon(
-                  Icons.chevron_right_rounded,
-                  color: ThemeV2.textSecondary,
-                ),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  context.push(
-                    '/portfolio/${p.id}/stock/${widget.symbol}/order',
-                    extra: {'type': type},
-                  );
-                },
               ),
             ),
           ],
@@ -1360,6 +1393,133 @@ class _NewsSection extends StatelessWidget {
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     if (diff.inDays < 7) return '${diff.inDays}d ago';
     return '${dt.month}/${dt.day}';
+  }
+}
+
+// ===========================================================================
+// Select Portfolio — option row for the multi-portfolio Buy/Sell sheet
+// ===========================================================================
+
+// Same brand dark-green gradient + gold accent used for the play-button
+// badge and PREMIUM tags on Home's stress test widget.
+const List<Color> _walletGradient = [dialLight, dialDark];
+
+class _PortfolioOptionTile extends StatelessWidget {
+  final String name;
+  final double cash;
+  final bool isPremium;
+  final VoidCallback onTap;
+
+  const _PortfolioOptionTile({
+    required this.name,
+    required this.cash,
+    required this.isPremium,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: ThemeV2.primaryBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: ThemeV2.divider),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: _walletGradient,
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.account_balance_wallet_rounded,
+                color: isPremium ? dialBrassLight : Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          name,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: ThemeV2.primary,
+                          ),
+                        ),
+                      ),
+                      if (isPremium) ...[
+                        const SizedBox(width: 6),
+                        _premiumBadge(),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '\$${cash.toStringAsFixed(2)} available',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: ThemeV2.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: ThemeV2.textSecondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _premiumBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: _walletGradient,
+        ),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Text(
+        'PREMIUM',
+        style: GoogleFonts.inter(
+          fontSize: 8,
+          fontWeight: FontWeight.w800,
+          color: dialBrassLight,
+          letterSpacing: 1.0,
+          shadows: [
+            Shadow(
+              color: dialBrassLight.withValues(alpha: 0.5),
+              blurRadius: 6,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

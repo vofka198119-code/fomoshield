@@ -13,11 +13,13 @@ import '../portfolio_providers.dart';
 // ---------------------------------------------------------------------------
 
 class PortfolioHoldingsWidget extends StatefulWidget {
+  final String portfolioId;
   final List<HoldingPerformance>? holdings;
   final String? emptyPortfolioName;
 
   const PortfolioHoldingsWidget({
     super.key,
+    required this.portfolioId,
     this.holdings,
     this.emptyPortfolioName,
   });
@@ -29,6 +31,25 @@ class PortfolioHoldingsWidget extends StatefulWidget {
 class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
   bool _showAll = false;
 
+  Widget _addButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push(
+        '/search',
+        extra: {'portfolioId': widget.portfolioId},
+      ),
+      child: Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          color: ThemeV2.primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        alignment: Alignment.center,
+        child: Icon(Icons.add_rounded, size: 18, color: ThemeV2.primary),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final holdings = widget.holdings;
@@ -36,6 +57,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
     if (holdings == null) {
       return WidgetContainer(
         title: 'HOLDINGS',
+        trailing: _addButton(context),
         showFooter: false,
         children: [
           const Padding(
@@ -69,6 +91,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
     return WidgetContainer(
       title: 'HOLDINGS',
       onTap: () => setState(() => _showAll = !_showAll),
+      trailing: _addButton(context),
       showFooter: !_showAll && sorted.length > previewLimit,
       footerText: '+ ${sorted.length - previewLimit} more',
       children: display
@@ -76,6 +99,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                 key: ValueKey(h.symbol),
                 child: _HoldingCard(
                   holding: h,
+                  portfolioId: widget.portfolioId,
                   weightPercent:
                       totalValue > 0 ? (h.currentValue / totalValue) * 100 : 0,
                 ),
@@ -88,7 +112,11 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
     final name = widget.emptyPortfolioName ?? 'this portfolio';
     return WidgetContainer(
       title: 'HOLDINGS',
-      onTap: () => context.push('/search'),
+      onTap: () => context.push(
+        '/search',
+        extra: {'portfolioId': widget.portfolioId},
+      ),
+      trailing: _addButton(context),
       showFooter: false,
       emptyText: 'Nothing here yet',
       children: [
@@ -112,7 +140,10 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                         fontSize: 13, color: ThemeV2.textSecondary)),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  onPressed: () => context.push('/search'),
+                  onPressed: () => context.push(
+                    '/search',
+                    extra: {'portfolioId': widget.portfolioId},
+                  ),
                   icon: const Icon(Icons.search_rounded, size: 18),
                   label: Text('Find Companies',
                       style: GoogleFonts.inter(
@@ -139,9 +170,14 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
 
 class _HoldingCard extends ConsumerWidget {
   final HoldingPerformance holding;
+  final String portfolioId;
   final double weightPercent;
 
-  const _HoldingCard({required this.holding, this.weightPercent = 0});
+  const _HoldingCard({
+    required this.holding,
+    required this.portfolioId,
+    this.weightPercent = 0,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -152,7 +188,10 @@ class _HoldingCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
-        onTap: () => context.push('/company/${holding.symbol}'),
+        onTap: () => context.push(
+          '/company/${holding.symbol}',
+          extra: {'portfolioId': portfolioId},
+        ),
         borderRadius: BorderRadius.circular(22),
         child: Padding(
           padding: const EdgeInsets.all(14),

@@ -73,7 +73,11 @@ class AppRouter {
         name: 'companyDetail',
         builder: (context, state) {
           final symbol = state.pathParameters['symbol'] ?? '';
-          return CompanyDetailScreen(symbol: symbol.toUpperCase());
+          final extra = state.extra as Map<String, dynamic>?;
+          return CompanyDetailScreen(
+            symbol: symbol.toUpperCase(),
+            contextPortfolioId: extra?['portfolioId'] as String?,
+          );
         },
       ),
 

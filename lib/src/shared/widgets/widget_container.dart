@@ -20,6 +20,9 @@ class WidgetContainer extends StatelessWidget {
   final String footerText;
   final bool showFooter;
   final String? emptyText;
+  // Optional header-right action (e.g. a "+" add button), shown before the
+  // chevron. Has its own tap target — safe to combine with [onTap].
+  final Widget? trailing;
 
   const WidgetContainer({
     super.key,
@@ -29,6 +32,7 @@ class WidgetContainer extends StatelessWidget {
     this.footerText = 'More',
     this.showFooter = true,
     this.emptyText,
+    this.trailing,
   });
 
   @override
@@ -57,6 +61,10 @@ class WidgetContainer extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
+                  if (trailing != null) ...[
+                    trailing!,
+                    if (hasTap) const SizedBox(width: 8),
+                  ],
                   if (hasTap)
                     Icon(
                       Icons.chevron_right_rounded,

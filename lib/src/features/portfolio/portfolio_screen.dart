@@ -663,13 +663,17 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
         if (isLoading || hasError) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 24),
-            child: PortfolioHoldingsWidget(holdings: null),
+            child: PortfolioHoldingsWidget(
+              portfolioId: widget.portfolioId,
+              holdings: null,
+            ),
           );
         }
         if (performance == null) return const SizedBox.shrink();
         return Padding(
           padding: const EdgeInsets.only(bottom: 24),
           child: PortfolioHoldingsWidget(
+            portfolioId: widget.portfolioId,
             holdings: performance.holdings,
             emptyPortfolioName: performance.name,
           ),
