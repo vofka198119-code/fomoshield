@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 
 // ===========================================================================
 // News Section (inline, no tab)
@@ -22,20 +23,19 @@ class NewsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
+      child: Container(
+        padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+        decoration: FomoShieldTheme.cardDecoration,
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Text(
-              'News',
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: ThemeV2.textPrimary,
-              ),
-            ),
+          Text(
+            'NEWS',
+            style: FomoShieldTheme.cardTitle(),
           ),
+          const SizedBox(height: 10),
+          Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+          const SizedBox(height: 12),
           if (isLoading)
             const Center(
               child: Padding(
@@ -73,7 +73,7 @@ class NewsSection extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: ThemeV2.surface,
+                  color: ThemeV2.surfaceDark,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -145,6 +145,7 @@ class NewsSection extends StatelessWidget {
               );
             }),
         ],
+        ),
       ),
     );
   }

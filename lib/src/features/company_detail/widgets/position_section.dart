@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 import '../../portfolio/portfolio_providers.dart';
 
 // ===========================================================================
@@ -64,22 +65,17 @@ class PositionSection extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: BorderRadius.circular(14),
-        ),
+        padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+        decoration: FomoShieldTheme.cardDecoration,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Your Position',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: ThemeV2.textPrimary,
-              ),
+              'YOUR POSITION',
+              style: FomoShieldTheme.cardTitle(),
             ),
+            const SizedBox(height: 10),
+            Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
             const SizedBox(height: 12),
             Row(
               children: [

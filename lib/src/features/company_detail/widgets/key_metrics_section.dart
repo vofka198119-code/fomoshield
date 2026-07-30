@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 
 // ===========================================================================
 // Key Metrics — P/E, дивиденды, маржинальность (из 30-дневного кэша)
@@ -60,22 +61,17 @@ class KeyMetricsSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: BorderRadius.circular(14),
-        ),
+        padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+        decoration: FomoShieldTheme.cardDecoration,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Key Metrics',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: ThemeV2.textPrimary,
-              ),
+              'KEY METRICS',
+              style: FomoShieldTheme.cardTitle(),
             ),
+            const SizedBox(height: 10),
+            Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
             const SizedBox(height: 12),
             ...items.asMap().entries.map((entry) {
               final i = entry.key;

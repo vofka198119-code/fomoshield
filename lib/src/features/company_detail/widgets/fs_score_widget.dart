@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 
 // ---------------------------------------------------------------------------
 // FS Score Widget — gauge + radar chart + 6 marker details
@@ -21,12 +22,8 @@ class FsScoreWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
-        ),
+        padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+        decoration: FomoShieldTheme.cardDecoration,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -36,16 +33,14 @@ class FsScoreWidget extends StatelessWidget {
                 Icon(Icons.shield_rounded, size: 18, color: _gaugeColor(fsScore)),
                 const SizedBox(width: 8),
                 Text(
-                  'FS Score',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
-                  ),
+                  'FS SCORE',
+                  style: FomoShieldTheme.cardTitle(),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+            const SizedBox(height: 16),
 
             // ── Gauge + Radar row ──
             Row(
