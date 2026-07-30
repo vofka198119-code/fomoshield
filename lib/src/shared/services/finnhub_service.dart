@@ -11,15 +11,19 @@ import '../../core/supabase/supabase_client.dart';
 ///
 /// Routed through the backend (works for ANY symbol, not just a fixed
 /// list — see the backend's `/quote` fallback path): [quote] (and
-/// therefore [previousTradingDayQuote], which calls it), [candles].
+/// therefore [previousTradingDayQuote], which calls it).
 ///
 /// Routed through the backend, all with direct-Finnhub fallback on error
 /// (backend down/unreachable): [search], [companyProfile], [metrics],
 /// [companyNews] (any symbol, not just hot tickers — the backend fetches
 /// and caches on a cold miss), [earningsCalendar], [earningsSurprises].
 ///
+/// Routed through the backend, no Finnhub fallback (Finnhub itself would
+/// just 403 — the backend serves this from Yahoo Finance instead):
+/// [candles].
+///
 /// Blocked entirely, zero network calls (Finnhub paid-tier-only, confirmed
-/// via live 403): [candles], [dividendsCalendar].
+/// via live 403): [dividendsCalendar].
 ///
 /// [AppConstants.finnhubKey] stays embedded as the fallback path's
 /// credential (same reasoning as [quote] already had) — under normal
@@ -563,24 +567,19 @@ class FinnhubService {
   // Historical Candles
   // ---------------------------------------------------------------------------
 
-  /// `/stock/candle` is a Finnhub PAID-tier endpoint — confirmed via a
-  /// live 403 on the free tier (2026-07-23), both direct and through the
-  /// backend. Blocked here with zero network calls (not even to our own
-  /// backend) rather than letting every chart open waste a request that
-  /// can only ever fail — no retry/fallback path makes sense for a
-  /// permanently-403 endpoint. Callers already handle a thrown exception
-  /// (see `price_chart.dart`'s `_loadCandles` catch block → "Failed to
-  /// load chart"). Flip back on if the Finnhub plan is ever upgraded.
+  /// Backed by the scanco-backend `/candles` route, which fetches from
+  /// Yahoo Finance (Finnhub's own `/stock/candle` is paid-tier only — see
+  /// yahooClient.js on the backend). No direct-Finnhub fallback: Finnhub
+  /// would just 403 here.
   Future<Map<String, dynamic>> candles(
     String symbol, {
     required String resolution,
     required int from,
     required int to,
-  }) async {
-    throw Exception(
-      'Candle/chart data requires a paid Finnhub plan — not available.',
-    );
-  }
+  }) => _getFromBackend(
+    '/candles/$symbol',
+    params: {'resolution': resolution, 'from': from, 'to': to},
+  );
 
   // ---------------------------------------------------------------------------
   // Helpers

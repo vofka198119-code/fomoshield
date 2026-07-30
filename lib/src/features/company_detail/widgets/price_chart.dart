@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/period_selector.dart';
 
@@ -113,28 +114,37 @@ class _PriceChartState extends State<PriceChart> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Period selector
-        PeriodSelector<ChartPeriod>(
-          periods: ChartPeriod.values,
-          selected: _selectedPeriod,
-          labelOf: (p) => p.label,
-          onSelected: (period) {
-            setState(() => _selectedPeriod = period);
-            _loadCandles();
-          },
-        ),
+    return Container(
+      padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+      decoration: FomoShieldTheme.cardDecoration,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+          const SizedBox(height: 10),
+          Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+          const SizedBox(height: 12),
 
-        const SizedBox(height: 16),
+          // Period selector
+          PeriodSelector<ChartPeriod>(
+            periods: ChartPeriod.values,
+            selected: _selectedPeriod,
+            labelOf: (p) => p.label,
+            onSelected: (period) {
+              setState(() => _selectedPeriod = period);
+              _loadCandles();
+            },
+          ),
 
-        // Chart area
-        SizedBox(
-          height: 220,
-          child: _buildChartArea(),
-        ),
-      ],
+          const SizedBox(height: 16),
+
+          // Chart area
+          SizedBox(
+            height: 220,
+            child: _buildChartArea(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -223,10 +233,19 @@ class _PriceChartState extends State<PriceChart> {
                 if (idx < 0 || idx >= timestamps.length) return const SizedBox();
                 final date = DateTime.fromMillisecondsSinceEpoch(
                     timestamps[idx] * 1000);
+                final label = switch (_selectedPeriod) {
+                  ChartPeriod.month1 ||
+                  ChartPeriod.month6 =>
+                    '${date.day}.${date.month}',
+                  ChartPeriod.year1 ||
+                  ChartPeriod.year5 ||
+                  ChartPeriod.all =>
+                    '${date.month}/${date.year % 100}',
+                };
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
-                    '${date.month}/${date.year % 100}',
+                    label,
                     style: GoogleFonts.inter(fontSize: 10, color: ThemeV2.textSecondary),
                   ),
                 );
