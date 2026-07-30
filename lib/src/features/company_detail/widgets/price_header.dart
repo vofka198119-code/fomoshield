@@ -6,6 +6,21 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
+import '../../market_clock/market_clock_engine.dart'
+    show MarketPhase, nowInNewYork, resolveMarketClockState;
+
+// ===========================================================================
+// Market session label — reuses Market Clock's real Eastern-time engine
+// (nowInNewYork/resolveMarketClockState, DST-aware) instead of the phone's
+// local clock, so this always agrees with the actual NYSE session.
+// ===========================================================================
+
+String _phaseLabel(MarketPhase p) => switch (p) {
+      MarketPhase.preMarket => 'PRE-MARKET',
+      MarketPhase.marketOpen => 'MARKET OPEN',
+      MarketPhase.afterHours => 'POST-MARKET',
+      MarketPhase.closed => 'MARKET CLOSED',
+    };
 
 // ===========================================================================
 // Price Header — brand dark-green hero card (logo/name/price/change always
@@ -36,10 +51,8 @@ class PriceHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
     // Home Portfolio widget's cell fills are a 10%-alpha tint meant for a
-    // light card background — flattened against white here so they still
-    // read as a distinct olive/tinted box on top of this card's dark-green
-    // gradient instead of nearly disappearing into it.
-    final priceCellBg = Color.alphaBlend(ThemeV2.primaryBg, Colors.white);
+    // light card background — flattened against white here so it still
+    // reads as a distinct tinted box instead of nearly disappearing.
     final changeCellBg = Color.alphaBlend(
       isUp ? ThemeV2.successBg : ThemeV2.lossBg,
       Colors.white,
@@ -135,66 +148,172 @@ class PriceHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        // Price + change — own row, same cell shape as Home's Portfolio
-        // widget (PORTFOLIO BALANCE / CHANGE), price kept at its existing
-        // larger display size.
+        // Price cell — wide enough for 4-digit prices (e.g. 1234.098) but
+        // not edge-to-edge, gradient-backed to match the name card, gold
+        // value with a subtle glow, and a market-session read (gold+glow
+        // only while the regular session is actually open).
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _cell(
-                  label: 'PRICE',
-                  bgColor: priceCellBg,
-                  valueColor: ThemeV2.textPrimary,
-                  child: Text(
-                    '\$${price.toStringAsFixed(2)}',
-                    style: interNums(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
-                      height: 1,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _cell(
-                  label: 'CHANGE',
-                  bgColor: changeCellBg,
-                  valueColor: changeColor,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        isUp
-                            ? Icons.trending_up_rounded
-                            : Icons.trending_down_rounded,
-                        size: 16,
-                        color: changeColor,
-                      ),
-                      const SizedBox(width: 3),
-                      Flexible(
-                        child: Text(
-                          '${isUp ? '+' : ''}${change.toStringAsFixed(2)} (${changePercent.toStringAsFixed(2)}%)',
-                          style: interNums(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: changeColor,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                      _priceCell(),
+                      const SizedBox(height: 10),
+                      // Change — fill/colors unchanged for now (still the
+                      // olive/success/loss tint used elsewhere), just
+                      // repositioned below the price cell.
+                      _cell(
+                        label: 'CHANGE',
+                        bgColor: changeCellBg,
+                        valueColor: changeColor,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isUp
+                                  ? Icons.trending_up_rounded
+                                  : Icons.trending_down_rounded,
+                              size: 16,
+                              color: changeColor,
+                            ),
+                            const SizedBox(width: 3),
+                            Flexible(
+                              child: Text(
+                                '${isUp ? '+' : ''}${change.toStringAsFixed(2)}\$ (${isUp ? '+' : ''}${changePercent.toStringAsFixed(2)}%)',
+                                style: interNums(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: changeColor,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 10),
+                // Placeholder — reserved for later, unwired/unlabeled on
+                // purpose for now.
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: ThemeV2.divider),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _priceCell() {
+    final phase = resolveMarketClockState(nowInNewYork()).phase;
+    final isOpen = phase == MarketPhase.marketOpen;
+    final sessionColor = isOpen ? dialBrassLight : Colors.white;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [dialLight, dialDark],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'PRICE',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                  color: Colors.white,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                _phaseLabel(phase),
+                style: GoogleFonts.inter(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                  color: sessionColor,
+                  shadows: isOpen
+                      ? [
+                          Shadow(
+                            color: dialBrassLight.withValues(alpha: 0.5),
+                            blurRadius: 6,
+                          ),
+                        ]
+                      : null,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.attach_money_rounded,
+                  size: 26,
+                  color: sessionColor,
+                  shadows: isOpen
+                      ? [
+                          Shadow(
+                            color: dialBrassLight.withValues(alpha: 0.5),
+                            blurRadius: 6,
+                          ),
+                        ]
+                      : null,
+                ),
+                Text(
+                  price.toStringAsFixed(2),
+                  style: interNums(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                    color: sessionColor,
+                    height: 1,
+                  ).copyWith(
+                    shadows: isOpen
+                        ? [
+                            Shadow(
+                              color: dialBrassLight.withValues(alpha: 0.5),
+                              blurRadius: 6,
+                            ),
+                          ]
+                        : null,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
