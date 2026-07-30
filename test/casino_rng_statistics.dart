@@ -51,7 +51,6 @@ enum MarketScenario {
 const double fatigueDecay = 0.02;
 const double fatigueRecovery = 0.005;
 const double fatigueMinWeight = 5.0;
-const double bullRepeatTargetProb = 0.20;
 const int minEpochsBetweenCatastrophes = 6;
 
 // ── Casino State (per-session mutable state) ───────────────────────────
@@ -59,6 +58,7 @@ const int minEpochsBetweenCatastrophes = 6;
 class CasinoState {
   final Map<String, double> currentWeights;
   int casinoDeclineStreak = 0;
+  int bullStreak = 0;
   int casinoCatastropheCooldown = 0;
   int casinoLastCatastropheEpoch = -999;
   MarketScenario? lastScenario;
@@ -87,6 +87,13 @@ MarketScenario rollScenario(CasinoState state, int epochIdx, Random rng) {
     return MarketScenario.volatility;
   }
 
+  if (state.bullStreak >= 2) {
+    final antiStuckRoll = rng.nextDouble();
+    if (antiStuckRoll < 0.40) return MarketScenario.bear;
+    if (antiStuckRoll < 0.70) return MarketScenario.sideways;
+    return MarketScenario.volatility;
+  }
+
   final pool = MarketScenario.values
       .where((s) => !s.isPerCompanyEvent && !s.isScriptedRecovery)
       .toList();
@@ -99,15 +106,6 @@ MarketScenario rollScenario(CasinoState state, int epochIdx, Random rng) {
   }
   for (final s in pool) {
     weights.add(state.currentWeights[s.name] ?? s.weight);
-  }
-
-  if (state.lastScenario == MarketScenario.bull) {
-    final bullIdx = pool.indexOf(MarketScenario.bull);
-    if (bullIdx != -1) {
-      final othersSum = weights.fold(0.0, (a, b) => a + b) - weights[bullIdx];
-      weights[bullIdx] =
-          othersSum * (bullRepeatTargetProb / (1 - bullRepeatTargetProb));
-    }
   }
 
   final totalWeight = weights.fold(0.0, (a, b) => a + b);
@@ -184,6 +182,7 @@ void updateState(CasinoState state, MarketScenario scenario, int epochIdx) {
       state.casinoCatastropheCooldown--;
     }
   }
+  state.bullStreak = scenario == MarketScenario.bull ? state.bullStreak + 1 : 0;
   state.lastScenario = scenario;
 }
 

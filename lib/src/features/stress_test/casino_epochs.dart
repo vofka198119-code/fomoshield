@@ -24,7 +24,22 @@ part of 'stress_test_engine.dart';
 const double _fatigueDecay = 0.02; // 2% штраф активному сценарию
 const double _fatigueRecovery = 0.005; // 0.5% восстановление за шаг
 const double _fatigueMinWeight = 5.0; // 5% от total=100 — пол стандартных
-const double _bullRepeatTargetProb = 0.20; // target P(Bull | prev was Bull)
+
+/// Count how many epochs, walking back from the most recent, share
+/// [scenario] with no interruption. Used by the anti-stuck Bull/Bear
+/// streak gates in [CasinoEpochsEngine._rollScenario] — reads directly
+/// from epoch history rather than a persisted counter (unlike Bear's
+/// older `casinoDeclineStreak` field) since only Bull needs this check
+/// and adding a new persisted/serialized session field for a single
+/// consumer isn't worth the model churn.
+int _trailingStreak(List<EpochRecord> history, MarketScenario scenario) {
+  int streak = 0;
+  for (int i = history.length - 1; i >= 0; i--) {
+    if (history[i].scenario != scenario) break;
+    streak++;
+  }
+  return streak;
+}
 
 extension CasinoEpochsEngine on StressTestNotifier {
   /// Roll a market scenario using session casino state.
@@ -58,6 +73,28 @@ extension CasinoEpochsEngine on StressTestNotifier {
       return MarketScenario.volatility;
     }
 
+    // Anti-stuck Bull correction (device-test feedback 2026-07-30, replaces
+    // the old always-on anti-repeat-Bull throttle below the pool weights).
+    // The old mechanism re-targeted Bull's weight to a flat 20% conditional
+    // probability on EVERY single Bull occurrence, regardless of streak —
+    // but Bull's base weight (35 of ~93) is already close to double Bear's
+    // (18), so a flat 20% target cut Bull's realized long-run share far
+    // below its intended ~1.94x Bear ratio, while giving Bear no matching
+    // throttle (Bear's base weight is already ~19.4%, so a mirrored 20%
+    // target was a no-op for it) — net effect confirmed on-device as Bear
+    // outnumbering Bull within single sessions despite Bear's lower base
+    // weight. Mirroring Bear's own mechanism instead — only intervene
+    // after 2+ CONSECUTIVE Bulls, hard-redirecting away from Bull rather
+    // than softly throttling every occurrence — keeps the original ask
+    // (no long unbroken Bull streaks) without suppressing Bull's fair
+    // share in the common case of an isolated single Bull epoch.
+    if (_trailingStreak(session.epochHistory, MarketScenario.bull) >= 2) {
+      final antiStuckRoll = rng.nextDouble();
+      if (antiStuckRoll < 0.40) return MarketScenario.bear;
+      if (antiStuckRoll < 0.70) return MarketScenario.sideways;
+      return MarketScenario.volatility;
+    }
+
     // ── Block 5 fix: hype/speculation are per-company events, NOT ──
     // global macro scenarios — remove them from the roulette wheel.
     // Recovery is also removed: it's scripted-only (see above), never
@@ -85,26 +122,6 @@ extension CasinoEpochsEngine on StressTestNotifier {
     } else {
       for (final s in pool) {
         weights.add(currentWeights[s.name] ?? s.weight.toDouble());
-      }
-    }
-
-    // ── Anti-repeat Bull correction (device-test feedback 2026-07-21) ──
-    // Bull carries no scripted anti-stuck correction the way Bear does
-    // (see the consecutive-Bear redirect above), and its base weight (35
-    // of ~93) alone gives it a ~20-38% shot every single roll regardless
-    // of history — so a second Bull immediately after a first one was
-    // landing far more often than it should feel. This doesn't touch
-    // Bull's normal weight in any other case; it only re-targets THIS
-    // roll's Bull weight so an immediate repeat lands ~20% of the time,
-    // whatever the pool's current total happens to be (fatigue-adjusted
-    // or not, catastrophe-eligible or not).
-    if (session.epochHistory.lastOrNull?.scenario == MarketScenario.bull) {
-      final bullIdx = pool.indexOf(MarketScenario.bull);
-      if (bullIdx != -1) {
-        final othersSum =
-            weights.fold(0.0, (a, b) => a + b) - weights[bullIdx];
-        weights[bullIdx] =
-            othersSum * (_bullRepeatTargetProb / (1 - _bullRepeatTargetProb));
       }
     }
 

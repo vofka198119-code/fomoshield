@@ -362,8 +362,10 @@ extension NoiseEngine on StressTestNotifier {
                 _recoveryCrashDropPct(session, h.symbol),
               )
             : 1.0;
+        final effectiveAnnualDrift =
+            params.annualDrift + _varianceDragCompensation(params.annualVolatility);
         final rawChange =
-            params.annualDrift * dtPerTick * driftMultiplier + noise + microNoise;
+            effectiveAnnualDrift * dtPerTick * driftMultiplier + noise + microNoise;
         final clampedChange = _clampDrift(rawChange, regime);
         currentPrice = currentPrice * (1 + clampedChange);
         // ignore: avoid_print
@@ -472,7 +474,7 @@ extension NoiseEngine on StressTestNotifier {
           scenario: scenario,
           sector: sector,
           hasCorrection: hasCorrection,
-          marketDriftRaw: params.annualDrift * dtPerTick * driftMultiplier,
+          marketDriftRaw: effectiveAnnualDrift * dtPerTick * driftMultiplier,
           sectorDriftRaw:
               (params.annualDrift - avgDrift) * dtPerTick * driftMultiplier,
           noiseRaw: noise,

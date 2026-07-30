@@ -39,6 +39,26 @@ const double _microNoiseRange = 0.003; // ±0.3% intra-epoch micro-fluctuation
 /// Whether we've already printed the dt calibration header this session.
 bool _dtCalibrationLogged = false;
 
+// ── Variance-drag compensation (device-test feedback 2026-07-30) ──────
+// The tick formula above compounds MULTIPLICATIVELY (P_new = P_old × (1 +
+// r)), so even though each tick's noise term is zero-mean, the realized
+// (typical/median) path's log-return is systematically below the stated
+// annualDrift by a Jensen's-inequality drag term. For this specific noise
+// distribution (ε ~ Uniform(-0.5,+0.5), Var(ε) = 1/12):
+//   E[log(1+r)] ≈ E[r] − Var(r)/2,  Var(r) per tick ≈ σ²·dt/12
+//   summed over the full epoch (Σdt = 1):  drag ≈ σ²/24 (annualized)
+// This is real (it's the same "volatility drag" that makes real markets'
+// median returns trail their mean returns) but it scales with σ², so it's
+// negligible for calm regimes (Bull σ=0.18 → ~0.14%) and only becomes
+// visible for the highest-σ regime in the matrix: Volatility (σ up to
+// 0.40 → ~0.67%), which is documented as "0% avg" (see MarketScenario
+// .drift) but was realizing visibly negative on-device. Adding this term
+// back to the drift used for simulation (not the documented/logged
+// value) keeps the realized average matching what's documented, without
+// changing anything about Volatility's amplitude/character.
+double _varianceDragCompensation(double annualVolatility) =>
+    annualVolatility * annualVolatility / 24;
+
 // ---------------------------------------------------------------------------
 // Definitive Market Simulation Matrix — Multi-Sector & Multi-Scenario
 // ---------------------------------------------------------------------------
