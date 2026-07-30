@@ -17,14 +17,17 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
+import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
 
 /// Sparkline periods
 enum _SparkPeriod { d1, w1, m1, m3, y1, max }
@@ -390,58 +393,104 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   }
 
   // ─── Company Header (Steps 107–112) ──────────────────────────────
+  // Visual matches company_detail's PriceHeader name card (brand dark-green
+  // gradient, gold logo ring, sector badge under the ticker) — copied for
+  // visual consistency only, no behavior changes underneath.
   Widget _buildCompanyHeader(
     StressTestSession session,
     AsyncValue<String?> logoAsync,
   ) {
-    return Container(
-      height: 88,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 64,
-            height: 64,
-            child: logoAsync.when(
-              data: (url) =>
-                  CompanyLogo(ticker: widget.symbol, logoUrl: url, radius: 32),
-              error: (_, _) => CompanyLogo(ticker: widget.symbol, radius: 32),
-              loading: () => CompanyLogo(ticker: widget.symbol, radius: 32),
-            ),
+    final sectorBadgeBg = Color.alphaBlend(ThemeV2.primaryBg, Colors.white);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [dialLight, dialDark],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(_companyName(widget.symbol), style: ThemeV2.title),
-                const SizedBox(height: 4),
-                Text('${widget.symbol} · NYSE', style: ThemeV2.caption),
-              ],
-            ),
-          ),
-          // Sector Badge (Step 112)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: ThemeV2.primaryBg,
-              borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
-            ),
-            child: Text(
-              _sectorName(widget.symbol),
-              style: ThemeV2.small.copyWith(
-                color: ThemeV2.primary,
-                fontWeight: FontWeight.w600,
+          borderRadius: FomoShieldTheme.cardRadius,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: dialBrassLight, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: dialBrassLight.withValues(alpha: 0.35),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+              child: logoAsync.when(
+                data: (url) =>
+                    CompanyLogo(ticker: widget.symbol, logoUrl: url, radius: 30),
+                error: (_, _) => CompanyLogo(ticker: widget.symbol, radius: 30),
+                loading: () => CompanyLogo(ticker: widget.symbol, radius: 30),
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _companyName(widget.symbol),
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '${widget.symbol} · NYSE',
+                    style: GoogleFonts.inter(fontSize: 12, color: Colors.white),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: sectorBadgeBg,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      _sectorName(widget.symbol),
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: ThemeV2.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   // ─── Live Price Card (Steps 113–123) ─────────────────────────────
+  // Price/change/placeholder visual matches company_detail's PriceHeader —
+  // copied for visual consistency only. Deliberately NOT wired to
+  // _currentMarketPhase() (price stays a fixed gold): this is a simulated
+  // stress-test price, and the engine has its own always-open semantics —
+  // tying it to real market-session state would misrepresent that. The
+  // market-status row below (still driven by _currentMarketPhase()) and
+  // everything after it is unchanged, same content and behavior as before.
   Widget _buildPriceCard({
     required StressTestSession session,
     required double currentPrice,
@@ -451,113 +500,259 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   }) {
     final phase = _currentMarketPhase();
     final phaseInfo = _marketPhaseDisplay(phase);
+    final changeColor = isPositive ? ThemeV2.success : ThemeV2.loss;
+    final changeCellBg = Color.alphaBlend(
+      isPositive ? ThemeV2.successBg : ThemeV2.lossBg,
+      Colors.white,
+    );
 
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _priceCell(currentPrice),
+                      const SizedBox(height: 10),
+                      _cell(
+                        label: 'CHANGE',
+                        bgColor: changeCellBg,
+                        valueColor: changeColor,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isPositive
+                                  ? Icons.trending_up_rounded
+                                  : Icons.trending_down_rounded,
+                              size: 16,
+                              color: changeColor,
+                            ),
+                            const SizedBox(width: 3),
+                            Flexible(
+                              child: Text(
+                                '${isPositive ? '+' : ''}${_fmtFull(priceChange)} '
+                                '(${isPositive ? '+' : ''}${priceChangePercent.toStringAsFixed(2)}%)',
+                                style: interNums(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: changeColor,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // Placeholder — reserved for later, unwired/unlabeled on
+                // purpose for now (same as company_detail's PriceHeader).
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: ThemeV2.divider),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: ThemeV2.surface,
+            borderRadius: ThemeV2.borderRadiusLarge,
+            boxShadow: ThemeV2.cardShadow,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Market status + Why today (Steps 117–123) — unchanged ──
+              Row(
+                children: [
+                  // Market status
+                  GestureDetector(
+                    onTap: () => _showMarketHoursSheet(),
+                    child: Row(
+                      children: [
+                        Text(phaseInfo.emoji, style: const TextStyle(fontSize: 14)),
+                        const SizedBox(width: 6),
+                        Text(
+                          phaseInfo.label,
+                          style: ThemeV2.caption.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: phaseInfo.color,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.info_outline_rounded,
+                          size: 14,
+                          color: ThemeV2.textSecondary.withValues(alpha: 0.6),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  // "Why today?" button (Steps 118–120) — Filled Tonal
+                  FilledButton.tonal(
+                    onPressed: () => context.push(
+                      '/stress-test/${widget.sessionId}/stock/${widget.symbol}/why',
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: ThemeV2.primaryBg,
+                      foregroundColor: ThemeV2.primary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+                      ),
+                      textStyle: ThemeV2.small.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.lightbulb_outline_rounded, size: 14),
+                        SizedBox(width: 6),
+                        Text('Why today?'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              // Last Updated (Step 123)
+              const SizedBox(height: 8),
+              Text(
+                'Last updated: ${_fmtTime(DateTime.now())}',
+                style: ThemeV2.small.copyWith(
+                  color: ThemeV2.textSecondary.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Same shape as company_detail's PriceHeader `_cell`/`_priceCell` — small
+  // caps label, then the value. Price value color is a fixed gold, not
+  // session-dependent (see note on _buildPriceCard above).
+  Widget _priceCell(double price) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.all(24),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: ThemeV2.surface,
-        borderRadius: ThemeV2.borderRadiusLarge,
-        boxShadow: ThemeV2.cardShadow,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [dialLight, dialDark],
+        ),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Price row (Steps 113–116) ──
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(_fmtFull(currentPrice), style: ThemeV2.displayXL),
-              const SizedBox(width: 10),
-              // Change capsule (Step 115)
-              Container(
-                height: 42,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                decoration: BoxDecoration(
-                  color: isPositive ? ThemeV2.successBg : ThemeV2.lossBg,
-                  borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '${isPositive ? '+' : ''}${_fmtFull(priceChange)} '
-                  '(${isPositive ? '+' : ''}${priceChangePercent.toStringAsFixed(2)}%)',
-                  style: ThemeV2.caption.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: isPositive ? ThemeV2.success : ThemeV2.loss,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // ── Market status + Why today (Steps 117–123) ──
-          Row(
-            children: [
-              // Market status
-              GestureDetector(
-                onTap: () => _showMarketHoursSheet(),
-                child: Row(
-                  children: [
-                    Text(phaseInfo.emoji, style: const TextStyle(fontSize: 14)),
-                    const SizedBox(width: 6),
-                    Text(
-                      phaseInfo.label,
-                      style: ThemeV2.caption.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: phaseInfo.color,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.info_outline_rounded,
-                      size: 14,
-                      color: ThemeV2.textSecondary.withValues(alpha: 0.6),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              // "Why today?" button (Steps 118–120) — Filled Tonal
-              FilledButton.tonal(
-                onPressed: () => context.push(
-                  '/stress-test/${widget.sessionId}/stock/${widget.symbol}/why',
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: ThemeV2.primaryBg,
-                  foregroundColor: ThemeV2.primary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
-                  ),
-                  textStyle: ThemeV2.small.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.lightbulb_outline_rounded, size: 14),
-                    SizedBox(width: 6),
-                    Text('Why today?'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          // Last Updated (Step 123)
-          const SizedBox(height: 8),
           Text(
-            'Last updated: ${_fmtTime(DateTime.now())}',
-            style: ThemeV2.small.copyWith(
-              color: ThemeV2.textSecondary.withValues(alpha: 0.7),
+            'PRICE',
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: Colors.white,
             ),
           ),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.attach_money_rounded,
+                  size: 26,
+                  color: dialBrassLight,
+                  shadows: [
+                    Shadow(
+                      color: dialBrassLight.withValues(alpha: 0.5),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                Text(
+                  price.toStringAsFixed(2),
+                  style: interNums(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                    color: dialBrassLight,
+                    height: 1,
+                  ).copyWith(
+                    shadows: [
+                      Shadow(
+                        color: dialBrassLight.withValues(alpha: 0.5),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cell({
+    required String label,
+    required Color bgColor,
+    required Color valueColor,
+    required Widget child,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ThemeV2.divider),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: ThemeV2.primary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: child),
         ],
       ),
     );
