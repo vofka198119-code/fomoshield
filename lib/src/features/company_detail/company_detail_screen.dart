@@ -416,67 +416,73 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
 
     return Column(
       children: [
-        // Scrollable content
-        Expanded(
-          child: CustomScrollView(
-            slivers: [
-              // Top bar with back + bookmark + widget settings
-              SliverAppBar(
-                floating: true,
-                backgroundColor: Colors.transparent,
-                leading: IconButton(
+        // Top bar with back + bookmark — fixed outside the scroll view so it
+        // never scrolls away, matching every other screen's header pattern.
+        SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              children: [
+                IconButton(
                   icon: const Icon(
                     Icons.arrow_back_rounded,
                     color: ThemeV2.textPrimary,
                   ),
                   onPressed: () => context.pop(),
                 ),
-                actions: [
-                  Consumer(
-                    builder: (context, ref, _) {
-                      final watchlist = ref.watch(watchlistSymbolsProvider);
-                      final inWatchlist = watchlist.contains(widget.symbol);
-                      return IconButton(
-                        icon: Icon(
-                          inWatchlist
-                              ? Icons.bookmark_rounded
-                              : Icons.bookmark_border_rounded,
-                          color: inWatchlist
-                              ? ThemeV2.primary
-                              : ThemeV2.textSecondary,
-                        ),
-                        onPressed: () {
-                          if (inWatchlist) {
-                            ref
-                                .read(watchlistSymbolsProvider.notifier)
-                                .remove(widget.symbol);
-                            return;
-                          }
-                          final maxW = ref.read(maxWatchlistProvider);
-                          if (watchlist.length >= maxW) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  maxW == 30
-                                      ? 'FREE limit: 30 companies. Upgrade to Premium (50).'
-                                      : 'Max $maxW companies reached.',
-                                  style: GoogleFonts.inter(fontSize: 13),
-                                ),
-                                backgroundColor: ThemeV2.primary,
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                            return;
-                          }
+                const Spacer(),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final watchlist = ref.watch(watchlistSymbolsProvider);
+                    final inWatchlist = watchlist.contains(widget.symbol);
+                    return IconButton(
+                      icon: Icon(
+                        inWatchlist
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_border_rounded,
+                        color: inWatchlist
+                            ? ThemeV2.primary
+                            : ThemeV2.textSecondary,
+                      ),
+                      onPressed: () {
+                        if (inWatchlist) {
                           ref
                               .read(watchlistSymbolsProvider.notifier)
-                              .add(widget.symbol);
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
+                              .remove(widget.symbol);
+                          return;
+                        }
+                        final maxW = ref.read(maxWatchlistProvider);
+                        if (watchlist.length >= maxW) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                maxW == 30
+                                    ? 'FREE limit: 30 companies. Upgrade to Premium (50).'
+                                    : 'Max $maxW companies reached.',
+                                style: GoogleFonts.inter(fontSize: 13),
+                              ),
+                              backgroundColor: ThemeV2.primary,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          return;
+                        }
+                        ref
+                            .read(watchlistSymbolsProvider.notifier)
+                            .add(widget.symbol);
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Scrollable content
+        Expanded(
+          child: CustomScrollView(
+            slivers: [
               // Main content — dynamic widgets
               SliverToBoxAdapter(
                 child: Column(
