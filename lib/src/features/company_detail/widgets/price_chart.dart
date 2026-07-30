@@ -7,6 +7,7 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import '../../portfolio/portfolio_providers.dart';
+import '../company_detail_provider.dart' show chartHoverPriceProvider;
 
 // ---------------------------------------------------------------------------
 // Period Selection
@@ -81,6 +82,13 @@ class _PriceChartState extends ConsumerState<PriceChart> {
   Map<String, dynamic>? _candleData;
   bool _isLoading = true;
   String? _error;
+
+  // Touch state for the custom date tooltip — fixed vertically at the top
+  // of the chart, moves only horizontally with the touch (see
+  // feedback from the 2026-07-30 visual pass: fl_chart's built-in
+  // tooltip/indicator followed the line's peaks, which hurt readability).
+  double? _touchDx;
+  int? _touchedSpotIndex;
 
   @override
   void initState() {
@@ -328,6 +336,13 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     final avgLineTop = showAvgLine
         ? ((chartMaxY - avgCost) / (chartMaxY - chartMinY)) * 220
         : 0.0;
+    // The touch-indicator line's own top now stops at the date tooltip's
+    // bottom edge (~24px, matching its padding+text height) instead of
+    // piercing straight through the box — converted from pixels to a data
+    // Y-value since getTouchLineEnd works in chart data space.
+    const dateTooltipHeight = 24.0;
+    final touchLineTopY =
+        chartMaxY - (dateTooltipHeight / 220) * (chartMaxY - chartMinY);
 
     return Stack(
       children: [
@@ -355,41 +370,50 @@ class _PriceChartState extends ConsumerState<PriceChart> {
               ),
               borderData: FlBorderData(show: false),
               lineTouchData: LineTouchData(
+                // fl_chart's own tooltip bubble is replaced by a custom
+                // fixed-position one drawn outside the chart (see the
+                // Positioned widget below) — suppress its default content
+                // entirely rather than fight its positioning.
                 touchTooltipData: LineTouchTooltipData(
-                  getTooltipItems: (touchedSpots) {
-                    return touchedSpots.map((spot) {
-                      final idx = spot.spotIndex;
-                      final date = idx < timestamps.length
-                          ? DateTime.fromMillisecondsSinceEpoch(
-                              timestamps[idx] * 1000,
-                            )
-                          : null;
-                      return LineTooltipItem(
-                        '\$${spot.y.toStringAsFixed(2)}',
-                        TextStyle(
-                          color: lineColor,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          fontFamily: 'Inter',
-                        ),
-                        children: date != null
-                            ? [
-                                TextSpan(
-                                  text:
-                                      '\n${date.day}.${date.month}.${date.year}',
-                                  style: TextStyle(
-                                    color: ThemeV2.textSecondary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'Inter',
-                                  ),
-                                ),
-                              ]
-                            : [],
-                      );
-                    }).toList();
-                  },
+                  getTooltipItems: (touchedSpots) =>
+                      touchedSpots.map((_) => null).toList(),
                 ),
+                // Indicator line: thin black, no dot, and always spans the
+                // full plot height rather than stopping at the touched
+                // point — a fixed reference line instead of one that bobs
+                // up and down with the chart's peaks.
+                getTouchedSpotIndicator: (barData, spotIndexes) {
+                  return spotIndexes
+                      .map(
+                        (_) => TouchedSpotIndicatorData(
+                          const FlLine(color: Colors.black, strokeWidth: 1.3),
+                          const FlDotData(show: false),
+                        ),
+                      )
+                      .toList();
+                },
+                getTouchLineEnd: (barData, spotIndex) => touchLineTopY,
+                touchCallback: (event, response) {
+                  final notifier = ref.read(
+                    chartHoverPriceProvider(widget.symbol).notifier,
+                  );
+                  final spots = response?.lineBarSpots;
+                  if (event.isInterestedForInteractions &&
+                      spots != null &&
+                      spots.isNotEmpty) {
+                    notifier.state = spots.first.y;
+                    setState(() {
+                      _touchDx = event.localPosition?.dx;
+                      _touchedSpotIndex = spots.first.spotIndex;
+                    });
+                  } else {
+                    notifier.state = null;
+                    setState(() {
+                      _touchDx = null;
+                      _touchedSpotIndex = null;
+                    });
+                  }
+                },
               ),
               lineBarsData: [
                 LineChartBarData(
@@ -442,8 +466,37 @@ class _PriceChartState extends ConsumerState<PriceChart> {
               ),
             ),
           ),
+        // Custom date tooltip — fixed at the top of the chart (right under
+        // the title divider), moves only horizontally with the touch.
+        if (_touchDx != null &&
+            _touchedSpotIndex != null &&
+            _touchedSpotIndex! < timestamps.length)
+          Positioned(
+            top: 0,
+            left: _touchDx! - 28,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: ThemeV2.primaryBg,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                _fmtTouchDate(timestamps[_touchedSpotIndex!]),
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
       ],
     );
+  }
+
+  String _fmtTouchDate(int unixSeconds) {
+    final date = DateTime.fromMillisecondsSinceEpoch(unixSeconds * 1000);
+    return '${date.day}.${date.month}.${date.year}';
   }
 
   List<double> _parseCloses(Map<String, dynamic>? data) {

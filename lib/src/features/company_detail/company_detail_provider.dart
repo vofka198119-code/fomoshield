@@ -85,6 +85,17 @@ final companyDetailProvider =
       return data;
     });
 
+/// Price at the point the user is currently dragging on `PriceChart`, or
+/// null when they're not touching it. Lets the Price Header's PRICE cell
+/// mirror the touched point while scrubbing, like most trading apps do,
+/// without PriceChart and PriceHeader needing to know about each other
+/// directly — keyed by symbol so switching companies can't leak a stale
+/// value across screens.
+final chartHoverPriceProvider = StateProvider.autoDispose.family<
+  double?,
+  String
+>((ref, symbol) => null);
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

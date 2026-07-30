@@ -567,13 +567,14 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
   }) {
     switch (id) {
       case 'price_header':
+        final hoverPrice = ref.watch(chartHoverPriceProvider(symbol));
         return Column(
           children: [
             PriceHeader(
               logo: logo,
               companyName: companyName,
               symbol: symbol,
-              price: price,
+              price: hoverPrice ?? price,
               change: change,
               changePercent: changePercent,
               isUp: isUp,
