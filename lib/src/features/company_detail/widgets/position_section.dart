@@ -116,6 +116,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             if (positions.length > 1) ...[
               const SizedBox(height: 10),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Flexible(
                     child: Text(
@@ -128,10 +129,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
                       ),
                     ),
                   ),
-                  if (safeIndex > 0) ...[
-                    const Spacer(),
-                    _premiumBadge(),
-                  ],
+                  if (safeIndex > 0) _premiumBadge(),
                 ],
               ),
             ],
