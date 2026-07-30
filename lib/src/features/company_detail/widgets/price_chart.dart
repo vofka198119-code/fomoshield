@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
-import '../../../shared/widgets/period_selector.dart';
+import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../portfolio/portfolio_providers.dart';
 
 // ---------------------------------------------------------------------------
 // Period Selection
@@ -32,13 +34,28 @@ extension ChartPeriodExt on ChartPeriod {
     final now = DateTime.now();
     switch (this) {
       case ChartPeriod.month1:
-        return (now.subtract(const Duration(days: 30)).millisecondsSinceEpoch ~/ 1000, 'D');
+        return (
+          now.subtract(const Duration(days: 30)).millisecondsSinceEpoch ~/ 1000,
+          'D',
+        );
       case ChartPeriod.month6:
-        return (now.subtract(const Duration(days: 182)).millisecondsSinceEpoch ~/ 1000, 'D');
+        return (
+          now.subtract(const Duration(days: 182)).millisecondsSinceEpoch ~/
+              1000,
+          'D',
+        );
       case ChartPeriod.year1:
-        return (now.subtract(const Duration(days: 365)).millisecondsSinceEpoch ~/ 1000, 'D');
+        return (
+          now.subtract(const Duration(days: 365)).millisecondsSinceEpoch ~/
+              1000,
+          'D',
+        );
       case ChartPeriod.year5:
-        return (now.subtract(const Duration(days: 1825)).millisecondsSinceEpoch ~/ 1000, 'W');
+        return (
+          now.subtract(const Duration(days: 1825)).millisecondsSinceEpoch ~/
+              1000,
+          'W',
+        );
       case ChartPeriod.all:
         return (0, 'M'); // all time = monthly
     }
@@ -49,16 +66,16 @@ extension ChartPeriodExt on ChartPeriod {
 // Price Chart Widget
 // ---------------------------------------------------------------------------
 
-class PriceChart extends StatefulWidget {
+class PriceChart extends ConsumerStatefulWidget {
   final String symbol;
 
   const PriceChart({super.key, required this.symbol});
 
   @override
-  State<PriceChart> createState() => _PriceChartState();
+  ConsumerState<PriceChart> createState() => _PriceChartState();
 }
 
-class _PriceChartState extends State<PriceChart> {
+class _PriceChartState extends ConsumerState<PriceChart> {
   final FinnhubService _api = FinnhubService();
   ChartPeriod _selectedPeriod = ChartPeriod.year1;
   Map<String, dynamic>? _candleData;
@@ -112,46 +129,134 @@ class _PriceChartState extends State<PriceChart> {
     }
   }
 
+  /// Weighted-average cost basis for this symbol across every portfolio
+  /// that holds it, or null if the user doesn't hold it anywhere — same
+  /// computation as `PositionSection`'s "Avg Cost" tile.
+  double? _avgCost() {
+    final portfolios = ref.watch(portfoliosProvider);
+    double totalShares = 0;
+    double totalCost = 0;
+    for (final p in portfolios) {
+      final perf = ref.watch(portfolioPerformanceProvider(p.id));
+      final holding = perf.asData?.value.holdings.firstWhere(
+        (h) => h.symbol == widget.symbol,
+        orElse: () => HoldingPerformance(
+          symbol: widget.symbol,
+          shares: 0,
+          avgCost: 0,
+          totalCost: 0,
+          currentPrice: 0,
+          currentValue: 0,
+          pnl: 0,
+          pnlPercent: 0,
+        ),
+      );
+      if (holding != null && holding.shares > 0) {
+        totalShares += holding.shares;
+        totalCost += holding.shares * holding.avgCost;
+      }
+    }
+    if (totalShares <= 0) return null;
+    return totalCost / totalShares;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final avgCost = _avgCost();
+
     return Container(
-      padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+      padding: const EdgeInsets.symmetric(
+        vertical: FomoShieldTheme.cardPadding,
+      ),
       decoration: FomoShieldTheme.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: FomoShieldTheme.cardPadding,
+            ),
+            child: Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+          ),
           const SizedBox(height: 10),
-          Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: FomoShieldTheme.cardPadding,
+            ),
+            child: Divider(
+              height: 1,
+              color: Colors.black.withValues(alpha: 0.06),
+            ),
+          ),
           const SizedBox(height: 12),
 
-          // Period selector
-          PeriodSelector<ChartPeriod>(
-            periods: ChartPeriod.values,
-            selected: _selectedPeriod,
-            labelOf: (p) => p.label,
-            onSelected: (period) {
-              setState(() => _selectedPeriod = period);
-              _loadCandles();
-            },
+          // Chart area — bled almost to the card's own edges (1px left,
+          // 2px right) rather than sitting at the full card padding.
+          Padding(
+            padding: const EdgeInsets.only(left: 1, right: 2),
+            child: SizedBox(height: 220, child: _buildChartArea(avgCost)),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-          // Chart area
-          SizedBox(
-            height: 220,
-            child: _buildChartArea(),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: FomoShieldTheme.cardPadding,
+            ),
+            child: _buildPeriodSelector(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildChartArea() {
+  Widget _buildPeriodSelector() {
+    return Row(
+      children: ChartPeriod.values.map((period) {
+        final isSelected = period == _selectedPeriod;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () {
+              if (isSelected) return;
+              setState(() => _selectedPeriod = period);
+              _loadCandles();
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: isSelected
+                  ? BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [dialLight, dialDark],
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                    )
+                  : null,
+              child: Text(
+                period.label,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildChartArea(double? avgCost) {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: ThemeV2.primary, strokeWidth: 2),
+        child: CircularProgressIndicator(
+          color: ThemeV2.primary,
+          strokeWidth: 2,
+        ),
       );
     }
 
@@ -160,10 +265,19 @@ class _PriceChartState extends State<PriceChart> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.show_chart_rounded, size: 40, color: ThemeV2.textSecondary),
+            const Icon(
+              Icons.show_chart_rounded,
+              size: 40,
+              color: ThemeV2.textSecondary,
+            ),
             const SizedBox(height: 8),
-            Text(_error!,
-                style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary)),
+            Text(
+              _error!,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
           ],
         ),
       );
@@ -174,8 +288,10 @@ class _PriceChartState extends State<PriceChart> {
 
     if (closes.length < 2) {
       return Center(
-        child: Text('Not enough data',
-            style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary)),
+        child: Text(
+          'Not enough data',
+          style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+        ),
       );
     }
 
@@ -195,118 +311,138 @@ class _PriceChartState extends State<PriceChart> {
       spots.add(FlSpot(i.toDouble(), closes[i]));
     }
 
-    return LineChart(
-      LineChartData(
-        minY: chartMinY,
-        maxY: chartMaxY,
-        gridData: FlGridData(
-          show: true,
-          drawVerticalLine: false,
-          horizontalInterval: (chartMaxY - chartMinY) / 4,
-          getDrawingHorizontalLine: (value) => FlLine(
-            color: ThemeV2.surfaceDark,
-            strokeWidth: 1,
+    final showAvgLine =
+        avgCost != null && avgCost >= chartMinY && avgCost <= chartMaxY;
+    final horizontalLines = [
+      HorizontalLine(y: chartMinY, color: ThemeV2.surfaceDark, strokeWidth: 1),
+      if (showAvgLine)
+        HorizontalLine(
+          y: avgCost,
+          color: ThemeV2.textSecondary,
+          strokeWidth: 1,
+          dashArray: [4, 4],
+        ),
+    ];
+    // Vertical position (within the 220px chart box) of the avg-cost line,
+    // for the plain text label drawn outside fl_chart's own inset canvas.
+    final avgLineTop = showAvgLine
+        ? ((chartMaxY - avgCost) / (chartMaxY - chartMinY)) * 220
+        : 0.0;
+
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 130 / 3),
+          child: LineChart(
+            LineChartData(
+              minY: chartMinY,
+              maxY: chartMaxY,
+              gridData: const FlGridData(show: false),
+              extraLinesData: ExtraLinesData(horizontalLines: horizontalLines),
+              titlesData: const FlTitlesData(
+                topTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+              ),
+              borderData: FlBorderData(show: false),
+              lineTouchData: LineTouchData(
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipItems: (touchedSpots) {
+                    return touchedSpots.map((spot) {
+                      final idx = spot.spotIndex;
+                      final date = idx < timestamps.length
+                          ? DateTime.fromMillisecondsSinceEpoch(
+                              timestamps[idx] * 1000,
+                            )
+                          : null;
+                      return LineTooltipItem(
+                        '\$${spot.y.toStringAsFixed(2)}',
+                        TextStyle(
+                          color: lineColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                        ),
+                        children: date != null
+                            ? [
+                                TextSpan(
+                                  text:
+                                      '\n${date.day}.${date.month}.${date.year}',
+                                  style: TextStyle(
+                                    color: ThemeV2.textSecondary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'Inter',
+                                  ),
+                                ),
+                              ]
+                            : [],
+                      );
+                    }).toList();
+                  },
+                ),
+              ),
+              lineBarsData: [
+                LineChartBarData(
+                  spots: spots,
+                  isCurved: false,
+                  color: lineColor,
+                  barWidth: 1.2,
+                  isStrokeCapRound: true,
+                  dotData: const FlDotData(show: false),
+                ),
+              ],
+            ),
+            duration: const Duration(milliseconds: 300),
           ),
         ),
-        titlesData: FlTitlesData(
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 60,
-              getTitlesWidget: (value, meta) {
-                return Text(
-                  '\$${value.toStringAsFixed(0)}',
-                  style: GoogleFonts.inter(fontSize: 10, color: ThemeV2.textSecondary),
-                );
-              },
-            ),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 24,
-              interval: _xLabelInterval(closes.length),
-              getTitlesWidget: (value, meta) {
-                final idx = value.toInt();
-                if (idx < 0 || idx >= timestamps.length) return const SizedBox();
-                final date = DateTime.fromMillisecondsSinceEpoch(
-                    timestamps[idx] * 1000);
-                final label = switch (_selectedPeriod) {
-                  ChartPeriod.month1 ||
-                  ChartPeriod.month6 =>
-                    '${date.day}.${date.month}',
-                  ChartPeriod.year1 ||
-                  ChartPeriod.year5 ||
-                  ChartPeriod.all =>
-                    '${date.month}/${date.year % 100}',
-                };
-                return Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Text(
-                    label,
-                    style: GoogleFonts.inter(fontSize: 10, color: ThemeV2.textSecondary),
-                  ),
-                );
-              },
+        Positioned(
+          top: 0,
+          right: 3,
+          child: Text(
+            '\$${maxPrice.toStringAsFixed(2)}',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: ThemeV2.textSecondary,
             ),
           ),
         ),
-        borderData: FlBorderData(show: false),
-        lineTouchData: LineTouchData(
-          touchTooltipData: LineTouchTooltipData(
-            getTooltipItems: (touchedSpots) {
-              return touchedSpots.map((spot) {
-                final idx = spot.spotIndex;
-                final date = idx < timestamps.length
-                    ? DateTime.fromMillisecondsSinceEpoch(
-                        timestamps[idx] * 1000)
-                    : null;
-                return LineTooltipItem(
-                  '\$${spot.y.toStringAsFixed(2)}',
-                  TextStyle(
-                    color: lineColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                  ),
-                  children: date != null
-                      ? [
-                          TextSpan(
-                            text: '\n${date.day}.${date.month}.${date.year}',
-                            style: TextStyle(
-                              color: ThemeV2.textSecondary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                        ]
-                      : [],
-                );
-              }).toList();
-            },
-          ),
-        ),
-        lineBarsData: [
-          LineChartBarData(
-            spots: spots,
-            isCurved: false,
-            color: lineColor,
-            barWidth: 2.5,
-            isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
-            belowBarData: BarAreaData(
-              show: true,
-              color: lineColor.withValues(alpha: 0.20),
-              cutOffY: chartMinY,
-              applyCutOffY: true,
+        Positioned(
+          bottom: 0,
+          right: 3,
+          child: Text(
+            '\$${minPrice.toStringAsFixed(2)}',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: ThemeV2.textSecondary,
             ),
           ),
-        ],
-      ),
-      duration: const Duration(milliseconds: 300),
+        ),
+        if (showAvgLine)
+          Positioned(
+            top: (avgLineTop - 14).clamp(0.0, 220.0 - 14),
+            right: 3,
+            child: Text(
+              '\$${avgCost.toStringAsFixed(2)}',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -323,13 +459,4 @@ class _PriceChartState extends State<PriceChart> {
     if (t is List) return t.map((e) => (e as num).toInt()).toList();
     return [];
   }
-
-  double _xLabelInterval(int count) {
-    if (count <= 30) return 7;
-    if (count <= 60) return 15;
-    if (count <= 250) return 60;
-    if (count <= 500) return 120;
-    return 250;
-  }
 }
-
