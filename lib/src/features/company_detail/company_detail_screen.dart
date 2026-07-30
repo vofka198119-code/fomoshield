@@ -475,13 +475,6 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                       );
                     },
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.tune_rounded,
-                      color: ThemeV2.textSecondary,
-                    ),
-                    onPressed: _showWidgetsBottomSheet,
-                  ),
                 ],
               ),
               // Main content — dynamic widgets
