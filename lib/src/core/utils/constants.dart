@@ -43,4 +43,13 @@ class AppConstants {
   // Dividends
   static const double dividendTrapThreshold = 10.0; // yield %
   static const int dividendTrapPenalty = 20;
+
+  // FS Score — a clean balance sheet (low debt, strong current ratio)
+  // can mask a company burning cash far faster than it earns revenue;
+  // Financial Health measures balance-sheet strength independent of the
+  // P&L, so catastrophic losses don't otherwise drag the weighted
+  // average down as much as they should. Net margin below -100% means
+  // losses exceed total revenue.
+  static const double catastrophicLossThreshold = -100.0; // net margin %
+  static const int catastrophicLossPenalty = 25;
 }

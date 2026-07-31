@@ -93,6 +93,15 @@ class ScoringEngine {
       finalScore = max(0, finalScore - AppConstants.dividendTrapPenalty);
     }
 
+    // Catastrophic unprofitability protection — a clean balance sheet
+    // (Financial Health) shouldn't be able to offset losses this severe
+    // in the weighted average. Confirmed live 2026-07-31: VANI (net
+    // margin -993.8%, zero debt) still scored 46 "Average" without this.
+    final catastrophicLoss = netMargin < AppConstants.catastrophicLossThreshold;
+    if (catastrophicLoss) {
+      finalScore = max(0, finalScore - AppConstants.catastrophicLossPenalty);
+    }
+
     return {
       // Named 'financial_score' (not 'fs_score') to avoid the collision
       // with Stress Test's unrelated behavioral Psychology Meter, which
@@ -110,6 +119,8 @@ class ScoringEngine {
       'dividend_trap_penalty': divYield > AppConstants.dividendTrapThreshold / 100
           ? AppConstants.dividendTrapPenalty
           : 0,
+      'catastrophic_loss_penalty':
+          catastrophicLoss ? AppConstants.catastrophicLossPenalty : 0,
     };
   }
 

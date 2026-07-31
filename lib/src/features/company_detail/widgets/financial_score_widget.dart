@@ -23,6 +23,7 @@ class FinancialScoreWidget extends StatelessWidget {
     final fsScore = score['financial_score'] as int? ?? 0;
     final markers = score['markers'] as Map<String, dynamic>? ?? {};
     final penalty = score['dividend_trap_penalty'] as int? ?? 0;
+    final lossPenalty = score['catastrophic_loss_penalty'] as int? ?? 0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -83,6 +84,35 @@ class FinancialScoreWidget extends StatelessWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: ThemeV2.warning,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            if (lossPenalty > 0) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: ThemeV2.loss.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: ThemeV2.loss.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.warning_amber_rounded, size: 14, color: ThemeV2.loss),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'Catastrophic loss penalty: -$lossPenalty pts (net margin below -100%)',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: ThemeV2.loss,
+                        ),
                       ),
                     ),
                   ],
