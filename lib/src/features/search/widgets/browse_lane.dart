@@ -4,8 +4,8 @@ import '../../../core/theme/theme_v2.dart';
 import 'company_mini_card.dart';
 
 // ---------------------------------------------------------------------------
-// BrowseLane — titled card containing a horizontally scrolling row of
-// CompanyMiniCard entries. Shared by all Search-screen browse widgets (Top
+// BrowseLane — titled card containing a vertical stack of CompanyMiniCard
+// rows (Watchlist-style). Shared by all Search-screen browse widgets (Top
 // S&P 500, per-sector tops, Recently Viewed).
 // ---------------------------------------------------------------------------
 
@@ -59,17 +59,7 @@ class BrowseLane extends StatelessWidget {
             endIndent: 22,
             color: Color(0x0F000000),
           ),
-          const SizedBox(height: 14),
-          SizedBox(
-            height: 128,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              itemCount: items.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 14),
-              itemBuilder: (context, i) => items[i],
-            ),
-          ),
+          for (int i = 0; i < items.length; i++) items[i],
         ],
       ),
     );

@@ -48,6 +48,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     // and trades straight into this portfolio (see contextPortfolioId).
     final routeExtra = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final portfolioId = routeExtra?['portfolioId'] as String?;
+    final stressTestSource = routeExtra?['source'] as String?;
+    final stressTestSessionId = routeExtra?['sessionId'] as String?;
 
     // First back press while a query is active just clears search (back to
     // the browse lanes); only a second press with no query actually leaves
@@ -114,12 +116,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   )
                 : state.query.isEmpty
                 ? SearchBrowseLanes(
-                    onTapSymbol: (symbol) => context.push(
-                      '/company/$symbol',
-                      extra: portfolioId != null
-                          ? {'portfolioId': portfolioId}
-                          : null,
-                    ),
+                    onTapSymbol: (symbol) {
+                      if (stressTestSource == 'stress-test' &&
+                          stressTestSessionId != null) {
+                        context.push(
+                          '/stress-test/$stressTestSessionId/stock/$symbol',
+                        );
+                        return;
+                      }
+                      context.push(
+                        '/company/$symbol',
+                        extra: portfolioId != null
+                            ? {'portfolioId': portfolioId}
+                            : null,
+                      );
+                    },
                   )
                 : state.results.isEmpty && state.query.isNotEmpty
                 ? Center(

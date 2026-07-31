@@ -21,7 +21,7 @@ import 'company_mini_card.dart';
 // that records each view.
 // ---------------------------------------------------------------------------
 
-const _lanePreviewCount = 4;
+const _lanePreviewCount = 6;
 
 class SearchBrowseLanes extends ConsumerWidget {
   final void Function(String symbol) onTapSymbol;
@@ -96,11 +96,12 @@ class SearchBrowseLanes extends ConsumerWidget {
             BrowseLane(
               title: 'RECENTLY VIEWED',
               items: [
-                for (final e in recentlyViewed)
+                for (int i = 0; i < recentlyViewed.length; i++)
                   CompanyMiniCard(
-                    symbol: e.symbol,
-                    name: e.name,
-                    onTap: () => onTapSymbol(e.symbol),
+                    symbol: recentlyViewed[i].symbol,
+                    name: recentlyViewed[i].name,
+                    onTap: () => onTapSymbol(recentlyViewed[i].symbol),
+                    showDivider: i < recentlyViewed.length - 1,
                   ),
               ],
             ),
@@ -118,11 +119,12 @@ class SearchBrowseLanes extends ConsumerWidget {
 
   List<CompanyMiniCard> _cards(List<TopCompanyEntry> data) {
     return [
-      for (final c in data)
+      for (int i = 0; i < data.length; i++)
         CompanyMiniCard(
-          symbol: c.symbol,
-          name: c.name,
-          onTap: () => onTapSymbol(c.symbol),
+          symbol: data[i].symbol,
+          name: data[i].name,
+          onTap: () => onTapSymbol(data[i].symbol),
+          showDivider: i < data.length - 1,
         ),
     ];
   }
