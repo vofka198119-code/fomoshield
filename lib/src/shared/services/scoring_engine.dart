@@ -38,7 +38,14 @@ class ScoringEngine {
     // e.g. Yahoo's equivalents. Confirmed live 2026-07-31.
     final revGrowth = _d(m['revenueGrowth5Y']);
     final epsGrowth = _d(m['epsGrowth5Y']);
-    final growth = _calcGrowth(revGrowth, epsGrowth);
+    // marketCapitalization is already in this same Finnhub response (in
+    // $millions) — used to dampen the growth signal for micro/nano-caps,
+    // where % growth off a near-zero revenue/earnings base swings huge
+    // and isn't comparable to a larger company's growth rate. Confirmed
+    // live 2026-07-31 (SPCE: Growth Potential scored 80 "Excellent" off
+    // this exact small-base effect).
+    final marketCapMillions = _dOrNull(m['marketCapitalization']);
+    final growth = _calcGrowth(revGrowth, epsGrowth, marketCapMillions);
 
     // 4. Efficiency (net margin + ROE) — same percentage-point
     // convention as Growth Potential above.
@@ -152,10 +159,32 @@ class ScoringEngine {
 
   // Growth Potential — revGrowth/epsGrowth are already percentage points
   // (e.g. 7.75 = 7.75%), added directly rather than re-multiplied by 100.
-  static double _calcGrowth(double revGrowth, double epsGrowth) {
+  // marketCapMillions dampens the swing for micro/nano-caps, where %
+  // growth off a near-zero base is noisy rather than genuinely
+  // informative — confidence scales down below $300M, further below
+  // $50M. Unknown market cap (null) gets full confidence rather than
+  // guessing a company is small.
+  static double _calcGrowth(
+    double revGrowth,
+    double epsGrowth,
+    double? marketCapMillions,
+  ) {
     double score = 50;
     score += revGrowth.clamp(-30, 30);
     score += epsGrowth.clamp(-30, 30);
+    score = score.clamp(0, 100);
+
+    if (marketCapMillions != null && marketCapMillions > 0) {
+      double confidence = 1.0;
+      if (marketCapMillions < 50) {
+        confidence = 0.4; // nano-cap
+      } else if (marketCapMillions < 300) {
+        confidence = 0.7; // micro-cap
+      }
+      if (confidence < 1.0) {
+        score = 50 + (score - 50) * confidence;
+      }
+    }
     return score.clamp(0, 100);
   }
 
@@ -198,5 +227,6 @@ class ScoringEngine {
   }
 
   static double _d(dynamic v) => (v is num) ? v.toDouble() : 0.0;
+  static double? _dOrNull(dynamic v) => (v is num) ? v.toDouble() : null;
   static double _pct(dynamic v) => (v is num) ? v.toDouble() / 100.0 : 0.0;
 }
