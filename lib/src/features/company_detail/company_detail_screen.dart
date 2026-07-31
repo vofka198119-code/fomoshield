@@ -431,7 +431,21 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                   ),
                   onPressed: () => context.pop(),
                 ),
-                const Spacer(),
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'COMPANY OVERVIEW',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: ThemeV2.primary,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
                 Consumer(
                   builder: (context, ref, _) {
                     final watchlist = ref.watch(watchlistSymbolsProvider);

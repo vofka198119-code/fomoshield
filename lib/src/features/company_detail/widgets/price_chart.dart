@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -112,10 +114,28 @@ class _PriceChartState extends ConsumerState<PriceChart> {
   double? _touchDx;
   int? _touchedSpotIndex;
 
+  // The indicator/tooltip only appears after a 1.2s hold — an instant
+  // reveal on first touch made quick swipes over the chart (e.g.
+  // scrolling the page) feel like the chart was grabbing them. A quick
+  // tap/swipe that releases before the hold completes shows nothing at
+  // all, same as before this existed.
+  static const _revealDelay = Duration(milliseconds: 1200);
+  Timer? _touchHoldTimer;
+  bool _touchRevealed = false;
+  double? _pendingDx;
+  int? _pendingSpotIndex;
+  double? _pendingY;
+
   @override
   void initState() {
     super.initState();
     _loadCandles();
+  }
+
+  @override
+  void dispose() {
+    _touchHoldTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadCandles() async {
@@ -420,7 +440,15 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                   return spotIndexes
                       .map(
                         (_) => TouchedSpotIndicatorData(
-                          const FlLine(color: Colors.black, strokeWidth: 1.3),
+                          _touchRevealed
+                              ? const FlLine(
+                                  color: Colors.black,
+                                  strokeWidth: 1.3,
+                                )
+                              : const FlLine(
+                                  color: Colors.transparent,
+                                  strokeWidth: 0,
+                                ),
                           const FlDotData(show: false),
                         ),
                       )
@@ -432,19 +460,44 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                     chartHoverPriceProvider(widget.symbol).notifier,
                   );
                   final spots = response?.lineBarSpots;
-                  if (event.isInterestedForInteractions &&
+                  final isDown = event.isInterestedForInteractions &&
                       spots != null &&
-                      spots.isNotEmpty) {
-                    notifier.state = spots.first.y;
+                      spots.isNotEmpty;
+
+                  if (!isDown) {
+                    _touchHoldTimer?.cancel();
+                    _touchHoldTimer = null;
+                    _touchRevealed = false;
+                    notifier.state = null;
+                    if (_touchDx != null || _touchedSpotIndex != null) {
+                      setState(() {
+                        _touchDx = null;
+                        _touchedSpotIndex = null;
+                      });
+                    }
+                    return;
+                  }
+
+                  _pendingDx = event.localPosition?.dx;
+                  _pendingSpotIndex = spots.first.spotIndex;
+                  _pendingY = spots.first.y;
+
+                  if (_touchRevealed) {
+                    notifier.state = _pendingY;
                     setState(() {
-                      _touchDx = event.localPosition?.dx;
-                      _touchedSpotIndex = spots.first.spotIndex;
+                      _touchDx = _pendingDx;
+                      _touchedSpotIndex = _pendingSpotIndex;
                     });
                   } else {
-                    notifier.state = null;
-                    setState(() {
-                      _touchDx = null;
-                      _touchedSpotIndex = null;
+                    _touchHoldTimer ??= Timer(_revealDelay, () {
+                      _touchHoldTimer = null;
+                      if (!mounted) return;
+                      _touchRevealed = true;
+                      notifier.state = _pendingY;
+                      setState(() {
+                        _touchDx = _pendingDx;
+                        _touchedSpotIndex = _pendingSpotIndex;
+                      });
                     });
                   }
                 },
