@@ -59,7 +59,11 @@ const int _hypeMaxEpochSpan = 4;
 /// price clamp in gbm_engine.dart is still the hard backstop; this is a
 /// softer, earlier damping so Bull+Hype doesn't routinely slam into that
 /// ceiling the way an undamped stack would.
-const double _hypeBullCoOccurrenceDamping = 0.5;
+/// Cut 0.5 -> 0.3 (device-test feedback 2026-07-31, same session as
+/// Bull's own maxPriceMultiplier trim in gbm_engine.dart) — 0.5 was still
+/// letting Bull+Hype read as too strong even after that regime-ceiling
+/// cut.
+const double _hypeBullCoOccurrenceDamping = 0.3;
 
 extension HypeEventEngine on StressTestNotifier {
   /// Roll for new sector Hype event(s). Only call when eligible (8+

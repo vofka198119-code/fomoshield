@@ -269,10 +269,16 @@ const _driftBounds = <_MacroRegime, _DriftBounds>{
     maxPriceMultiplier: 1.3,
     minPriceMultiplier: 0.6,
   ),
+  // maxPriceMultiplier trimmed 2.0 -> 1.5 (device-test feedback 2026-07-31):
+  // Bull's own sector drift (8-25%/yr) compounded over a couple of epochs,
+  // plus noise, was comfortably reaching into the old +100%-per-epoch
+  // ceiling and reading as unrealistic — a holding jumping +60% within
+  // "2 bull epochs" felt like a bug even though it was within bounds.
+  // +50% is still a strong tail outcome, not the typical realized move.
   _MacroRegime.bull: _DriftBounds(
     -0.05,
     0.05,
-    maxPriceMultiplier: 2.0,
+    maxPriceMultiplier: 1.5,
     minPriceMultiplier: 0.3,
   ),
   _MacroRegime.volatility: _DriftBounds(
