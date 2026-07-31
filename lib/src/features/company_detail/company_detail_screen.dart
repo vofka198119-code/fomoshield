@@ -13,7 +13,7 @@ import 'watchlist_ad_provider.dart';
 import 'company_detail_provider.dart';
 import 'company_widget_order_provider.dart';
 import 'widgets/price_chart.dart';
-import 'widgets/fs_score_widget.dart';
+import 'widgets/financial_score_widget.dart';
 import 'widgets/price_header.dart';
 import 'widgets/key_metrics_section.dart';
 import 'widgets/position_section.dart';
@@ -625,11 +625,11 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
             const SizedBox(height: 24),
           ],
         );
-      case 'fs_score':
+      case 'financial_score':
         if (scoreData.isEmpty) return const SizedBox.shrink();
         return Column(
           children: [
-            FsScoreWidget(score: scoreData),
+            FinancialScoreWidget(score: scoreData),
             const SizedBox(height: 24),
           ],
         );

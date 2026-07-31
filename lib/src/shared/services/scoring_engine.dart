@@ -4,34 +4,52 @@ import '../../core/utils/constants.dart';
 /// 6-marker FS Score algorithm
 /// Each marker: 0-100, overall FS Score: 0-100
 class ScoringEngine {
-  /// Calculate all 6 markers from financial metrics
-  static Map<String, dynamic> calculate(Map<String, dynamic> metrics) {
+  /// Calculate all 6 markers from financial metrics.
+  ///
+  /// [sectorPe] — average P/E across the company's GICS sector, computed
+  /// server-side from the tracked-company basket (Finnhub has no such
+  /// field of its own) — null until that job is wired in; Valuation stays
+  /// neutral (50) until then rather than guessing.
+  /// [priceCagr5Y] — 5-year annualized share-price return in percentage
+  /// points (e.g. 12.5 for +12.5%/yr), computed from Yahoo candle
+  /// history — null until wired in; Historical Trend stays neutral (50)
+  /// until then.
+  static Map<String, dynamic> calculate(
+    Map<String, dynamic> metrics, {
+    double? sectorPe,
+    double? priceCagr5Y,
+  }) {
     final m = metrics['metric'] as Map<String, dynamic>? ?? {};
 
     // 1. Valuation (P/E vs sector)
     final pe = _d(m['peTTM']);
-    final sectorPe = _d(m['sectorPeTTM']);
     final valuation = _calcValuation(pe, sectorPe);
 
-    // 2. Financial Health (debt)
-    final debtEquity = _d(m['debtEquityTTM']);
-    final currentRatio = _d(m['currentRatioTTM']);
+    // 2. Financial Health (debt/liquidity) — Finnhub's real field names.
+    // The previous 'debtEquityTTM'/'currentRatioTTM' keys never existed
+    // in Finnhub's response (confirmed against a live call), so this
+    // marker silently defaulted to a fixed 70 for every company.
+    final debtEquity = _d(m['totalDebt/totalEquityQuarterly']);
+    final currentRatio = _d(m['currentRatioQuarterly']);
     final financialHealth = _calcFinancialHealth(debtEquity, currentRatio);
 
-    // 3. Growth Potential
+    // 3. Growth Potential — Finnhub's growth fields already arrive as
+    // percentage points (7.75 means 7.75%), not 0-1 fractions, unlike
+    // e.g. Yahoo's equivalents. Confirmed live 2026-07-31.
     final revGrowth = _d(m['revenueGrowth5Y']);
     final epsGrowth = _d(m['epsGrowth5Y']);
     final growth = _calcGrowth(revGrowth, epsGrowth);
 
-    // 4. Efficiency (net margin)
+    // 4. Efficiency (net margin + ROE) — same percentage-point
+    // convention as Growth Potential above.
     final netMargin = _d(m['netProfitMarginTTM']);
     final roe = _d(m['roeTTM']);
     final efficiency = _calcEfficiency(netMargin, roe);
 
-    // 5. Historical Trend (5Y CAGR)
-    final revCagr = _d(m['revenueGrowth5Y']);
-    final epsCagr = _d(m['epsGrowth5Y']);
-    final historicalTrend = _calcHistoricalTrend(revCagr, epsCagr);
+    // 5. Historical Trend — real 5Y share-price CAGR. Used to just
+    // re-read Growth Potential's exact same two fundamentals fields,
+    // making it a duplicate marker rather than an independent signal.
+    final historicalTrend = _calcHistoricalTrend(priceCagr5Y);
 
     // 6. Capital Return (dividends/buybacks)
     final divYield = _pct(m['dividendYieldIndicatedAnnual']);
@@ -53,13 +71,17 @@ class ScoringEngine {
     }
 
     return {
-      'fs_score': finalScore.round(),
+      // Named 'financial_score' (not 'fs_score') to avoid the collision
+      // with Stress Test's unrelated behavioral Psychology Meter, which
+      // also produces a 0-100 number under the same 'fs_score' name —
+      // see docs/CODEBASE_REFERENCE.md section 4.5.
+      'financial_score': finalScore.round(),
       'markers': {
         'valuation': _markerResult('Valuation', valuation, 'P/E vs sector average'),
         'financial_health': _markerResult('Financial Health', financialHealth, 'Debt/Equity ratio'),
         'growth_potential': _markerResult('Growth Potential', growth, 'Revenue & EPS 5Y growth'),
         'efficiency': _markerResult('Efficiency', efficiency, 'Net margin & ROE'),
-        'historical_trend': _markerResult('Historical Trend', historicalTrend, '5Y CAGR'),
+        'historical_trend': _markerResult('Historical Trend', historicalTrend, '5Y share price CAGR'),
         'capital_return': _markerResult('Capital Return', capitalReturn, 'Dividends & buybacks'),
       },
       'dividend_trap_penalty': divYield > AppConstants.dividendTrapThreshold / 100
@@ -92,9 +114,10 @@ class ScoringEngine {
     return 'red';
   }
 
-  // Valuation: lower P/E relative to sector = better
-  static double _calcValuation(double pe, double sectorPe) {
-    if (pe <= 0 || sectorPe <= 0) return 50;
+  // Valuation: lower P/E relative to sector = better. Neutral (50) until
+  // a real sector average is available — never guess.
+  static double _calcValuation(double pe, double? sectorPe) {
+    if (pe <= 0 || sectorPe == null || sectorPe <= 0) return 50;
     final ratio = pe / sectorPe;
     if (ratio <= 0.5) return 90;  // Undervalued
     if (ratio <= 0.8) return 75;
@@ -127,27 +150,30 @@ class ScoringEngine {
     return score.clamp(0, 100);
   }
 
-  // Growth Potential
+  // Growth Potential — revGrowth/epsGrowth are already percentage points
+  // (e.g. 7.75 = 7.75%), added directly rather than re-multiplied by 100.
   static double _calcGrowth(double revGrowth, double epsGrowth) {
     double score = 50;
-    score += (revGrowth * 100).clamp(-30, 30);
-    score += (epsGrowth * 100).clamp(-30, 30);
+    score += revGrowth.clamp(-30, 30);
+    score += epsGrowth.clamp(-30, 30);
     return score.clamp(0, 100);
   }
 
-  // Efficiency: net margin + ROE
+  // Efficiency: net margin + ROE — same percentage-point convention.
   static double _calcEfficiency(double netMargin, double roe) {
     double score = 50;
-    score += (netMargin * 100).clamp(-25, 25);
-    score += (roe * 100).clamp(-25, 25);
+    score += netMargin.clamp(-25, 25);
+    score += roe.clamp(-25, 25);
     return score.clamp(0, 100);
   }
 
-  // Historical Trend: 5Y CAGR
-  static double _calcHistoricalTrend(double revCagr, double epsCagr) {
+  // Historical Trend: real 5Y annualized share-price return. Wider clamp
+  // than fundamentals-based Growth Potential since price CAGR reflects
+  // market sentiment too, not just the underlying business.
+  static double _calcHistoricalTrend(double? priceCagr5Y) {
+    if (priceCagr5Y == null) return 50;
     double score = 50;
-    score += (revCagr * 100).clamp(-25, 25);
-    score += (epsCagr * 100).clamp(-25, 25);
+    score += priceCagr5Y.clamp(-35, 35);
     return score.clamp(0, 100);
   }
 

@@ -62,7 +62,7 @@ class _CompanyWidgetsSettingsSheetState
         return Icons.show_chart_rounded;
       case 'key_metrics':
         return Icons.analytics_rounded;
-      case 'fs_score':
+      case 'financial_score':
         return Icons.shield_rounded;
       case 'position':
         return Icons.account_balance_wallet_rounded;

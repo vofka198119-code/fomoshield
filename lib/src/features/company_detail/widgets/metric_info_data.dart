@@ -32,6 +32,15 @@ const Map<String, String> metricInfoIdByLabel = {
   'Operating Margin': 'operating-margin',
   'Gross Margin': 'gross-margin',
   'ROE': 'roe',
+  // Financial Score's 6 markers (financial_score_widget.dart) — content
+  // not written yet, so none of these show a "?" until an entry exists
+  // in metricInfoRegistry below.
+  'Valuation': 'valuation',
+  'Financial Health': 'financial-health',
+  'Growth Potential': 'growth-potential',
+  'Efficiency': 'efficiency',
+  'Historical Trend': 'historical-trend',
+  'Capital Return': 'capital-return',
 };
 
 const Map<String, MetricInfoContent> metricInfoRegistry = {

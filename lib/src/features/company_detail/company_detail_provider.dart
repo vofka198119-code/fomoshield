@@ -1,8 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/cache/logo_dao.dart';
 import '../../core/models/logo_cache_entry.dart';
+import '../../core/services/gics_sector_mapper.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/scoring_engine.dart';
+import '../search/top_companies_provider.dart';
 import 'company_cache_provider.dart';
 import 'score_cache_provider.dart';
 import 'metrics_cache_provider.dart';
@@ -10,6 +14,30 @@ import 'metrics_cache_provider.dart';
 // ---------------------------------------------------------------------------
 // Providers — with layered cache: 4h (main) + 30d (score + metrics)
 // ---------------------------------------------------------------------------
+
+/// Average P/E per GICS sector, computed from the tracked top-47 basket
+/// (see `top_companies_provider.dart`) grouped via
+/// `resolveGicsSector()` — Finnhub has no sector-average field of its
+/// own, so this is the FS Score Valuation marker's real comparison
+/// baseline instead of the nonexistent `sectorPeTTM` the engine used to
+/// (silently) read as always-zero. Refreshes whenever the backend's
+/// quarterly top-47 job does.
+final sectorAveragePeProvider = FutureProvider<Map<GicsSector, double>>((
+  ref,
+) async {
+  final companies = await ref.watch(topCompaniesProvider.future);
+  final sums = <GicsSector, double>{};
+  final counts = <GicsSector, int>{};
+  for (final c in companies) {
+    final pe = c.peTTM;
+    if (pe == null || pe <= 0) continue;
+    final sector = resolveGicsSector(c.symbol, companyName: c.name);
+    if (sector == null) continue;
+    sums[sector] = (sums[sector] ?? 0) + pe;
+    counts[sector] = (counts[sector] ?? 0) + 1;
+  }
+  return {for (final sector in sums.keys) sector: sums[sector]! / counts[sector]!};
+});
 
 final companyDetailProvider =
     FutureProvider.family<Map<String, dynamic>, String>((ref, symbol) async {
@@ -62,7 +90,49 @@ final companyDetailProvider =
       final profile = await api.companyProfile(symbol);
       final quote = await api.quote(symbol);
       final metrics = await api.metrics(symbol);
-      final score = ScoringEngine.calculate(metrics);
+
+      final sectorAverages = await ref.watch(sectorAveragePeProvider.future);
+      final sector = resolveGicsSector(
+        symbol,
+        companyName: profile['name'] as String?,
+      );
+      final sectorPe = sector != null ? sectorAverages[sector] : null;
+
+      // 5Y weekly price history for the Historical Trend marker's real
+      // CAGR — same shape of candle call PriceChart makes for
+      // ChartPeriod.year5. Left null (marker stays neutral) if the
+      // fetch fails or the symbol doesn't have 5 years of history yet
+      // (e.g. a recent IPO) — never guess.
+      double? priceCagr5Y;
+      try {
+        final fiveYearsAgo = DateTime.now()
+                .subtract(const Duration(days: 1825))
+                .millisecondsSinceEpoch ~/
+            1000;
+        final nowSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+        final candleData = await api.candles(
+          symbol,
+          resolution: 'W',
+          from: fiveYearsAgo,
+          to: nowSec,
+        );
+        final closes = (candleData['c'] as List<dynamic>?)
+            ?.map((e) => (e as num).toDouble())
+            .toList();
+        if (closes != null && closes.length >= 2 && closes.first > 0) {
+          final totalReturn = closes.last / closes.first;
+          // Percentage-point annualized return (e.g. 12.5 for +12.5%/yr).
+          priceCagr5Y = (math.pow(totalReturn, 1 / 5) - 1) * 100;
+        }
+      } catch (_) {
+        // priceCagr5Y stays null.
+      }
+
+      final score = ScoringEngine.calculate(
+        metrics,
+        sectorPe: sectorPe,
+        priceCagr5Y: priceCagr5Y,
+      );
 
       // Сохранить логотип в LogoCache (если есть и нет в кэше)
       cacheCompanyLogo(symbol, profile);

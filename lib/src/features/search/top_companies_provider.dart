@@ -12,11 +12,13 @@ class TopCompanyEntry {
   final String symbol;
   final String name;
   final double marketCap;
+  final double? peTTM;
 
   const TopCompanyEntry({
     required this.symbol,
     required this.name,
     required this.marketCap,
+    this.peTTM,
   });
 }
 
@@ -29,6 +31,7 @@ final topCompaniesProvider = FutureProvider<List<TopCompanyEntry>>((ref) async {
         symbol: (c as Map)['symbol'] as String? ?? '',
         name: c['name'] as String? ?? '',
         marketCap: (c['marketCap'] as num?)?.toDouble() ?? 0,
+        peTTM: (c['peTTM'] as num?)?.toDouble(),
       ),
   ];
 });

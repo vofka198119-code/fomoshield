@@ -53,9 +53,8 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
       final metrics = {
         'metric': {
           'peTTM': 15.0 + priceChange * 0.1,
-          'sectorPeTTM': 18.0,
-          'debtEquityTTM': 0.5 + (priceChange < 0 ? 0.3 : 0.0),
-          'currentRatioTTM': 1.8,
+          'totalDebt/totalEquityQuarterly': 0.5 + (priceChange < 0 ? 0.3 : 0.0),
+          'currentRatioQuarterly': 1.8,
           'revenueGrowth5Y': 5.0 + priceChange * 0.05,
           'epsGrowth5Y': 4.0 + priceChange * 0.04,
           'netProfitMarginTTM': 8.0 + priceChange * 0.02,
@@ -64,7 +63,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
           'payoutRatioAnnual': 30.0,
         },
       };
-      final score = ScoringEngine.calculate(metrics);
+      final score = ScoringEngine.calculate(metrics, sectorPe: 18.0);
       holdingsScores.add({
         'symbol': h.symbol,
         'score': score,
@@ -76,13 +75,13 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
     }
 
     // Portfolio-level aggregated score
-    double avgFsScore = 0;
+    double avgFinancialScore = 0;
     if (holdingsScores.isNotEmpty) {
       for (final hs in holdingsScores) {
         final s = hs['score'] as Map<String, dynamic>;
-        avgFsScore += (s['fs_score'] as num?)?.toDouble() ?? 0;
+        avgFinancialScore += (s['financial_score'] as num?)?.toDouble() ?? 0;
       }
-      avgFsScore = avgFsScore / holdingsScores.length;
+      avgFinancialScore = avgFinancialScore / holdingsScores.length;
     }
 
     final totalValue = session.totalValue;
@@ -121,7 +120,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 8),
-                  _buildFsScoreGauge(avgFsScore.round()),
+                  _buildFsScoreGauge(avgFinancialScore.round()),
                   const SizedBox(height: 16),
                   Text(
                     'Portfolio Financial Strength Score',
@@ -133,10 +132,10 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _scoreLabel(avgFsScore.round()),
+                    _scoreLabel(avgFinancialScore.round()),
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: _scoreColor(avgFsScore.round()),
+                      color: _scoreColor(avgFinancialScore.round()),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -363,12 +362,12 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
   Widget _buildHoldingScoreTile(Map<String, dynamic> hs) {
     final symbol = hs['symbol'] as String;
     final scoreMap = hs['score'] as Map<String, dynamic>;
-    final fsScore = scoreMap['fs_score'] as int? ?? 0;
+    final financialScore = scoreMap['financial_score'] as int? ?? 0;
     final priceChange = hs['priceChange'] as double;
     final entryPrice = hs['entryPrice'] as double;
     final currentPrice = hs['currentPrice'] as double;
     final shares = hs['shares'] as double;
-    final color = _scoreColor(fsScore);
+    final color = _scoreColor(financialScore);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -391,7 +390,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
               ),
               child: Center(
                 child: Text(
-                  '$fsScore',
+                  '$financialScore',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,

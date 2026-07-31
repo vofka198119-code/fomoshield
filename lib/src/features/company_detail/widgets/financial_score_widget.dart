@@ -1,21 +1,26 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import 'metric_info_data.dart';
 
 // ---------------------------------------------------------------------------
-// FS Score Widget — gauge + radar chart + 6 marker details
+// Financial Score Widget — gauge + radar chart + 6 marker details. Named
+// distinctly from Stress Test's unrelated behavioral "Psychology Meter"
+// (which also produces a 0-100 number) — see
+// docs/CODEBASE_REFERENCE.md section 4.5.
 // ---------------------------------------------------------------------------
 
-class FsScoreWidget extends StatelessWidget {
+class FinancialScoreWidget extends StatelessWidget {
   final Map<String, dynamic> score;
 
-  const FsScoreWidget({super.key, required this.score});
+  const FinancialScoreWidget({super.key, required this.score});
 
   @override
   Widget build(BuildContext context) {
-    final fsScore = score['fs_score'] as int? ?? 0;
+    final fsScore = score['financial_score'] as int? ?? 0;
     final markers = score['markers'] as Map<String, dynamic>? ?? {};
     final penalty = score['dividend_trap_penalty'] as int? ?? 0;
 
@@ -91,6 +96,15 @@ class FsScoreWidget extends StatelessWidget {
               final marker = entry.value as Map<String, dynamic>;
               return _MarkerCard(marker: marker);
             }),
+
+            const SizedBox(height: 4),
+            Text(
+              'For informational purposes only. Not investment advice.',
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
           ],
         ),
       ),
@@ -318,6 +332,7 @@ class _MarkerCard extends StatelessWidget {
     final description = marker['description'] as String? ?? '';
     final details = marker['details'] as String? ?? '';
     final colorStr = marker['color'] as String? ?? '';
+    final infoId = metricInfoIdByLabel[name];
 
     Color markerColor;
     switch (colorStr) {
@@ -359,13 +374,40 @@ class _MarkerCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      name,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: ThemeV2.textPrimary,
+                      ),
+                    ),
+                    if (infoId != null) ...[
+                      const SizedBox(width: 6),
+                      GestureDetector(
+                        onTap: () => context.push('/metric-info/$infoId'),
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: ThemeV2.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(
+                              ThemeV2.radiusSmall,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.help_outline_rounded,
+                            size: 13,
+                            color: ThemeV2.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(
