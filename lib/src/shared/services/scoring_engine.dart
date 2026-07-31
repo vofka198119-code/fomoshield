@@ -159,11 +159,13 @@ class ScoringEngine {
 
   // Growth Potential — revGrowth/epsGrowth are already percentage points
   // (e.g. 7.75 = 7.75%), added directly rather than re-multiplied by 100.
-  // marketCapMillions dampens the swing for micro/nano-caps, where %
-  // growth off a near-zero base is noisy rather than genuinely
-  // informative — confidence scales down below $300M, further below
-  // $50M. Unknown market cap (null) gets full confidence rather than
-  // guessing a company is small.
+  // marketCapMillions dampens the swing below real small-cap territory
+  // (~$2B), where % growth off a modest-to-tiny base is noisy rather
+  // than genuinely informative — the effect gets stronger the smaller
+  // the company. Verified live 2026-07-31: SPCE at $343M (initially
+  // undampened — the first cutoff was $300M, just below it) still
+  // scored a small-base-inflated 80. Unknown market cap (null) gets
+  // full confidence rather than guessing a company is small.
   static double _calcGrowth(
     double revGrowth,
     double epsGrowth,
@@ -179,7 +181,9 @@ class ScoringEngine {
       if (marketCapMillions < 50) {
         confidence = 0.4; // nano-cap
       } else if (marketCapMillions < 300) {
-        confidence = 0.7; // micro-cap
+        confidence = 0.6; // micro-cap
+      } else if (marketCapMillions < 2000) {
+        confidence = 0.8; // small-cap
       }
       if (confidence < 1.0) {
         score = 50 + (score - 50) * confidence;
