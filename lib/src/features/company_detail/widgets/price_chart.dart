@@ -7,17 +7,22 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import '../../portfolio/portfolio_providers.dart';
-import '../company_detail_provider.dart' show chartHoverPriceProvider;
+import '../company_detail_provider.dart'
+    show chartHoverPriceProvider, chartPeriodChangeProvider;
 
 // ---------------------------------------------------------------------------
 // Period Selection
 // ---------------------------------------------------------------------------
 
-enum ChartPeriod { month1, month6, year1, year5, all }
+enum ChartPeriod { day1, week1, month1, month6, year1, year5, all }
 
 extension ChartPeriodExt on ChartPeriod {
   String get label {
     switch (this) {
+      case ChartPeriod.day1:
+        return '1D';
+      case ChartPeriod.week1:
+        return '1W';
       case ChartPeriod.month1:
         return '1M';
       case ChartPeriod.month6:
@@ -31,9 +36,26 @@ extension ChartPeriodExt on ChartPeriod {
     }
   }
 
+  /// Whether this period's points are within a single day/week (Yahoo
+  /// intraday resolution) rather than daily+ closes — the touch tooltip
+  /// needs to show a time, not just a date, for these.
+  bool get isIntraday => this == ChartPeriod.day1 || this == ChartPeriod.week1;
+
   (int fromTs, String resolution) toApiParams() {
     final now = DateTime.now();
     switch (this) {
+      case ChartPeriod.day1:
+        return (
+          now.subtract(const Duration(days: 1)).millisecondsSinceEpoch ~/
+              1000,
+          '5',
+        );
+      case ChartPeriod.week1:
+        return (
+          now.subtract(const Duration(days: 7)).millisecondsSinceEpoch ~/
+              1000,
+          '15',
+        );
       case ChartPeriod.month1:
         return (
           now.subtract(const Duration(days: 30)).millisecondsSinceEpoch ~/ 1000,
@@ -127,6 +149,18 @@ class _PriceChartState extends ConsumerState<PriceChart> {
         _candleData = data;
         _isLoading = false;
       });
+
+      final closes = _parseCloses(data);
+      if (closes.length >= 2) {
+        final periodChange = closes.last - closes.first;
+        final periodChangePercent =
+            closes.first != 0 ? (periodChange / closes.first) * 100 : 0.0;
+        ref.read(chartPeriodChangeProvider(widget.symbol).notifier).state = (
+          change: periodChange,
+          changePercent: periodChangePercent,
+          periodLabel: _selectedPeriod.label,
+        );
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -481,7 +515,10 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                _fmtTouchDate(timestamps[_touchedSpotIndex!]),
+                _fmtTouchDate(
+                  timestamps[_touchedSpotIndex!],
+                  intraday: _selectedPeriod.isIntraday,
+                ),
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -494,8 +531,13 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     );
   }
 
-  String _fmtTouchDate(int unixSeconds) {
+  String _fmtTouchDate(int unixSeconds, {bool intraday = false}) {
     final date = DateTime.fromMillisecondsSinceEpoch(unixSeconds * 1000);
+    if (intraday) {
+      final hh = date.hour.toString().padLeft(2, '0');
+      final mm = date.minute.toString().padLeft(2, '0');
+      return '${date.day}.${date.month} $hh:$mm';
+    }
     return '${date.day}.${date.month}.${date.year}';
   }
 

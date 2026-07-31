@@ -96,6 +96,17 @@ final chartHoverPriceProvider = StateProvider.autoDispose.family<
   String
 >((ref, symbol) => null);
 
+/// Change/%change for whichever period is currently selected on
+/// `PriceChart` (plus its label, e.g. "1D"), or null before the chart's
+/// first candle load finishes. Lets the Price Header's CHANGE cell track
+/// the selected period instead of always showing the fixed daily change
+/// — same PriceChart<->PriceHeader decoupling pattern as
+/// [chartHoverPriceProvider].
+final chartPeriodChangeProvider = StateProvider.autoDispose.family<
+  ({double change, double changePercent, String periodLabel})?,
+  String
+>((ref, symbol) => null);
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

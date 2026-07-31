@@ -35,6 +35,7 @@ class PriceHeader extends StatelessWidget {
   final double change;
   final double changePercent;
   final bool isUp;
+  final String changeLabel;
 
   const PriceHeader({
     super.key,
@@ -45,6 +46,7 @@ class PriceHeader extends StatelessWidget {
     required this.change,
     required this.changePercent,
     required this.isUp,
+    this.changeLabel = 'CHANGE',
   });
 
   @override
@@ -169,7 +171,7 @@ class PriceHeader extends StatelessWidget {
                       // olive/success/loss tint used elsewhere), just
                       // repositioned below the price cell.
                       _cell(
-                        label: 'CHANGE',
+                        label: changeLabel,
                         bgColor: changeCellBg,
                         valueColor: changeColor,
                         child: Row(

@@ -574,6 +574,9 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     switch (id) {
       case 'price_header':
         final hoverPrice = ref.watch(chartHoverPriceProvider(symbol));
+        final periodChange = ref.watch(chartPeriodChangeProvider(symbol));
+        final shownChange = periodChange?.change ?? change;
+        final shownChangePercent = periodChange?.changePercent ?? changePercent;
         return Column(
           children: [
             PriceHeader(
@@ -581,9 +584,12 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
               companyName: companyName,
               symbol: symbol,
               price: hoverPrice ?? price,
-              change: change,
-              changePercent: changePercent,
-              isUp: isUp,
+              change: shownChange,
+              changePercent: shownChangePercent,
+              isUp: shownChange >= 0,
+              changeLabel: periodChange != null
+                  ? 'CHANGE (${periodChange.periodLabel})'
+                  : 'CHANGE',
             ),
             const SizedBox(height: 16),
           ],
