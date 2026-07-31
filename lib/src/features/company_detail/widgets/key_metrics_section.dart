@@ -20,23 +20,35 @@ class KeyMetricsSection extends StatelessWidget {
     final m = metrics['metric'] as Map<String, dynamic>? ?? {};
     if (m.isEmpty) return const SizedBox.shrink();
 
-    final pe = _double(m['peTTM']);
-    final divYield = _double(m['dividendYieldIndicatedAnnual']);
-    final netMargin = _double(m['netProfitMarginTTM']);
-    final opMargin = _double(m['operatingMarginTTM']);
-    final grossMargin = _double(m['grossMarginTTM']);
-    final roe = _double(m['roeTTM']);
+    // Shown as real numbers even when negative (e.g. a loss-making
+    // company's margins) — N/A means the field is genuinely absent from
+    // Finnhub's response, not that the value happens to be <= 0.
+    final pe = _doubleOrNull(m['peTTM']);
+    final divYield = _doubleOrNull(m['dividendYieldIndicatedAnnual']);
+    final netMargin = _doubleOrNull(m['netProfitMarginTTM']);
+    final opMargin = _doubleOrNull(m['operatingMarginTTM']);
+    final grossMargin = _doubleOrNull(m['grossMarginTTM']);
+    final roe = _doubleOrNull(m['roeTTM']);
 
     final items = <(String, String)>[
-      ('P/E', pe > 0 ? pe.toStringAsFixed(1) : 'N/A'),
-      ('Dividend Yield', divYield > 0 ? '${divYield.toStringAsFixed(2)}%' : 'N/A'),
-      ('Net Margin', netMargin > 0 ? '${netMargin.toStringAsFixed(1)}%' : 'N/A'),
-      ('Operating Margin', opMargin > 0 ? '${opMargin.toStringAsFixed(1)}%' : 'N/A'),
+      ('P/E', pe != null ? pe.toStringAsFixed(1) : 'N/A'),
+      (
+        'Dividend Yield',
+        divYield != null ? '${divYield.toStringAsFixed(2)}%' : 'N/A',
+      ),
+      (
+        'Net Margin',
+        netMargin != null ? '${netMargin.toStringAsFixed(1)}%' : 'N/A',
+      ),
+      (
+        'Operating Margin',
+        opMargin != null ? '${opMargin.toStringAsFixed(1)}%' : 'N/A',
+      ),
       (
         'Gross Margin',
-        grossMargin > 0 ? '${grossMargin.toStringAsFixed(1)}%' : 'N/A',
+        grossMargin != null ? '${grossMargin.toStringAsFixed(1)}%' : 'N/A',
       ),
-      if (m['roeTTM'] != null) ('ROE', '${roe.toStringAsFixed(1)}%'),
+      if (roe != null) ('ROE', '${roe.toStringAsFixed(1)}%'),
     ];
 
     return Padding(
@@ -118,5 +130,5 @@ class KeyMetricsSection extends StatelessWidget {
     );
   }
 
-  double _double(dynamic v) => (v is num) ? v.toDouble() : 0.0;
+  double? _doubleOrNull(dynamic v) => (v is num) ? v.toDouble() : null;
 }
