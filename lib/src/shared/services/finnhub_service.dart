@@ -3,47 +3,23 @@ import 'package:dio/dio.dart';
 import '../../core/utils/constants.dart';
 import '../../core/supabase/supabase_client.dart';
 
-/// Talks to Finnhub — partly directly, partly via `scanco-backend` (the
-/// Finnhub proxy/cache server, see d:/Projects/scanco-backend), which
-/// exists because every device sharing one embedded Finnhub key blows
-/// through the free tier's 60 req/min limit once there's more than a
-/// handful of concurrent users.
-///
-/// Routed through the backend (works for ANY symbol, not just a fixed
-/// list — see the backend's `/quote` fallback path): [quote] (and
-/// therefore [previousTradingDayQuote], which calls it).
-///
-/// Routed through the backend, all with direct-Finnhub fallback on error
-/// (backend down/unreachable): [search], [companyProfile], [metrics],
-/// [companyNews] (any symbol, not just hot tickers — the backend fetches
-/// and caches on a cold miss), [earningsCalendar], [earningsSurprises].
-///
-/// Routed through the backend, no Finnhub fallback (Finnhub itself would
-/// just 403 — the backend serves this from Yahoo Finance instead):
-/// [candles].
+/// Talks to `scanco-backend` (the Finnhub proxy/cache server, see
+/// d:/Projects/scanco-backend) exclusively — never Finnhub directly.
+/// Every device sharing one embedded Finnhub key would blow through the
+/// free tier's 60 req/min limit with more than a handful of concurrent
+/// users; a device falling back to that shared key on a backend hiccup
+/// used to turn one rate-limit blip into every device hammering Finnhub
+/// at once, which is worse, not better (direct-Finnhub fallback removed
+/// 2026-07-31).
 ///
 /// Blocked entirely, zero network calls (Finnhub paid-tier-only, confirmed
 /// via live 403): [dividendsCalendar].
-///
-/// [AppConstants.finnhubKey] stays embedded as the fallback path's
-/// credential (same reasoning as [quote] already had) — under normal
-/// operation nothing uses it, but it's what keeps the app working if the
-/// backend is ever down.
 class FinnhubService {
-  final Dio _dio;
   final Dio _backendDio;
   final Map<String, _CacheEntry> _cache = {};
 
   FinnhubService()
-    : _dio = Dio(
-        BaseOptions(
-          baseUrl: AppConstants.finnhubBase,
-          queryParameters: {'token': AppConstants.finnhubKey},
-          connectTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
-        ),
-      ),
-      _backendDio = Dio(
+    : _backendDio = Dio(
         BaseOptions(
           baseUrl: '${AppConstants.backendBaseUrl}/api/v1',
           connectTimeout: const Duration(seconds: 5),
@@ -53,39 +29,6 @@ class FinnhubService {
               : {'X-API-Key': AppConstants.backendApiKey},
         ),
       ) {
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          // Mask the token in logs for security
-          final uri = options.uri.toString().replaceAll(
-            RegExp(r'token=[^&]+'),
-            'token=***MASKED***',
-          );
-          debugPrint('🌐 ➡️ Finnhub REQ: $uri');
-          handler.next(options);
-        },
-        onError: (error, handler) {
-          final uri = error.requestOptions.uri.toString().replaceAll(
-            RegExp(r'token=[^&]+'),
-            'token=***MASKED***',
-          );
-          debugPrint(
-            '🌐 ❌ Finnhub ERROR | $uri | '
-            'Status: ${error.response?.statusCode} | '
-            'Body: ${error.response?.data} | '
-            '${error.message}',
-          );
-          handler.next(error);
-        },
-        onResponse: (response, handler) {
-          debugPrint(
-            '🌐 ✅ Finnhub OK | ${response.requestOptions.path} | '
-            'Status: ${response.statusCode}',
-          );
-          handler.next(response);
-        },
-      ),
-    );
     _backendDio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
@@ -119,68 +62,8 @@ class FinnhubService {
     );
   }
 
-  /// Get from API (top-level JSON object).
-  /// Throws if server returns an error object.
-  Future<Map<String, dynamic>> _get(
-    String path, {
-    Map<String, dynamic>? params,
-  }) async {
-    final cacheKey = '$path?${params?.toString() ?? ''}';
-    final cached = _getCached(cacheKey);
-    if (cached != null) return cached.data as Map<String, dynamic>;
-
-    final response = await _dio.get(path, queryParameters: params);
-    // Safely cast response – Finnhub always returns JSON objects for _get endpoints
-    if (response.data is! Map) {
-      throw Exception(
-        'Finnhub $path: unexpected response type ${response.data.runtimeType}',
-      );
-    }
-    final data = Map<String, dynamic>.from(response.data);
-    // Check for Finnhub error response
-    if (data.containsKey('error')) {
-      throw Exception('Finnhub $path: ${data['error']}');
-    }
-    _setCache(cacheKey, data);
-    return data;
-  }
-
-  /// Get from API (top-level JSON array).
-  /// If server returns an error object, throws a descriptive exception.
-  Future<List<dynamic>> _getRaw(
-    String path, {
-    Map<String, dynamic>? params,
-  }) async {
-    final cacheKey = 'raw:$path?${params?.toString() ?? ''}';
-    final cached = _getCachedRaw(cacheKey);
-    if (cached != null) return cached;
-
-    final response = await _dio.get(path, queryParameters: params);
-    if (response.data is List) {
-      final data = List<dynamic>.from(response.data);
-      _setCacheRaw(cacheKey, data);
-      return data;
-    }
-    // Finnhub sometimes returns {"error":"...","message":"..."} on failure
-    if (response.data is Map) {
-      final errorMap = Map<String, dynamic>.from(response.data);
-      final errMsg =
-          errorMap['error'] as String? ??
-          errorMap['message'] as String? ??
-          'Unknown API error';
-      throw Exception('Finnhub $path: $errMsg');
-    }
-    throw Exception(
-      'Finnhub $path: unexpected response type ${response.data.runtimeType}',
-    );
-  }
-
-  /// Get from scanco-backend (top-level JSON object). Same cache/error
-  /// handling as [_get] but against `_backendDio`, with a `backend:`-
-  /// prefixed cache key so it can never collide with a direct-Finnhub
-  /// cache entry for a differently-shaped path. Callers are expected to
-  /// catch and fall back to [_get]/[_getRaw] — the backend may not be
-  /// deployed yet, or may be temporarily down.
+  /// Get from scanco-backend (top-level JSON object), `backend:`-prefixed
+  /// cache key.
   Future<Map<String, dynamic>> _getFromBackend(
     String path, {
     Map<String, dynamic>? params,
@@ -300,13 +183,10 @@ class FinnhubService {
   Future<List<Map<String, dynamic>>> search(String query) async {
     if (query.length < AppConstants.minSearchChars) return [];
     // Finnhub /search returns { "count": N, "result": [...] }
-    Map<String, dynamic> data;
-    try {
-      data = await _getFromBackend('/search', params: {'q': query});
-    } catch (e) {
-      debugPrint('⚠️ Backend search($query) failed, falling back direct: $e');
-      data = await _get('/search', params: {'q': query});
-    }
+    // Backend-only — no direct-Finnhub fallback. A device falling back to
+    // the shared embedded key on a backend hiccup is exactly what turns
+    // one rate-limit blip into every device hammering Finnhub at once.
+    final data = await _getFromBackend('/search', params: {'q': query});
     final items = data['result'] as List<dynamic>? ?? [];
     final List<Map<String, dynamic>> results = [];
     final seen = <String>{};
@@ -382,44 +262,29 @@ class FinnhubService {
   // Company Profile
   // ---------------------------------------------------------------------------
 
-  Future<Map<String, dynamic>> companyProfile(String symbol) async {
-    try {
-      return await _getFromBackend('/profile/$symbol');
-    } catch (e) {
-      debugPrint(
-        '⚠️ Backend companyProfile($symbol) failed, falling back direct: $e',
-      );
-      return _get('/stock/profile2', params: {'symbol': symbol});
-    }
-  }
+  Future<Map<String, dynamic>> companyProfile(String symbol) async =>
+      _getFromBackend('/profile/$symbol');
 
   // ---------------------------------------------------------------------------
   // Quote
   // ---------------------------------------------------------------------------
 
   Future<Map<String, dynamic>> quote(String symbol) async {
-    try {
-      final data = await _getFromBackend('/quote/$symbol');
-      // Reshape the backend's {price, change, changePercent, high, low,
-      // open, prevClose, timestamp} back into Finnhub's own raw
-      // {c,d,dp,h,l,o,pc,t} shape, so every existing caller (portfolio/
-      // home/stress-test buy flow/…) keeps working unchanged.
-      return {
-        'c': data['price'],
-        'd': data['change'],
-        'dp': data['changePercent'],
-        'h': data['high'],
-        'l': data['low'],
-        'o': data['open'],
-        'pc': data['prevClose'],
-        't': data['timestamp'],
-      };
-    } catch (e) {
-      // Backend not deployed yet / temporarily down — fall back to
-      // Finnhub directly so the app keeps working during the migration.
-      debugPrint('⚠️ Backend quote($symbol) failed, falling back direct: $e');
-      return _get('/quote', params: {'symbol': symbol});
-    }
+    final data = await _getFromBackend('/quote/$symbol');
+    // Reshape the backend's {price, change, changePercent, high, low,
+    // open, prevClose, timestamp} back into Finnhub's own raw
+    // {c,d,dp,h,l,o,pc,t} shape, so every existing caller (portfolio/
+    // home/stress-test buy flow/…) keeps working unchanged.
+    return {
+      'c': data['price'],
+      'd': data['change'],
+      'dp': data['changePercent'],
+      'h': data['high'],
+      'l': data['low'],
+      'o': data['open'],
+      'pc': data['prevClose'],
+      't': data['timestamp'],
+    };
   }
 
   // ---------------------------------------------------------------------------
@@ -452,46 +317,16 @@ class FinnhubService {
   // Financials / Metrics
   // ---------------------------------------------------------------------------
 
-  Future<Map<String, dynamic>> metrics(String symbol) async {
-    try {
-      return await _getFromBackend('/metrics/$symbol');
-    } catch (e) {
-      debugPrint(
-        '⚠️ Backend metrics($symbol) failed, falling back direct: $e',
-      );
-      return _get('/stock/metric', params: {'symbol': symbol, 'metric': 'all'});
-    }
-  }
+  Future<Map<String, dynamic>> metrics(String symbol) async =>
+      _getFromBackend('/metrics/$symbol');
 
   // ---------------------------------------------------------------------------
   // News
   // ---------------------------------------------------------------------------
 
-  Future<List<dynamic>> companyNews(String symbol, {int days = 7}) async {
-    try {
-      return await _getRawFromBackend('/news', params: {'symbol': symbol});
-    } catch (e) {
-      debugPrint(
-        '⚠️ Backend companyNews($symbol) failed, falling back direct: $e',
-      );
-      final now = DateTime.now();
-      final from = now.subtract(Duration(days: days));
-      final toStr = _fmtDate(now);
-      final fromStr = _fmtDate(from);
-      return _getRaw(
-        '/company-news',
-        params: {'symbol': symbol, 'from': fromStr, 'to': toStr},
-      );
-    }
-  }
+  Future<List<dynamic>> companyNews(String symbol, {int days = 7}) async =>
+      _getRawFromBackend('/news', params: {'symbol': symbol});
 
-
-  // ---------------------------------------------------------------------------
-  // Market Index
-  // ---------------------------------------------------------------------------
-
-  Future<Map<String, dynamic>> indexQuote(String symbol) async =>
-      _get('/quote', params: {'symbol': symbol});
 
   // ---------------------------------------------------------------------------
   // Top Companies (backend-computed, no direct-Finnhub equivalent)
@@ -522,13 +357,7 @@ class FinnhubService {
     final params = <String, dynamic>{'from': from, 'to': to};
     if (symbol != null) params['symbol'] = symbol;
 
-    Map<String, dynamic> data;
-    try {
-      data = await _getFromBackend('/earnings/calendar', params: params);
-    } catch (e) {
-      debugPrint('⚠️ Backend earningsCalendar failed, falling back direct: $e');
-      data = await _get('/calendar/earnings', params: params);
-    }
+    final data = await _getFromBackend('/earnings/calendar', params: params);
     return data['earningsCalendar'] as List<dynamic>? ?? [];
   }
 
@@ -552,16 +381,8 @@ class FinnhubService {
   // Earnings / Revenue trends
   // ---------------------------------------------------------------------------
 
-  Future<List<dynamic>> earningsSurprises(String symbol) async {
-    try {
-      return await _getRawFromBackend('/earnings/surprises/$symbol');
-    } catch (e) {
-      debugPrint(
-        '⚠️ Backend earningsSurprises($symbol) failed, falling back direct: $e',
-      );
-      return _getRaw('/stock/earnings', params: {'symbol': symbol, 'limit': 5});
-    }
-  }
+  Future<List<dynamic>> earningsSurprises(String symbol) async =>
+      _getRawFromBackend('/earnings/surprises/$symbol');
 
   // ---------------------------------------------------------------------------
   // Historical Candles

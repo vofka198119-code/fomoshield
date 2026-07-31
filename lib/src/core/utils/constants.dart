@@ -8,17 +8,12 @@ class AppConstants {
   static const String tagline = 'Invest with discipline, not emotion.';
 
   // API
-  static String get finnhubKey =>
-      dotenv.env['FINNHUB_API_KEY'] ?? 'd8l3qgpr01qut1f8r240d8l3qgpr01qut1f8r24g';
-  static const String finnhubBase = 'https://finnhub.io/api/v1';
-  static const int finnhubRateLimit = 60; // req/min
   static const int cacheTTLMinutes = 240; // 4 hours for market data
 
-  /// scanco-backend (Finnhub proxy/cache) base URL — shares one
-  /// rate-limited Finnhub connection across all users instead of every
-  /// device hitting Finnhub directly with the same embedded key. Only
-  /// quote/news(general)/candles are proxied so far — see
-  /// FinnhubService's doc comment for which calls still go direct.
+  /// scanco-backend (Finnhub proxy/cache) base URL — every device talks
+  /// to this exclusively, sharing one rate-limited Finnhub connection
+  /// instead of each device hitting Finnhub directly with an embedded
+  /// key (removed 2026-07-31 — see FinnhubService's doc comment).
   static String get backendBaseUrl =>
       dotenv.env['BACKEND_BASE_URL'] ?? 'http://localhost:3000';
 

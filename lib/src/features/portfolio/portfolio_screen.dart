@@ -452,7 +452,11 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
   @override
   void initState() {
     super.initState();
-    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+    // Not a live broker — quotes this fresh don't need sub-minute
+    // polling, and this timer keeps ticking even while this screen sits
+    // mounted-but-hidden underneath a pushed company-detail route (a
+    // push, not a tab switch, doesn't dispose it). 5 minutes is plenty.
+    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (_) {
       if (mounted) {
         ref.invalidate(portfolioPerformanceProvider(widget.portfolioId));
       }
