@@ -137,8 +137,13 @@ final companyDetailProvider =
       // Сохранить логотип в LogoCache (если есть и нет в кэше)
       cacheCompanyLogo(symbol, profile);
 
-      // Сохранить score в 30-дневный кэш
-      scoreCache.set(symbol, Map<String, dynamic>.from(score));
+      // Сохранить score в 30-дневный кэш — null (fund/ETF, no
+      // fundamentals) cached as {} so a re-open this session doesn't
+      // redo the same "no fundamentals" check for nothing.
+      scoreCache.set(
+        symbol,
+        score != null ? Map<String, dynamic>.from(score) : {},
+      );
       // Сохранить сырые метрики в 30-дневный кэш
       metricsCache.set(symbol, Map<String, dynamic>.from(metrics));
 

@@ -14,12 +14,28 @@ class ScoringEngine {
   /// points (e.g. 12.5 for +12.5%/yr), computed from Yahoo candle
   /// history — null until wired in; Historical Trend stays neutral (50)
   /// until then.
-  static Map<String, dynamic> calculate(
+  ///
+  /// Returns null when Finnhub has no fundamentals at all for this
+  /// instrument — funds/ETFs and some thinly-covered tickers. Confirmed
+  /// live 2026-07-31 (FGDL, an ETF): /stock/metric returns only
+  /// price/volume technicals, none of the fields below. Scoring that
+  /// with nothing but neutral 50s would look like a real analysis
+  /// happened when it didn't — better to show no score at all.
+  static Map<String, dynamic>? calculate(
     Map<String, dynamic> metrics, {
     double? sectorPe,
     double? priceCagr5Y,
   }) {
     final m = metrics['metric'] as Map<String, dynamic>? ?? {};
+
+    final hasFundamentals = m['peTTM'] != null ||
+        m['totalDebt/totalEquityQuarterly'] != null ||
+        m['currentRatioQuarterly'] != null ||
+        m['revenueGrowth5Y'] != null ||
+        m['epsGrowth5Y'] != null ||
+        m['netProfitMarginTTM'] != null ||
+        m['roeTTM'] != null;
+    if (!hasFundamentals) return null;
 
     // 1. Valuation (P/E vs sector)
     final pe = _d(m['peTTM']);
