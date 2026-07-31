@@ -321,14 +321,6 @@ class FinnhubService {
       _getFromBackend('/metrics/$symbol');
 
   // ---------------------------------------------------------------------------
-  // News
-  // ---------------------------------------------------------------------------
-
-  Future<List<dynamic>> companyNews(String symbol, {int days = 7}) async =>
-      _getRawFromBackend('/news', params: {'symbol': symbol});
-
-
-  // ---------------------------------------------------------------------------
   // Top Companies (backend-computed, no direct-Finnhub equivalent)
   // ---------------------------------------------------------------------------
 
@@ -344,22 +336,6 @@ class FinnhubService {
   // ---------------------------------------------------------------------------
   // Calendar
   // ---------------------------------------------------------------------------
-
-  /// Returns earnings calendar items.
-  /// Finnhub response: { "earningsCalendar": [...] }
-  Future<List<dynamic>> earningsCalendar({
-    String? symbol,
-    int daysAhead = 30,
-  }) async {
-    final now = DateTime.now();
-    final from = _fmtDate(now);
-    final to = _fmtDate(now.add(Duration(days: daysAhead)));
-    final params = <String, dynamic>{'from': from, 'to': to};
-    if (symbol != null) params['symbol'] = symbol;
-
-    final data = await _getFromBackend('/earnings/calendar', params: params);
-    return data['earningsCalendar'] as List<dynamic>? ?? [];
-  }
 
   /// `/stock/dividend` is a Finnhub PAID-tier endpoint — confirmed via a
   /// live 403 on every company-detail-page open (2026-07-24), same
@@ -401,14 +377,6 @@ class FinnhubService {
     '/candles/$symbol',
     params: {'resolution': resolution, 'from': from, 'to': to},
   );
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
-  String _fmtDate(DateTime d) => '${d.year}-${_pad(d.month)}-${_pad(d.day)}';
-
-  String _pad(int n) => n.toString().padLeft(2, '0');
 }
 
 class _CacheEntry {

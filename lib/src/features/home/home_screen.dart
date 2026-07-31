@@ -31,9 +31,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _onRefresh() {
     ref.invalidate(marketIndicesProvider);
-    ref.invalidate(calendarEventsProvider);
     ref.read(marketCacheProvider).invalidate();
-    ref.read(eventsCacheProvider).invalidate();
   }
 
   void _showWidgetsBottomSheet() {

@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_providers.dart';
-import '../../shared/services/finnhub_service.dart';
 import '../home/home_providers.dart';
 import '../home/watchlist_limits_provider.dart';
 import '../portfolio/portfolio_providers.dart';
@@ -17,8 +16,6 @@ import 'widgets/financial_score_widget.dart';
 import 'widgets/price_header.dart';
 import 'widgets/key_metrics_section.dart';
 import 'widgets/position_section.dart';
-import 'widgets/events_stub.dart';
-import 'widgets/news_section.dart';
 import 'widgets/portfolio_option_tile.dart';
 import 'widgets/company_widgets_settings_sheet.dart';
 import 'widgets/company_bottom_bar.dart';
@@ -283,23 +280,10 @@ class _CompanyDetailBody extends ConsumerStatefulWidget {
 }
 
 class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
-  final FinnhubService _api = FinnhubService();
-  List<dynamic>? _news;
-  bool _newsLoading = false;
-
   @override
   void initState() {
     super.initState();
-    _loadNews();
     _cacheDetailLogo();
-  }
-
-  Future<void> _loadNews() async {
-    setState(() => _newsLoading = true);
-    try {
-      _news = await _api.companyNews(widget.symbol);
-    } catch (_) {}
-    if (mounted) setState(() => _newsLoading = false);
   }
 
   Future<void> _cacheDetailLogo() async {
@@ -637,15 +621,6 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
         return Column(
           children: [
             PositionSection(symbol: symbol, price: price),
-            const SizedBox(height: 24),
-          ],
-        );
-      case 'events':
-        return Column(children: [const EventsStub(), const SizedBox(height: 24)]);
-      case 'news':
-        return Column(
-          children: [
-            NewsSection(symbol: symbol, news: _news, isLoading: _newsLoading),
             const SizedBox(height: 24),
           ],
         );

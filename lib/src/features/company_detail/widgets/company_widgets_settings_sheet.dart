@@ -66,10 +66,6 @@ class _CompanyWidgetsSettingsSheetState
         return Icons.shield_rounded;
       case 'position':
         return Icons.account_balance_wallet_rounded;
-      case 'events':
-        return Icons.event_rounded;
-      case 'news':
-        return Icons.newspaper_rounded;
       default:
         return Icons.widgets_rounded;
     }

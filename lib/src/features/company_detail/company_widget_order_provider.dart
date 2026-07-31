@@ -6,8 +6,7 @@ import '../../core/supabase/supabase_providers.dart';
 // Company Detail Widget Order Provider (SharedPreferences-backed)
 // ---------------------------------------------------------------------------
 // Allows reordering, hiding/showing widgets on the Company Detail screen.
-// Widgets: price_header, chart, key_metrics, financial_score, position,
-// events, news
+// Widgets: price_header, chart, key_metrics, financial_score, position
 // ---------------------------------------------------------------------------
 
 const List<String> defaultCompanyWidgetOrder = [
@@ -16,8 +15,6 @@ const List<String> defaultCompanyWidgetOrder = [
   'key_metrics',
   'financial_score',
   'position',
-  'events',
-  'news',
 ];
 
 String _orderPrefsKey(String? uid) =>
@@ -44,10 +41,6 @@ class CompanyWidgetConfig {
         return 'Financial Score';
       case 'position':
         return 'Your Position';
-      case 'events':
-        return 'Upcoming Events';
-      case 'news':
-        return 'News';
       default:
         return id;
     }
@@ -88,13 +81,16 @@ class CompanyWidgetsNotifier extends StateNotifier<List<CompanyWidgetConfig>> {
     final savedOrder = prefs.getStringList(orderKey);
     var order = savedOrder ?? defaultCompanyWidgetOrder;
 
-    // Merge: append any default widgets missing from saved order
+    // Merge: append any default widgets missing from saved order, and drop
+    // any saved ids that no longer exist (e.g. a widget removed since the
+    // user last saved their layout).
     if (savedOrder != null) {
       final savedSet = Set<String>.from(savedOrder);
       final missing = defaultCompanyWidgetOrder.where((id) => !savedSet.contains(id));
-      if (missing.isNotEmpty) {
-        order = [...savedOrder, ...missing];
-      }
+      order = [
+        ...savedOrder.where(defaultCompanyWidgetOrder.contains),
+        ...missing,
+      ];
     }
 
     // Load visibility
