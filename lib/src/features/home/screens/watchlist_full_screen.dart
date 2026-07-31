@@ -5,9 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../../core/cache/sector_providers.dart';
+import '../../../core/cache/logo_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../home_providers.dart';
@@ -38,7 +37,6 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
   @override
   Widget build(BuildContext context) {
     final watchlistSymbols = ref.watch(watchlistSymbolsProvider);
-    final watchlistQuotesAsync = ref.watch(watchlistQuotesProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -57,74 +55,59 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
       ),
       body: watchlistSymbols.isEmpty
           ? _emptyState()
-          : watchlistQuotesAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: ThemeV2.primary,
-                ),
-              ),
-              error: (err, _) {
-                debugPrint('❌ WatchlistFullScreen error: $err');
-                return _emptyState();
-              },
-              data: (companies) {
-                if (companies.isEmpty) return _emptyState();
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: FomoShieldTheme.cardDecoration,
-                        clipBehavior: Clip.antiAlias,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(22, 14, 22, 14),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'WATCHLIST',
-                                    style: FomoShieldTheme.cardTitle(),
-                                  ),
-                                  const Spacer(),
-                                  InkWell(
-                                    onTap: _isNavigating
-                                        ? null
-                                        : _navigateToSearch,
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: const Icon(
-                                      Icons.add_rounded,
-                                      color: ThemeV2.primary,
-                                      size: 22,
-                                    ),
-                                  ),
-                                ],
+          : SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: FomoShieldTheme.cardDecoration,
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(22, 14, 22, 14),
+                          child: Row(
+                            children: [
+                              Text(
+                                'WATCHLIST',
+                                style: FomoShieldTheme.cardTitle(),
                               ),
-                            ),
-                            Divider(
-                              height: 1,
-                              indent: 16,
-                              endIndent: 16,
-                              color: Colors.black.withValues(alpha: 0.06),
-                            ),
-                            for (int i = 0; i < companies.length; i++)
-                              _WatchlistRow(
-                                key: ValueKey(companies[i]['symbol']),
-                                data: companies[i],
-                                showDivider: i < companies.length - 1,
+                              const Spacer(),
+                              InkWell(
+                                onTap: _isNavigating
+                                    ? null
+                                    : _navigateToSearch,
+                                borderRadius: BorderRadius.circular(20),
+                                child: const Icon(
+                                  Icons.add_rounded,
+                                  color: ThemeV2.primary,
+                                  size: 22,
+                                ),
                               ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildEventsSection(),
-                    ],
+                        Divider(
+                          height: 1,
+                          indent: 16,
+                          endIndent: 16,
+                          color: Colors.black.withValues(alpha: 0.06),
+                        ),
+                        for (int i = 0; i < watchlistSymbols.length; i++)
+                          _WatchlistRow(
+                            key: ValueKey(watchlistSymbols[i]),
+                            symbol: watchlistSymbols[i],
+                            showDivider: i < watchlistSymbols.length - 1,
+                          ),
+                      ],
+                    ),
                   ),
-                );
-              },
+                  const SizedBox(height: 16),
+                  _buildEventsSection(),
+                ],
+              ),
             ),
     );
   }
@@ -243,31 +226,28 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// Watchlist Row — My Assets sizing/layout: logo, name + sector, price + %
+// Watchlist Row — logo, name + sector, no live price (see cachedLogoEntryProvider
+// doc comment: no Finnhub call ever happens from this row — price only shows
+// once the user taps through to Company Detail).
 // ---------------------------------------------------------------------------
 
 class _WatchlistRow extends ConsumerWidget {
-  final Map<String, dynamic> data;
+  final String symbol;
   final bool showDivider;
 
   const _WatchlistRow({
     super.key,
-    required this.data,
+    required this.symbol,
     required this.showDivider,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final price = (data['price'] as num?)?.toDouble() ?? 0;
-    final change = (data['change'] as num?)?.toDouble() ?? 0;
-    final symbol = data['symbol'] as String? ?? '';
-    final name = data['name'] as String? ?? '';
-    final weburl = data['weburl'] as String?;
-    final domain = CompanyLogo.extractDomain(weburl);
-    final logoUrl = data['logoUrl'] as String?;
-    final isUp = change >= 0;
-
-    final sectorAsync = ref.watch(cachedGicsSectorProvider(symbol));
+    final logoEntry = ref.watch(cachedLogoEntryProvider(symbol)).valueOrNull;
+    final name = logoEntry?.companyName.isNotEmpty == true
+        ? logoEntry!.companyName
+        : symbol;
+    final sector = resolveGicsSector(symbol, companyName: logoEntry?.companyName);
 
     return GestureDetector(
       onTap: () => context.push('/company/$symbol'),
@@ -295,8 +275,8 @@ class _WatchlistRow extends ConsumerWidget {
               ),
               child: CompanyLogo(
                 ticker: symbol,
-                logoUrl: logoUrl,
-                domain: domain,
+                logoUrl: logoEntry?.logoUrl,
+                domain: logoEntry?.domain,
                 radius: 18,
               ),
             ),
@@ -318,11 +298,7 @@ class _WatchlistRow extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    sectorAsync.when(
-                      data: (s) => s?.label ?? symbol,
-                      loading: () => symbol,
-                      error: (_, _) => symbol,
-                    ),
+                    sector?.label ?? symbol,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
@@ -334,28 +310,10 @@ class _WatchlistRow extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '\$${price.toStringAsFixed(2)}',
-                  style: interNums(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${isUp ? '+' : ''}${change.toStringAsFixed(2)}%',
-                  style: interNums(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isUp ? ThemeV2.success : ThemeV2.loss,
-                  ),
-                ),
-              ],
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: ThemeV2.textSecondary,
+              size: 20,
             ),
           ],
         ),

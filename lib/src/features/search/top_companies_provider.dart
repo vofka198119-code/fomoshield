@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/services/finnhub_service.dart';
 
 // ---------------------------------------------------------------------------
-// Top Companies — real backend-ranked top-47 S&P 500 by market cap
+// Top Companies — the full S&P 500, real backend-ranked by market cap
 // (see FinnhubService.topCompanies / scanco-backend's sp500Service.js).
 // Sector grouping happens client-side via gics_sector_mapper.dart's
 // resolveGicsSector(), not here.

@@ -15,13 +15,13 @@ import 'metrics_cache_provider.dart';
 // Providers — with layered cache: 4h (main) + 30d (score + metrics)
 // ---------------------------------------------------------------------------
 
-/// Average P/E per GICS sector, computed from the tracked top-47 basket
+/// Average P/E per GICS sector, computed from the full ranked S&P 500 list
 /// (see `top_companies_provider.dart`) grouped via
 /// `resolveGicsSector()` — Finnhub has no sector-average field of its
 /// own, so this is the FS Score Valuation marker's real comparison
 /// baseline instead of the nonexistent `sectorPeTTM` the engine used to
 /// (silently) read as always-zero. Refreshes whenever the backend's
-/// quarterly top-47 job does.
+/// quarterly ranking job does.
 final sectorAveragePeProvider = FutureProvider<Map<GicsSector, double>>((
   ref,
 ) async {

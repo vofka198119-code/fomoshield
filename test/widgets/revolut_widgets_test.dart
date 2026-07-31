@@ -3,52 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:scanco/src/core/theme/app_theme.dart';
+import 'package:scanco/src/core/supabase/supabase_providers.dart';
+import 'package:scanco/src/shared/services/user_data_service.dart';
 import 'package:scanco/src/shared/widgets/widget_container.dart';
 import 'package:scanco/src/features/home/widgets/watchlist_widget.dart';
-import 'package:scanco/src/features/home/home_providers.dart';
-
-// =============================================================================
-// Mock Providers (FutureProvider overrides only — StateNotifierProvider is
-// handled via SharedPreferences.setMockInitialValues)
-// =============================================================================
-
-/// 5 companies with price/change data — overrides watchlistQuotesProvider.
-Future<List<Map<String, dynamic>>> _mockWatchlistQuotes() async {
-  return [
-    {
-      'symbol': 'AAPL',
-      'name': 'Apple Inc.',
-      'price': 198.50,
-      'change': 1.20,
-    },
-    {
-      'symbol': 'GOOGL',
-      'name': 'Alphabet Inc.',
-      'price': 175.30,
-      'change': -0.50,
-    },
-    {
-      'symbol': 'MSFT',
-      'name': 'Microsoft Corp.',
-      'price': 425.10,
-      'change': 0.80,
-    },
-    {
-      'symbol': 'AMZN',
-      'name': 'Amazon.com Inc.',
-      'price': 185.20,
-      'change': 2.10,
-    },
-    {
-      'symbol': 'TSLA',
-      'name': 'Tesla Inc.',
-      'price': 248.90,
-      'change': -1.50,
-    },
-  ];
-}
 
 // =============================================================================
 // Test Helpers
@@ -71,6 +32,18 @@ Future<void> _seedWatchlistSymbols(List<String> symbols) async {
     'watchlist_symbols': symbols,
   });
   await SharedPreferences.getInstance();
+}
+
+/// Stands in for a real SupabaseClient in tests — constructing the real
+/// class starts background auth-refresh timers that outlive the widget
+/// tree and fail the test ("A Timer is still pending..."), and the real
+/// singleton (Supabase.instance) isn't initialized in a widget test at
+/// all. Never actually called: WatchlistNotifier only touches its
+/// UserDataService on add()/remove(), neither of which this test
+/// exercises — every member here only needs to type-check, not run.
+class _FakeSupabaseClient implements SupabaseClient {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }
 
 // =============================================================================
@@ -98,12 +71,16 @@ void main() {
           ),
         ));
 
-        // With 2 children → exactly 1 Divider is rendered between them
-        expect(find.byType(Divider), findsOneWidget);
+        // WidgetContainer always renders a title/content separator, plus
+        // one between-item Divider per gap — 2 children means 1 gap, so
+        // 2 Dividers total (title separator + the one between the items).
+        expect(find.byType(Divider), findsNWidgets(2));
 
-        final divider = tester.widget<Divider>(find.byType(Divider));
-        expect(divider.indent, equals(16.0));
-        expect(divider.endIndent, equals(16.0));
+        final dividers = tester.widgetList<Divider>(find.byType(Divider));
+        for (final divider in dividers) {
+          expect(divider.indent, equals(16.0));
+          expect(divider.endIndent, equals(16.0));
+        }
       },
     );
   });
@@ -176,23 +153,36 @@ void main() {
       // Seed watchlist symbols BEFORE pumping the widget
       await _seedWatchlistSymbols(['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA']);
 
+      // currentUserProvider is overridden (logged-out/null) so
+      // watchlistSymbolsProvider never watches real auth state, and
+      // userDataServiceProvider is overridden with _FakeSupabaseClient so
+      // merely constructing it doesn't require Supabase.initialize() to
+      // have run and doesn't start any real background timers — this
+      // test never actually calls through it, since watchlist symbols
+      // come from the seeded SharedPreferences data above, not a
+      // Supabase load. No quote-related override needed anymore — the
+      // widget reads symbols straight from watchlistSymbolsProvider (no
+      // live fetch), so logo/name/sector all resolve from local
+      // cache-or-fallback only.
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            watchlistQuotesProvider
-                .overrideWith((ref) => _mockWatchlistQuotes()),
+            currentUserProvider.overrideWithValue(null),
+            userDataServiceProvider.overrideWithValue(
+              UserDataService(_FakeSupabaseClient()),
+            ),
           ],
           child: _wrapWithTheme(const WatchlistWidget()),
         ),
       );
 
-      // Pump multiple frames to let WatchlistNotifier._load() complete
-      // and FutureProvider resolve, WITHOUT hanging on CircularProgressIndicator
-      await tester.pump(const Duration(milliseconds: 50));
+      // Pump a couple frames to let WatchlistNotifier._load() and the
+      // per-tile cachedLogoEntryProvider reads settle.
       await tester.pump(const Duration(milliseconds: 50));
       await tester.pump(const Duration(milliseconds: 50));
 
-      // Each _WatchlistTile renders exactly one CircleAvatar.
+      // Each _WatchlistTile renders exactly one CircleAvatar (via
+      // CompanyLogo's letter-fallback, since no logo is cached in tests).
       // With 5 companies and .take(2), only 2 should be present.
       expect(find.byType(CircleAvatar), findsNWidgets(2));
     });

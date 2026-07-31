@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/theme_v2.dart';
 import 'company_mini_card.dart';
 
 // ---------------------------------------------------------------------------
@@ -11,8 +12,14 @@ import 'company_mini_card.dart';
 class BrowseLane extends StatelessWidget {
   final String title;
   final List<CompanyMiniCard> items;
+  final VoidCallback? onSeeAll;
 
-  const BrowseLane({super.key, required this.title, required this.items});
+  const BrowseLane({
+    super.key,
+    required this.title,
+    required this.items,
+    this.onSeeAll,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +31,26 @@ class BrowseLane extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 22),
-            child: Text(title, style: FomoShieldTheme.cardTitle()),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(title, style: FomoShieldTheme.cardTitle()),
+                ),
+                if (onSeeAll != null)
+                  InkWell(
+                    onTap: onSeeAll,
+                    borderRadius: BorderRadius.circular(20),
+                    child: const Padding(
+                      padding: EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.chevron_right_rounded,
+                        color: ThemeV2.primary,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
           const SizedBox(height: 14),
           const Divider(

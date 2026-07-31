@@ -6,17 +6,22 @@ import '../../../core/services/gics_sector_mapper.dart';
 import '../recently_viewed_provider.dart';
 import '../top_companies_provider.dart';
 import 'browse_lane.dart';
+import 'company_list_sheet.dart';
 import 'company_mini_card.dart';
 
 // ---------------------------------------------------------------------------
 // Browse Lanes — shown on the empty-query state. "TOP S&P 500" + per-sector
 // lanes are real, backend-ranked data (topCompaniesProvider — quarterly
-// Wikipedia+Finnhub job, see scanco-backend's sp500Service.js), grouped
-// client-side by real GICS sector via resolveGicsSector(). Each card fetches
-// its own live price (see CompanyMiniCard). Recently Viewed is separately
-// real — see recently_viewed_provider and company_detail_screen.dart's
-// ref.listen that records each view.
+// Wikipedia+Finnhub job, see scanco-backend's sp500Service.js, now the full
+// ranked S&P 500, not just a top-47 slice), grouped client-side by real GICS
+// sector via resolveGicsSector(). Each lane previews 4 companies — no live
+// price anywhere here (see CompanyMiniCard) — with a chevron that opens the
+// full list via [showCompanyListSheet]. Recently Viewed is separately real —
+// see recently_viewed_provider and company_detail_screen.dart's ref.listen
+// that records each view.
 // ---------------------------------------------------------------------------
+
+const _lanePreviewCount = 4;
 
 class SearchBrowseLanes extends ConsumerWidget {
   final void Function(String symbol) onTapSymbol;
@@ -64,16 +69,28 @@ class SearchBrowseLanes extends ConsumerWidget {
         }
 
         // One BrowseLane per list item so ListView.separated only builds
-        // (and only fires each card's live quote/logo fetch) for lanes
-        // actually scrolled into view — building all ~10 lanes eagerly in
-        // one Column was firing ~50+ simultaneous network calls on open.
+        // (and only fires each card's logo fetch) for lanes actually
+        // scrolled into view — building all ~10 lanes eagerly in one Column
+        // was firing ~50+ simultaneous network calls on open.
         final lanes = <BrowseLane>[
-          BrowseLane(title: 'TOP S&P 500', items: _cards(companies)),
+          BrowseLane(
+            title: 'TOP S&P 500',
+            items: _cards(companies.take(_lanePreviewCount).toList()),
+            onSeeAll: () =>
+                showCompanyListSheet(context, 'TOP S&P 500', companies),
+          ),
           for (final sector in GicsSector.values)
             if (bySector[sector] != null)
               BrowseLane(
                 title: sector.label.toUpperCase(),
-                items: _cards(bySector[sector]!),
+                items: _cards(
+                  bySector[sector]!.take(_lanePreviewCount).toList(),
+                ),
+                onSeeAll: () => showCompanyListSheet(
+                  context,
+                  sector.label.toUpperCase(),
+                  bySector[sector]!,
+                ),
               ),
           if (recentlyViewed.isNotEmpty)
             BrowseLane(
@@ -83,7 +100,6 @@ class SearchBrowseLanes extends ConsumerWidget {
                   CompanyMiniCard(
                     symbol: e.symbol,
                     name: e.name,
-                    showPrice: false,
                     onTap: () => onTapSymbol(e.symbol),
                   ),
               ],

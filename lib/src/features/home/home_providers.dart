@@ -5,9 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/user_data_service.dart';
 import '../../core/supabase/supabase_providers.dart';
-import '../../core/cache/logo_dao.dart';
-import '../../core/models/logo_cache_entry.dart';
-import '../../core/services/company_tag_mapper.dart';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -268,143 +265,6 @@ final marketIndicesProvider = FutureProvider<List<MarketIndex>>((ref) async {
 });
 
 // ---------------------------------------------------------------------------
-// Watchlist Quote Cache (4-hour TTL per symbol)
-// ---------------------------------------------------------------------------
-
-class _WatchlistQuoteEntry {
-  final Map<String, dynamic> data;
-  final DateTime timestamp;
-
-  _WatchlistQuoteEntry(this.data, this.timestamp);
-
-  bool get isValid => DateTime.now().difference(timestamp).inHours < 4;
-}
-
-class WatchlistQuoteCache {
-  final Map<String, _WatchlistQuoteEntry> _cache = {};
-
-  Map<String, dynamic>? get(String symbol) {
-    final key = symbol.toUpperCase();
-    final entry = _cache[key];
-    if (entry == null || !entry.isValid) {
-      _cache.remove(key);
-      return null;
-    }
-    return entry.data;
-  }
-
-  void set(String symbol, Map<String, dynamic> data) {
-    _cache[symbol.toUpperCase()] = _WatchlistQuoteEntry(data, DateTime.now());
-  }
-
-  void invalidate(String symbol) {
-    _cache.remove(symbol.toUpperCase());
-  }
-}
-
-final watchlistQuoteCacheProvider = Provider<WatchlistQuoteCache>((ref) {
-  return WatchlistQuoteCache();
-});
-
-// ---------------------------------------------------------------------------
-// Watchlist Quotes Provider (4h cache + 1s delay between requests)
-// ---------------------------------------------------------------------------
-
-final watchlistQuotesProvider = FutureProvider<List<Map<String, dynamic>>>((
-  ref,
-) async {
-  final symbols = ref.watch(watchlistSymbolsProvider);
-  if (symbols.isEmpty) return [];
-
-  final quoteCache = ref.read(watchlistQuoteCacheProvider);
-  final api = FinnhubService();
-  final List<Map<String, dynamic>> quotes = [];
-
-  for (final s in symbols) {
-    // Check 4h cache first
-    final cached = quoteCache.get(s);
-    if (cached != null) {
-      quotes.add(cached);
-      continue;
-    }
-
-    try {
-      final profile = await api.companyProfile(s);
-      final quote = await api.previousTradingDayQuote(s);
-
-      // Получить логотип из LogoCache (если есть)
-      final logoDao = LogoDao();
-      final cachedLogo = await logoDao.getLogo(s);
-      String? logoUrl = cachedLogo?.logoUrl;
-
-      // Если нет в кэше — попробовать загрузить логотип (fire-and-forget)
-      if (logoUrl == null) {
-        final weburl = profile['weburl'] as String?;
-        String? domain;
-        if (weburl != null && weburl.isNotEmpty) {
-          try {
-            final uri = Uri.parse(weburl);
-            domain = uri.host;
-            if (domain.startsWith('www.')) domain = domain.substring(4);
-          } catch (_) {}
-        }
-        final finnhubLogo = profile['logo'] as String?;
-        logoUrl = finnhubLogo ??
-            (domain != null ? 'https://logo.clearbit.com/$domain' : null);
-
-        // Сохранить в кэш асинхронно
-        if (logoUrl != null) {
-          final entry = LogoCacheEntry(
-            ticker: s.toUpperCase(),
-            companyName: profile['name'] as String? ?? s,
-            domain: domain,
-            logoUrl: logoUrl,
-            createdAt: DateTime.now(),
-          );
-          logoDao.saveLogo(entry); // fire-and-forget
-        }
-      }
-
-      final name = profile['name'] as String? ?? s;
-      final tag = CompanyTagMapper.tag(s, companyName: name)?.tag;
-
-      final data = {
-        'symbol': s,
-        'name': name,
-        'tag': tag,
-        'description': profile['description'] as String? ?? '',
-        'weburl': profile['weburl'] as String?,
-        'domain': _extractDomain(profile['weburl'] as String?),
-        'logoUrl': logoUrl,
-        'price': ((quote['c'] as num?)?.toDouble() ?? 0),
-        'change': ((quote['dp'] as num?)?.toDouble() ?? 0),
-      };
-      quoteCache.set(s, Map<String, dynamic>.from(data));
-      quotes.add(data);
-    } catch (_) {
-      quotes.add({
-        'symbol': s,
-        'name': s,
-        'tag': CompanyTagMapper.tag(s, companyName: s)?.tag,
-        'description': '',
-        'weburl': null,
-        'domain': null,
-        'logoUrl': null,
-        'price': 0.0,
-        'change': 0.0,
-      });
-    }
-
-    // 1-second delay between requests to prevent API rate-limiting
-    if (symbols.length > 1) {
-      await Future.delayed(const Duration(seconds: 1));
-    }
-  }
-
-  return quotes;
-});
-
-// ---------------------------------------------------------------------------
 // Calendar Events Provider (Watchlist-aware, 12h cache)
 // ---------------------------------------------------------------------------
 
@@ -427,86 +287,51 @@ final calendarEventsProvider = FutureProvider<List<CalendarEvent>>((ref) async {
   final api = FinnhubService();
   final now = DateTime.now();
   final List<CalendarEvent> events = [];
+  final watchlistSet = symbols.map((s) => s.toUpperCase()).toSet();
 
-  for (final symbol in symbols) {
-    // --- Earnings ---
-    try {
-      final earnings = await api.earningsCalendar(
-        symbol: symbol,
-        daysAhead: 90,
-      );
-      for (final item in earnings) {
-        final data = Map<String, dynamic>.from(item);
-        final dateStr = data['date'] as String?;
-        if (dateStr == null) continue;
-        final date = DateTime.tryParse(dateStr);
-        if (date == null ||
-            date.isBefore(now.subtract(const Duration(days: 1)))) {
-          continue;
-        }
+  // One market-wide call instead of one per watchlist symbol — the
+  // backend's /earnings/calendar route already supports the no-symbol
+  // shape (returns every company reporting in the date range) and caches
+  // it server-side, shared across every user, for a full day. Filtering
+  // down to just this watchlist happens here, client-side, for free.
+  try {
+    final earnings = await api.earningsCalendar(daysAhead: 90);
+    for (final item in earnings) {
+      final data = Map<String, dynamic>.from(item);
+      final symbol = (data['symbol'] as String?)?.toUpperCase();
+      if (symbol == null || !watchlistSet.contains(symbol)) continue;
 
-        final quarterRaw = data['quarter'] as int?;
-        final yearRaw = data['year'] as int?;
-        final quarter = quarterRaw != null
-            ? 'Q$quarterRaw'
-            : _quarterLabel(date.month);
-        final year = yearRaw ?? date.year;
-        final hour = data['hour'] as String?;
-
-        events.add(
-          CalendarEvent(
-            symbol: symbol,
-            type: 'earnings',
-            date: date,
-            title: '$quarter $year Earnings Release',
-            epsEstimate: (data['epsEstimate'] as num?)?.toStringAsFixed(2),
-            quarter: quarter,
-            year: year,
-            hour: hour,
-          ),
-        );
+      final dateStr = data['date'] as String?;
+      if (dateStr == null) continue;
+      final date = DateTime.tryParse(dateStr);
+      if (date == null ||
+          date.isBefore(now.subtract(const Duration(days: 1)))) {
+        continue;
       }
-    } catch (_) {
-      // Ignore individual symbol errors
-    }
 
-    // --- Dividends ---
-    try {
-      final dividends = await api.dividendsCalendar(
-        symbol: symbol,
-        daysAhead: 90,
+      final quarterRaw = data['quarter'] as int?;
+      final yearRaw = data['year'] as int?;
+      final quarter = quarterRaw != null
+          ? 'Q$quarterRaw'
+          : _quarterLabel(date.month);
+      final year = yearRaw ?? date.year;
+      final hour = data['hour'] as String?;
+
+      events.add(
+        CalendarEvent(
+          symbol: symbol,
+          type: 'earnings',
+          date: date,
+          title: '$quarter $year Earnings Release',
+          epsEstimate: (data['epsEstimate'] as num?)?.toStringAsFixed(2),
+          quarter: quarter,
+          year: year,
+          hour: hour,
+        ),
       );
-      for (final item in dividends) {
-        final data = Map<String, dynamic>.from(item);
-        // Try exDate first, fall back to date
-        final dateStr = data['exDate'] as String? ?? data['date'] as String?;
-        if (dateStr == null) continue;
-        final date = DateTime.tryParse(dateStr);
-        if (date == null ||
-            date.isBefore(now.subtract(const Duration(days: 1)))) {
-          continue;
-        }
-
-        events.add(
-          CalendarEvent(
-            symbol: symbol,
-            type: 'dividend',
-            date: date,
-            title: 'Dividend Ex-Date',
-            amount:
-                (data['amount'] as num?)?.toDouble() ??
-                (data['dividend'] as num?)?.toDouble(),
-          ),
-        );
-      }
-    } catch (_) {
-      // Ignore individual symbol errors
     }
-
-    // 1-second delay between symbols to prevent API rate-limiting
-    if (symbols.length > 1) {
-      await Future.delayed(const Duration(seconds: 1));
-    }
+  } catch (_) {
+    // Leave events empty on failure — the news half below is independent.
   }
 
   // Sort by date ascending
@@ -576,20 +401,3 @@ Future<List<CalendarEvent>> _fetchWatchlistNews(
   return capped;
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/// Извлекает домен из URL компании.
-/// e.g. "https://www.apple.com" → "apple.com"
-String? _extractDomain(String? weburl) {
-  if (weburl == null || weburl.isEmpty) return null;
-  try {
-    final uri = Uri.parse(weburl);
-    final host = uri.host;
-    if (host.startsWith('www.')) return host.substring(4);
-    return host;
-  } catch (_) {
-    return null;
-  }
-}
