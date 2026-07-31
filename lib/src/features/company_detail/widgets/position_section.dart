@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialLight, dialDark, dialBrassLight;
 import '../../portfolio/portfolio_providers.dart';
@@ -123,7 +124,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
                       positions[safeIndex].portfolioName,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: safeIndex > 0 ? dialBrassLight : Colors.white,
                       ),
@@ -198,6 +199,11 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
     );
   }
 
+  // Label/value font matches the "Active — {duration}" tile in the Home
+  // MY STRESS TEST widget (stress_test_widget.dart) — the app's reference
+  // for readable label+number pairs; value uses interNums() (tabular
+  // figures) rather than plain GoogleFonts.inter like every other number
+  // in the app.
   Widget _row(String label, String value) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
@@ -205,12 +211,13 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
         label,
         style: GoogleFonts.inter(
           fontSize: 13,
-          color: Colors.white.withValues(alpha: 0.75),
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
       ),
       Text(
         value,
-        style: GoogleFonts.inter(
+        style: interNums(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -232,13 +239,14 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
         'Unrealized P&L',
         style: GoogleFonts.inter(
           fontSize: 13,
-          color: Colors.white.withValues(alpha: 0.75),
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
       ),
       if (!pos.hasPosition)
         Text(
           '—',
-          style: GoogleFonts.inter(
+          style: interNums(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -256,7 +264,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             const SizedBox(width: 4),
             Text(
               '${isUp ? '+' : ''}${pnl.toStringAsFixed(2)} (${pnlPercent.toStringAsFixed(2)}%)',
-              style: GoogleFonts.inter(
+              style: interNums(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: pnlColor,

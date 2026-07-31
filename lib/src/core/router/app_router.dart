@@ -21,6 +21,8 @@ import '../../features/market_clock/market_clock_risk_detail_screen.dart';
 import '../../features/market_clock/market_phases_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
+import '../../features/company_detail/widgets/metric_info_screen.dart';
+import '../../features/company_detail/widgets/metric_info_data.dart';
 import '../../features/stress_test/stress_test_setup_screen.dart';
 import '../../features/stress_test/stress_test_screen.dart';
 import '../../features/stress_test/verdict_screen.dart';
@@ -78,6 +80,20 @@ class AppRouter {
             symbol: symbol.toUpperCase(),
             contextPortfolioId: extra?['portfolioId'] as String?,
           );
+        },
+      ),
+
+      // Metric info — title + explanation sections, reached from the "?"
+      // next to a KEY METRICS row.
+      GoRoute(
+        path: '/metric-info/:id',
+        name: 'metricInfo',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final content = metricInfoRegistry[id];
+          return content == null
+              ? const SizedBox()
+              : MetricInfoScreen(content: content);
         },
       ),
 

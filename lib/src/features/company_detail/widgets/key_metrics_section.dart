@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/typography_helpers.dart';
+import 'metric_info_data.dart';
 
 // ===========================================================================
 // Key Metrics — P/E, дивиденды, маржинальность (из 30-дневного кэша)
@@ -24,38 +27,16 @@ class KeyMetricsSection extends StatelessWidget {
     final grossMargin = _double(m['grossMarginTTM']);
     final roe = _double(m['roeTTM']);
 
-    final items = <_MetricItem>[
-      _MetricItem(
-        'P/E',
-        pe > 0 ? pe.toStringAsFixed(1) : 'N/A',
-        'Price-to-Earnings',
-      ),
-      _MetricItem(
-        'Div. Yield',
-        divYield > 0 ? '${divYield.toStringAsFixed(2)}%' : 'N/A',
-        'Dividend Yield',
-      ),
-      _MetricItem(
-        'Net Margin',
-        netMargin > 0 ? '${netMargin.toStringAsFixed(1)}%' : 'N/A',
-        'Net Profit Margin',
-      ),
-      _MetricItem(
-        'Op. Margin',
-        opMargin > 0 ? '${opMargin.toStringAsFixed(1)}%' : 'N/A',
-        'Operating Margin',
-      ),
-      _MetricItem(
+    final items = <(String, String)>[
+      ('P/E', pe > 0 ? pe.toStringAsFixed(1) : 'N/A'),
+      ('Dividend Yield', divYield > 0 ? '${divYield.toStringAsFixed(2)}%' : 'N/A'),
+      ('Net Margin', netMargin > 0 ? '${netMargin.toStringAsFixed(1)}%' : 'N/A'),
+      ('Operating Margin', opMargin > 0 ? '${opMargin.toStringAsFixed(1)}%' : 'N/A'),
+      (
         'Gross Margin',
         grossMargin > 0 ? '${grossMargin.toStringAsFixed(1)}%' : 'N/A',
-        'Gross Margin',
       ),
-      if (m['roeTTM'] != null)
-        _MetricItem(
-          'ROE',
-          '${roe.toStringAsFixed(1)}%',
-          'Return on Equity',
-        ),
+      if (m['roeTTM'] != null) ('ROE', '${roe.toStringAsFixed(1)}%'),
     ];
 
     return Padding(
@@ -66,77 +47,76 @@ class KeyMetricsSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'KEY METRICS',
-              style: FomoShieldTheme.cardTitle(),
-            ),
+            Text('KEY METRICS', style: FomoShieldTheme.cardTitle()),
             const SizedBox(height: 10),
             Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
             const SizedBox(height: 12),
-            ...items.asMap().entries.map((entry) {
-              final i = entry.key;
-              final item = entry.value;
-              final showDivider = i < items.length - 1;
-              return _metricRow(item, showDivider: showDivider);
-            }),
+            for (int i = 0; i < items.length; i++) ...[
+              if (i > 0) const SizedBox(height: 8),
+              _row(context, items[i].$1, items[i].$2),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _metricRow(_MetricItem item, {required bool showDivider}) {
-    return Column(
+  // Same shape/type-scale as Position Section's "MY INVESTMENTS" `_row` —
+  // label/value on one line, no subtitle, no divider between rows. Label
+  // and value font match the "Active — {duration}" tile in the Home MY
+  // STRESS TEST widget (stress_test_widget.dart) — the app's reference
+  // for readable label+number pairs; value uses interNums() (tabular
+  // figures) rather than plain GoogleFonts.inter like every other number
+  // in the app.
+  Widget _row(BuildContext context, String label, String value) {
+    final infoId = metricInfoIdByLabel[label];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.label,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  item.subtitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: ThemeV2.textSecondary,
-                  ),
-                ),
-              ],
-            ),
             Text(
-              item.value,
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: ThemeV2.primary,
+              value,
+              style: interNums(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
               ),
             ),
+            if (infoId != null) ...[
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () => context.push('/metric-info/$infoId'),
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: ThemeV2.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.help_outline_rounded,
+                    size: 13,
+                    color: ThemeV2.primary,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
-        if (showDivider)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Container(height: 1, color: ThemeV2.divider),
-          ),
       ],
     );
   }
 
   double _double(dynamic v) => (v is num) ? v.toDouble() : 0.0;
-}
-
-class _MetricItem {
-  final String label;
-  final String value;
-  final String subtitle;
-  const _MetricItem(this.label, this.value, this.subtitle);
 }
