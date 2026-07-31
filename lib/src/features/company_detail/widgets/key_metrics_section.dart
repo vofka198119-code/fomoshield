@@ -32,28 +32,28 @@ class KeyMetricsSection extends StatelessWidget {
       ),
       _MetricItem(
         'Div. Yield',
-        divYield > 0 ? '${(divYield * 100).toStringAsFixed(2)}%' : 'N/A',
+        divYield > 0 ? '${divYield.toStringAsFixed(2)}%' : 'N/A',
         'Dividend Yield',
       ),
       _MetricItem(
         'Net Margin',
-        netMargin > 0 ? '${(netMargin * 100).toStringAsFixed(1)}%' : 'N/A',
+        netMargin > 0 ? '${netMargin.toStringAsFixed(1)}%' : 'N/A',
         'Net Profit Margin',
       ),
       _MetricItem(
         'Op. Margin',
-        opMargin > 0 ? '${(opMargin * 100).toStringAsFixed(1)}%' : 'N/A',
+        opMargin > 0 ? '${opMargin.toStringAsFixed(1)}%' : 'N/A',
         'Operating Margin',
       ),
       _MetricItem(
         'Gross Margin',
-        grossMargin > 0 ? '${(grossMargin * 100).toStringAsFixed(1)}%' : 'N/A',
+        grossMargin > 0 ? '${grossMargin.toStringAsFixed(1)}%' : 'N/A',
         'Gross Margin',
       ),
       if (m['roeTTM'] != null)
         _MetricItem(
           'ROE',
-          '${(roe * 100).toStringAsFixed(1)}%',
+          '${roe.toStringAsFixed(1)}%',
           'Return on Equity',
         ),
     ];
