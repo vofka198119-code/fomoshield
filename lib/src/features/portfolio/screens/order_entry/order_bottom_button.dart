@@ -27,8 +27,6 @@ class OrderBottomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canExecute = onSubmit != null;
-
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
       decoration: BoxDecoration(
@@ -62,17 +60,38 @@ class OrderBottomButton extends StatelessWidget {
                 ],
               ),
             ),
-          _button(canExecute),
+          ReviewOrderButton(isBuy: isBuy, onSubmit: onSubmit),
         ],
       ),
     );
   }
+}
 
-  Widget _button(bool canExecute) {
+// ---------------------------------------------------------------------------
+// Review Order Button — the actual olive/dark-green CTA, pulled out on its
+// own so AmountKeypad can also show it (compact) above the numeric grid.
+// ---------------------------------------------------------------------------
+
+class ReviewOrderButton extends StatelessWidget {
+  final bool isBuy;
+  final VoidCallback? onSubmit;
+  final double height;
+
+  const ReviewOrderButton({
+    super.key,
+    required this.isBuy,
+    required this.onSubmit,
+    this.height = 52,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final canExecute = onSubmit != null;
+
     if (!canExecute) {
       return Container(
         width: double.infinity,
-        height: 52,
+        height: height,
         decoration: BoxDecoration(
           color: ThemeV2.textSecondary.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(18),
@@ -99,7 +118,7 @@ class OrderBottomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           child: Container(
             width: double.infinity,
-            height: 52,
+            height: height,
             alignment: Alignment.center,
             child: Text(
               'Review Order',
@@ -132,7 +151,7 @@ class OrderBottomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           child: Container(
             width: double.infinity,
-            height: 52,
+            height: height,
             alignment: Alignment.center,
             child: Text(
               'Review Order',

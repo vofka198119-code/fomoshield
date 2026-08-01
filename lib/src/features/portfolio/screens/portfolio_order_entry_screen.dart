@@ -462,6 +462,10 @@ class _PortfolioOrderEntryScreenState
                 controller: _amountController,
                 onChanged: _onAmountTextChanged,
                 onDone: () => setState(() => _amountKeypadOpen = false),
+                isBuy: _isBuy,
+                inputMode: _inputMode,
+                displayAmount: displayAmount,
+                onSubmit: displayAmount > 0 ? _submitOrder : null,
               )
             else
               OrderBottomButton(
