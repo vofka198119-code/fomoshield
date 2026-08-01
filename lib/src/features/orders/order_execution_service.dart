@@ -190,12 +190,26 @@ class OrderExecutionService {
       );
     }
 
-    // Execute — use limit price (or better)
-    final executionPrice = order.side == OrderSide.buy
-        ? min(currentPrice, limit)
-        : max(currentPrice, limit);
+    // Execute at the limit price (± a few cents of realistic slippage) —
+    // deliberately NOT at currentPrice, however favorable. Pending orders
+    // are only re-checked periodically (see main.dart's startup check +
+    // Portfolio's 5-min timer), so currentPrice at check time can be far
+    // past the limit (e.g. the app was closed for 2 days while the price
+    // kept moving). A real limit order fills right around the limit the
+    // moment it's crossed, not at whatever price exists whenever we
+    // happen to next check — so we simulate that instead of handing the
+    // user an unrealistically good fill.
+    return _fillWithPartial(order, _realisticLimitFill(limit, order.side));
+  }
 
-    return _fillWithPartial(order, executionPrice);
+  /// Fill price for a triggered limit order: the limit itself, improved by
+  /// a small random amount (0-10¢) in the user's favor — mimics a real
+  /// limit order filling right around the limit rather than at whatever
+  /// price the market happens to be at whenever this gets checked.
+  double _realisticLimitFill(double limit, OrderSide side) {
+    final slippage = _random.nextDouble() * 0.10;
+    final price = side == OrderSide.buy ? limit - slippage : limit + slippage;
+    return (price * 100).round() / 100;
   }
 
   // -----------------------------------------------------------------------
@@ -294,11 +308,7 @@ class OrderExecutionService {
       );
     }
 
-    final executionPrice = order.side == OrderSide.buy
-        ? min(currentPrice, limit)
-        : max(currentPrice, limit);
-
-    return _fillWithPartial(order, executionPrice);
+    return _fillWithPartial(order, _realisticLimitFill(limit, order.side));
   }
 
   // -----------------------------------------------------------------------

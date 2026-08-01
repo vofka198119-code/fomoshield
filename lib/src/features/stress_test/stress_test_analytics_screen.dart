@@ -625,8 +625,8 @@ class _AnalyticsRadarPainter extends CustomPainter {
         return 'EFF';
       case 'Historical Trend':
         return 'TRD';
-      case 'Capital Return':
-        return 'CAP';
+      case 'Shareholder Returns':
+        return 'SHR';
       default:
         return name.length > 3
             ? name.substring(0, 3).toUpperCase()

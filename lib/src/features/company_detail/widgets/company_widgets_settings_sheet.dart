@@ -32,7 +32,12 @@ class _CompanyWidgetsSettingsSheetState
     _configs = List.from(widget.initialConfigs);
   }
 
+  // 'price_header' is pinned first — never draggable, never hidden.
+  static const _pinnedFirstId = 'price_header';
+
   void _onReorder(int oldIndex, int newIndex) {
+    if (_configs[oldIndex].id == _pinnedFirstId) return;
+    if (newIndex == 0) newIndex = 1;
     setState(() {
       final item = _configs.removeAt(oldIndex);
       _configs.insert(newIndex, item);
@@ -41,6 +46,7 @@ class _CompanyWidgetsSettingsSheetState
   }
 
   void _toggleVisibility(String id) {
+    if (id == _pinnedFirstId) return;
     setState(() {
       final index = _configs.indexWhere((c) => c.id == id);
       if (index >= 0) {
@@ -152,6 +158,7 @@ class _CompanyWidgetsSettingsSheetState
               },
               itemBuilder: (context, index) {
                 final config = _configs[index];
+                final isPinned = config.id == _pinnedFirstId;
                 return Container(
                   key: ValueKey(config.id),
                   margin: const EdgeInsets.only(bottom: 8),
@@ -171,15 +178,21 @@ class _CompanyWidgetsSettingsSheetState
                     leading: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Drag handle
-                        ReorderableDragStartListener(
-                          index: index,
-                          child: const Icon(
-                            Icons.drag_handle_rounded,
-                            color: ThemeV2.textSecondary,
-                            size: 24,
-                          ),
-                        ),
+                        // Drag handle — pinned widget can't be dragged.
+                        isPinned
+                            ? const Icon(
+                                Icons.push_pin_rounded,
+                                color: ThemeV2.textSecondary,
+                                size: 20,
+                              )
+                            : ReorderableDragStartListener(
+                                index: index,
+                                child: const Icon(
+                                  Icons.drag_handle_rounded,
+                                  color: ThemeV2.textSecondary,
+                                  size: 24,
+                                ),
+                              ),
                         const SizedBox(width: 8),
                         Icon(
                           _widgetIcon(config.id),
@@ -200,7 +213,13 @@ class _CompanyWidgetsSettingsSheetState
                             : ThemeV2.textSecondary,
                       ),
                     ),
-                    trailing: GestureDetector(
+                    trailing: isPinned
+                        ? Icon(
+                            Icons.visibility_rounded,
+                            color: ThemeV2.textSecondary.withValues(alpha: 0.4),
+                            size: 22,
+                          )
+                        : GestureDetector(
                       onTap: () => _toggleVisibility(config.id),
                       child: Icon(
                         config.visible

@@ -9,6 +9,7 @@ import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import 'portfolio_providers.dart';
 import 'portfolio_limits_provider.dart';
+import '../orders/pending_orders_checker.dart';
 import 'portfolio_ad_provider.dart';
 import 'portfolio_widget_order_provider.dart';
 import 'widgets/portfolio_summary_widget.dart';
@@ -459,6 +460,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
     _refreshTimer = Timer.periodic(const Duration(minutes: 5), (_) {
       if (mounted) {
         ref.invalidate(portfolioPerformanceProvider(widget.portfolioId));
+        checkPendingOrders(ref);
       }
     });
   }

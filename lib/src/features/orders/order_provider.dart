@@ -170,39 +170,56 @@ class OrderNotifier extends StateNotifier<List<Order>> {
   // Execute pending orders (called when price updates arrive)
   // -----------------------------------------------------------------------
 
-  /// Process all active (PENDING or PARTIALLY_FILLED) orders.
+  /// Process all active (PENDING or PARTIALLY_FILLED) orders, each against
+  /// its own symbol's current price. [currentPrices] must be keyed by
+  /// symbol — a single shared price would apply e.g. one held symbol's
+  /// price to every other pending order regardless of what it's actually
+  /// for (a real bug this method had before it was ever wired up to a
+  /// caller). Orders for symbols missing from [currentPrices] are skipped
+  /// (left pending) rather than guessed at.
   /// Returns the list of transactions created.
   List<Transaction> processPendingOrders({
-    required double currentPrice,
+    required Map<String, double> currentPrices,
     required MarketSession session,
   }) {
     final activeOrders = state.where((o) => o.status.isActive).toList();
     if (activeOrders.isEmpty) return [];
 
     final engine = OrderExecutionService();
-    final result = engine.processPendingOrders(
-      pendingOrders: activeOrders,
-      currentPrice: currentPrice,
-      session: session,
-    );
+    final transactions = <Transaction>[];
 
-    // Apply all order updates
-    for (final execResult in result.results) {
-      _upsertOrder(execResult.updatedOrder);
+    final bySymbol = <String, List<Order>>{};
+    for (final order in activeOrders) {
+      bySymbol.putIfAbsent(order.assetSymbol, () => []).add(order);
     }
 
-    // Apply all transactions to their respective portfolios
-    final transactions = <Transaction>[];
-    for (final tx in result.transactions) {
-      final portfolioId = _findPortfolioForOrder(tx.symbol);
-      if (portfolioId != null) {
-        _applyTransaction(portfolioId, tx);
-        transactions.add(tx);
+    for (final entry in bySymbol.entries) {
+      final price = currentPrices[entry.key];
+      if (price == null) continue;
+
+      final result = engine.processPendingOrders(
+        pendingOrders: entry.value,
+        currentPrice: price,
+        session: session,
+      );
+
+      for (final execResult in result.results) {
+        _upsertOrder(execResult.updatedOrder);
+      }
+
+      for (final tx in result.transactions) {
+        final portfolioId = _findPortfolioForOrder(tx.symbol);
+        if (portfolioId != null) {
+          _applyTransaction(portfolioId, tx);
+          transactions.add(tx);
+        }
       }
     }
 
-    _saveLocal();
-    _syncToSupabase();
+    if (transactions.isNotEmpty) {
+      _saveLocal();
+      _syncToSupabase();
+    }
     return transactions;
   }
 

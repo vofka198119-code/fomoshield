@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../market_clock/market_clock_dial.dart'
+    show dialLight, dialDark, dialBrassLight;
 import 'metric_info_data.dart';
 
 // ---------------------------------------------------------------------------
@@ -29,7 +31,14 @@ class FinancialScoreWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-        decoration: FomoShieldTheme.cardDecoration,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [dialLight, dialDark],
+          ),
+          borderRadius: FomoShieldTheme.cardRadius,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -40,12 +49,12 @@ class FinancialScoreWidget extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   'FS SCORE',
-                  style: FomoShieldTheme.cardTitle(),
+                  style: FomoShieldTheme.cardTitle(Colors.white),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+            Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
             const SizedBox(height: 16),
 
             // ── Gauge + Radar row ──
@@ -128,11 +137,42 @@ class FinancialScoreWidget extends StatelessWidget {
             }),
 
             const SizedBox(height: 4),
-            Text(
-              'For informational purposes only. Not investment advice.',
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                color: ThemeV2.textSecondary,
+            GestureDetector(
+              onTap: () => context.push('/metric-info/fs-score-legal'),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: dialBrassLight, width: 1),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: dialBrassLight.withValues(alpha: 0.25),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.gavel_rounded, size: 14, color: dialBrassLight),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Legal Disclaimer & Methodology',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: dialBrassLight,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 16,
+                      color: dialBrassLight,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -229,7 +269,7 @@ class _RadarChartPainter extends CustomPainter {
     final dataPath = Path();
     // Paint grid lines
     final gridPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.06)
+      ..color = dialBrassLight.withValues(alpha: 0.35)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
@@ -275,12 +315,12 @@ class _RadarChartPainter extends CustomPainter {
     dataPath.close();
 
     final dataPaint = Paint()
-      ..color = ThemeV2.primary.withValues(alpha: 0.15)
+      ..color = dialBrassLight.withValues(alpha: 0.25)
       ..style = PaintingStyle.fill;
     canvas.drawPath(dataPath, dataPaint);
 
     final dataStroke = Paint()
-      ..color = ThemeV2.primary.withValues(alpha: 0.6)
+      ..color = dialBrassLight.withValues(alpha: 0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawPath(dataPath, dataStroke);
@@ -297,8 +337,8 @@ class _RadarChartPainter extends CustomPainter {
       // Dot
       canvas.drawCircle(
         Offset(x, y),
-        3,
-        Paint()..color = ThemeV2.primary,
+        3.5,
+        Paint()..color = dialBrassLight,
       );
 
       // Label at edge
@@ -316,7 +356,7 @@ class _RadarChartPainter extends CustomPainter {
       case 'Growth Potential': return 'GRW';
       case 'Efficiency': return 'EFF';
       case 'Historical Trend': return 'TRD';
-      case 'Capital Return': return 'CAP';
+      case 'Shareholder Returns': return 'SHR';
       default: return name.substring(0, 3).toUpperCase();
     }
   }
@@ -326,7 +366,7 @@ class _RadarChartPainter extends CustomPainter {
       text: TextSpan(
         text: text,
         style: TextStyle(
-          color: ThemeV2.textSecondary.withValues(alpha: 0.8),
+          color: Colors.white.withValues(alpha: 0.7),
           fontSize: 9,
           fontWeight: FontWeight.w600,
         ),
@@ -385,7 +425,7 @@ class _MarkerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -412,7 +452,7 @@ class _MarkerCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: ThemeV2.textPrimary,
+                        color: Colors.white,
                       ),
                     ),
                     if (infoId != null) ...[
@@ -423,7 +463,7 @@ class _MarkerCard extends StatelessWidget {
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: ThemeV2.primary.withValues(alpha: 0.1),
+                            color: Colors.white.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(
                               ThemeV2.radiusSmall,
                             ),
@@ -432,7 +472,7 @@ class _MarkerCard extends StatelessWidget {
                           child: const Icon(
                             Icons.help_outline_rounded,
                             size: 13,
-                            color: ThemeV2.primary,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -444,7 +484,7 @@ class _MarkerCard extends StatelessWidget {
                   description,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: ThemeV2.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ],

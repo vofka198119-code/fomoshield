@@ -74,7 +74,7 @@ class ScoringEngine {
     // making it a duplicate marker rather than an independent signal.
     final historicalTrend = _calcHistoricalTrend(priceCagr5Y);
 
-    // 6. Capital Return (dividends/buybacks)
+    // 6. Shareholder Returns (dividends/buybacks)
     final divYield = _pct(m['dividendYieldIndicatedAnnual']);
     final payoutRatio = _pct(m['payoutRatioAnnual']);
     final capitalReturn = _calcCapitalReturn(divYield, payoutRatio);
@@ -114,7 +114,7 @@ class ScoringEngine {
         'growth_potential': _markerResult('Growth Potential', growth, 'Revenue & EPS 5Y growth'),
         'efficiency': _markerResult('Efficiency', efficiency, 'Net margin & ROE'),
         'historical_trend': _markerResult('Historical Trend', historicalTrend, '5Y share price CAGR'),
-        'capital_return': _markerResult('Capital Return', capitalReturn, 'Dividends & buybacks'),
+        'capital_return': _markerResult('Shareholder Returns', capitalReturn, 'Dividends & buybacks'),
       },
       'dividend_trap_penalty': divYield > AppConstants.dividendTrapThreshold / 100
           ? AppConstants.dividendTrapPenalty
@@ -237,7 +237,7 @@ class ScoringEngine {
     return score.clamp(0, 100);
   }
 
-  // Capital Return
+  // Shareholder Returns
   static double _calcCapitalReturn(double divYield, double payoutRatio) {
     double score = 40;
     // Yield up to reasonable threshold

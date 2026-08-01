@@ -36,6 +36,7 @@ class PriceHeader extends StatelessWidget {
   final double changePercent;
   final bool isUp;
   final String changeLabel;
+  final int? fsScore;
 
   const PriceHeader({
     super.key,
@@ -47,6 +48,7 @@ class PriceHeader extends StatelessWidget {
     required this.changePercent,
     required this.isUp,
     this.changeLabel = 'CHANGE',
+    this.fsScore,
   });
 
   @override
@@ -203,23 +205,100 @@ class PriceHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                // Placeholder — reserved for later, unwired/unlabeled on
-                // purpose for now.
+                // FS Score gauge — duplicates FinancialScoreWidget's circle
+                // so the score is visible without scrolling down.
                 Expanded(
                   flex: 3,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: ThemeV2.divider),
-                    ),
-                  ),
+                  child: fsScore == null
+                      ? Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: ThemeV2.divider),
+                          ),
+                        )
+                      : _fsScoreCell(fsScore!),
                 ),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Color _gaugeColor(int score) {
+    if (score >= 70) return ThemeV2.success;
+    if (score >= 40) return ThemeV2.warning;
+    return ThemeV2.loss;
+  }
+
+  // Green-gradient card duplicating FinancialScoreWidget's circular gauge,
+  // so the score is visible right at the top without scrolling down.
+  Widget _fsScoreCell(int score) {
+    final color = _gaugeColor(score);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [dialLight, dialDark],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'FS SCORE',
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.9,
+                heightFactor: 0.9,
+                child: AspectRatio(
+                aspectRatio: 1,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: ThemeV2.surface,
+                    border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.1),
+                        blurRadius: 20,
+                        spreadRadius: 3,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$score',
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: color,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                  ),
+                ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -243,6 +243,9 @@ class AppRouter {
             portfolioId: id,
             symbol: symbol.toUpperCase(),
             orderType: (extra['type'] as String?) ?? 'buy',
+            initialPrice: (extra['price'] as num?)?.toDouble(),
+            companyName: extra['companyName'] as String?,
+            logo: extra['logo'] as String?,
           );
         },
       ),

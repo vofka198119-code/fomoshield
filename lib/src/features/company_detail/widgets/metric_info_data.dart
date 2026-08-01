@@ -15,10 +15,16 @@ class MetricInfoContent {
   final String title;
   final String subtitle;
   final List<MetricInfoSection> sections;
+  // Small "Educational & Academic Disclaimer" footer — only the 6 Financial
+  // Score marker screens (Valuation, Financial Health, Growth Potential,
+  // Efficiency, Historical Trend, Shareholder Returns) show it, not the
+  // KEY METRICS screens (P/E, ROE, etc.) or the fs-score-legal screen.
+  final bool showAcademicDisclaimer;
   const MetricInfoContent({
     required this.title,
     required this.subtitle,
     required this.sections,
+    this.showAcademicDisclaimer = false,
   });
 }
 
@@ -32,15 +38,15 @@ const Map<String, String> metricInfoIdByLabel = {
   'Operating Margin': 'operating-margin',
   'Gross Margin': 'gross-margin',
   'ROE': 'roe',
-  // Financial Score's 6 markers (financial_score_widget.dart) — content
-  // not written yet, so none of these show a "?" until an entry exists
-  // in metricInfoRegistry below.
+  // Financial Score's 6 markers (financial_score_widget.dart). The "?"
+  // icon shows for all of them regardless of registry content below —
+  // one without an entry just opens a blank screen until its text is added.
   'Valuation': 'valuation',
   'Financial Health': 'financial-health',
   'Growth Potential': 'growth-potential',
   'Efficiency': 'efficiency',
   'Historical Trend': 'historical-trend',
-  'Capital Return': 'capital-return',
+  'Shareholder Returns': 'capital-return',
 };
 
 const Map<String, MetricInfoContent> metricInfoRegistry = {
@@ -1012,6 +1018,691 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
             'high-quality business, but investors should always check '
             'whether that performance is driven by genuine profitability '
             'or excessive debt.',
+      ),
+    ],
+  ),
+  'valuation': MetricInfoContent(
+    title: 'Valuation',
+    subtitle: 'How Fairly the Market Is Pricing the Company',
+    showAcademicDisclaimer: true,
+    sections: [
+      MetricInfoSection(
+        header: 'What is Valuation?',
+        body:
+            'Valuation measures how fairly the market is pricing a company '
+            'based on its financial performance and compared to other '
+            'companies in the same industry.\n\n'
+            'In simple terms: it helps you understand whether investors may '
+            'be paying too much—or too little—for the company\'s '
+            'stock.\n\n'
+            'However, an expensive stock is not always a bad investment, '
+            'and a cheap stock is not always a good one.',
+      ),
+      MetricInfoSection(
+        header: 'Why is Valuation important?',
+        body:
+            'When investors buy a stock, they are buying more than the '
+            'company\'s current business—they are also buying expectations '
+            'for its future.\n\n'
+            'Sometimes expectations become overly optimistic, causing the '
+            'stock price to rise much faster than the company\'s actual '
+            'performance.\n\n'
+            'At other times, the market becomes overly pessimistic, '
+            'allowing high-quality companies to trade below what many '
+            'investors believe is their fair value.\n\n'
+            'Valuation helps investors judge whether the current price '
+            'appears reasonable.',
+      ),
+      MetricInfoSection(
+        header: 'What does a high score mean?',
+        body:
+            'A high Valuation score suggests that the company\'s current '
+            'market price appears reasonable relative to its financial '
+            'performance and compared with similar companies.\n\n'
+            'It does not guarantee that the stock will rise, but it '
+            'generally indicates a lower risk of overpaying.',
+      ),
+      MetricInfoSection(
+        header: 'What does a low score mean?',
+        body:
+            'A low Valuation score may indicate that investors are paying '
+            'a premium for the company\'s shares.\n\n'
+            'This increases the risk that future expectations are already '
+            'reflected in the stock price.\n\n'
+            'If the company fails to meet those expectations, the stock '
+            'may decline—even if the business itself remains healthy.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a low score always bad?',
+        body:
+            'Some companies trade at premium valuations for many years '
+            'because they have:\n\n'
+            '• Strong competitive advantages\n'
+            '• Rapid earnings growth\n'
+            '• Market leadership\n'
+            '• Innovative products\n'
+            '• High investor confidence\n\n'
+            'In these cases, a higher valuation may be fully justified.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a high score always a guarantee?',
+        body:
+            'Even if a company appears attractively valued, there is no '
+            'guarantee that its stock price will increase.\n\n'
+            'Sometimes the market is already aware of risks that are not '
+            'yet fully reflected in financial reports.\n\n'
+            'That is why Valuation should always be considered alongside '
+            'financial strength, profitability, and future growth '
+            'potential.',
+      ),
+      MetricInfoSection(
+        header: 'What should investors pay attention to?',
+        body:
+            'Valuation helps estimate the risk of overpaying, but it does '
+            'not measure the overall quality of a business.\n\n'
+            'A company should always be evaluated using multiple financial '
+            'indicators rather than relying on valuation alone.',
+      ),
+      MetricInfoSection(
+        header: 'Key Takeaway',
+        body:
+            'Valuation helps determine whether a company\'s current market '
+            'price appears fair relative to its financial performance. It '
+            'is a valuable tool for identifying the risk of overpaying, '
+            'but it should never be used as the only factor when '
+            'evaluating an investment.',
+      ),
+    ],
+  ),
+  'financial-health': MetricInfoContent(
+    title: 'Financial Health',
+    subtitle: 'Stability and Ability to Manage Debt',
+    showAcademicDisclaimer: true,
+    sections: [
+      MetricInfoSection(
+        header: 'What is Financial Health?',
+        body:
+            'Financial Health evaluates a company\'s overall financial '
+            'stability and its ability to manage debt and long-term '
+            'obligations.\n\n'
+            'In simple terms: it helps determine whether a company has a '
+            'strong financial foundation or may face increased financial '
+            'risk in the future.\n\n'
+            'A financially healthy company is generally better prepared to '
+            'navigate economic downturns, invest in future growth, and '
+            'adapt to changing market conditions.',
+      ),
+      MetricInfoSection(
+        header: 'Why is Financial Health important?',
+        body:
+            'Every business needs money to operate and grow.\n\n'
+            'Some companies rely mostly on their own resources, while '
+            'others depend heavily on borrowed money.\n\n'
+            'Debt is not necessarily bad—it can help a business expand, '
+            'build new facilities, or acquire competitors. However, '
+            'excessive debt can become a serious burden, especially during '
+            'periods of slower growth or higher interest rates.\n\n'
+            'Financial Health helps investors understand how resilient a '
+            'company may be under different economic conditions.',
+      ),
+      MetricInfoSection(
+        header: 'What does a high score mean?',
+        body:
+            'A high Financial Health score suggests that the company '
+            'appears financially stable and is managing its obligations '
+            'responsibly.\n\n'
+            'Companies with strong financial health are generally in a '
+            'better position to:\n\n'
+            '• Invest in future growth\n'
+            '• Handle unexpected challenges\n'
+            '• Continue operations during economic downturns\n'
+            '• Maintain financial flexibility\n\n'
+            'While no company is completely risk-free, a stronger '
+            'financial position often provides greater long-term '
+            'stability.',
+      ),
+      MetricInfoSection(
+        header: 'What does a low score mean?',
+        body:
+            'A low Financial Health score may indicate that the company is '
+            'carrying a higher level of financial risk.\n\n'
+            'This could reduce its flexibility and make it more vulnerable '
+            'during difficult economic periods.\n\n'
+            'Companies with weaker financial health may face challenges '
+            'such as:\n\n'
+            '• Higher borrowing costs\n'
+            '• Reduced ability to invest\n'
+            '• Greater pressure during recessions\n'
+            '• Increased sensitivity to rising interest rates\n\n'
+            'A lower score does not necessarily mean the company is in '
+            'trouble, but it deserves closer attention.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a low score always bad?',
+        body:
+            'Some industries naturally rely on higher levels of debt.\n\n'
+            'For example:\n\n'
+            '• Utilities\n'
+            '• Telecommunications\n'
+            '• Real estate\n'
+            '• Infrastructure companies\n\n'
+            'These businesses often generate stable cash flows that allow '
+            'them to manage larger debt levels safely.\n\n'
+            'As a result, financial health should always be considered '
+            'within the context of the company\'s industry and business '
+            'model.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a high score always a guarantee?',
+        body:
+            'Even financially strong companies can face unexpected '
+            'challenges.\n\n'
+            'Market disruptions, changing consumer demand, poor management '
+            'decisions, or global economic events can affect any '
+            'business.\n\n'
+            'Financial Health reduces risk—it does not eliminate it.',
+      ),
+      MetricInfoSection(
+        header: 'What should investors pay attention to?',
+        body:
+            'Financial Health reflects a company\'s ability to remain '
+            'stable over time, but it is only one part of the overall '
+            'picture.\n\n'
+            'A company should also be evaluated based on its '
+            'profitability, valuation, growth potential, and operational '
+            'efficiency.\n\n'
+            'Looking at all these factors together provides a much more '
+            'balanced assessment.',
+      ),
+      MetricInfoSection(
+        header: 'Key Takeaway',
+        body:
+            'Financial Health measures the overall financial strength and '
+            'stability of a company. Businesses with stronger financial '
+            'foundations are generally better equipped to manage '
+            'uncertainty, support future growth, and withstand economic '
+            'challenges, but no single indicator should be used in '
+            'isolation.',
+      ),
+    ],
+  ),
+  'growth-potential': MetricInfoContent(
+    title: 'Growth Potential',
+    subtitle: 'How Consistently the Business Has Expanded',
+    showAcademicDisclaimer: true,
+    sections: [
+      MetricInfoSection(
+        header: 'What is Growth Potential?',
+        body:
+            'Growth Potential evaluates how consistently a company has '
+            'expanded its business over time by increasing its revenue '
+            'and earnings.\n\n'
+            'In simple terms: it helps determine whether a company is '
+            'growing, standing still, or gradually losing momentum.\n\n'
+            'Growing companies often have more opportunities to increase '
+            'their value over the long term, although growth is never '
+            'guaranteed.',
+      ),
+      MetricInfoSection(
+        header: 'Why is Growth Potential important?',
+        body:
+            'A successful company should not only be profitable '
+            'today—it should also have the ability to grow in the '
+            'future.\n\n'
+            'Business growth may come from:\n\n'
+            '• Selling more products\n'
+            '• Expanding into new markets\n'
+            '• Launching new services\n'
+            '• Increasing market share\n'
+            '• Improving operational performance\n\n'
+            'Consistent growth often reflects strong demand, effective '
+            'management, and a healthy business strategy.',
+      ),
+      MetricInfoSection(
+        header: 'What does a high score mean?',
+        body:
+            'A high Growth Potential score suggests that the company has '
+            'demonstrated strong and consistent business growth over '
+            'time.\n\n'
+            'Companies with higher growth potential are often better '
+            'positioned to:\n\n'
+            '• Increase future earnings\n'
+            '• Expand their operations\n'
+            '• Strengthen their competitive position\n'
+            '• Create long-term value for shareholders\n\n'
+            'Consistent growth is generally viewed as a positive sign of '
+            'business quality.',
+      ),
+      MetricInfoSection(
+        header: 'What does a low score mean?',
+        body:
+            'A low Growth Potential score may indicate that business '
+            'expansion has slowed or become inconsistent.\n\n'
+            'Possible reasons include:\n\n'
+            '• Slower customer demand\n'
+            '• Increased competition\n'
+            '• Market saturation\n'
+            '• Economic challenges\n'
+            '• Company-specific issues\n\n'
+            'A lower score does not necessarily mean the business is weak, '
+            'but it may suggest fewer growth opportunities in the near '
+            'future.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a low score always bad?',
+        body:
+            'Not every successful company needs to grow rapidly.\n\n'
+            'Many mature businesses focus on:\n\n'
+            '• Stable earnings\n'
+            '• Reliable dividends\n'
+            '• Strong cash flow\n'
+            '• Long-term consistency\n\n'
+            'These companies may deliver attractive long-term returns even '
+            'without rapid expansion.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a high score always a guarantee?',
+        body:
+            'Rapid growth often comes with higher expectations.\n\n'
+            'If future growth slows, investors may react negatively, even '
+            'if the company continues to perform well.\n\n'
+            'Growth can also become more difficult as companies become '
+            'larger and more established.\n\n'
+            'For this reason, sustainable growth is generally more '
+            'valuable than short periods of exceptional performance.',
+      ),
+      MetricInfoSection(
+        header: 'What should investors pay attention to?',
+        body:
+            'Growth should always be evaluated together with profitability '
+            'and financial stability.\n\n'
+            'A company that grows rapidly while consistently generating '
+            'healthy profits is often in a stronger position than one that '
+            'grows quickly but struggles financially.\n\n'
+            'Long-term consistency is usually more important than '
+            'short-term acceleration.',
+      ),
+      MetricInfoSection(
+        header: 'Key Takeaway',
+        body:
+            'Growth Potential measures how consistently a company has '
+            'expanded its business over time. Strong and sustainable '
+            'growth can create long-term opportunities, but it should '
+            'always be considered alongside profitability, financial '
+            'health, and overall business quality.',
+      ),
+    ],
+  ),
+  // Marker label is "Efficiency" (financial_score_widget.dart), computed in
+  // scoring_engine.dart from net margin + ROE — i.e. profitability, not
+  // day-to-day operational/resource management. Content below matches what
+  // the marker actually measures rather than its short label.
+  'efficiency': MetricInfoContent(
+    title: 'Efficiency',
+    subtitle: 'How Effectively Revenue Becomes Profit',
+    showAcademicDisclaimer: true,
+    sections: [
+      MetricInfoSection(
+        header: 'What is Profitability?',
+        body:
+            'Profitability measures how effectively a company turns its '
+            'revenue into profit.\n\n'
+            'In simple terms: it helps determine whether a company is '
+            'making money efficiently—or simply generating a lot of sales '
+            'with little profit.\n\n'
+            'A profitable company is generally better positioned to invest '
+            'in growth, reward shareholders, and navigate challenging '
+            'economic conditions.',
+      ),
+      MetricInfoSection(
+        header: 'Why is Profitability important?',
+        body:
+            'Revenue alone does not tell the full story.\n\n'
+            'A company may generate billions of dollars in sales but keep '
+            'only a small portion as profit.\n\n'
+            'Another company may generate lower revenue but operate much '
+            'more efficiently, producing stronger and more consistent '
+            'earnings.\n\n'
+            'Profitability helps investors understand the quality of a '
+            'company\'s business model.',
+      ),
+      MetricInfoSection(
+        header: 'What does a high score mean?',
+        body:
+            'A high Profitability score suggests that the company '
+            'consistently converts a meaningful portion of its revenue '
+            'into profit.\n\n'
+            'Companies with strong profitability are often better '
+            'positioned to:\n\n'
+            '• Invest in future growth\n'
+            '• Expand their operations\n'
+            '• Pay dividends\n'
+            '• Repurchase shares\n'
+            '• Build financial reserves\n'
+            '• Withstand economic downturns\n\n'
+            'Consistently profitable businesses often demonstrate '
+            'efficient management and strong competitive advantages.',
+      ),
+      MetricInfoSection(
+        header: 'What does a low score mean?',
+        body:
+            'A low Profitability score may indicate that the company is '
+            'struggling to generate healthy profits.\n\n'
+            'Possible reasons include:\n\n'
+            '• Rising operating costs\n'
+            '• Intense competition\n'
+            '• Weak pricing power\n'
+            '• Declining demand\n'
+            '• Poor cost management\n'
+            '• Temporary business challenges\n\n'
+            'Lower profitability may reduce a company\'s ability to grow '
+            'or respond to unexpected financial pressures.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a low score always bad?',
+        body:
+            'Some businesses naturally operate with lower profit '
+            'margins.\n\n'
+            'Examples include:\n\n'
+            '• Supermarkets\n'
+            '• Airlines\n'
+            '• Wholesale distributors\n'
+            '• Large retail chains\n\n'
+            'These industries often rely on very high sales volumes rather '
+            'than large profits on each sale.\n\n'
+            'A lower profitability score should always be evaluated within '
+            'the context of the company\'s industry.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a high score always a guarantee?',
+        body:
+            'Strong profitability today does not guarantee strong '
+            'profitability tomorrow.\n\n'
+            'Changing market conditions, increased competition, higher '
+            'costs, or economic slowdowns can all reduce future '
+            'earnings.\n\n'
+            'Investors should look for companies that have demonstrated '
+            'consistent profitability over many years, rather than relying '
+            'on a single strong reporting period.',
+      ),
+      MetricInfoSection(
+        header: 'What should investors pay attention to?',
+        body:
+            'Profitability is one of the strongest indicators of business '
+            'quality, but it should never be viewed in isolation.\n\n'
+            'A complete evaluation should also consider:\n\n'
+            '• Financial Health\n'
+            '• Growth Potential\n'
+            '• Valuation\n'
+            '• Operational Efficiency\n\n'
+            'Looking at these factors together provides a much clearer '
+            'understanding of a company\'s long-term prospects.',
+      ),
+      MetricInfoSection(
+        header: 'Key Takeaway',
+        body:
+            'Profitability measures how efficiently a company converts '
+            'revenue into profit. Businesses with strong and consistent '
+            'profitability are often better equipped to grow, invest, and '
+            'withstand economic challenges, but profitability should '
+            'always be evaluated alongside other aspects of financial '
+            'performance.',
+      ),
+    ],
+  ),
+  // Marker label is "Historical Trend" (financial_score_widget.dart),
+  // computed in scoring_engine.dart from real 5Y share-price CAGR — a
+  // market-driven signal (not a fundamental), so "Market Confidence"
+  // content maps here rather than to Capital Return (dividends/buybacks).
+  'historical-trend': MetricInfoContent(
+    title: 'Historical Trend',
+    subtitle: 'How the Market Has Rewarded the Company Over Time',
+    showAcademicDisclaimer: true,
+    sections: [
+      MetricInfoSection(
+        header: 'What is Market Confidence?',
+        body:
+            'Market Confidence reflects how investors currently perceive a '
+            'company based on its overall performance, stability, and '
+            'future prospects.\n\n'
+            'In simple terms: it helps determine whether the market has '
+            'confidence in the company\'s future or is becoming more '
+            'cautious.\n\n'
+            'Investor confidence can strongly influence a stock\'s price, '
+            'especially over the short and medium term.',
+      ),
+      MetricInfoSection(
+        header: 'Why is Market Confidence important?',
+        body:
+            'The stock market is driven by both facts and expectations.\n\n'
+            'A company may report excellent financial results, but if '
+            'investors expect even better performance, the stock price can '
+            'still fall.\n\n'
+            'Likewise, a company with average results may see its stock '
+            'rise if investors believe its future is improving.\n\n'
+            'Market Confidence helps investors understand how the market '
+            'is currently viewing the business.',
+      ),
+      MetricInfoSection(
+        header: 'What does a high score mean?',
+        body:
+            'A high Market Confidence score suggests that investors '
+            'generally have a positive view of the company\'s future.\n\n'
+            'Companies with strong market confidence often benefit '
+            'from:\n\n'
+            '• Positive investor sentiment\n'
+            '• Stable long-term expectations\n'
+            '• Strong reputation\n'
+            '• Confidence in management\n'
+            '• Optimism about future growth\n\n'
+            'Higher confidence can make it easier for a company to raise '
+            'capital and attract long-term investors.',
+      ),
+      MetricInfoSection(
+        header: 'What does a low score mean?',
+        body:
+            'A low Market Confidence score may indicate that investors are '
+            'becoming more cautious.\n\n'
+            'Possible reasons include:\n\n'
+            '• Slowing business growth\n'
+            '• Weak financial results\n'
+            '• Increased competition\n'
+            '• Industry uncertainty\n'
+            '• Economic concerns\n'
+            '• Company-specific challenges\n\n'
+            'Lower confidence does not necessarily mean the company is '
+            'performing poorly, but it often signals increased '
+            'uncertainty.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a low score always bad?',
+        body:
+            'Investor sentiment can change quickly.\n\n'
+            'Sometimes the market reacts emotionally to short-term news, '
+            'temporary setbacks, or broader economic conditions.\n\n'
+            'Strong companies occasionally experience periods of lower '
+            'confidence before recovering as business conditions '
+            'improve.\n\n'
+            'For long-term investors, temporary pessimism may even create '
+            'attractive opportunities.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a high score always a guarantee?',
+        body:
+            'High investor confidence can sometimes become excessive.\n\n'
+            'When expectations become unrealistically optimistic, stock '
+            'prices may rise much faster than the underlying business.\n\n'
+            'If future results fail to meet those expectations, investor '
+            'confidence can decline rapidly, leading to increased price '
+            'volatility.\n\n'
+            'Confidence should always be supported by strong business '
+            'fundamentals.',
+      ),
+      MetricInfoSection(
+        header: 'What should investors pay attention to?',
+        body:
+            'Market Confidence reflects how investors currently feel about '
+            'a company, but market sentiment can change much faster than '
+            'the business itself.\n\n'
+            'For a balanced investment decision, Market Confidence should '
+            'always be considered together with:\n\n'
+            '• Valuation\n'
+            '• Financial Health\n'
+            '• Growth Potential\n'
+            '• Profitability\n'
+            '• Operational Efficiency\n\n'
+            'Strong companies are built on solid fundamentals—not on '
+            'market optimism alone.',
+      ),
+      MetricInfoSection(
+        header: 'Key Takeaway',
+        body:
+            'Market Confidence reflects how investors currently view a '
+            'company\'s future. Positive sentiment can support stock '
+            'performance, while declining confidence may increase '
+            'uncertainty. However, investor sentiment should always be '
+            'evaluated alongside the company\'s underlying financial '
+            'strength and long-term business quality.',
+      ),
+    ],
+  ),
+  'capital-return': MetricInfoContent(
+    title: 'Shareholder Returns',
+    subtitle: 'Dividends and Share Buybacks',
+    showAcademicDisclaimer: true,
+    sections: [
+      MetricInfoSection(
+        header: 'What are Shareholder Returns?',
+        body:
+            'Shareholder Returns evaluate how a company rewards its '
+            'shareholders by returning value through dividends and share '
+            'buybacks.\n\n'
+            'In simple terms: it helps determine how effectively a '
+            'company shares its financial success with investors.\n\n'
+            'Some companies reward shareholders by paying regular '
+            'dividends, while others choose to repurchase their own '
+            'shares. Many successful businesses use both approaches.',
+      ),
+      MetricInfoSection(
+        header: 'Why are Shareholder Returns important?',
+        body:
+            'When a company generates profits, management must decide how '
+            'to use that money.\n\n'
+            'Common options include:\n\n'
+            '• Investing in future growth\n'
+            '• Reducing debt\n'
+            '• Building cash reserves\n'
+            '• Paying dividends\n'
+            '• Repurchasing company shares\n\n'
+            'Returning capital to shareholders can demonstrate financial '
+            'strength and confidence in the company\'s future.',
+      ),
+      MetricInfoSection(
+        header: 'What does a high score mean?',
+        body:
+            'A high Shareholder Returns score suggests that the company '
+            'has a consistent and shareholder-friendly approach to '
+            'returning value.\n\n'
+            'This may include:\n\n'
+            '• Reliable dividend payments\n'
+            '• Sustainable dividend growth\n'
+            '• Thoughtful share repurchase programs\n'
+            '• A balanced capital allocation strategy\n\n'
+            'Companies with strong shareholder return policies often focus '
+            'on creating long-term value rather than short-term results.',
+      ),
+      MetricInfoSection(
+        header: 'What does a low score mean?',
+        body:
+            'A low Shareholder Returns score does not necessarily indicate '
+            'poor business quality.\n\n'
+            'Possible reasons include:\n\n'
+            '• Reinvesting profits into future growth\n'
+            '• Expanding operations\n'
+            '• Developing new products\n'
+            '• Acquiring other businesses\n'
+            '• Strengthening the balance sheet\n\n'
+            'Many successful companies choose to reinvest their earnings '
+            'instead of returning cash directly to shareholders.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a low score always bad?',
+        body:
+            'Fast-growing companies often generate better long-term '
+            'returns by investing in their own business rather than '
+            'paying dividends or buying back shares.\n\n'
+            'If those investments produce higher future earnings, '
+            'shareholders may benefit through long-term stock price '
+            'appreciation instead of immediate cash distributions.\n\n'
+            'Growth-focused companies frequently follow this strategy '
+            'during their expansion years.',
+      ),
+      MetricInfoSection(
+        header: 'Why isn\'t a high score always a guarantee?',
+        body:
+            'Returning cash to shareholders is generally positive—but '
+            'only when it is financially sustainable.\n\n'
+            'For example:\n\n'
+            '• A company may pay an unusually high dividend that cannot '
+            'be maintained.\n'
+            '• A business may repurchase shares while taking on excessive '
+            'debt.\n\n'
+            'Capital returned to shareholders should never weaken the '
+            'company\'s long-term financial stability.\n\n'
+            'Healthy shareholder returns should be supported by strong '
+            'earnings, cash flow, and a solid financial position.',
+      ),
+      MetricInfoSection(
+        header: 'What should investors pay attention to?',
+        body:
+            'Shareholder Returns should be viewed as part of the '
+            'company\'s overall capital allocation strategy.\n\n'
+            'A company that balances:\n\n'
+            '• Business investment\n'
+            '• Financial stability\n'
+            '• Sustainable dividends\n'
+            '• Responsible share buybacks\n\n'
+            'is often creating greater long-term value for its '
+            'shareholders.\n\n'
+            'There is no single "best" approach. The right strategy '
+            'depends on the company\'s stage of growth, industry, and '
+            'long-term objectives.',
+      ),
+      MetricInfoSection(
+        header: 'Key Takeaway',
+        body:
+            'Shareholder Returns measure how a company rewards investors '
+            'through dividends and share buybacks. Strong shareholder '
+            'returns often reflect disciplined financial management, but '
+            'they should always be supported by healthy earnings, '
+            'sustainable cash flow, and a solid financial foundation.',
+      ),
+    ],
+  ),
+  // Reached by tapping the gold "Legal Disclaimer & Methodology" link at
+  // the bottom of FinancialScoreWidget — full legal-grade text, the
+  // compact on-card line is a summary of this.
+  'fs-score-legal': MetricInfoContent(
+    title: 'Legal Disclaimer',
+    subtitle: 'Financial Scoring & Market Data',
+    sections: [
+      MetricInfoSection(
+        body:
+            'The financial evaluation metrics (including FS Score) '
+            'displayed in this application are calculated automatically '
+            'using mathematical algorithms applied to publicly accessible '
+            'market data and corporate financial disclosures (such as '
+            '10-K, 10-Q SEC filings).\n\n'
+            'These scores are strictly analytical outputs intended for '
+            'educational and market research simulation. They do not '
+            'constitute investment advice, financial recommendations, '
+            'credit ratings, or endorsements of any security or '
+            'entity.\n\n'
+            'Neither the app nor its developers warrant the accuracy, '
+            'completeness, or timeliness of the underlying data or '
+            'calculated metrics. Users assume full responsibility for any '
+            'trading or investment decisions made independently outside '
+            'of this educational simulator.',
       ),
     ],
   ),

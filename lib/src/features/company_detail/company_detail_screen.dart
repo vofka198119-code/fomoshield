@@ -291,6 +291,20 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     await cacheCompanyLogo(widget.symbol, profile);
   }
 
+  // Quote/profile already loaded for this screen — handed to the order
+  // entry screen via route extra so it doesn't have to refetch on open or
+  // guess the company name/logo. Only price (not day's change, see
+  // order_header.dart).
+  Map<String, dynamic> get _quoteExtra {
+    final profile = widget.data['profile'] as Map<String, dynamic>? ?? {};
+    final quote = widget.data['quote'] as Map<String, dynamic>? ?? {};
+    return {
+      'price': (quote['c'] as num?)?.toDouble() ?? 0,
+      'companyName': profile['name'] as String? ?? widget.symbol,
+      'logo': profile['logo'] as String?,
+    };
+  }
+
   void _openOrderEntry(String type) {
     final portfolios = ref.read(portfoliosProvider);
     if (portfolios.isEmpty) {
@@ -306,7 +320,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     if (contextId != null && portfolios.any((p) => p.id == contextId)) {
       context.push(
         '/portfolio/$contextId/stock/${widget.symbol}/order',
-        extra: {'type': type},
+        extra: {'type': type, ..._quoteExtra},
       );
       return;
     }
@@ -314,7 +328,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     if (portfolios.length == 1) {
       context.push(
         '/portfolio/${portfolios.first.id}/stock/${widget.symbol}/order',
-        extra: {'type': type},
+        extra: {'type': type, ..._quoteExtra},
       );
       return;
     }
@@ -369,7 +383,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                     Navigator.pop(ctx);
                     context.push(
                       '/portfolio/${p.id}/stock/${widget.symbol}/order',
-                      extra: {'type': type},
+                      extra: {'type': type, ..._quoteExtra},
                     );
                   },
                 ),
@@ -489,22 +503,27 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                     for (int i = 0; i < visibleWidgets.length; i++)
                       KeyedSubtree(
                         key: ValueKey('company_widget_${visibleWidgets[i].id}'),
-                        child: _buildWidget(
-                          visibleWidgets[i].id,
-                          logo: logo,
-                          companyName: companyName,
-                          symbol: widget.symbol,
-                          price: price,
-                          change: change,
-                          changePercent: changePercent,
-                          isUp: isUp,
-                          metrics: metrics,
-                          scoreData: scoreData,
+                        child: _StaggerFadeIn(
+                          index: i,
+                          child: _buildWidget(
+                            visibleWidgets[i].id,
+                            logo: logo,
+                            companyName: companyName,
+                            symbol: widget.symbol,
+                            price: price,
+                            change: change,
+                            changePercent: changePercent,
+                            isUp: isUp,
+                            metrics: metrics,
+                            scoreData: scoreData,
+                          ),
                         ),
                       ),
                     const SizedBox(height: 16),
                     // ── Add widgets button ──
-                    Center(
+                    _StaggerFadeIn(
+                      index: visibleWidgets.length,
+                      child: Center(
                       child: TextButton.icon(
                         onPressed: _showWidgetsBottomSheet,
                         icon: const Icon(
@@ -533,6 +552,63 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             ),
                           ),
                         ),
+                      ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // ── Educational Purpose & Legal Disclaimer ──
+                    _StaggerFadeIn(
+                      index: visibleWidgets.length + 1,
+                      child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Educational Purpose & Legal Disclaimer',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: ThemeV2.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'This application operates strictly as an '
+                            'educational simulator designed to help users '
+                            'learn how to analyze and understand business '
+                            'fundamentals. Evaluation scores and analytics '
+                            'are derived from public corporate financial '
+                            'filings, as well as academic frameworks from '
+                            'leading universities and established financial '
+                            'literacy textbooks.\n\n'
+                            'Displayed market prices and metrics may be '
+                            'delayed, estimated, or differ from live '
+                            'exchange prices. Content within this app does '
+                            'not constitute a solicitation, recommendation, '
+                            'or offer to buy or sell any financial security. '
+                            'All trading decisions are made solely and '
+                            'independently by the user. The developers do '
+                            'not provide financial services and bear no '
+                            'liability for any potential lost profits, '
+                            'financial losses, or loss of real-world '
+                            'capital.\n\n'
+                            'Continued use of this application constitutes '
+                            'your full acknowledgment and acceptance of '
+                            'this disclaimer, including the release of '
+                            'developers from any liability. Failure to read '
+                            'this disclaimer does not exempt the user from '
+                            'compliance nor provide grounds for any claims, '
+                            'disputes, or legal actions.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 9,
+                              color: ThemeV2.textPrimary,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
                       ),
                     ),
                     const SizedBox(height: 100), // space for bottom bar
@@ -588,6 +664,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
               changeLabel: periodChange != null
                   ? 'CHANGE (${periodChange.periodLabel})'
                   : 'CHANGE',
+              fsScore: scoreData['financial_score'] as int?,
             ),
             const SizedBox(height: 16),
           ],
@@ -648,6 +725,60 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
         initialConfigs: currentConfigs,
         notifier: notifier,
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Staggered top-to-bottom fade/slide-in for the card's widgets — masks the
+// layout reflow that happens as each widget's own async data (chart
+// candles, financial score, etc.) resolves at a different time, instead of
+// everything popping into place at once. Runs once per widget instance
+// (tied to its KeyedSubtree's key, so it doesn't replay on every rebuild).
+// ---------------------------------------------------------------------------
+
+class _StaggerFadeIn extends StatefulWidget {
+  final int index;
+  final Widget child;
+
+  const _StaggerFadeIn({required this.index, required this.child});
+
+  @override
+  State<_StaggerFadeIn> createState() => _StaggerFadeInState();
+}
+
+class _StaggerFadeInState extends State<_StaggerFadeIn>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    _slide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
+        .animate(_fade);
+    Future.delayed(Duration(milliseconds: 70 * widget.index), () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(position: _slide, child: widget.child),
     );
   }
 }

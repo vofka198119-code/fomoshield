@@ -382,7 +382,7 @@ compositeScore = PR × 0.25 + D × 0.30 + P × 0.25 + SA × 0.20
 | Контекст | Файл | Формула | Природа |
 |----------|------|---------|---------|
 | **Psychology Meter** | `psychology_meter.dart` + `stress_test_models.dart` | `compositeScore` (4 субиндекса) | **Поведенческая** |
-| **Scoring Engine** | `scoring_engine.dart` | 6 финансовых маркеров (P/E, Debt, Growth, Efficiency, Trend, Capital Return) | **Финансовая** |
+| **Scoring Engine** | `scoring_engine.dart` | 6 финансовых маркеров (P/E, Debt, Growth, Efficiency, Trend, Shareholder Returns) | **Финансовая** |
 | **Verdict** | `stress_test_engine.dart` `_calculateFsScore()` | PnL + penalties (panic, peak, concentration) | **Гибридная** |
 
 **Путаница**: все три используют имя `fsScore`/`fs_score`, но это РАЗНЫЕ показатели. Рекомендовано переименовать Psychology Meter → `psychologyScore` или `traderScore`.
@@ -411,7 +411,7 @@ compositeScore = PR × 0.25 + D × 0.30 + P × 0.25 + SA × 0.20
 | Growth Potential | 0.20 | Revenue & EPS 5Y growth |
 | Efficiency | 0.15 | Net Margin, ROE |
 | Historical Trend | 0.15 | 5Y CAGR |
-| Capital Return | 0.10 | Dividends, Buybacks |
+| Shareholder Returns | 0.10 | Dividends, Buybacks |
 
 Итог: `totalScore = Σ(marker_i × weight_i)`, с dividend trap penalty.
 

@@ -6,6 +6,7 @@ import 'src/core/cache/sector_providers.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
+import 'src/features/orders/pending_orders_checker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,11 +46,27 @@ void main() async {
   );
 }
 
-class ScanCoApp extends ConsumerWidget {
+class ScanCoApp extends ConsumerStatefulWidget {
   const ScanCoApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ScanCoApp> createState() => _ScanCoAppState();
+}
+
+class _ScanCoAppState extends ConsumerState<ScanCoApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Delayed so this doesn't compete with everything else the first
+    // frame already loads (widget order providers, home widgets, sector
+    // cache hydration, ...) — the CPU spike right at cold start is real.
+    Future.delayed(const Duration(seconds: 8), () {
+      if (mounted) checkPendingOrders(ref);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'F.O.M.O. Shield',
       debugShowCheckedModeBanner: false,

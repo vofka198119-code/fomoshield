@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import 'metric_info_data.dart';
@@ -21,6 +22,14 @@ class MetricInfoScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_rounded,
+            size: 22,
+            color: ThemeV2.textPrimary,
+          ),
+          onPressed: () => context.pop(),
+        ),
         title: Text(
           content.title.toUpperCase(),
           style: GoogleFonts.inter(
@@ -48,8 +57,31 @@ class MetricInfoScreen extends StatelessWidget {
             for (int i = 0; i < content.sections.length; i++)
               _Section(
                 section: content.sections[i],
-                isLast: i == content.sections.length - 1,
+                isLast: i == content.sections.length - 1 &&
+                    !content.showAcademicDisclaimer,
               ),
+            if (content.showAcademicDisclaimer) ...[
+              const SizedBox(height: 18),
+              Text(
+                'Educational & Academic Disclaimer',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: ThemeV2.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'The methodology, definitions, and analytical principles '
+                'presented here are based on standard corporate finance '
+                'theory and valuation frameworks taught in leading business '
+                'schools. Provided strictly for educational purposes.',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  color: ThemeV2.textSecondary,
+                ),
+              ),
+            ],
           ],
         ),
       ),

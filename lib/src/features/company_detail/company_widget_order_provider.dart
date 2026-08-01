@@ -12,9 +12,9 @@ import '../../core/supabase/supabase_providers.dart';
 const List<String> defaultCompanyWidgetOrder = [
   'price_header',
   'chart',
+  'position',
   'key_metrics',
   'financial_score',
-  'position',
 ];
 
 String _orderPrefsKey(String? uid) =>
@@ -124,20 +124,28 @@ class CompanyWidgetsNotifier extends StateNotifier<List<CompanyWidgetConfig>> {
     );
   }
 
+  // 'price_header' is pinned first — always index 0, never hidden. Guarded
+  // here too (not just in the settings sheet UI) so it holds regardless of
+  // caller.
+  static const _pinnedFirstId = 'price_header';
+
   Future<void> reorder(String id, int newIndex) async {
+    if (id == _pinnedFirstId) return;
     final currentIndex = state.indexWhere((c) => c.id == id);
     if (currentIndex < 0) return;
 
     final config = state[currentIndex];
+    final clampedIndex = newIndex.clamp(1, state.length - 1);
     final newList = [...state]
       ..removeAt(currentIndex)
-      ..insert(newIndex.clamp(0, state.length - 1), config);
+      ..insert(clampedIndex, config);
 
     state = newList;
     await _saveLocal();
   }
 
   Future<void> toggleVisibility(String id) async {
+    if (id == _pinnedFirstId) return;
     state = state.map((c) {
       if (c.id == id) return CompanyWidgetConfig(id: c.id, visible: !c.visible);
       return c;
