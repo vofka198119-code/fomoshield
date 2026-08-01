@@ -137,16 +137,16 @@ class _SectorParams {
 /// |               | cyclicalConsumer  | 0.15       | 0.20       |
 /// |               | realEstateREIT    | -0.05      | 0.08       |
 /// |               | etfBroadMarket    | 0.10       | 0.15       |
-/// | BULL          | techSpeculative   | 0.25       | 0.18       |
+/// | BULL          | techSpeculative   | 0.1625     | 0.198      |
 /// |               | consumerStaples   | 0.08       | 0.06       |
-/// |               | cyclicalConsumer  | 0.18       | 0.12       |
-/// |               | realEstateREIT    | 0.10       | 0.05       |
-/// |               | etfBroadMarket    | 0.12       | 0.08       |
-/// | BEAR          | techSpeculative   | -0.08      | 0.12       |
-/// |               | consumerStaples   | -0.01      | 0.03       |
-/// |               | cyclicalConsumer  | -0.05      | 0.07       |
-/// |               | realEstateREIT    | -0.03      | 0.04       |
-/// |               | etfBroadMarket    | -0.04      | 0.05       |
+/// |               | cyclicalConsumer  | 0.135      | 0.132      |
+/// |               | realEstateREIT    | 0.075      | 0.055      |
+/// |               | etfBroadMarket    | 0.09       | 0.088      |
+/// | BEAR          | techSpeculative   | -0.072     | 0.132      |
+/// |               | consumerStaples   | -0.009     | 0.033      |
+/// |               | cyclicalConsumer  | -0.045     | 0.077      |
+/// |               | realEstateREIT    | -0.027     | 0.044      |
+/// |               | etfBroadMarket    | -0.036     | 0.055      |
 /// | CRASH         | techSpeculative   | -0.25      | 0.28       |
 /// |               | consumerStaples   | -0.03      | 0.07       |
 /// |               | cyclicalConsumer  | -0.17      | 0.17       |
@@ -173,12 +173,26 @@ const Map<_MacroRegime, Map<AssetSector, _SectorParams>> _masterMatrix = {
     AssetSector.realEstateREIT: _SectorParams(0.02, 0.02),
     AssetSector.etfBroadMarket: _SectorParams(0.00, 0.03),
   },
+  // Drift trimmed, volatility raised +10% across every sector (device-test
+  // feedback 2026-08-01): 2 consecutive Bull epochs were compounding the
+  // OLD drift into +39-56% for techSpeculative/cyclicalConsumer (drift is
+  // applied ~fully per epoch regardless of the epoch's real-world length —
+  // see the dt/GBM note above), while consumerStaples's +17% over 2
+  // epochs "felt normal" and was left untouched. techSpeculative got the
+  // deepest cut (-35%, vs -25% for the other trimmed sectors) since it
+  // was still the biggest outlier even after the first pass. Also, in
+  // every row the max possible negative noise swing (σ×0.5) was smaller
+  // than the drift, so a Bull epoch could mathematically never net
+  // negative — no down days even within a real bull trend. The vol bump
+  // alone isn't enough to flip that guarantee sector-by-sector, but
+  // combined with the drift cut it meaningfully narrows the
+  // always-positive margin.
   _MacroRegime.bull: {
-    AssetSector.techSpeculative: _SectorParams(0.25, 0.18),
+    AssetSector.techSpeculative: _SectorParams(0.1625, 0.198),
     AssetSector.consumerStaples: _SectorParams(0.08, 0.06),
-    AssetSector.cyclicalConsumer: _SectorParams(0.18, 0.12),
-    AssetSector.realEstateREIT: _SectorParams(0.10, 0.05),
-    AssetSector.etfBroadMarket: _SectorParams(0.12, 0.08),
+    AssetSector.cyclicalConsumer: _SectorParams(0.135, 0.132),
+    AssetSector.realEstateREIT: _SectorParams(0.075, 0.055),
+    AssetSector.etfBroadMarket: _SectorParams(0.09, 0.088),
   },
   _MacroRegime.volatility: {
     AssetSector.techSpeculative: _SectorParams(0.00, 0.40),
@@ -188,13 +202,20 @@ const Map<_MacroRegime, Map<AssetSector, _SectorParams>> _masterMatrix = {
     AssetSector.etfBroadMarket: _SectorParams(0.00, 0.20),
   },
   // Bear: mild, "gradual decline, staples resilient" — the calmest of the
-  // three decline scenarios.
+  // three decline scenarios. Drift trimmed -10% and volatility raised
+  // +10% across every sector (device-test feedback 2026-08-01, same pass
+  // as the Bull retune above) — mirrors the Bull fix: in 4 of 5 sectors
+  // the max possible positive noise swing (σ×0.5) was smaller than the
+  // drift, so a Bear epoch could never net positive (consumerStaples was
+  // the one exception, "resilient" by design). Bear was already the
+  // mildest of the three decline regimes (max ~-15% over 2 epochs vs
+  // Bull's old +56%), so this is a light touch, not a rebalance.
   _MacroRegime.bear: {
-    AssetSector.techSpeculative: _SectorParams(-0.08, 0.12),
-    AssetSector.consumerStaples: _SectorParams(-0.01, 0.03),
-    AssetSector.cyclicalConsumer: _SectorParams(-0.05, 0.07),
-    AssetSector.realEstateREIT: _SectorParams(-0.03, 0.04),
-    AssetSector.etfBroadMarket: _SectorParams(-0.04, 0.05),
+    AssetSector.techSpeculative: _SectorParams(-0.072, 0.132),
+    AssetSector.consumerStaples: _SectorParams(-0.009, 0.033),
+    AssetSector.cyclicalConsumer: _SectorParams(-0.045, 0.077),
+    AssetSector.realEstateREIT: _SectorParams(-0.027, 0.044),
+    AssetSector.etfBroadMarket: _SectorParams(-0.036, 0.055),
   },
   // Crash: "heavy sector-wide drop" — meaningfully worse than Bear,
   // clearly milder than blackSwan.
