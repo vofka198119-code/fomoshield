@@ -17,8 +17,10 @@ class OrderConfigSection extends StatelessWidget {
   final bool isBuy;
   final VoidCallback onTapLimitPriceField;
   final String infoText;
-  final bool extendedHours;
-  final ValueChanged<bool> onExtendedHoursChanged;
+  // Null on both hides the toggle entirely — for markets with no concept
+  // of trading hours (Stress Test's simulated market is always open).
+  final bool? extendedHours;
+  final ValueChanged<bool>? onExtendedHoursChanged;
 
   const OrderConfigSection({
     super.key,
@@ -28,8 +30,8 @@ class OrderConfigSection extends StatelessWidget {
     required this.isBuy,
     required this.onTapLimitPriceField,
     required this.infoText,
-    required this.extendedHours,
-    required this.onExtendedHoursChanged,
+    this.extendedHours,
+    this.onExtendedHoursChanged,
   });
 
   @override
@@ -44,7 +46,8 @@ class OrderConfigSection extends StatelessWidget {
             onTapField: onTapLimitPriceField,
           ),
         _infoBox(),
-        _extendedHoursToggle(),
+        if (extendedHours != null && onExtendedHoursChanged != null)
+          _extendedHoursToggle(extendedHours!, onExtendedHoursChanged!),
         _disclaimer(),
       ],
     );
@@ -109,7 +112,7 @@ class OrderConfigSection extends StatelessWidget {
     );
   }
 
-  Widget _extendedHoursToggle() {
+  Widget _extendedHoursToggle(bool extendedHours, ValueChanged<bool> onChanged) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Container(
@@ -140,7 +143,7 @@ class OrderConfigSection extends StatelessWidget {
             ),
             Switch(
               value: extendedHours,
-              onChanged: onExtendedHoursChanged,
+              onChanged: onChanged,
               activeTrackColor: ThemeV2.primary,
             ),
           ],

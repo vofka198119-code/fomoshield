@@ -37,6 +37,13 @@ class PriceHeader extends StatelessWidget {
   final bool isUp;
   final String changeLabel;
   final int? fsScore;
+  // Overrides the real-NYSE-time phase label/color computed below — for
+  // callers whose price isn't a real market price (Stress Test's
+  // simulated engine has its own always-open semantics; showing the
+  // actual NYSE session there would misrepresent it).
+  final String? phaseLabel;
+  final Color? phaseLabelColor;
+  final bool phaseGlow;
 
   const PriceHeader({
     super.key,
@@ -49,6 +56,9 @@ class PriceHeader extends StatelessWidget {
     required this.isUp,
     this.changeLabel = 'CHANGE',
     this.fsScore,
+    this.phaseLabel,
+    this.phaseLabelColor,
+    this.phaseGlow = false,
   });
 
   @override
@@ -303,9 +313,17 @@ class PriceHeader extends StatelessWidget {
   }
 
   Widget _priceCell() {
-    final phase = resolveMarketClockState(nowInNewYork()).phase;
-    final isOpen = phase == MarketPhase.marketOpen;
-    final sessionColor = isOpen ? dialBrassLight : Colors.white;
+    final String sessionLabel;
+    final bool isOpen;
+    if (phaseLabel != null) {
+      sessionLabel = phaseLabel!;
+      isOpen = phaseGlow;
+    } else {
+      final phase = resolveMarketClockState(nowInNewYork()).phase;
+      sessionLabel = _phaseLabel(phase);
+      isOpen = phase == MarketPhase.marketOpen;
+    }
+    final sessionColor = phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
 
     return Container(
       width: double.infinity,
@@ -334,7 +352,7 @@ class PriceHeader extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                _phaseLabel(phase),
+                sessionLabel,
                 style: GoogleFonts.inter(
                   fontSize: 9,
                   fontWeight: FontWeight.w700,
