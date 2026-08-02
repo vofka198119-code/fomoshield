@@ -24,8 +24,6 @@ import '../../core/supabase/supabase_providers.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 
-import 'package:fl_chart/fl_chart.dart';
-import '../../shared/widgets/corporate_events.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 
 import '../monetization/monetization_modal.dart';
@@ -36,6 +34,8 @@ import '../../shared/widgets/verdict_card.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_widget_order_provider.dart';
+import 'widgets/stress_test_allocation_chart.dart';
+import 'widgets/stress_test_cash_widget.dart';
 
 class StressTestScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -443,15 +443,12 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
               ),
             if (isExpired) const SizedBox(height: 12),
 
-            // ── Allocation chart (always above dynamic widgets) ──
-            _buildAllocationChart(session),
-            const SizedBox(height: 14),
-
-            // ── Dynamic widgets (reorderable via gear icon) ──
+            // ── Widgets (reorderable via gear icon; Portfolio Balance
+            // pinned first, Timer pinned last — see
+            // stress_test_widget_order_provider.dart) ──
             for (final cfg in visibleWidgets) ...[
-              if (cfg.id != 'allocation_chart')
-                _buildWidgetById(cfg.id, session),
-              if (cfg.id != 'allocation_chart') const SizedBox(height: 12),
+              _buildWidgetById(cfg.id, session),
+              const SizedBox(height: 12),
             ],
 
             const SizedBox(height: 4),
@@ -500,6 +497,10 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   /// Returns [SizedBox.shrink] if the widget's conditions aren't met.
   Widget _buildWidgetById(String id, StressTestSession session) {
     switch (id) {
+      case 'allocation_chart':
+        return StressTestAllocationChart(session: session);
+      case 'cash':
+        return StressTestCashWidget(session: session);
       case 'psychology_meter':
         return PsychologyMeter(data: PsychologyMeterData.fromSession(session));
       case 'my_assets':
@@ -523,18 +524,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             activeEpochProgress: epochProgress,
             initialLimit: 3,
             session: session,
-          ),
-        );
-      case 'corporate_events':
-        if (session.holdings.isEmpty) return const SizedBox.shrink();
-        return _buildSectionCard(
-          title: '',
-          noInnerPadding: true,
-          child: CorporateEventsWidget(
-            sessionId: widget.sessionId,
-            holdings: session.holdings,
-            activeNewsEvent: session.activeNewsEvent,
-            activeHypeEvents: session.activeHypeEvents,
           ),
         );
       case 'trade_history':
@@ -677,160 +666,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     return buf.toString();
   }
 
-  // ── Donut Chart with centered portfolio metrics ──────────────────────
-
-  /// Generates a deterministic distinct color for any index using
-  /// golden-angle hue distribution — unlimited unique colors.
-  static Color _allocationColor(int index) {
-    const double goldenAngle = 137.508; // degrees
-    final hue = (index * goldenAngle) % 360.0;
-    // Slightly vary saturation & lightness to keep colours vibrant
-    final saturation = 55.0 + (index % 3) * 10.0;
-    final lightness = 40.0 + (index % 2) * 8.0;
-    return HSLColor.fromAHSL(
-      1.0,
-      hue,
-      saturation / 100,
-      lightness / 100,
-    ).toColor();
-  }
-
-  /// Thin elegant donut chart with portfolio metrics centered inside the ring.
-  /// Steps 56–62: 240×240, ring thickness 18, animation 400ms, cash capsule below.
-  Widget _buildAllocationChart(StressTestSession session) {
-    final holdings = session.holdings;
-    final isEmpty = holdings.isEmpty;
-
-    // Calculate total invested value per holding (shares * current price)
-    final invested = <({String symbol, double value})>[];
-    double totalInvested = 0;
-    for (final h in holdings) {
-      final price = session.currentPrices[h.symbol] ?? h.entryPrice;
-      final val = h.shares * price;
-      invested.add((symbol: h.symbol, value: val));
-      totalInvested += val;
-    }
-    invested.sort((a, b) => b.value.compareTo(a.value));
-
-    final hasData = !isEmpty && totalInvested > 0;
-
-    // ── Portfolio metrics for the center ──────────────────────────
-    final portfolioTotal = session.totalValue;
-    final pnl = session.profitLoss;
-    final pnlPercent = session.profitLossPercent;
-    final isPositive = pnl >= 0;
-    final isZero = pnl == 0;
-    final pnlColor = isZero
-        ? ThemeV2.textSecondary
-        : isPositive
-        ? ThemeV2.success
-        : ThemeV2.loss;
-    final pnlText = isZero
-        ? '\$0.00'
-        : '${isPositive ? '+' : ''}\$${_fmtFull(pnl.abs())} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
-
-    return Column(
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 240,
-                height: 240,
-                child: hasData
-                    ? PieChart(
-                        PieChartData(
-                          sectionsSpace: 3,
-                          centerSpaceRadius: 102,
-                          sections: List.generate(invested.length, (i) {
-                            final item = invested[i];
-                            final share = item.value / totalInvested;
-                            return PieChartSectionData(
-                              value: share * 100,
-                              title: '',
-                              radius: 12,
-                              color: _allocationColor(i),
-                            );
-                          }),
-                        ),
-                        duration: const Duration(milliseconds: 400),
-                      )
-                    : PieChart(
-                        PieChartData(
-                          sectionsSpace: 3,
-                          centerSpaceRadius: 102,
-                          sections: [
-                            PieChartSectionData(
-                              value: 100,
-                              title: '',
-                              radius: 12,
-                              color: Colors.black.withValues(alpha: 0.06),
-                            ),
-                          ],
-                        ),
-                        duration: const Duration(milliseconds: 400),
-                      ),
-              ),
-              // ── Center content: Portfolio Value + P&L ─────────────
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Portfolio Value',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: ThemeV2.textSecondary,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '\$${_fmtFull(portfolioTotal)}',
-                    style: interNums(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    pnlText,
-                    style: interNums(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: pnlColor,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        // ── Cash Capsule (Steps 61–62) ──────────────────────
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          decoration: BoxDecoration(
-            color: ThemeV2.primaryBg,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: ThemeV2.divider),
-          ),
-          child: Text(
-            'Cash: \$${_fmtFull(session.cash)} available',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: ThemeV2.primary,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   /// Reactive wrapper for _buildMyAssets — watches the provider
   /// and rebuilds when holdings change.
   Widget _buildMyAssetsSection() {
@@ -878,7 +713,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     final displayList = _showAllAssets ? sorted : sorted.take(10).toList();
 
     return _buildSectionCard(
-      title: 'MY ASSETS',
+      title: 'HOLDINGS',
       trailing: addButton,
       noInnerPadding: true,
       child: holdings.isEmpty
@@ -968,9 +803,10 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: _allocationColor(
-                                      i,
-                                    ).withValues(alpha: 0.7),
+                                    color:
+                                        StressTestAllocationChart.allocationColor(
+                                          i,
+                                        ).withValues(alpha: 0.7),
                                     width: 1.5,
                                   ),
                                 ),
@@ -1538,7 +1374,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           const SizedBox(height: 16),
 
           // ── Allocation Chart ────────────────────────────
-          _buildAllocationChart(session),
+          StressTestAllocationChart(session: session),
           const SizedBox(height: 16),
 
           // ── Cash Row ────────────────────────────────────
@@ -1660,6 +1496,11 @@ class _StressTestWidgetSettingsSheetState
     extends State<_StressTestWidgetSettingsSheet> {
   late List<StressTestWidgetConfig> _configs;
 
+  // 'allocation_chart' is pinned first, 'timer' is pinned last — never
+  // draggable, never hidden (mirrors company_detail's pinned-first pattern).
+  static const _pinnedFirstId = 'allocation_chart';
+  static const _pinnedLastId = 'timer';
+
   @override
   void initState() {
     super.initState();
@@ -1667,14 +1508,18 @@ class _StressTestWidgetSettingsSheetState
   }
 
   void _onReorderItem(int oldIndex, int newIndex) {
+    final id = _configs[oldIndex].id;
+    if (id == _pinnedFirstId || id == _pinnedLastId) return;
+    final clampedIndex = newIndex.clamp(1, _configs.length - 2);
     setState(() {
       final item = _configs.removeAt(oldIndex);
-      _configs.insert(newIndex, item);
+      _configs.insert(clampedIndex, item);
     });
-    widget.notifier.reorder(_configs[newIndex].id, newIndex);
+    widget.notifier.reorder(id, clampedIndex);
   }
 
   void _toggleVisibility(String id) {
+    if (id == _pinnedFirstId || id == _pinnedLastId) return;
     setState(() {
       final index = _configs.indexWhere((c) => c.id == id);
       if (index >= 0) {
@@ -1728,36 +1573,12 @@ class _StressTestWidgetSettingsSheetState
                     onPressed: () {
                       widget.notifier.resetToDefaults();
                       setState(() {
-                        _configs = [
-                          const StressTestWidgetConfig(
-                            id: 'psychology_meter',
-                            visible: true,
-                          ),
-                          const StressTestWidgetConfig(
-                            id: 'allocation_chart',
-                            visible: true,
-                          ),
-                          const StressTestWidgetConfig(
-                            id: 'my_assets',
-                            visible: true,
-                          ),
-                          const StressTestWidgetConfig(
-                            id: 'market_timeline',
-                            visible: true,
-                          ),
-                          const StressTestWidgetConfig(
-                            id: 'corporate_events',
-                            visible: true,
-                          ),
-                          const StressTestWidgetConfig(
-                            id: 'trade_history',
-                            visible: true,
-                          ),
-                          const StressTestWidgetConfig(
-                            id: 'timer',
-                            visible: true,
-                          ),
-                        ];
+                        _configs = stressTestDefaultWidgetOrder
+                            .map(
+                              (id) =>
+                                  StressTestWidgetConfig(id: id, visible: true),
+                            )
+                            .toList();
                       });
                     },
                     child: Text(
@@ -1794,6 +1615,8 @@ class _StressTestWidgetSettingsSheetState
                 },
                 itemBuilder: (context, index) {
                   final config = _configs[index];
+                  final isPinned =
+                      config.id == _pinnedFirstId || config.id == _pinnedLastId;
                   return ListTile(
                     key: ValueKey(config.id),
                     contentPadding: const EdgeInsets.symmetric(
@@ -1803,14 +1626,21 @@ class _StressTestWidgetSettingsSheetState
                     leading: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        ReorderableDragStartListener(
-                          index: index,
-                          child: const Icon(
-                            Icons.drag_handle_rounded,
-                            color: ThemeV2.textSecondary,
-                            size: 24,
-                          ),
-                        ),
+                        // Pinned widgets can't be dragged.
+                        isPinned
+                            ? const Icon(
+                                Icons.push_pin_rounded,
+                                color: ThemeV2.textSecondary,
+                                size: 20,
+                              )
+                            : ReorderableDragStartListener(
+                                index: index,
+                                child: const Icon(
+                                  Icons.drag_handle_rounded,
+                                  color: ThemeV2.textSecondary,
+                                  size: 24,
+                                ),
+                              ),
                         const SizedBox(width: 8),
                         Icon(
                           _widgetIcon(config.id),
@@ -1827,18 +1657,24 @@ class _StressTestWidgetSettingsSheetState
                         color: ThemeV2.textPrimary,
                       ),
                     ),
-                    trailing: GestureDetector(
-                      onTap: () => _toggleVisibility(config.id),
-                      child: Icon(
-                        config.visible
-                            ? Icons.visibility_rounded
-                            : Icons.visibility_off_rounded,
-                        color: config.visible
-                            ? ThemeV2.primary
-                            : ThemeV2.textSecondary,
-                        size: 22,
-                      ),
-                    ),
+                    trailing: isPinned
+                        ? Icon(
+                            Icons.visibility_rounded,
+                            color: ThemeV2.textSecondary.withValues(alpha: 0.4),
+                            size: 22,
+                          )
+                        : GestureDetector(
+                            onTap: () => _toggleVisibility(config.id),
+                            child: Icon(
+                              config.visible
+                                  ? Icons.visibility_rounded
+                                  : Icons.visibility_off_rounded,
+                              color: config.visible
+                                  ? ThemeV2.primary
+                                  : ThemeV2.textSecondary,
+                              size: 22,
+                            ),
+                          ),
                   );
                 },
               ),
@@ -1856,12 +1692,12 @@ class _StressTestWidgetSettingsSheetState
         return Icons.psychology_rounded;
       case 'allocation_chart':
         return Icons.pie_chart_rounded;
+      case 'cash':
+        return Icons.account_balance_wallet_rounded;
       case 'my_assets':
         return Icons.account_balance_rounded;
       case 'market_timeline':
-        return Icons.timeline_rounded;
-      case 'corporate_events':
-        return Icons.event_rounded;
+        return Icons.show_chart_rounded;
       case 'trade_history':
         return Icons.swap_horiz_rounded;
       case 'timer':

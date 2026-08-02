@@ -13,21 +13,20 @@ class StressTestWidgetConfig {
   final String id;
   final bool visible;
 
-  const StressTestWidgetConfig({
-    required this.id,
-    required this.visible,
-  });
+  const StressTestWidgetConfig({required this.id, required this.visible});
 
   String get displayName {
     switch (id) {
+      case 'allocation_chart':
+        return 'Portfolio Balance';
+      case 'cash':
+        return 'Cash Available';
       case 'psychology_meter':
         return 'Psychology Meter';
       case 'my_assets':
-        return 'My Assets';
+        return 'Holdings';
       case 'market_timeline':
-        return 'Market Timeline';
-      case 'corporate_events':
-        return 'Corporate Events';
+        return 'Portfolio Value';
       case 'trade_history':
         return 'Trade History';
       case 'timer':
@@ -36,15 +35,17 @@ class StressTestWidgetConfig {
         return id;
     }
   }
-
 }
 
-/// Default order of reorderable widgets.
-const List<String> _defaultOrder = [
-  'psychology_meter',
-  'my_assets',
+/// Default order of reorderable widgets. 'allocation_chart' is pinned first
+/// and 'timer' is pinned last (see [StressTestWidgetsNotifier._pinnedFirstId]
+/// / [_pinnedLastId]) — never hidden, never draggable out of position.
+const List<String> stressTestDefaultWidgetOrder = [
+  'allocation_chart',
+  'cash',
   'market_timeline',
-  'corporate_events',
+  'my_assets',
+  'psychology_meter',
   'trade_history',
   'timer',
 ];
@@ -61,6 +62,23 @@ class StressTestWidgetsNotifier
   String get _orderKey => 'stress_widget_order_$_sessionId';
   String get _visibilityKey => 'stress_widget_visibility_$_sessionId';
 
+  // 'allocation_chart' is pinned first, 'timer' is pinned last — always at
+  // those positions, never hidden. Guarded here too (not just in the
+  // settings sheet UI) so it holds regardless of caller.
+  static const _pinnedFirstId = 'allocation_chart';
+  static const _pinnedLastId = 'timer';
+
+  /// Forces the pinned ids to their fixed positions regardless of whatever
+  /// order they arrived in (e.g. a saved layout from before these ids
+  /// existed/were pinned, which would otherwise land them wherever the
+  /// merge below happens to append them).
+  List<String> _normalizePinned(List<String> ids) {
+    final rest = [...ids]
+      ..remove(_pinnedFirstId)
+      ..remove(_pinnedLastId);
+    return [_pinnedFirstId, ...rest, _pinnedLastId];
+  }
+
   // ── Load from SharedPreferences ──────────────────────────────────
 
   Future<void> _load() async {
@@ -68,14 +86,20 @@ class StressTestWidgetsNotifier
 
     // Load saved order
     final savedOrder = prefs.getStringList(_orderKey);
-    final orderIds =
-        (savedOrder != null && savedOrder.isNotEmpty) ? savedOrder : _defaultOrder;
+    final orderIds = (savedOrder != null && savedOrder.isNotEmpty)
+        ? savedOrder
+        : stressTestDefaultWidgetOrder;
 
-    // Merge: add any new default widgets that aren't in saved order
-    final merged = <String>[...orderIds];
-    for (final id in _defaultOrder) {
+    // Merge: drop stale ids no longer in the default set (e.g. the removed
+    // 'corporate_events'), then add any new default widgets missing from
+    // the saved order.
+    final merged = <String>[
+      ...orderIds.where(stressTestDefaultWidgetOrder.contains),
+    ];
+    for (final id in stressTestDefaultWidgetOrder) {
       if (!merged.contains(id)) merged.add(id);
     }
+    final normalized = _normalizePinned(merged);
 
     // Load visibility
     final visibilityStr = prefs.getString(_visibilityKey) ?? '';
@@ -89,11 +113,8 @@ class StressTestWidgetsNotifier
       }
     }
 
-    state = merged.map((id) {
-      return StressTestWidgetConfig(
-        id: id,
-        visible: visibilityMap[id] ?? true,
-      );
+    state = normalized.map((id) {
+      return StressTestWidgetConfig(id: id, visible: visibilityMap[id] ?? true);
     }).toList();
   }
 
@@ -101,10 +122,7 @@ class StressTestWidgetsNotifier
 
   Future<void> _saveLocal() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      _orderKey,
-      state.map((c) => c.id).toList(),
-    );
+    await prefs.setStringList(_orderKey, state.map((c) => c.id).toList());
     await prefs.setString(
       _visibilityKey,
       state.map((c) => '${c.id}:${c.visible}').join(','),
@@ -114,12 +132,14 @@ class StressTestWidgetsNotifier
   // ── Reorder ──────────────────────────────────────────────────────
 
   Future<void> reorder(String id, int newIndex) async {
+    if (id == _pinnedFirstId || id == _pinnedLastId) return;
     final currentIndex = state.indexWhere((c) => c.id == id);
     if (currentIndex < 0) return;
     final config = state[currentIndex];
+    final clampedIndex = newIndex.clamp(1, state.length - 2);
     final newList = [...state]
       ..removeAt(currentIndex)
-      ..insert(newIndex.clamp(0, state.length - 1), config);
+      ..insert(clampedIndex, config);
     state = newList;
     await _saveLocal();
   }
@@ -127,6 +147,7 @@ class StressTestWidgetsNotifier
   // ── Toggle visibility ────────────────────────────────────────────
 
   Future<void> toggleVisibility(String id) async {
+    if (id == _pinnedFirstId || id == _pinnedLastId) return;
     state = state.map((c) {
       if (c.id == id) {
         return StressTestWidgetConfig(id: c.id, visible: !c.visible);
@@ -139,7 +160,7 @@ class StressTestWidgetsNotifier
   // ── Reset to defaults ────────────────────────────────────────────
 
   Future<void> resetToDefaults() async {
-    state = _defaultOrder
+    state = stressTestDefaultWidgetOrder
         .map((id) => StressTestWidgetConfig(id: id, visible: true))
         .toList();
     await _saveLocal();
@@ -147,9 +168,9 @@ class StressTestWidgetsNotifier
 }
 
 /// Provider for stress test widget order — keyed by sessionId.
-final stressTestWidgetOrderProvider = StateNotifierProvider.family<
-    StressTestWidgetsNotifier,
-    List<StressTestWidgetConfig>,
-    String>(
-  (ref, sessionId) => StressTestWidgetsNotifier(sessionId),
-);
+final stressTestWidgetOrderProvider =
+    StateNotifierProvider.family<
+      StressTestWidgetsNotifier,
+      List<StressTestWidgetConfig>,
+      String
+    >((ref, sessionId) => StressTestWidgetsNotifier(sessionId));

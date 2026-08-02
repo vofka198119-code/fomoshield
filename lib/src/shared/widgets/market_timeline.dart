@@ -99,16 +99,18 @@ class _MarketTimelineState extends State<MarketTimeline> {
         if (widget.session != null) ...[
           MarketValueChart(session: widget.session!),
           const SizedBox(height: 8),
-          const Divider(height: 1, indent: 20, endIndent: 20, color: ThemeV2.divider),
+          const Divider(
+            height: 1,
+            indent: 20,
+            endIndent: 20,
+            color: ThemeV2.divider,
+          ),
         ],
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
           child: Row(
             children: [
-              Text(
-                'MARKET TIMELINE',
-                style: FomoShieldTheme.cardTitle(),
-              ),
+              Text('PORTFOLIO VALUE', style: FomoShieldTheme.cardTitle()),
               const Spacer(),
               Text(
                 '${currentIdx + 1} of ${widget.epochs.length} epochs',
@@ -121,7 +123,12 @@ class _MarketTimelineState extends State<MarketTimeline> {
             ],
           ),
         ),
-        const Divider(height: 1, indent: 20, endIndent: 20, color: ThemeV2.divider),
+        const Divider(
+          height: 1,
+          indent: 20,
+          endIndent: 20,
+          color: ThemeV2.divider,
+        ),
         // ── Epoch rows (no scroll, natural height) ──
         ...shown.asMap().entries.map((entry) {
           final i = entry.key;
@@ -135,7 +142,9 @@ class _MarketTimelineState extends State<MarketTimeline> {
             isCurrent: isCurrent,
             isPast: isPast,
             isFirst: i == 0,
-            isLast: i == shown.length - 1 && widget.epochs.length <= widget.initialLimit,
+            isLast:
+                i == shown.length - 1 &&
+                widget.epochs.length <= widget.initialLimit,
             epochProgress: isCurrent ? widget.activeEpochProgress : null,
           );
         }),
@@ -295,9 +304,7 @@ class _TimelineRow extends StatelessWidget {
                           fontWeight: isCurrent
                               ? FontWeight.w800
                               : FontWeight.w600,
-                          color: ThemeV2.textPrimary.withValues(
-                            alpha: opacity,
-                          ),
+                          color: ThemeV2.textPrimary.withValues(alpha: opacity),
                         ),
                       ),
                       if (isCurrent) ...[
