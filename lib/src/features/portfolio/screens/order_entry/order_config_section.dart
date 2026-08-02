@@ -172,7 +172,7 @@ class OrderConfigSection extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Pre-market and post-market volatility',
+                    'Off: trade only while the real market is open',
                     style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
                   ),
                 ],

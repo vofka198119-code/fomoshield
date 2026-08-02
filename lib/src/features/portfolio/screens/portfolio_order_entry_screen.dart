@@ -30,6 +30,7 @@ import 'order_entry/order_amount_section.dart';
 import 'order_entry/order_config_section.dart';
 import 'order_entry/order_bottom_button.dart';
 import 'order_entry/amount_keypad.dart';
+import 'order_entry/market_closed_dialog.dart';
 
 /// Order type. Stop/StopLimit exist in the order model and are still fully
 /// handled by _mapOrderType/_executeOrder below, but the UI only exposes
@@ -202,7 +203,7 @@ class _PortfolioOrderEntryScreenState
     });
   }
 
-  void _submitOrder() {
+  Future<void> _submitOrder() async {
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
       ScaffoldMessenger.of(
@@ -226,9 +227,24 @@ class _PortfolioOrderEntryScreenState
     }
 
     final orderType = _mapOrderType(_selectedOrderType);
-    final session = _extendedHours
-        ? orders.MarketSession.afterHours
-        : orders.currentMarketSession();
+    final session = orders.currentMarketSession();
+
+    // With Extended Hours off, Market orders can only fill while the real
+    // exchange is actually open — same rule a real broker enforces. Limit
+    // orders are unaffected: they're always queued as PENDING anyway (see
+    // OrderNotifier.placeOrder) and fill whenever the market crosses the
+    // price, open or not.
+    if (orderType == orders.OrderType.market &&
+        !_extendedHours &&
+        session != orders.MarketSession.regular) {
+      final switchToLimit = await showMarketClosedDialog(context);
+      if (!mounted) return;
+      if (switchToLimit) {
+        _onOrderTypeChanged(true);
+      }
+      return;
+    }
+
     final side = _isBuy ? orders.OrderSide.buy : orders.OrderSide.sell;
 
     // Validate limit price

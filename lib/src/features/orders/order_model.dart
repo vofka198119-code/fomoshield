@@ -5,6 +5,8 @@
 // MarketSession, OrderSide, OrderType, OrderStatus, Order.
 // ---------------------------------------------------------------------------
 
+import '../market_clock/market_clock_engine.dart' as market_clock;
+
 /// Market session modes
 enum MarketSession {
   regular('Regular'),
@@ -178,32 +180,23 @@ class Order {
 }
 
 // ---------------------------------------------------------------------------
-// Helper: determine market session by current time
+// Helper: determine market session by current (real) time
 // ---------------------------------------------------------------------------
 
+/// Real NYSE session right now, delegating to the Market Clock engine so
+/// this stays correct for New York time (not device-local time) and knows
+/// about weekends/holidays/early closes — all things a naive hour/minute
+/// check here used to get wrong.
 MarketSession currentMarketSession() {
-  final now = DateTime.now();
-  final hour = now.hour;
-  final minute = now.minute;
-  final totalMinutes = hour * 60 + minute;
-
-  // Approximate US market hours (ET):
-  //   Pre-market: 4:00-9:30 (240-570 min)
-  //   Regular:    9:30-16:00 (570-960 min)
-  //   After-hours: 16:00-20:00 (960-1200 min)
-  //   Closed:     20:00-4:00
-  // Weekends → closed
-  if (now.weekday == DateTime.saturday || now.weekday == DateTime.sunday) {
-    return MarketSession.closed;
-  }
-
-  if (totalMinutes >= 240 && totalMinutes < 570) {
-    return MarketSession.preMarket;
-  } else if (totalMinutes >= 570 && totalMinutes < 960) {
-    return MarketSession.regular;
-  } else if (totalMinutes >= 960 && totalMinutes < 1200) {
-    return MarketSession.afterHours;
-  } else {
-    return MarketSession.closed;
+  final state = market_clock.resolveMarketClockState(market_clock.nowInNewYork());
+  switch (state.phase) {
+    case market_clock.MarketPhase.preMarket:
+      return MarketSession.preMarket;
+    case market_clock.MarketPhase.marketOpen:
+      return MarketSession.regular;
+    case market_clock.MarketPhase.afterHours:
+      return MarketSession.afterHours;
+    case market_clock.MarketPhase.closed:
+      return MarketSession.closed;
   }
 }
