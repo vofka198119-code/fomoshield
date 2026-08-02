@@ -18,6 +18,7 @@ const List<String> _defaultPortfolioWidgetOrder = [
   'portfolio_journal',
   'historical_sim',
   'scenario_compare',
+  'my_limit_orders',
 ];
 
 String _orderPrefsKey(String? uid) =>
@@ -48,6 +49,8 @@ class PortfolioWidgetConfig {
         return 'Historical Simulator';
       case 'scenario_compare':
         return 'Scenario Comparison';
+      case 'my_limit_orders':
+        return 'My Limit Orders';
       default:
         return id;
     }

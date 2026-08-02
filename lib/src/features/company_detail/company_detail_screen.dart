@@ -16,6 +16,7 @@ import 'widgets/financial_score_widget.dart';
 import 'widgets/price_header.dart';
 import 'widgets/key_metrics_section.dart';
 import 'widgets/position_section.dart';
+import 'widgets/limit_orders_section.dart';
 import 'widgets/portfolio_option_tile.dart';
 import 'widgets/company_widgets_settings_sheet.dart';
 import 'widgets/company_bottom_bar.dart';
@@ -698,6 +699,13 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
         return Column(
           children: [
             PositionSection(symbol: symbol, price: price),
+            const SizedBox(height: 24),
+          ],
+        );
+      case 'limit_orders':
+        return Column(
+          children: [
+            LimitOrdersSection(symbol: symbol),
             const SizedBox(height: 24),
           ],
         );

@@ -144,6 +144,70 @@ class OrderNotifier extends StateNotifier<List<Order>> {
   }
 
   // -----------------------------------------------------------------------
+  // Reserved cash (pending BUY orders) — used by order entry to cap how
+  // much of the portfolio's cash is still free to commit to a new order.
+  // -----------------------------------------------------------------------
+
+  /// Cash already committed to this portfolio's active BUY orders — real
+  /// cash isn't deducted until a buy actually fills, but it shouldn't be
+  /// offered as "available" for a second order while the first is pending.
+  double reservedCashForPortfolio(String portfolioId) {
+    double reserved = 0;
+    for (final o in state) {
+      if (!o.status.isActive || o.portfolioId != portfolioId || o.side != OrderSide.buy) {
+        continue;
+      }
+      final price = o.limitPrice ?? o.stopPrice ?? o.createdPrice;
+      reserved += price * o.remainingQuantity;
+    }
+    return reserved;
+  }
+
+  // -----------------------------------------------------------------------
+  // Reconcile pending SELL orders against actual held shares — a SELL
+  // order (market fill, or another pending order filling) can leave less
+  // stock behind than an earlier still-pending SELL order for the same
+  // symbol needs. Cancels whichever orders (oldest-first) no longer have
+  // enough shares behind them, mirroring a real broker's post-fill check.
+  // -----------------------------------------------------------------------
+
+  void reconcileSellOrders({
+    required String portfolioId,
+    required String symbol,
+    required double heldShares,
+  }) {
+    final candidates = state
+        .where((o) =>
+            o.status.isActive &&
+            o.portfolioId == portfolioId &&
+            o.assetSymbol == symbol &&
+            o.side == OrderSide.sell)
+        .toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    double remaining = heldShares;
+    final toCancelIds = <String>{};
+    for (final order in candidates) {
+      if (order.remainingQuantity <= remaining + 0.0001) {
+        remaining -= order.remainingQuantity;
+      } else {
+        toCancelIds.add(order.orderId);
+      }
+    }
+    if (toCancelIds.isEmpty) return;
+
+    state = [
+      for (final o in state)
+        if (toCancelIds.contains(o.orderId))
+          o.copyWith(status: OrderStatus.cancelled)
+        else
+          o,
+    ];
+    _saveLocal();
+    _syncToSupabase();
+  }
+
+  // -----------------------------------------------------------------------
   // Cancel order
   // -----------------------------------------------------------------------
 
@@ -295,6 +359,32 @@ final ordersProvider =
   // Connect to portfolio: when orders fill, add transactions
   notifier.onTransaction = (portfolioId, tx) {
     ref.read(portfoliosProvider.notifier).addTransaction(portfolioId, tx);
+
+    // A sell just reduced (or could reduce) held shares — any other
+    // pending sell order for the same symbol may no longer have enough
+    // shares behind it.
+    if (tx.type == TransactionType.sell) {
+      final portfolios = ref.read(portfoliosProvider);
+      Portfolio? portfolio;
+      for (final p in portfolios) {
+        if (p.id == portfolioId) {
+          portfolio = p;
+          break;
+        }
+      }
+      if (portfolio != null) {
+        double heldShares = 0;
+        for (final t in portfolio.transactions) {
+          if (t.symbol != tx.symbol) continue;
+          heldShares += t.type == TransactionType.buy ? t.shares : -t.shares;
+        }
+        notifier.reconcileSellOrders(
+          portfolioId: portfolioId,
+          symbol: tx.symbol,
+          heldShares: heldShares,
+        );
+      }
+    }
   };
 
   return notifier;

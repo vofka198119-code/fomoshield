@@ -7,7 +7,7 @@
 //   - Input mode: Cost / Shares (BottomSheet)
 //   - Large input + slider 0-100%
 //   - Info box (changes by order type)
-//   - Extra toggles: extended hours, expiration
+//   - Extra toggle: extended hours
 //   - "Review Order" button
 //
 // Split 2026-08-01 into order_entry/ widget files (header/tabs, amount
@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../portfolio_providers.dart';
@@ -37,6 +38,12 @@ import 'order_entry/trade_confirmation_toast.dart';
 /// handled by _mapOrderType/_executeOrder below, but the UI only exposes
 /// Market/Limit for now (OrderTypeTabs is a plain market/limit toggle).
 enum _OrderType { market, limit, stop, stopLimit }
+
+/// Which field (if any) currently owns the shared bottom keypad — amount
+/// and limit price both type into the same custom keypad, one at a time.
+enum _ActiveKeypad { none, amount, limitPrice }
+
+const String _extendedHoursPrefsKey = 'order_entry_extended_hours';
 
 class PortfolioOrderEntryScreen extends ConsumerStatefulWidget {
   final String portfolioId;
@@ -73,7 +80,11 @@ class _PortfolioOrderEntryScreenState
   final _limitPriceController = TextEditingController();
   double _sliderValue = 0;
   bool _extendedHours = false;
-  bool _amountKeypadOpen = false;
+  _ActiveKeypad _activeKeypad = _ActiveKeypad.none;
+  // Restored if the limit-price keypad is dismissed without typing a new
+  // value — tapping the field clears it for fresh entry, but swiping away
+  // empty-handed shouldn't leave the price blank.
+  String? _limitPriceBeforeEdit;
 
   // Price data — from the caller's already-loaded quote when available,
   // otherwise fetched here (backend-proxied, see FinnhubService.quote).
@@ -90,6 +101,19 @@ class _PortfolioOrderEntryScreenState
     } else {
       _fetchPrice();
     }
+    _loadExtendedHoursPref();
+  }
+
+  Future<void> _loadExtendedHoursPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getBool(_extendedHoursPrefsKey);
+    if (saved != null && mounted) setState(() => _extendedHours = saved);
+  }
+
+  Future<void> _setExtendedHours(bool value) async {
+    setState(() => _extendedHours = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_extendedHoursPrefsKey, value);
   }
 
   @override
@@ -145,11 +169,18 @@ class _PortfolioOrderEntryScreenState
     return held.shares;
   }
 
+  // Cash still free to commit to a new order — real cash minus whatever's
+  // already reserved by this portfolio's other pending BUY orders (see
+  // OrderNotifier.reservedCashForPortfolio; real cash isn't touched until
+  // a buy actually fills, but it shouldn't be offered twice).
   double get _availableCash {
     final performance = ref
         .read(portfolioPerformanceProvider(widget.portfolioId))
         .maybeWhen(data: (d) => d, orElse: () => null);
-    return performance?.cash ?? 0;
+    final cash = performance?.cash ?? 0;
+    final reserved =
+        ref.read(ordersProvider.notifier).reservedCashForPortfolio(widget.portfolioId);
+    return (cash - reserved).clamp(0, double.infinity);
   }
 
   // Same ceiling logic as OrderAmountSection._maxAmount — kept here too
@@ -186,10 +217,7 @@ class _PortfolioOrderEntryScreenState
     setState(() {
       _selectedOrderType = isLimit ? _OrderType.limit : _OrderType.market;
       if (isLimit) {
-        // Default limit price: slightly below for buy, above for sell
-        final defaultPrice =
-            _isBuy ? (_currentPrice * 0.98) : (_currentPrice * 1.02);
-        _limitPriceController.text = defaultPrice.toStringAsFixed(2);
+        _limitPriceController.text = _currentPrice.toStringAsFixed(2);
       } else {
         _limitPriceController.clear();
       }
@@ -255,6 +283,23 @@ class _PortfolioOrderEntryScreenState
       if (limitPrice == null || limitPrice <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Enter a valid limit price')),
+        );
+        return;
+      }
+    }
+
+    // Cash already committed to other pending buy orders isn't free to
+    // spend again — see _availableCash.
+    if (_isBuy) {
+      final orderCost = shares * (limitPrice ?? _currentPrice);
+      if (orderCost > _availableCash + 0.01) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Not enough available cash — \$${_availableCash.toStringAsFixed(2)} '
+              'free (some is reserved for pending orders)',
+            ),
+          ),
         );
         return;
       }
@@ -457,25 +502,45 @@ class _PortfolioOrderEntryScreenState
                       sliderValue: _sliderValue,
                       onSliderChanged: (v) => setState(() => _sliderValue = v),
                       onAmountChanged: _onAmountTextChanged,
-                      onTapAmount: () => setState(() => _amountKeypadOpen = true),
+                      onTapAmount: () =>
+                          setState(() => _activeKeypad = _ActiveKeypad.amount),
                     ),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
                       limitPriceController: _limitPriceController,
+                      currentPrice: _currentPrice,
+                      isBuy: _isBuy,
+                      onTapLimitPriceField: () => setState(() {
+                        // Typing on the keypad starts a fresh value rather
+                        // than appending onto the pre-filled current price.
+                        _limitPriceBeforeEdit = _limitPriceController.text;
+                        _limitPriceController.clear();
+                        _activeKeypad = _ActiveKeypad.limitPrice;
+                      }),
                       infoText: _infoText,
                       extendedHours: _extendedHours,
-                      onExtendedHoursChanged: (v) =>
-                          setState(() => _extendedHours = v),
+                      onExtendedHoursChanged: _setExtendedHours,
                     ),
                   ],
                 ),
               ),
             ),
-            if (_amountKeypadOpen)
+            if (_activeKeypad != _ActiveKeypad.none)
               AmountKeypad(
-                controller: _amountController,
-                onChanged: _onAmountTextChanged,
-                onDone: () => setState(() => _amountKeypadOpen = false),
+                controller: _activeKeypad == _ActiveKeypad.amount
+                    ? _amountController
+                    : _limitPriceController,
+                onChanged: _activeKeypad == _ActiveKeypad.amount
+                    ? _onAmountTextChanged
+                    : () => setState(() {}),
+                onDone: () => setState(() {
+                  if (_activeKeypad == _ActiveKeypad.limitPrice &&
+                      _limitPriceController.text.isEmpty &&
+                      _limitPriceBeforeEdit != null) {
+                    _limitPriceController.text = _limitPriceBeforeEdit!;
+                  }
+                  _activeKeypad = _ActiveKeypad.none;
+                }),
                 isBuy: _isBuy,
                 inputMode: _inputMode,
                 displayAmount: displayAmount,

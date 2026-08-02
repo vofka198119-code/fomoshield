@@ -20,6 +20,7 @@ import '../home/widgets/portfolio_journal_widget.dart';
 import '../home/widgets/historical_sim_widget.dart';
 import '../home/widgets/scenario_compare_widget.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
+import 'widgets/my_limit_orders_widget.dart';
 
 class PortfolioScreen extends ConsumerStatefulWidget {
   const PortfolioScreen({super.key});
@@ -699,6 +700,11 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
           padding: EdgeInsets.only(bottom: 24),
           child: ScenarioCompareWidget(),
         );
+      case 'my_limit_orders':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: MyLimitOrdersWidget(portfolioId: widget.portfolioId),
+        );
       default:
         return const SizedBox.shrink();
     }
@@ -923,6 +929,8 @@ class _PortfolioWidgetsSettingsSheetState
         return Icons.query_stats_rounded;
       case 'scenario_compare':
         return Icons.compare_arrows_rounded;
+      case 'my_limit_orders':
+        return Icons.pending_actions_rounded;
       default:
         return Icons.widgets_rounded;
     }

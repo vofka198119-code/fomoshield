@@ -6,7 +6,8 @@ import '../../core/supabase/supabase_providers.dart';
 // Company Detail Widget Order Provider (SharedPreferences-backed)
 // ---------------------------------------------------------------------------
 // Allows reordering, hiding/showing widgets on the Company Detail screen.
-// Widgets: price_header, chart, key_metrics, financial_score, position
+// Widgets: price_header, chart, key_metrics, financial_score, position,
+// limit_orders
 // ---------------------------------------------------------------------------
 
 const List<String> defaultCompanyWidgetOrder = [
@@ -15,6 +16,7 @@ const List<String> defaultCompanyWidgetOrder = [
   'position',
   'key_metrics',
   'financial_score',
+  'limit_orders',
 ];
 
 String _orderPrefsKey(String? uid) =>
@@ -41,6 +43,8 @@ class CompanyWidgetConfig {
         return 'Financial Score';
       case 'position':
         return 'Your Position';
+      case 'limit_orders':
+        return 'Limit Orders';
       default:
         return id;
     }

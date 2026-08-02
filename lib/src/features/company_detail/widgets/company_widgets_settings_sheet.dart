@@ -72,6 +72,8 @@ class _CompanyWidgetsSettingsSheetState
         return Icons.shield_rounded;
       case 'position':
         return Icons.account_balance_wallet_rounded;
+      case 'limit_orders':
+        return Icons.pending_actions_rounded;
       default:
         return Icons.widgets_rounded;
     }

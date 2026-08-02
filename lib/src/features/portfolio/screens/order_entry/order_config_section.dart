@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import 'limit_price_input.dart';
 
 // ---------------------------------------------------------------------------
 // Order Config Section — limit price input (Limit orders only), the order
-// type info box, extended-hours toggle, and expiration selector (Limit
-// orders only). Grouped as the secondary order-configuration block.
+// type info box, and extended-hours toggle. Grouped as the secondary
+// order-configuration block.
 // ---------------------------------------------------------------------------
 
 class OrderConfigSection extends StatelessWidget {
   final bool isLimit;
   final TextEditingController limitPriceController;
+  final double currentPrice;
+  final bool isBuy;
+  final VoidCallback onTapLimitPriceField;
   final String infoText;
   final bool extendedHours;
   final ValueChanged<bool> onExtendedHoursChanged;
@@ -20,6 +24,9 @@ class OrderConfigSection extends StatelessWidget {
     super.key,
     required this.isLimit,
     required this.limitPriceController,
+    required this.currentPrice,
+    required this.isBuy,
+    required this.onTapLimitPriceField,
     required this.infoText,
     required this.extendedHours,
     required this.onExtendedHoursChanged,
@@ -29,10 +36,15 @@ class OrderConfigSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (isLimit) _limitPriceInput(),
+        if (isLimit)
+          LimitPriceInput(
+            controller: limitPriceController,
+            currentPrice: currentPrice,
+            isBuy: isBuy,
+            onTapField: onTapLimitPriceField,
+          ),
         _infoBox(),
         _extendedHoursToggle(),
-        if (isLimit) _expirationSelector(),
         _disclaimer(),
       ],
     );
@@ -71,58 +83,6 @@ class OrderConfigSection extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _limitPriceInput() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: FomoShieldTheme.cardDecoration,
-        child: Row(
-          children: [
-            const Icon(Icons.trending_flat_rounded, color: ThemeV2.primary, size: 20),
-            const SizedBox(width: 10),
-            Text(
-              'Limit Price',
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: ThemeV2.textPrimary,
-              ),
-            ),
-            const Spacer(),
-            SizedBox(
-              width: 120,
-              child: TextField(
-                controller: limitPriceController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: ThemeV2.primary,
-                ),
-                textAlign: TextAlign.right,
-                decoration: InputDecoration(
-                  prefixText: '\$ ',
-                  prefixStyle: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: ThemeV2.primary,
-                  ),
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -189,39 +149,4 @@ class OrderConfigSection extends StatelessWidget {
     );
   }
 
-  Widget _expirationSelector() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: FomoShieldTheme.cardDecoration,
-        child: Row(
-          children: [
-            const Icon(Icons.calendar_today_rounded, color: ThemeV2.textSecondary, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Expiration',
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    'Valid until end of day',
-                    style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.keyboard_arrow_down_rounded, color: ThemeV2.textSecondary, size: 20),
-          ],
-        ),
-      ),
-    );
-  }
 }
