@@ -346,7 +346,7 @@ final portfolioPerformanceProvider =
   final portfolios = ref.watch(portfoliosProvider);
   final portfolio = portfolios.firstWhere((p) => p.id == portfolioId);
 
-  final api = FinnhubService();
+  final api = ref.read(finnhubServiceProvider);
   final holdings = portfolio.holdings;
 
   if (holdings.isEmpty) {
@@ -364,47 +364,46 @@ final portfolioPerformanceProvider =
     );
   }
 
+  // Quotes fetched in parallel (used to be a sequential await-in-loop —
+  // one round-trip's latency per holding, stacked). A failed quote falls
+  // back to null and is priced at avgCost below, same as before.
+  final entries = holdings.entries.toList();
+  final quotes = await Future.wait(entries.map((entry) async {
+    try {
+      return await api.quote(entry.key);
+    } catch (_) {
+      return null;
+    }
+  }));
+
   final holdingPerformances = <HoldingPerformance>[];
   double totalCurrentValue = portfolio.cash;
 
-  for (final entry in holdings.entries) {
+  for (int i = 0; i < entries.length; i++) {
+    final entry = entries[i];
     final symbol = entry.key;
     final shares = entry.value['shares']!;
     final totalCost = entry.value['cost']!;
     final avgCost = totalCost / shares;
 
-    try {
-      final quote = await api.quote(symbol);
-      final currentPrice = (quote['c'] as num?)?.toDouble() ?? avgCost;
-      final currentValue = shares * currentPrice;
-      totalCurrentValue += currentValue;
+    final quote = quotes[i];
+    final currentPrice =
+        quote != null ? ((quote['c'] as num?)?.toDouble() ?? avgCost) : avgCost;
+    final currentValue = shares * currentPrice;
+    totalCurrentValue += currentValue;
 
-      holdingPerformances.add(HoldingPerformance(
-        symbol: symbol,
-        shares: shares,
-        avgCost: avgCost,
-        totalCost: totalCost,
-        currentPrice: currentPrice,
-        currentValue: currentValue,
-        pnl: currentValue - totalCost,
-        pnlPercent: totalCost > 0
-            ? ((currentValue - totalCost) / totalCost) * 100
-            : 0.0,
-      ));
-    } catch (_) {
-      // If quote fails, use avgCost as current price
-      totalCurrentValue += totalCost;
-      holdingPerformances.add(HoldingPerformance(
-        symbol: symbol,
-        shares: shares,
-        avgCost: avgCost,
-        totalCost: totalCost,
-        currentPrice: avgCost,
-        currentValue: totalCost,
-        pnl: 0,
-        pnlPercent: 0,
-      ));
-    }
+    holdingPerformances.add(HoldingPerformance(
+      symbol: symbol,
+      shares: shares,
+      avgCost: avgCost,
+      totalCost: totalCost,
+      currentPrice: currentPrice,
+      currentValue: currentValue,
+      pnl: currentValue - totalCost,
+      pnlPercent: totalCost > 0
+          ? ((currentValue - totalCost) / totalCost) * 100
+          : 0.0,
+    ));
   }
 
   final totalInvested = portfolio.totalInvested;

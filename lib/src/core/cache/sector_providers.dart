@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/gics_sector_mapper.dart';
+import '../../shared/services/finnhub_service.dart';
 import 'sector_dao.dart';
 import 'sector_repository.dart';
 
@@ -8,7 +9,7 @@ import 'sector_repository.dart';
 // ---------------------------------------------------------------------------
 
 final sectorRepositoryProvider = Provider<SectorRepository>((ref) {
-  return SectorRepository(dao: SectorDao());
+  return SectorRepository(dao: SectorDao(), api: ref.read(finnhubServiceProvider));
 });
 
 // ---------------------------------------------------------------------------

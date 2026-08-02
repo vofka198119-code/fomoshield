@@ -23,7 +23,7 @@ class TopCompanyEntry {
 }
 
 final topCompaniesProvider = FutureProvider<List<TopCompanyEntry>>((ref) async {
-  final data = await FinnhubService().topCompanies();
+  final data = await ref.read(finnhubServiceProvider).topCompanies();
   final companies = data['companies'] as List<dynamic>? ?? [];
   return [
     for (final c in companies)

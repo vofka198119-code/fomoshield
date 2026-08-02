@@ -131,7 +131,7 @@ class _PortfolioOrderEntryScreenState
       _loadFailed = false;
     });
     try {
-      final quote = await FinnhubService().quote(widget.symbol);
+      final quote = await ref.read(finnhubServiceProvider).quote(widget.symbol);
       if (mounted) {
         setState(() {
           _currentPrice = (quote['c'] as num?)?.toDouble() ?? 0;

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../shared/widgets/stagger_fade_in.dart';
 import '../home/home_providers.dart';
 import '../home/watchlist_limits_provider.dart';
 import '../portfolio/portfolio_providers.dart';
@@ -504,7 +505,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                     for (int i = 0; i < visibleWidgets.length; i++)
                       KeyedSubtree(
                         key: ValueKey('company_widget_${visibleWidgets[i].id}'),
-                        child: _StaggerFadeIn(
+                        child: StaggerFadeIn(
                           index: i,
                           child: _buildWidget(
                             visibleWidgets[i].id,
@@ -522,7 +523,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                       ),
                     const SizedBox(height: 16),
                     // ── Add widgets button ──
-                    _StaggerFadeIn(
+                    StaggerFadeIn(
                       index: visibleWidgets.length,
                       child: Center(
                       child: TextButton.icon(
@@ -558,7 +559,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                     ),
                     const SizedBox(height: 20),
                     // ── Educational Purpose & Legal Disclaimer ──
-                    _StaggerFadeIn(
+                    StaggerFadeIn(
                       index: visibleWidgets.length + 1,
                       child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -733,60 +734,6 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
         initialConfigs: currentConfigs,
         notifier: notifier,
       ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Staggered top-to-bottom fade/slide-in for the card's widgets — masks the
-// layout reflow that happens as each widget's own async data (chart
-// candles, financial score, etc.) resolves at a different time, instead of
-// everything popping into place at once. Runs once per widget instance
-// (tied to its KeyedSubtree's key, so it doesn't replay on every rebuild).
-// ---------------------------------------------------------------------------
-
-class _StaggerFadeIn extends StatefulWidget {
-  final int index;
-  final Widget child;
-
-  const _StaggerFadeIn({required this.index, required this.child});
-
-  @override
-  State<_StaggerFadeIn> createState() => _StaggerFadeInState();
-}
-
-class _StaggerFadeInState extends State<_StaggerFadeIn>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _fade;
-  late final Animation<Offset> _slide;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _slide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
-        .animate(_fade);
-    Future.delayed(Duration(milliseconds: 70 * widget.index), () {
-      if (mounted) _controller.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fade,
-      child: SlideTransition(position: _slide, child: widget.child),
     );
   }
 }

@@ -9,11 +9,11 @@ import '../../shared/services/finnhub_service.dart';
 // ---------------------------------------------------------------------------
 
 final searchProvider = ChangeNotifierProvider<SearchNotifier>(
-  (ref) => SearchNotifier(),
+  (ref) => SearchNotifier(ref.read(finnhubServiceProvider)),
 );
 
 class SearchNotifier extends ChangeNotifier {
-  final FinnhubService _api = FinnhubService();
+  final FinnhubService _api;
   List<Map<String, dynamic>> results = [];
   List<String> recentSearches = [];
   bool isLoading = false;
@@ -21,7 +21,7 @@ class SearchNotifier extends ChangeNotifier {
   String? errorMessage;
   Timer? _debounce;
 
-  SearchNotifier();
+  SearchNotifier(this._api);
 
   /// Called on every keystroke — debounces 500ms before actual API call
   void onSearchInput(String q) {

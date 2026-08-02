@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../../core/utils/constants.dart';
 import '../../core/supabase/supabase_client.dart';
@@ -378,6 +379,16 @@ class FinnhubService {
     params: {'resolution': resolution, 'from': from, 'to': to},
   );
 }
+
+// ---------------------------------------------------------------------------
+// Shared instance — the in-memory per-instance cache above only helps if
+// callers actually share one instance; most call sites used to construct
+// `FinnhubService()` fresh per call, which meant `_cache` almost never
+// survived long enough to be hit. Read this instead of constructing
+// directly wherever `ref` is available.
+// ---------------------------------------------------------------------------
+
+final finnhubServiceProvider = Provider<FinnhubService>((ref) => FinnhubService());
 
 class _CacheEntry {
   final dynamic data;

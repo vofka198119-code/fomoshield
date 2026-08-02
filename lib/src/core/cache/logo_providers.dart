@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/logo_cache_entry.dart';
+import '../../shared/services/finnhub_service.dart';
 import 'logo_dao.dart';
 import 'logo_repository.dart';
 
@@ -8,7 +9,7 @@ import 'logo_repository.dart';
 // ---------------------------------------------------------------------------
 
 final logoRepositoryProvider = Provider<LogoRepository>((ref) {
-  return LogoRepository(dao: LogoDao());
+  return LogoRepository(dao: LogoDao(), api: ref.read(finnhubServiceProvider));
 });
 
 // ---------------------------------------------------------------------------

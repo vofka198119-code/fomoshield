@@ -101,7 +101,7 @@ class PriceChart extends ConsumerStatefulWidget {
 }
 
 class _PriceChartState extends ConsumerState<PriceChart> {
-  final FinnhubService _api = FinnhubService();
+  late final FinnhubService _api;
   ChartPeriod _selectedPeriod = ChartPeriod.year1;
   Map<String, dynamic>? _candleData;
   bool _isLoading = true;
@@ -129,6 +129,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
   @override
   void initState() {
     super.initState();
+    _api = ref.read(finnhubServiceProvider);
     _loadCandles();
   }
 

@@ -47,7 +47,7 @@ final companyDetailProvider =
       final cached = cache.get(symbol);
       if (cached != null) return cached;
 
-      final api = FinnhubService();
+      final api = ref.read(finnhubServiceProvider);
       final scoreCache = ref.read(scoreCacheProvider);
       final metricsCache = ref.read(metricsCacheProvider);
 

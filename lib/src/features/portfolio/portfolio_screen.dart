@@ -20,6 +20,7 @@ import '../home/widgets/portfolio_journal_widget.dart';
 import '../home/widgets/historical_sim_widget.dart';
 import '../home/widgets/scenario_compare_widget.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
+import '../../shared/widgets/stagger_fade_in.dart';
 import 'widgets/my_limit_orders_widget.dart';
 
 class PortfolioScreen extends ConsumerStatefulWidget {
@@ -549,9 +550,13 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                 _buildWidget('portfolio_allocation', hasError: true),
                 _buildWidget('portfolio_holdings', hasError: true),
               ],
-              data: (perf) => visibleWidgets
-                  .map((w) => _buildWidget(w.id, performance: perf))
-                  .toList(),
+              data: (perf) => [
+                for (int i = 0; i < visibleWidgets.length; i++)
+                  StaggerFadeIn(
+                    index: i,
+                    child: _buildWidget(visibleWidgets[i].id, performance: perf),
+                  ),
+              ],
             ),
             const SizedBox(height: 24),
             // Add widgets button

@@ -16,6 +16,7 @@ import 'widgets/historical_sim_widget.dart';
 import 'widgets/scenario_compare_widget.dart';
 import 'widgets/stress_test_widget.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
+import '../../shared/widgets/stagger_fade_in.dart';
 
 // ---------------------------------------------------------------------------
 // Home Screen
@@ -104,7 +105,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 if (i > 0) const SizedBox(height: 24),
                 KeyedSubtree(
                   key: ValueKey(visibleWidgets[i].id),
-                  child: _buildWidget(visibleWidgets[i].id),
+                  child: StaggerFadeIn(
+                    index: i,
+                    child: _buildWidget(visibleWidgets[i].id),
+                  ),
                 ),
               ],
               const SizedBox(height: 24),

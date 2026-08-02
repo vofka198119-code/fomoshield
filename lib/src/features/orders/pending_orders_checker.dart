@@ -19,7 +19,7 @@ Future<void> checkPendingOrders(WidgetRef ref) async {
   if (activeOrders.isEmpty) return;
 
   final symbols = activeOrders.map((o) => o.assetSymbol).toSet();
-  final api = FinnhubService();
+  final api = ref.read(finnhubServiceProvider);
   final prices = <String, double>{};
 
   for (final symbol in symbols) {

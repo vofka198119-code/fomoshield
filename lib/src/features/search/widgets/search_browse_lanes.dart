@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../../shared/widgets/stagger_fade_in.dart';
 import '../recently_viewed_provider.dart';
 import '../top_companies_provider.dart';
 import 'browse_lane.dart';
@@ -23,13 +24,27 @@ import 'company_mini_card.dart';
 
 const _lanePreviewCount = 6;
 
-class SearchBrowseLanes extends ConsumerWidget {
+// Lanes cascade in over a ~2s total window (matches roughly how long it
+// takes to scroll to the bottom) instead of a flat per-lane delay that
+// would keep growing with the sector count — see StaggerFadeIn's
+// anchorTime/maxDelay.
+const _laneStaggerStep = Duration(milliseconds: 150);
+const _laneStaggerCap = Duration(milliseconds: 1800);
+
+class SearchBrowseLanes extends ConsumerStatefulWidget {
   final void Function(String symbol) onTapSymbol;
 
   const SearchBrowseLanes({super.key, required this.onTapSymbol});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SearchBrowseLanes> createState() => _SearchBrowseLanesState();
+}
+
+class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
+  final _revealAnchor = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
     final recentlyViewed = ref.watch(recentlyViewedProvider);
     final topCompanies = ref.watch(topCompaniesProvider);
 
@@ -100,7 +115,7 @@ class SearchBrowseLanes extends ConsumerWidget {
                   CompanyMiniCard(
                     symbol: recentlyViewed[i].symbol,
                     name: recentlyViewed[i].name,
-                    onTap: () => onTapSymbol(recentlyViewed[i].symbol),
+                    onTap: () => widget.onTapSymbol(recentlyViewed[i].symbol),
                     showDivider: i < recentlyViewed.length - 1,
                   ),
               ],
@@ -111,7 +126,13 @@ class SearchBrowseLanes extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
           itemCount: lanes.length,
           separatorBuilder: (_, _) => const SizedBox(height: 16),
-          itemBuilder: (context, i) => lanes[i],
+          itemBuilder: (context, i) => StaggerFadeIn(
+            index: i,
+            anchorTime: _revealAnchor,
+            delayPerIndex: _laneStaggerStep,
+            maxDelay: _laneStaggerCap,
+            child: lanes[i],
+          ),
         );
       },
     );
@@ -123,7 +144,7 @@ class SearchBrowseLanes extends ConsumerWidget {
         CompanyMiniCard(
           symbol: data[i].symbol,
           name: data[i].name,
-          onTap: () => onTapSymbol(data[i].symbol),
+          onTap: () => widget.onTapSymbol(data[i].symbol),
           showDivider: i < data.length - 1,
         ),
     ];

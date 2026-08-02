@@ -182,7 +182,7 @@ final marketIndicesProvider = FutureProvider<List<MarketIndex>>((ref) async {
   if (cached != null) return cached;
 
   try {
-    final api = FinnhubService();
+    final api = ref.read(finnhubServiceProvider);
     final results = await Future.wait([
       api.previousTradingDayQuote('SPY'),
       api.previousTradingDayQuote('QQQ'),
