@@ -10,7 +10,11 @@ import '../order_cancel_dialog.dart';
 // ---------------------------------------------------------------------------
 // Order Row Tile — one active order, shared by the Company Detail and
 // Portfolio "Limit Orders" widgets and the "see all" sheet. Cancel (X)
-// always confirms first (see order_cancel_dialog.dart).
+// always confirms first (see order_cancel_dialog.dart). Three stacked
+// lines (side+quantity / company name / limit price) inside the app's
+// olive brand tint box (same recipe as Home's Portfolio Balance/Cash
+// cells: ThemeV2.primaryBg + ThemeV2.divider border) — one order per box
+// rather than a single cramped line.
 // ---------------------------------------------------------------------------
 
 class OrderRowTile extends ConsumerWidget {
@@ -24,15 +28,24 @@ class OrderRowTile extends ConsumerWidget {
     final isBuy = order.side == OrderSide.buy;
     final accentColor = isBuy ? ThemeV2.success : ThemeV2.loss;
     final price = order.limitPrice ?? order.stopPrice;
+    final companyName = order.companyName ?? order.assetSymbol;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: ThemeV2.primaryBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ThemeV2.divider),
+      ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 8,
             height: 8,
-            margin: const EdgeInsets.only(right: 10),
+            margin: const EdgeInsets.only(top: 5, right: 10),
             decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
           ),
           Expanded(
@@ -40,20 +53,36 @@ class OrderRowTile extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${isBuy ? 'Buy' : 'Sell'} ${formatOrderQuantity(order.quantity)} '
-                  '${order.assetSymbol} ${order.type.label}'
-                  '${price != null ? ' @ \$${price.toStringAsFixed(2)}' : ''}',
+                  '${isBuy ? 'Buy' : 'Sell'} ${formatOrderQuantity(order.quantity)} shares',
                   style: interNums(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
                     color: ThemeV2.textPrimary,
                   ),
                 ),
-                if (subtitle != null && subtitle!.isNotEmpty)
+                const SizedBox(height: 2),
+                Text(
+                  companyName,
+                  style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textPrimary),
+                ),
+                if (price != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '${order.type.label} Price \$${price.toStringAsFixed(2)}',
+                    style: interNums(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: ThemeV2.primary,
+                    ),
+                  ),
+                ],
+                if (subtitle != null && subtitle!.isNotEmpty) ...[
+                  const SizedBox(height: 2),
                   Text(
                     subtitle!,
                     style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
                   ),
+                ],
               ],
             ),
           ),

@@ -47,11 +47,8 @@ class LimitOrdersSection extends ConsumerWidget {
         children: [
           Text('LIMIT ORDERS', style: FomoShieldTheme.cardTitle()),
           const Divider(height: 20, color: Color(0x0F000000)),
-          for (int i = 0; i < shown.length; i++) ...[
-            OrderRowTile(order: shown[i], subtitle: portfolioNameFor(shown[i].portfolioId)),
-            if (i != shown.length - 1)
-              Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
-          ],
+          for (final order in shown)
+            OrderRowTile(order: order, subtitle: portfolioNameFor(order.portfolioId)),
           if (orders.length > _inlineLimit)
             Padding(
               padding: const EdgeInsets.only(top: 6, bottom: 10),

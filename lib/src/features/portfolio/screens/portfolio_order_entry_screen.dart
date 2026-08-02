@@ -329,6 +329,7 @@ class _PortfolioOrderEntryScreenState
         .placeOrder(
           portfolioId: widget.portfolioId,
           assetSymbol: widget.symbol,
+          companyName: widget.companyName ?? widget.symbol,
           side: side,
           type: orderType,
           quantity: shares,

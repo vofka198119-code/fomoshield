@@ -59,6 +59,10 @@ class Order {
   final String? userId;
   final String portfolioId;
   final String assetSymbol;
+  // Full company name at the time the order was placed — order list
+  // widgets show this instead of the bare ticker. Null falls back to
+  // assetSymbol (orders placed before this field existed).
+  final String? companyName;
   final OrderSide side;
   final OrderType type;
   final double quantity;
@@ -77,6 +81,7 @@ class Order {
     this.userId,
     required this.portfolioId,
     required this.assetSymbol,
+    this.companyName,
     required this.side,
     required this.type,
     required this.quantity,
@@ -113,6 +118,7 @@ class Order {
         'userId': userId,
         'portfolioId': portfolioId,
         'assetSymbol': assetSymbol,
+        'companyName': companyName,
         'side': side.name,
         'type': type.name,
         'quantity': quantity,
@@ -132,6 +138,7 @@ class Order {
         userId: json['userId'] as String?,
         portfolioId: json['portfolioId'] as String,
         assetSymbol: json['assetSymbol'] as String,
+        companyName: json['companyName'] as String?,
         side: OrderSide.values.firstWhere((e) => e.name == json['side']),
         type: OrderType.values.firstWhere((e) => e.name == json['type']),
         quantity: (json['quantity'] as num).toDouble(),
@@ -164,6 +171,7 @@ class Order {
         userId: userId,
         portfolioId: portfolioId,
         assetSymbol: assetSymbol,
+        companyName: companyName,
         side: side,
         type: type,
         quantity: quantity,

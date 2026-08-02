@@ -48,11 +48,7 @@ class MyLimitOrdersWidget extends ConsumerWidget {
               ),
             )
           else ...[
-            for (int i = 0; i < shown.length; i++) ...[
-              OrderRowTile(order: shown[i]),
-              if (i != shown.length - 1)
-                Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
-            ],
+            for (final order in shown) OrderRowTile(order: order),
             if (orders.length > _inlineLimit)
               Padding(
                 padding: const EdgeInsets.only(top: 6, bottom: 10),

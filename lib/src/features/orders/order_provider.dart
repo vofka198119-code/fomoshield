@@ -95,6 +95,7 @@ class OrderNotifier extends StateNotifier<List<Order>> {
   Order placeOrder({
     required String portfolioId,
     required String assetSymbol,
+    String? companyName,
     required OrderSide side,
     required OrderType type,
     required double quantity,
@@ -108,6 +109,7 @@ class OrderNotifier extends StateNotifier<List<Order>> {
       userId: _userId,
       portfolioId: portfolioId,
       assetSymbol: assetSymbol,
+      companyName: companyName,
       side: side,
       type: type,
       quantity: quantity,

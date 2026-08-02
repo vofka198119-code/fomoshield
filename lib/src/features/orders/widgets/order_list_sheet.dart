@@ -51,11 +51,9 @@ void showOrderListSheet(
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: ListView.separated(
+              child: ListView.builder(
                 controller: scrollController,
                 itemCount: orders.length,
-                separatorBuilder: (_, _) =>
-                    Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
                 itemBuilder: (_, i) => OrderRowTile(
                   order: orders[i],
                   subtitle: subtitleFor(orders[i]),
