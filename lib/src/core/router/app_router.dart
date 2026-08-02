@@ -28,6 +28,7 @@ import '../../features/stress_test/stress_test_screen.dart';
 import '../../features/stress_test/verdict_screen.dart';
 import '../../features/stress_test/stress_test_analytics_screen.dart';
 import '../../features/stress_test/stress_test_hub_screen.dart';
+import '../../features/stress_test/stress_test_portfolio_balance_screen.dart';
 import '../../features/assets/screens/assets_screen.dart';
 import '../../features/assets/screens/stock_detail_screen.dart';
 import '../../features/assets/screens/why_today_screen.dart';
@@ -171,6 +172,14 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return StressTestAnalyticsScreen(sessionId: id);
+        },
+      ),
+      GoRoute(
+        path: '/stress-test/:id/portfolio-balance',
+        name: 'stressTestPortfolioBalance',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return StressTestPortfolioBalanceScreen(sessionId: id);
         },
       ),
 
