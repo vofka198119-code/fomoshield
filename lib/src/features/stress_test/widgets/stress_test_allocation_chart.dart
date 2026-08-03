@@ -4,6 +4,7 @@
 // ---------------------------------------------------------------------------
 
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -159,7 +160,7 @@ class _StressTestAllocationChartState extends State<StressTestAllocationChart> {
                                   (i) => StressTestAllocationChart.allocationColor(i),
                                 )
                               : [Colors.black.withValues(alpha: 0.06)],
-                          gapDegrees: hasData ? 6 : 0,
+                          gapDegrees: hasData ? 5 : 0,
                         ),
                       ),
                       Column(
@@ -293,7 +294,10 @@ class _StressTestAllocationChartState extends State<StressTestAllocationChart> {
 /// Paints the allocation donut as separate stroked arcs (not fl_chart's
 /// PieChart) so each slice can get a round stroke cap — reads as a pill
 /// shape instead of a hard-edged wedge — plus its own soft color glow
-/// underneath. [shares] must sum to ~1.0.
+/// underneath. Stroke is kept thin (see [_strokeWidth]) so the cap's bulge
+/// stays small enough not to fuse into neighboring slices once holdings
+/// count grows past ~10 and individual gaps get thin. [shares] must sum
+/// to ~1.0.
 class _DonutRingPainter extends CustomPainter {
   final List<double> shares;
   final List<Color> colors;
@@ -305,7 +309,7 @@ class _DonutRingPainter extends CustomPainter {
     this.gapDegrees = 6,
   });
 
-  static const double _strokeWidth = 12;
+  static const double _strokeWidth = 7;
   static const double _glowOffset = 5;
   static const double _glowBlurSigma = 6;
   // Room left inside the box edge for the glow's blur/offset bleed so it
@@ -319,33 +323,79 @@ class _DonutRingPainter extends CustomPainter {
     final rect = Rect.fromCircle(center: center, radius: ringRadius);
     final gapRad = gapDegrees * math.pi / 180;
 
+    final n = shares.length;
+    final rawSweeps = List<double>.generate(n, (i) => shares[i] * 2 * math.pi);
+    final rawStarts = <double>[];
     double startAngle = -math.pi / 2;
+    for (var i = 0; i < n; i++) {
+      rawStarts.add(startAngle);
+      startAngle += rawSweeps[i];
+    }
+
+    // Each boundary's gap is carved out of whichever of its two neighbors
+    // is BIGGER, never the smaller one. Sizing the gap off the smaller
+    // slice (the old approach) meant the smallest slice in the whole ring
+    // — which, since holdings are sorted by value, sits right where the
+    // ring wraps back to the largest slice — always got the thinnest gap
+    // of anywhere on the ring. Taking it from the bigger neighbor instead
+    // means that seam gets a full-size gap donated from the large slice,
+    // which has plenty of room to spare, while tiny slices are never
+    // shrunk further.
+    final trimStart = List<double>.filled(n, 0.0);
+    final trimEnd = List<double>.filled(n, 0.0);
+    if (n > 1) {
+      for (var i = 0; i < n; i++) {
+        final next = (i + 1) % n;
+        final donorIsCurrent = rawSweeps[i] >= rawSweeps[next];
+        final donorSweep = donorIsCurrent ? rawSweeps[i] : rawSweeps[next];
+        final gap = math.min(gapRad, donorSweep * 0.8);
+        if (donorIsCurrent) {
+          trimEnd[i] += gap;
+        } else {
+          trimStart[next] += gap;
+        }
+      }
+    }
+
+    final starts = <double>[];
+    final sweeps = <double>[];
+    for (var i = 0; i < n; i++) {
+      starts.add(rawStarts[i] + trimStart[i]);
+      sweeps.add(rawSweeps[i] - trimStart[i] - trimEnd[i]);
+    }
+
+    // One shared blur pass for every slice's glow, instead of a separate
+    // MaskFilter.blur per slice — with 10+ holdings that was 10+ blur
+    // layers in a single frame, which was corrupting/truncating the rest
+    // of the page's raster on some Android GPUs (MediaTek in particular).
+    canvas.saveLayer(
+      rect.inflate(_strokeWidth + _glowBlurSigma * 3),
+      Paint()
+        ..imageFilter = ImageFilter.blur(
+          sigmaX: _glowBlurSigma,
+          sigmaY: _glowBlurSigma,
+        ),
+    );
+    canvas.save();
+    canvas.translate(0, _glowOffset);
     for (var i = 0; i < shares.length; i++) {
-      final sweep = shares[i] * 2 * math.pi;
-      final drawSweep = shares.length > 1
-          ? (sweep - gapRad).clamp(0.05, sweep)
-          : sweep;
-      final color = colors[i];
-
       final glowPaint = Paint()
-        ..color = color.withValues(alpha: 0.5)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = _strokeWidth
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, _glowBlurSigma);
-      canvas.save();
-      canvas.translate(0, _glowOffset);
-      canvas.drawArc(rect, startAngle, drawSweep, false, glowPaint);
-      canvas.restore();
-
-      final slicePaint = Paint()
-        ..color = color
+        ..color = colors[i].withValues(alpha: 0.5)
         ..style = PaintingStyle.stroke
         ..strokeWidth = _strokeWidth
         ..strokeCap = StrokeCap.round;
-      canvas.drawArc(rect, startAngle, drawSweep, false, slicePaint);
+      canvas.drawArc(rect, starts[i], sweeps[i], false, glowPaint);
+    }
+    canvas.restore();
+    canvas.restore();
 
-      startAngle += sweep;
+    for (var i = 0; i < shares.length; i++) {
+      final slicePaint = Paint()
+        ..color = colors[i]
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = _strokeWidth
+        ..strokeCap = StrokeCap.round;
+      canvas.drawArc(rect, starts[i], sweeps[i], false, slicePaint);
     }
   }
 
