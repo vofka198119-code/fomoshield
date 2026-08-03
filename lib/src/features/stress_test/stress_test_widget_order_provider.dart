@@ -25,8 +25,10 @@ class StressTestWidgetConfig {
         return 'Psychology Meter';
       case 'my_assets':
         return 'Holdings';
-      case 'market_timeline':
-        return 'Portfolio Value';
+      case 'price_chart':
+        return 'Price Chart';
+      case 'epoch_history':
+        return 'Epoch History';
       case 'trade_history':
         return 'Trade History';
       case 'timer':
@@ -43,7 +45,8 @@ class StressTestWidgetConfig {
 const List<String> stressTestDefaultWidgetOrder = [
   'allocation_chart',
   'cash',
-  'market_timeline',
+  'price_chart',
+  'epoch_history',
   'my_assets',
   'psychology_meter',
   'trade_history',

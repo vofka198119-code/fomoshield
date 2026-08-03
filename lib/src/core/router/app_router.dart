@@ -85,16 +85,21 @@ class AppRouter {
       ),
 
       // Metric info — title + explanation sections, reached from the "?"
-      // next to a KEY METRICS row.
+      // next to a KEY METRICS row. No transition: both this screen and its
+      // callers use a transparent Scaffold over the app-wide gradient
+      // (see main.dart), so an animated push/pop briefly shows both
+      // routes' text overlapping — a plain cut avoids that ghosting.
       GoRoute(
         path: '/metric-info/:id',
         name: 'metricInfo',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           final content = metricInfoRegistry[id];
-          return content == null
-              ? const SizedBox()
-              : MetricInfoScreen(content: content);
+          return NoTransitionPage(
+            child: content == null
+                ? const SizedBox()
+                : MetricInfoScreen(content: content),
+          );
         },
       ),
 

@@ -1706,4 +1706,141 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
       ),
     ],
   ),
+  // Reached by tapping the "?" in the Portfolio Balance detail screen's
+  // 4 widget headers (stress_test_portfolio_balance_screen.dart and its
+  // widgets/ files) — not part of company_detail's KEY METRICS/FS Score
+  // rows, just reusing the same MetricInfoScreen shape.
+  'portfolio-health': MetricInfoContent(
+    title: 'Portfolio Health',
+    subtitle: 'Overall Portfolio Quality Assessment',
+    sections: [
+      MetricInfoSection(
+        body:
+            'Portfolio Health provides an overall assessment of your '
+            'portfolio\'s structure and investment quality. Instead of '
+            'reviewing many separate statistics, this widget combines '
+            'several important indicators into a single summary that '
+            'helps you understand whether your portfolio follows healthy '
+            'investing principles.\n\n'
+            'A strong portfolio is not determined only by profit or loss. '
+            'Even a portfolio that is currently making money can contain '
+            'hidden weaknesses, such as too much money invested in one '
+            'company or too many investments concentrated in a single '
+            'industry. These risks may not be obvious during a rising '
+            'market, but they can become much more noticeable when market '
+            'conditions change.\n\n'
+            'The Portfolio Health widget analyzes different aspects of '
+            'your portfolio, including diversification, concentration, '
+            'sector balance, and overall stability. Each indicator '
+            'contributes to the final picture and helps identify areas '
+            'that may need improvement.\n\n'
+            'A higher score generally means your investments are spread '
+            'more effectively, reducing unnecessary risk and making your '
+            'portfolio more resilient to unexpected market events. A '
+            'lower score does not necessarily mean your portfolio is bad, '
+            'but it may suggest that some adjustments could improve its '
+            'balance and reduce exposure to avoidable risks.\n\n'
+            'This widget is designed to help investors focus on building '
+            'a healthier portfolio over time rather than reacting to '
+            'short-term market movements.',
+      ),
+    ],
+  ),
+  'asset-allocation-pct': MetricInfoContent(
+    title: 'Asset Allocation %',
+    subtitle: 'How Your Capital Is Distributed',
+    sections: [
+      MetricInfoSection(
+        body:
+            'Asset Allocation shows exactly how your investment capital '
+            'is distributed among the individual companies you own.\n\n'
+            'Every percentage displayed represents the portion of your '
+            'total portfolio invested in a specific company. As stock '
+            'prices change over time, these percentages also change '
+            'automatically. A company that performs very well may '
+            'gradually become a much larger part of your portfolio, even '
+            'if you never purchase additional shares.\n\n'
+            'Monitoring asset allocation is important because excessive '
+            'concentration can increase risk. If one company represents '
+            'a large percentage of your investments, the success or '
+            'failure of that single business will have a much greater '
+            'influence on your overall portfolio.\n\n'
+            'A balanced allocation helps reduce dependence on any '
+            'individual company. While there is no perfect distribution '
+            'that fits every investor, avoiding extremely large positions '
+            'can help create a more stable investment portfolio over the '
+            'long term.\n\n'
+            'This widget allows you to quickly identify your largest '
+            'holdings, monitor how your portfolio evolves, and decide '
+            'whether your allocation still matches your investment '
+            'goals.',
+      ),
+    ],
+  ),
+  'diversification-indicator': MetricInfoContent(
+    title: 'Diversification Indicator',
+    subtitle: 'Sector Balance Across Your Holdings',
+    sections: [
+      MetricInfoSection(
+        body:
+            'Diversification Indicator measures how your investments are '
+            'distributed across different sectors of the economy.\n\n'
+            'Every company belongs to a particular industry or business '
+            'sector, such as Technology, Healthcare, Financial Services, '
+            'Consumer Goods, Energy, Industrials, Utilities, or Real '
+            'Estate. Different sectors often perform differently '
+            'depending on economic conditions, interest rates, consumer '
+            'demand, or global events.\n\n'
+            'If most of your money is invested in only one sector, your '
+            'portfolio becomes more vulnerable to problems affecting that '
+            'industry. For example, a decline in technology companies may '
+            'have a significant impact if your portfolio consists mainly '
+            'of technology stocks.\n\n'
+            'A portfolio spread across multiple sectors can reduce this '
+            'type of risk because different industries may perform '
+            'differently during the same period. While one sector '
+            'struggles, another may remain stable or continue growing.\n\n'
+            'This widget helps you understand which sectors make up your '
+            'portfolio, identify areas that may be overrepresented, and '
+            'discover sectors that are currently missing. Building sector '
+            'diversification gradually can improve the overall balance of '
+            'your investments without requiring you to own a very large '
+            'number of companies.',
+      ),
+    ],
+  ),
+  'diversification-progress': MetricInfoContent(
+    title: 'Diversification Progress',
+    subtitle: 'Building a Broader Portfolio Over Time',
+    sections: [
+      MetricInfoSection(
+        body:
+            'Diversification Progress tracks how your portfolio grows by '
+            'measuring the number of different companies you own.\n\n'
+            'For many long-term investors, diversification is built '
+            'gradually over months or even years. Every new investment '
+            'has the potential to increase the variety of businesses '
+            'represented in the portfolio and reduce dependence on any '
+            'single company.\n\n'
+            'Owning only a few companies means that each investment has a '
+            'greater influence on your portfolio\'s performance. As the '
+            'number of holdings increases, the impact of one company\'s '
+            'poor performance usually becomes smaller, creating a more '
+            'balanced investment structure.\n\n'
+            'However, diversification is not simply about buying as many '
+            'companies as possible. A portfolio with many businesses from '
+            'the same industry may still be poorly diversified. True '
+            'diversification combines both the number of companies and '
+            'the variety of sectors they represent.\n\n'
+            'This widget allows you to monitor your progress toward '
+            'building a broader portfolio. Watching this number grow over '
+            'time can encourage disciplined investing and remind you '
+            'that diversification is a gradual process rather than '
+            'something achieved in a single day.\n\n'
+            'As your portfolio expands, this widget provides a simple '
+            'visual indication of how far you have progressed on your '
+            'long-term diversification journey.',
+      ),
+    ],
+  ),
 };

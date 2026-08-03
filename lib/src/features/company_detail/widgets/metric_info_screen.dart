@@ -24,7 +24,7 @@ class MetricInfoScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back_ios_rounded,
+            Icons.arrow_back_rounded,
             size: 22,
             color: ThemeV2.textPrimary,
           ),

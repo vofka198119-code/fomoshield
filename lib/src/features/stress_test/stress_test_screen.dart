@@ -33,6 +33,7 @@ import '../../shared/widgets/market_timeline.dart';
 import '../../shared/widgets/verdict_card.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
+import 'widgets/market_value_chart.dart';
 import 'stress_test_widget_order_provider.dart';
 import 'widgets/stress_test_allocation_chart.dart';
 import 'widgets/stress_test_cash_widget.dart';
@@ -506,9 +507,17 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         return PsychologyMeter(data: PsychologyMeterData.fromSession(session));
       case 'my_assets':
         return _buildMyAssetsSection();
-      case 'market_timeline':
+      case 'price_chart':
+        return _buildSectionCard(
+          title: '',
+          noInnerPadding: true,
+          child: MarketValueChart(session: session),
+        );
+      case 'epoch_history':
+        // Admin-only — regular users never see the underlying scenario/
+        // epoch narrative, only the price chart above.
+        if (!ref.watch(isAdminProvider)) return const SizedBox.shrink();
         if (session.epochHistory.isEmpty) return const SizedBox.shrink();
-        // ── Step 1: Reactive timeline snapshot (deterministic epoch math) ──
         final timelineSnapshot = ref.watch(
           timelineSnapshotProvider(widget.sessionId),
         );
@@ -524,7 +533,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             currentEpochIndex: epochIndex,
             activeEpochProgress: epochProgress,
             initialLimit: 3,
-            session: session,
           ),
         );
       case 'trade_history':
@@ -1631,8 +1639,10 @@ class _StressTestWidgetSettingsSheetState
         return Icons.account_balance_wallet_rounded;
       case 'my_assets':
         return Icons.account_balance_rounded;
-      case 'market_timeline':
+      case 'price_chart':
         return Icons.show_chart_rounded;
+      case 'epoch_history':
+        return Icons.history_rounded;
       case 'trade_history':
         return Icons.swap_horiz_rounded;
       case 'timer':

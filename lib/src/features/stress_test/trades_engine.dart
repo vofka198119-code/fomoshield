@@ -87,6 +87,13 @@ extension TradesEngine on StressTestNotifier {
         ...session.priceHistory,
         symbol: [...(session.priceHistory[symbol] ?? []), price],
       },
+      priceHistoryTimestamps: {
+        ...session.priceHistoryTimestamps,
+        symbol: [
+          ...(session.priceHistoryTimestamps[symbol] ?? []),
+          DateTime.now().millisecondsSinceEpoch,
+        ],
+      },
       explanationLog: session.explanationLog,
       currentWeights: session.currentWeights,
       soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -174,6 +181,8 @@ extension TradesEngine on StressTestNotifier {
             activeHypeEvents: session.activeHypeEvents,
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: Map.from(session.priceHistory)..remove(symbol),
+            priceHistoryTimestamps:
+                Map.from(session.priceHistoryTimestamps)..remove(symbol),
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -501,6 +510,7 @@ extension TradesEngine on StressTestNotifier {
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             priceHistory: session.priceHistory,
+            priceHistoryTimestamps: session.priceHistoryTimestamps,
             // lastTickTimestamp drives _catchUp's granular-tick fallback
             // chain (lastTickTimestamp ?? lastEpochRollAt ?? startedAt) —
             // was also silently dropped here, reverting to null and

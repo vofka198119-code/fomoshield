@@ -274,28 +274,37 @@ extension CasinoEpochsEngine on StressTestNotifier {
     }
 
     // ── DIAGNOSTIC DUMP: session state before catch-up ──────────
-    // ignore: avoid_print
-    print('[CATCHUP-BEFORE] session=${session.id}');
-    // ignore: avoid_print
-    print('  epochHistory.length=${session.epochHistory.length}');
-    // ignore: avoid_print
-    print(
-      '  epochHistory=${session.epochHistory.map((e) => "E${e.index}:${e.scenario.name}").toList()}',
-    );
-    // ignore: avoid_print
-    print('  lastEpochRollAt=${session.lastEpochRollAt}');
-    // ignore: avoid_print
-    print('  casinoLastCatastropheEpoch=${session.casinoLastCatastropheEpoch}');
-    // ignore: avoid_print
-    print('  casinoCatastropheCooldown=${session.casinoCatastropheCooldown}');
-    // ignore: avoid_print
-    print('  casinoDeclineStreak=${session.casinoDeclineStreak}');
-    // ignore: avoid_print
-    print('  basePrices=${session.basePrices}');
-    // ignore: avoid_print
-    print('  currentPrices=${session.currentPrices}');
-    // ignore: avoid_print
-    print('  missedRolls=$missedRolls');
+    // Gated behind kDebugMode — this whole block (including two full-map
+    // toStrings) used to fire unconditionally on every catch-up with a
+    // missed epoch roll, in release builds too.
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print('[CATCHUP-BEFORE] session=${session.id}');
+      // ignore: avoid_print
+      print('  epochHistory.length=${session.epochHistory.length}');
+      // ignore: avoid_print
+      print(
+        '  epochHistory=${session.epochHistory.map((e) => "E${e.index}:${e.scenario.name}").toList()}',
+      );
+      // ignore: avoid_print
+      print('  lastEpochRollAt=${session.lastEpochRollAt}');
+      // ignore: avoid_print
+      print(
+        '  casinoLastCatastropheEpoch=${session.casinoLastCatastropheEpoch}',
+      );
+      // ignore: avoid_print
+      print(
+        '  casinoCatastropheCooldown=${session.casinoCatastropheCooldown}',
+      );
+      // ignore: avoid_print
+      print('  casinoDeclineStreak=${session.casinoDeclineStreak}');
+      // ignore: avoid_print
+      print('  basePrices=${session.basePrices}');
+      // ignore: avoid_print
+      print('  currentPrices=${session.currentPrices}');
+      // ignore: avoid_print
+      print('  missedRolls=$missedRolls');
+    }
 
     // Apply missed macro-step rolls
     final rng = _sessionRandom[session.id] ?? Random(session.simulationSeed);
@@ -402,7 +411,16 @@ extension CasinoEpochsEngine on StressTestNotifier {
       // fire a SECOND, non-deterministic roll on top of the deterministic
       // one this loop just performed above.
       session.lastEpochRollAt = now;
-      _simulateCurrentPrices(idx, ticks: ticksPerSegment);
+      _simulateCurrentPrices(
+        idx,
+        ticks: ticksPerSegment,
+        // Anchor this segment's price-history entries to when the epoch
+        // itself really happened along the missed gap, not to "now" — the
+        // whole loop runs synchronously with no real delay between
+        // iterations, so without this every missed epoch would otherwise
+        // get stamped at virtually the same instant.
+        priceHistoryAsOf: rollTime,
+      );
       // Re-sync: _simulateCurrentPrices just replaced state[idx] with a
       // new object — point `session` at it so the next iteration's
       // mutations (and casino-state fields read below the loop) land on
@@ -421,22 +439,26 @@ extension CasinoEpochsEngine on StressTestNotifier {
     // would read as ~0 and starve this trailing segment down to the
     // clamp's 1-tick floor.
     final missedTicks = ticksPerSegment;
-    // ignore: avoid_print
-    print(
-      '[CATCHUP-TICKS] ticksPerSegment=$ticksPerSegment missedTicks=$missedTicks',
-    );
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print(
+        '[CATCHUP-TICKS] ticksPerSegment=$ticksPerSegment missedTicks=$missedTicks',
+      );
+    }
     _simulateCurrentPrices(idx, ticks: missedTicks);
     session = state[idx]; // re-sync for the diagnostic prints below
 
     // ── DIAGNOSTIC DUMP: session state after catch-up ──────────
-    // ignore: avoid_print
-    print('[CATCHUP-AFTER] session=${session.id}');
-    // ignore: avoid_print
-    print(
-      '  epochHistory=${session.epochHistory.map((e) => "E${e.index}:${e.scenario.name}").toList()}',
-    );
-    // ignore: avoid_print
-    print('  currentPrices=${session.currentPrices}');
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print('[CATCHUP-AFTER] session=${session.id}');
+      // ignore: avoid_print
+      print(
+        '  epochHistory=${session.epochHistory.map((e) => "E${e.index}:${e.scenario.name}").toList()}',
+      );
+      // ignore: avoid_print
+      print('  currentPrices=${session.currentPrices}');
+    }
   }
 
   // ── Block 6: Casino Wall-Clock Epoch Recording ─────────────────────

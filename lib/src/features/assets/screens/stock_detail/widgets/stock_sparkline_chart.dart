@@ -1,25 +1,44 @@
+import 'dart:async';
 import 'dart:math';
-import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
-import 'stock_detail_helpers.dart';
+import '../../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../../stress_test/stress_test_engine.dart' show ChartDataPoint;
 
 // ---------------------------------------------------------------------------
-// Stress Test sparkline chart card — split out of the old monolithic
-// stock_detail_screen.dart. The painter/data logic is UNCHANGED (still the
-// simulation's own priceHistory, not the real Yahoo-backed PriceChart used
-// by Company Detail — different data source entirely); only the outer card
-// container was converted to the FomoShieldTheme.cardDecoration standard.
-// A closer visual match to Company Detail's PriceChart (scrub interaction,
-// dashed avg-cost styling) is a deferred follow-up, not done in this pass.
+// Stress Test sparkline chart card — per-symbol price chart for the "company
+// card" within an active stress test. Visual design is a deliberate copy of
+// company_detail/widgets/price_chart.dart and stress_test/widgets/
+// market_value_chart.dart (straight thin line, no fill/grid/axis-title
+// chrome, manual min/max/avg-cost price labels, custom hold-to-reveal touch
+// tooltip+indicator, gradient period tabs) — all three should read as the
+// same chart family. Data comes from the simulation's own
+// session.priceHistory[symbol] + session.priceHistoryTimestamps[symbol]
+// (real per-tick timestamps), not Finnhub — see stock_detail_screen.dart's
+// _generateSparkData for how points are built and period-filtered.
 // ---------------------------------------------------------------------------
 
 enum StressTestSparkPeriod { d1, w1, m1, m3, y1, max }
 
-class StockSparklineChart extends StatelessWidget {
+const Map<StressTestSparkPeriod, String> _periodLabels = {
+  StressTestSparkPeriod.d1: '1D',
+  StressTestSparkPeriod.w1: '1W',
+  StressTestSparkPeriod.m1: '1M',
+  StressTestSparkPeriod.m3: '3M',
+  StressTestSparkPeriod.y1: '1Y',
+  StressTestSparkPeriod.max: 'ALL',
+};
+
+final _priceFmt = NumberFormat('#,##0.00', 'en_US');
+
+class StockSparklineChart extends StatefulWidget {
   final bool ready;
-  final List<double> prices;
+  final List<ChartDataPoint> points;
   final double? avgPrice;
   final List<StressTestSparkPeriod> availablePeriods;
   final StressTestSparkPeriod selectedPeriod;
@@ -28,7 +47,7 @@ class StockSparklineChart extends StatelessWidget {
   const StockSparklineChart({
     super.key,
     required this.ready,
-    required this.prices,
+    required this.points,
     required this.availablePeriods,
     required this.selectedPeriod,
     required this.onPeriodChanged,
@@ -36,107 +55,129 @@ class StockSparklineChart extends StatelessWidget {
   });
 
   @override
+  State<StockSparklineChart> createState() => _StockSparklineChartState();
+}
+
+class _StockSparklineChartState extends State<StockSparklineChart> {
+  // Touch state for the custom date tooltip — same hold-to-reveal mechanic
+  // as PriceChart/MarketValueChart: a quick tap/swipe (e.g. scrolling the
+  // page) shows nothing, the indicator+tooltip only reveal after a
+  // sustained hold.
+  double? _touchDx;
+  int? _touchedSpotIndex;
+
+  static const _revealDelay = Duration(milliseconds: 1200);
+  Timer? _touchHoldTimer;
+  bool _touchRevealed = false;
+  double? _pendingDx;
+  int? _pendingSpotIndex;
+
+  @override
+  void didUpdateWidget(covariant StockSparklineChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.points != widget.points) {
+      _touchHoldTimer?.cancel();
+      _touchHoldTimer = null;
+      _touchRevealed = false;
+      _touchDx = null;
+      _touchedSpotIndex = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _touchHoldTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (!ready || prices.isEmpty) {
+    if (!widget.ready || widget.points.length < 2) {
       return Container(
         height: 280,
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
         decoration: FomoShieldTheme.cardDecoration,
-        child: const Center(child: CircularProgressIndicator()),
+        child: const Center(
+          child: CircularProgressIndicator(
+            color: ThemeV2.primary,
+            strokeWidth: 2,
+          ),
+        ),
       );
     }
 
-    final isUp = prices.last >= prices.first;
-    final lineColor = isUp ? ThemeV2.success : ThemeV2.loss;
-    final openPrice = prices.first;
-
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(
+        vertical: FomoShieldTheme.cardPadding,
+      ),
       decoration: FomoShieldTheme.cardDecoration,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-            height: 200,
-            child: ClipRect(
-              child: CustomPaint(
-                size: const Size(double.infinity, 200),
-                painter: _SparklinePainter(
-                  prices: prices,
-                  avgPrice: avgPrice,
-                  lineColor: lineColor,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                _techLabel('O:', openPrice),
-                if (avgPrice != null) ...[
-                  const SizedBox(width: 16),
-                  _techLabel('AVG', avgPrice!),
-                ],
-              ],
+            padding: const EdgeInsets.symmetric(
+              horizontal: FomoShieldTheme.cardPadding,
+            ),
+            child: Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: FomoShieldTheme.cardPadding,
+            ),
+            child: Divider(
+              height: 1,
+              color: Colors.black.withValues(alpha: 0.06),
             ),
           ),
           const SizedBox(height: 12),
-          _periodCapsules(),
+          Padding(
+            padding: const EdgeInsets.only(left: 1, right: 2),
+            child: SizedBox(height: 220, child: _buildChartArea()),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: FomoShieldTheme.cardPadding,
+            ),
+            child: _periodSelector(),
+          ),
         ],
       ),
     );
   }
 
-  Widget _techLabel(String prefix, double price) {
-    return Text(
-      '$prefix ${fmtFullCurrency(price)}',
-      style: ThemeV2.small.copyWith(
-        color: ThemeV2.textSecondary.withValues(alpha: 0.7),
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
-    );
-  }
-
-  Widget _periodCapsules() {
-    const labels = {
-      StressTestSparkPeriod.d1: '1D',
-      StressTestSparkPeriod.w1: '1W',
-      StressTestSparkPeriod.m1: '1M',
-      StressTestSparkPeriod.m3: '3M',
-      StressTestSparkPeriod.y1: '1Y',
-      StressTestSparkPeriod.max: 'ALL',
-    };
-
+  Widget _periodSelector() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: availablePeriods.map((period) {
-        final isActive = selectedPeriod == period;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3),
+      children: widget.availablePeriods.map((period) {
+        final isSelected = period == widget.selectedPeriod;
+        return Expanded(
           child: GestureDetector(
             onTap: () {
-              if (selectedPeriod != period) onPeriodChanged(period);
+              if (isSelected) return;
+              widget.onPeriodChanged(period);
             },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: isActive
-                    ? ThemeV2.primary.withValues(alpha: 0.12)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
-              ),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: isSelected
+                  ? BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [dialLight, dialDark],
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                    )
+                  : null,
               child: Text(
-                labels[period]!,
-                style: ThemeV2.caption.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: isActive ? ThemeV2.primary : ThemeV2.textSecondary,
+                _periodLabels[period]!,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? Colors.white : Colors.black,
                 ),
               ),
             ),
@@ -145,168 +186,239 @@ class StockSparklineChart extends StatelessWidget {
       }).toList(),
     );
   }
-}
 
-class _SparklinePainter extends CustomPainter {
-  final List<double> prices;
-  final double? avgPrice;
-  final Color lineColor;
+  Widget _buildChartArea() {
+    final points = widget.points;
 
-  _SparklinePainter({
-    required this.prices,
-    this.avgPrice,
-    required this.lineColor,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (prices.length < 2) return;
-
-    const topPad = 20.0;
-    const bottomPad = 24.0;
-    const leftPad = 12.0;
-    const rightPad = 12.0;
-    final chartW = size.width - leftPad - rightPad;
-    final chartH = size.height - topPad - bottomPad;
-
-    final minPrice = prices.reduce(min);
-    final maxPrice = prices.reduce(max);
-    final range = maxPrice - minPrice;
-
-    double yPrice(double p) {
-      if (range == 0) return size.height / 2;
-      return topPad + chartH * (1 - (p - minPrice) / range);
+    final minTime = points.first.time.millisecondsSinceEpoch.toDouble();
+    final maxTime = points.last.time.millisecondsSinceEpoch.toDouble();
+    final timeRange = maxTime - minTime;
+    final spots = <FlSpot>[];
+    for (int i = 0; i < points.length; i++) {
+      final t = points[i].time.millisecondsSinceEpoch.toDouble();
+      final x = timeRange > 0 ? (t - minTime) / timeRange : 0.0;
+      spots.add(FlSpot(x, points[i].value));
     }
 
-    double xIdx(int i) {
-      return leftPad + (i / (prices.length - 1)) * chartW;
-    }
+    final isUp = spots.last.y >= spots.first.y;
+    final lineColor = isUp ? ThemeV2.success : ThemeV2.loss;
 
-    final openPrice = prices.first;
-    final openY = yPrice(openPrice);
-    final dashPaint = Paint()
-      ..color = ThemeV2.textSecondary.withValues(alpha: 0.25)
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-    _drawDashedLine(canvas, leftPad, openY, size.width - rightPad, openY, dashPaint);
+    final values = points.map((p) => p.value);
+    final minValue = values.reduce(min);
+    final maxValue = values.reduce(max);
+    final valueRange = maxValue - minValue;
+    final headroom = valueRange > 0 ? valueRange * 0.08 : maxValue * 0.08;
+    final chartMinY = minValue - headroom;
+    final chartMaxY = maxValue + headroom;
 
-    final labelStyle = TextStyle(
-      color: ThemeV2.textSecondary.withValues(alpha: 0.5),
-      fontSize: 9,
-      fontWeight: FontWeight.w400,
+    final avgPrice = widget.avgPrice;
+    final showAvgLine =
+        avgPrice != null && avgPrice >= chartMinY && avgPrice <= chartMaxY;
+    final horizontalLines = [
+      HorizontalLine(y: chartMinY, color: ThemeV2.surfaceDark, strokeWidth: 1),
+      if (showAvgLine)
+        HorizontalLine(
+          y: avgPrice,
+          color: ThemeV2.textSecondary,
+          strokeWidth: 1,
+          dashArray: [4, 4],
+        ),
+    ];
+    const chartHeight = 220.0;
+    final avgLineTop = showAvgLine
+        ? ((chartMaxY - avgPrice) / (chartMaxY - chartMinY)) * chartHeight
+        : 0.0;
+
+    // The touch-indicator line's own top stops at the date tooltip's bottom
+    // edge instead of piercing straight through the box — same as
+    // PriceChart/MarketValueChart.
+    const dateTooltipHeight = 24.0;
+    final touchLineTopY =
+        chartMaxY -
+        (dateTooltipHeight / chartHeight) * (chartMaxY - chartMinY);
+
+    final intraday =
+        widget.selectedPeriod == StressTestSparkPeriod.d1 ||
+        widget.selectedPeriod == StressTestSparkPeriod.w1;
+
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 130 / 3),
+          child: LineChart(
+            LineChartData(
+              minY: chartMinY,
+              maxY: chartMaxY,
+              gridData: const FlGridData(show: false),
+              extraLinesData: ExtraLinesData(horizontalLines: horizontalLines),
+              titlesData: const FlTitlesData(
+                topTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+              ),
+              borderData: FlBorderData(show: false),
+              lineTouchData: LineTouchData(
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipItems: (touchedSpots) =>
+                      touchedSpots.map((_) => null).toList(),
+                ),
+                getTouchedSpotIndicator: (barData, spotIndexes) {
+                  return spotIndexes
+                      .map(
+                        (_) => TouchedSpotIndicatorData(
+                          _touchRevealed
+                              ? const FlLine(
+                                  color: Colors.black,
+                                  strokeWidth: 1.3,
+                                )
+                              : const FlLine(
+                                  color: Colors.transparent,
+                                  strokeWidth: 0,
+                                ),
+                          const FlDotData(show: false),
+                        ),
+                      )
+                      .toList();
+                },
+                getTouchLineEnd: (barData, spotIndex) => touchLineTopY,
+                touchCallback: (event, response) {
+                  final touched = response?.lineBarSpots;
+                  final isDown =
+                      event.isInterestedForInteractions &&
+                      touched != null &&
+                      touched.isNotEmpty;
+
+                  if (!isDown) {
+                    _touchHoldTimer?.cancel();
+                    _touchHoldTimer = null;
+                    _touchRevealed = false;
+                    if (_touchDx != null || _touchedSpotIndex != null) {
+                      setState(() {
+                        _touchDx = null;
+                        _touchedSpotIndex = null;
+                      });
+                    }
+                    return;
+                  }
+
+                  _pendingDx = event.localPosition?.dx;
+                  _pendingSpotIndex = touched.first.spotIndex;
+
+                  if (_touchRevealed) {
+                    setState(() {
+                      _touchDx = _pendingDx;
+                      _touchedSpotIndex = _pendingSpotIndex;
+                    });
+                  } else {
+                    _touchHoldTimer ??= Timer(_revealDelay, () {
+                      _touchHoldTimer = null;
+                      if (!mounted) return;
+                      _touchRevealed = true;
+                      setState(() {
+                        _touchDx = _pendingDx;
+                        _touchedSpotIndex = _pendingSpotIndex;
+                      });
+                    });
+                  }
+                },
+              ),
+              lineBarsData: [
+                LineChartBarData(
+                  spots: spots,
+                  isCurved: false,
+                  color: lineColor,
+                  barWidth: 1.2,
+                  isStrokeCapRound: true,
+                  dotData: const FlDotData(show: false),
+                ),
+              ],
+            ),
+            duration: const Duration(milliseconds: 300),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          right: 3,
+          child: Text(
+            '\$${_priceFmt.format(maxValue)}',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          right: 3,
+          child: Text(
+            '\$${_priceFmt.format(minValue)}',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
+        ),
+        if (showAvgLine)
+          Positioned(
+            top: (avgLineTop - 14).clamp(0.0, chartHeight - 14),
+            right: 3,
+            child: Text(
+              '\$${_priceFmt.format(avgPrice)}',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
+          ),
+        // Custom date tooltip — fixed at the top of the chart, moves only
+        // horizontally with the touch.
+        if (_touchDx != null &&
+            _touchedSpotIndex != null &&
+            _touchedSpotIndex! < points.length)
+          Positioned(
+            top: 0,
+            left: _touchDx! - 28,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: ThemeV2.primaryBg,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                _fmtTouchDate(
+                  points[_touchedSpotIndex!].time,
+                  intraday: intraday,
+                ),
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
-
-    if (avgPrice != null &&
-        avgPrice! >= minPrice * 0.995 &&
-        avgPrice! <= maxPrice * 1.005) {
-      final avgY = yPrice(avgPrice!);
-      final avgPaint = Paint()
-        ..color = ThemeV2.textSecondary.withValues(alpha: 0.4)
-        ..strokeWidth = 1.0
-        ..style = PaintingStyle.stroke;
-      _drawDashedLine(canvas, leftPad, avgY, size.width - rightPad, avgY, avgPaint);
-    }
-
-    final path = Path();
-    path.moveTo(xIdx(0), yPrice(prices[0]));
-    for (int i = 1; i < prices.length; i++) {
-      path.lineTo(xIdx(i), yPrice(prices[i]));
-    }
-
-    final linePaint = Paint()
-      ..color = lineColor
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawPath(path, linePaint);
-
-    final fillPath = Path.from(path);
-    final lastX = xIdx(prices.length - 1);
-    fillPath.lineTo(lastX, size.height);
-    fillPath.lineTo(xIdx(0), size.height);
-    fillPath.close();
-
-    final gradient = ui.Gradient.linear(
-      Offset(0, topPad),
-      Offset(0, size.height - bottomPad),
-      [lineColor.withValues(alpha: 0.12), lineColor.withValues(alpha: 0.0)],
-    );
-    final fillPaint = Paint()
-      ..shader = gradient
-      ..style = PaintingStyle.fill;
-
-    canvas.drawPath(fillPath, fillPaint);
-
-    final minY = yPrice(minPrice);
-    final minLinePaint = Paint()
-      ..color = ThemeV2.textSecondary.withValues(alpha: 0.2)
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-    _drawDashedLine(canvas, leftPad, minY, size.width - rightPad, minY, minLinePaint);
-
-    final minLabel = TextPainter(
-      text: TextSpan(
-        text: '\$${minPrice.toStringAsFixed(2)}',
-        style: labelStyle.copyWith(color: ThemeV2.textSecondary.withValues(alpha: 0.5)),
-      ),
-      textDirection: ui.TextDirection.ltr,
-    )..layout();
-    minLabel.paint(canvas, Offset(leftPad + 2, minY + 2));
-
-    final maxY = yPrice(maxPrice);
-    final maxLinePaint = Paint()
-      ..color = ThemeV2.textSecondary.withValues(alpha: 0.2)
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-    _drawDashedLine(canvas, leftPad, maxY, size.width - rightPad, maxY, maxLinePaint);
-
-    final maxLabelStyle = TextStyle(
-      color: ThemeV2.textPrimary.withValues(alpha: 0.65),
-      fontSize: 11,
-      fontWeight: FontWeight.w600,
-    );
-    final maxLabel = TextPainter(
-      text: TextSpan(text: '\$${maxPrice.toStringAsFixed(2)}', style: maxLabelStyle),
-      textDirection: ui.TextDirection.ltr,
-    )..layout();
-    maxLabel.paint(canvas, Offset(size.width - rightPad - maxLabel.width - 2, maxY + 3));
   }
 
-  void _drawDashedLine(
-    Canvas canvas,
-    double x1,
-    double y1,
-    double x2,
-    double y2,
-    Paint paint,
-  ) {
-    const dashLen = 4.0;
-    const gapLen = 4.0;
-    final dx = x2 - x1;
-    final dy = y2 - y1;
-    final dist = sqrt(dx * dx + dy * dy);
-    if (dist == 0) return;
-    final ux = dx / dist;
-    final uy = dy / dist;
-    double drawn = 0;
-    bool dash = true;
-    double cx = x1, cy = y1;
-    while (drawn < dist) {
-      final remaining = dist - drawn;
-      final segment = dash ? min(dashLen, remaining) : min(gapLen, remaining);
-      if (dash) {
-        canvas.drawLine(Offset(cx, cy), Offset(cx + ux * segment, cy + uy * segment), paint);
-      }
-      cx += ux * segment;
-      cy += uy * segment;
-      drawn += segment;
-      dash = !dash;
+  String _fmtTouchDate(DateTime date, {bool intraday = false}) {
+    if (intraday) {
+      final hh = date.hour.toString().padLeft(2, '0');
+      final mm = date.minute.toString().padLeft(2, '0');
+      return '${date.day}.${date.month} $hh:$mm';
     }
-  }
-
-  @override
-  bool shouldRepaint(_SparklinePainter old) {
-    return old.prices != prices || old.avgPrice != avgPrice || old.lineColor != lineColor;
+    return '${date.day}.${date.month}.${date.year}';
   }
 }

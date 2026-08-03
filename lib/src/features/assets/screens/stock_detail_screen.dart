@@ -46,7 +46,7 @@ class StockDetailScreen extends ConsumerStatefulWidget {
 
 class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   StressTestSparkPeriod _selectedPeriod = StressTestSparkPeriod.m1;
-  List<double> _rawPrices = [];
+  List<ChartDataPoint> _points = [];
   bool _chartReady = false;
 
   @override
@@ -66,6 +66,14 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     }
   }
 
+  static const Map<StressTestSparkPeriod, Duration> _sparkPeriodCutoffs = {
+    StressTestSparkPeriod.d1: Duration(days: 1),
+    StressTestSparkPeriod.w1: Duration(days: 7),
+    StressTestSparkPeriod.m1: Duration(days: 30),
+    StressTestSparkPeriod.m3: Duration(days: 90),
+    StressTestSparkPeriod.y1: Duration(days: 365),
+  };
+
   void _generateSparkData() {
     final session = _session;
     if (session == null) return;
@@ -75,46 +83,83 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
       _selectedPeriod = available.first;
     }
 
-    final history = session.priceHistory[widget.symbol] ?? [];
-    if (history.isEmpty) {
+    final priceHist = session.priceHistory[widget.symbol] ?? [];
+    if (priceHist.isEmpty) {
       final price = session.currentPrices[widget.symbol] ??
           session.basePrices[widget.symbol] ??
           100.0;
+      final now = DateTime.now();
       setState(() {
-        _rawPrices = [price, price];
+        _points = [
+          ChartDataPoint(now.subtract(const Duration(minutes: 1)), price),
+          ChartDataPoint(now, price),
+        ];
         _chartReady = true;
       });
       return;
     }
 
-    final targetCount = switch (_selectedPeriod) {
-      StressTestSparkPeriod.d1 => 24,
-      StressTestSparkPeriod.w1 => 30,
-      StressTestSparkPeriod.m1 => 60,
-      StressTestSparkPeriod.m3 => 90,
-      StressTestSparkPeriod.y1 => 120,
-      StressTestSparkPeriod.max => 200,
-    };
+    // Real per-tick timestamps if this symbol has them (see
+    // stress_test_engine.dart's priceHistoryTimestamps) — falls back to
+    // the old synthetic "nominally tickIntervalSeconds apart" spacing for
+    // points recorded before that field existed, same as
+    // StressTestNotifier.computeChartData.
+    final tsHist = session.priceHistoryTimestamps[widget.symbol];
+    final hasRealTimestamps =
+        tsHist != null && tsHist.length == priceHist.length;
+    final now = DateTime.now();
+    final allPoints = <ChartDataPoint>[];
+    for (int i = 0; i < priceHist.length; i++) {
+      final time = hasRealTimestamps
+          ? DateTime.fromMillisecondsSinceEpoch(tsHist[i])
+          : now.subtract(
+              Duration(
+                seconds: (priceHist.length - 1 - i) * tickIntervalSeconds,
+              ),
+            );
+      allPoints.add(ChartDataPoint(time, priceHist[i]));
+    }
 
-    final sampled = _sampleData(history, targetCount);
+    List<ChartDataPoint> filtered;
+    final cutoffDuration = _sparkPeriodCutoffs[_selectedPeriod];
+    if (cutoffDuration == null) {
+      // StressTestSparkPeriod.max — no time filter, whole history.
+      filtered = allPoints;
+    } else {
+      // 1D is a calendar day (resets at local midnight), not a rolling
+      // 24h lookback — explicit ask: the daily chart should start
+      // drawing a NEW day, not keep showing part of yesterday until a
+      // full 24h have passed.
+      final cutoff = _selectedPeriod == StressTestSparkPeriod.d1
+          ? DateTime(now.year, now.month, now.day)
+          : now.subtract(cutoffDuration);
+      filtered = allPoints.where((p) => !p.time.isBefore(cutoff)).toList();
+      if (filtered.length < 2) {
+        filtered = allPoints.length >= 2
+            ? [allPoints.first, allPoints.last]
+            : allPoints;
+      }
+    }
+
+    final sampled = _sampleData(filtered, 200);
 
     setState(() {
-      _rawPrices = sampled;
+      _points = sampled;
       _chartReady = true;
     });
   }
 
   /// Evenly downsample [data] to at most [targetCount] points,
   /// always keeping the very last point as-is.
-  List<double> _sampleData(List<double> data, int targetCount) {
+  List<ChartDataPoint> _sampleData(List<ChartDataPoint> data, int targetCount) {
     if (data.length <= targetCount) return data;
     final step = data.length / targetCount;
-    final result = <double>[];
+    final result = <ChartDataPoint>[];
     for (int i = 0; i < targetCount; i++) {
       final idx = (i * step).floor();
       result.add(data[idx.clamp(0, data.length - 1)]);
     }
-    result.last = data.last;
+    result[result.length - 1] = data.last;
     return result;
   }
 
@@ -123,6 +168,13 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   }
 
   /// Returns available sparkline periods based on session duration.
+  /// Infinite/Custom show every period upfront too, not gated by how much
+  /// real time has actually elapsed — a period tab reflects however
+  /// little (or much) data exists so far (auto-scaled in
+  /// StockSparklineChart), same as a fixed-length test already does;
+  /// hiding "1W" until a real week had passed made the chart
+  /// inaccessible right when the user most wanted to check a brand-new
+  /// test. Explicit ask — don't reintroduce elapsed gating here.
   List<StressTestSparkPeriod> _availablePeriods(StressTestSession session) {
     return switch (session.duration) {
       TestDuration.week1 => [StressTestSparkPeriod.d1, StressTestSparkPeriod.w1],
@@ -137,32 +189,14 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
           StressTestSparkPeriod.m1,
           StressTestSparkPeriod.m3,
         ],
-      TestDuration.infinite ||
-      TestDuration.custom =>
-        _elapsedGatedPeriods(session),
+      TestDuration.infinite || TestDuration.custom => [
+          StressTestSparkPeriod.d1,
+          StressTestSparkPeriod.w1,
+          StressTestSparkPeriod.m1,
+          StressTestSparkPeriod.m3,
+          StressTestSparkPeriod.y1,
+        ],
     };
-  }
-
-  static const Map<StressTestSparkPeriod, Duration> _periodElapsedCutoffs = {
-    StressTestSparkPeriod.w1: Duration(days: 7),
-    StressTestSparkPeriod.m1: Duration(days: 30),
-    StressTestSparkPeriod.m3: Duration(days: 90),
-    StressTestSparkPeriod.y1: Duration(days: 365),
-  };
-
-  List<StressTestSparkPeriod> _elapsedGatedPeriods(StressTestSession session) {
-    final start = session.startedAt ?? session.createdAt;
-    final elapsed = DateTime.now().difference(start);
-    final periods = [StressTestSparkPeriod.d1];
-    for (final p in [
-      StressTestSparkPeriod.w1,
-      StressTestSparkPeriod.m1,
-      StressTestSparkPeriod.m3,
-      StressTestSparkPeriod.y1,
-    ]) {
-      if (elapsed >= _periodElapsedCutoffs[p]!) periods.add(p);
-    }
-    return periods;
   }
 
   StressTestHolding? _findHolding(StressTestSession session) {
@@ -204,6 +238,15 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   @override
   Widget build(BuildContext context) {
     ref.watch(stressTestRefreshProvider);
+    // Regenerate the chart's points whenever the engine ticks — previously
+    // only initState/didUpdateWidget/period-tap called _generateSparkData,
+    // so the chart sat stale (while the price header above it kept
+    // updating live) until the screen was torn down and rebuilt by
+    // leaving and re-entering. Safe to call here (not directly in build)
+    // since ref.listen's callback fires after the build phase completes.
+    ref.listen<int>(stressTestRefreshProvider, (prev, next) {
+      _generateSparkData();
+    });
     final session = _session;
     if (session == null) {
       return const Scaffold(
@@ -281,7 +324,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                     ),
                     StockSparklineChart(
                       ready: _chartReady,
-                      prices: _rawPrices,
+                      points: _points,
                       avgPrice: holding?.averagePrice,
                       availablePeriods: _availablePeriods(session),
                       selectedPeriod: _selectedPeriod,

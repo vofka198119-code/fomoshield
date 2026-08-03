@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------------
-// Stress Test — Portfolio Size card, lives on the Portfolio Balance detail
-// screen below Diversification Indicator. Same segmented-bar visual as
+// Stress Test — Diversification Progress card (was "Portfolio Size"), lives
+// on the Portfolio Balance detail screen below Diversification Indicator.
+// Same segmented-bar visual as
 // Portfolio's TARGET widget (see target_widget.dart's _SegmentedBar), but
 // mapped to holdings COUNT instead of goal %, with a non-monotonic color
 // curve: too few holdings is risky (red) same as too many (red again) —
@@ -8,6 +9,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
@@ -72,9 +74,32 @@ class StressTestAssetCountCard extends StatelessWidget {
             width: double.infinity,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-              child: Text(
-                'PORTFOLIO SIZE',
-                style: FomoShieldTheme.cardTitle(Colors.white),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'DIVERSIFICATION PROGRESS',
+                    style: FomoShieldTheme.cardTitle(Colors.white),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        context.push('/metric-info/diversification-progress'),
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.help_outline_rounded,
+                        size: 13,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

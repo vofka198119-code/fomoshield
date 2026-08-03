@@ -11,6 +11,7 @@
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
@@ -112,9 +113,31 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
             width: double.infinity,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-              child: Text(
-                'PORTFOLIO HEALTH',
-                style: FomoShieldTheme.cardTitle(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'PORTFOLIO HEALTH',
+                    style: FomoShieldTheme.cardTitle(),
+                  ),
+                  GestureDetector(
+                    onTap: () => context.push('/metric-info/portfolio-health'),
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: ThemeV2.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.help_outline_rounded,
+                        size: 13,
+                        color: ThemeV2.primary,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

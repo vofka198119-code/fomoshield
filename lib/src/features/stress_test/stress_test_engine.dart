@@ -54,6 +54,16 @@ const int _maxCatchUpTicks = 900;
 /// hundred points at most, so this comfortably covers every real use.
 const int _maxPriceHistoryPoints = 5000;
 
+/// Max [TickExplanation]s kept per symbol in [StressTestSession.explanationLog].
+/// Unlike priceHistory, this was never capped at all — Why Today's timeline
+/// only ever displays the last 20 (`why_today_screen.dart`'s `displayTicks`)
+/// and the summary/breakdown cards only ever read `.last`, so nothing reads
+/// further back than that. Left uncapped, a long-lived session's per-tick
+/// O(n) list-copy on every catch-up kept getting more expensive forever —
+/// generous margin over the 20 actually shown, in case that display window
+/// ever grows.
+const int _maxExplanationLogEntries = 50;
+
 // ---------------------------------------------------------------------------
 // Storage keys (user-scoped)
 // ── Task 1.7: Separated Cache Architecture ─────────────────────────
@@ -316,6 +326,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       'priceHistory': s.priceHistory.map(
         (k, v) => MapEntry(k, v.map((e) => e).toList()),
       ),
+      'priceHistoryTimestamps': s.priceHistoryTimestamps,
       'status': s.status.name,
       'psychologyProfile': s.psychologyProfile.toJson(),
       'diversificationBonusRecorded': s.diversificationBonusRecorded,
@@ -431,6 +442,17 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             ),
           ) ??
           {},
+      // Missing entirely (or a shorter list than priceHistory) for sessions
+      // persisted before this field existed — computeChartData falls back
+      // to synthetic timestamps for those, see its own doc comment.
+      priceHistoryTimestamps:
+          (json['priceHistoryTimestamps'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(
+              k,
+              (v as List<dynamic>).map((e) => (e as num).toInt()).toList(),
+            ),
+          ) ??
+          {},
       currentWeights:
           (json['currentWeights'] as Map<String, dynamic>?)?.map(
             (k, v) => MapEntry(k, (v as num).toDouble()),
@@ -506,6 +528,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       customDurationDays: customDurationDays,
       simulationSeed: seed,
       priceHistory: const {},
+      priceHistoryTimestamps: const {},
     );
     state = [...state, session];
     _save();
@@ -645,6 +668,13 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               ...session.priceHistory,
               symbol: [...(session.priceHistory[symbol] ?? []), price],
             },
+            priceHistoryTimestamps: {
+              ...session.priceHistoryTimestamps,
+              symbol: [
+                ...(session.priceHistoryTimestamps[symbol] ?? []),
+                DateTime.now().millisecondsSinceEpoch,
+              ],
+            },
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -704,6 +734,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             activeHypeEvents: session.activeHypeEvents,
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: session.priceHistory,
+            priceHistoryTimestamps: session.priceHistoryTimestamps,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -827,6 +858,13 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         }
         return history;
       }(),
+      priceHistoryTimestamps: () {
+        final timestamps = <String, List<int>>{};
+        for (final h in session.holdings) {
+          timestamps[h.symbol] = [now.millisecondsSinceEpoch];
+        }
+        return timestamps;
+      }(),
       explanationLog: session.explanationLog,
       soldDuringCatastrophe: session.soldDuringCatastrophe,
       diversificationBonusRecorded: session.diversificationBonusRecorded,
@@ -899,6 +937,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             activeHypeEvents: session.activeHypeEvents,
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: session.priceHistory,
+            priceHistoryTimestamps: session.priceHistoryTimestamps,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
@@ -1164,10 +1203,16 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     if (session == null || session.holdings.isEmpty) return [];
 
     final histories = <List<double>>[];
+    // Real per-tick timestamps, same length/order as the matching entry in
+    // `histories` — null (or shorter than its price history) for a symbol
+    // whose data predates `priceHistoryTimestamps` existing, or whenever
+    // some other legacy write path skipped it.
+    final timestampHistories = <List<int>?>[];
     for (final h in session.holdings) {
       final hist = session.priceHistory[h.symbol];
       if (hist == null || hist.isEmpty) return [];
       histories.add(hist);
+      timestampHistories.add(session.priceHistoryTimestamps[h.symbol]);
     }
     final minLen = histories.map((h) => h.length).reduce(min);
     if (minLen < 2) return [];
@@ -1176,24 +1221,34 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     final points = <ChartDataPoint>[];
     for (int k = 0; k < minLen; k++) {
       double value = session.cash;
+      DateTime? realTime;
       for (int i = 0; i < session.holdings.length; i++) {
         final hist = histories[i];
         // Right-aligned: count from the end so every symbol's k-th-from-
         // last point corresponds to the same simulated tick.
         final idx = hist.length - minLen + k;
         value += session.holdings[i].shares * hist[idx];
+
+        // Every currently-held symbol gets exactly one price (and one
+        // timestamp) appended per tick-processing call, so any symbol's
+        // real timestamp at this same right-aligned idx is representative
+        // of the whole point — first one found wins.
+        if (realTime == null) {
+          final ts = timestampHistories[i];
+          if (ts != null && ts.length == hist.length) {
+            realTime = DateTime.fromMillisecondsSinceEpoch(ts[idx]);
+          }
+        }
       }
-      // Ticks are nominally _tickSeconds apart in wall-clock time (catch-up
-      // batches compress real gaps, so this is an approximation, not an
-      // exact replay clock) — used only for relative ordering/spacing and
-      // for the timeframe tabs' elapsed-time cutoffs, not precise recall.
+      // Fallback for points recorded before real per-tick timestamps
+      // existed: the old synthetic "nominally _tickSeconds apart" spacing.
+      // Catch-up batches compress real gaps, so this was always an
+      // approximation — real timestamps (above) replace it going forward.
       final ticksAgo = minLen - 1 - k;
-      points.add(
-        ChartDataPoint(
-          now.subtract(Duration(seconds: ticksAgo * _tickSeconds)),
-          value,
-        ),
-      );
+      final time =
+          realTime ??
+          now.subtract(Duration(seconds: ticksAgo * _tickSeconds));
+      points.add(ChartDataPoint(time, value));
     }
     return points;
   }

@@ -1100,6 +1100,17 @@ class StressTestSession {
   /// Each tick of the simulation pushes the latest currentPrice into this list.
   Map<String, List<double>> priceHistory;
 
+  /// Real wall-clock timestamp (epoch millis) for each entry in
+  /// [priceHistory], same keys, same per-key length/order — every place
+  /// that appends a price also appends its real timestamp here. Lets
+  /// [StressTestNotifier.computeChartData] plot against genuine calendar
+  /// time (including large catch-up gaps) instead of a synthetic "now
+  /// minus index × 20s" reconstruction. Sessions persisted before this
+  /// field existed simply have a shorter (or missing) array per symbol —
+  /// computeChartData falls back to the old synthetic method for those
+  /// points rather than crashing/misaligning.
+  Map<String, List<int>> priceHistoryTimestamps;
+
   /// Explainable Simulation — лог причин изменения цен (не сохраняется в JSON).
   /// symbol → список объяснений за каждый тик.
   Map<String, List<TickExplanation>> explanationLog;
@@ -1157,7 +1168,7 @@ class StressTestSession {
 
   /// Per-session sandbox: true, если катастрофа уже записана
   /// в психологический профиль для этой сессии.
-  /// Заменяет старый глобальный Set<String> в StateNotifier.
+  /// Заменяет старый глобальный `Set<String>` в StateNotifier.
   bool catastropheSurvivalRecorded;
 
   /// Task 1.5: true, когда бонус диверсификации уже начислен.
@@ -1225,6 +1236,7 @@ class StressTestSession {
     this.realizedPnl = 0,
     this.customDurationDays,
     this.priceHistory = const {},
+    this.priceHistoryTimestamps = const {},
     this.explanationLog = const {},
     this.simulationSeed = 0,
     this.enableDeveloperTrace = false,

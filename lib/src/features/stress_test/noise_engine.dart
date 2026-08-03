@@ -187,11 +187,25 @@ extension NoiseEngine on StressTestNotifier {
   /// When [ticks] > 1 (catch-up mode), simulates multiple 20-second ticks
   /// in a granular loop so GBM produces smooth trajectories instead of
   /// hitting the clamp ceiling on a single mega-tick.
-  void _simulateCurrentPrices(int idx, {int ticks = 1}) {
+  /// [priceHistoryAsOf] — the real wall-clock moment this batch of ticks
+  /// should be recorded as having happened at, for [priceHistoryTimestamps]
+  /// only. Defaults to the real `DateTime.now()` fetched below (correct for
+  /// normal live ticking and the single-batch catch-up path). Catch-up's
+  /// per-epoch-segment loop (casino_epochs.dart) passes each segment's own
+  /// already-computed `rollTime` instead — those calls all happen back-to-
+  /// back synchronously with no real delay between them, so without this
+  /// override every segment would otherwise get stamped with virtually the
+  /// same instant instead of being spread across the actual missed gap.
+  void _simulateCurrentPrices(
+    int idx, {
+    int ticks = 1,
+    DateTime? priceHistoryAsOf,
+  }) {
     final session = state[idx];
     if (session.holdings.isEmpty) return;
 
     final now = DateTime.now();
+    final tickTimestamp = (priceHistoryAsOf ?? now).millisecondsSinceEpoch;
 
     // ── Casino Wall-Clock: check if it's time to roll a new epoch ──
     final rollInterval = _getRollInterval(session.duration);
@@ -368,10 +382,17 @@ extension NoiseEngine on StressTestNotifier {
             effectiveAnnualDrift * dtPerTick * driftMultiplier + noise + microNoise;
         final clampedChange = _clampDrift(rawChange, regime);
         currentPrice = currentPrice * (1 + clampedChange);
-        // ignore: avoid_print
-        print(
-          '[TICK] ${h.symbol} basePrice=${basePrice.toStringAsFixed(4)} beforeGbm=${beforeGbm.toStringAsFixed(4)} afterGbm=${currentPrice.toStringAsFixed(4)} regime=${regime.name}',
-        );
+        // Gated behind kDebugMode — this fires once per held symbol per
+        // simulated tick, and catch-up can run up to 900 ticks in one
+        // screen-entry call (see _maxCatchUpTicks); ungated, that's up to
+        // 9000 string-interpolating print() calls on a single re-entry,
+        // in release builds too.
+        if (kDebugMode) {
+          // ignore: avoid_print
+          print(
+            '[TICK] ${h.symbol} basePrice=${basePrice.toStringAsFixed(4)} beforeGbm=${beforeGbm.toStringAsFixed(4)} afterGbm=${currentPrice.toStringAsFixed(4)} regime=${regime.name}',
+          );
+        }
 
         // ── News micro-scenario: apply if this holding is the one hit ──
         // Mutates session.activeNewsEvent in place (advances currentTick,
@@ -408,7 +429,7 @@ extension NoiseEngine on StressTestNotifier {
           basePrice * regimeBounds.minPriceMultiplier,
           basePrice * regimeBounds.maxPriceMultiplier,
         );
-        if ((currentPrice - beforeClamp).abs() > 0.0001) {
+        if (kDebugMode && (currentPrice - beforeClamp).abs() > 0.0001) {
           // ignore: avoid_print
           print(
             '[CLAMP] ${h.symbol} clamped '
@@ -440,7 +461,7 @@ extension NoiseEngine on StressTestNotifier {
         }
 
         // ── Debug: log dt calibration once per app session ──────
-        if (!_dtCalibrationLogged) {
+        if (kDebugMode && !_dtCalibrationLogged) {
           _dtCalibrationLogged = true;
           final dtDrift = params.annualDrift * dtPerTick;
           final dtVol = params.annualVolatility * sqrtDt;
@@ -481,10 +502,14 @@ extension NoiseEngine on StressTestNotifier {
           newsRaw: newsIncrement,
           hypeRaw: hypeIncrement,
         );
-        final symLog = <TickExplanation>[
+        var symLog = <TickExplanation>[
           ...(explanations[h.symbol] ?? []),
           expl,
         ];
+        // Cap per-symbol log — see _maxExplanationLogEntries.
+        if (symLog.length > _maxExplanationLogEntries) {
+          symLog = symLog.sublist(symLog.length - _maxExplanationLogEntries);
+        }
         explanations[h.symbol] = symLog;
 
         // Advance the anchor to this tick's result so the NEXT tick (in
@@ -573,6 +598,39 @@ extension NoiseEngine on StressTestNotifier {
     // NOT during tick simulation — otherwise the same deduction is
     // subtracted on every tick, multiplying the penalty exponentially.
 
+    // Price + real-timestamp history, built together so they can never
+    // drift out of lockstep (same symbols, same append, same cap).
+    final priceHistoryUpdate = () {
+      final hist = Map<String, List<double>>.from(session.priceHistory);
+      final ts = Map<String, List<int>>.from(session.priceHistoryTimestamps);
+      for (final h in session.holdings) {
+        final sym = h.symbol;
+        if (newPrices.containsKey(sym)) {
+          hist[sym] = [...(hist[sym] ?? []), newPrices[sym]!];
+          ts[sym] = [...(ts[sym] ?? []), tickTimestamp];
+        }
+      }
+      for (final sym in newPrices.keys) {
+        if (!hist.containsKey(sym)) {
+          hist[sym] = [newPrices[sym]!];
+          ts[sym] = [tickTimestamp];
+        }
+      }
+      // Cap per-symbol history — see _maxPriceHistoryPoints. Both maps
+      // trimmed identically so they stay the same length per symbol.
+      for (final sym in hist.keys.toList()) {
+        final points = hist[sym]!;
+        if (points.length > _maxPriceHistoryPoints) {
+          hist[sym] = points.sublist(points.length - _maxPriceHistoryPoints);
+        }
+        final symTs = ts[sym];
+        if (symTs != null && symTs.length > _maxPriceHistoryPoints) {
+          ts[sym] = symTs.sublist(symTs.length - _maxPriceHistoryPoints);
+        }
+      }
+      return (hist, ts);
+    }();
+
     state = [
       for (int i = 0; i < state.length; i++)
         if (i == idx)
@@ -625,30 +683,8 @@ extension NoiseEngine on StressTestNotifier {
             lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
             activeHypeEvents: session.activeHypeEvents,
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
-            priceHistory: () {
-              final hist = Map<String, List<double>>.from(session.priceHistory);
-              for (final h in session.holdings) {
-                final sym = h.symbol;
-                if (newPrices.containsKey(sym)) {
-                  hist[sym] = [...(hist[sym] ?? []), newPrices[sym]!];
-                }
-              }
-              for (final sym in newPrices.keys) {
-                if (!hist.containsKey(sym)) {
-                  hist[sym] = [newPrices[sym]!];
-                }
-              }
-              // Cap per-symbol history — see _maxPriceHistoryPoints.
-              for (final sym in hist.keys.toList()) {
-                final points = hist[sym]!;
-                if (points.length > _maxPriceHistoryPoints) {
-                  hist[sym] = points.sublist(
-                    points.length - _maxPriceHistoryPoints,
-                  );
-                }
-              }
-              return hist;
-            }(),
+            priceHistory: priceHistoryUpdate.$1,
+            priceHistoryTimestamps: priceHistoryUpdate.$2,
             lastTickTimestamp: now,
             // ── Block 5 + 6: Per-company events & casino state ─
             lastEpochRollAt: session.lastEpochRollAt ?? now,

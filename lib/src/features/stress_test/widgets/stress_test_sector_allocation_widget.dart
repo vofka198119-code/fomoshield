@@ -7,6 +7,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
@@ -67,9 +68,32 @@ class StressTestSectorAllocationCard extends StatelessWidget {
             width: double.infinity,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-              child: Text(
-                'DIVERSIFICATION INDICATOR',
-                style: FomoShieldTheme.cardTitle(Colors.white),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'DIVERSIFICATION INDICATOR',
+                    style: FomoShieldTheme.cardTitle(Colors.white),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        context.push('/metric-info/diversification-indicator'),
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.help_outline_rounded,
+                        size: 13,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
