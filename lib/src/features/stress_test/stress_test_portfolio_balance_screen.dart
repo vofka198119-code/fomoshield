@@ -2,7 +2,8 @@
 // Stress Test — Portfolio Balance detail screen. Reached via the chevron
 // next to the Portfolio Balance widget's title on the main Stress Test
 // screen (see StressTestAllocationChart). Hosts several widgets, built one
-// at a time per user direction — first one is the % allocation bar list.
+// at a time per user direction — Portfolio Health (dashboard-style 4-gauge
+// summary) is pinned first, followed by the raw breakdown widgets.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import '../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import 'widgets/allocation_bar_row.dart';
 import 'widgets/stress_test_sector_allocation_widget.dart';
 import 'widgets/stress_test_asset_count_widget.dart';
+import 'widgets/stress_test_portfolio_health_widget.dart';
 
 class StressTestPortfolioBalanceScreen extends ConsumerWidget {
   final String sessionId;
@@ -51,16 +53,21 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
             if (session != null) ...[
               StaggerFadeIn(
                 index: 0,
-                child: _AssetAllocationBarsCard(session: session),
+                child: StressTestPortfolioHealthCard(session: session),
               ),
               const SizedBox(height: 16),
               StaggerFadeIn(
                 index: 1,
-                child: StressTestSectorAllocationCard(session: session),
+                child: _AssetAllocationBarsCard(session: session),
               ),
               const SizedBox(height: 16),
               StaggerFadeIn(
                 index: 2,
+                child: StressTestSectorAllocationCard(session: session),
+              ),
+              const SizedBox(height: 16),
+              StaggerFadeIn(
+                index: 3,
                 child: StressTestAssetCountCard(session: session),
               ),
             ],
