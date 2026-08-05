@@ -331,6 +331,17 @@ extension NoiseEngine on StressTestNotifier {
     final epochElapsedTicksNow =
         now.difference(currentEpoch.startedAt).inSeconds / _tickSeconds;
 
+    // Per-tick price history snapshots — one entry per sub-tick simulated
+    // below, not just the final result. A single catch-up call can cover
+    // up to _maxCatchUpTicks (900) sub-ticks; without recording each one,
+    // the chart only ever sees the batch's start and end price and draws
+    // a straight line between them (the catch-up straight-line artifact).
+    // Downsampled to _maxRenderPointsPerBurst before being merged into
+    // priceHistory below.
+    final tickSnapshots = <Map<String, double>>[];
+    final tickTimestamps = <int>[];
+    final tickIntervalMs = _tickSeconds * 1000;
+
     for (int tick = 0; tick < ticks; tick++) {
       // Peek once per tick (not once per holding — one Hype event can
       // target many holdings within the same tick); advanced once after
@@ -535,6 +546,13 @@ extension NoiseEngine on StressTestNotifier {
       // per tick, not once per holding (see _hypeTickIncrements' peek
       // above, which one or more holdings may have just consumed).
       _advanceHypeEvents(session);
+
+      // Snapshot this tick's resulting prices — see the `tickSnapshots`
+      // comment above the loop. Timestamp walks backward from this batch's
+      // anchor (`tickTimestamp`) so the LAST tick lands exactly on it,
+      // matching the pre-existing single-point behavior when ticks == 1.
+      tickSnapshots.add(Map<String, double>.from(newPrices));
+      tickTimestamps.add(tickTimestamp - (ticks - 1 - tick) * tickIntervalMs);
     }
 
     // ── Psychology Profile: diversification / concentration ──
@@ -600,21 +618,37 @@ extension NoiseEngine on StressTestNotifier {
 
     // Price + real-timestamp history, built together so they can never
     // drift out of lockstep (same symbols, same append, same cap).
+    //
+    // Every sub-tick recorded in `tickSnapshots` above gets its own history
+    // point (downsampled to at most _maxRenderPointsPerBurst if the batch
+    // is large) instead of only the batch's final price — this is what
+    // actually fixes the catch-up straight-line artifact. For the normal
+    // live-tick path (ticks == 1) tickSnapshots has exactly one entry, so
+    // behavior is unchanged from before.
     final priceHistoryUpdate = () {
       final hist = Map<String, List<double>>.from(session.priceHistory);
       final ts = Map<String, List<int>>.from(session.priceHistoryTimestamps);
-      for (final h in session.holdings) {
-        final sym = h.symbol;
-        if (newPrices.containsKey(sym)) {
-          hist[sym] = [...(hist[sym] ?? []), newPrices[sym]!];
-          ts[sym] = [...(ts[sym] ?? []), tickTimestamp];
+      final renderIndices = _downsamplePointIndices(
+        tickSnapshots.length,
+        _maxRenderPointsPerBurst,
+      );
+      final allSymbols = <String>{
+        ...session.holdings.map((h) => h.symbol),
+        ...newPrices.keys,
+      };
+      for (final sym in allSymbols) {
+        final newPts = <double>[];
+        final newTs = <int>[];
+        for (final i in renderIndices) {
+          final p = tickSnapshots[i][sym];
+          if (p != null) {
+            newPts.add(p);
+            newTs.add(tickTimestamps[i]);
+          }
         }
-      }
-      for (final sym in newPrices.keys) {
-        if (!hist.containsKey(sym)) {
-          hist[sym] = [newPrices[sym]!];
-          ts[sym] = [tickTimestamp];
-        }
+        if (newPts.isEmpty) continue;
+        hist[sym] = [...(hist[sym] ?? []), ...newPts];
+        ts[sym] = [...(ts[sym] ?? []), ...newTs];
       }
       // Cap per-symbol history — see _maxPriceHistoryPoints. Both maps
       // trimmed identically so they stay the same length per symbol.

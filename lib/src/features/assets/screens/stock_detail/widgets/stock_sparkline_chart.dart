@@ -7,7 +7,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
-import '../../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../../../shared/widgets/chart_line_glow_painter.dart';
+import '../../../../market_clock/market_clock_dial.dart'
+    show dialLight, dialDark;
 import '../../../../stress_test/stress_test_engine.dart' show ChartDataPoint;
 
 // ---------------------------------------------------------------------------
@@ -35,6 +37,52 @@ const Map<StressTestSparkPeriod, String> _periodLabels = {
 };
 
 final _priceFmt = NumberFormat('#,##0.00', 'en_US');
+
+/// Time-bucket averaging: splits [domainStart, domainEnd] into [maxBuckets]
+/// equal time slices and averages every raw point that falls in the same
+/// slice into one point. A slice with only one raw point in it (e.g. a
+/// widely-spaced old catch-up burst) passes through unchanged. This is what
+/// actually fixes the "earthquake" look of raw 20s-tick data plotted
+/// point-by-point (each rendered point is a local average, not one noisy
+/// instant) without switching to curved/Bezier interpolation, which stays
+/// off by design (see reference_chart_visual_standard.md).
+List<ChartDataPoint> _downsampleForRender(
+  List<ChartDataPoint> data,
+  DateTime domainStart,
+  DateTime domainEnd,
+  int maxBuckets,
+) {
+  if (data.length <= 2) return data;
+  final startMs = domainStart.millisecondsSinceEpoch;
+  final endMs = domainEnd.millisecondsSinceEpoch;
+  final rangeMs = endMs - startMs;
+  if (rangeMs <= 0) return data;
+  final bucketMs = rangeMs / maxBuckets;
+
+  final buckets = <int, List<ChartDataPoint>>{};
+  for (final p in data) {
+    final idx = ((p.time.millisecondsSinceEpoch - startMs) / bucketMs)
+        .floor()
+        .clamp(0, maxBuckets - 1);
+    (buckets[idx] ??= []).add(p);
+  }
+
+  final sortedKeys = buckets.keys.toList()..sort();
+  final result = <ChartDataPoint>[];
+  for (final k in sortedKeys) {
+    final bucket = buckets[k]!;
+    if (bucket.length == 1) {
+      result.add(bucket.first);
+    } else {
+      final avgValue =
+          bucket.map((p) => p.value).reduce((a, b) => a + b) / bucket.length;
+      result.add(ChartDataPoint(bucket.last.time, avgValue));
+    }
+  }
+  result[0] = data.first;
+  result[result.length - 1] = data.last;
+  return result;
+}
 
 class StockSparklineChart extends StatefulWidget {
   final bool ready;
@@ -188,15 +236,73 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   }
 
   Widget _buildChartArea() {
-    final points = widget.points;
+    final now = DateTime.now();
 
-    final minTime = points.first.time.millisecondsSinceEpoch.toDouble();
-    final maxTime = points.last.time.millisecondsSinceEpoch.toDouble();
-    final timeRange = maxTime - minTime;
+    DateTime domainStart;
+    DateTime domainEnd;
+    List<ChartDataPoint> points;
+    if (widget.selectedPeriod == StressTestSparkPeriod.d1) {
+      final todayStart = DateTime(now.year, now.month, now.day);
+      final todayEnd = todayStart.add(const Duration(days: 1));
+      points = widget.points
+          .where(
+            (p) => !p.time.isBefore(todayStart) && !p.time.isAfter(todayEnd),
+          )
+          .toList();
+      if (points.length < 2) {
+        return Center(
+          child: Text(
+            'Not enough data for this period',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
+        );
+      }
+      // Left edge anchors to wherever today's REAL data actually starts —
+      // not literal midnight. A simulated holding can't backfill more than
+      // ~5 real hours of catch-up, so pinning to midnight would show a
+      // permanent empty gap every time the app was closed overnight. The
+      // right edge stays fixed at midnight tomorrow so the line still
+      // stops at "now" with empty space after it — a genuine "hasn't
+      // happened yet" gap, not a missing-data one.
+      domainStart = points.first.time;
+      domainEnd = todayEnd;
+    } else {
+      // Every period longer than a day (including ALL) always stretches to
+      // fill the chart's full width using whatever real data falls in the
+      // window — explicit ask: unlike 1D, no "stop at now" empty space.
+      points = widget.points;
+      if (points.length < 2) {
+        return Center(
+          child: Text(
+            'Not enough data for this period',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
+        );
+      }
+      domainStart = points.first.time;
+      domainEnd = points.last.time;
+    }
+
+    points = _downsampleForRender(points, domainStart, domainEnd, 200);
+
+    // 1D uses the fixed calendar-day domain computed above (so it can stop
+    // short of the right edge); every other period's domain is just
+    // [points.first, points.last], stretching to fill the full width.
+    final minTimeMs = domainStart.millisecondsSinceEpoch.toDouble();
+    final maxTimeMs = domainEnd.millisecondsSinceEpoch.toDouble();
+    final timeRange = maxTimeMs - minTimeMs;
     final spots = <FlSpot>[];
     for (int i = 0; i < points.length; i++) {
       final t = points[i].time.millisecondsSinceEpoch.toDouble();
-      final x = timeRange > 0 ? (t - minTime) / timeRange : 0.0;
+      final x = timeRange > 0
+          ? ((t - minTimeMs) / timeRange).clamp(0.0, 1.0)
+          : 0.0;
       spots.add(FlSpot(x, points[i].value));
     }
 
@@ -207,7 +313,10 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
     final minValue = values.reduce(min);
     final maxValue = values.reduce(max);
     final valueRange = maxValue - minValue;
-    final headroom = valueRange > 0 ? valueRange * 0.08 : maxValue * 0.08;
+    // 15% headroom each side — the line occupies ~70% of the chart's
+    // height instead of nearly touching top/bottom, matching the
+    // reference chart's proportions.
+    final headroom = valueRange > 0 ? valueRange * 0.15 : maxValue * 0.15;
     final chartMinY = minValue - headroom;
     final chartMaxY = maxValue + headroom;
 
@@ -234,8 +343,15 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
     // PriceChart/MarketValueChart.
     const dateTooltipHeight = 24.0;
     final touchLineTopY =
-        chartMaxY -
-        (dateTooltipHeight / chartHeight) * (chartMaxY - chartMinY);
+        chartMaxY - (dateTooltipHeight / chartHeight) * (chartMaxY - chartMinY);
+
+    // Fill fades out this many px below the line at every x — drawn by
+    // ChartLineGlowPainter (a custom painter), NOT fl_chart's
+    // belowBarData.gradient, which positions its fade relative to the
+    // whole chart box's Y-range rather than the line's own local height —
+    // confirmed on-device to only show fill near the chart's absolute
+    // peak and nowhere else the line dips below it.
+    const fillFadeHeight = 40.0;
 
     final intraday =
         widget.selectedPeriod == StressTestSparkPeriod.d1 ||
@@ -245,104 +361,145 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
       children: [
         Padding(
           padding: const EdgeInsets.only(right: 130 / 3),
-          child: LineChart(
-            LineChartData(
-              minY: chartMinY,
-              maxY: chartMaxY,
-              gridData: const FlGridData(show: false),
-              extraLinesData: ExtraLinesData(horizontalLines: horizontalLines),
-              titlesData: const FlTitlesData(
-                topTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-              ),
-              borderData: FlBorderData(show: false),
-              lineTouchData: LineTouchData(
-                touchTooltipData: LineTouchTooltipData(
-                  getTooltipItems: (touchedSpots) =>
-                      touchedSpots.map((_) => null).toList(),
-                ),
-                getTouchedSpotIndicator: (barData, spotIndexes) {
-                  return spotIndexes
-                      .map(
-                        (_) => TouchedSpotIndicatorData(
-                          _touchRevealed
-                              ? const FlLine(
-                                  color: Colors.black,
-                                  strokeWidth: 1.3,
-                                )
-                              : const FlLine(
-                                  color: Colors.transparent,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final plotWidth = constraints.maxWidth;
+              final pixelPoints = spots.map((s) {
+                final px = s.x * plotWidth;
+                final py =
+                    chartHeight *
+                    (1 - (s.y - chartMinY) / (chartMaxY - chartMinY));
+                return Offset(px, py);
+              }).toList();
+              return Stack(
+                children: [
+                  CustomPaint(
+                    size: Size(plotWidth, chartHeight),
+                    painter: ChartLineGlowPainter(
+                      pixelPoints: pixelPoints,
+                      color: lineColor,
+                      fadeHeight: fillFadeHeight,
+                    ),
+                  ),
+                  LineChart(
+                    LineChartData(
+                      minX: 0,
+                      maxX: 1,
+                      minY: chartMinY,
+                      maxY: chartMaxY,
+                      gridData: const FlGridData(show: false),
+                      extraLinesData: ExtraLinesData(
+                        horizontalLines: horizontalLines,
+                      ),
+                      titlesData: const FlTitlesData(
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        rightTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                      ),
+                      borderData: FlBorderData(show: false),
+                      lineTouchData: LineTouchData(
+                        touchTooltipData: LineTouchTooltipData(
+                          getTooltipItems: (touchedSpots) =>
+                              touchedSpots.map((_) => null).toList(),
+                        ),
+                        getTouchedSpotIndicator: (barData, spotIndexes) {
+                          return spotIndexes
+                              .map(
+                                (_) => TouchedSpotIndicatorData(
+                                  _touchRevealed
+                                      ? const FlLine(
+                                          color: Colors.black,
+                                          strokeWidth: 1.3,
+                                        )
+                                      : const FlLine(
+                                          color: Colors.transparent,
+                                          strokeWidth: 0,
+                                        ),
+                                  const FlDotData(show: false),
+                                ),
+                              )
+                              .toList();
+                        },
+                        getTouchLineEnd: (barData, spotIndex) => touchLineTopY,
+                        touchCallback: (event, response) {
+                          final touched = response?.lineBarSpots;
+                          final isDown =
+                              event.isInterestedForInteractions &&
+                              touched != null &&
+                              touched.isNotEmpty;
+
+                          if (!isDown) {
+                            _touchHoldTimer?.cancel();
+                            _touchHoldTimer = null;
+                            _touchRevealed = false;
+                            if (_touchDx != null || _touchedSpotIndex != null) {
+                              setState(() {
+                                _touchDx = null;
+                                _touchedSpotIndex = null;
+                              });
+                            }
+                            return;
+                          }
+
+                          _pendingDx = event.localPosition?.dx;
+                          _pendingSpotIndex = touched.first.spotIndex;
+
+                          if (_touchRevealed) {
+                            setState(() {
+                              _touchDx = _pendingDx;
+                              _touchedSpotIndex = _pendingSpotIndex;
+                            });
+                          } else {
+                            _touchHoldTimer ??= Timer(_revealDelay, () {
+                              _touchHoldTimer = null;
+                              if (!mounted) return;
+                              _touchRevealed = true;
+                              setState(() {
+                                _touchDx = _pendingDx;
+                                _touchedSpotIndex = _pendingSpotIndex;
+                              });
+                            });
+                          }
+                        },
+                      ),
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots: spots,
+                          isCurved: false,
+                          color: lineColor,
+                          barWidth: 1.7,
+                          isStrokeCapRound: true,
+                          // A small dot on the very last point only — anchors the
+                          // eye to where the line currently ends, especially when
+                          // there's empty space after it (1D stops at "now").
+                          dotData: FlDotData(
+                            show: true,
+                            checkToShowDot: (spot, barData) =>
+                                spot == barData.spots.last,
+                            getDotPainter: (spot, percent, barData, index) =>
+                                FlDotCirclePainter(
+                                  radius: 3,
+                                  color: lineColor,
                                   strokeWidth: 0,
                                 ),
-                          const FlDotData(show: false),
+                          ),
                         ),
-                      )
-                      .toList();
-                },
-                getTouchLineEnd: (barData, spotIndex) => touchLineTopY,
-                touchCallback: (event, response) {
-                  final touched = response?.lineBarSpots;
-                  final isDown =
-                      event.isInterestedForInteractions &&
-                      touched != null &&
-                      touched.isNotEmpty;
-
-                  if (!isDown) {
-                    _touchHoldTimer?.cancel();
-                    _touchHoldTimer = null;
-                    _touchRevealed = false;
-                    if (_touchDx != null || _touchedSpotIndex != null) {
-                      setState(() {
-                        _touchDx = null;
-                        _touchedSpotIndex = null;
-                      });
-                    }
-                    return;
-                  }
-
-                  _pendingDx = event.localPosition?.dx;
-                  _pendingSpotIndex = touched.first.spotIndex;
-
-                  if (_touchRevealed) {
-                    setState(() {
-                      _touchDx = _pendingDx;
-                      _touchedSpotIndex = _pendingSpotIndex;
-                    });
-                  } else {
-                    _touchHoldTimer ??= Timer(_revealDelay, () {
-                      _touchHoldTimer = null;
-                      if (!mounted) return;
-                      _touchRevealed = true;
-                      setState(() {
-                        _touchDx = _pendingDx;
-                        _touchedSpotIndex = _pendingSpotIndex;
-                      });
-                    });
-                  }
-                },
-              ),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: false,
-                  color: lineColor,
-                  barWidth: 1.2,
-                  isStrokeCapRound: true,
-                  dotData: const FlDotData(show: false),
-                ),
-              ],
-            ),
-            duration: const Duration(milliseconds: 300),
+                      ],
+                    ),
+                    duration: const Duration(milliseconds: 300),
+                  ),
+                ],
+              );
+            },
           ),
         ),
         Positioned(

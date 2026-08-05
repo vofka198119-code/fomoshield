@@ -15,6 +15,7 @@ import 'dart:math';
 import '../../core/theme/theme_v2.dart';
 import '../../features/stress_test/stress_test_engine.dart';
 import '../../features/portfolio/portfolio_chart_providers.dart';
+import 'chart_line_glow_painter.dart';
 import 'period_selector.dart';
 
 // ---------------------------------------------------------------------------
@@ -176,8 +177,10 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
     }
 
     final filtered = widget.allPoints
-        .where((p) =>
-            p.time.isAfter(cutoff) || p.time == widget.allPoints.first.time)
+        .where(
+          (p) =>
+              p.time.isAfter(cutoff) || p.time == widget.allPoints.first.time,
+        )
         .toList();
 
     if (filtered.length < 2) {
@@ -206,8 +209,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
 
   bool get _isUp => _spots.length >= 2 && _spots.last.y >= _spots.first.y;
 
-  Color get _lineColor =>
-      _isUp ? ThemeV2.success : ThemeV2.loss;
+  Color get _lineColor => _isUp ? ThemeV2.success : ThemeV2.loss;
 
   @override
   Widget build(BuildContext context) {
@@ -239,8 +241,10 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                 if (_spots.length >= 2) ...[
                   const SizedBox(width: 10),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: _lineColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(4),
@@ -271,148 +275,186 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                       style: GoogleFonts.inter(color: ThemeV2.textSecondary),
                     ),
                   )
-                : LineChart(
-                    LineChartData(
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: false,
-                        horizontalInterval: _calcYInterval(),
-                        getDrawingHorizontalLine: (value) => FlLine(
-                          color: ThemeV2.surfaceDark,
-                          strokeWidth: 1,
-                        ),
-                      ),
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 52,
-                            getTitlesWidget: (value, meta) {
-                              return Text(
-                                '\$${_fmtAxis(value)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  color: ThemeV2.textSecondary,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 22,
-                            interval: _spots.length > 8
-                                ? (_spots.length / 5).ceilToDouble()
-                                : 1,
-                            getTitlesWidget: (value, meta) {
-                              final idx = value.toInt();
-                              if (idx < 0 || idx >= _spots.length) {
-                                return const SizedBox();
-                              }
-                              // Map fl-spot index back to original data point
-                              if (widget.allPoints.isEmpty) {
-                                return const SizedBox();
-                              }
-                              final ratio = _spots.length > 1
-                                  ? idx / (_spots.length - 1)
-                                  : 0.0;
-                              final dataIdx = (ratio *
-                                      (widget.allPoints.length - 1))
-                                  .round()
-                                  .clamp(0, widget.allPoints.length - 1);
-                              final point = widget.allPoints[dataIdx];
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Text(
-                                  _fmtTime(point.time),
-                                  style: GoogleFonts.inter(
-                                    fontSize: 9,
-                                    color: ThemeV2.textSecondary,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        topTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false)),
-                      ),
-                      borderData: FlBorderData(show: false),
-                      minY: _calcMinY(),
-                      maxY: _calcMaxY(),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: _spots,
-                          isCurved: true,
-                          preventCurveOverShooting: true,
-                          color: _lineColor,
-                          barWidth: 2.5,
-                          isStrokeCapRound: true,
-                          dotData: const FlDotData(show: false),
-                          belowBarData: BarAreaData(
-                            show: true,
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                _lineColor.withValues(alpha: 0.20),
-                                _lineColor.withValues(alpha: 0.06),
-                                _lineColor.withValues(alpha: 0.0),
-                              ],
-                              stops: const [0.0, 0.5, 1.0],
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      // fl_chart insets its actual plot rect by each axis's
+                      // reservedSize (left titles: 52, bottom titles: 22
+                      // below) — replicated here so the glow painter's
+                      // pixel space lines up with where the line is really
+                      // drawn, not the widget's raw bounds.
+                      const leftInset = 52.0;
+                      const bottomInset = 22.0;
+                      final plotWidth = constraints.maxWidth - leftInset;
+                      final plotHeight = constraints.maxHeight - bottomInset;
+                      final minYVal = _calcMinY();
+                      final maxYVal = _calcMaxY();
+                      final pixelPoints = _spots.map((s) {
+                        final px = s.x * plotWidth;
+                        final py =
+                            plotHeight *
+                            (1 - (s.y - minYVal) / (maxYVal - minYVal));
+                        return Offset(px, py);
+                      }).toList();
+                      return Stack(
+                        children: [
+                          Positioned(
+                            left: leftInset,
+                            top: 0,
+                            width: plotWidth,
+                            height: plotHeight,
+                            child: CustomPaint(
+                              size: Size(plotWidth, plotHeight),
+                              painter: ChartLineGlowPainter(
+                                pixelPoints: pixelPoints,
+                                color: _lineColor,
+                                fadeHeight: 40.0,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                      lineTouchData: LineTouchData(
-                        enabled: true,
-                        touchTooltipData: LineTouchTooltipData(
-                          getTooltipColor: (_) => ThemeV2.surface,
-                          tooltipRoundedRadius: 8,
-                          tooltipPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          getTooltipItems: (touchedSpots) {
-                            return touchedSpots.map((spot) {
-                              final changeSinceStart = _spots.isNotEmpty && _spots.first.y != 0
-                                      ? ((spot.y - _spots.first.y) /
-                                              _spots.first.y) *
-                                          100
-                                      : 0.0;
-                              return LineTooltipItem(
-                                '\$${_fmtValue(spot.y)}',
-                                TextStyle(
-                                  color: _lineColor,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily:
-                                      GoogleFonts.playfairDisplay().fontFamily,
+                          LineChart(
+                            LineChartData(
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: false,
+                                horizontalInterval: _calcYInterval(),
+                                getDrawingHorizontalLine: (value) => FlLine(
+                                  color: ThemeV2.surfaceDark,
+                                  strokeWidth: 1,
                                 ),
-                                children: [
-                                  TextSpan(
-                                    text:
-                                        '\n${changeSinceStart >= 0 ? '+' : ''}${changeSinceStart.toStringAsFixed(2)}%',
-                                    style: TextStyle(
-                                      color: changeSinceStart >= 0
-                                          ? ThemeV2.success
-                                          : ThemeV2.loss,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily:
-                                          GoogleFonts.inter().fontFamily,
-                                    ),
+                              ),
+                              titlesData: FlTitlesData(
+                                leftTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    reservedSize: 52,
+                                    getTitlesWidget: (value, meta) {
+                                      return Text(
+                                        '\$${_fmtAxis(value)}',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 10,
+                                          color: ThemeV2.textSecondary,
+                                        ),
+                                      );
+                                    },
                                   ),
-                                ],
-                              );
-                            }).toList();
-                          },
-                        ),
-                        handleBuiltInTouches: true,
-                      ),
-                    ),
-                    duration: const Duration(milliseconds: 300),
+                                ),
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    reservedSize: 22,
+                                    interval: _spots.length > 8
+                                        ? (_spots.length / 5).ceilToDouble()
+                                        : 1,
+                                    getTitlesWidget: (value, meta) {
+                                      final idx = value.toInt();
+                                      if (idx < 0 || idx >= _spots.length) {
+                                        return const SizedBox();
+                                      }
+                                      // Map fl-spot index back to original data point
+                                      if (widget.allPoints.isEmpty) {
+                                        return const SizedBox();
+                                      }
+                                      final ratio = _spots.length > 1
+                                          ? idx / (_spots.length - 1)
+                                          : 0.0;
+                                      final dataIdx =
+                                          (ratio *
+                                                  (widget.allPoints.length - 1))
+                                              .round()
+                                              .clamp(
+                                                0,
+                                                widget.allPoints.length - 1,
+                                              );
+                                      final point = widget.allPoints[dataIdx];
+                                      return Padding(
+                                        padding: const EdgeInsets.only(top: 4),
+                                        child: Text(
+                                          _fmtTime(point.time),
+                                          style: GoogleFonts.inter(
+                                            fontSize: 9,
+                                            color: ThemeV2.textSecondary,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                topTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
+                                ),
+                                rightTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
+                                ),
+                              ),
+                              borderData: FlBorderData(show: false),
+                              minY: _calcMinY(),
+                              maxY: _calcMaxY(),
+                              lineBarsData: [
+                                LineChartBarData(
+                                  spots: _spots,
+                                  isCurved: true,
+                                  preventCurveOverShooting: true,
+                                  color: _lineColor,
+                                  barWidth: 2.5,
+                                  isStrokeCapRound: true,
+                                  dotData: const FlDotData(show: false),
+                                ),
+                              ],
+                              lineTouchData: LineTouchData(
+                                enabled: true,
+                                touchTooltipData: LineTouchTooltipData(
+                                  getTooltipColor: (_) => ThemeV2.surface,
+                                  tooltipRoundedRadius: 8,
+                                  tooltipPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  getTooltipItems: (touchedSpots) {
+                                    return touchedSpots.map((spot) {
+                                      final changeSinceStart =
+                                          _spots.isNotEmpty &&
+                                              _spots.first.y != 0
+                                          ? ((spot.y - _spots.first.y) /
+                                                    _spots.first.y) *
+                                                100
+                                          : 0.0;
+                                      return LineTooltipItem(
+                                        '\$${_fmtValue(spot.y)}',
+                                        TextStyle(
+                                          color: _lineColor,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily:
+                                              GoogleFonts.playfairDisplay()
+                                                  .fontFamily,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text:
+                                                '\n${changeSinceStart >= 0 ? '+' : ''}${changeSinceStart.toStringAsFixed(2)}%',
+                                            style: TextStyle(
+                                              color: changeSinceStart >= 0
+                                                  ? ThemeV2.success
+                                                  : ThemeV2.loss,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: GoogleFonts.inter()
+                                                  .fontFamily,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList();
+                                  },
+                                ),
+                                handleBuiltInTouches: true,
+                              ),
+                            ),
+                            duration: const Duration(milliseconds: 300),
+                          ),
+                        ],
+                      );
+                    },
                   ),
           ),
 
@@ -504,4 +546,3 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
     }
   }
 }
-

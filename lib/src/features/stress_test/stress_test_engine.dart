@@ -54,6 +54,29 @@ const int _maxCatchUpTicks = 900;
 /// hundred points at most, so this comfortably covers every real use.
 const int _maxPriceHistoryPoints = 5000;
 
+/// Max price-history points recorded from a single catch-up burst (up to
+/// [_maxCatchUpTicks] raw sub-ticks). Every sub-tick is simulated for GBM
+/// accuracy either way; this only caps how many of those get written to
+/// history/rendered on the chart, so a long catch-up still reads as an
+/// organic jagged line instead of either a single straight jump (1 point)
+/// or thousands of points collapsing onto a handful of screen pixels.
+const int _maxRenderPointsPerBurst = 150;
+
+/// Picks up to [maxPoints] evenly-spaced indices from `[0, length)`,
+/// always including the first and last index so a downsampled burst still
+/// starts and ends exactly where the real batch did.
+List<int> _downsamplePointIndices(int length, int maxPoints) {
+  if (length <= maxPoints) return List.generate(length, (i) => i);
+  if (maxPoints <= 1) return [length - 1];
+  final step = (length - 1) / (maxPoints - 1);
+  final indices = <int>{};
+  for (int i = 0; i < maxPoints; i++) {
+    indices.add((i * step).round().clamp(0, length - 1));
+  }
+  final sorted = indices.toList()..sort();
+  return sorted;
+}
+
 /// Max [TickExplanation]s kept per symbol in [StressTestSession.explanationLog].
 /// Unlike priceHistory, this was never capped at all — Why Today's timeline
 /// only ever displays the last 20 (`why_today_screen.dart`'s `displayTicks`)

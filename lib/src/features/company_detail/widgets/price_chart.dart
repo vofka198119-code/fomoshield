@@ -7,6 +7,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
+import '../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import '../../portfolio/portfolio_providers.dart';
 import '../company_detail_provider.dart'
@@ -48,14 +49,12 @@ extension ChartPeriodExt on ChartPeriod {
     switch (this) {
       case ChartPeriod.day1:
         return (
-          now.subtract(const Duration(days: 1)).millisecondsSinceEpoch ~/
-              1000,
+          now.subtract(const Duration(days: 1)).millisecondsSinceEpoch ~/ 1000,
           '5',
         );
       case ChartPeriod.week1:
         return (
-          now.subtract(const Duration(days: 7)).millisecondsSinceEpoch ~/
-              1000,
+          now.subtract(const Duration(days: 7)).millisecondsSinceEpoch ~/ 1000,
           '15',
         );
       case ChartPeriod.month1:
@@ -174,8 +173,9 @@ class _PriceChartState extends ConsumerState<PriceChart> {
       final closes = _parseCloses(data);
       if (closes.length >= 2) {
         final periodChange = closes.last - closes.first;
-        final periodChangePercent =
-            closes.first != 0 ? (periodChange / closes.first) * 100 : 0.0;
+        final periodChangePercent = closes.first != 0
+            ? (periodChange / closes.first) * 100
+            : 0.0;
         ref.read(chartPeriodChangeProvider(widget.symbol).notifier).state = (
           change: periodChange,
           changePercent: periodChangePercent,
@@ -399,122 +399,172 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     final touchLineTopY =
         chartMaxY - (dateTooltipHeight / 220) * (chartMaxY - chartMinY);
 
+    // Fill fades out this many px below the line at every x — drawn by
+    // ChartLineGlowPainter (a custom painter), NOT fl_chart's
+    // belowBarData.gradient, which positions its fade relative to the
+    // whole chart box's Y-range rather than the line's own local height —
+    // confirmed on-device to only show fill near the chart's absolute
+    // peak and nowhere else the line dips below it.
+    const fillFadeHeight = 40.0;
+
     return Stack(
       children: [
         Padding(
           padding: const EdgeInsets.only(right: 130 / 3),
-          child: LineChart(
-            LineChartData(
-              minY: chartMinY,
-              maxY: chartMaxY,
-              gridData: const FlGridData(show: false),
-              extraLinesData: ExtraLinesData(horizontalLines: horizontalLines),
-              titlesData: const FlTitlesData(
-                topTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-              ),
-              borderData: FlBorderData(show: false),
-              lineTouchData: LineTouchData(
-                // fl_chart's own tooltip bubble is replaced by a custom
-                // fixed-position one drawn outside the chart (see the
-                // Positioned widget below) — suppress its default content
-                // entirely rather than fight its positioning.
-                touchTooltipData: LineTouchTooltipData(
-                  getTooltipItems: (touchedSpots) =>
-                      touchedSpots.map((_) => null).toList(),
-                ),
-                // Indicator line: thin black, no dot, and always spans the
-                // full plot height rather than stopping at the touched
-                // point — a fixed reference line instead of one that bobs
-                // up and down with the chart's peaks.
-                getTouchedSpotIndicator: (barData, spotIndexes) {
-                  return spotIndexes
-                      .map(
-                        (_) => TouchedSpotIndicatorData(
-                          _touchRevealed
-                              ? const FlLine(
-                                  color: Colors.black,
-                                  strokeWidth: 1.3,
-                                )
-                              : const FlLine(
-                                  color: Colors.transparent,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final plotWidth = constraints.maxWidth;
+              final pixelPoints = spots.map((s) {
+                final xFraction = spots.length > 1
+                    ? s.x / (spots.length - 1)
+                    : 0.0;
+                final px = xFraction * plotWidth;
+                final py =
+                    220 * (1 - (s.y - chartMinY) / (chartMaxY - chartMinY));
+                return Offset(px, py);
+              }).toList();
+              return Stack(
+                children: [
+                  CustomPaint(
+                    size: Size(plotWidth, 220),
+                    painter: ChartLineGlowPainter(
+                      pixelPoints: pixelPoints,
+                      color: lineColor,
+                      fadeHeight: fillFadeHeight,
+                    ),
+                  ),
+                  LineChart(
+                    LineChartData(
+                      minY: chartMinY,
+                      maxY: chartMaxY,
+                      gridData: const FlGridData(show: false),
+                      extraLinesData: ExtraLinesData(
+                        horizontalLines: horizontalLines,
+                      ),
+                      titlesData: const FlTitlesData(
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        rightTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                      ),
+                      borderData: FlBorderData(show: false),
+                      lineTouchData: LineTouchData(
+                        // fl_chart's own tooltip bubble is replaced by a custom
+                        // fixed-position one drawn outside the chart (see the
+                        // Positioned widget below) — suppress its default content
+                        // entirely rather than fight its positioning.
+                        touchTooltipData: LineTouchTooltipData(
+                          getTooltipItems: (touchedSpots) =>
+                              touchedSpots.map((_) => null).toList(),
+                        ),
+                        // Indicator line: thin black, no dot, and always spans the
+                        // full plot height rather than stopping at the touched
+                        // point — a fixed reference line instead of one that bobs
+                        // up and down with the chart's peaks.
+                        getTouchedSpotIndicator: (barData, spotIndexes) {
+                          return spotIndexes
+                              .map(
+                                (_) => TouchedSpotIndicatorData(
+                                  _touchRevealed
+                                      ? const FlLine(
+                                          color: Colors.black,
+                                          strokeWidth: 1.3,
+                                        )
+                                      : const FlLine(
+                                          color: Colors.transparent,
+                                          strokeWidth: 0,
+                                        ),
+                                  const FlDotData(show: false),
+                                ),
+                              )
+                              .toList();
+                        },
+                        getTouchLineEnd: (barData, spotIndex) => touchLineTopY,
+                        touchCallback: (event, response) {
+                          final notifier = ref.read(
+                            chartHoverPriceProvider(widget.symbol).notifier,
+                          );
+                          final spots = response?.lineBarSpots;
+                          final isDown =
+                              event.isInterestedForInteractions &&
+                              spots != null &&
+                              spots.isNotEmpty;
+
+                          if (!isDown) {
+                            _touchHoldTimer?.cancel();
+                            _touchHoldTimer = null;
+                            _touchRevealed = false;
+                            notifier.state = null;
+                            if (_touchDx != null || _touchedSpotIndex != null) {
+                              setState(() {
+                                _touchDx = null;
+                                _touchedSpotIndex = null;
+                              });
+                            }
+                            return;
+                          }
+
+                          _pendingDx = event.localPosition?.dx;
+                          _pendingSpotIndex = spots.first.spotIndex;
+                          _pendingY = spots.first.y;
+
+                          if (_touchRevealed) {
+                            notifier.state = _pendingY;
+                            setState(() {
+                              _touchDx = _pendingDx;
+                              _touchedSpotIndex = _pendingSpotIndex;
+                            });
+                          } else {
+                            _touchHoldTimer ??= Timer(_revealDelay, () {
+                              _touchHoldTimer = null;
+                              if (!mounted) return;
+                              _touchRevealed = true;
+                              notifier.state = _pendingY;
+                              setState(() {
+                                _touchDx = _pendingDx;
+                                _touchedSpotIndex = _pendingSpotIndex;
+                              });
+                            });
+                          }
+                        },
+                      ),
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots: spots,
+                          isCurved: false,
+                          color: lineColor,
+                          barWidth: 1.7,
+                          isStrokeCapRound: true,
+                          // A small dot on the very last point only — anchors the
+                          // eye to where the line currently ends, especially when
+                          // there's empty space after it (1D stops at "now").
+                          dotData: FlDotData(
+                            show: true,
+                            checkToShowDot: (spot, barData) =>
+                                spot == barData.spots.last,
+                            getDotPainter: (spot, percent, barData, index) =>
+                                FlDotCirclePainter(
+                                  radius: 3,
+                                  color: lineColor,
                                   strokeWidth: 0,
                                 ),
-                          const FlDotData(show: false),
+                          ),
                         ),
-                      )
-                      .toList();
-                },
-                getTouchLineEnd: (barData, spotIndex) => touchLineTopY,
-                touchCallback: (event, response) {
-                  final notifier = ref.read(
-                    chartHoverPriceProvider(widget.symbol).notifier,
-                  );
-                  final spots = response?.lineBarSpots;
-                  final isDown = event.isInterestedForInteractions &&
-                      spots != null &&
-                      spots.isNotEmpty;
-
-                  if (!isDown) {
-                    _touchHoldTimer?.cancel();
-                    _touchHoldTimer = null;
-                    _touchRevealed = false;
-                    notifier.state = null;
-                    if (_touchDx != null || _touchedSpotIndex != null) {
-                      setState(() {
-                        _touchDx = null;
-                        _touchedSpotIndex = null;
-                      });
-                    }
-                    return;
-                  }
-
-                  _pendingDx = event.localPosition?.dx;
-                  _pendingSpotIndex = spots.first.spotIndex;
-                  _pendingY = spots.first.y;
-
-                  if (_touchRevealed) {
-                    notifier.state = _pendingY;
-                    setState(() {
-                      _touchDx = _pendingDx;
-                      _touchedSpotIndex = _pendingSpotIndex;
-                    });
-                  } else {
-                    _touchHoldTimer ??= Timer(_revealDelay, () {
-                      _touchHoldTimer = null;
-                      if (!mounted) return;
-                      _touchRevealed = true;
-                      notifier.state = _pendingY;
-                      setState(() {
-                        _touchDx = _pendingDx;
-                        _touchedSpotIndex = _pendingSpotIndex;
-                      });
-                    });
-                  }
-                },
-              ),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: false,
-                  color: lineColor,
-                  barWidth: 1.2,
-                  isStrokeCapRound: true,
-                  dotData: const FlDotData(show: false),
-                ),
-              ],
-            ),
-            duration: const Duration(milliseconds: 300),
+                      ],
+                    ),
+                    duration: const Duration(milliseconds: 300),
+                  ),
+                ],
+              );
+            },
           ),
         ),
         Positioned(

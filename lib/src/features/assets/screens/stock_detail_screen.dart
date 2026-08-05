@@ -121,46 +121,32 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     }
 
     List<ChartDataPoint> filtered;
-    final cutoffDuration = _sparkPeriodCutoffs[_selectedPeriod];
-    if (cutoffDuration == null) {
+    final periodDuration = _sparkPeriodCutoffs[_selectedPeriod];
+    if (periodDuration == null) {
       // StressTestSparkPeriod.max — no time filter, whole history.
       filtered = allPoints;
+    } else if (_selectedPeriod == StressTestSparkPeriod.d1) {
+      // 1D is a fixed calendar day (midnight → midnight) — StockSparklineChart
+      // further anchors its left edge to wherever today's real data starts
+      // (not literal midnight); this just needs to include all of today.
+      final todayStart = DateTime(now.year, now.month, now.day);
+      filtered = allPoints.where((p) => !p.time.isBefore(todayStart)).toList();
     } else {
-      // 1D is a calendar day (resets at local midnight), not a rolling
-      // 24h lookback — explicit ask: the daily chart should start
-      // drawing a NEW day, not keep showing part of yesterday until a
-      // full 24h have passed.
-      final cutoff = _selectedPeriod == StressTestSparkPeriod.d1
-          ? DateTime(now.year, now.month, now.day)
-          : now.subtract(cutoffDuration);
+      // Periods longer than a day are a plain trailing rolling window —
+      // StockSparklineChart stretches whatever falls in it to fill the
+      // full chart width (no "stop at now" empty space for these).
+      final cutoff = now.subtract(periodDuration);
       filtered = allPoints.where((p) => !p.time.isBefore(cutoff)).toList();
-      if (filtered.length < 2) {
-        filtered = allPoints.length >= 2
-            ? [allPoints.first, allPoints.last]
-            : allPoints;
-      }
     }
 
-    final sampled = _sampleData(filtered, 200);
-
+    // Passed through at full resolution — StockSparklineChart does its own
+    // time-bucket averaging (not blind stride-sampling) once it knows the
+    // exact fixed domain it's rendering into, so raw noisy ticks get
+    // properly smoothed instead of arbitrarily thinned out beforehand.
     setState(() {
-      _points = sampled;
+      _points = filtered;
       _chartReady = true;
     });
-  }
-
-  /// Evenly downsample [data] to at most [targetCount] points,
-  /// always keeping the very last point as-is.
-  List<ChartDataPoint> _sampleData(List<ChartDataPoint> data, int targetCount) {
-    if (data.length <= targetCount) return data;
-    final step = data.length / targetCount;
-    final result = <ChartDataPoint>[];
-    for (int i = 0; i < targetCount; i++) {
-      final idx = (i * step).floor();
-      result.add(data[idx.clamp(0, data.length - 1)]);
-    }
-    result[result.length - 1] = data.last;
-    return result;
   }
 
   StressTestSession? get _session {
