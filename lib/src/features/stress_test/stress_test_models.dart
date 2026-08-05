@@ -7,6 +7,9 @@
 
 import 'dart:math';
 import '../../core/services/gics_sector_mapper.dart';
+import 'psychology_profile.dart';
+
+export 'psychology_profile.dart';
 
 /// Supported test durations.
 /// [custom] requires [StressTestSession.customDurationDays] at runtime.
@@ -360,167 +363,8 @@ enum MarketScenario {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Trader Psychology Profile — 4 Sub-Indices
-// ---------------------------------------------------------------------------
-
-/// Tracks the psychological state of a trader across 4 independent sub-indices.
-///
-/// Each index ranges 0.0 (weak) → 1.0 (strong), initialized at 0.5 (neutral).
-/// All mutations are clamped to [0.0, 1.0].
-class TraderPsychologyProfile {
-  /// Resistance to panic selling under pressure.
-  double panicResistance;
-
-  /// Discipline to follow a plan (not over-trade, not chase).
-  double discipline;
-
-  /// Patience to hold through volatility and avoid impulsive moves.
-  double patience;
-
-  /// Adherence to a strategy (diversification, risk management).
-  double strategyAdherence;
-
-  TraderPsychologyProfile({
-    this.panicResistance = 0.0,
-    this.discipline = 0.0,
-    this.patience = 0.0,
-    this.strategyAdherence = 0.0,
-  });
-
-  // ── Accumulator methods (called by engine on trade events) ──────
-
-  /// Called when user buys near a peak (FOMO behavior).
-  void recordBuyPeak() {
-    discipline = (discipline - 0.08).clamp(0.0, 1.0);
-    patience = (patience - 0.05).clamp(0.0, 1.0);
-  }
-
-  /// Called when user sells near a bottom (panic behavior).
-  void recordSellBottom() {
-    panicResistance = (panicResistance - 0.12).clamp(0.0, 1.0);
-    discipline = (discipline - 0.06).clamp(0.0, 1.0);
-  }
-
-  /// Called after every trade — frequent trading erodes discipline/patience.
-  void recordTradeExecuted() {
-    discipline = (discipline - 0.01).clamp(0.0, 1.0);
-    patience = (patience - 0.005).clamp(0.0, 1.0);
-  }
-
-  /// Called when user survives a Black Swan / catastrophe without panic selling.
-  void recordCatastropheSurvived() {
-    panicResistance = (panicResistance + 0.15).clamp(0.0, 1.0);
-    patience = (patience + 0.10).clamp(0.0, 1.0);
-  }
-
-  /// Called when the user's max allocation is healthy (≤50%).
-  void recordGoodDiversification() {
-    strategyAdherence = (strategyAdherence + 0.03).clamp(0.0, 1.0);
-  }
-
-  /// Called when the user's max allocation is excessive (>80%).
-  void recordOverconcentration() {
-    strategyAdherence = (strategyAdherence - 0.08).clamp(0.0, 1.0);
-  }
-
-  /// Called on a profitable trade (realized P&L > 0).
-  void recordProfitTaking() {
-    patience = (patience + 0.02).clamp(0.0, 1.0);
-    strategyAdherence = (strategyAdherence + 0.01).clamp(0.0, 1.0);
-  }
-
-  /// Called on a losing trade (realized P&L < 0).
-  void recordLossCut() {
-    discipline = (discipline - 0.03).clamp(0.0, 1.0);
-    patience = (patience - 0.02).clamp(0.0, 1.0);
-  }
-
-  // ── Task 1.5: Cumulative Scoring Methods ───────────────────────
-
-  /// Strategy: diversification bonus on first portfolio setup.
-  /// ≥3 sectors = +100 pts (max out), 1-2 sectors = +40 pts.
-  void recordStrategyDiversification(int sectorCount) {
-    if (sectorCount >= 3) {
-      strategyAdherence = (strategyAdherence + 1.0).clamp(0.0, 1.0);
-    } else if (sectorCount >= 1) {
-      strategyAdherence = (strategyAdherence + 0.4).clamp(0.0, 1.0);
-    }
-  }
-
-  /// Strategy: cash buffer — user didn't go all-in.
-  void recordCashBuffer() {
-    strategyAdherence = (strategyAdherence + 0.1).clamp(0.0, 1.0);
-  }
-
-  /// Strategy: trade frequency deduction.
-  /// If trades/epoch > 0.5, deduct proportional amount (capped at -0.3).
-  void recordTradeFrequencyDeduction(int totalTrades, int epochs) {
-    if (epochs > 0) {
-      final ratio = totalTrades / epochs;
-      if (ratio > 0.5) {
-        final deduction = ((ratio - 0.5) * 0.2).clamp(0.0, 0.3);
-        strategyAdherence = (strategyAdherence - deduction).clamp(0.0, 1.0);
-      }
-    }
-  }
-
-  /// Discipline: buying during fear/green zone (blackSwan, crash, bear).
-  void recordBuyLow() {
-    discipline = (discipline + 0.15).clamp(0.0, 1.0);
-  }
-
-  /// Discipline: buying during euphoria/red zone (hype, bull). FOMO penalty.
-  void recordBuyHighFomo() {
-    discipline = (discipline - 0.2).clamp(0.0, 1.0);
-  }
-
-  /// Patience: held through catastrophe epoch without panic selling.
-  void recordHeldThroughCatastrophe() {
-    patience = (patience + 0.2).clamp(0.0, 1.0);
-  }
-
-  /// Patience + Panic: panic selling at a loss during fear/green zone.
-  void recordPanicSell() {
-    patience = (patience - 0.25).clamp(0.0, 1.0);
-    panicResistance = (panicResistance - 0.25).clamp(0.0, 1.0);
-  }
-
-  /// Create a copy with the same values.
-  TraderPsychologyProfile copy() {
-    return TraderPsychologyProfile(
-      panicResistance: panicResistance,
-      discipline: discipline,
-      patience: patience,
-      strategyAdherence: strategyAdherence,
-    );
-  }
-
-  /// Calculate weighted composite score (0.0–1.0).
-  double get compositeScore {
-    // Веса: panicResistance 0.25, discipline 0.30, patience 0.25, strategyAdherence 0.20
-    return panicResistance * 0.25 +
-        discipline * 0.30 +
-        patience * 0.25 +
-        strategyAdherence * 0.20;
-  }
-
-  Map<String, dynamic> toJson() => {
-    'panicResistance': panicResistance,
-    'discipline': discipline,
-    'patience': patience,
-    'strategyAdherence': strategyAdherence,
-  };
-
-  factory TraderPsychologyProfile.fromJson(Map<String, dynamic> json) =>
-      TraderPsychologyProfile(
-        panicResistance: (json['panicResistance'] as num?)?.toDouble() ?? 0.0,
-        discipline: (json['discipline'] as num?)?.toDouble() ?? 0.0,
-        patience: (json['patience'] as num?)?.toDouble() ?? 0.0,
-        strategyAdherence:
-            (json['strategyAdherence'] as num?)?.toDouble() ?? 0.0,
-      );
-}
+// TraderPsychologyProfile moved to psychology_profile.dart (2026-08-05) —
+// imported/re-exported above.
 
 /// ── Block 6: Casino Wall-Clock Epoch Record ──────────────────────────
 ///
@@ -997,6 +841,29 @@ class StressTestTrade {
     this.wasBottom = false,
     this.realizedPnl, // null for buys
   });
+
+  Map<String, dynamic> toJson() => {
+    'symbol': symbol,
+    'isBuy': isBuy,
+    'shares': shares,
+    'price': price,
+    'date': date.toIso8601String(),
+    'wasPeak': wasPeak,
+    'wasBottom': wasBottom,
+    'realizedPnl': realizedPnl,
+  };
+
+  factory StressTestTrade.fromJson(Map<String, dynamic> json) =>
+      StressTestTrade(
+        symbol: json['symbol'] as String,
+        isBuy: json['isBuy'] as bool,
+        shares: (json['shares'] as num).toDouble(),
+        price: (json['price'] as num).toDouble(),
+        date: DateTime.parse(json['date'] as String),
+        wasPeak: json['wasPeak'] as bool? ?? false,
+        wasBottom: json['wasBottom'] as bool? ?? false,
+        realizedPnl: (json['realizedPnl'] as num?)?.toDouble(),
+      );
 }
 
 /// A holding in a stress test session.
@@ -1445,6 +1312,13 @@ class VerdictArchiveEntry {
   final DateTime completedAt;
   final PsychologicalVerdict verdict;
 
+  /// Full per-trade record, kept for the verdict screen's trade breakdown
+  /// widget (symbol, buy/sell, price, realized P&L, peak/bottom flags).
+  /// Added 2026-08-05 — previously the whole session (including this) was
+  /// discarded on completion, leaving only aggregate counts like
+  /// [totalTrades] with no way to show what actually happened per trade.
+  final List<StressTestTrade> trades;
+
   const VerdictArchiveEntry({
     required this.sessionId,
     required this.durationLabel,
@@ -1455,6 +1329,7 @@ class VerdictArchiveEntry {
     required this.holdingCount,
     required this.completedAt,
     required this.verdict,
+    this.trades = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -1467,6 +1342,7 @@ class VerdictArchiveEntry {
     'holdingCount': holdingCount,
     'completedAt': completedAt.toIso8601String(),
     'verdict': verdict.toJson(),
+    'trades': trades.map((t) => t.toJson()).toList(),
   };
 
   factory VerdictArchiveEntry.fromJson(Map<String, dynamic> json) =>
@@ -1484,6 +1360,13 @@ class VerdictArchiveEntry {
         verdict: PsychologicalVerdict.fromJson(
           json['verdict'] as Map<String, dynamic>,
         ),
+        // Absent for verdicts archived before this field existed —
+        // backward-compatible empty list, the widget shows a fallback.
+        trades:
+            (json['trades'] as List<dynamic>?)
+                ?.map((t) => StressTestTrade.fromJson(t as Map<String, dynamic>))
+                .toList() ??
+            const [],
       );
 }
 

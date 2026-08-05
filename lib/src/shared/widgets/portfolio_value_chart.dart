@@ -450,7 +450,7 @@ class _PortfolioValueChartState extends ConsumerState<_PortfolioValueChart> {
                                 handleBuiltInTouches: true,
                               ),
                             ),
-                            duration: const Duration(milliseconds: 300),
+                            duration: Duration.zero,
                           ),
                         ],
                       );

@@ -104,21 +104,13 @@ extension TradesEngine on StressTestNotifier {
     newSession.epochPriceRanges = {...session.epochPriceRanges};
     newSession.epochPriceRanges[symbol] = EpochPriceRange(price, price);
 
-    // ── Task 1.5: Strategy — diversification bonus ────────────
-    if (!session.diversificationBonusRecorded && newHoldings.length >= 2) {
-      final sectors = newHoldings.map((h) => _getSector(h.symbol)).toSet();
-      newSession.psychologyProfile.recordStrategyDiversification(
-        sectors.length,
-      );
-      newSession.diversificationBonusRecorded = true;
-    }
-
-    // ── Task 1.5: Strategy — cash buffer ──────────────────────
+    // ── Strategy pillar (diversification/concentration/sector/ETF/cash) ──
     final newCash = session.cash - amount;
-    final bufferRatio = newCash / session.startingCash;
-    if (bufferRatio > 0.1) {
-      newSession.psychologyProfile.recordCashBuffer();
-    }
+    evaluateStrategyPillar(
+      profile: newSession.psychologyProfile,
+      holdings: newHoldings,
+      cash: newCash,
+    );
 
     state = [
       for (int i = 0; i < state.length; i++)
@@ -286,6 +278,7 @@ extension TradesEngine on StressTestNotifier {
 
     // ── Calculate realized P&L on sell ───────────────────────────────
     double? realizedPnl;
+    double? realizedCostBasis;
     if (!isBuy) {
       final held = session.holdings.firstWhere(
         (h) => h.symbol == symbol,
@@ -298,8 +291,9 @@ extension TradesEngine on StressTestNotifier {
         ),
       );
       if (held.shares > 0) {
-        realizedPnl =
-            (currentPrice - held.avgCost) * shares.clamp(0, held.shares);
+        final soldShares = shares.clamp(0, held.shares);
+        realizedPnl = (currentPrice - held.avgCost) * soldShares;
+        realizedCostBasis = held.avgCost * soldShares;
       }
     }
 
@@ -391,51 +385,46 @@ extension TradesEngine on StressTestNotifier {
       newBlackSwanSurvived = false;
     }
 
-    // ── Psychology Profile: record trade behavior ─────────────
-    session.psychologyProfile.recordTradeExecuted();
-    if (wasPeak) session.psychologyProfile.recordBuyPeak();
-    if (wasBottom) session.psychologyProfile.recordSellBottom();
-    if (!isBuy && realizedPnl != null) {
-      if (realizedPnl > 0) {
-        session.psychologyProfile.recordProfitTaking();
-      } else if (realizedPnl < 0) {
-        session.psychologyProfile.recordLossCut();
-      }
+    // ── Psychology: regime/context-aware trade evaluation ──────
+    // Trade COUNT itself is tracked separately as a verdict-only
+    // narrative (see Phase 2e), not a live score driver — replaces the
+    // old flat per-trade discipline/patience tax that applied regardless
+    // of whether the trade itself was good or bad. Buy evaluation
+    // happens further down (needs newHoldings/newCash computed above);
+    // sell evaluation happens here.
+    if (!isBuy) {
+      evaluateSellTrade(
+        profile: session.psychologyProfile,
+        session: session,
+        symbol: symbol,
+        sellPrice: currentPrice,
+        realizedPnl: realizedPnl,
+        realizedCostBasis: realizedCostBasis,
+      );
     }
+    evaluateStrategyPillar(
+      profile: session.psychologyProfile,
+      holdings: newHoldings,
+      cash: newCash,
+    );
 
-    // ── Task 1.5: Discipline — buy low (green zone) / buy high (red zone) ──
+    // ── Psychology: regime-aware buy evaluation (see psychology_engine.dart) ──
     if (isBuy) {
-      final phase = session.devMarketPhase.toLowerCase();
-      final isGreen =
-          phase == 'blackswan' ||
-          phase == 'black_swan' ||
-          phase == 'crash' ||
-          phase == 'bear';
-      final isRed = phase == 'hype' || phase == 'bull';
-      if (isGreen) {
-        session.psychologyProfile.recordBuyLow();
-      } else if (isRed) {
-        session.psychologyProfile.recordBuyHighFomo();
-      }
-
-      // ── Task 1.5: Strategy — cash buffer ──
-      final bufferRatio = newCash / session.startingCash;
-      if (bufferRatio > 0.1) {
-        session.psychologyProfile.recordCashBuffer();
-      }
-    }
-
-    // ── Task 1.5: Panic — panic selling at a loss in green zone ──
-    if (!isBuy && realizedPnl != null && realizedPnl < 0) {
-      final phase = session.devMarketPhase.toLowerCase();
-      final isGreen =
-          phase == 'blackswan' ||
-          phase == 'black_swan' ||
-          phase == 'crash' ||
-          phase == 'bear';
-      if (isGreen) {
-        session.psychologyProfile.recordPanicSell();
-      }
+      final totalValueAfterBuy =
+          newCash +
+          newHoldings.fold<double>(
+            0,
+            (sum, h) =>
+                sum + h.shares * (session.currentPrices[h.symbol] ?? h.entryPrice),
+          );
+      evaluateBuyTrade(
+        profile: session.psychologyProfile,
+        session: session,
+        symbol: symbol,
+        macroRegime: _getCurrentEpoch(session)?.scenario,
+        cashAfterBuy: newCash,
+        totalValueAfterBuy: totalValueAfterBuy,
+      );
     }
 
     // ── Task 1.5: Track sells during catastrophe ──
@@ -449,19 +438,15 @@ extension TradesEngine on StressTestNotifier {
       }
     }
 
-    // ── Task 1.5: Strategy — trade frequency deduction ──
-    // Only applies AFTER initial portfolio setup (3+ trades).
-    // During setup, a disciplined user needs 3+ trades for the
-    // Diversification Bonus — penalizing early trades would
-    // create a "First Move" trap where Epoch 1 ratio ≥ 3.0
-    // triggers the maximum penalty instantly.
-    final newTradeCount = session.trades.length + 1;
-    if (newTradeCount >= 4) {
-      session.psychologyProfile.recordTradeFrequencyDeduction(
-        newTradeCount,
-        session.epochHistory.length,
-      );
-    }
+    // Trade frequency is no longer a live-score penalty — see Phase 2e:
+    // it's tracked as a verdict-only narrative (session.trades.length is
+    // already available there), not blended into strategyAdherence. The
+    // old version divided by session.epochHistory.length, which stays at
+    // 1 for the entire first roll interval (12-24h) — meaning simply
+    // buying 4 diversified positions on day one (exactly the behavior the
+    // diversification bonus rewards) instantly triggered the MAXIMUM
+    // frequency penalty. Don't reintroduce a live per-trade-count penalty
+    // without fixing that denominator first.
 
     state = [
       for (int i = 0; i < state.length; i++)

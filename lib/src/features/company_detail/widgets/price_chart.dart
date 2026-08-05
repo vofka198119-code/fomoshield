@@ -560,7 +560,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                         ),
                       ],
                     ),
-                    duration: const Duration(milliseconds: 300),
+                    duration: Duration.zero,
                   ),
                 ],
               );

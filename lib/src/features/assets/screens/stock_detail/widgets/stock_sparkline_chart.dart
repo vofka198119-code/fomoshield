@@ -495,7 +495,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                         ),
                       ],
                     ),
-                    duration: const Duration(milliseconds: 300),
+                    duration: Duration.zero,
                   ),
                 ],
               );

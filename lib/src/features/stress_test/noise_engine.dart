@@ -555,36 +555,11 @@ extension NoiseEngine on StressTestNotifier {
       tickTimestamps.add(tickTimestamp - (ticks - 1 - tick) * tickIntervalMs);
     }
 
-    // ── Psychology Profile: diversification / concentration ──
-    if (session.holdings.length >= 2) {
-      // Sector allocation
-      final sectorValues = <MarketSector, double>{};
-      for (final h in session.holdings) {
-        final sector = _getSector(h.symbol);
-        final val = h.shares * (newPrices[h.symbol] ?? h.entryPrice);
-        sectorValues[sector] = (sectorValues[sector] ?? 0) + val;
-      }
-      final totalAssets = sectorValues.values.fold(0.0, (a, b) => a + b);
-      if (totalAssets > 0) {
-        for (final v in sectorValues.values) {
-          if (v / totalAssets > 0.50) {
-            session.psychologyProfile.recordOverconcentration();
-          }
-        }
-      }
-
-      // Single-asset concentration
-      final maxAlloc = _calcAllocation(
-        session.holdings,
-        newPrices,
-        session.cash,
-      );
-      if (maxAlloc > 0.80) {
-        session.psychologyProfile.recordOverconcentration();
-      } else if (maxAlloc <= 0.50) {
-        session.psychologyProfile.recordGoodDiversification();
-      }
-    }
+    // Diversification/concentration/sector-balance scoring moved to
+    // evaluateStrategyPillar (psychology_engine.dart), called from
+    // trades_engine.dart at trade time only — this per-tick version used
+    // to fire every 20s with no cooldown, saturating strategyAdherence to
+    // 0 or 1 within minutes purely from portfolio composition. Removed.
 
     // ── Psychology Profile: catastrophe survival ─────────────
     bool newCatastropheSurvivalRecorded = session.catastropheSurvivalRecorded;

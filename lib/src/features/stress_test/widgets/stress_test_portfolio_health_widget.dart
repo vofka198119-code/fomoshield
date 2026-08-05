@@ -17,33 +17,8 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
+import '../psychology_engine.dart' show diversificationScoreForCount;
 import '../stress_test_models.dart';
-
-// Diversification score vs. holdings count — same non-monotonic shape as
-// the Portfolio Size widget's color curve (too few AND too many holdings
-// both score low), just expressed as a 0-100 number instead of a color.
-const List<MapEntry<double, double>> _diversificationStops = [
-  MapEntry(0, 20),
-  MapEntry(4, 20),
-  MapEntry(10, 55),
-  MapEntry(15, 80),
-  MapEntry(20, 95),
-  MapEntry(30, 20),
-];
-
-double _diversificationScore(double count) {
-  final stops = _diversificationStops;
-  final clamped = count.clamp(stops.first.key, stops.last.key);
-  for (var i = 0; i < stops.length - 1; i++) {
-    final a = stops[i];
-    final b = stops[i + 1];
-    if (clamped <= b.key) {
-      final t = (clamped - a.key) / (b.key - a.key);
-      return a.value + (b.value - a.value) * t;
-    }
-  }
-  return stops.last.value;
-}
 
 // Relative baseline-risk tier per AssetSector — NOT the GBM engine's exact
 // sigma values (those are private to gbm_engine.dart and tuned separately),
@@ -66,11 +41,14 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final holdings = session.holdings;
+    // Cost basis (shares × avgCost — money actually invested), NOT current
+    // market value. A market swing on ANY holding would otherwise shift
+    // every other holding's allocation % without the user doing anything —
+    // these scores are meant to grade a DECISION, not the market's mood.
     final values = <String, double>{};
     double total = 0;
     for (final h in holdings) {
-      final price = session.currentPrices[h.symbol] ?? h.entryPrice;
-      final val = h.shares * price;
+      final val = h.shares * h.avgCost;
       values[h.symbol] = val;
       total += val;
     }
@@ -82,7 +60,9 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
     double stability = 0;
 
     if (hasData) {
-      diversification = _diversificationScore(holdings.length.toDouble());
+      diversification = diversificationScoreForCount(
+        holdings.length.toDouble(),
+      );
 
       final maxHoldingPct = values.values.reduce(math.max) / total * 100;
       concentration = (100 - maxHoldingPct).clamp(0.0, 100.0);

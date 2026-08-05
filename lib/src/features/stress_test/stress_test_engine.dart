@@ -14,6 +14,7 @@ import 'dart:convert';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/services/gics_sector_mapper.dart';
 import '../../shared/services/user_data_service.dart';
+import 'psychology_engine.dart';
 import 'stress_test_models.dart';
 
 part 'gbm_engine.dart';
@@ -307,20 +308,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             },
           )
           .toList(),
-      'trades': s.trades
-          .map(
-            (t) => {
-              'symbol': t.symbol,
-              'isBuy': t.isBuy,
-              'shares': t.shares,
-              'price': t.price,
-              'date': t.date.toIso8601String(),
-              'wasPeak': t.wasPeak,
-              'wasBottom': t.wasBottom,
-              if (t.realizedPnl != null) 'realizedPnl': t.realizedPnl,
-            },
-          )
-          .toList(),
+      'trades': s.trades.map((t) => t.toJson()).toList(),
       'currentWeights': s.currentWeights,
       if (s.lastTickTimestamp != null)
         'lastTickTimestamp': s.lastTickTimestamp!.toIso8601String(),
@@ -389,18 +377,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           )
           .toList(),
       trades: (json['trades'] as List<dynamic>)
-          .map(
-            (t) => StressTestTrade(
-              symbol: t['symbol'] as String,
-              isBuy: t['isBuy'] as bool,
-              shares: (t['shares'] as num).toDouble(),
-              price: (t['price'] as num).toDouble(),
-              date: DateTime.parse(t['date'] as String),
-              wasPeak: t['wasPeak'] as bool? ?? false,
-              wasBottom: t['wasBottom'] as bool? ?? false,
-              realizedPnl: (t['realizedPnl'] as num?)?.toDouble(),
-            ),
-          )
+          .map((t) => StressTestTrade.fromJson(t as Map<String, dynamic>))
           .toList(),
       status: StressTestStatus.values.firstWhere(
         (s) => s.name == (json['status'] as String),
@@ -984,6 +961,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       holdingCount: completed.holdings.length,
       completedAt: completed.completedAt ?? DateTime.now(),
       verdict: verdict,
+      trades: completed.trades,
     );
     // ── Task 1.7: FIFO Verdict History ──────────────────────────
     // Oldest record at index 0, newest appended at the end.

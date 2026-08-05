@@ -555,7 +555,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                         ),
                       ],
                     ),
-                    duration: const Duration(milliseconds: 300),
+                    duration: Duration.zero,
                   ),
                 ],
               );

@@ -17,6 +17,7 @@ import '../../shared/guardian/guardian_engine.dart';
 import '../../shared/guardian/guardian_providers.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
+import 'widgets/verdict_trade_breakdown_widget.dart';
 
 class VerdictScreen extends ConsumerWidget {
   final String sessionId;
@@ -114,6 +115,10 @@ class VerdictScreen extends ConsumerWidget {
 
             // ── Session Stats ───────────────────────────────────
             _buildStatsCard(entry),
+            const SizedBox(height: 16),
+
+            // ── Trade Breakdown ──────────────────────────────────
+            VerdictTradeBreakdownWidget(trades: entry.trades),
             const SizedBox(height: 24),
 
             // ── Continue Learning ───────────────────────────────
@@ -552,7 +557,7 @@ class _GuardianVerdictSection extends ConsumerWidget {
         return _buildCard(state, message);
       },
       loading: () => _buildCard(state, 'Analyzing your performance...'),
-      error: (_, __) => _buildCard(
+      error: (_, _) => _buildCard(
         state,
         'Every simulation teaches something. Reflect on your decisions.',
       ),
