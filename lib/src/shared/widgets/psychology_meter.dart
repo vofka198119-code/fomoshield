@@ -8,14 +8,15 @@
 // ---------------------------------------------------------------------------
 
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import '../../features/stress_test/stress_test_models.dart';
 import '../../core/theme/fomo_shield_theme.dart';
-import 'card_frame.dart';
 
 /// Data for the Psychology Meter.
 class PsychologyMeterData {
@@ -135,65 +136,66 @@ MarketSector _symbolToSector(String symbol) {
 /// analysing what the user is doing right, wrong, and active risks.
 class PsychologyMeter extends StatelessWidget {
   final PsychologyMeterData data;
+  final String sessionId;
 
-  const PsychologyMeter({super.key, required this.data});
+  const PsychologyMeter({
+    super.key,
+    required this.data,
+    required this.sessionId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showAuditSheet(context, data),
-      child: CardFrame(
-        showTopBar: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'PSYCHOLOGY METER',
-                    style: FomoShieldTheme.cardTitle(),
+    return Container(
+      width: double.infinity,
+      decoration: FomoShieldTheme.cardDecoration,
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () =>
+                context.push('/stress-test/$sessionId/psychology-meter'),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+              child: Row(
+                children: [
+                  Text('PSYCHOLOGY METER', style: FomoShieldTheme.cardTitle()),
+                  const Spacer(),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: ThemeV2.textSecondary,
+                    size: 20,
                   ),
-                ),
-                Icon(
-                  Icons.info_outline,
-                  size: 14,
-                  color: FomoShieldTheme.textLight.withValues(alpha: 0.5),
-                ),
-              ],
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
-            _PsychologyMeterBody(data: data),
-            // ── Trade & portfolio analytics section ──────────────
-            if (data.totalTrades > 0) ...[
-              const SizedBox(height: 16),
-              _DividerLine(),
-              const SizedBox(height: 10),
-              _AnalyticsSection(data: data),
-            ],
-          ],
-        ),
+          ),
+          Divider(
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Colors.black.withValues(alpha: 0.06),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
+            child: GestureDetector(
+              onTap: () => _showAuditSheet(context, data),
+              child: _PsychologyMeterBody(data: data),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Thin divider line.
-class _DividerLine extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 1,
-      color: FomoShieldTheme.border.withValues(alpha: 0.3),
-    );
-  }
-}
-
 /// Analytics section: trade stats, diversification, frequency.
-class _AnalyticsSection extends StatelessWidget {
+/// Public — reused by the Psychology Meter detail screen
+/// (stress_test_psychology_meter_screen.dart).
+class PsychologyAnalyticsSection extends StatelessWidget {
   final PsychologyMeterData data;
 
-  const _AnalyticsSection({required this.data});
+  const PsychologyAnalyticsSection({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -303,47 +305,38 @@ class _PsychologyMeterBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Column(
       children: [
         _FsScoreRing(score: data.fsScore),
-        const SizedBox(width: 24),
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _SubIndexRow(
-                label: 'Panic Resistance',
-                value: data.panicResistance,
-                color: FomoShieldTheme.panic,
-              ),
-              const SizedBox(height: 10),
-              _SubIndexRow(
-                label: 'Discipline',
-                value: data.discipline,
-                color: FomoShieldTheme.discipline,
-              ),
-              const SizedBox(height: 10),
-              _SubIndexRow(
-                label: 'Patience',
-                value: data.patience,
-                color: FomoShieldTheme.patience,
-              ),
-              const SizedBox(height: 10),
-              _SubIndexRow(
-                label: 'Strategy',
-                value: data.strategyAdherence,
-                color: FomoShieldTheme.strategy,
-              ),
-            ],
-          ),
+        const SizedBox(height: 20),
+        _SubIndexRow(
+          label: 'Panic',
+          value: data.panicResistance,
+        ),
+        _SubIndexRow(
+          label: 'Discipline',
+          value: data.discipline,
+        ),
+        _SubIndexRow(
+          label: 'Patience',
+          value: data.patience,
+        ),
+        _SubIndexRow(
+          label: 'Strategy',
+          value: data.strategyAdherence,
+          isLast: true,
         ),
       ],
     );
   }
 }
 
-/// Circular FS Score ring (CustomPainter).
+/// FS Score gauge — full-width car-speedometer dial: 270° arc (a 90° gap
+/// at the bottom), static red→yellow→green track (same 3-stop palette as
+/// the sub-index bars), tick marks + numbers at 0/20/40/60/80/100, and a
+/// needle pivoting from the dial's center pointing at the current score.
+/// The numeric readout sits in a small pill below the pivot, in the open
+/// bottom gap, occluding whatever part of the needle passes behind it.
 class _FsScoreRing extends StatelessWidget {
   final double score; // 0-100
 
@@ -355,167 +348,374 @@ class _FsScoreRing extends StatelessWidget {
     return FomoShieldTheme.negative;
   }
 
-  String get _label {
-    if (score >= 80) return 'Excellent';
-    if (score >= 60) return 'Good';
-    if (score >= 40) return 'Fair';
-    if (score >= 20) return 'Poor';
-    return 'Critical';
-  }
+  // How far the tick marks + their number labels reach beyond the arc's
+  // own radius — must stay in sync with _SpeedometerPainter's tick metrics.
+  static const double _outerPad = 60;
+  static const double _sideSin = 0.7071; // sin(135°) / sin(45°)
+  static const double _pillTopGap = 52;
+  static const double _pillHeight = 56;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 100,
-      height: 100,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: const Size(100, 100),
-            painter: _RingPainter(
-              score: score,
-              color: _color,
-              trackColor: FomoShieldTheme.border.withValues(alpha: 0.3),
-            ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 260.0;
+        final radius = (width / 2 - _outerPad).clamp(60.0, 220.0);
+        final topExtent = radius + _outerPad;
+        final sideBottomExtent = radius * _sideSin + _outerPad;
+        final centerY = topExtent + 8;
+        final height =
+            centerY +
+            math.max(sideBottomExtent, _pillTopGap + _pillHeight) +
+            8;
+        final center = Offset(width / 2, centerY);
+
+        return SizedBox(
+          width: width,
+          height: height,
+          child: Stack(
             children: [
-              Text(
-                '${score.round()}',
-                style: interNums(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: FomoShieldTheme.text,
-                  letterSpacing: -1,
+              CustomPaint(
+                size: Size(width, height),
+                painter: _SpeedometerPainter(
+                  score: score,
+                  needleColor: FomoShieldTheme.text,
+                  accentColor: _color,
+                  center: center,
+                  radius: radius,
                 ),
               ),
-              Text(
-                _label,
-                style: GoogleFonts.inter(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                  color: _color,
+              Positioned(
+                left: 0,
+                right: 0,
+                top: centerY + _pillTopGap,
+                child: Center(
+                  child: Container(
+                    width: 110,
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      color: FomoShieldTheme.card,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: FomoShieldTheme.border.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${score.round()}',
+                          textAlign: TextAlign.center,
+                          style: interNums(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w900,
+                            color: FomoShieldTheme.text,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                        Text(
+                          'SCORE',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: FomoShieldTheme.textLight,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
-/// Custom painter for the FS Score ring.
-class _RingPainter extends CustomPainter {
+/// Custom painter for the FS Score gauge dial — see _FsScoreRing.
+class _SpeedometerPainter extends CustomPainter {
   final double score;
-  final Color color;
-  final Color trackColor;
+  final Color needleColor;
+  final Color accentColor;
+  final Offset center;
+  final double radius;
 
-  _RingPainter({
+  _SpeedometerPainter({
     required this.score,
-    required this.color,
-    required this.trackColor,
+    required this.needleColor,
+    required this.accentColor,
+    required this.center,
+    required this.radius,
   });
+
+  static const double _startAngle = 3 * math.pi / 4; // 135°, down-left
+  static const double _sweepAngle = 3 * math.pi / 2; // 270°, ends down-right
+  static const double _strokeWidth = 18.0;
+  static const Color _red = Color(0xFFFF3B30);
+  static const Color _yellow = Color(0xFFFFD600);
+  static const Color _green = Color(0xFF00C853);
+  static const List<int> _majorTicks = [0, 20, 40, 60, 80, 100];
+  static const List<int> _minorTicks = [10, 30, 50, 70, 90];
+  static const double _glowOffset = 5;
+  static const double _glowBlurSigma = 6;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 6;
-    const strokeWidth = 8.0;
+    final rect = Rect.fromCircle(center: center, radius: radius);
 
-    // Track
-    final trackPaint = Paint()
-      ..color = trackColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(center, radius, trackPaint);
+    // Track gradient — same 3-stop palette as the sub-index bars / TARGET's
+    // segmented bar, spun across the FULL circle (not just the visible
+    // 270°) with a 4th stop back at red. A SweepGradient always has a seam
+    // where its angle wraps; with only 3 stops over 270° that seam landed
+    // exactly on the arc's own round start-cap, which bulges slightly past
+    // the mathematical start angle and sampled the wrapped-around tail
+    // (green) instead of clamping to red — a green fleck on the red end.
+    // Coloring the hidden 90° gap green→red closes the loop so the seam
+    // sits where both sides already agree on the color.
+    final sweepFraction = _sweepAngle / (2 * math.pi);
+    final trackShader = SweepGradient(
+      colors: const [_red, _yellow, _green, _red],
+      stops: [0.0, sweepFraction / 2, sweepFraction, 1.0],
+      transform: const GradientRotation(_startAngle),
+    ).createShader(rect);
 
-    // Fill
-    final sweepAngle = (score / 100.0) * 2 * math.pi;
-    if (sweepAngle > 0) {
-      final fillPaint = Paint()
-        ..color = color
+    // Needle geometry — computed up front so both the glow pass and the
+    // crisp pass draw the exact same shape.
+    final t = (score / 100.0).clamp(0.0, 1.0);
+    final needleAngle = _startAngle + _sweepAngle * t;
+    final dir = Offset(math.cos(needleAngle), math.sin(needleAngle));
+    final perp = Offset(-dir.dy, dir.dx);
+    final needleLength = radius - 20;
+    const baseHalfWidth = 4.5;
+    final tip = center + dir * needleLength;
+    final baseL = center + perp * baseHalfWidth;
+    final baseR = center - perp * baseHalfWidth;
+    final needlePath = Path()
+      ..moveTo(tip.dx, tip.dy)
+      ..lineTo(baseL.dx, baseL.dy)
+      ..lineTo(baseR.dx, baseR.dy)
+      ..close();
+
+    // ── Glow pass — track + needle, one shared blur layer offset down.
+    // Mirrors StressTestAllocationChart's _DonutRingPainter: a single
+    // saveLayer/blur for everything glowing (not one MaskFilter.blur per
+    // element) — per-element blur passes were the root cause of a prior
+    // GPU raster corruption bug on MediaTek devices at higher element
+    // counts, see project memory on the allocation ring.
+    canvas.saveLayer(
+      rect.inflate(_strokeWidth + _glowBlurSigma * 3),
+      Paint()
+        ..imageFilter = ImageFilter.blur(
+          sigmaX: _glowBlurSigma,
+          sigmaY: _glowBlurSigma,
+        ),
+    );
+    canvas.save();
+    canvas.translate(0, _glowOffset);
+    canvas.drawArc(
+      rect,
+      _startAngle,
+      _sweepAngle,
+      false,
+      Paint()
+        ..shader = trackShader
+        ..color = Colors.black.withValues(alpha: 0.55)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round;
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        -math.pi / 2, // start from top
-        sweepAngle,
-        false,
-        fillPaint,
-      );
+        ..strokeWidth = _strokeWidth
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawPath(
+      needlePath,
+      Paint()..color = needleColor.withValues(alpha: 0.5),
+    );
+    canvas.drawCircle(
+      center,
+      10,
+      Paint()..color = needleColor.withValues(alpha: 0.5),
+    );
+    canvas.restore();
+    canvas.restore();
+
+    // ── Crisp pass — actual track, ticks, needle (no blur, no offset) ──
+    canvas.drawArc(
+      rect,
+      _startAngle,
+      _sweepAngle,
+      false,
+      Paint()
+        ..shader = trackShader
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = _strokeWidth
+        ..strokeCap = StrokeCap.round,
+    );
+
+    for (final tick in _majorTicks) {
+      _drawTick(canvas, tick / 100.0, label: '$tick');
     }
+    for (final tick in _minorTicks) {
+      _drawTick(canvas, tick / 100.0);
+    }
+
+    // Needle — a tapered triangle (not a plain stroked line) for a cleaner
+    // pointer look, plus a 3-layer hub (dark outer, status-colored ring,
+    // white center) instead of a flat dot.
+    canvas.drawPath(needlePath, Paint()..color = needleColor);
+    canvas.drawCircle(center, 10, Paint()..color = needleColor);
+    canvas.drawCircle(center, 6.5, Paint()..color = accentColor);
+    canvas.drawCircle(center, 3, Paint()..color = FomoShieldTheme.card);
+  }
+
+  /// Draws one tick line at [t] (0.0-1.0 across the dial). Pass [label] for
+  /// a labeled major tick; omit it for a short, dim, unlabeled minor tick.
+  void _drawTick(Canvas canvas, double t, {String? label}) {
+    final angle = _startAngle + _sweepAngle * t;
+    final cosA = math.cos(angle);
+    final sinA = math.sin(angle);
+    final isMajor = label != null;
+    final innerR = radius + _strokeWidth / 2 + 3;
+    final outerR = innerR + (isMajor ? 10 : 6);
+
+    final p1 = Offset(center.dx + innerR * cosA, center.dy + innerR * sinA);
+    final p2 = Offset(center.dx + outerR * cosA, center.dy + outerR * sinA);
+    final tickPaint = Paint()
+      ..color = FomoShieldTheme.textLight.withValues(
+        alpha: isMajor ? 0.6 : 0.35,
+      )
+      ..strokeWidth = isMajor ? 2 : 1.5;
+    canvas.drawLine(p1, p2, tickPaint);
+
+    if (label == null) return;
+
+    final labelR = outerR + 16;
+    final labelCenter = Offset(
+      center.dx + labelR * cosA,
+      center.dy + labelR * sinA,
+    );
+    final tp = TextPainter(
+      text: TextSpan(
+        text: label,
+        style: GoogleFonts.inter(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: FomoShieldTheme.textLight,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, labelCenter - Offset(tp.width / 2, tp.height / 2));
   }
 
   @override
-  bool shouldRepaint(_RingPainter old) =>
-      old.score != score || old.color != color;
+  bool shouldRepaint(_SpeedometerPainter old) =>
+      old.score != score ||
+      old.accentColor != accentColor ||
+      old.center != center ||
+      old.radius != radius;
 }
 
-/// Single sub-index row: label + progress bar + value.
+/// Single sub-index row: label + filled/glowing bar + value. Visual match
+/// for AllocationBarRow (Diversification Indicator card) — same glow-bar
+/// look, adapted for a light card background (dark text, light track).
+/// Fill color is a red→yellow→green lerp keyed to the row's own value —
+/// same 3-stop palette as TARGET's _SegmentedBar / Diversification
+/// Progress's segmented bar (a direct red→green lerp dips through a muddy
+/// brown, not yellow — this avoids that).
 class _SubIndexRow extends StatelessWidget {
   final String label;
   final double value; // 0.0-1.0
-  final Color color;
+  final bool isLast;
 
   const _SubIndexRow({
     required this.label,
     required this.value,
-    required this.color,
+    this.isLast = false,
   });
+
+  static const Color _red = Color(0xFFFF3B30);
+  static const Color _yellow = Color(0xFFFFD600);
+  static const Color _green = Color(0xFF00C853);
+
+  Color get _color {
+    final t = value.clamp(0.0, 1.0);
+    if (t <= 0.5) return Color.lerp(_red, _yellow, t / 0.5)!;
+    return Color.lerp(_yellow, _green, (t - 0.5) / 0.5)!;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // Label — flex 4 gives "Panic Resistance" guaranteed room
-        Flexible(
-          flex: 4,
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.visible,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: FomoShieldTheme.textLight,
+    final percent = (value * 100).clamp(0.0, 100.0);
+    final color = _color;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 76,
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: FomoShieldTheme.text,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 6),
-        // Progress bar — slightly reduced flex
-        Flexible(
-          flex: 3,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: value,
-              backgroundColor: FomoShieldTheme.border.withValues(alpha: 0.4),
-              valueColor: AlwaysStoppedAnimation(color),
-              minHeight: 12,
+          const SizedBox(width: 10),
+          Expanded(
+            child: SizedBox(
+              height: 8,
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: FomoShieldTheme.border.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: (percent / 100).clamp(0.0, 1.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withValues(alpha: 0.5),
+                            blurRadius: 6,
+                            spreadRadius: 0.5,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 6),
-        // Value — small numeric label
-        Flexible(
-          flex: 1,
-          child: Text(
-            '${(value * 100).round()}',
-            textAlign: TextAlign.right,
-            maxLines: 1,
-            style: interNums(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-              color: FomoShieldTheme.text,
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 32,
+            child: Text(
+              '${percent.round()}',
+              textAlign: TextAlign.right,
+              style: interNums(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: FomoShieldTheme.text,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

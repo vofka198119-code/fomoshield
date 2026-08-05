@@ -92,7 +92,7 @@ class _MarketTimelineState extends State<MarketTimeline> {
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
           child: Row(
             children: [
-              Text('PORTFOLIO VALUE', style: FomoShieldTheme.cardTitle()),
+              Text('EPOCHS', style: FomoShieldTheme.cardTitle()),
               const Spacer(),
               Text(
                 '${currentIdx + 1} of ${widget.epochs.length} epochs',

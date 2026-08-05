@@ -83,24 +83,6 @@ abstract final class FomoShieldTheme {
       };
 
   // ══════════════════════════════════════════════
-  //  PSYCHOLOGY (4 Sub-Indices)
-  // ══════════════════════════════════════════════
-  static const Color discipline = Color(0xFF3C8D60); // --discipline
-  static const Color patience = Color(0xFF5078E1); // --patience
-  static const Color panic = Color(0xFFC74D4D); // --panic
-  static const Color strategy = Color(0xFFE0A42F); // --strategy
-
-  /// Get color for a psychology sub-index by name.
-  static Color psychologyColor(String index) => switch (index.toLowerCase()) {
-        'panicresistance' || 'panic_resistance' || 'panic resistance' => panic,
-        'discipline' => discipline,
-        'patience' => patience,
-        'strategyadherence' || 'strategy_adherence' || 'strategy adherence' =>
-          strategy,
-        _ => textLight,
-      };
-
-  // ══════════════════════════════════════════════
   //  GUARDIAN COLORS
   // ══════════════════════════════════════════════
   static const Color guardianBody = Color(0xFF4E6D8D); // --guardian-body

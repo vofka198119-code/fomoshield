@@ -504,7 +504,10 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       case 'cash':
         return StressTestCashWidget(session: session);
       case 'psychology_meter':
-        return PsychologyMeter(data: PsychologyMeterData.fromSession(session));
+        return PsychologyMeter(
+          data: PsychologyMeterData.fromSession(session),
+          sessionId: session.id,
+        );
       case 'my_assets':
         return _buildMyAssetsSection();
       case 'price_chart':
@@ -1313,7 +1316,10 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       child: Column(
         children: [
           // ── Psychology Meter ────────────────────────────
-          PsychologyMeter(data: PsychologyMeterData.fromSession(session)),
+          PsychologyMeter(
+            data: PsychologyMeterData.fromSession(session),
+            sessionId: session.id,
+          ),
           const SizedBox(height: 16),
 
           // ── Allocation Chart ────────────────────────────

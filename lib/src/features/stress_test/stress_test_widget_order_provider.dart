@@ -28,7 +28,7 @@ class StressTestWidgetConfig {
       case 'price_chart':
         return 'Price Chart';
       case 'epoch_history':
-        return 'Epoch History';
+        return 'Epochs';
       case 'trade_history':
         return 'Trade History';
       case 'timer':
