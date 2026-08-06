@@ -4,6 +4,18 @@ import 'package:dio/dio.dart';
 import '../../core/utils/constants.dart';
 import '../../core/supabase/supabase_client.dart';
 
+/// True if a search result's `type` field (Finnhub's own `/search`, or the
+/// backend's local index) identifies an ETF. Both sources label real ETFs
+/// "ETP" (Exchange Traded Product), not "ETF" — checking only "ETF" was a
+/// confirmed real bug twice (search UI badge 2026-07-29, Stress Test's
+/// ETF-exposure buy-time detection 2026-08-06: SPY/QQQ/VOO and others all
+/// come back "ETP"). Single source of truth — every "is this an ETF" check
+/// anywhere in the app should call this, not compare `type` directly.
+bool isEtfSecurityType(String? type) {
+  final t = (type ?? '').toUpperCase();
+  return t == 'ETF' || t == 'ETP';
+}
+
 /// Talks to `scanco-backend` (the Finnhub proxy/cache server, see
 /// d:/Projects/scanco-backend) exclusively — never Finnhub directly.
 /// Every device sharing one embedded Finnhub key would blow through the
@@ -195,10 +207,9 @@ class FinnhubService {
     for (final item in items) {
       final m = Map<String, dynamic>.from(item);
       final symbol = m['symbol'] as String? ?? '';
-      final type = (m['type'] as String? ?? '').toUpperCase();
 
       // Always keep ETFs regardless of exchange
-      if (type == 'ETF') {
+      if (isEtfSecurityType(m['type'] as String?)) {
         final baseSymbol = symbol.split('.')[0];
         if (seen.contains(baseSymbol)) continue;
         seen.add(baseSymbol);

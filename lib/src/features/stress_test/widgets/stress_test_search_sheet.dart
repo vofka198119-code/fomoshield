@@ -364,7 +364,7 @@ class _StressTestSearchSheetState
                           onTap: () => _selectCompany(
                             symbol,
                             desc,
-                            isEtf: type.toUpperCase() == 'ETF',
+                            isEtf: isEtfSecurityType(type),
                           ),
                         );
                       },

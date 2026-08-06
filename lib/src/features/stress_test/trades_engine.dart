@@ -615,9 +615,8 @@ extension TradesEngine on StressTestNotifier {
         .then((results) {
           final isEtf = results.any((r) {
             final rSymbol = (r['symbol'] as String? ?? '').split('.').first;
-            final rType = (r['type'] as String? ?? '').toUpperCase();
             return rSymbol.toUpperCase() == symbol.toUpperCase() &&
-                rType == 'ETF';
+                isEtfSecurityType(r['type'] as String?);
           });
           if (!isEtf) return;
 

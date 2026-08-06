@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../shared/services/finnhub_service.dart' show isEtfSecurityType;
 
 // ---------------------------------------------------------------------------
 // Exchange & Type Badge
@@ -14,10 +15,7 @@ class ExchangeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Finnhub/our local index label ETFs "ETP" (Exchange Traded Product),
-    // not "ETF" — checking only 'ETF' silently hid the badge for almost
-    // every real fund (confirmed live 2026-07-29: SPY/QQQ/VOO all "ETP").
-    final isEtf = type.toUpperCase() == 'ETF' || type.toUpperCase() == 'ETP';
+    final isEtf = isEtfSecurityType(type);
     final exchange = symbol.contains('.')
         ? symbol.split('.').last.toUpperCase()
         : 'US';
