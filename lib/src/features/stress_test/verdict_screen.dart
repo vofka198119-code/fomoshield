@@ -18,6 +18,8 @@ import '../../shared/guardian/guardian_providers.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'widgets/verdict_trade_breakdown_widget.dart';
+import 'widgets/verdict/verdict_marker_card.dart';
+import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
 
 class VerdictScreen extends ConsumerWidget {
   final String sessionId;
@@ -61,18 +63,21 @@ class VerdictScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: Text(
-          'Session Complete',
+          'SESSION COMPLETE',
           style: GoogleFonts.inter(
             fontSize: 18,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w800,
             color: ThemeV2.primary,
+            letterSpacing: 1,
           ),
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
             color: ThemeV2.textPrimary,
+            size: 22,
           ),
           onPressed: () => context.go('/stress-test-hub'),
         ),
@@ -119,6 +124,58 @@ class VerdictScreen extends ConsumerWidget {
 
             // ── Trade Breakdown ──────────────────────────────────
             VerdictTradeBreakdownWidget(trades: entry.trades),
+            const SizedBox(height: 16),
+
+            // ── Per-marker verdict cards ─────────────────────────
+            VerdictMarkerCard(
+              sessionId: sessionId,
+              markerId: 'discipline',
+              label: 'Discipline',
+              score: entry.discipline,
+            ),
+            const SizedBox(height: 12),
+            VerdictMarkerCard(
+              sessionId: sessionId,
+              markerId: 'panic',
+              label: 'Panic',
+              score: entry.panicResistance,
+            ),
+            const SizedBox(height: 12),
+            VerdictMarkerCard(
+              sessionId: sessionId,
+              markerId: 'patience',
+              label: 'Patience',
+              score: entry.patience,
+            ),
+            const SizedBox(height: 12),
+            VerdictMarkerCard(
+              sessionId: sessionId,
+              markerId: 'strategy',
+              label: 'Strategy',
+              score: entry.strategyAdherence,
+            ),
+            const SizedBox(height: 12),
+            VerdictMarkerCard(
+              sessionId: sessionId,
+              markerId: 'diversification',
+              label: 'Diversification',
+              score: (entry.strategySector + entry.strategyDiversification) / 2,
+            ),
+            const SizedBox(height: 12),
+            VerdictMarkerCard(
+              sessionId: sessionId,
+              markerId: 'sector-diversification',
+              label: 'Sector Diversification',
+              score: entry.strategyDiversification,
+            ),
+            const SizedBox(height: 12),
+            VerdictMarkerCard(
+              sessionId: sessionId,
+              markerId: 'safety-marker',
+              label: 'Safety Marker',
+              score: entry.safetyMarker,
+            ),
+            const StressTestVerdictDisclaimer(),
             const SizedBox(height: 24),
 
             // ── Continue Learning ───────────────────────────────

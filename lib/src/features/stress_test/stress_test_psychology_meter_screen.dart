@@ -14,6 +14,12 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../shared/widgets/psychology_meter.dart';
 import 'stress_test_engine.dart';
+import 'widgets/psychology/psychology_discipline_widget.dart';
+import 'widgets/psychology/psychology_diversification_widget.dart';
+import 'widgets/psychology/psychology_panic_widget.dart';
+import 'widgets/psychology/psychology_patience_widget.dart';
+import 'widgets/psychology/psychology_strategy_widget.dart';
+import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
 
 class StressTestPsychologyMeterScreen extends ConsumerWidget {
   final String sessionId;
@@ -52,8 +58,29 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
           ? const SizedBox.shrink()
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
-              child: _PsychologyMeterDetailCard(
-                data: PsychologyMeterData.fromSession(session),
+              child: Column(
+                children: [
+                  PsychologyDisciplineCard(
+                    discipline: session.psychologyProfile.discipline,
+                  ),
+                  const SizedBox(height: 16),
+                  PsychologyPanicCard(
+                    panicResistance: session.psychologyProfile.panicResistance,
+                  ),
+                  const SizedBox(height: 16),
+                  PsychologyPatienceCard(
+                    patience: session.psychologyProfile.patience,
+                  ),
+                  const SizedBox(height: 16),
+                  PsychologyStrategyCard(session: session),
+                  const SizedBox(height: 16),
+                  PsychologyDiversificationCard(session: session),
+                  const SizedBox(height: 16),
+                  _PsychologyMeterDetailCard(
+                    data: PsychologyMeterData.fromSession(session),
+                  ),
+                  const StressTestVerdictDisclaimer(),
+                ],
               ),
             ),
     );

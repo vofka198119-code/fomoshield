@@ -20,12 +20,19 @@ class AllocationBarRow extends StatelessWidget {
   final String name;
   final double percent;
   final bool warning;
+  // Value label formatting — defaults match the original allocation-%
+  // callers (1 decimal + '%'). Psychology Meter's 0-100 score bars pass
+  // decimals: 0, suffix: '' since they're points, not a percentage.
+  final int decimals;
+  final String suffix;
 
   const AllocationBarRow({
     super.key,
     required this.name,
     required this.percent,
     this.warning = false,
+    this.decimals = 1,
+    this.suffix = '%',
   });
 
   @override
@@ -86,7 +93,7 @@ class AllocationBarRow extends StatelessWidget {
           SizedBox(
             width: 42,
             child: Text(
-              '${percent.toStringAsFixed(1)}%',
+              '${percent.toStringAsFixed(decimals)}$suffix',
               textAlign: TextAlign.right,
               style: interNums(
                 fontSize: 12.5,

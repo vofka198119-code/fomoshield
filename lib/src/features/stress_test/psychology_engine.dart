@@ -15,13 +15,25 @@ import 'stress_test_models.dart';
 // too many holdings both score low). Single source of truth, shared with
 // stress_test_portfolio_health_widget.dart's Diversification gauge — keep
 // them using this same curve, don't let them drift apart.
+//
+// 5-tier curve confirmed 2026-08-06, tuned around the $15k stress-test
+// budget (see sector_diversification_tiers.dart for the matching verdict
+// copy — keep the tier boundaries here and there in sync):
+//   1-2   concentrated ("all your eggs in one basket")
+//   3-4   building a foundation
+//   5-15  golden middle — flat peak, the intended sweet spot
+//   16-24 excellent, but watch business quality as it grows
+//   25+   overloaded ("a zoo") — declining the more it grows
 const List<MapEntry<double, double>> diversificationStops = [
-  MapEntry(0, 20),
-  MapEntry(4, 20),
-  MapEntry(10, 55),
-  MapEntry(15, 80),
-  MapEntry(20, 95),
-  MapEntry(30, 20),
+  MapEntry(1, 15),
+  MapEntry(2, 15),
+  MapEntry(4, 45),
+  MapEntry(5, 92),
+  MapEntry(15, 92),
+  MapEntry(16, 75),
+  MapEntry(24, 60),
+  MapEntry(25, 35),
+  MapEntry(40, 15),
 ];
 
 /// 0-100 diversification score for a given holdings count.
@@ -201,27 +213,58 @@ void evaluateSellTrade({
       .clamp(0.0, 1.0);
 }
 
-/// Evaluates the Strategy pillar (diversification, concentration, sector
-/// balance, ETF exposure) — called once per trade (buy or sell), never
-/// per-tick. The old version (`recordGoodDiversification`/
-/// `recordOverconcentration` in noise_engine.dart) fired every 20s tick
-/// with no cooldown, saturating strategyAdherence to 0 or 1 within
-/// minutes purely from portfolio composition, unrelated to any decision
-/// the user actually made — confirmed on review, removed.
+/// The 5 independent signals behind the Strategy pillar, plus their
+/// weighted blend (`target`) — see [computeStrategySubScores]. All 0.0-1.0.
+class StrategySubScores {
+  final double diversification;
+  final double concentration;
+  final double sector;
+  final double etf;
+  final double cashBuffer;
+  final double target;
+  // False only when there's no real cost-basis data to score yet (empty
+  // portfolio, or a degenerate all-zero-avgCost holding list) — lets
+  // callers tell "nothing to score" apart from "scored and it's 0".
+  final bool hasData;
+
+  const StrategySubScores({
+    required this.diversification,
+    required this.concentration,
+    required this.sector,
+    required this.etf,
+    required this.cashBuffer,
+    required this.target,
+    this.hasData = true,
+  });
+
+  static const zero = StrategySubScores(
+    diversification: 0,
+    concentration: 0,
+    sector: 0,
+    etf: 0,
+    cashBuffer: 0,
+    target: 0,
+    hasData: false,
+  );
+}
+
+/// Pure computation of the Strategy pillar's 5 sub-signals from the
+/// portfolio's CURRENT state — diversification (holdings-count curve),
+/// concentration (1 - largest single holding's %), sector balance
+/// (1 - largest sector's %), ETF exposure, and cash buffer. All money
+/// shares use cost basis (`shares × avgCost`), not live market value — a
+/// market swing shouldn't change this score without the user doing
+/// anything (see the same fix in stress_test_portfolio_health_widget.dart).
 ///
-/// All money shares use cost basis (`shares × avgCost`), not live market
-/// value — a market swing shouldn't change this score without the user
-/// doing anything (see the same fix in stress_test_portfolio_health_widget.dart).
-///
-/// Eases `strategyAdherence` a fraction of the way toward a freshly
-/// computed target each trade, rather than snapping to it — one trade
-/// shouldn't swing the whole pillar instantly.
-void evaluateStrategyPillar({
-  required TraderPsychologyProfile profile,
+/// Deterministic given the current holdings/cash — no session history
+/// involved — so both [evaluateStrategyPillar] (trade-time engine) and
+/// the Strategy/Diversification detail widgets (live UI) can call this
+/// directly and always agree.
+StrategySubScores computeStrategySubScores({
   required List<StressTestHolding> holdings,
   required double cash,
 }) {
-  if (holdings.isEmpty) return;
+  if (holdings.isEmpty) return StrategySubScores.zero;
 
   final values = <String, double>{};
   double total = 0;
@@ -230,7 +273,7 @@ void evaluateStrategyPillar({
     values[h.symbol] = val;
     total += val;
   }
-  if (total <= 0) return;
+  if (total <= 0) return StrategySubScores.zero;
 
   // Cash buffer — scaled: 0% cash held back is the full penalty, ~10%+
   // clears it. Folded in here (not a separate ungated per-buy bonus like
@@ -271,6 +314,65 @@ void evaluateStrategyPillar({
       sectorScore * 0.20 +
       etfScore * 0.15 +
       cashBufferScore * 0.15;
+
+  return StrategySubScores(
+    diversification: diversificationScore,
+    concentration: concentrationScore,
+    sector: sectorScore,
+    etf: etfScore,
+    cashBuffer: cashBufferScore,
+    target: target,
+  );
+}
+
+/// Evaluates the Strategy pillar — called once per trade (buy or sell),
+/// never per-tick. The old version (`recordGoodDiversification`/
+/// `recordOverconcentration` in noise_engine.dart) fired every 20s tick
+/// with no cooldown, saturating strategyAdherence to 0 or 1 within
+/// minutes purely from portfolio composition, unrelated to any decision
+/// the user actually made — confirmed on review, removed.
+///
+/// Eases `strategyAdherence` a fraction of the way toward a freshly
+/// computed target each trade, rather than snapping to it — one trade
+/// shouldn't swing the whole pillar instantly.
+void evaluateStrategyPillar({
+  required TraderPsychologyProfile profile,
+  required List<StressTestHolding> holdings,
+  required double cash,
+}) {
+  if (holdings.isEmpty) return;
+  final scores = computeStrategySubScores(holdings: holdings, cash: cash);
+  if (!scores.hasData) return;
   profile.strategyAdherence =
-      profile.strategyAdherence + (target - profile.strategyAdherence) * 0.25;
+      profile.strategyAdherence +
+      (scores.target - profile.strategyAdherence) * 0.25;
+}
+
+/// "Safety Marker" — cost-basis-weighted average of the FS Score each
+/// holding had at the moment of its FIRST purchase (`entryFsScore`, see
+/// StressTestHolding), normalized to 0.0-1.0. Answers "how good were the
+/// companies this trader actually bought", independent of diversification
+/// or timing — a portfolio of 20 well-spread penny biotechs still scores
+/// low here.
+///
+/// Holdings whose `entryFsScore` hasn't resolved yet (fetch still in
+/// flight, or failed / no fundamentals) are excluded from the average
+/// rather than counted as 0 — an unresolved score isn't a bad score, it's
+/// no data yet. `hasData` is false only when NONE of the holdings have a
+/// resolved score.
+({double score, bool hasData}) safetyMarkerFor(
+  List<StressTestHolding> holdings,
+) {
+  double weightedSum = 0;
+  double totalWeight = 0;
+  for (final h in holdings) {
+    if (h.entryFsScore == null) continue;
+    final weight = h.shares * h.avgCost;
+    if (weight <= 0) continue;
+    weightedSum += h.entryFsScore! * weight;
+    totalWeight += weight;
+  }
+  if (totalWeight <= 0) return (score: 0.0, hasData: false);
+  final score = (weightedSum / totalWeight / 100).clamp(0.0, 1.0);
+  return (score: score, hasData: true);
 }

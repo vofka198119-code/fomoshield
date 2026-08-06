@@ -14,6 +14,8 @@ import 'dart:convert';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/services/gics_sector_mapper.dart';
 import '../../shared/services/user_data_service.dart';
+import '../../shared/services/finnhub_service.dart';
+import '../../shared/services/scoring_engine.dart';
 import 'psychology_engine.dart';
 import 'stress_test_models.dart';
 
@@ -305,6 +307,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               'avgCost': h.avgCost,
               'entryPrice': h.entryPrice,
               if (h.cachedLogoUrl != null) 'cachedLogoUrl': h.cachedLogoUrl,
+              if (h.entryFsScore != null) 'entryFsScore': h.entryFsScore,
             },
           )
           .toList(),
@@ -373,6 +376,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               avgCost: (h['avgCost'] as num).toDouble(),
               entryPrice: (h['entryPrice'] as num).toDouble(),
               cachedLogoUrl: h['cachedLogoUrl'] as String?,
+              entryFsScore: (h['entryFsScore'] as num?)?.toDouble(),
             ),
           )
           .toList(),
@@ -951,6 +955,11 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     // Archive the verdict and remove the session from active state
     final completed = state.firstWhere((s) => s.id == session.id);
     final verdict = calculateVerdict(session.id);
+    final finalStrategyScores = computeStrategySubScores(
+      holdings: completed.holdings,
+      cash: completed.cash,
+    );
+    final finalSafetyMarker = safetyMarkerFor(completed.holdings);
     final entry = VerdictArchiveEntry(
       sessionId: session.id,
       durationLabel: session.duration.displayName,
@@ -962,6 +971,17 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       completedAt: completed.completedAt ?? DateTime.now(),
       verdict: verdict,
       trades: completed.trades,
+      discipline: completed.psychologyProfile.discipline,
+      panicResistance: completed.psychologyProfile.panicResistance,
+      patience: completed.psychologyProfile.patience,
+      strategyAdherence: completed.psychologyProfile.strategyAdherence,
+      strategyDiversification: finalStrategyScores.diversification,
+      strategyConcentration: finalStrategyScores.concentration,
+      strategySector: finalStrategyScores.sector,
+      strategyEtf: finalStrategyScores.etf,
+      strategyCashBuffer: finalStrategyScores.cashBuffer,
+      safetyMarker: finalSafetyMarker.score,
+      safetyMarkerHasData: finalSafetyMarker.hasData,
     );
     // ── Task 1.7: FIFO Verdict History ──────────────────────────
     // Oldest record at index 0, newest appended at the end.

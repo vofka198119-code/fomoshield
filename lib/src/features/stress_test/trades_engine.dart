@@ -47,6 +47,7 @@ extension TradesEngine on StressTestNotifier {
         avgCost: totalCost / totalShares,
         entryPrice: existing.entryPrice,
         cachedLogoUrl: existing.cachedLogoUrl,
+        entryFsScore: existing.entryFsScore,
       );
     } else {
       newHoldings.add(
@@ -57,6 +58,7 @@ extension TradesEngine on StressTestNotifier {
           entryPrice: price,
         ),
       );
+      _fetchSafetyMarkerScore(sessionId, symbol);
     }
 
     final newSession = StressTestSession(
@@ -322,6 +324,7 @@ extension TradesEngine on StressTestNotifier {
           avgCost: totalCost / totalShares,
           entryPrice: currentPrice,
           cachedLogoUrl: existing.cachedLogoUrl,
+          entryFsScore: existing.entryFsScore,
         );
       } else {
         newHoldings.add(
@@ -332,6 +335,7 @@ extension TradesEngine on StressTestNotifier {
             entryPrice: currentPrice,
           ),
         );
+        _fetchSafetyMarkerScore(sessionId, symbol);
       }
     } else {
       final existingIdx = newHoldings.indexWhere((h) => h.symbol == symbol);
@@ -347,6 +351,7 @@ extension TradesEngine on StressTestNotifier {
             avgCost: existing.avgCost,
             entryPrice: existing.entryPrice,
             cachedLogoUrl: existing.cachedLogoUrl,
+            entryFsScore: existing.entryFsScore,
           );
         }
       }
@@ -536,6 +541,52 @@ extension TradesEngine on StressTestNotifier {
       if (val > maxVal) maxVal = val;
     }
     return maxVal / totalValue;
+  }
+
+  /// Fires off a one-time fetch of [symbol]'s FS Score for the "Safety
+  /// Marker" signal, right after its FIRST purchase in this session —
+  /// never re-fetched or overwritten by later buys/sells of the same
+  /// symbol. Fire-and-forget: doesn't block the buy that triggered it,
+  /// patches the holding's `entryFsScore` in place once resolved.
+  ///
+  /// Uses a plain `FinnhubService()` + `ScoringEngine.calculate()` call
+  /// directly (no sectorPe/priceCagr5Y — those two markers just stay
+  /// neutral 50, a documented fallback in scoring_engine.dart) rather
+  /// than going through `companyDetailProvider`, since StressTestNotifier
+  /// isn't constructed with a Riverpod `Ref` to read that provider.
+  void _fetchSafetyMarkerScore(String sessionId, String symbol) {
+    FinnhubService()
+        .metrics(symbol)
+        .then((metrics) {
+          final score = ScoringEngine.calculate(metrics);
+          final fs = (score?['financial_score'] as num?)?.toDouble();
+          if (fs == null) return;
+
+          final i = state.indexWhere((s) => s.id == sessionId);
+          if (i < 0) return;
+          final s = state[i];
+          final hIdx = s.holdings.indexWhere((h) => h.symbol == symbol);
+          if (hIdx < 0 || s.holdings[hIdx].entryFsScore != null) return;
+
+          final existing = s.holdings[hIdx];
+          s.holdings = [
+            for (int j = 0; j < s.holdings.length; j++)
+              if (j == hIdx)
+                StressTestHolding(
+                  symbol: existing.symbol,
+                  shares: existing.shares,
+                  avgCost: existing.avgCost,
+                  entryPrice: existing.entryPrice,
+                  cachedLogoUrl: existing.cachedLogoUrl,
+                  entryFsScore: fs,
+                )
+              else
+                s.holdings[j],
+          ];
+          state = [...state];
+          _save();
+        })
+        .catchError((_) {});
   }
 }
 

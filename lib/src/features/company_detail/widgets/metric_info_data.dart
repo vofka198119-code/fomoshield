@@ -1843,4 +1843,72 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
       ),
     ],
   ),
+
+  // ── Psychology Meter marker widgets (stress_test/widgets/psychology/) ──
+  // Stub copy — placeholder text pending final wording from the user.
+  'psychology-discipline': MetricInfoContent(
+    title: 'Discipline',
+    subtitle: 'Buying With a Plan, Not With Emotion',
+    sections: [
+      MetricInfoSection(
+        body:
+            'Discipline tracks how you behave at the moment you buy. '
+            'Buying during a crash or a confirmed rebound is rewarded — '
+            'that\'s a calculated move, not a reaction. Chasing a hype '
+            'spike or buying into an active pump on a single stock is '
+            'penalized — that\'s FOMO, not a plan.',
+      ),
+    ],
+  ),
+  'psychology-panic': MetricInfoContent(
+    title: 'Panic',
+    subtitle: 'Selling Calmly, Not Selling Scared',
+    sections: [
+      MetricInfoSection(
+        body:
+            'Panic Resistance tracks how you behave at the moment you '
+            'sell. Selling near the test\'s real bottom, or locking in a '
+            'large loss, drags this score down. Taking a profit — any '
+            'size — always gets a small, calm bonus.',
+      ),
+    ],
+  ),
+  'psychology-patience': MetricInfoContent(
+    title: 'Patience',
+    subtitle: 'Letting Positions Play Out',
+    sections: [
+      MetricInfoSection(
+        body:
+            'Patience rewards holding through turbulence and taking '
+            'profits without rushing, instead of jumping in and out of '
+            'positions on every swing.',
+      ),
+    ],
+  ),
+  'psychology-strategy': MetricInfoContent(
+    title: 'Strategy',
+    subtitle: 'How Your Portfolio Is Built',
+    sections: [
+      MetricInfoSection(
+        body:
+            'Strategy blends 5 signals from your current portfolio: how '
+            'many positions you hold, how concentrated your biggest '
+            'position is, how balanced your sectors are, how much sits '
+            'in broad-market ETFs, and how much cash you\'re keeping in '
+            'reserve.',
+      ),
+    ],
+  ),
+  'psychology-diversification': MetricInfoContent(
+    title: 'Diversification',
+    subtitle: 'Spreading Risk Across Your Portfolio',
+    sections: [
+      MetricInfoSection(
+        body:
+            'A closer look at how your portfolio is spread out — across '
+            'sectors, across the number of positions you hold, and '
+            'across the quality of what you\'re buying.',
+      ),
+    ],
+  ),
 };

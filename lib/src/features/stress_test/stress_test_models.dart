@@ -874,12 +874,22 @@ class StressTestHolding {
   final double entryPrice; // real price from Finnhub at purchase
   final String? cachedLogoUrl; // Logo URL cached during initial search
 
+  /// The company's FS Score (0-100) at the moment of the FIRST purchase
+  /// of this symbol in this session — "Safety Marker" signal. Fetched
+  /// asynchronously right after that first buy (see trades_engine.dart)
+  /// and never touched again by later buys/sells of the same symbol —
+  /// averaging up doesn't change the entry-quality judgment. Null until
+  /// the fetch resolves, or if it fails / the symbol has no fundamentals
+  /// (funds/ETFs) — excluded from the Safety Marker average in that case.
+  final double? entryFsScore;
+
   const StressTestHolding({
     required this.symbol,
     required this.shares,
     required this.avgCost,
     required this.entryPrice,
     this.cachedLogoUrl,
+    this.entryFsScore,
   });
 
   /// Alias for [avgCost] — the average purchase price of the position.
@@ -1319,6 +1329,36 @@ class VerdictArchiveEntry {
   /// [totalTrades] with no way to show what actually happened per trade.
   final List<StressTestTrade> trades;
 
+  /// Final Psychology Meter marker scores (0.0-1.0), snapshotted at the
+  /// moment the session completes — needed by the Session Complete
+  /// screen's per-marker verdict widgets. Added 2026-08-06; previously
+  /// `TraderPsychologyProfile` was discarded along with the rest of the
+  /// session on completion, same gap [trades] fixed for per-trade data.
+  final double discipline;
+  final double panicResistance;
+  final double patience;
+  final double strategyAdherence;
+
+  /// The 5 signals behind [strategyAdherence], snapshotted the same way —
+  /// see [StrategySubScores]/computeStrategySubScores in psychology_engine.dart.
+  /// Stored as flat doubles rather than the holdings list itself, since
+  /// StressTestHolding has no toJson/fromJson yet and these are already
+  /// deterministic from the portfolio at completion time.
+  final double strategyDiversification;
+  final double strategyConcentration;
+  final double strategySector;
+  final double strategyEtf;
+  final double strategyCashBuffer;
+
+  /// "Safety Marker" — cost-basis-weighted average FS Score (0.0-1.0) of
+  /// every holding's FIRST purchase, snapshotted at completion — see
+  /// safetyMarkerFor() in psychology_engine.dart. [safetyMarkerHasData]
+  /// is false when no holding's FS Score ever resolved (e.g. the test
+  /// completed before the async fetch landed, or an empty portfolio) —
+  /// distinct from a real, scored 0.
+  final double safetyMarker;
+  final bool safetyMarkerHasData;
+
   const VerdictArchiveEntry({
     required this.sessionId,
     required this.durationLabel,
@@ -1330,6 +1370,17 @@ class VerdictArchiveEntry {
     required this.completedAt,
     required this.verdict,
     this.trades = const [],
+    this.discipline = 0,
+    this.panicResistance = 0,
+    this.patience = 0,
+    this.strategyAdherence = 0,
+    this.strategyDiversification = 0,
+    this.strategyConcentration = 0,
+    this.strategySector = 0,
+    this.strategyEtf = 0,
+    this.strategyCashBuffer = 0,
+    this.safetyMarker = 0,
+    this.safetyMarkerHasData = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -1343,6 +1394,17 @@ class VerdictArchiveEntry {
     'completedAt': completedAt.toIso8601String(),
     'verdict': verdict.toJson(),
     'trades': trades.map((t) => t.toJson()).toList(),
+    'discipline': discipline,
+    'panicResistance': panicResistance,
+    'patience': patience,
+    'strategyAdherence': strategyAdherence,
+    'strategyDiversification': strategyDiversification,
+    'strategyConcentration': strategyConcentration,
+    'strategySector': strategySector,
+    'strategyEtf': strategyEtf,
+    'strategyCashBuffer': strategyCashBuffer,
+    'safetyMarker': safetyMarker,
+    'safetyMarkerHasData': safetyMarkerHasData,
   };
 
   factory VerdictArchiveEntry.fromJson(Map<String, dynamic> json) =>
@@ -1367,6 +1429,23 @@ class VerdictArchiveEntry {
                 ?.map((t) => StressTestTrade.fromJson(t as Map<String, dynamic>))
                 .toList() ??
             const [],
+        // Absent for verdicts archived before this field existed — the
+        // marker widgets just show 0, same convention as [trades] above.
+        discipline: (json['discipline'] as num?)?.toDouble() ?? 0,
+        panicResistance: (json['panicResistance'] as num?)?.toDouble() ?? 0,
+        patience: (json['patience'] as num?)?.toDouble() ?? 0,
+        strategyAdherence:
+            (json['strategyAdherence'] as num?)?.toDouble() ?? 0,
+        strategyDiversification:
+            (json['strategyDiversification'] as num?)?.toDouble() ?? 0,
+        strategyConcentration:
+            (json['strategyConcentration'] as num?)?.toDouble() ?? 0,
+        strategySector: (json['strategySector'] as num?)?.toDouble() ?? 0,
+        strategyEtf: (json['strategyEtf'] as num?)?.toDouble() ?? 0,
+        strategyCashBuffer:
+            (json['strategyCashBuffer'] as num?)?.toDouble() ?? 0,
+        safetyMarker: (json['safetyMarker'] as num?)?.toDouble() ?? 0,
+        safetyMarkerHasData: json['safetyMarkerHasData'] as bool? ?? false,
       );
 }
 

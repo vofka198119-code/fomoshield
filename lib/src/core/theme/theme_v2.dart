@@ -294,6 +294,7 @@ abstract final class ThemeV2 {
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: textPrimary,
         titleTextStyle: section,
