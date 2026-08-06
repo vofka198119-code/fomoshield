@@ -54,13 +54,24 @@ class TraderPsychologyProfile {
     );
   }
 
-  /// Calculate weighted composite score (0.0–1.0).
-  double get compositeScore {
-    // Веса: panicResistance 0.25, discipline 0.30, patience 0.25, strategyAdherence 0.20
-    return panicResistance * 0.25 +
-        discipline * 0.30 +
-        patience * 0.25 +
-        strategyAdherence * 0.20;
+  /// Calculate weighted composite score (0.0–1.0). [safetyMarkerScore] is
+  /// computed separately from the portfolio's holdings (see
+  /// safetyMarkerFor() in psychology_engine.dart) rather than stored on
+  /// this profile, since it's a pure function of entryFsScore per holding
+  /// — pass in `safetyMarkerFor(session.holdings).score`.
+  double compositeScore(double safetyMarkerScore) {
+    // Веса: panicResistance 0.22, discipline 0.26, patience 0.22,
+    // strategyAdherence 0.15, safetyMarker 0.15 — rebalanced 2026-08-06
+    // to fold in Safety Marker (previously computed but never actually
+    // counted toward the overall score), keeping the original behavioral
+    // 3 (panic/discipline/patience) at roughly their original 80%
+    // combined share and splitting the rest evenly between the 2
+    // portfolio-construction signals (strategy, safety).
+    return panicResistance * 0.22 +
+        discipline * 0.26 +
+        patience * 0.22 +
+        strategyAdherence * 0.15 +
+        safetyMarkerScore * 0.15;
   }
 
   Map<String, dynamic> toJson() => {

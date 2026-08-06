@@ -24,8 +24,9 @@ extension TradesEngine on StressTestNotifier {
     String sessionId,
     String symbol,
     double amount,
-    double price,
-  ) async {
+    double price, {
+    bool isEtf = false,
+  }) async {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) return false;
 
@@ -48,6 +49,7 @@ extension TradesEngine on StressTestNotifier {
         entryPrice: existing.entryPrice,
         cachedLogoUrl: existing.cachedLogoUrl,
         entryFsScore: existing.entryFsScore,
+        isEtf: existing.isEtf,
       );
     } else {
       newHoldings.add(
@@ -56,9 +58,11 @@ extension TradesEngine on StressTestNotifier {
           shares: shares,
           avgCost: price,
           entryPrice: price,
+          isEtf: isEtf,
         ),
       );
       _fetchSafetyMarkerScore(sessionId, symbol);
+      _fetchIsEtfFlag(sessionId, symbol);
     }
 
     final newSession = StressTestSession(
@@ -201,6 +205,7 @@ extension TradesEngine on StressTestNotifier {
     bool isBuy,
     double amountOrShares, {
     bool useShares = false,
+    bool isEtf = false,
   }) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) {
@@ -325,6 +330,7 @@ extension TradesEngine on StressTestNotifier {
           entryPrice: currentPrice,
           cachedLogoUrl: existing.cachedLogoUrl,
           entryFsScore: existing.entryFsScore,
+          isEtf: existing.isEtf,
         );
       } else {
         newHoldings.add(
@@ -333,9 +339,11 @@ extension TradesEngine on StressTestNotifier {
             shares: shares,
             avgCost: currentPrice,
             entryPrice: currentPrice,
+            isEtf: isEtf,
           ),
         );
         _fetchSafetyMarkerScore(sessionId, symbol);
+        _fetchIsEtfFlag(sessionId, symbol);
       }
     } else {
       final existingIdx = newHoldings.indexWhere((h) => h.symbol == symbol);
@@ -579,6 +587,58 @@ extension TradesEngine on StressTestNotifier {
                   entryPrice: existing.entryPrice,
                   cachedLogoUrl: existing.cachedLogoUrl,
                   entryFsScore: fs,
+                  isEtf: existing.isEtf,
+                )
+              else
+                s.holdings[j],
+          ];
+          state = [...state];
+          _save();
+        })
+        .catchError((_) {});
+  }
+
+  /// Fires off a one-time check of whether [symbol] is a real ETF (via
+  /// Finnhub's own `type` field, same signal the search UI already shows
+  /// — see stress_test_search_sheet.dart), right after its FIRST purchase.
+  /// Only ever flips `isEtf` false → true, never the reverse, so it's
+  /// safe to call unconditionally for every new holding regardless of
+  /// which UI path bought it — covers buys that come through the general
+  /// Search screen → stock detail → Order Entry chain, which has no way
+  /// to thread the search result's `type` field through 3 screens.
+  /// Confirmed real bug 2026-08-06: ETF Exposure never moved for SCJ/PPH
+  /// bought that way (only in AssetSector.etfBroadMarket's small static
+  /// list, which neither is).
+  void _fetchIsEtfFlag(String sessionId, String symbol) {
+    FinnhubService()
+        .search(symbol)
+        .then((results) {
+          final isEtf = results.any((r) {
+            final rSymbol = (r['symbol'] as String? ?? '').split('.').first;
+            final rType = (r['type'] as String? ?? '').toUpperCase();
+            return rSymbol.toUpperCase() == symbol.toUpperCase() &&
+                rType == 'ETF';
+          });
+          if (!isEtf) return;
+
+          final i = state.indexWhere((s) => s.id == sessionId);
+          if (i < 0) return;
+          final s = state[i];
+          final hIdx = s.holdings.indexWhere((h) => h.symbol == symbol);
+          if (hIdx < 0 || s.holdings[hIdx].isEtf) return;
+
+          final existing = s.holdings[hIdx];
+          s.holdings = [
+            for (int j = 0; j < s.holdings.length; j++)
+              if (j == hIdx)
+                StressTestHolding(
+                  symbol: existing.symbol,
+                  shares: existing.shares,
+                  avgCost: existing.avgCost,
+                  entryPrice: existing.entryPrice,
+                  cachedLogoUrl: existing.cachedLogoUrl,
+                  entryFsScore: existing.entryFsScore,
+                  isEtf: true,
                 )
               else
                 s.holdings[j],

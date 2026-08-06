@@ -56,6 +56,7 @@ class _StressTestSearchSheetState
   bool _showAmountInput = false;
   String _selectedSymbol = '';
   String _selectedDescription = '';
+  bool _selectedIsEtf = false;
   double _selectedPrice = 0;
   double _amount = 500;
   String? _errorMessage;
@@ -110,7 +111,11 @@ class _StressTestSearchSheetState
 
   // ── Step 2: Fetch Price & Show Amount Input ────────────────────
 
-  Future<void> _selectCompany(String symbol, String description) async {
+  Future<void> _selectCompany(
+    String symbol,
+    String description, {
+    bool isEtf = false,
+  }) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -129,6 +134,7 @@ class _StressTestSearchSheetState
       setState(() {
         _selectedSymbol = symbol;
         _selectedDescription = description;
+        _selectedIsEtf = isEtf;
         _selectedPrice = price;
         _amount = 500;
         _showAmountInput = true;
@@ -157,11 +163,13 @@ class _StressTestSearchSheetState
     if (isSetup) {
       success = await engine.buyAssetSetup(
         widget.sessionId, _selectedSymbol, _amount, _selectedPrice,
+        isEtf: _selectedIsEtf,
       );
     } else {
       // Active phase — use executeTrade
       final result = engine.executeTrade(
         widget.sessionId, _selectedSymbol, true, _amount,
+        isEtf: _selectedIsEtf,
       );
       success = result.success;
     }
@@ -353,7 +361,11 @@ class _StressTestSearchSheetState
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          onTap: () => _selectCompany(symbol, desc),
+                          onTap: () => _selectCompany(
+                            symbol,
+                            desc,
+                            isEtf: type.toUpperCase() == 'ETF',
+                          ),
                         );
                       },
                     ),

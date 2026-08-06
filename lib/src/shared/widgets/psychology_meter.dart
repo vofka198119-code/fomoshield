@@ -16,6 +16,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import '../../features/stress_test/stress_test_models.dart';
+import '../../features/stress_test/psychology_engine.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 
 /// Data for the Psychology Meter.
@@ -66,7 +67,7 @@ class PsychologyMeterData {
 
   factory PsychologyMeterData.fromProfile(TraderPsychologyProfile profile) {
     return PsychologyMeterData(
-      fsScore: (profile.compositeScore * 100).round().clamp(0, 100).toDouble(),
+      fsScore: (profile.compositeScore(0) * 100).round().clamp(0, 100).toDouble(),
       panicResistance: profile.panicResistance,
       discipline: profile.discipline,
       patience: profile.patience,
@@ -102,8 +103,13 @@ class PsychologyMeterData {
       tpd = totalTrades / elapsedDays.clamp(0.25, double.infinity);
     }
 
+    final safetyMarker = safetyMarkerFor(session.holdings).score;
+
     return PsychologyMeterData(
-      fsScore: (profile.compositeScore * 100).round().clamp(0, 100).toDouble(),
+      fsScore: (profile.compositeScore(safetyMarker) * 100)
+          .round()
+          .clamp(0, 100)
+          .toDouble(),
       panicResistance: profile.panicResistance,
       discipline: profile.discipline,
       patience: profile.patience,
@@ -307,7 +313,7 @@ class _PsychologyMeterBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _FsScoreRing(score: data.fsScore),
+        FsScoreRing(score: data.fsScore),
         const SizedBox(height: 20),
         _SubIndexRow(
           label: 'Panic',
@@ -337,10 +343,10 @@ class _PsychologyMeterBody extends StatelessWidget {
 /// needle pivoting from the dial's center pointing at the current score.
 /// The numeric readout sits in a small pill below the pivot, in the open
 /// bottom gap, occluding whatever part of the needle passes behind it.
-class _FsScoreRing extends StatelessWidget {
+class FsScoreRing extends StatelessWidget {
   final double score; // 0-100
 
-  const _FsScoreRing({required this.score});
+  const FsScoreRing({super.key, required this.score});
 
   Color get _color {
     if (score >= 70) return FomoShieldTheme.positive;
@@ -438,7 +444,7 @@ class _FsScoreRing extends StatelessWidget {
   }
 }
 
-/// Custom painter for the FS Score gauge dial — see _FsScoreRing.
+/// Custom painter for the FS Score gauge dial — see FsScoreRing.
 class _SpeedometerPainter extends CustomPainter {
   final double score;
   final Color needleColor;

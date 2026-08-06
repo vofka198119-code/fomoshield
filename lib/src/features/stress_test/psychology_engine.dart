@@ -302,10 +302,17 @@ StrategySubScores computeStrategySubScores({
   // penalty, ~15%+ invested in ETFs (doesn't matter how many, or whether
   // it's the whole portfolio) clears it entirely. All-in on ONE ETF still
   // gets caught by Concentration above — this only measures "is there any
-  // ETF ballast at all."
-  final etfValue = values.entries
-      .where((e) => resolveAssetSector(e.key) == AssetSector.etfBroadMarket)
-      .fold(0.0, (sum, e) => sum + e.value);
+  // ETF ballast at all." A holding counts as an ETF if it was tagged
+  // `type: 'ETF'` at buy time (h.isEtf — real Finnhub data, covers any
+  // ETF) OR falls in the small static AssetSector.etfBroadMarket list
+  // (covers holdings bought before isEtf existed, or via a path that
+  // doesn't have the search result's type).
+  final etfValue = holdings
+      .where(
+        (h) =>
+            h.isEtf || resolveAssetSector(h.symbol) == AssetSector.etfBroadMarket,
+      )
+      .fold(0.0, (sum, h) => sum + (values[h.symbol] ?? 0));
   final etfScore = (etfValue / total / 0.15).clamp(0.0, 1.0);
 
   final target =

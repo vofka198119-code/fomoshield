@@ -182,10 +182,25 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     } catch (_) {}
   }
 
-  /// Pushes the current active sessions to Supabase. Called only from
-  /// significant events (trade, start, complete, delete) — NOT from the
-  /// ~20s tick-simulation _save(), which would hammer Supabase with writes
-  /// for every user with the screen open.
+  /// Load the verdict archive (completed test results) from Supabase —
+  /// replaces local, same as loadFromSupabase above. Added 2026-08-06:
+  /// the archive used to be local-only, so it never survived a reinstall.
+  void loadVerdictArchiveFromSupabase(List<dynamic> rawArchive) {
+    if (rawArchive.isEmpty) return;
+    try {
+      _verdictArchive = rawArchive
+          .map((e) => VerdictArchiveEntry.fromJson(e as Map<String, dynamic>))
+          .toList();
+      _save();
+    } catch (_) {}
+  }
+
+  /// Pushes the current active sessions AND the verdict archive to
+  /// Supabase. Called only from significant events (trade, start,
+  /// complete, delete) — NOT from the ~20s tick-simulation _save(), which
+  /// would hammer Supabase with writes for every user with the screen
+  /// open. The archive push was added 2026-08-06 — it used to be
+  /// local-only, so a reinstall wiped every past verdict for good.
   void _syncToSupabase() {
     final uid = _userId;
     final service = _supabaseService;
@@ -193,6 +208,10 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     service.saveStressTestSessions(
       uid,
       state.map((s) => _sessionToJson(s)).toList(),
+    );
+    service.saveVerdictArchive(
+      uid,
+      _verdictArchive.map((e) => e.toJson()).toList(),
     );
   }
 
@@ -308,6 +327,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               'entryPrice': h.entryPrice,
               if (h.cachedLogoUrl != null) 'cachedLogoUrl': h.cachedLogoUrl,
               if (h.entryFsScore != null) 'entryFsScore': h.entryFsScore,
+              if (h.isEtf) 'isEtf': h.isEtf,
             },
           )
           .toList(),
@@ -377,6 +397,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               entryPrice: (h['entryPrice'] as num).toDouble(),
               cachedLogoUrl: h['cachedLogoUrl'] as String?,
               entryFsScore: (h['entryFsScore'] as num?)?.toDouble(),
+              isEtf: h['isEtf'] as bool? ?? false,
             ),
           )
           .toList(),

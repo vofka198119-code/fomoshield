@@ -21,6 +21,7 @@ import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'widgets/verdict/sector_diversification_tiers.dart';
 import 'widgets/verdict/safety_marker_tiers.dart';
+import 'widgets/verdict/sector_balance_tiers.dart';
 import 'widgets/verdict/verdict_tier.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
 
@@ -35,23 +36,22 @@ const Map<String, _MarkerInfo> _markers = {
   'panic': _MarkerInfo('Panic', _panicScore),
   'patience': _MarkerInfo('Patience', _patienceScore),
   'strategy': _MarkerInfo('Strategy', _strategyScore),
-  'diversification': _MarkerInfo('Diversification', _diversificationScore),
   'sector-diversification': _MarkerInfo(
     'Sector Diversification',
     _sectorDiversificationScore,
   ),
   'safety-marker': _MarkerInfo('Safety Marker', _safetyMarkerScore),
+  'sector-balance': _MarkerInfo('Sector Balance', _sectorBalanceScore),
 };
 
 double _disciplineScore(VerdictArchiveEntry e) => e.discipline;
 double _panicScore(VerdictArchiveEntry e) => e.panicResistance;
 double _patienceScore(VerdictArchiveEntry e) => e.patience;
 double _strategyScore(VerdictArchiveEntry e) => e.strategyAdherence;
-double _diversificationScore(VerdictArchiveEntry e) =>
-    (e.strategySector + e.strategyDiversification) / 2;
 double _sectorDiversificationScore(VerdictArchiveEntry e) =>
     e.strategyDiversification;
 double _safetyMarkerScore(VerdictArchiveEntry e) => e.safetyMarker;
+double _sectorBalanceScore(VerdictArchiveEntry e) => e.strategySector;
 
 /// Picks the long-form tier content for markers that have one — null for
 /// markers still on the generic threshold-based placeholder.
@@ -64,6 +64,8 @@ VerdictTier? _tierFor(String markerId, VerdictArchiveEntry entry) {
         entry.safetyMarker,
         entry.safetyMarkerHasData,
       );
+    case 'sector-balance':
+      return sectorBalanceTierFor(entry.strategySector, entry.holdingCount);
     default:
       return null;
   }

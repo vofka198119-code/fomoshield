@@ -1,7 +1,11 @@
 // ---------------------------------------------------------------------------
 // Stress Test — Strategy card, standalone marker widget on the Psychology
-// Meter detail screen. 5 independent bars — the same 5 signals blended
-// into profile.strategyAdherence, shown here broken out instead of merged.
+// Meter detail screen. Shows the 3 signals blended into
+// profile.strategyAdherence that AREN'T already broken out elsewhere:
+// Concentration, ETF Exposure, Cash Buffer. Diversification and Sector
+// Balance (the other 2 of the 5) live in their own PsychologyDiversificationCard
+// instead — showing them here too was a confirmed duplicate (2026-08-06),
+// removed rather than kept for a "full picture in one place" view.
 // Recomputed live from the CURRENT portfolio via computeStrategySubScores
 // (psychology_engine.dart) — always agrees with the engine's own math.
 // ---------------------------------------------------------------------------
@@ -31,9 +35,7 @@ class PsychologyStrategyCard extends StatelessWidget {
       infoId: 'psychology-strategy',
       child: Column(
         children: [
-          _bar('Diversification', scores.diversification),
           _bar('Concentration', scores.concentration),
-          _bar('Sector Balance', scores.sector),
           _bar('ETF Exposure', scores.etf),
           _bar('Cash Buffer', scores.cashBuffer),
         ],

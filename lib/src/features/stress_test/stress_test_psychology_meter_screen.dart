@@ -30,6 +30,9 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(stressTestRefreshProvider);
     final session = ref.watch(stressTestSessionProvider(sessionId));
+    final data = session == null
+        ? null
+        : PsychologyMeterData.fromSession(session);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -54,12 +57,14 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: session == null
+      body: session == null || data == null
           ? const SizedBox.shrink()
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
+                  _FsScoreGaugeCard(data: data),
+                  const SizedBox(height: 16),
                   PsychologyDisciplineCard(
                     discipline: session.psychologyProfile.discipline,
                   ),
@@ -76,13 +81,48 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   PsychologyDiversificationCard(session: session),
                   const SizedBox(height: 16),
-                  _PsychologyMeterDetailCard(
-                    data: PsychologyMeterData.fromSession(session),
-                  ),
+                  _PsychologyMeterDetailCard(data: data),
                   const StressTestVerdictDisclaimer(),
                 ],
               ),
             ),
+    );
+  }
+}
+
+/// Duplicates the FS Score speedometer gauge (also shown compact on the
+/// main Stress Test screen's PsychologyMeter card) here on the detail
+/// screen too — same light card shell as the other detail-screen cards.
+class _FsScoreGaugeCard extends StatelessWidget {
+  final PsychologyMeterData data;
+
+  const _FsScoreGaugeCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: FomoShieldTheme.cardDecoration,
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+            child: Text('FS SCORE', style: FomoShieldTheme.cardTitle()),
+          ),
+          Divider(
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Colors.black.withValues(alpha: 0.06),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
+            child: FsScoreRing(score: data.fsScore),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -268,3 +268,18 @@ DROP FUNCTION IF EXISTS public.auto_confirm_email();
 -- =============================================================================
 
 DROP TRIGGER IF EXISTS on_auth_user_created_confirm ON auth.users;
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 007
+-- Table: user_data (ALTER)
+-- Description: Completed stress-test verdicts (VerdictArchiveEntry — the
+--              archived results/scores from every finished test) were only
+--              ever persisted to local SharedPreferences, never synced to
+--              Supabase like Migration 004 did for active sessions. Confirmed
+--              real data loss 2026-08-06: a phone-side reinstall wiped every
+--              past verdict with no way to recover it. This column is the fix.
+-- =============================================================================
+
+ALTER TABLE public.user_data
+ADD COLUMN IF NOT EXISTS stress_test_verdicts JSONB NOT NULL DEFAULT '[]'::jsonb;

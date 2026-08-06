@@ -883,6 +883,19 @@ class StressTestHolding {
   /// (funds/ETFs) — excluded from the Safety Marker average in that case.
   final double? entryFsScore;
 
+  /// True when Finnhub's search result for this symbol was tagged
+  /// `type: 'ETF'` at the moment it was bought (see
+  /// stress_test_search_sheet.dart's onTap → _selectCompany). Feeds the
+  /// Strategy pillar's ETF Exposure signal directly — added 2026-08-06
+  /// after confirmed bug: real ETFs outside the small hardcoded
+  /// `AssetSector.etfBroadMarket` ticker list (e.g. SCJ, PPH) never moved
+  /// that bar, since sector-based classification has no general "is this
+  /// an ETF" detector. Defaults false for holdings bought before this
+  /// field existed, or via a path that doesn't have the search result's
+  /// `type` (see computeStrategySubScores — ORs this with the old
+  /// sector-based check, doesn't replace it).
+  final bool isEtf;
+
   const StressTestHolding({
     required this.symbol,
     required this.shares,
@@ -890,6 +903,7 @@ class StressTestHolding {
     required this.entryPrice,
     this.cachedLogoUrl,
     this.entryFsScore,
+    this.isEtf = false,
   });
 
   /// Alias for [avgCost] — the average purchase price of the position.
@@ -1593,8 +1607,12 @@ class StressTestAnalytics {
         ? (session.cash / session.totalValue * 100)
         : 0.0;
 
-    // Derived audit labels
-    final fsVal = (profile.compositeScore * 100).round().clamp(0, 100);
+    // Derived audit labels. Safety Marker isn't folded in here (0
+    // passed) — this whole StressTestAnalytics factory has no live UI
+    // consumer (see stressTestAnalyticsProvider), and pulling in
+    // psychology_engine.dart's safetyMarkerFor() would create a circular
+    // import (that file already imports this one for StressTestHolding).
+    final fsVal = (profile.compositeScore(0) * 100).round().clamp(0, 100);
     final auditTitle = _deriveAuditTitle(fsVal, profile);
     final auditSubtitle = _deriveAuditSubtitle(profile, tpd, sectors.length);
     final activeRiskLabel = _deriveActiveRisk(

@@ -19,6 +19,7 @@ import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'widgets/verdict_trade_breakdown_widget.dart';
 import 'widgets/verdict/verdict_marker_card.dart';
+import 'widgets/verdict/verdict_diversification_card.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
 
 class VerdictScreen extends ConsumerWidget {
@@ -155,25 +156,11 @@ class VerdictScreen extends ConsumerWidget {
               score: entry.strategyAdherence,
             ),
             const SizedBox(height: 12),
-            VerdictMarkerCard(
+            VerdictDiversificationCard(
               sessionId: sessionId,
-              markerId: 'diversification',
-              label: 'Diversification',
-              score: (entry.strategySector + entry.strategyDiversification) / 2,
-            ),
-            const SizedBox(height: 12),
-            VerdictMarkerCard(
-              sessionId: sessionId,
-              markerId: 'sector-diversification',
-              label: 'Sector Diversification',
-              score: entry.strategyDiversification,
-            ),
-            const SizedBox(height: 12),
-            VerdictMarkerCard(
-              sessionId: sessionId,
-              markerId: 'safety-marker',
-              label: 'Safety Marker',
-              score: entry.safetyMarker,
+              sectorDiversificationScore: entry.strategyDiversification,
+              safetyMarkerScore: entry.safetyMarker,
+              sectorBalanceScore: entry.strategySector,
             ),
             const StressTestVerdictDisclaimer(),
             const SizedBox(height: 24),

@@ -35,7 +35,9 @@ class UserDataService {
     try {
       final response = await _client
           .from('user_data')
-          .select('portfolios, watchlist, widget_order, orders, stress_test_sessions')
+          .select(
+            'portfolios, watchlist, widget_order, orders, stress_test_sessions, stress_test_verdicts',
+          )
           .eq('id', userId)
           .maybeSingle();
 
@@ -46,6 +48,7 @@ class UserDataService {
           'widget_order': [],
           'orders': [],
           'stress_test_sessions': [],
+          'stress_test_verdicts': [],
         };
       }
 
@@ -55,6 +58,7 @@ class UserDataService {
         'widget_order': _decodeJsonList(response['widget_order']),
         'orders': _decodeJsonList(response['orders']),
         'stress_test_sessions': _decodeJsonList(response['stress_test_sessions']),
+        'stress_test_verdicts': _decodeJsonList(response['stress_test_verdicts']),
       };
     } catch (e) {
       debugPrint('🔄 userDataService.loadAll($userId) failed: $e');
@@ -64,6 +68,7 @@ class UserDataService {
         'widget_order': [],
         'orders': [],
         'stress_test_sessions': [],
+        'stress_test_verdicts': [],
       };
     }
   }
@@ -116,6 +121,23 @@ class UserDataService {
       await _client.from('user_data').upsert({
         'id': userId,
         'stress_test_sessions': sessions,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    } catch (_) {}
+  }
+
+  // ── Save stress-test verdict archive ──────────────────────────────
+  // The completed-test results (scores/tiers) — same "significant events
+  // only" cadence as saveStressTestSessions above. Added 2026-08-06 after
+  // confirmed data loss: this was local-only before, so a reinstall wiped
+  // every past verdict with nothing to restore from.
+
+  Future<void> saveVerdictArchive(
+      String userId, List<Map<String, dynamic>> archive) async {
+    try {
+      await _client.from('user_data').upsert({
+        'id': userId,
+        'stress_test_verdicts': archive,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (_) {}
@@ -210,5 +232,13 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
   final stressTestSessions = data['stress_test_sessions'] as List<dynamic>;
   if (stressTestSessions.isNotEmpty) {
     ref.read(stressTestProvider.notifier).loadFromSupabase(stressTestSessions);
+  }
+
+  // Load stress-test verdict archive
+  final stressTestVerdicts = data['stress_test_verdicts'] as List<dynamic>;
+  if (stressTestVerdicts.isNotEmpty) {
+    ref
+        .read(stressTestProvider.notifier)
+        .loadVerdictArchiveFromSupabase(stressTestVerdicts);
   }
 });

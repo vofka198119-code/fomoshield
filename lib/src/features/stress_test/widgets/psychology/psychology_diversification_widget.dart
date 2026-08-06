@@ -1,10 +1,13 @@
 // ---------------------------------------------------------------------------
 // Stress Test — Diversification card, standalone marker widget on the
-// Psychology Meter detail screen. 3 bars: Sector Balance + Count Balance
-// (same 2 signals reused from computeStrategySubScores, shown here as
-// their own detail view) + Safety Marker — cost-basis-weighted average of
-// each holding's FS Score at the moment of its FIRST purchase (see
-// safetyMarkerFor/entryFsScore), flagging portfolios built on "junk"
+// Psychology Meter detail screen. 3 bars, named to match their Session
+// Complete verdict-card counterparts exactly (widgets/verdict/): Sector
+// Balance (scores.sector, % of capital in the largest GICS sector) +
+// Sector Diversification (scores.diversification, the holdings-COUNT
+// curve — same signal sector_diversification_tiers.dart's tiers are keyed
+// on, despite the "sector" name) + Safety Marker — cost-basis-weighted
+// average of each holding's FS Score at the moment of its FIRST purchase
+// (see safetyMarkerFor/entryFsScore), flagging portfolios built on "junk"
 // (penny-stock trap, dividend trap) rather than real fundamentals.
 // ---------------------------------------------------------------------------
 
@@ -35,7 +38,7 @@ class PsychologyDiversificationCard extends StatelessWidget {
       child: Column(
         children: [
           _bar('Sector Balance', scores.sector * 100),
-          _bar('Count Balance', scores.diversification * 100),
+          _bar('Sector Diversification', scores.diversification * 100),
           _bar('Safety Marker', safety.score * 100),
         ],
       ),
