@@ -22,6 +22,7 @@ import 'stress_test_models.dart';
 import 'widgets/verdict/sector_diversification_tiers.dart';
 import 'widgets/verdict/safety_marker_tiers.dart';
 import 'widgets/verdict/sector_balance_tiers.dart';
+import 'widgets/verdict/concentration_tiers.dart';
 import 'widgets/verdict/verdict_tier.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
 
@@ -42,6 +43,7 @@ const Map<String, _MarkerInfo> _markers = {
   ),
   'safety-marker': _MarkerInfo('Safety Marker', _safetyMarkerScore),
   'sector-balance': _MarkerInfo('Sector Balance', _sectorBalanceScore),
+  'concentration': _MarkerInfo('Concentration', _concentrationScore),
 };
 
 double _disciplineScore(VerdictArchiveEntry e) => e.discipline;
@@ -52,6 +54,7 @@ double _sectorDiversificationScore(VerdictArchiveEntry e) =>
     e.strategyDiversification;
 double _safetyMarkerScore(VerdictArchiveEntry e) => e.safetyMarker;
 double _sectorBalanceScore(VerdictArchiveEntry e) => e.strategySector;
+double _concentrationScore(VerdictArchiveEntry e) => e.strategyConcentration;
 
 /// Picks the long-form tier content for markers that have one — null for
 /// markers still on the generic threshold-based placeholder.
@@ -66,6 +69,11 @@ VerdictTier? _tierFor(String markerId, VerdictArchiveEntry entry) {
       );
     case 'sector-balance':
       return sectorBalanceTierFor(entry.strategySector, entry.holdingCount);
+    case 'concentration':
+      return concentrationTierFor(
+        entry.strategyConcentration,
+        entry.holdingCount,
+      );
     default:
       return null;
   }

@@ -162,6 +162,13 @@ class VerdictScreen extends ConsumerWidget {
               safetyMarkerScore: entry.safetyMarker,
               sectorBalanceScore: entry.strategySector,
             ),
+            const SizedBox(height: 12),
+            VerdictMarkerCard(
+              sessionId: sessionId,
+              markerId: 'concentration',
+              label: 'Concentration',
+              score: entry.strategyConcentration,
+            ),
             const StressTestVerdictDisclaimer(),
             const SizedBox(height: 24),
 
