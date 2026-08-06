@@ -85,18 +85,32 @@ class FinnhubService {
     final cached = _getCached(cacheKey);
     if (cached != null) return cached.data as Map<String, dynamic>;
 
-    final response = await _backendDio.get(path, queryParameters: params);
-    if (response.data is! Map) {
-      throw Exception(
-        'Backend $path: unexpected response type ${response.data.runtimeType}',
-      );
+    try {
+      final response = await _backendDio.get(path, queryParameters: params);
+      if (response.data is! Map) {
+        throw Exception(
+          'Backend $path: unexpected response type ${response.data.runtimeType}',
+        );
+      }
+      final data = Map<String, dynamic>.from(response.data);
+      if (data.containsKey('error')) {
+        throw Exception('Backend $path: ${data['error']}');
+      }
+      _setCache(cacheKey, data);
+      return data;
+    } catch (e) {
+      // A stale (past-TTL) entry beats no data at all — e.g. a portfolio
+      // holding's price falling back to null/avgCost on a transient quote
+      // failure used to render as a false $0.00 unrealized P&L. Only kicks
+      // in when this same key was successfully fetched at some earlier
+      // point in this FinnhubService instance's lifetime.
+      final stale = _cache[cacheKey];
+      if (stale != null) {
+        debugPrint('🖥️ ⚠️ Backend $path failed, serving stale cache: $e');
+        return stale.data as Map<String, dynamic>;
+      }
+      rethrow;
     }
-    final data = Map<String, dynamic>.from(response.data);
-    if (data.containsKey('error')) {
-      throw Exception('Backend $path: ${data['error']}');
-    }
-    _setCache(cacheKey, data);
-    return data;
   }
 
   /// Get from scanco-backend (top-level JSON array). See [_getFromBackend].
