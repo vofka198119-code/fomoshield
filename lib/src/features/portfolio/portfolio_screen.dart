@@ -16,6 +16,7 @@ import 'widgets/portfolio_summary_widget.dart';
 import 'widgets/target_widget.dart';
 import 'widgets/portfolio_allocation_widget.dart';
 import 'widgets/portfolio_holdings_widget.dart';
+import 'widgets/portfolio_trade_history_widget.dart';
 import '../home/widgets/portfolio_journal_widget.dart';
 import '../home/widgets/historical_sim_widget.dart';
 import '../home/widgets/scenario_compare_widget.dart';
@@ -690,6 +691,11 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             emptyPortfolioName: performance.name,
           ),
         );
+      case 'trade_history':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: PortfolioTradeHistoryWidget(portfolioId: widget.portfolioId),
+        );
       case 'portfolio_journal':
         return const Padding(
           padding: EdgeInsets.only(bottom: 24),
@@ -928,6 +934,8 @@ class _PortfolioWidgetsSettingsSheetState
         return Icons.pie_chart_rounded;
       case 'portfolio_holdings':
         return Icons.view_list_rounded;
+      case 'trade_history':
+        return Icons.receipt_long_rounded;
       case 'portfolio_journal':
         return Icons.auto_stories_rounded;
       case 'historical_sim':

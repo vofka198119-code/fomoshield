@@ -31,6 +31,12 @@ import '../../features/stress_test/stress_test_analytics_screen.dart';
 import '../../features/stress_test/stress_test_hub_screen.dart';
 import '../../features/stress_test/stress_test_portfolio_balance_screen.dart';
 import '../../features/stress_test/stress_test_psychology_meter_screen.dart';
+import '../../features/stress_test/stress_test_trade_history_screen.dart';
+import '../../features/stress_test/stress_test_trade_detail_screen.dart';
+import '../../features/stress_test/stress_test_models.dart' show StressTestTrade;
+import '../../features/portfolio/screens/portfolio_trade_history_screen.dart';
+import '../../features/portfolio/screens/portfolio_trade_detail_screen.dart';
+import '../../features/portfolio/portfolio_providers.dart' show Transaction;
 import '../../features/assets/screens/assets_screen.dart';
 import '../../features/assets/screens/stock_detail_screen.dart';
 import '../../features/assets/screens/why_today_screen.dart';
@@ -206,6 +212,25 @@ class AppRouter {
           return StressTestPsychologyMeterScreen(sessionId: id);
         },
       ),
+      GoRoute(
+        path: '/stress-test/:id/trade-history',
+        name: 'stressTestTradeHistory',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return StressTestTradeHistoryScreen(sessionId: id);
+        },
+      ),
+      GoRoute(
+        path: '/stress-test/:id/trade-detail',
+        name: 'stressTestTradeDetail',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return StressTestTradeDetailScreen(
+            sessionId: id,
+            trade: state.extra as StressTestTrade?,
+          );
+        },
+      ),
 
       // ── Assets (Trading 212-style screens, inside stress test) ──
       GoRoute(
@@ -288,6 +313,25 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return SetGoalScreen(portfolioId: id);
+        },
+      ),
+      GoRoute(
+        path: '/portfolio/:id/trade-history',
+        name: 'portfolioTradeHistory',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return PortfolioTradeHistoryScreen(portfolioId: id);
+        },
+      ),
+      GoRoute(
+        path: '/portfolio/:id/trade-detail',
+        name: 'portfolioTradeDetail',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return PortfolioTradeDetailScreen(
+            portfolioId: id,
+            transaction: state.extra as Transaction?,
+          );
         },
       ),
 

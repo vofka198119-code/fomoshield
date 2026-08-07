@@ -25,6 +25,7 @@ import '../../core/cache/logo_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 
 import '../../shared/widgets/disclaimer_footer.dart';
+import '../../shared/widgets/trade_history_tile.dart';
 
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
@@ -54,7 +55,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   Timer? _timelineTimer;
   int _tick = 0;
   bool _showAllAssets = false;
-  bool _showAllTrades = false;
   // Guards the auto-navigate-to-verdict side effect (see
   // _handleCompletionIfNeeded) against firing twice for the same session
   // completion — both the ref.listen transition and the Finish Test
@@ -541,9 +541,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       case 'trade_history':
         if (session.trades.isEmpty) return const SizedBox.shrink();
         final allTrades = session.trades.reversed.toList();
-        final displayTrades = _showAllTrades
-            ? allTrades
-            : allTrades.take(5).toList();
+        final displayTrades = allTrades.take(5).toList();
         return _buildSectionCard(
           title: 'TRADE HISTORY',
           noInnerPadding: true,
@@ -555,11 +553,25 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 endIndent: 16,
                 color: Colors.black.withValues(alpha: 0.06),
               ),
-              ...displayTrades.map((t) => _buildTradeTile(t)),
+              ...displayTrades.asMap().entries.map(
+                (entry) => TradeHistoryTile(
+                  symbol: entry.value.symbol,
+                  companyName: _companyName(entry.value.symbol),
+                  isBuy: entry.value.isBuy,
+                  totalValue: entry.value.shares * entry.value.price,
+                  showDivider: entry.key != displayTrades.length - 1,
+                  onTap: () => context.push(
+                    '/stress-test/${widget.sessionId}/trade-detail',
+                    extra: entry.value,
+                  ),
+                ),
+              ),
               if (allTrades.length > 5) ...[
                 const SizedBox(height: 6),
                 GestureDetector(
-                  onTap: () => setState(() => _showAllTrades = !_showAllTrades),
+                  onTap: () => context.push(
+                    '/stress-test/${widget.sessionId}/trade-history',
+                  ),
                   child: Container(
                     margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     width: double.infinity,
@@ -570,9 +582,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        _showAllTrades
-                            ? 'Less'
-                            : 'More (${allTrades.length - 5})',
+                        'More (${allTrades.length - 5})',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -1179,122 +1189,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Trade Tile ─────────────────────────────────────────────────
-
-  Widget _buildTradeTile(StressTestTrade trade) {
-    final totalValue = trade.shares * trade.price;
-
-    return Container(
-      key: ValueKey('${trade.date.millisecondsSinceEpoch}_${trade.symbol}'),
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: ThemeV2.surface,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          // ── Logo ──
-          Consumer(
-            builder: (context, ref, _) {
-              final logoAsync = ref.watch(cachedLogoProvider(trade.symbol));
-              return Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: trade.isBuy
-                        ? ThemeV2.success.withValues(alpha: 0.3)
-                        : ThemeV2.loss.withValues(alpha: 0.3),
-                    width: 1.5,
-                  ),
-                ),
-                padding: const EdgeInsets.all(2),
-                child: ClipOval(
-                  child: SizedBox(
-                    width: 34,
-                    height: 34,
-                    child: logoAsync.when(
-                      data: (url) => CompanyLogo(
-                        ticker: trade.symbol,
-                        logoUrl: url,
-                        radius: 17,
-                      ),
-                      error: (_, _) =>
-                          CompanyLogo(ticker: trade.symbol, radius: 17),
-                      loading: () =>
-                          CompanyLogo(ticker: trade.symbol, radius: 17),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 12),
-          // ── Company name + shares ──
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _companyName(trade.symbol),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${trade.shares.toStringAsFixed(4)} ${trade.symbol}',
-                  style: interNums(fontSize: 11, color: ThemeV2.textSecondary),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          // ── Total sum + BUY/SELL chip ──
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '\$${_fmtPosition(totalValue)}',
-                style: interNums(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: ThemeV2.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: trade.isBuy
-                      ? ThemeV2.success.withValues(alpha: 0.12)
-                      : ThemeV2.loss.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  trade.isBuy ? 'BUY' : 'SELL',
-                  style: GoogleFonts.inter(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    color: trade.isBuy ? ThemeV2.success : ThemeV2.loss,
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),

@@ -47,9 +47,8 @@ class OrderNotifier extends StateNotifier<List<Order>> {
   // AFTER loadFromSupabase() and clobbering the just-synced server data.
   bool _loadedFromSupabase = false;
 
-  OrderNotifier(this._service, {required String? userId})
-      : _userId = userId,
-        super([]) {
+  OrderNotifier(this._service, {required this._userId})
+      : super([]) {
     _loadLocal();
   }
 
@@ -360,7 +359,36 @@ final ordersProvider =
 
   // Connect to portfolio: when orders fill, add transactions
   notifier.onTransaction = (portfolioId, tx) {
-    ref.read(portfoliosProvider.notifier).addTransaction(portfolioId, tx);
+    // Stamp realized P&L on sells, same avg-cost formula Portfolio.holdings
+    // already uses — computed against the portfolio's state *before* this
+    // fill is appended, since that's the cost basis the shares were
+    // actually sold against.
+    var enrichedTx = tx;
+    if (tx.type == TransactionType.sell) {
+      final preSalePortfolios = ref.read(portfoliosProvider);
+      Portfolio? preSalePortfolio;
+      for (final p in preSalePortfolios) {
+        if (p.id == portfolioId) {
+          preSalePortfolio = p;
+          break;
+        }
+      }
+      final held = preSalePortfolio?.holdings[tx.symbol];
+      if (held != null && (held['shares'] ?? 0) > 0) {
+        final avgCost = held['cost']! / held['shares']!;
+        enrichedTx = Transaction(
+          symbol: tx.symbol,
+          type: tx.type,
+          shares: tx.shares,
+          price: tx.price,
+          date: tx.date,
+          orderId: tx.orderId,
+          realizedPnl: (tx.price - avgCost) * tx.shares,
+        );
+      }
+    }
+
+    ref.read(portfoliosProvider.notifier).addTransaction(portfolioId, enrichedTx);
 
     // A sell just reduced (or could reduce) held shares — any other
     // pending sell order for the same symbol may no longer have enough

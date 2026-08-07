@@ -15,6 +15,7 @@ const List<String> _defaultPortfolioWidgetOrder = [
   'target',
   'portfolio_allocation',
   'portfolio_holdings',
+  'trade_history',
   'portfolio_journal',
   'historical_sim',
   'scenario_compare',
@@ -43,6 +44,8 @@ class PortfolioWidgetConfig {
         return 'Allocation';
       case 'portfolio_holdings':
         return 'Holdings';
+      case 'trade_history':
+        return 'Trade History';
       case 'portfolio_journal':
         return 'Portfolio Journal';
       case 'historical_sim':

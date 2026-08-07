@@ -339,6 +339,7 @@ class OrderExecutionService {
       shares: fillQuantity,
       price: executionPrice,
       date: DateTime.now(),
+      orderId: order.orderId,
     );
 
     return OrderExecutionResult(

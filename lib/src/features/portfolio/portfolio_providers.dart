@@ -19,6 +19,15 @@ class Transaction {
   final double shares;
   final double price;
   final DateTime date;
+  // Links back to the Order that produced this fill (see order_model.dart /
+  // order_execution_service.dart) so a trade-detail screen can show how the
+  // trade was executed (market/limit/stop) and its limit price. Null for
+  // transactions created before this field existed.
+  final String? orderId;
+  // Realized P&L on sells, avg-cost matched against holdings at the moment
+  // of sale (same formula as Portfolio.holdings below). Null for buys and
+  // for transactions created before this field existed.
+  final double? realizedPnl;
 
   const Transaction({
     required this.symbol,
@@ -26,6 +35,8 @@ class Transaction {
     required this.shares,
     required this.price,
     required this.date,
+    this.orderId,
+    this.realizedPnl,
   });
 
   Map<String, dynamic> toJson() => {
@@ -34,6 +45,8 @@ class Transaction {
         'shares': shares,
         'price': price,
         'date': date.toIso8601String(),
+        'orderId': orderId,
+        'realizedPnl': realizedPnl,
       };
 
   factory Transaction.fromJson(Map<String, dynamic> json) => Transaction(
@@ -43,6 +56,8 @@ class Transaction {
         shares: (json['shares'] as num).toDouble(),
         price: (json['price'] as num).toDouble(),
         date: DateTime.parse(json['date'] as String),
+        orderId: json['orderId'] as String?,
+        realizedPnl: (json['realizedPnl'] as num?)?.toDouble(),
       );
 }
 

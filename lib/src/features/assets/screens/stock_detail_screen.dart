@@ -28,7 +28,6 @@ import 'stock_detail/widgets/stock_sparkline_chart.dart';
 import 'stock_detail/widgets/stock_position_card.dart';
 import 'stock_detail/widgets/stock_why_today_card.dart';
 import 'stock_detail/widgets/stock_limit_orders_section.dart';
-import 'stock_detail/widgets/stock_transaction_history.dart';
 
 class StockDetailScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -344,7 +343,6 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                           ? session.explanationLog[widget.symbol]!.last.contributions.noisePct
                           : null,
                     ),
-                    StockTransactionHistory(symbol: widget.symbol, session: session),
                     StockLimitOrdersSection(
                       sessionId: widget.sessionId,
                       symbol: widget.symbol,
