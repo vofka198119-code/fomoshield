@@ -51,6 +51,26 @@ double diversificationScoreForCount(double count) {
   return stops.last.value;
 }
 
+// ETF Exposure score vs. count of DISTINCT ETFs held — non-monotonic, peaks
+// at 2-3 (enough for broad-market ballast without duplicating the same
+// index under different tickers). Step function, not interpolated, since
+// the input is always a small integer — keep the bands in sync with
+// etf_exposure_tiers.dart's verdict copy:
+//   0     No Safety Net — no index-fund ballast at all
+//   1     A Step Toward Stability — a start, still stock-picking-dependent
+//   2-3   A Strong Core — the intended sweet spot (broad market + optional
+//         international/bonds), the ideal
+//   4-6   Broadly Diversified — still good, first real overlaps appear
+//   7+    Too Many Roads to the Same Destination — safe but redundant,
+//         dilutes any edge from picking individual stocks
+double etfExposureScoreForCount(int etfCount) {
+  if (etfCount <= 0) return 10;
+  if (etfCount == 1) return 35;
+  if (etfCount <= 3) return 95;
+  if (etfCount <= 6) return 85;
+  return 70;
+}
+
 /// A symbol's price range across the WHOLE test, not just the current
 /// epoch — used to judge how close a sale was to the test's real bottom
 /// (panic-selling severity), regardless of which epoch it happened in.
@@ -298,22 +318,20 @@ StrategySubScores computeStrategySubScores({
   final maxSectorPct = sectorTotals.values.reduce(math.max) / total;
   final sectorScore = (1 - maxSectorPct).clamp(0.0, 1.0);
 
-  // ETF exposure — scaled, not binary: 0% invested in an ETF is the full
-  // penalty, ~15%+ invested in ETFs (doesn't matter how many, or whether
-  // it's the whole portfolio) clears it entirely. All-in on ONE ETF still
-  // gets caught by Concentration above — this only measures "is there any
-  // ETF ballast at all." A holding counts as an ETF if it was tagged
-  // `type: 'ETF'` at buy time (h.isEtf — real Finnhub data, covers any
-  // ETF) OR falls in the small static AssetSector.etfBroadMarket list
-  // (covers holdings bought before isEtf existed, or via a path that
+  // ETF exposure — keyed by COUNT of distinct ETFs held, not their %
+  // of portfolio value (see etfExposureScoreForCount: peaks at 2-3, more
+  // is redundant, not better). A holding counts as an ETF if it was
+  // tagged `type: 'ETF'` at buy time (h.isEtf — real Finnhub data,
+  // covers any ETF) OR falls in the small static AssetSector.etfBroadMarket
+  // list (covers holdings bought before isEtf existed, or via a path that
   // doesn't have the search result's type).
-  final etfValue = holdings
+  final etfCount = holdings
       .where(
         (h) =>
             h.isEtf || resolveAssetSector(h.symbol) == AssetSector.etfBroadMarket,
       )
-      .fold(0.0, (sum, h) => sum + (values[h.symbol] ?? 0));
-  final etfScore = (etfValue / total / 0.15).clamp(0.0, 1.0);
+      .length;
+  final etfScore = etfExposureScoreForCount(etfCount) / 100;
 
   final target =
       diversificationScore * 0.30 +

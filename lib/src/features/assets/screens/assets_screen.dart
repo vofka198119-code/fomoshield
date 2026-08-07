@@ -108,7 +108,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     final totalValue = session.totalValue;
     final startCash = session.startingCash;
     final unrealizedPnl = session.unrealizedPnl;
-    final pnlPercent = session.profitLossPercent;
+    final pnlPercent = session.unrealizedPnlPercent;
     final isPositive = unrealizedPnl >= 0;
 
     return Scaffold(

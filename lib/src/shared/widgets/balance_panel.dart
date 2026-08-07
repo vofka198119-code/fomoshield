@@ -23,8 +23,8 @@ class BalancePanel extends StatelessWidget {
     final textColor = isDark ? Colors.white : Colors.black87;
     final subTextColor = isDark ? ThemeV2.textSecondary : Colors.black54;
     final totalValue = session.totalValue;
-    final pnl = session.profitLoss;
-    final pnlPercent = session.profitLossPercent;
+    final pnl = session.unrealizedPnl;
+    final pnlPercent = session.unrealizedPnlPercent;
     final isPositive = pnl >= 0;
 
     return Container(

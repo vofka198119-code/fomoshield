@@ -1,0 +1,183 @@
+// ---------------------------------------------------------------------------
+// Shared row: color bar + window border + name + "?" + score, no progress
+// bar. Used both inside multi-row combo cards (VerdictDiversificationCard,
+// VerdictStrategyCard) and, via VerdictSingleMarkerCard, as a standalone
+// one-row card for markers that don't share a combo (Discipline/Panic/
+// Patience). One shape everywhere on Session Complete — see 2026-08-06/07
+// visual-parity asks.
+// ---------------------------------------------------------------------------
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/theme/theme_v2.dart';
+import '../../../../core/theme/fomo_shield_theme.dart';
+
+class VerdictMarkerRow extends StatelessWidget {
+  final String sessionId;
+  final String markerId;
+  final String label;
+  final double score; // 0.0-1.0
+
+  const VerdictMarkerRow({
+    super.key,
+    required this.sessionId,
+    required this.markerId,
+    required this.label,
+    required this.score,
+  });
+
+  Color get _color {
+    if (score >= 0.7) return ThemeV2.success;
+    if (score >= 0.4) return ThemeV2.warning;
+    return ThemeV2.loss;
+  }
+
+  String get _statusWord {
+    if (score >= 0.7) return 'Good';
+    if (score >= 0.4) return 'Fair';
+    return 'Needs Work';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _color;
+    final percent = (score * 100).clamp(0.0, 100.0);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 36,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: FomoShieldTheme.text,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: () => context.push(
+                    '/stress-test/$sessionId/verdict/marker/$markerId',
+                  ),
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.help_outline_rounded,
+                      size: 13,
+                      color: FomoShieldTheme.textLight,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${percent.round()}',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: color,
+                  letterSpacing: -1,
+                ),
+              ),
+              Text(
+                _statusWord,
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One-row version of the DIVERSIFICATION/STRATEGY combo-card shape, for
+/// markers that stand alone (Discipline/Panic/Patience) rather than
+/// sharing a card with siblings.
+class VerdictSingleMarkerCard extends StatelessWidget {
+  final String sessionId;
+  final String markerId;
+  final String title; // card header, e.g. 'DISCIPLINE'
+  final String label; // row label, e.g. 'Discipline'
+  final double score; // 0.0-1.0
+
+  const VerdictSingleMarkerCard({
+    super.key,
+    required this.sessionId,
+    required this.markerId,
+    required this.title,
+    required this.label,
+    required this.score,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: FomoShieldTheme.cardDecoration,
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+            child: Text(title, style: FomoShieldTheme.cardTitle()),
+          ),
+          Divider(
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Colors.black.withValues(alpha: 0.06),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
+            child: VerdictMarkerRow(
+              sessionId: sessionId,
+              markerId: markerId,
+              label: label,
+              score: score,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

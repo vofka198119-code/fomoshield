@@ -390,11 +390,11 @@ class StressTestWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${session.profitLoss >= 0 ? '+' : '-'}\$${session.profitLoss.abs().toStringAsFixed(0)}',
+                  '${session.unrealizedPnl >= 0 ? '+' : '-'}\$${session.unrealizedPnl.abs().toStringAsFixed(0)}',
                   style: interNums(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: session.profitLoss >= 0
+                    color: session.unrealizedPnl >= 0
                         ? ThemeV2.success
                         : ThemeV2.loss,
                   ),

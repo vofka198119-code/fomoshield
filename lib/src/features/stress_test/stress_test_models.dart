@@ -1187,6 +1187,17 @@ class StressTestSession {
   /// Total unrealized (paper) profit/loss.
   double get unrealizedPnl => profitLoss - realizedPnl;
 
+  /// Unrealized P&L as a percentage of the cost basis of currently held
+  /// positions — matches positionPnLPercent's per-symbol convention (%
+  /// vs. cost, not vs. current value). 0 if nothing is currently held.
+  double get unrealizedPnlPercent {
+    final costBasis = holdings.fold(
+      0.0,
+      (sum, h) => sum + h.shares * h.avgCost,
+    );
+    return costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
+  }
+
   /// Per-symbol unrealized P&L in dollars.
   /// Возвращает 0.0 для активов в периоде стабилизации.
   Map<String, double> get positionPnL {

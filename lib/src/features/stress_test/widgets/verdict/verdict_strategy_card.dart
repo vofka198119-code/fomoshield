@@ -1,64 +1,58 @@
 // ---------------------------------------------------------------------------
-// Session Complete screen — combined "DIVERSIFICATION" card, replacing 3
-// separate VerdictMarkerCard instances (Sector Diversification, Safety
-// Marker, Sector Balance) with one card, 3 rows. Matches the Psychology
-// Meter's own PsychologyDiversificationCard naming/grouping.
-//
-// Visual: light-theme adaptation of company_detail/financial_score_widget's
-// _MarkerCard (color indicator bar + window border + name + "?" + score) —
-// same shape, but on FomoShieldTheme's light card standard (title+divider)
-// instead of the FS Score widget's dark dialLight/dialDark card, and no
-// progress bars — those read as noise on a final summary, per explicit ask
-// 2026-08-06. The "?" replaces VerdictMarkerCard's old "More" text button
-// but pushes the exact same route.
+// Session Complete screen — combined "STRATEGY" card, mirrors
+// VerdictDiversificationCard's shape exactly (color bar + window border +
+// name + "?" + score, no progress bars) but for the Strategy pillar's other
+// 3 sub-signals: Concentration, ETF Exposure, Cash Buffer. Replaces the old
+// separate generic "Strategy" composite VerdictMarkerCard and the standalone
+// Concentration VerdictMarkerCard.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
 import 'verdict_marker_row.dart';
 
-class _DiversificationRow {
+class _StrategyRow {
   final String markerId;
   final String label;
   final double score; // 0.0-1.0
-  const _DiversificationRow({
+  const _StrategyRow({
     required this.markerId,
     required this.label,
     required this.score,
   });
 }
 
-class VerdictDiversificationCard extends StatelessWidget {
+class VerdictStrategyCard extends StatelessWidget {
   final String sessionId;
-  final double sectorDiversificationScore;
-  final double safetyMarkerScore;
-  final double sectorBalanceScore;
+  final double concentrationScore;
+  final double etfExposureScore;
+  final double cashBufferScore;
 
-  const VerdictDiversificationCard({
+  const VerdictStrategyCard({
     super.key,
     required this.sessionId,
-    required this.sectorDiversificationScore,
-    required this.safetyMarkerScore,
-    required this.sectorBalanceScore,
+    required this.concentrationScore,
+    required this.etfExposureScore,
+    required this.cashBufferScore,
   });
 
   @override
   Widget build(BuildContext context) {
     final rows = [
-      _DiversificationRow(
-        markerId: 'sector-diversification',
-        label: 'Sector Diversification',
-        score: sectorDiversificationScore,
+      _StrategyRow(
+        markerId: 'concentration',
+        label: 'Concentration',
+        score: concentrationScore,
       ),
-      _DiversificationRow(
-        markerId: 'safety-marker',
-        label: 'Safety Marker',
-        score: safetyMarkerScore,
+      _StrategyRow(
+        markerId: 'etf-exposure',
+        label: 'ETF Exposure',
+        score: etfExposureScore,
       ),
-      _DiversificationRow(
-        markerId: 'sector-balance',
-        label: 'Sector Balance',
-        score: sectorBalanceScore,
+      _StrategyRow(
+        markerId: 'cash-buffer',
+        label: 'Cash Buffer',
+        score: cashBufferScore,
       ),
     ];
 
@@ -71,7 +65,7 @@ class VerdictDiversificationCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text('DIVERSIFICATION', style: FomoShieldTheme.cardTitle()),
+            child: Text('STRATEGY', style: FomoShieldTheme.cardTitle()),
           ),
           Divider(
             height: 1,

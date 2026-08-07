@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../stress_test/widgets/verdict/stress_test_verdict_disclaimer.dart';
 import 'metric_info_data.dart';
 
 // ---------------------------------------------------------------------------
@@ -58,7 +59,8 @@ class MetricInfoScreen extends StatelessWidget {
               _Section(
                 section: content.sections[i],
                 isLast: i == content.sections.length - 1 &&
-                    !content.showAcademicDisclaimer,
+                    !content.showAcademicDisclaimer &&
+                    !content.showStressTestDisclaimer,
               ),
             if (content.showAcademicDisclaimer) ...[
               const SizedBox(height: 18),
@@ -82,6 +84,8 @@ class MetricInfoScreen extends StatelessWidget {
                 ),
               ),
             ],
+            if (content.showStressTestDisclaimer)
+              const StressTestVerdictDisclaimer(),
           ],
         ),
       ),

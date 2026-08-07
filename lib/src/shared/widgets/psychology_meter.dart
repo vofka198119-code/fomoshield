@@ -37,8 +37,12 @@ class PsychologyMeterData {
 
   // ── Step 2 & 3: Diversification & concentration ──────────────────
   final int sectorCount; // distinct sectors held
+  final int holdingCount; // distinct companies currently held
+  final int etfCount; // distinct ETFs currently held (subset of holdingCount)
+  final int epochsPassed; // epochs completed/active so far this test
   final double maxConcentrationPct; // 0-100, biggest single asset %
   final bool hasDiversificationWarning;
+  final double unrealizedPnl; // paper P&L on currently open positions
 
   // ── Step 4: Trade frequency ───────────────────────────────────────
   final double tradesPerDay;
@@ -59,8 +63,12 @@ class PsychologyMeterData {
     this.soldAtBottomCount = 0,
     this.realizedPnl = 0,
     this.sectorCount = 0,
+    this.holdingCount = 0,
+    this.etfCount = 0,
+    this.epochsPassed = 0,
     this.maxConcentrationPct = 0,
     this.hasDiversificationWarning = false,
+    this.unrealizedPnl = 0,
     this.tradesPerDay = 0,
     this.cashBufferPct = 0,
   });
@@ -121,8 +129,18 @@ class PsychologyMeterData {
       soldAtBottomCount: soldAtBottom,
       realizedPnl: session.realizedPnl,
       sectorCount: sectors.length,
+      holdingCount: session.holdings.length,
+      etfCount: session.holdings
+          .where(
+            (h) =>
+                h.isEtf ||
+                resolveAssetSector(h.symbol) == AssetSector.etfBroadMarket,
+          )
+          .length,
+      epochsPassed: session.epochHistory.length,
       maxConcentrationPct: (session.currentMaxAllocation * 100).roundToDouble(),
       hasDiversificationWarning: session.currentMaxAllocation > 0.50,
+      unrealizedPnl: session.unrealizedPnl,
       tradesPerDay: tpd,
       cashBufferPct: session.totalValue > 0
           ? (session.cash / session.totalValue * 100)
@@ -166,6 +184,24 @@ class PsychologyMeter extends StatelessWidget {
               child: Row(
                 children: [
                   Text('PSYCHOLOGY METER', style: FomoShieldTheme.cardTitle()),
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: () => context.push('/metric-info/investor-score'),
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.help_outline_rounded,
+                        size: 13,
+                        color: ThemeV2.textSecondary,
+                      ),
+                    ),
+                  ),
                   const Spacer(),
                   const Icon(
                     Icons.chevron_right_rounded,
@@ -195,7 +231,19 @@ class PsychologyMeter extends StatelessWidget {
   }
 }
 
-/// Analytics section: trade stats, diversification, frequency.
+/// Raw session numbers: trade counts, holdings, ETF count, unrealized +
+/// realized P&L — plain counters, not scored 0-100 bars (those live in the
+/// Discipline/Panic/Patience/Strategy/Diversification cards above this one
+/// on the Psychology Meter detail screen). Sectors-held, max-allocation,
+/// and trade frequency were cut 2026-08-07 — the first two duplicate what
+/// the Diversification/Strategy cards' own bars already show as a score,
+/// frequency wasn't a useful signal on its own. ETF count reuses the same
+/// isEtf/etfBroadMarket predicate as computeStrategySubScores
+/// (psychology_engine.dart) — Finnhub tags real ETFs `type: 'ETP'`, not
+/// `'ETF'`, so don't check the literal string here either (see
+/// isEtfSecurityType in finnhub_service.dart for the shared fix). Same row
+/// style as verdict_screen.dart's Session Stats card (`_statRow`) — keep
+/// the two in sync if either changes.
 /// Public — reused by the Psychology Meter detail screen
 /// (stress_test_psychology_meter_screen.dart).
 class PsychologyAnalyticsSection extends StatelessWidget {
@@ -210,91 +258,55 @@ class PsychologyAnalyticsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Step 1: Trade timing ──────────────────────────────
-        _analyticsHeader('📊 Trade Timing'),
-        const SizedBox(height: 6),
-        _analyticsRow(
-          'Trades',
-          '${data.totalTrades} (${data.buyTrades} buys · ${data.sellTrades} sells)',
+        _statRow('Total Trades', '${data.totalTrades}'),
+        _statRow('Trades Buy', '${data.buyTrades}'),
+        _statRow('Trades Sell', '${data.sellTrades}'),
+        _statRow('Holdings', '${data.holdingCount}'),
+        _statRow('ETF', '${data.etfCount}'),
+        _statRow('Epochs', '${data.epochsPassed}'),
+        _statRow(
+          'Unrealized P&L',
+          '\$${nf.format(data.unrealizedPnl)}',
+          valueColor: data.unrealizedPnl >= 0
+              ? FomoShieldTheme.positive
+              : FomoShieldTheme.negative,
         ),
-        if (data.boughtAtPeakCount > 0 || data.soldAtBottomCount > 0)
-          _analyticsRow(
-            '⚠️ Timing',
-            '${data.boughtAtPeakCount} buy peaks · ${data.soldAtBottomCount} sell bottoms',
-            valueColor: FomoShieldTheme.negative,
-          ),
-        _analyticsRow(
+        _statRow(
           'Realized P&L',
           '\$${nf.format(data.realizedPnl)}',
           valueColor: data.realizedPnl >= 0
               ? FomoShieldTheme.positive
               : FomoShieldTheme.negative,
+          isLast: true,
         ),
-        const SizedBox(height: 10),
-
-        // ── Step 2 & 3: Diversification & concentration ──────
-        _analyticsHeader('🏭 Diversification'),
-        const SizedBox(height: 6),
-        _analyticsRow('Sectors held', '${data.sectorCount}'),
-        _analyticsRow(
-          'Max allocation',
-          '${data.maxConcentrationPct.round()}%'
-              '${data.hasDiversificationWarning ? ' ⚠️' : ' ✅'}',
-          valueColor: data.hasDiversificationWarning
-              ? FomoShieldTheme.negative
-              : FomoShieldTheme.positive,
-        ),
-        const SizedBox(height: 10),
-
-        // ── Step 4: Trade frequency ──────────────────────────
-        _analyticsHeader('🔄 Activity'),
-        const SizedBox(height: 6),
-        _analyticsRow(
-          'Trade frequency',
-          '${data.tradesPerDay.round()} trades/day',
-        ),
-        const SizedBox(height: 6),
       ],
     );
   }
 
-  Widget _analyticsHeader(String text) {
-    return Text(
-      text,
-      style: GoogleFonts.inter(
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        color: ThemeV2.primary,
-        letterSpacing: 0.4,
-      ),
-    );
-  }
-
-  Widget _analyticsRow(String label, String value, {Color? valueColor}) {
+  Widget _statRow(
+    String label,
+    String value, {
+    Color? valueColor,
+    bool isLast = false,
+  }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: FomoShieldTheme.textLight,
-              ),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: FomoShieldTheme.textLight,
             ),
           ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: valueColor ?? FomoShieldTheme.text,
-              ),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: valueColor ?? FomoShieldTheme.text,
             ),
           ),
         ],

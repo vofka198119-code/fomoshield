@@ -18,8 +18,9 @@ import '../../shared/guardian/guardian_providers.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'widgets/verdict_trade_breakdown_widget.dart';
-import 'widgets/verdict/verdict_marker_card.dart';
+import 'widgets/verdict/verdict_marker_row.dart';
 import 'widgets/verdict/verdict_diversification_card.dart';
+import 'widgets/verdict/verdict_strategy_card.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
 
 class VerdictScreen extends ConsumerWidget {
@@ -128,32 +129,35 @@ class VerdictScreen extends ConsumerWidget {
             const SizedBox(height: 16),
 
             // ── Per-marker verdict cards ─────────────────────────
-            VerdictMarkerCard(
+            VerdictSingleMarkerCard(
               sessionId: sessionId,
               markerId: 'discipline',
+              title: 'DISCIPLINE',
               label: 'Discipline',
               score: entry.discipline,
             ),
             const SizedBox(height: 12),
-            VerdictMarkerCard(
+            VerdictSingleMarkerCard(
               sessionId: sessionId,
               markerId: 'panic',
+              title: 'PANIC',
               label: 'Panic',
               score: entry.panicResistance,
             ),
             const SizedBox(height: 12),
-            VerdictMarkerCard(
+            VerdictSingleMarkerCard(
               sessionId: sessionId,
               markerId: 'patience',
+              title: 'PATIENCE',
               label: 'Patience',
               score: entry.patience,
             ),
             const SizedBox(height: 12),
-            VerdictMarkerCard(
+            VerdictStrategyCard(
               sessionId: sessionId,
-              markerId: 'strategy',
-              label: 'Strategy',
-              score: entry.strategyAdherence,
+              concentrationScore: entry.strategyConcentration,
+              etfExposureScore: entry.strategyEtf,
+              cashBufferScore: entry.strategyCashBuffer,
             ),
             const SizedBox(height: 12),
             VerdictDiversificationCard(
@@ -161,13 +165,6 @@ class VerdictScreen extends ConsumerWidget {
               sectorDiversificationScore: entry.strategyDiversification,
               safetyMarkerScore: entry.safetyMarker,
               sectorBalanceScore: entry.strategySector,
-            ),
-            const SizedBox(height: 12),
-            VerdictMarkerCard(
-              sessionId: sessionId,
-              markerId: 'concentration',
-              label: 'Concentration',
-              score: entry.strategyConcentration,
             ),
             const StressTestVerdictDisclaimer(),
             const SizedBox(height: 24),

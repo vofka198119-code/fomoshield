@@ -23,6 +23,11 @@ import 'widgets/verdict/sector_diversification_tiers.dart';
 import 'widgets/verdict/safety_marker_tiers.dart';
 import 'widgets/verdict/sector_balance_tiers.dart';
 import 'widgets/verdict/concentration_tiers.dart';
+import 'widgets/verdict/etf_exposure_tiers.dart';
+import 'widgets/verdict/cash_buffer_tiers.dart';
+import 'widgets/verdict/discipline_tiers.dart';
+import 'widgets/verdict/panic_tiers.dart';
+import 'widgets/verdict/patience_tiers.dart';
 import 'widgets/verdict/verdict_tier.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
 
@@ -36,7 +41,6 @@ const Map<String, _MarkerInfo> _markers = {
   'discipline': _MarkerInfo('Discipline', _disciplineScore),
   'panic': _MarkerInfo('Panic', _panicScore),
   'patience': _MarkerInfo('Patience', _patienceScore),
-  'strategy': _MarkerInfo('Strategy', _strategyScore),
   'sector-diversification': _MarkerInfo(
     'Sector Diversification',
     _sectorDiversificationScore,
@@ -44,17 +48,20 @@ const Map<String, _MarkerInfo> _markers = {
   'safety-marker': _MarkerInfo('Safety Marker', _safetyMarkerScore),
   'sector-balance': _MarkerInfo('Sector Balance', _sectorBalanceScore),
   'concentration': _MarkerInfo('Concentration', _concentrationScore),
+  'etf-exposure': _MarkerInfo('ETF Exposure', _etfExposureScore),
+  'cash-buffer': _MarkerInfo('Cash Buffer', _cashBufferScore),
 };
 
 double _disciplineScore(VerdictArchiveEntry e) => e.discipline;
 double _panicScore(VerdictArchiveEntry e) => e.panicResistance;
 double _patienceScore(VerdictArchiveEntry e) => e.patience;
-double _strategyScore(VerdictArchiveEntry e) => e.strategyAdherence;
 double _sectorDiversificationScore(VerdictArchiveEntry e) =>
     e.strategyDiversification;
 double _safetyMarkerScore(VerdictArchiveEntry e) => e.safetyMarker;
 double _sectorBalanceScore(VerdictArchiveEntry e) => e.strategySector;
 double _concentrationScore(VerdictArchiveEntry e) => e.strategyConcentration;
+double _etfExposureScore(VerdictArchiveEntry e) => e.strategyEtf;
+double _cashBufferScore(VerdictArchiveEntry e) => e.strategyCashBuffer;
 
 /// Picks the long-form tier content for markers that have one — null for
 /// markers still on the generic threshold-based placeholder.
@@ -74,6 +81,16 @@ VerdictTier? _tierFor(String markerId, VerdictArchiveEntry entry) {
         entry.strategyConcentration,
         entry.holdingCount,
       );
+    case 'etf-exposure':
+      return etfExposureTierFor(entry.strategyEtf, entry.holdingCount);
+    case 'cash-buffer':
+      return cashBufferTierFor(entry.strategyCashBuffer, entry.holdingCount);
+    case 'discipline':
+      return disciplineTierFor(entry.discipline, entry.totalTrades);
+    case 'panic':
+      return panicTierFor(entry.panicResistance, entry.totalTrades);
+    case 'patience':
+      return patienceTierFor(entry.patience, entry.totalTrades);
     default:
       return null;
   }

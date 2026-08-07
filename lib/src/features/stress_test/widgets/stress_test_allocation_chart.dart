@@ -82,8 +82,15 @@ class _StressTestAllocationChartState extends State<StressTestAllocationChart> {
     final hasData = !isEmpty && totalInvested > 0;
 
     final portfolioTotal = session.totalValue;
-    final pnl = session.profitLoss;
-    final pnlPercent = session.profitLossPercent;
+    // Balance itself already reflects the whole account (cash + positions,
+    // including any realized gains already banked into cash) — this
+    // subtitle shows Unrealized P&L specifically (paper P&L on currently
+    // held positions only), so it stops double-counting realized gains
+    // that are already visible in Balance. Realized P&L lives in its own
+    // row on the Psychology Meter's Session Stats card. Confirmed
+    // 2026-08-07 after a live on-device walkthrough.
+    final pnl = session.unrealizedPnl;
+    final pnlPercent = session.unrealizedPnlPercent;
     final isPositive = pnl >= 0;
     final isZero = pnl == 0;
     final pnlColor = isZero

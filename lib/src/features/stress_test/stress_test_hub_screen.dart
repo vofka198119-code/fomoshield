@@ -443,7 +443,12 @@ class StressTestHubScreen extends ConsumerWidget {
     int index,
   ) {
     final tierBadge = _tierBadge(ref, context, index);
-    final plDollar = session.profitLoss;
+    // Unrealized, not total-since-start — totalValue right above it
+    // already reflects the whole account (cash + positions, including
+    // any realized gains already banked), so this dollar figure shows
+    // paper P&L on currently held positions specifically, matching the
+    // same fix on the main Portfolio Balance card. Confirmed 2026-08-07.
+    final plDollar = session.unrealizedPnl;
     final plSign = plDollar >= 0 ? '+' : '-';
     final plColor = plDollar >= 0 ? ThemeV2.success : ThemeV2.loss;
 

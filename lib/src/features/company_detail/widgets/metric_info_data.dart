@@ -20,11 +20,21 @@ class MetricInfoContent {
   // Efficiency, Historical Trend, Shareholder Returns) show it, not the
   // KEY METRICS screens (P/E, ROE, etc.) or the fs-score-legal screen.
   final bool showAcademicDisclaimer;
+  // Full StressTestVerdictDisclaimer footer — every Psychology Meter
+  // marker screen (psychology-discipline/panic/patience/strategy/
+  // diversification, investor-score) shows this instead, matching the
+  // same mandatory disclaimer used on Session Complete / the per-marker
+  // "More" screen / the Psychology Meter detail screen — see
+  // stress_test_verdict_disclaimer.dart. Mutually exclusive with
+  // showAcademicDisclaimer in practice (company-detail markers vs.
+  // stress-test markers), but not enforced — don't set both.
+  final bool showStressTestDisclaimer;
   const MetricInfoContent({
     required this.title,
     required this.subtitle,
     required this.sections,
     this.showAcademicDisclaimer = false,
+    this.showStressTestDisclaimer = false,
   });
 }
 
@@ -1849,65 +1859,784 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
   'psychology-discipline': MetricInfoContent(
     title: 'Discipline',
     subtitle: 'Buying With a Plan, Not With Emotion',
+    showStressTestDisclaimer: true,
     sections: [
       MetricInfoSection(
+        header: 'What Is Investment Discipline?',
         body:
-            'Discipline tracks how you behave at the moment you buy. '
-            'Buying during a crash or a confirmed rebound is rewarded — '
-            'that\'s a calculated move, not a reaction. Chasing a hype '
-            'spike or buying into an active pump on a single stock is '
-            'penalized — that\'s FOMO, not a plan.',
+            'Investment discipline is the ability to make decisions '
+            'based on a strategy rather than emotions.\n\n'
+            'The market constantly creates situations that test '
+            'investors:\n\n'
+            'When prices rise quickly — excitement appears and the '
+            'fear of missing out begins.\n\n'
+            'When markets fall — fear appears and investors often '
+            'hesitate or panic.\n\n'
+            'Many investment mistakes do not happen because people '
+            'lack investing knowledge.\n\n'
+            'They happen because emotions push investors to change '
+            'their decisions at the worst possible moments.\n\n'
+            'Discipline helps investors stay committed to their '
+            'strategy regardless of what is happening around them.',
+      ),
+      MetricInfoSection(
+        header: 'A Simple Example',
+        body:
+            'Imagine two investors.\n\n'
+            'They both have the same amount of money and access to '
+            'the same information.',
+      ),
+      MetricInfoSection(
+        header: 'Investor A',
+        body:
+            'The market is rising quickly.\n\n'
+            'The news is full of stories about one popular company.\n\n'
+            'Everyone is talking about its future potential.\n\n'
+            'The investor buys because they are afraid of missing the '
+            'opportunity.\n\n'
+            'A few months later, the market changes.\n\n'
+            'The stock price falls.\n\n'
+            'The investor sells because fear takes over.\n\n'
+            'Their decisions are controlled by emotions.',
+      ),
+      MetricInfoSection(
+        header: 'Investor B',
+        body:
+            'Before buying, they ask important questions:\n\n'
+            'Why am I buying this company?\n'
+            'Has the real value of the business changed?\n'
+            'Does this purchase fit my investment strategy?\n\n'
+            'When the market rises, they don\'t buy simply because '
+            'everyone is excited.\n\n'
+            'When the market falls, they look for opportunities.\n\n'
+            'Their decisions are based on a process, not market '
+            'emotions.',
+      ),
+      MetricInfoSection(
+        header: 'What Does This Widget Track?',
+        body:
+            'This widget analyzes your buying history and evaluates '
+            'how closely your actions follow the principles of '
+            'disciplined investing.\n\n'
+            'It does not only look at the outcome of your '
+            'investments.\n\n'
+            'It looks at the conditions and environment in which your '
+            'decisions were made.',
+      ),
+      MetricInfoSection(
+        header: 'Buying During Market Fear',
+        body:
+            'Buying during:\n\n'
+            'market declines;\n'
+            'financial crises;\n'
+            'periods of extreme uncertainty;\n\n'
+            'can demonstrate the ability to act when many investors '
+            'are afraid.',
+      ),
+      MetricInfoSection(
+        header: 'Buying During Market Excitement',
+        body:
+            'Buying during:\n\n'
+            'market hype;\n'
+            'rapid price increases;\n'
+            'massive attention around a specific theme;\n\n'
+            'can indicate an emotional decision and the desire to '
+            'avoid missing out.',
+      ),
+      MetricInfoSection(
+        header: 'Risk Control During Opportunities',
+        body:
+            'Even a good investment idea requires good execution.\n\n'
+            'A strong investor does not only recognize '
+            'opportunities.\n\n'
+            'They also manage position sizes and maintain '
+            'flexibility.\n\n'
+            'For example, buying during a market decline while '
+            'keeping a cash reserve shows a more controlled and '
+            'thoughtful approach.',
+      ),
+      MetricInfoSection(
+        header: 'What Does This Widget Teach?',
+        body:
+            'This widget teaches one of the most important skills of '
+            'a long-term investor:\n\n'
+            'Managing not only your portfolio, but also your own '
+            'behavior.\n\n'
+            'Because the market cannot be controlled.\n\n'
+            'You cannot control:\n\n'
+            'news;\n'
+            'the economy;\n'
+            'price movements;\n'
+            'the emotions of other investors.\n\n'
+            'But you can control:\n\n'
+            'your decisions;\n'
+            'your strategy;\n'
+            'your reaction to events.',
+      ),
+      MetricInfoSection(
+        header: 'The Main Idea',
+        body:
+            'A successful investor is not someone who never makes '
+            'mistakes.\n\n'
+            'Everyone makes mistakes.\n\n'
+            'A successful investor is someone who can continue making '
+            'rational decisions even when the market creates maximum '
+            'pressure.\n\n'
+            'Your strategy shows what you buy.\n\n'
+            'Your discipline shows why you buy it.',
       ),
     ],
   ),
   'psychology-panic': MetricInfoContent(
     title: 'Panic',
     subtitle: 'Selling Calmly, Not Selling Scared',
+    showStressTestDisclaimer: true,
     sections: [
       MetricInfoSection(
+        header: 'What Is Panic in Investing?',
         body:
-            'Panic Resistance tracks how you behave at the moment you '
-            'sell. Selling near the test\'s real bottom, or locking in a '
-            'large loss, drags this score down. Taking a profit — any '
-            'size — always gets a small, calm bonus.',
+            'Panic in investing is not simply feeling fear.\n\n'
+            'Fear is a natural reaction when money is involved.\n\n'
+            'Every investor experiences uncertainty when prices '
+            'fall.\n\n'
+            'The problem begins when fear starts controlling '
+            'decisions.\n\n'
+            'A falling stock price does not automatically mean a bad '
+            'investment.\n\n'
+            'Sometimes a declining price means:\n\n'
+            'the entire market is under pressure;\n'
+            'investors are temporarily afraid;\n'
+            'a good company is becoming cheaper.\n\n'
+            'But during stressful periods, many investors make '
+            'decisions based on emotions instead of analysis.\n\n'
+            'They sell because the situation feels uncomfortable.\n\n'
+            'They sell because they want to stop the pain.\n\n'
+            'They sell because they believe the decline will continue '
+            'forever.\n\n'
+            'This is one of the most common mistakes in investing.',
+      ),
+      MetricInfoSection(
+        header: 'A Simple Example',
+        body:
+            'Imagine an investor buys shares of a strong company.\n\n'
+            'The business is growing.\n\n'
+            'The financial results are healthy.\n\n'
+            'The long-term idea remains unchanged.\n\n'
+            'But then the market enters a difficult period.\n\n'
+            'The stock price falls:\n\n'
+            '-20%.\n\n'
+            'Then:\n\n'
+            '-35%.\n\n'
+            'Negative headlines appear everywhere.\n\n'
+            'Many investors become afraid.',
+      ),
+      MetricInfoSection(
+        header: 'Investor A',
+        body:
+            'The falling price creates stress.\n\n'
+            'They think:\n\n'
+            '"I cannot handle this loss anymore."\n\n'
+            'They sell near the worst moment.\n\n'
+            'A few months later, the market begins recovering.\n\n'
+            'The problem was not only the price decline.\n\n'
+            'The problem was making a decision at the moment when '
+            'emotions were strongest.',
+      ),
+      MetricInfoSection(
+        header: 'Investor B',
+        body:
+            'They review the original investment idea.\n\n'
+            'They ask:\n\n'
+            'Did the company become weaker?\n'
+            'Did the business model change?\n'
+            'Is this a temporary market reaction?\n\n'
+            'If the investment reason is still valid, they remain '
+            'patient.\n\n'
+            'They understand that volatility is part of investing.',
+      ),
+      MetricInfoSection(
+        header: 'What Does This Widget Track?',
+        body:
+            'This widget analyzes your selling behavior and evaluates '
+            'how you react during difficult market situations.\n\n'
+            'It does not judge every losing sale as a mistake.\n\n'
+            'Selling at a loss can sometimes be the correct '
+            'decision.\n\n'
+            'A smart investor may sell because:\n\n'
+            'the business fundamentals changed;\n'
+            'the original investment idea is no longer valid;\n'
+            'a better opportunity appeared.\n\n'
+            'The important question is:\n\n'
+            'Why did you sell?',
+      ),
+      MetricInfoSection(
+        header: 'Selling During Fear',
+        body:
+            'The system looks at whether sales happened during '
+            'periods of extreme market pressure.\n\n'
+            'Selling close to major declines can indicate an '
+            'emotional reaction, especially if the investment later '
+            'recovers.',
+      ),
+      MetricInfoSection(
+        header: 'Ability to Accept Volatility',
+        body:
+            'Successful investors understand that price movement is '
+            'normal.\n\n'
+            'Strong companies can experience temporary declines.\n\n'
+            'This widget helps measure whether you can separate '
+            'temporary market noise from real problems with an '
+            'investment.',
+      ),
+      MetricInfoSection(
+        header: 'Surviving Extreme Market Events',
+        body:
+            'The strongest test of an investor often comes during '
+            'crises.\n\n'
+            'Market crashes create:\n\n'
+            'uncertainty;\n'
+            'fear;\n'
+            'pressure to act.\n\n'
+            'Investors who can survive these periods without '
+            'emotional decisions demonstrate one of the most valuable '
+            'skills in investing:\n\n'
+            'patience.',
+      ),
+      MetricInfoSection(
+        header: 'What Does This Widget Teach?',
+        body:
+            'This widget teaches that investing is not only about '
+            'choosing the right assets.\n\n'
+            'It is also about controlling your reactions when things '
+            'do not go according to plan.\n\n'
+            'You cannot control:\n\n'
+            'market crashes;\n'
+            'negative news;\n'
+            'temporary price declines.\n\n'
+            'But you can control:\n\n'
+            'your decisions;\n'
+            'your preparation;\n'
+            'your response to uncertainty.',
+      ),
+      MetricInfoSection(
+        header: 'The Main Idea',
+        body:
+            'A great investor is not someone who never experiences '
+            'fear.\n\n'
+            'Everyone feels fear.\n\n'
+            'The difference is what happens next.\n\n'
+            'Some investors allow fear to make decisions for them.\n\n'
+            'Others use patience, analysis, and a clear strategy.\n\n'
+            'Your portfolio shows what you own.\n\n'
+            'Your Discipline shows how you buy.\n\n'
+            'Your Panic score shows how you behave when the market '
+            'tests you.',
       ),
     ],
   ),
   'psychology-patience': MetricInfoContent(
     title: 'Patience',
     subtitle: 'Letting Positions Play Out',
+    showStressTestDisclaimer: true,
     sections: [
       MetricInfoSection(
+        header: 'What Is Investment Patience?',
         body:
-            'Patience rewards holding through turbulence and taking '
-            'profits without rushing, instead of jumping in and out of '
-            'positions on every swing.',
+            'Investment patience is the ability to stay focused on a '
+            'long-term plan without making unnecessary decisions '
+            'because of short-term market movements.\n\n'
+            'Many investors believe that successful investing is '
+            'about finding the perfect moment to buy or sell.\n\n'
+            'But in reality, one of the biggest advantages an '
+            'investor has is time.\n\n'
+            'The market constantly creates situations that test '
+            'patience:\n\n'
+            'prices move up and down;\n'
+            'unexpected news appears;\n'
+            'other investors become excited or afraid;\n'
+            'good companies sometimes experience difficult periods.\n\n'
+            'During these moments, investors often feel pressure to '
+            'act.\n\n'
+            'They want to change something.\n\n'
+            'They want to fix the situation.\n\n'
+            'But sometimes the best decision is not making a decision '
+            'at all.',
+      ),
+      MetricInfoSection(
+        header: 'A Simple Example',
+        body:
+            'Imagine two investors who bought shares of the same '
+            'strong company.\n\n'
+            'The business continues growing.\n\n'
+            'The financial results remain healthy.\n\n'
+            'But the market enters a difficult period and the stock '
+            'price declines.',
+      ),
+      MetricInfoSection(
+        header: 'Investor A',
+        body:
+            'The falling price creates stress.\n\n'
+            'They think:\n\n'
+            '"Maybe I made a mistake. I should do something."\n\n'
+            'They sell because the situation feels uncomfortable.\n\n'
+            'Later, the company recovers.\n\n'
+            'The problem was not the temporary decline.\n\n'
+            'The problem was not allowing the original investment '
+            'idea enough time.',
+      ),
+      MetricInfoSection(
+        header: 'Investor B',
+        body:
+            'They review the situation.\n\n'
+            'They ask:\n\n'
+            'Did the business become weaker?\n'
+            'Has the original reason for investing changed?\n'
+            'Is this a company problem or only market fear?\n\n'
+            'If the investment idea remains valid, they stay '
+            'patient.\n\n'
+            'They understand that short-term volatility is a normal '
+            'part of long-term investing.',
+      ),
+      MetricInfoSection(
+        header: 'What Does This Widget Track?',
+        body:
+            'This widget analyzes your investing behavior and '
+            'measures your ability to remain patient during different '
+            'market situations.\n\n'
+            'It does not simply measure how long you hold an '
+            'investment.\n\n'
+            'Holding a bad company for many years is not patience.\n\n'
+            'True patience means:\n\n'
+            'Giving good decisions enough time to work while staying '
+            'ready to react when the facts truly change.',
+      ),
+      MetricInfoSection(
+        header: 'Ability to Avoid Unnecessary Actions',
+        body:
+            'The market creates constant movement.\n\n'
+            'Every price change can create an emotional reaction.\n\n'
+            'This widget evaluates whether your decisions are based '
+            'on:\n\n'
+            'new information;\n'
+            'changes in business quality;\n'
+            'a clear investment reason;\n'
+            'or simply on temporary market pressure.',
+      ),
+      MetricInfoSection(
+        header: 'Ability to Stay Calm During Crisis',
+        body:
+            'The strongest test of patience appears during extreme '
+            'events.\n\n'
+            'Market crashes create:\n\n'
+            'fear;\n'
+            'uncertainty;\n'
+            'pressure to sell.\n\n'
+            'Many investors make their biggest mistakes during these '
+            'moments because they focus only on the current '
+            'situation.\n\n'
+            'A patient investor understands that difficult periods '
+            'are part of investing.',
+      ),
+      MetricInfoSection(
+        header: 'Taking Profit Without Greed',
+        body:
+            'Patience is not only about holding.\n\n'
+            'It is also about knowing when enough is enough.\n\n'
+            'A disciplined investor can accept a successful result '
+            'without waiting forever for a perfect exit.\n\n'
+            'Markets rarely provide perfect timing.',
+      ),
+      MetricInfoSection(
+        header: 'What Does This Widget Teach?',
+        body:
+            'This widget teaches one of the most important lessons in '
+            'investing:\n\n'
+            'Time is one of the greatest advantages an investor can '
+            'have.\n\n'
+            'You cannot control:\n\n'
+            'daily price movements;\n'
+            'market emotions;\n'
+            'economic events.\n\n'
+            'But you can control:\n\n'
+            'your reactions;\n'
+            'your decision process;\n'
+            'your ability to stay focused.',
+      ),
+      MetricInfoSection(
+        header: 'The Main Idea',
+        body:
+            'Patience does not mean ignoring problems.\n\n'
+            'It does not mean holding every investment forever.\n\n'
+            'It means understanding the difference between temporary '
+            'market noise and real changes that require action.\n\n'
+            'The best investors are not those who make the most '
+            'decisions.\n\n'
+            'They are those who make the right decisions and give '
+            'them enough time to work.\n\n'
+            'Your Discipline shows how you enter the market.\n\n'
+            'Your Panic score shows how you react under pressure.\n\n'
+            'Your Patience score shows whether you can let time '
+            'become your advantage.',
       ),
     ],
   ),
   'psychology-strategy': MetricInfoContent(
     title: 'Strategy',
     subtitle: 'How Your Portfolio Is Built',
+    showStressTestDisclaimer: true,
     sections: [
       MetricInfoSection(
+        header: 'What Is an Investment Strategy?',
         body:
-            'Strategy blends 5 signals from your current portfolio: how '
-            'many positions you hold, how concentrated your biggest '
-            'position is, how balanced your sectors are, how much sits '
-            'in broad-market ETFs, and how much cash you\'re keeping in '
-            'reserve.',
+            'An investment strategy is not just a list of companies you '
+            'own.\n\n'
+            'It is a system of rules that guides your decisions.\n\n'
+            'A strong strategy answers questions like:\n\n'
+            'What am I buying?\n'
+            'Why am I buying it?\n'
+            'How do I manage risk?\n'
+            'What will I do during a market decline?\n'
+            'How will I react when new opportunities appear?',
+      ),
+      MetricInfoSection(
+        header: 'A Simple Example',
+        body:
+            'Two investors can own the same stocks.\n\n'
+            'But their strategies can be completely different.',
+      ),
+      MetricInfoSection(
+        header: 'Investor A',
+        body:
+            'Buys companies because their prices are rising.\n\n'
+            'Follows every headline.\n\n'
+            'Buys after strong price increases because of fear of '
+            'missing out.\n\n'
+            'Sells during market declines because of panic.\n\n'
+            'They own investments, but they don\'t have a system.',
+      ),
+      MetricInfoSection(
+        header: 'Investor B',
+        body:
+            'Buys strong businesses.\n\n'
+            'Manages position sizes.\n\n'
+            'Keeps a cash reserve.\n\n'
+            'Uses ETFs for additional diversification.\n\n'
+            'Has a plan for different market situations.\n\n'
+            'They don\'t simply own stocks.\n\n'
+            'They have a strategy.',
+      ),
+      MetricInfoSection(
+        header: 'What Does This Widget Track?',
+        body:
+            'This widget analyzes whether your investing approach '
+            'follows the principles of long-term portfolio '
+            'management.\n\n'
+            'It evaluates:',
+      ),
+      MetricInfoSection(
+        header: 'Quality of Your Investments',
+        body:
+            'Are you investing in strong businesses with sustainable '
+            'models?\n\n'
+            'Or are you taking excessive risks hoping for quick '
+            'returns?',
+      ),
+      MetricInfoSection(
+        header: 'Balance Between Growth and Protection',
+        body:
+            'A portfolio should not only perform well during good '
+            'markets.\n\n'
+            'It should also have the ability to survive difficult '
+            'periods.',
+      ),
+      MetricInfoSection(
+        header: 'Preparation for Opportunities',
+        body:
+            'Investors without a plan often make emotional '
+            'decisions.\n\n'
+            'Investors with a strategy understand:\n\n'
+            'when to wait;\n'
+            'when to invest;\n'
+            'when to review their decisions.',
+      ),
+      MetricInfoSection(
+        header: 'The Main Idea',
+        body:
+            'Successful investing is not about finding one perfect '
+            'stock.\n\n'
+            'It is about building a system that helps you make '
+            'reasonable decisions again and again.\n\n'
+            'You cannot control the market.\n\n'
+            'But you can control your actions.',
+      ),
+    ],
+  ),
+  'investor-score': MetricInfoContent(
+    title: 'Investor Score',
+    subtitle: 'Your Overall Investment Profile',
+    showStressTestDisclaimer: true,
+    sections: [
+      MetricInfoSection(
+        header: 'What Does This Widget Show?',
+        body:
+            'Investor Score is a combined indicator that evaluates '
+            'your overall investment approach.\n\n'
+            'It does not measure:\n\n'
+            'how much money you made;\n'
+            'how fast your portfolio grew;\n'
+            'whether you will make a profit in the future.\n\n'
+            'Instead, it answers a different question:\n\n'
+            '"How closely does your investment behavior match the '
+            'habits of a disciplined long-term investor?"',
+      ),
+      MetricInfoSection(
+        header: 'How Is Your Score Calculated?',
+        body:
+            'Your final score combines several important aspects of '
+            'investor behavior.\n\n'
+            'Each indicator represents a different part of your '
+            'investment personality.\n\n'
+            'Together, they create a broader picture of how you '
+            'manage decisions, risk, and emotions.',
+      ),
+      MetricInfoSection(
+        header: '🧩 Diversification — How Your Portfolio Is Built',
+        body:
+            'This indicator evaluates:\n\n'
+            'how your investments are distributed;\n'
+            'whether your portfolio depends too heavily on one '
+            'company or idea;\n'
+            'how well your portfolio is protected from a single '
+            'mistake.\n\n'
+            'A strong investor understands:\n\n'
+            'Owning one great company can be a good decision.\n\n'
+            'But building an entire portfolio around one idea creates '
+            'unnecessary risk.',
+      ),
+      MetricInfoSection(
+        header: '🧩 Strategy — How You Manage Your Portfolio',
+        body:
+            'This indicator evaluates:\n\n'
+            'asset balance;\n'
+            'ETF exposure;\n'
+            'cash reserves;\n'
+            'risk management.\n\n'
+            'A strong strategy helps prevent situations like:\n\n'
+            '"I bought everything I liked, and now I don\'t know what '
+            'to do next."\n\n'
+            'A portfolio is not only about what you own.\n\n'
+            'It is also about how you prepare for different market '
+            'situations.',
+      ),
+      MetricInfoSection(
+        header: '🧩 Discipline — How You Make Investment Decisions',
+        body:
+            'This indicator analyzes:\n\n'
+            'whether you buy during fear or excitement;\n'
+            'whether you follow your strategy;\n'
+            'whether your decisions are based on logic or emotions.\n\n'
+            'One of the most common investor mistakes is:\n\n'
+            'Buying when everyone already feels confident.\n\n'
+            'Discipline helps investors search for opportunities '
+            'instead of simply following the crowd.',
+      ),
+      MetricInfoSection(
+        header: '🧩 Panic — How You React During Market Declines',
+        body:
+            'This indicator shows:\n\n'
+            'whether you sell under pressure;\n'
+            'how you handle market downturns;\n'
+            'whether you can separate temporary declines from real '
+            'problems.\n\n'
+            'Market declines are unavoidable.\n\n'
+            'The important question is not:\n\n'
+            '"Will the market fall?"\n\n'
+            'The important question is:\n\n'
+            '"How will I react when it does?"',
+      ),
+      MetricInfoSection(
+        header: '🧩 Patience — Whether You Can Let Time Work',
+        body:
+            'This indicator evaluates:\n\n'
+            'your ability to wait;\n'
+            'whether you avoid unnecessary decisions;\n'
+            'whether you can stay focused during difficult periods.\n\n'
+            'Sometimes the best investment decision is not making a '
+            'decision.\n\n'
+            'Patience allows good ideas enough time to develop.',
+      ),
+      MetricInfoSection(
+        header: 'How Should You Understand Your Score?',
+        body:
+            '🔴 0–20 — Beginner Investor\n'
+            'Your investment process is currently strongly influenced '
+            'by emotions and short-term reactions. The main goal is '
+            'not finding perfect investments — the first step is '
+            'building strong investment habits.\n\n'
+            '🟠 21–40 — Developing Investor\n'
+            'You understand many basic investment concepts, but '
+            'market situations may still influence some decisions. '
+            'The next step: create clear rules and learn to follow '
+            'them consistently.\n\n'
+            '🟡 41–60 — Balanced Investor\n'
+            'You have built a solid foundation. You understand the '
+            'importance of strategy and risk management. However, '
+            'some market situations may still create pressure.\n\n'
+            '🟢 61–80 — Disciplined Investor\n'
+            'Your behavior shows strong investment habits. You are '
+            'able to control emotions, evaluate risks, and make more '
+            'thoughtful decisions.\n\n'
+            '⭐ 81–100 — Experienced Investor Mindset\n'
+            'Your actions demonstrate a high level of investment '
+            'maturity. You understand the importance of long-term '
+            'thinking, the power of discipline, and the need for risk '
+            'control. However, a high score does not mean '
+            'perfection — markets can always surprise investors. The '
+            'greatest advantage is the ability to continue making '
+            'rational decisions in changing conditions.',
+      ),
+      MetricInfoSection(
+        header: 'The Main Purpose of This Widget',
+        body:
+            'This score is not designed to tell you:\n\n'
+            '"You are a good investor."\n\n'
+            'or\n\n'
+            '"You are a bad investor."\n\n'
+            'Its purpose is to show:\n\n'
+            '"Which investment habits are helping you, and which ones '
+            'may limit your long-term progress."\n\n'
+            'Every investor can improve their score.\n\n'
+            'Not by trying to predict every market movement.\n\n'
+            'But by improving their own decision-making process.',
+      ),
+      MetricInfoSection(
+        header: 'Final Thought',
+        body:
+            'The market cannot be controlled.\n\n'
+            'You cannot control:\n\n'
+            'news;\n'
+            'prices;\n'
+            'economic cycles.\n\n'
+            'But you can control:\n\n'
+            'your strategy;\n'
+            'your decisions;\n'
+            'your discipline.\n\n'
+            'Your portfolio shows what you own.\n\n'
+            'Your Investor Score shows what kind of investor you are '
+            'becoming.',
       ),
     ],
   ),
   'psychology-diversification': MetricInfoContent(
     title: 'Diversification',
     subtitle: 'Spreading Risk Across Your Portfolio',
+    showStressTestDisclaimer: true,
     sections: [
       MetricInfoSection(
+        header: 'What Is Diversification?',
         body:
-            'A closer look at how your portfolio is spread out — across '
-            'sectors, across the number of positions you hold, and '
-            'across the quality of what you\'re buying.',
+            'Diversification is a way to reduce portfolio risk by '
+            'spreading your investments across different assets.\n\n'
+            'In simple words:\n\n'
+            'Don\'t put all your eggs in one basket.\n\n'
+            'If one basket falls, you lose everything.\n\n'
+            'But if you have several baskets, a problem with one of '
+            'them does not destroy the entire result.\n\n'
+            'In investing, this means:\n\n'
+            'owning different companies;\n'
+            'investing across different industries;\n'
+            'avoiding dependence on one single stock.',
+      ),
+      MetricInfoSection(
+        header: 'A Simple Example',
+        body:
+            'Imagine an investor has \$15,000.\n\n'
+            'Scenario 1:\n\n'
+            'They invest everything into one company.\n\n'
+            'If that company performs well, the results can be '
+            'excellent.\n\n'
+            'But if the business faces problems, the entire portfolio '
+            'suffers together with it.\n\n'
+            'One disappointing report.\n\n'
+            'One management mistake.\n\n'
+            'One unexpected crisis.\n\n'
+            'The full impact falls on a single investment.\n\n'
+            'Scenario 2:\n\n'
+            'The same \$15,000 is distributed across different '
+            'companies:\n\n'
+            'technology;\n'
+            'healthcare;\n'
+            'consumer goods;\n'
+            'financial services;\n'
+            'industrial companies.\n\n'
+            'Now, problems in one industry do not necessarily damage '
+            'the entire portfolio.\n\n'
+            'Some companies may struggle while others continue to '
+            'perform well.',
+      ),
+      MetricInfoSection(
+        header: 'But Diversification Is Not Simply Buying Many Stocks',
+        body:
+            'Many beginner investors think:\n\n'
+            '"I own 20 companies, so my portfolio is safe."\n\n'
+            'But this is not always true.\n\n'
+            'You can own 20 different companies and still have a '
+            'highly concentrated portfolio.\n\n'
+            'For example:\n\n'
+            '20 companies from the artificial intelligence sector.\n\n'
+            'Technically, you own many businesses.\n\n'
+            'But if the AI industry experiences a major decline, your '
+            'entire portfolio may fall at the same time.\n\n'
+            'True diversification is not about quantity.\n\n'
+            'It is about balance.',
+      ),
+      MetricInfoSection(
+        header: 'What Does This Widget Track?',
+        body:
+            'This widget analyzes how well your portfolio is '
+            'distributed.\n\n'
+            'It looks at several important elements:',
+      ),
+      MetricInfoSection(
+        header: 'Number of Companies',
+        body:
+            'Too few companies can make your portfolio dependent on '
+            'only a few decisions.\n\n'
+            'But too many companies can turn your portfolio into a '
+            'collection of random assets that become difficult to '
+            'monitor.',
+      ),
+      MetricInfoSection(
+        header: 'Sector Distribution',
+        body:
+            'Different industries react differently to economic '
+            'conditions.\n\n'
+            'When one sector experiences pressure, another may remain '
+            'stronger.\n\n'
+            'That is why it is important not only to ask:\n\n'
+            '"How many companies do I own?"\n\n'
+            'But also:\n\n'
+            '"What types of businesses and industries do these '
+            'companies represent?"',
+      ),
+      MetricInfoSection(
+        header: 'Individual Position Concentration',
+        body:
+            'Even a strong portfolio can become risky if one company '
+            'represents too much of your capital.\n\n'
+            'Your favorite company may be an excellent business.\n\n'
+            'But even great companies can face unexpected challenges.',
+      ),
+      MetricInfoSection(
+        header: 'The Main Idea',
+        body:
+            'Good diversification does not mean buying everything.\n\n'
+            'It means creating a portfolio where one mistake, one '
+            'company, or one industry cannot destroy your entire '
+            'investment journey.\n\n'
+            'The goal of diversification is not to remove all risk.\n\n'
+            'That is impossible.\n\n'
+            'The goal is to make risk manageable.',
       ),
     ],
   ),

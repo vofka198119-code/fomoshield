@@ -295,6 +295,8 @@ class PortfolioPerformance {
   final double totalInvested;
   final double cash;
   final double currentValue;
+  /// Unrealized P&L — sum of P&L across currently held positions only.
+  /// Does NOT include gains/losses already locked in from past sales.
   final double pnl;
   final double pnlPercent;
   final double startingBalance;
@@ -407,9 +409,20 @@ final portfolioPerformanceProvider =
   }
 
   final totalInvested = portfolio.totalInvested;
-  final pnl = totalCurrentValue - portfolio.startingBalance;
-  final pnlPercent =
-      portfolio.startingBalance > 0 ? (pnl / portfolio.startingBalance) * 100 : 0.0;
+  // Unrealized P&L — sum of P&L on positions currently held, NOT total
+  // account return since start. Selling a position at a gain/loss moves
+  // its slice into cash (visible in currentValue/Cash already) but
+  // shouldn't move this number — it only tracks what's still open. See
+  // 2026-08-07: this used to be `totalCurrentValue - startingBalance`
+  // (a combined figure that silently absorbed every past sale's P&L,
+  // making it look unchanged — or worse, wrong-direction — right after
+  // locking in a gain/loss).
+  final pnl = holdingPerformances.fold(0.0, (sum, h) => sum + h.pnl);
+  final unrealizedCost = holdingPerformances.fold(
+    0.0,
+    (sum, h) => sum + h.totalCost,
+  );
+  final pnlPercent = unrealizedCost > 0 ? (pnl / unrealizedCost) * 100 : 0.0;
 
   return PortfolioPerformance(
     portfolioId: portfolio.id,
