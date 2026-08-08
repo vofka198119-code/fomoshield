@@ -63,20 +63,6 @@ class OrderExecutionService {
     return session == MarketSession.regular;
   }
 
-  /// Estimated spread multiplier by session (for realistic fills)
-  double _spreadMultiplier(MarketSession session) {
-    switch (session) {
-      case MarketSession.regular:
-        return 1.0; // normal
-      case MarketSession.preMarket:
-        return 1.5; // 50% wider spread
-      case MarketSession.afterHours:
-        return 1.3; // 30% wider spread
-      case MarketSession.closed:
-        return 2.0; // 2x spread (theoretical)
-    }
-  }
-
   // -----------------------------------------------------------------------
   // Main evaluation
   // -----------------------------------------------------------------------
@@ -144,14 +130,12 @@ class OrderExecutionService {
     double currentPrice,
     MarketSession session,
   ) {
-    final spread = _spreadMultiplier(session);
-    // Market buy: pay ask price (slightly above), sell: get bid price (slightly below)
-    final slippage = currentPrice * 0.001 * spread; // 0.1% base slippage
-    final executionPrice = order.side == OrderSide.buy
-        ? currentPrice + slippage
-        : currentPrice - slippage;
-
-    return _fillOrder(order, executionPrice, order.remainingQuantity);
+    // Filled at the exact quoted price — no artificial slippage. There's
+    // no real bid/ask in this app (just one quote field), so any spread
+    // added here at fill time was never mirrored on the unrealized-P&L
+    // side, making every fresh buy look underwater the instant it filled.
+    // See 2026-08-08 bug report.
+    return _fillOrder(order, currentPrice, order.remainingQuantity);
   }
 
   // -----------------------------------------------------------------------
