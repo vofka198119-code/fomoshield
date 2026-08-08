@@ -16,6 +16,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import 'verdict_marker_row.dart';
 
 class _DiversificationRow {
@@ -65,7 +66,14 @@ class VerdictDiversificationCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: FomoShieldTheme.cardDecoration,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [dialLight, dialDark],
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +83,10 @@ class VerdictDiversificationCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('DIVERSIFICATION', style: FomoShieldTheme.cardTitle()),
+                Text(
+                  'DIVERSIFICATION',
+                  style: FomoShieldTheme.cardTitle(Colors.white),
+                ),
                 GestureDetector(
                   onTap: () =>
                       context.push('/metric-info/psychology-diversification'),
@@ -83,14 +94,14 @@ class VerdictDiversificationCard extends StatelessWidget {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     alignment: Alignment.center,
                     child: Icon(
                       Icons.help_outline_rounded,
                       size: 13,
-                      color: FomoShieldTheme.textLight,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -101,7 +112,7 @@ class VerdictDiversificationCard extends StatelessWidget {
             height: 1,
             indent: 16,
             endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.white.withValues(alpha: 0.12),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),

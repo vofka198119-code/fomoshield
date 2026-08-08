@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'widgets/verdict_trade_breakdown_widget.dart';
@@ -158,23 +159,39 @@ class VerdictScreen extends ConsumerWidget {
             // ── Continue Learning ───────────────────────────────
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  context.go('/stress-test-hub');
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: FomoShieldTheme.primary,
-                  side: BorderSide(color: FomoShieldTheme.primary),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: Text(
-                  'Continue Learning',
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => context.go('/stress-test-hub'),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [dialLight, dialDark],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: dialDark.withValues(alpha: 0.35),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Continue Learning',
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

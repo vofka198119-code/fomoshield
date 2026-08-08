@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 
 class VerdictMarkerRow extends StatelessWidget {
   final String sessionId;
@@ -48,7 +49,7 @@ class VerdictMarkerRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Row(
         children: [
@@ -73,7 +74,7 @@ class VerdictMarkerRow extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: FomoShieldTheme.text,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -86,14 +87,14 @@ class VerdictMarkerRow extends StatelessWidget {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     alignment: Alignment.center,
                     child: Icon(
                       Icons.help_outline_rounded,
                       size: 13,
-                      color: FomoShieldTheme.textLight,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -152,7 +153,14 @@ class VerdictSingleMarkerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: FomoShieldTheme.cardDecoration,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [dialLight, dialDark],
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +170,7 @@ class VerdictSingleMarkerCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: FomoShieldTheme.cardTitle()),
+                Text(title, style: FomoShieldTheme.cardTitle(Colors.white)),
                 GestureDetector(
                   onTap: () => context.push(
                     '/metric-info/psychology-$markerId',
@@ -171,14 +179,14 @@ class VerdictSingleMarkerCard extends StatelessWidget {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     alignment: Alignment.center,
                     child: Icon(
                       Icons.help_outline_rounded,
                       size: 13,
-                      color: FomoShieldTheme.textLight,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -189,7 +197,7 @@ class VerdictSingleMarkerCard extends StatelessWidget {
             height: 1,
             indent: 16,
             endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.white.withValues(alpha: 0.12),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),

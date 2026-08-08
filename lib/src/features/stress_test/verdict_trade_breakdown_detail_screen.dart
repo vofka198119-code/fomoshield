@@ -117,9 +117,9 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   _scenariosCard(entry),
                   const SizedBox(height: 16),
-                  _companiesCard(entry),
+                  _CompaniesCard(entry: entry),
                   const SizedBox(height: 16),
-                  _tradeHistoryCard(entry),
+                  _TradeHistoryCard(entry: entry),
                   const _TradeBreakdownDisclaimer(),
                 ],
               ),
@@ -183,87 +183,6 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// Every symbol ever bought during the test, with its combined
-  /// realized P&L (summed from sell trades) plus, for shares still held at
-  /// completion, [VerdictArchiveEntry.unrealizedPnlBySymbol]'s mark-to-
-  /// market figure — so a never-sold holding shows its real gain/loss "as
-  /// if sold at test end" instead of a misleading $0.
-  Widget _companiesCard(VerdictArchiveEntry entry) {
-    final symbols = entry.trades
-        .where((t) => t.isBuy)
-        .map((t) => t.symbol)
-        .toSet()
-        .toList();
-    final pnlBySymbol = <String, double>{};
-    for (final t in entry.trades.where((t) => !t.isBuy)) {
-      pnlBySymbol[t.symbol] = (pnlBySymbol[t.symbol] ?? 0) + (t.realizedPnl ?? 0);
-    }
-    for (final e in entry.unrealizedPnlBySymbol.entries) {
-      pnlBySymbol[e.key] = (pnlBySymbol[e.key] ?? 0) + e.value;
-    }
-    // Max profit first, down to max loss.
-    symbols.sort(
-      (a, b) => (pnlBySymbol[b] ?? 0).compareTo(pnlBySymbol[a] ?? 0),
-    );
-
-    return _DarkCard(
-      title: 'COMPANIES',
-      child: Column(
-        children: symbols.isEmpty
-            ? [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(
-                    'No companies traded.',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ),
-              ]
-            : [
-                for (int i = 0; i < symbols.length; i++)
-                  _CompanyRow(
-                    symbol: symbols[i],
-                    pnl: pnlBySymbol[symbols[i]] ?? 0,
-                    isLast: i == symbols.length - 1,
-                  ),
-              ],
-      ),
-    );
-  }
-
-  /// Full per-trade log for the completed test, newest first — moved here
-  /// 2026-08-08 from its own light-theme widget on the Session Complete
-  /// screen, restyled dark-green to match this screen's card family. No
-  /// 5+More cap — this screen is already the "full detail" destination.
-  Widget _tradeHistoryCard(VerdictArchiveEntry entry) {
-    final sorted = entry.trades.reversed.toList();
-    return _DarkCard(
-      title: 'TRADE HISTORY',
-      child: Column(
-        children: sorted.isEmpty
-            ? [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(
-                    'No trades yet.',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ),
-              ]
-            : [
-                for (int i = 0; i < sorted.length; i++)
-                  _TradeRow(trade: sorted[i], isLast: i == sorted.length - 1),
-              ],
-      ),
-    );
-  }
-
   Widget _financialSummaryCard(VerdictArchiveEntry entry) {
     final sells = entry.trades.where((t) => !t.isBuy).toList();
     final profitSells = sells.where((t) => (t.realizedPnl ?? 0) > 0).toList();
@@ -304,6 +223,174 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
             isLast: true,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Every symbol ever bought during the test, with its combined realized
+/// P&L (summed from sell trades) plus, for shares still held at
+/// completion, [VerdictArchiveEntry.unrealizedPnlBySymbol]'s mark-to-market
+/// figure — so a never-sold holding shows its real gain/loss "as if sold at
+/// test end" instead of a misleading $0. Capped at 5 rows with a
+/// More(N)/Less toggle, same shape as [market_timeline.dart]'s expand button.
+class _CompaniesCard extends StatefulWidget {
+  final VerdictArchiveEntry entry;
+
+  const _CompaniesCard({required this.entry});
+
+  @override
+  State<_CompaniesCard> createState() => _CompaniesCardState();
+}
+
+class _CompaniesCardState extends State<_CompaniesCard> {
+  static const _collapsedCount = 5;
+  bool _showAll = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final entry = widget.entry;
+    final symbols = entry.trades
+        .where((t) => t.isBuy)
+        .map((t) => t.symbol)
+        .toSet()
+        .toList();
+    final pnlBySymbol = <String, double>{};
+    for (final t in entry.trades.where((t) => !t.isBuy)) {
+      pnlBySymbol[t.symbol] = (pnlBySymbol[t.symbol] ?? 0) + (t.realizedPnl ?? 0);
+    }
+    for (final e in entry.unrealizedPnlBySymbol.entries) {
+      pnlBySymbol[e.key] = (pnlBySymbol[e.key] ?? 0) + e.value;
+    }
+    // Max profit first, down to max loss.
+    symbols.sort(
+      (a, b) => (pnlBySymbol[b] ?? 0).compareTo(pnlBySymbol[a] ?? 0),
+    );
+    final visible = _showAll ? symbols : symbols.take(_collapsedCount).toList();
+
+    return _DarkCard(
+      title: 'COMPANIES',
+      child: Column(
+        children: [
+          if (symbols.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                'No companies traded.',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+              ),
+            )
+          else
+            for (int i = 0; i < visible.length; i++)
+              _CompanyRow(
+                symbol: visible[i],
+                pnl: pnlBySymbol[visible[i]] ?? 0,
+                isLast: i == visible.length - 1,
+              ),
+          if (symbols.length > _collapsedCount) _MoreLessButton(
+            expanded: _showAll,
+            hiddenCount: symbols.length - _collapsedCount,
+            onTap: () => setState(() => _showAll = !_showAll),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Full per-trade log for the completed test, newest first — moved here
+/// 2026-08-08 from its own light-theme widget on the Session Complete
+/// screen, restyled dark-green to match this screen's card family. Capped
+/// at 5 rows with a More(N)/Less toggle (added since this screen is
+/// already the "full detail" destination — there's nowhere further to push).
+class _TradeHistoryCard extends StatefulWidget {
+  final VerdictArchiveEntry entry;
+
+  const _TradeHistoryCard({required this.entry});
+
+  @override
+  State<_TradeHistoryCard> createState() => _TradeHistoryCardState();
+}
+
+class _TradeHistoryCardState extends State<_TradeHistoryCard> {
+  static const _collapsedCount = 5;
+  bool _showAll = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = widget.entry.trades.reversed.toList();
+    final visible = _showAll ? sorted : sorted.take(_collapsedCount).toList();
+
+    return _DarkCard(
+      title: 'TRADE HISTORY',
+      child: Column(
+        children: [
+          if (sorted.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                'No trades yet.',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+              ),
+            )
+          else
+            for (int i = 0; i < visible.length; i++)
+              _TradeRow(trade: visible[i], isLast: i == visible.length - 1),
+          if (sorted.length > _collapsedCount) _MoreLessButton(
+            expanded: _showAll,
+            hiddenCount: sorted.length - _collapsedCount,
+            onTap: () => setState(() => _showAll = !_showAll),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shared More(N)/Less pill for this screen's dark card family — same
+/// interaction as [market_timeline.dart]/[stress_test_allocation_chart.dart]'s
+/// expand toggle, restyled with the white-on-gradient palette used here.
+class _MoreLessButton extends StatelessWidget {
+  final bool expanded;
+  final int hiddenCount;
+  final VoidCallback onTap;
+
+  const _MoreLessButton({
+    required this.expanded,
+    required this.hiddenCount,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 10),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              expanded ? 'Less' : 'More ($hiddenCount)',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: dialBrassLight,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
