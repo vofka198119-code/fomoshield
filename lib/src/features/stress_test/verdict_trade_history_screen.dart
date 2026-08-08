@@ -1,7 +1,11 @@
 // ---------------------------------------------------------------------------
-// Stress Test — full Trade History screen. Reached via the "More" button on
-// the Trade History card on the main Stress Test screen. Lists every trade
-// for the active session; tapping a row opens the trade detail screen.
+// Verdict — full Trade History screen. Reached via the "More" button on the
+// Trade Breakdown card on the Session Complete (verdict) screen. Unlike the
+// live Stress Test trade history screen, the session here is already
+// archived — StressTestEngine wipes the heavy session payload on completion
+// (see stress_test_engine.dart's deleteSession/_completeTest notes), so this
+// reads trades off VerdictArchiveEntry.trades via verdictArchiveProvider
+// instead of stressTestSessionProvider.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -14,16 +18,21 @@ import '../../shared/widgets/stagger_fade_in.dart';
 import '../../shared/widgets/trade_history_tile.dart';
 import '../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import 'stress_test_engine.dart';
+import 'stress_test_models.dart';
 
-class StressTestTradeHistoryScreen extends ConsumerWidget {
+class VerdictTradeHistoryScreen extends ConsumerWidget {
   final String sessionId;
 
-  const StressTestTradeHistoryScreen({super.key, required this.sessionId});
+  const VerdictTradeHistoryScreen({super.key, required this.sessionId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(stressTestRefreshProvider);
-    final session = ref.watch(stressTestSessionProvider(sessionId));
+    final archive = ref.watch(verdictArchiveProvider);
+    final entry = archive.cast<VerdictArchiveEntry?>().firstWhere(
+      (e) => e?.sessionId == sessionId,
+      orElse: () => null,
+    );
+    final trades = entry?.trades ?? const <StressTestTrade>[];
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -48,9 +57,9 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: session == null
+      body: entry == null
           ? const Center(child: Text('Session not found'))
-          : session.trades.isEmpty
+          : trades.isEmpty
           ? const Center(child: Text('No trades yet'))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -59,11 +68,10 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
                 clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
-                    for (int i = 0; i < session.trades.length; i++)
+                    for (int i = 0; i < trades.length; i++)
                       Builder(
                         builder: (context) {
-                          final trade =
-                              session.trades[session.trades.length - 1 - i];
+                          final trade = trades[trades.length - 1 - i];
                           return StaggerFadeIn(
                             index: i,
                             child: TradeHistoryTile(
@@ -74,7 +82,7 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
                               ),
                               isBuy: trade.isBuy,
                               totalValue: trade.shares * trade.price,
-                              showDivider: i != session.trades.length - 1,
+                              showDivider: i != trades.length - 1,
                               onTap: () => context.push(
                                 '/stress-test/$sessionId/trade-detail',
                                 extra: trade,

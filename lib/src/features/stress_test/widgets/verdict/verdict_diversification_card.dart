@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
 import 'verdict_marker_row.dart';
 
@@ -71,7 +72,30 @@ class VerdictDiversificationCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text('DIVERSIFICATION', style: FomoShieldTheme.cardTitle()),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('DIVERSIFICATION', style: FomoShieldTheme.cardTitle()),
+                GestureDetector(
+                  onTap: () =>
+                      context.push('/metric-info/psychology-diversification'),
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.help_outline_rounded,
+                      size: 13,
+                      color: FomoShieldTheme.textLight,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Divider(
             height: 1,

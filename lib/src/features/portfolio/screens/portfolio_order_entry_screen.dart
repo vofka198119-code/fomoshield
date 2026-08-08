@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Portfolio Order Entry Screen — buy/sell for portfolio (Block 3)
 // ---------------------------------------------------------------------------
-// Trading 212 style (full-featured, like Stress Test):
+// Broker style (full-featured, like Stress Test):
 //   - Top panel: operation, price, change
 //   - Order type tabs: Market / Limit
 //   - Input mode: Cost / Shares (BottomSheet)

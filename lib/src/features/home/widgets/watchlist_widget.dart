@@ -10,7 +10,7 @@ import '../../../core/services/gics_sector_mapper.dart';
 import '../home_providers.dart';
 
 // ---------------------------------------------------------------------------
-// Watchlist Widget — Compact (Revolut style)
+// Watchlist Widget — Compact
 // ---------------------------------------------------------------------------
 
 class WatchlistWidget extends ConsumerWidget {

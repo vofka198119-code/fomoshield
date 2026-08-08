@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/theme/fomo_shield_theme.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'widgets/verdict/sector_diversification_tiers.dart';
@@ -181,7 +182,7 @@ class _MarkerDetailBody extends StatelessWidget {
           height: 140,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: ThemeV2.surface,
+            color: FomoShieldTheme.card,
             border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
           ),
           child: Center(
@@ -223,10 +224,7 @@ class _MarkerDetailBody extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: ThemeV2.surface,
-              borderRadius: BorderRadius.circular(20),
-            ),
+            decoration: FomoShieldTheme.cardDecoration,
             child: Text(
               'Detailed feedback for $label is coming soon.',
               textAlign: TextAlign.center,

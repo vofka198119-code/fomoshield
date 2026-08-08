@@ -54,3 +54,30 @@ final cachedLogoEntryProvider =
 });
 
 final logoDaoProvider = Provider<LogoDao>((ref) => LogoDao());
+
+// ---------------------------------------------------------------------------
+// Resolved Company Name Provider — real name for tickers outside any
+// hand-maintained curated list (e.g. Stress Test's stressTestCompanyName()).
+// ---------------------------------------------------------------------------
+// Reuses the same LogoDao cache as the logo providers above: if a trustworthy
+// name is already cached, returns it instantly; otherwise triggers the same
+// Finnhub profile fetch loadLogo() uses (now fixed to persist profile['name']
+// instead of the ticker) and returns the freshly-cached name. Reactive, so
+// UI watching this provider updates once the fetch lands instead of staying
+// stuck on a fallback — unlike a plain synchronous helper would.
+
+final resolvedCompanyNameProvider =
+    FutureProvider.family<String, String>((ref, ticker) async {
+  final dao = ref.read(logoDaoProvider);
+  final cached = await dao.getLogo(ticker);
+  if (cached != null &&
+      cached.companyName.isNotEmpty &&
+      cached.companyName.toUpperCase() != ticker.toUpperCase()) {
+    return cached.companyName;
+  }
+
+  await ref.read(logoRepositoryProvider).loadLogoSymbol(ticker);
+  final refreshed = await dao.getLogo(ticker);
+  final name = refreshed?.companyName;
+  return (name != null && name.isNotEmpty) ? name : ticker;
+});

@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/stagger_fade_in.dart';
 import '../../../shared/widgets/trade_history_tile.dart';
 import '../portfolio_providers.dart';
@@ -74,7 +75,11 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
                             index: i,
                             child: TradeHistoryTile(
                               symbol: tx.symbol,
-                              companyName: tx.symbol,
+                              companyName:
+                                  ref
+                                      .watch(resolvedCompanyNameProvider(tx.symbol))
+                                      .valueOrNull ??
+                                  tx.symbol,
                               isBuy: tx.type == TransactionType.buy,
                               totalValue: tx.shares * tx.price,
                               showDivider: i != portfolio.transactions.length - 1,

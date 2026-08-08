@@ -24,7 +24,7 @@ class StressTestOrderRowTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final accentColor = order.isBuy ? ThemeV2.success : ThemeV2.loss;
-    final companyName = stressTestCompanyName(order.symbol);
+    final companyName = resolveStressTestCompanyName(ref, order.symbol);
 
     return Container(
       width: double.infinity,

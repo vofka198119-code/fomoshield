@@ -871,7 +871,7 @@ class _PortfolioSelector extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Widget Settings BottomSheet (Revolut-style, matching HomeScreen exactly)
+// Widget Settings BottomSheet (matching HomeScreen exactly)
 // ---------------------------------------------------------------------------
 
 class _PortfolioWidgetsSettingsSheet extends StatefulWidget {

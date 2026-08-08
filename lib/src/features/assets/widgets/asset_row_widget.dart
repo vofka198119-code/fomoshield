@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Asset Row Widget — элемент списка активов
 // ---------------------------------------------------------------------------
-// Trading 212 style: logo, название, тикер + доля %, справа стоимость + P&L
+// Broker style: logo, название, тикер + доля %, справа стоимость + P&L
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -12,6 +12,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../stress_test/stress_test_models.dart';
+import '../screens/stock_detail/widgets/stock_detail_helpers.dart';
 
 class AssetRowWidget extends ConsumerWidget {
   final StressTestHolding holding;
@@ -71,7 +72,7 @@ class AssetRowWidget extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _companyName(holding.symbol),
+                    resolveStressTestCompanyName(ref, holding.symbol),
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -128,75 +129,6 @@ class AssetRowWidget extends ConsumerWidget {
 
   String _fmtValue(double v) {
     return NumberFormat('#,##0.00', 'en_US').format(v);
-  }
-
-  String _companyName(String symbol) {
-    // Расширенный словарь для отображения
-    const names = <String, String>{
-      'AAPL': 'Apple',
-      'MSFT': 'Microsoft',
-      'GOOGL': 'Alphabet',
-      'GOOG': 'Alphabet',
-      'AMZN': 'Amazon',
-      'META': 'Meta',
-      'NVDA': 'NVIDIA',
-      'TSLA': 'Tesla',
-      'AMD': 'AMD',
-      'INTC': 'Intel',
-      'CRM': 'Salesforce',
-      'ADBE': 'Adobe',
-      'NFLX': 'Netflix',
-      'CSCO': 'Cisco',
-      'ORCL': 'Oracle',
-      'IBM': 'IBM',
-      'QCOM': 'Qualcomm',
-      'TXN': 'Texas Instruments',
-      'AVGO': 'Broadcom',
-      'MU': 'Micron',
-      'JPM': 'JPMorgan Chase',
-      'BAC': 'Bank of America',
-      'C': 'Citigroup',
-      'GS': 'Goldman Sachs',
-      'MS': 'Morgan Stanley',
-      'WFC': 'Wells Fargo',
-      'AXP': 'American Express',
-      'V': 'Visa',
-      'MA': 'Mastercard',
-      'BLK': 'BlackRock',
-      'SCHW': 'Charles Schwab',
-      'PYPL': 'PayPal',
-      'JNJ': 'Johnson & Johnson',
-      'PFE': 'Pfizer',
-      'UNH': 'UnitedHealth',
-      'ABBV': 'AbbVie',
-      'MRK': 'Merck',
-      'ABT': 'Abbott',
-      'LLY': 'Eli Lilly',
-      'MDT': 'Medtronic',
-      'BMY': 'Bristol-Myers',
-      'AMGN': 'Amgen',
-      'KO': 'Coca-Cola',
-      'PEP': 'PepsiCo',
-      'PG': 'Procter & Gamble',
-      'WMT': 'Walmart',
-      'COST': 'Costco',
-      'MO': 'Altria',
-      'CL': 'Colgate',
-      'KMB': 'Kimberly-Clark',
-      'SYY': 'Sysco',
-      'GIS': 'General Mills',
-      'NOVA': 'NovaGenix',
-      'ZEN': 'Zenith AI',
-      'AURA': 'Aura Energy',
-      'VERT': 'VertiCarbon',
-      'CORE': 'CoreVault',
-      'MORF': 'Morphic Labs',
-      'DRIF': 'Drift Auto',
-      'PULS': 'Pulse Health',
-      'CASP': 'Caspian Data',
-      'NEXO': 'NexoGene',
-    };
-    return names[symbol] ?? symbol;
   }
 }
 

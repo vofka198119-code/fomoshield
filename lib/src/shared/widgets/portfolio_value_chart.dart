@@ -2,7 +2,7 @@
 // Portfolio Value Chart Widget — fl_chart (Portfolio section)
 // ---------------------------------------------------------------------------
 // Professional chart showing portfolio value over time.
-// Same Trading 212-style design as Stress Test chart.
+// Same broker-style design as Stress Test chart.
 // Takes List<ChartDataPoint> from portfolioChartDataProvider.
 // ---------------------------------------------------------------------------
 

@@ -65,15 +65,15 @@ class StressTestTradeDetailScreen extends StatelessWidget {
   }
 }
 
-class _TradeDetailCard extends StatelessWidget {
+class _TradeDetailCard extends ConsumerWidget {
   final StressTestTrade trade;
 
   const _TradeDetailCard({required this.trade});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final accent = trade.isBuy ? ThemeV2.success : ThemeV2.loss;
-    final companyName = stressTestCompanyName(trade.symbol);
+    final companyName = resolveStressTestCompanyName(ref, trade.symbol);
 
     return Container(
       decoration: FomoShieldTheme.cardDecoration,

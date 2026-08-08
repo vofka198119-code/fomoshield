@@ -70,16 +70,19 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
   }
 }
 
-class _TradeDetailCard extends StatelessWidget {
+class _TradeDetailCard extends ConsumerWidget {
   final Transaction tx;
   final Order? order;
 
   const _TradeDetailCard({required this.tx, required this.order});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isBuy = tx.type == TransactionType.buy;
     final accent = isBuy ? ThemeV2.success : ThemeV2.loss;
+    final companyName =
+        ref.watch(resolvedCompanyNameProvider(tx.symbol)).valueOrNull ??
+        tx.symbol;
 
     return Container(
       decoration: FomoShieldTheme.cardDecoration,
@@ -126,13 +129,27 @@ class _TradeDetailCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  tx.symbol,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.textPrimary,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      companyName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: ThemeV2.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      tx.symbol,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: ThemeV2.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Container(

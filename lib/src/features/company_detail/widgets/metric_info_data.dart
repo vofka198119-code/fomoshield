@@ -1008,17 +1008,16 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
             'more efficiently. That is exactly what ROE measures.',
       ),
       MetricInfoSection(
-        header: 'Why Warren Buffett pays close attention to ROE',
+        header: 'Why long-term investors watch ROE closely',
         body:
-            'Legendary investor Warren Buffett has often favored '
-            'companies that consistently generate high ROE over many '
-            'years.\n\n'
+            'Many successful long-term investors favor companies that '
+            'consistently generate high ROE over many years.\n\n'
             'Why? Because consistently high ROE may indicate: strong '
             'management, durable competitive advantages, efficient use of '
             'capital, and a business capable of generating long-term '
             'value for shareholders.\n\n'
-            'However, Buffett also emphasizes that high ROE should always '
-            'be supported by reasonable debt levels.',
+            'That said, high ROE should always be checked against '
+            'reasonable debt levels — see below.',
       ),
       MetricInfoSection(
         header: 'Key Takeaway',
@@ -2637,6 +2636,126 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
             'The goal of diversification is not to remove all risk.\n\n'
             'That is impossible.\n\n'
             'The goal is to make risk manageable.',
+      ),
+    ],
+  ),
+
+  // ── Session Complete — Guardian's Verdict full text ──────────────────
+  // Reached via "View your analysis" on the Session Complete screen's
+  // first card (verdict_screen.dart's _GuardianVerdictSection). Same
+  // short-text + expand-to-full-screen pattern as every other "?" info
+  // screen.
+  'guardian-verdict': MetricInfoContent(
+    title: 'GUARDIAN\'S VERDICT',
+    subtitle: 'Congratulations — you have completed your portfolio stress '
+        'test.',
+    showStressTestDisclaimer: true,
+    sections: [
+      MetricInfoSection(
+        header: 'Stress Test Complete',
+        body:
+            'During the simulation, you experienced different market '
+            'periods and scenarios based on patterns observed throughout '
+            'real market history. Events that can unfold over months or '
+            'even years in the real world were accelerated in the '
+            'simulation, allowing you to experience their effects in a '
+            'much shorter period of time.\n\n'
+            'You saw how your portfolio could behave under very different '
+            'conditions:\n\n'
+            '📈 Market growth\n'
+            '➖ Sideways markets and uncertainty\n'
+            '📉 Market declines\n'
+            '🔄 Recovery after a downturn\n'
+            '🚀 Market hype\n'
+            '🎲 Speculative movements\n'
+            '⚠️ Crisis scenarios\n'
+            '🦢 Rare extreme events and Black Swan scenarios\n\n'
+            'Each of these market phases has its own characteristics.\n\n'
+            'Hype is not simply a rising price.\n\n'
+            'Speculation is not the same as long-term investing.\n\n'
+            'A market decline does not automatically mean that a business '
+            'is becoming weaker.\n\n'
+            'And strong price growth does not automatically mean that an '
+            'asset has become a better investment.\n\n'
+            'During the test, you have already seen these patterns in '
+            'action. Some of them you may have recognized immediately. '
+            'Others may have passed unnoticed. That is why one test may '
+            'not be enough.\n\n'
+            'Try running different stress tests again. Change your '
+            'portfolio and observe how your decisions and portfolio '
+            'behavior change under different market conditions.\n\n'
+            'Over time, you may become better at recognizing different '
+            'market phases and understanding why the same action can '
+            'have a very different meaning depending on the situation.',
+      ),
+      MetricInfoSection(
+        header: 'One Important Thing to Remember',
+        body:
+            'Neither in the real world nor in our simulator can anyone '
+            'know with certainty which direction the market will take '
+            'tomorrow.\n\n'
+            'No one can reliably predict: when a period of growth will '
+            'end; when a decline will begin; how deep a decline will '
+            'become; when recovery will start; which sector will become '
+            'the next leader; which unexpected event will change market '
+            'sentiment.\n\n'
+            'That is why this test is not designed to teach you how to '
+            'predict the market. It is designed to teach you something '
+            'more useful: how to understand possible market scenarios '
+            'and observe your own behavior when they occur.',
+      ),
+      MetricInfoSection(
+        header: 'Train, Don\'t Predict',
+        body:
+            'Use the simulator as a training environment. Run different '
+            'scenarios. Observe your decisions. Watch what happens to '
+            'your portfolio as market conditions change.\n\n'
+            'Most importantly, learn to recognize the classic mistakes '
+            'investors have been studying for decades: chasing hype, '
+            'FOMO, poor diversification, excessive concentration, panic '
+            'selling, having no cash reserve, constantly trying to time '
+            'the market, and making decisions based on emotions.\n\n'
+            'And there is an important distinction: this is about '
+            'investing, not trading. A trader and a long-term investor '
+            'may look at the same market, but their goals, time '
+            'horizons, and approaches to risk can be very different. Our '
+            'simulator is not designed to teach you to constantly buy '
+            'and sell. It is designed to help you understand long-term '
+            'investment behavior and develop better decision-making '
+            'habits.',
+      ),
+      MetricInfoSection(
+        header: 'Now, Let\'s Look at Your Results',
+        body:
+            'Below, you will find a detailed analysis of your actions '
+            'and your portfolio throughout the simulation. Each '
+            'indicator is based on your actual decisions and the events '
+            'that occurred during the test.\n\n'
+            'The system analyzes: which assets you selected; how '
+            'diversified your portfolio was; when you bought; when you '
+            'sold; how you behaved during market declines; how '
+            'frequently you changed your positions; whether you '
+            'demonstrated patience; how you managed risk and your cash '
+            'reserve; how closely your behavior matched the principles '
+            'of disciplined long-term investing.\n\n'
+            'Your actions are processed through an objective algorithmic '
+            'analysis that produces individual behavioral indicators and '
+            'an overall investor profile.\n\n'
+            'This is not about simply telling you "You did this right." '
+            'or "You did this wrong." Instead, the system shows: what '
+            'happened, why it matters, and which investment skill you '
+            'may want to develop further.\n\n'
+            'Your result should therefore not be treated as a final '
+            'judgment. It is not a prediction of your future financial '
+            'results, and it is not a measure of you as a person. It is '
+            'a snapshot of your behavior within this particular '
+            'simulation.\n\n'
+            'And if you don\'t like your result — that\'s actually a '
+            'good thing. Because here, you have an opportunity that is '
+            'much harder to get in real life: make mistakes in the '
+            'simulator, study your decisions, try again, and gradually '
+            'learn to recognize and avoid classic investment mistakes '
+            'before they become real-world problems.',
       ),
     ],
   ),

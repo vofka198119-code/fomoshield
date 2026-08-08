@@ -34,15 +34,24 @@ class LogoRepository {
   /// Загружает логотип, если его нет в кэше.
   /// Возвращает URL логотипа (из кэша или свежезагруженный).
   Future<String?> loadLogo(Company company) async {
-    // 1. Проверить кэш
+    // 1. Проверить кэш — но если companyName в кэше равен самому тикеру,
+    // это след старого бага loadLogoSymbol() (см. ниже): запись считается
+    // непригодной и перезагружается, чтобы самоисправиться при следующем
+    // обращении вместо того чтобы хранить тикер вместо имени вечно.
     final cached = await _dao.getLogo(company.ticker);
-    if (cached != null) return cached.logoUrl;
+    final cachedNameUseless = cached != null &&
+        cached.companyName.toUpperCase() == company.ticker.toUpperCase();
+    if (cached != null && !cachedNameUseless) return cached.logoUrl;
 
-    // 2. Если нет в кэше — загрузить profile и сохранить
+    // 2. Если нет в кэше (или имя непригодно) — загрузить profile и сохранить
     try {
       final profile = await _api.companyProfile(company.ticker);
       final weburl = profile['weburl'] as String?;
       final finnhubLogo = profile['logo'] as String?;
+      // Finnhub profile2 всегда возвращает настоящее имя компании — раньше
+      // оно игнорировалось: loadLogoSymbol() передавал Company(name: ticker),
+      // и в companyName записывался тикер вместо реального имени.
+      final profileName = profile['name'] as String?;
 
       // Домен из weburl
       String? domain;
@@ -73,10 +82,14 @@ class LogoRepository {
         return null;
       }
 
-      // Сохранить в постоянный кэш
+      // Сохранить в постоянный кэш. profileName приоритетнее company.name —
+      // last-known-good real name бьёт слабый/ticker-only фоллбэк, с которым
+      // Company мог быть создан вызывающей стороной (см. loadLogoSymbol).
       final entry = LogoCacheEntry(
         ticker: company.ticker.toUpperCase(),
-        companyName: company.name,
+        companyName: (profileName != null && profileName.isNotEmpty)
+            ? profileName
+            : company.name,
         domain: domain,
         logoUrl: logoUrl,
         createdAt: DateTime.now(),

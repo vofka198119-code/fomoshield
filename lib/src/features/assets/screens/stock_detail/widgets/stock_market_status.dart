@@ -50,7 +50,7 @@ StressTestMarketPhase currentStressTestMarketPhase() {
   };
 }
 
-/// Show market hours bottom sheet (Revolut-style).
+/// Show market hours bottom sheet.
 void showStressTestMarketHoursSheet(BuildContext context) {
   final currentPhase = currentStressTestMarketPhase();
 

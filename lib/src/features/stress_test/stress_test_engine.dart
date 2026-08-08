@@ -1080,7 +1080,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
     if (session.id.isEmpty) {
       return const PsychologicalVerdict(
-        primaryType: VerdictType.buffettShield,
+        primaryType: VerdictType.patientShield,
         fsScore: 0,
         title: 'No Data',
         description: 'Session data not found.',
@@ -1139,10 +1139,10 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           'methodical investing to dopamine-driven speculation. '
           'Consider whether each trade has a clear thesis behind it.';
     }
-    // Priority 4: Buffett Shield (Ultimate Praise)
+    // Priority 4: Patient Shield (Ultimate Praise)
     else if (totalTrades <= 5 && pnl > 0 && soldBottom == 0) {
-      primaryType = VerdictType.buffettShield;
-      title = 'BUFFETT SHIELD — Disciplined Investor';
+      primaryType = VerdictType.patientShield;
+      title = 'PATIENT SHIELD — Disciplined Investor';
       description =
           'You demonstrated remarkable discipline by making few, well-timed trades, '
           'holding through volatility, and avoiding panic selling. '
@@ -1160,7 +1160,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     }
     // Fallback: Balanced
     else {
-      primaryType = VerdictType.buffettShield;
+      primaryType = VerdictType.patientShield;
       title = 'BALANCED — Developing Investor';
       description =
           'Your trading patterns show a mix of behaviors. While you avoided '
@@ -1212,7 +1212,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     // Bonus for surviving catastrophe
     if (hasCat && session.blackSwanSurvived) score += 20;
 
-    // Bonus for low trading + profit (Buffett behavior)
+    // Bonus for low trading + profit (patient, disciplined behavior)
     if (totalTrades <= 5 && pnl > 0) score += 15;
 
     return score.clamp(0, 100);

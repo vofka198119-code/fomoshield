@@ -205,13 +205,13 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
 /// the bar's fill, percentage number at the end — same read as a workload
 /// chart. Shows every holding, not just a preview — this is the detail
 /// screen the ring's legend "More" button can't fully replace.
-class _AssetAllocationBarsCard extends StatelessWidget {
+class _AssetAllocationBarsCard extends ConsumerWidget {
   final StressTestSession session;
 
   const _AssetAllocationBarsCard({required this.session});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final holdings = session.holdings;
     final invested = <({String symbol, double value})>[];
     double totalInvested = 0;
@@ -282,7 +282,7 @@ class _AssetAllocationBarsCard extends StatelessWidget {
                 children: [
                   for (final item in invested)
                     AllocationBarRow(
-                      name: stressTestCompanyName(item.symbol),
+                      name: resolveStressTestCompanyName(ref, item.symbol),
                       percent: item.value / totalInvested * 100,
                     ),
                 ],

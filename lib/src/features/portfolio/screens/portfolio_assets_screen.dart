@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Portfolio Assets Screen — список активов портфеля (Блок 1 для Portfolio)
 // ---------------------------------------------------------------------------
-// Trading 212 style:
+// Broker style:
 //   - Total Balance (СТОИМОСТЬ АКТИВОВ, нереализованная прибыль, базовая стоимость)
 //   - Search bar + сортировка
 //   - Список активов с лого, названием, тикером, стоимостью, P&L
@@ -316,6 +316,9 @@ class _PortfolioAssetRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final logoAsync = ref.watch(cachedLogoProvider(holding.symbol));
     final isPositive = holding.pnl >= 0;
+    final companyName =
+        ref.watch(resolvedCompanyNameProvider(holding.symbol)).valueOrNull ??
+        holding.symbol;
 
     return GestureDetector(
       onTap: () {
@@ -351,11 +354,21 @@ class _PortfolioAssetRow extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    holding.symbol,
+                    companyName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: ThemeV2.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    holding.symbol,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: ThemeV2.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 2),

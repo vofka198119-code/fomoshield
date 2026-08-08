@@ -4,7 +4,7 @@ import '../../core/theme/theme_v2.dart';
 import 'card_frame.dart';
 
 // ---------------------------------------------------------------------------
-// Widget Container — Card wrapper in Revolut style
+// Widget Container — Card wrapper
 // ---------------------------------------------------------------------------
 // Renders a titled card with a chevron header, compact item list,
 // thin dividers between items, and a "More" footer button.

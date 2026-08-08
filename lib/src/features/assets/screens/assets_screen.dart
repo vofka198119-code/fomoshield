@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Stress Test Assets Screen — holdings list (Block 1)
 // ---------------------------------------------------------------------------
-// Trading 212 style:
+// Broker style:
 //   - Total Balance (TOTAL VALUE, unrealized P&L, start cash)
 //   - Search bar + sort toggles (Value / Market Price)
 //   - Holdings list with logo, name, ticker, weight, value, P&L

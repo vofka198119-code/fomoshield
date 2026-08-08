@@ -268,7 +268,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: PriceHeader(
                         logo: logoAsync.valueOrNull,
-                        companyName: stressTestCompanyName(widget.symbol),
+                        companyName: resolveStressTestCompanyName(ref, widget.symbol),
                         symbol: widget.symbol,
                         price: currentPrice,
                         change: priceChange,

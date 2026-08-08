@@ -1287,7 +1287,7 @@ class StressTestSession {
 // Psychological Verdict
 // ---------------------------------------------------------------------------
 
-enum VerdictType { panic, fomo, activeTrader, buffettShield }
+enum VerdictType { panic, fomo, activeTrader, patientShield }
 
 class PsychologicalVerdict {
   final VerdictType primaryType;
@@ -1317,8 +1317,12 @@ class PsychologicalVerdict {
 
   factory PsychologicalVerdict.fromJson(Map<String, dynamic> json) =>
       PsychologicalVerdict(
+        // orElse covers 'buffettShield' from archives saved before the enum
+        // was renamed to patientShield — falls back instead of throwing so
+        // old on-device verdict history doesn't crash on load.
         primaryType: VerdictType.values.firstWhere(
           (t) => t.name == (json['primaryType'] as String),
+          orElse: () => VerdictType.patientShield,
         ),
         fsScore: json['fsScore'] as int? ?? 0,
         title: json['title'] as String? ?? '',

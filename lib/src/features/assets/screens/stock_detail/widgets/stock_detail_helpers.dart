@@ -1,4 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../../../../core/cache/logo_providers.dart';
 
 // ---------------------------------------------------------------------------
 // Shared formatting/lookup helpers for the Stress Test stock detail screen's
@@ -73,6 +75,17 @@ const Map<String, String> _stressTestCompanyNames = <String, String>{
 
 String stressTestCompanyName(String symbol) =>
     _stressTestCompanyNames[symbol] ?? symbol;
+
+/// Same as [stressTestCompanyName], but for real tickers outside the curated
+/// map above (anything buyable via Search that isn't one of the ~50 famous
+/// companies or Stress Test's own fictional assets) — falls through to the
+/// real cached/fetched name via [resolvedCompanyNameProvider] instead of
+/// giving up and showing the raw ticker.
+String resolveStressTestCompanyName(WidgetRef ref, String symbol) {
+  final curated = stressTestCompanyName(symbol);
+  if (curated != symbol) return curated;
+  return ref.watch(resolvedCompanyNameProvider(symbol)).valueOrNull ?? symbol;
+}
 
 String stressTestSectorName(String symbol) {
   const tech = {

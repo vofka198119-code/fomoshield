@@ -5,7 +5,7 @@
 // PortfolioValueChartWidget (PortfolioChartRange), MarketValueChart
 // (_ValuePeriod), and PriceChart (ChartPeriod) — each its own enum, each a
 // hand-rolled tab row, each drifting slightly in visual style. This is the
-// "Trading 212-style" look Portfolio's chart already had (its own comment
+// broker-style look Portfolio's chart already had (its own comment
 // called it out as the intended look for the Stress Test chart too, which
 // never actually matched it until now). Generic over the period type [T]
 // so each caller keeps its own enum/period set — only the selector UI is

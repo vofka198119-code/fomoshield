@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/trade_history_tile.dart';
 import '../portfolio_providers.dart';
@@ -45,7 +46,9 @@ class PortfolioTradeHistoryWidget extends ConsumerWidget {
           .map(
             (tx) => TradeHistoryTile(
               symbol: tx.symbol,
-              companyName: tx.symbol,
+              companyName:
+                  ref.watch(resolvedCompanyNameProvider(tx.symbol)).valueOrNull ??
+                  tx.symbol,
               isBuy: tx.type == TransactionType.buy,
               totalValue: tx.shares * tx.price,
               showDivider: false,

@@ -799,7 +799,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                         onTapCancel: () {},
                         behavior: HitTestBehavior.opaque,
                         child: Container(
-                          height: 60,
+                          height: 72,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 6,
@@ -870,6 +870,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                         color: ThemeV2.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      h.symbol,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: ThemeV2.textSecondary,
                                       ),
                                     ),
                                     const SizedBox(height: 2),
@@ -984,7 +992,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
   }
 
-  String _companyName(String symbol) => stressTestCompanyName(symbol);
+  String _companyName(String symbol) => resolveStressTestCompanyName(ref, symbol);
 
   String _fmtPosition(double v) {
     return _fmtFull(v);

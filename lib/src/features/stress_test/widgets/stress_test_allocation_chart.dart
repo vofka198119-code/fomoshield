@@ -6,6 +6,7 @@
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -16,7 +17,7 @@ import '../../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 
 /// Card wrapper: donut chart + centered portfolio metrics + cash capsule,
 /// styled to the standard light card (see reference_widget_card_standard).
-class StressTestAllocationChart extends StatefulWidget {
+class StressTestAllocationChart extends ConsumerStatefulWidget {
   final StressTestSession session;
 
   const StressTestAllocationChart({super.key, required this.session});
@@ -41,11 +42,12 @@ class StressTestAllocationChart extends StatefulWidget {
   }
 
   @override
-  State<StressTestAllocationChart> createState() =>
+  ConsumerState<StressTestAllocationChart> createState() =>
       _StressTestAllocationChartState();
 }
 
-class _StressTestAllocationChartState extends State<StressTestAllocationChart> {
+class _StressTestAllocationChartState
+    extends ConsumerState<StressTestAllocationChart> {
   static const int _legendPreviewLimit = 5;
   bool _showAll = false;
 
@@ -241,7 +243,10 @@ class _StressTestAllocationChartState extends State<StressTestAllocationChart> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                stressTestCompanyName(invested[i].symbol),
+                                resolveStressTestCompanyName(
+                                  ref,
+                                  invested[i].symbol,
+                                ),
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.inter(
                                   fontSize: 13,

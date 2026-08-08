@@ -254,14 +254,14 @@ class VerdictCard extends StatelessWidget {
     VerdictType.panic => ThemeV2.loss,
     VerdictType.fomo => ThemeV2.warning,
     VerdictType.activeTrader => ThemeV2.primary,
-    VerdictType.buffettShield => ThemeV2.success,
+    VerdictType.patientShield => ThemeV2.success,
   };
 
   IconData _verdictIcon(VerdictType type) => switch (type) {
     VerdictType.panic => Icons.psychology_rounded,
     VerdictType.fomo => Icons.trending_up_rounded,
     VerdictType.activeTrader => Icons.swap_horiz_rounded,
-    VerdictType.buffettShield => Icons.shield_rounded,
+    VerdictType.patientShield => Icons.shield_rounded,
   };
 }
 
