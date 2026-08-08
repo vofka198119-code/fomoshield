@@ -9,9 +9,9 @@
 // even at zero — same "always visible, never a substitute empty state" rule
 // as the Portfolio Balance detail screen's widgets.
 //
-// Split 2026-08-08 from the per-trade list, now its own
-// VerdictTradeHistoryWidget below this one on the Verdict screen — this
-// card is purely the aggregate summary.
+// The per-trade list itself lives on the chevron-linked
+// VerdictTradeBreakdownDetailScreen (dark card family), not here — this
+// card is purely the light-theme aggregate summary.
 //
 // Light card, matches verdict_screen.dart's own FomoShieldTheme.cardDecoration
 // style (NOT the dark-green Stress Test widget family — this screen uses its
@@ -19,6 +19,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -59,7 +60,22 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text('TRADE BREAKDOWN', style: FomoShieldTheme.cardTitle()),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('TRADE BREAKDOWN', style: FomoShieldTheme.cardTitle()),
+                GestureDetector(
+                  onTap: () => context.push(
+                    '/stress-test/${entry.sessionId}/verdict-trade-breakdown',
+                  ),
+                  child: const Icon(
+                    Icons.chevron_right_rounded,
+                    color: ThemeV2.textSecondary,
+                    size: 22,
+                  ),
+                ),
+              ],
+            ),
           ),
           Divider(
             height: 1,

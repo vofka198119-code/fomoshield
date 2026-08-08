@@ -33,7 +33,7 @@ import '../../features/stress_test/stress_test_portfolio_balance_screen.dart';
 import '../../features/stress_test/stress_test_psychology_meter_screen.dart';
 import '../../features/stress_test/stress_test_trade_history_screen.dart';
 import '../../features/stress_test/stress_test_trade_detail_screen.dart';
-import '../../features/stress_test/verdict_trade_history_screen.dart';
+import '../../features/stress_test/verdict_trade_breakdown_detail_screen.dart';
 import '../../features/stress_test/stress_test_models.dart' show StressTestTrade;
 import '../../features/portfolio/screens/portfolio_trade_history_screen.dart';
 import '../../features/portfolio/screens/portfolio_trade_detail_screen.dart';
@@ -233,11 +233,11 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: '/stress-test/:id/verdict-trade-history',
-        name: 'verdictTradeHistory',
+        path: '/stress-test/:id/verdict-trade-breakdown',
+        name: 'verdictTradeBreakdown',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          return VerdictTradeHistoryScreen(sessionId: id);
+          return VerdictTradeBreakdownDetailScreen(sessionId: id);
         },
       ),
 

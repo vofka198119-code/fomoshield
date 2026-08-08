@@ -981,6 +981,17 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       cash: completed.cash,
     );
     final finalSafetyMarker = safetyMarkerFor(completed.holdings);
+    final scenarioCounts = <String, int>{};
+    for (final epoch in completed.epochHistory) {
+      scenarioCounts[epoch.scenario.name] =
+          (scenarioCounts[epoch.scenario.name] ?? 0) + 1;
+    }
+    final unrealizedPnlBySymbol = <String, double>{
+      for (final h in completed.holdings)
+        h.symbol:
+            ((completed.currentPrices[h.symbol] ?? h.avgCost) - h.avgCost) *
+            h.shares,
+    };
     final entry = VerdictArchiveEntry(
       sessionId: session.id,
       durationLabel: session.duration.displayName,
@@ -1003,6 +1014,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       strategyCashBuffer: finalStrategyScores.cashBuffer,
       safetyMarker: finalSafetyMarker.score,
       safetyMarkerHasData: finalSafetyMarker.hasData,
+      scenarioCounts: scenarioCounts,
+      unrealizedPnlBySymbol: unrealizedPnlBySymbol,
     );
     // ── Task 1.7: FIFO Verdict History ──────────────────────────
     // Oldest record at index 0, newest appended at the end.

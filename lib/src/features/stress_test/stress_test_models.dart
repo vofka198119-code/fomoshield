@@ -1388,6 +1388,25 @@ class VerdictArchiveEntry {
   final double safetyMarker;
   final bool safetyMarkerHasData;
 
+  /// How many epochs of each [MarketScenario] the session went through
+  /// before completion, keyed by [MarketScenario.name] — snapshotted from
+  /// [StressTestSession.epochHistory] the same way [trades] is, since the
+  /// live session itself is wiped on completion. Added 2026-08-08 for the
+  /// Trade Breakdown detail screen's "Scenarios Experienced" card; absent
+  /// (empty map) for verdicts archived before this field existed.
+  final Map<String, int> scenarioCounts;
+
+  /// Mark-to-market P&L for every symbol STILL HELD at completion —
+  /// `(finalPrice - avgCost) * shares`, snapshotted from the live
+  /// session's holdings/currentPrices the moment before it's wiped (same
+  /// reason [scenarioCounts] exists — this data doesn't survive archiving
+  /// otherwise). The Companies card adds this to a symbol's realized P&L
+  /// (summed from [trades]) so a never-sold holding shows its real gain/
+  /// loss "as if sold at test end" instead of a misleading $0. Added
+  /// 2026-08-08; absent (empty map) for verdicts archived before this
+  /// field existed.
+  final Map<String, double> unrealizedPnlBySymbol;
+
   const VerdictArchiveEntry({
     required this.sessionId,
     required this.durationLabel,
@@ -1410,6 +1429,8 @@ class VerdictArchiveEntry {
     this.strategyCashBuffer = 0,
     this.safetyMarker = 0,
     this.safetyMarkerHasData = false,
+    this.scenarioCounts = const {},
+    this.unrealizedPnlBySymbol = const {},
   });
 
   Map<String, dynamic> toJson() => {
@@ -1434,6 +1455,8 @@ class VerdictArchiveEntry {
     'strategyCashBuffer': strategyCashBuffer,
     'safetyMarker': safetyMarker,
     'safetyMarkerHasData': safetyMarkerHasData,
+    'scenarioCounts': scenarioCounts,
+    'unrealizedPnlBySymbol': unrealizedPnlBySymbol,
   };
 
   factory VerdictArchiveEntry.fromJson(Map<String, dynamic> json) =>
@@ -1475,6 +1498,18 @@ class VerdictArchiveEntry {
             (json['strategyCashBuffer'] as num?)?.toDouble() ?? 0,
         safetyMarker: (json['safetyMarker'] as num?)?.toDouble() ?? 0,
         safetyMarkerHasData: json['safetyMarkerHasData'] as bool? ?? false,
+        // Absent for verdicts archived before this field existed — the
+        // Scenarios Experienced card just shows all zeros.
+        scenarioCounts: (json['scenarioCounts'] as Map<String, dynamic>?)
+                ?.map((k, v) => MapEntry(k, v as int)) ??
+            const {},
+        // Absent for verdicts archived before this field existed — the
+        // Companies card falls back to realized-only P&L (still-held
+        // positions show $0 instead of a real mark-to-market figure).
+        unrealizedPnlBySymbol:
+            (json['unrealizedPnlBySymbol'] as Map<String, dynamic>?)
+                ?.map((k, v) => MapEntry(k, (v as num).toDouble())) ??
+            const {},
       );
 }
 

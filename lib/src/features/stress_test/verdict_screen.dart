@@ -15,7 +15,6 @@ import '../../core/theme/fomo_shield_theme.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'widgets/verdict_trade_breakdown_widget.dart';
-import 'widgets/verdict_trade_history_widget.dart';
 import 'widgets/verdict/verdict_marker_row.dart';
 import 'widgets/verdict/verdict_diversification_card.dart';
 import 'widgets/verdict/verdict_strategy_card.dart';
@@ -147,15 +146,10 @@ class VerdictScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // ── Trade Breakdown (incl. session stats) ────────────
+            // ── Trade Breakdown (incl. session stats; full detail
+            // screen — reached via its own chevron — now also hosts
+            // Trade History) ──────────────────────────────────────
             VerdictTradeBreakdownWidget(entry: entry),
-            const SizedBox(height: 16),
-
-            // ── Trade History ────────────────────────────────────
-            VerdictTradeHistoryWidget(
-              sessionId: sessionId,
-              trades: entry.trades,
-            ),
             const SizedBox(height: 16),
 
             const StressTestVerdictDisclaimer(),
