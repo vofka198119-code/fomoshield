@@ -20,10 +20,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../market_clock/market_clock_dial.dart'
+    show dialLight, dialDark, dialBrassLight;
 import '../stress_test_models.dart';
 
 final _priceFmt = NumberFormat('#,##0.00', 'en_US');
@@ -90,11 +90,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
               children: [
                 _statRow('Total Trades', '${entry.totalTrades}'),
                 _statRow('Holdings', '${entry.holdingCount}'),
-                _statRow(
-                  'Final P&L',
-                  _fmtMoney(totalPnl),
-                  valueColor: totalPnl >= 0 ? ThemeV2.success : ThemeV2.loss,
-                ),
+                _statRow('Final P&L', _fmtMoney(totalPnl)),
                 _statRow(
                   'Final Balance',
                   '\$${entry.finalValue.toStringAsFixed(0)}',
@@ -112,30 +108,39 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
     );
   }
 
-  Widget _statRow(
-    String label,
-    String value, {
-    Color? valueColor,
-    bool isLast = false,
-  }) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
+  /// Same shape as the detail screen's own row (_Row in
+  /// verdict_trade_breakdown_detail_screen.dart): white label, gold value,
+  /// white 12%-alpha underline between rows — kept in sync by eye per
+  /// 2026-08-08 visual-parity ask, not shared code (that _Row is private).
+  Widget _statRow(String label, String value, {bool isLast = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: isLast
+          ? null
+          : BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
+              ),
+            ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: GoogleFonts.inter(
-              fontSize: 13,
-              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
             ),
           ),
           Text(
             value,
             style: interNums(
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: valueColor ?? Colors.white,
+              color: dialBrassLight,
             ),
           ),
         ],

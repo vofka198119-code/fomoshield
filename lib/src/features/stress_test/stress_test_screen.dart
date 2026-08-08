@@ -31,7 +31,6 @@ import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import '../../shared/widgets/psychology_meter.dart';
 import '../../shared/widgets/market_timeline.dart';
-import '../../shared/widgets/verdict_card.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'widgets/market_value_chart.dart';
@@ -1017,7 +1016,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 
     if (isExpiredTimer) {
       label = 'Test Complete';
-      timeText = '0д 00ч 00м 00с';
+      timeText = '0d 00h 00m 00s';
       timerColor = ThemeV2.loss;
     } else if (isCountdown && remaining != null) {
       label = 'Time Remaining';
@@ -1027,7 +1026,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       final m = remaining.inMinutes % 60;
       final s = remaining.inSeconds % 60;
       timeText =
-          '$dд ${h.toString().padLeft(2, '0')}ч ${m.toString().padLeft(2, '0')}м ${s.toString().padLeft(2, '0')}с';
+          '${d}d ${h.toString().padLeft(2, '0')}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
       if (remaining.inDays < 1) timerColor = ThemeV2.warning;
       if (remaining.inHours < 1) timerColor = ThemeV2.loss;
     } else {
@@ -1040,7 +1039,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       final m = elapsed.inMinutes % 60;
       final s = elapsed.inSeconds % 60;
       timeText =
-          '$dд ${h.toString().padLeft(2, '0')}ч ${m.toString().padLeft(2, '0')}м ${s.toString().padLeft(2, '0')}с';
+          '${d}d ${h.toString().padLeft(2, '0')}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
     }
 
     // Infinite ("until bored") past its 14-day minimum: the countdown is
@@ -1206,13 +1205,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // ── Completed View ─────────────────────────────────────────────
 
   Widget _buildCompletedView(StressTestSession session) {
-    // Try to find the verdict archive entry for this session
-    final archive = ref.watch(verdictArchiveProvider);
-    final entry = archive.cast<VerdictArchiveEntry?>().firstWhere(
-      (e) => e?.sessionId == widget.sessionId,
-      orElse: () => null,
-    );
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -1282,39 +1274,33 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
           const SizedBox(height: 12),
 
-          // ── Verdict Card ────────────────────────────────
-          if (entry != null)
-            _buildSectionCard(
-              title: 'PSYCHOLOGIST VERDICT',
-              noInnerPadding: true,
-              child: VerdictCard(entry: entry, sessionId: widget.sessionId),
-            )
-          else ...[
-            // Fallback: session completed but verdict not in archive yet
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _showVerdict,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ThemeV2.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+          // ── Verdict entry point — the old inline VerdictCard summary
+          // (shared/widgets/verdict_card.dart) was cut 2026-08-08: it
+          // duplicated an older, unstyled version of the Session Complete
+          // screen and the user had never actually seen it. This button
+          // always links to the real Session Complete screen instead.
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _showVerdict,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeV2.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Text(
-                  'VIEW PSYCHOLOGIST VERDICT',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                    letterSpacing: 0.5,
-                  ),
+              ),
+              child: Text(
+                'VIEW PSYCHOLOGIST VERDICT',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
-          ],
+          ),
 
           const SizedBox(height: 24),
           const DisclaimerFooter(),

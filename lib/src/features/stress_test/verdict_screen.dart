@@ -1,8 +1,12 @@
 // ---------------------------------------------------------------------------
 // Verdict Screen — Final Psychological Assessment
 // ---------------------------------------------------------------------------
-// Displays the calculated psychological verdict with FS Score, behavioral
-// diagnosis, diversification warning, and the "Absolute Shield" badge.
+// Displays the calculated psychological verdict: FS Score plus the
+// Strategy/Diversification/marker breakdown cards. The Absolute Shield
+// badge and over-concentration warning card (conditional, rarely shown)
+// were cut 2026-08-08, along with the in-progress Stress Test screen's
+// old duplicate VerdictCard widget (shared/widgets/verdict_card.dart,
+// deleted the same day — this screen is now the only verdict UI).
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -13,6 +17,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../shared/widgets/stagger_fade_in.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'widgets/verdict_trade_breakdown_widget.dart';
@@ -84,111 +89,156 @@ class VerdictScreen extends ConsumerWidget {
         child: Column(
           children: [
             // ── Guardian Verdict ────────────────────────────────
-            const _GuardianVerdictSection(),
+            const KeyedSubtree(
+              key: ValueKey('guardian'),
+              child: StaggerFadeIn(index: 0, child: _GuardianVerdictSection()),
+            ),
             const SizedBox(height: 24),
 
             // ── Guardian Shield Icon + FS Score ─────────────────
-            _buildFsScoreGauge(verdict.fsScore),
+            KeyedSubtree(
+              key: const ValueKey('fsScore'),
+              child: StaggerFadeIn(
+                index: 1,
+                child: _buildFsScoreGauge(verdict.fsScore),
+              ),
+            ),
             const SizedBox(height: 24),
 
-            // ── Absolute Shield Badge ───────────────────────────
-            if (verdict.hasAbsoluteShieldBadge) ...[
-              _buildAbsoluteShieldBadge(),
-              const SizedBox(height: 20),
-            ],
-
-            // ── Diversification Warning ─────────────────────────
-            if (verdict.hasDiversificationWarning) ...[
-              _buildWarningCard(),
-              const SizedBox(height: 16),
-            ],
-
             // ── Strategy ─────────────────────────────────────────
-            VerdictStrategyCard(
-              sessionId: sessionId,
-              concentrationScore: entry.strategyConcentration,
-              etfExposureScore: entry.strategyEtf,
-              cashBufferScore: entry.strategyCashBuffer,
+            KeyedSubtree(
+              key: const ValueKey('strategy'),
+              child: StaggerFadeIn(
+                index: 2,
+                child: VerdictStrategyCard(
+                  sessionId: sessionId,
+                  concentrationScore: entry.strategyConcentration,
+                  etfExposureScore: entry.strategyEtf,
+                  cashBufferScore: entry.strategyCashBuffer,
+                ),
+              ),
             ),
             const SizedBox(height: 12),
 
             // ── Diversification ──────────────────────────────────
-            VerdictDiversificationCard(
-              sessionId: sessionId,
-              sectorDiversificationScore: entry.strategyDiversification,
-              safetyMarkerScore: entry.safetyMarker,
-              sectorBalanceScore: entry.strategySector,
+            KeyedSubtree(
+              key: const ValueKey('diversification'),
+              child: StaggerFadeIn(
+                index: 3,
+                child: VerdictDiversificationCard(
+                  sessionId: sessionId,
+                  sectorDiversificationScore: entry.strategyDiversification,
+                  safetyMarkerScore: entry.safetyMarker,
+                  sectorBalanceScore: entry.strategySector,
+                ),
+              ),
             ),
             const SizedBox(height: 12),
 
             // ── Per-marker verdict cards ─────────────────────────
-            VerdictSingleMarkerCard(
-              sessionId: sessionId,
-              markerId: 'discipline',
-              title: 'DISCIPLINE',
-              label: 'Discipline',
-              score: entry.discipline,
+            KeyedSubtree(
+              key: const ValueKey('discipline'),
+              child: StaggerFadeIn(
+                index: 4,
+                child: VerdictSingleMarkerCard(
+                  sessionId: sessionId,
+                  markerId: 'discipline',
+                  title: 'DISCIPLINE',
+                  label: 'Discipline',
+                  score: entry.discipline,
+                ),
+              ),
             ),
             const SizedBox(height: 12),
-            VerdictSingleMarkerCard(
-              sessionId: sessionId,
-              markerId: 'panic',
-              title: 'PANIC',
-              label: 'Panic',
-              score: entry.panicResistance,
+            KeyedSubtree(
+              key: const ValueKey('panic'),
+              child: StaggerFadeIn(
+                index: 5,
+                child: VerdictSingleMarkerCard(
+                  sessionId: sessionId,
+                  markerId: 'panic',
+                  title: 'PANIC',
+                  label: 'Panic',
+                  score: entry.panicResistance,
+                ),
+              ),
             ),
             const SizedBox(height: 12),
-            VerdictSingleMarkerCard(
-              sessionId: sessionId,
-              markerId: 'patience',
-              title: 'PATIENCE',
-              label: 'Patience',
-              score: entry.patience,
+            KeyedSubtree(
+              key: const ValueKey('patience'),
+              child: StaggerFadeIn(
+                index: 6,
+                child: VerdictSingleMarkerCard(
+                  sessionId: sessionId,
+                  markerId: 'patience',
+                  title: 'PATIENCE',
+                  label: 'Patience',
+                  score: entry.patience,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
 
             // ── Trade Breakdown (incl. session stats; full detail
             // screen — reached via its own chevron — now also hosts
             // Trade History) ──────────────────────────────────────
-            VerdictTradeBreakdownWidget(entry: entry),
+            KeyedSubtree(
+              key: const ValueKey('tradeBreakdown'),
+              child: StaggerFadeIn(
+                index: 7,
+                child: VerdictTradeBreakdownWidget(entry: entry),
+              ),
+            ),
             const SizedBox(height: 16),
 
-            const StressTestVerdictDisclaimer(),
+            KeyedSubtree(
+              key: const ValueKey('disclaimer'),
+              child: StaggerFadeIn(
+                index: 8,
+                child: const StressTestVerdictDisclaimer(),
+              ),
+            ),
             const SizedBox(height: 24),
 
             // ── Continue Learning ───────────────────────────────
-            SizedBox(
-              width: double.infinity,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => context.go('/stress-test-hub'),
-                  borderRadius: BorderRadius.circular(14),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [dialLight, dialDark],
-                      ),
+            KeyedSubtree(
+              key: const ValueKey('continueLearning'),
+              child: StaggerFadeIn(
+                index: 9,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => context.go('/stress-test-hub'),
                       borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: dialDark.withValues(alpha: 0.35),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [dialLight, dialDark],
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: dialDark.withValues(alpha: 0.35),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Continue Learning',
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Continue Learning',
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -197,18 +247,24 @@ class VerdictScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  context.go('/home');
-                },
-                child: Text(
-                  'Back to Home',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: ThemeV2.textSecondary,
-                    fontWeight: FontWeight.w600,
+            KeyedSubtree(
+              key: const ValueKey('backToHome'),
+              child: StaggerFadeIn(
+                index: 10,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () {
+                      context.go('/home');
+                    },
+                    child: Text(
+                      'Back to Home',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: ThemeV2.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -266,91 +322,6 @@ class VerdictScreen extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAbsoluteShieldBadge() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            ThemeV2.warning.withValues(alpha: 0.15),
-            ThemeV2.warning.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: ThemeV2.warning.withValues(alpha: 0.4),
-          width: 1.5,
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.shield_rounded, color: ThemeV2.warning, size: 48),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'ABSOLUTE SHIELD',
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: ThemeV2.warning,
-                    letterSpacing: 1,
-                  ),
-                ),
-                Text(
-                  'Master of Emotions — rarest achievement',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: ThemeV2.warning.withValues(alpha: 0.7),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWarningCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ThemeV2.warning.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(
-            Icons.warning_amber_rounded,
-            color: ThemeV2.warning,
-            size: 20,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Warning: Over-concentration detected. Putting more than 50% '
-              'of capital into one asset exposes you to unmitigated systemic risk.',
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: ThemeV2.warning,
-                height: 1.5,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

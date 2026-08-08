@@ -19,6 +19,7 @@ import '../../core/cache/logo_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import '../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
+import '../../shared/widgets/stagger_fade_in.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 
@@ -66,61 +67,107 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  _DarkCard(
-                    child: _Row(
-                      label: 'Test Duration',
-                      value: _durationDays(entry.durationLabel),
-                      isLast: true,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _DarkCard(
-                    title: 'STATISTICS',
-                    child: Column(
-                      children: [
-                        _Row(
-                          label: 'Total Trades',
-                          value: '${entry.totalTrades}',
-                        ),
-                        _Row(
-                          label: 'Bought',
-                          value: '${entry.trades.where((t) => t.isBuy).length}',
-                        ),
-                        _Row(
-                          label: 'Sold',
-                          value:
-                              '${entry.trades.where((t) => !t.isBuy).length}',
+                  KeyedSubtree(
+                    key: const ValueKey('duration'),
+                    child: StaggerFadeIn(
+                      index: 0,
+                      child: _DarkCard(
+                        child: _Row(
+                          label: 'Test Duration',
+                          value: _durationDays(entry.durationLabel),
                           isLast: true,
                         ),
-                      ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _DarkCard(
-                    title: 'TOTAL ASSETS',
-                    child: Column(
-                      children: [
-                        _Row(
-                          label: 'Assets Held (Total)',
-                          value: '${_totalAssetsEverHeld(entry)}',
+                  KeyedSubtree(
+                    key: const ValueKey('statistics'),
+                    child: StaggerFadeIn(
+                      index: 1,
+                      child: _DarkCard(
+                        title: 'STATISTICS',
+                        child: Column(
+                          children: [
+                            _Row(
+                              label: 'Total Trades',
+                              value: '${entry.totalTrades}',
+                            ),
+                            _Row(
+                              label: 'Bought',
+                              value:
+                                  '${entry.trades.where((t) => t.isBuy).length}',
+                            ),
+                            _Row(
+                              label: 'Sold',
+                              value:
+                                  '${entry.trades.where((t) => !t.isBuy).length}',
+                              isLast: true,
+                            ),
+                          ],
                         ),
-                        _Row(
-                          label: 'Assets at Test End',
-                          value: '${entry.holdingCount}',
-                          isLast: true,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _financialSummaryCard(entry),
+                  KeyedSubtree(
+                    key: const ValueKey('totalAssets'),
+                    child: StaggerFadeIn(
+                      index: 2,
+                      child: _DarkCard(
+                        title: 'TOTAL ASSETS',
+                        child: Column(
+                          children: [
+                            _Row(
+                              label: 'Assets Held (Total)',
+                              value: '${_totalAssetsEverHeld(entry)}',
+                            ),
+                            _Row(
+                              label: 'Assets at Test End',
+                              value: '${entry.holdingCount}',
+                              isLast: true,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 16),
-                  _scenariosCard(entry),
+                  KeyedSubtree(
+                    key: const ValueKey('financialSummary'),
+                    child: StaggerFadeIn(
+                      index: 3,
+                      child: _financialSummaryCard(entry),
+                    ),
+                  ),
                   const SizedBox(height: 16),
-                  _CompaniesCard(entry: entry),
+                  KeyedSubtree(
+                    key: const ValueKey('scenarios'),
+                    child: StaggerFadeIn(index: 4, child: _scenariosCard(entry)),
+                  ),
                   const SizedBox(height: 16),
-                  _TradeHistoryCard(entry: entry),
-                  const _TradeBreakdownDisclaimer(),
+                  KeyedSubtree(
+                    key: const ValueKey('companies'),
+                    child: StaggerFadeIn(
+                      index: 5,
+                      child: _CompaniesCard(entry: entry),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  KeyedSubtree(
+                    key: const ValueKey('tradeHistory'),
+                    child: StaggerFadeIn(
+                      index: 6,
+                      child: _TradeHistoryCard(entry: entry),
+                    ),
+                  ),
+                  KeyedSubtree(
+                    key: const ValueKey('breakdownDisclaimer'),
+                    child: StaggerFadeIn(
+                      index: 7,
+                      child: const _TradeBreakdownDisclaimer(),
+                    ),
+                  ),
                 ],
               ),
             ),
