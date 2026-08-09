@@ -9,9 +9,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import '../stress_test_models.dart';
+import '../stress_test_naming.dart';
 import 'allocation_bar_row.dart';
 
 const double _sectorWarningThreshold = 75.0;

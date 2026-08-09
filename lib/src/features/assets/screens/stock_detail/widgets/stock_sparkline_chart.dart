@@ -25,7 +25,7 @@ import '../../../../stress_test/stress_test_engine.dart' show ChartDataPoint;
 // _generateSparkData for how points are built and period-filtered.
 // ---------------------------------------------------------------------------
 
-enum StressTestSparkPeriod { d1, w1, m1, m3, y1, max }
+enum StressTestSparkPeriod { d1, w1, m1, m3, y1 }
 
 const Map<StressTestSparkPeriod, String> _periodLabels = {
   StressTestSparkPeriod.d1: '1D',
@@ -33,7 +33,6 @@ const Map<StressTestSparkPeriod, String> _periodLabels = {
   StressTestSparkPeriod.m1: '1M',
   StressTestSparkPeriod.m3: '3M',
   StressTestSparkPeriod.y1: '1Y',
-  StressTestSparkPeriod.max: 'ALL',
 };
 
 final _priceFmt = NumberFormat('#,##0.00', 'en_US');
@@ -123,13 +122,26 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   @override
   void didUpdateWidget(covariant StockSparklineChart oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.points != widget.points) {
+    // Compares content, not list identity — _generateSparkData rebuilds a
+    // fresh List instance on every ~20s engine tick even when the visible
+    // period's data hasn't actually changed, which used to reset (and
+    // effectively kill) the hold-to-reveal tooltip mid-hold.
+    if (_pointsChanged(oldWidget.points, widget.points)) {
       _touchHoldTimer?.cancel();
       _touchHoldTimer = null;
       _touchRevealed = false;
       _touchDx = null;
       _touchedSpotIndex = null;
     }
+  }
+
+  bool _pointsChanged(List<ChartDataPoint> a, List<ChartDataPoint> b) {
+    if (a.length != b.length) return true;
+    if (a.isEmpty) return false;
+    return a.first.time != b.first.time ||
+        a.first.value != b.first.value ||
+        a.last.time != b.last.time ||
+        a.last.value != b.last.value;
   }
 
   @override

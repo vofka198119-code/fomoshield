@@ -37,7 +37,8 @@ import 'widgets/market_value_chart.dart';
 import 'stress_test_widget_order_provider.dart';
 import 'widgets/stress_test_allocation_chart.dart';
 import 'widgets/stress_test_cash_widget.dart';
-import '../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
+import 'widgets/stress_test_my_limit_orders_widget.dart';
+import 'stress_test_naming.dart';
 
 class StressTestScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -52,6 +53,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   Timer? _timer;
   Timer? _countdownTimer;
   Timer? _timelineTimer;
+  Timer? _whyDiagnosticsTimer;
   int _tick = 0;
   bool _showAllAssets = false;
   // Guards the auto-navigate-to-verdict side effect (see
@@ -119,6 +121,15 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         ref.read(timelineTickProvider(widget.sessionId).notifier).state++;
       }
     });
+    // Why Diagnostics — persists the admin-only whole-period accumulator
+    // (stress_test_why_diagnostics.dart) to this device's local cache.
+    // Admin-gated here, not in the engine itself — regular users never
+    // write anything.
+    _whyDiagnosticsTimer = Timer.periodic(const Duration(seconds: 60), (_) {
+      if (mounted && ref.read(isAdminProvider)) {
+        ref.read(stressTestProvider.notifier).saveWhyDiagnostics();
+      }
+    });
   }
 
   @override
@@ -126,6 +137,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     _timer?.cancel();
     _countdownTimer?.cancel();
     _timelineTimer?.cancel();
+    _whyDiagnosticsTimer?.cancel();
     super.dispose();
   }
 
@@ -595,6 +607,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             ],
           ),
         );
+      case 'limit_orders':
+        return StressTestMyLimitOrdersWidget(sessionId: session.id);
       case 'timer':
         return _buildTimerBar(session);
       default:
@@ -607,9 +621,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     final notifier = ref.read(
       stressTestWidgetOrderProvider(widget.sessionId).notifier,
     );
-    final currentConfigs = ref.read(
-      stressTestWidgetOrderProvider(widget.sessionId),
-    );
+    // 'epoch_history' is an admin-only debugging widget (see
+    // _buildWidgetById) — non-admins shouldn't even see it listed here as
+    // a togglable/draggable item, not just have it render blank on-screen.
+    final isAdmin = ref.read(isAdminProvider);
+    final currentConfigs = ref
+        .read(stressTestWidgetOrderProvider(widget.sessionId))
+        .where((c) => isAdmin || c.id != 'epoch_history')
+        .toList();
 
     showModalBottomSheet(
       context: context,
@@ -621,6 +640,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       builder: (_) => _StressTestWidgetSettingsSheet(
         initialConfigs: currentConfigs,
         notifier: notifier,
+        isAdmin: isAdmin,
       ),
     );
   }
@@ -925,34 +945,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                   ),
                                 ],
                               ),
-                              // ── Lightbulb button — компактный ──
-                              if (session.explanationLog.containsKey(h.symbol))
-                                GestureDetector(
-                                  onTap: () => context.push(
-                                    '/stress-test/${widget.sessionId}/stock/${h.symbol}/why',
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 4),
-                                    child: Container(
-                                      width: 28,
-                                      height: 28,
-                                      decoration: BoxDecoration(
-                                        color: ThemeV2.primary.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          ThemeV2.radiusSmall,
-                                        ),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: const Icon(
-                                        Icons.help_outline_rounded,
-                                        size: 16,
-                                        color: ThemeV2.primary,
-                                      ),
-                                    ),
-                                  ),
-                                ),
                             ],
                           ),
                         ),
@@ -1318,10 +1310,12 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 class _StressTestWidgetSettingsSheet extends StatefulWidget {
   final List<StressTestWidgetConfig> initialConfigs;
   final StressTestWidgetsNotifier notifier;
+  final bool isAdmin;
 
   const _StressTestWidgetSettingsSheet({
     required this.initialConfigs,
     required this.notifier,
+    required this.isAdmin,
   });
 
   @override
@@ -1411,6 +1405,9 @@ class _StressTestWidgetSettingsSheetState
                       widget.notifier.resetToDefaults();
                       setState(() {
                         _configs = stressTestDefaultWidgetOrder
+                            .where(
+                              (id) => widget.isAdmin || id != 'epoch_history',
+                            )
                             .map(
                               (id) =>
                                   StressTestWidgetConfig(id: id, visible: true),
@@ -1539,6 +1536,8 @@ class _StressTestWidgetSettingsSheetState
         return Icons.history_rounded;
       case 'trade_history':
         return Icons.swap_horiz_rounded;
+      case 'limit_orders':
+        return Icons.receipt_long_rounded;
       case 'timer':
         return Icons.timer_rounded;
       default:

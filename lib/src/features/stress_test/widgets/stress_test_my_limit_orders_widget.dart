@@ -1,71 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../core/theme/theme_v2.dart';
-import '../../../../../core/theme/fomo_shield_theme.dart';
-import '../../../../stress_test/stress_test_pending_orders_provider.dart';
-import 'stress_test_order_row_tile.dart';
+import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
+import '../stress_test_pending_orders_provider.dart';
+import '../../assets/screens/stock_detail/widgets/stress_test_order_row_tile.dart';
 
 // ---------------------------------------------------------------------------
-// Stress Test Limit Orders — this symbol's active pending limit orders in
-// this session, mirroring Company Detail's limit_orders_section.dart
-// (same card standard, same 5-item cap + "See all" sheet). Reads from
-// Stress Test's own isolated pending-orders provider, not the real orders
-// feature.
+// Stress Test My Limit Orders — session-wide widget listing this session's
+// active limit orders across ALL symbols, mirroring Portfolio's
+// my_limit_orders_widget.dart. Unlike Stock Detail's own per-symbol
+// StockLimitOrdersSection (which hides itself when empty), this one never
+// hides — an empty state still shows a "no active orders" line — capped to
+// 5 inline with a live "See all" sheet beyond that.
 // ---------------------------------------------------------------------------
 
 const int _inlineLimit = 5;
 
-class StockLimitOrdersSection extends ConsumerWidget {
+class StressTestMyLimitOrdersWidget extends ConsumerWidget {
   final String sessionId;
-  final String symbol;
 
-  const StockLimitOrdersSection({
-    super.key,
-    required this.sessionId,
-    required this.symbol,
-  });
+  const StressTestMyLimitOrdersWidget({super.key, required this.sessionId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final orders = ref
-        .watch(stressTestSessionPendingOrdersProvider(sessionId))
-        .where((o) => o.symbol == symbol)
-        .toList();
-
-    if (orders.isEmpty) return const SizedBox.shrink();
-
+    final orders =
+        ref.watch(stressTestSessionPendingOrdersProvider(sessionId));
     final shown = orders.take(_inlineLimit).toList();
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      width: double.infinity,
       padding: const EdgeInsets.fromLTRB(22, 14, 22, 4),
       decoration: FomoShieldTheme.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('LIMIT ORDERS', style: FomoShieldTheme.cardTitle()),
+          Text('MY LIMIT ORDERS', style: FomoShieldTheme.cardTitle()),
           const Divider(height: 20, color: Color(0x0F000000)),
-          for (final order in shown) StressTestOrderRowTile(order: order),
-          if (orders.length > _inlineLimit)
+          if (orders.isEmpty)
             Padding(
-              padding: const EdgeInsets.only(top: 6, bottom: 10),
-              child: Center(
-                child: TextButton(
-                  onPressed: () => _showAllSheet(context),
-                  child: Text(
-                    'See all ${orders.length} orders',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeV2.primary,
+              padding: const EdgeInsets.only(bottom: 14),
+              child: Text(
+                'You currently have no active orders',
+                style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+              ),
+            )
+          else ...[
+            for (final order in shown) StressTestOrderRowTile(order: order),
+            if (orders.length > _inlineLimit)
+              Padding(
+                padding: const EdgeInsets.only(top: 6, bottom: 10),
+                child: Center(
+                  child: TextButton(
+                    onPressed: () => _showAllSheet(context),
+                    child: Text(
+                      'See all ${orders.length} orders',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: ThemeV2.primary,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-          else
-            const SizedBox(height: 10),
+              )
+            else
+              const SizedBox(height: 10),
+          ],
         ],
       ),
     );
@@ -98,7 +99,7 @@ class StockLimitOrdersSection extends ConsumerWidget {
                 ),
               ),
               Text(
-                '$symbol Limit Orders',
+                'My Limit Orders',
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -109,13 +110,12 @@ class StockLimitOrdersSection extends ConsumerWidget {
               Expanded(
                 child: Consumer(
                   builder: (context, ref, _) {
-                    // Watched live (not the snapshot the "See all" button
-                    // was built from) so a fill mid-session updates/removes
-                    // a row here instead of leaving a stale pending entry.
-                    final liveOrders = ref
-                        .watch(stressTestSessionPendingOrdersProvider(sessionId))
-                        .where((o) => o.symbol == symbol)
-                        .toList();
+                    // Watched live so a fill/cancel while the sheet is open
+                    // updates the list instead of showing a stale snapshot
+                    // (same fix as Stock Detail's own sheet).
+                    final liveOrders = ref.watch(
+                      stressTestSessionPendingOrdersProvider(sessionId),
+                    );
                     return ListView.builder(
                       controller: scrollController,
                       itemCount: liveOrders.length,

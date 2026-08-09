@@ -17,7 +17,7 @@ import '../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'stress_test_portfolio_balance_widget_order_provider.dart';
-import '../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
+import 'stress_test_naming.dart';
 import 'widgets/allocation_bar_row.dart';
 import 'widgets/stress_test_sector_allocation_widget.dart';
 import 'widgets/stress_test_asset_count_widget.dart';

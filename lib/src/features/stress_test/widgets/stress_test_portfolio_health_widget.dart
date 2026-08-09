@@ -16,9 +16,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import '../psychology_engine.dart' show diversificationScoreForCount;
 import '../stress_test_models.dart';
+import '../stress_test_naming.dart';
 
 // Relative baseline-risk tier per AssetSector — NOT the GBM engine's exact
 // sigma values (those are private to gbm_engine.dart and tuned separately),

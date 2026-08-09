@@ -12,8 +12,8 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import '../../shared/widgets/trade_history_tile.dart';
-import '../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import 'stress_test_engine.dart';
+import 'stress_test_naming.dart';
 
 class StressTestTradeHistoryScreen extends ConsumerWidget {
   final String sessionId;

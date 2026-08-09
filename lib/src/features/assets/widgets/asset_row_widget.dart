@@ -12,7 +12,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../stress_test/stress_test_models.dart';
-import '../screens/stock_detail/widgets/stock_detail_helpers.dart';
+import '../../stress_test/stress_test_naming.dart';
 
 class AssetRowWidget extends ConsumerWidget {
   final StressTestHolding holding;

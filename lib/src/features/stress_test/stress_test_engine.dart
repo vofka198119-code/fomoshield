@@ -25,6 +25,7 @@ part 'trades_engine.dart';
 part 'hype/hype_event.dart';
 part 'news_event.dart';
 part 'noise_engine.dart';
+part 'stress_test_why_diagnostics.dart';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -154,6 +155,10 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// что гарантирует детерминизм и отсутствие cross-session утечек.
   final Map<String, Random> _sessionRandom = {};
 
+  /// Why Diagnostics — sessionId → symbol → running whole-period
+  /// accumulator, admin-only. See stress_test_why_diagnostics.dart.
+  final Map<String, Map<String, WhyDiagnosticsAccumulator>> _whyDiagnostics = {};
+
   /// Override for testing: if set, bypasses real clock for _isMarketOpen.
   /// Allows tests to simulate prices regardless of time/day.
   // ignore: prefer_private_fields
@@ -244,6 +249,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     // — silently losing the verdict. Loading first means catch-up only ever
     // appends on top of the real, already-current archive.
     _loadArchive(prefs);
+    // Why Diagnostics — local-only, admin debugging cache. Independent of
+    // the session load below, never blocks/affects it either way.
+    _loadWhyDiagnostics();
     // ── Ephemeral active sessions (heavy) ────────────────────────
     // If loadFromSupabase() already landed (async race — see
     // _loadedFromSupabase docs above), don't let a stale/empty local

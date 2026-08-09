@@ -31,6 +31,8 @@ class StressTestWidgetConfig {
         return 'Epochs';
       case 'trade_history':
         return 'Trade History';
+      case 'limit_orders':
+        return 'My Limit Orders';
       case 'timer':
         return 'Timer';
       default:
@@ -46,10 +48,11 @@ const List<String> stressTestDefaultWidgetOrder = [
   'allocation_chart',
   'cash',
   'price_chart',
-  'epoch_history',
   'my_assets',
   'psychology_meter',
   'trade_history',
+  'limit_orders',
+  'epoch_history',
   'timer',
 ];
 

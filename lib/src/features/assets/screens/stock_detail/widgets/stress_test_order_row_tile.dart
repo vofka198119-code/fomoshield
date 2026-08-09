@@ -6,7 +6,7 @@ import '../../../../../core/theme/typography_helpers.dart';
 import '../../../../orders/order_cancel_dialog.dart';
 import '../../../../stress_test/stress_test_pending_order.dart';
 import '../../../../stress_test/stress_test_pending_orders_provider.dart';
-import 'stock_detail_helpers.dart';
+import '../../../../stress_test/stress_test_naming.dart';
 
 // ---------------------------------------------------------------------------
 // Stress Test Order Row Tile — same olive-box visual as the real orders

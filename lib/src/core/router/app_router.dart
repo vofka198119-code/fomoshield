@@ -286,6 +286,8 @@ class AppRouter {
             symbol: symbol.toUpperCase(),
             orderType: (extra['type'] as String?) ?? 'buy',
             price: (extra['price'] as num?)?.toDouble() ?? 0,
+            companyName: extra['companyName'] as String?,
+            logo: extra['logo'] as String?,
           );
         },
       ),

@@ -1,22 +1,36 @@
 // ---------------------------------------------------------------------------
-// Why Today Screen — Explainable AI Experience (Design Bible Chapter 4)
+// Why Today Screen — admin-only engine diagnostics for one symbol's price.
 // ---------------------------------------------------------------------------
-// Full-screen breakdown of what influenced today's price movement.
+// Reached only via the admin-gated "Why today?" button on Stress Test's
+// Company Card (stock_why_today_card.dart) — this is a debugging tool for
+// understanding the simulation, not a consumer-facing feature. Redesigned
+// 2026-08-09: cut the old "AI explains your portfolio" framing (Guardian
+// mood commentary, generated investor-advice bullets, decorative emoji) —
+// all of that was written for a regular user, not an admin reading engine
+// internals. devMarketTemperature (the old Guardian mood driver) was cut
+// entirely: it's initialized to 0 and never recomputed anywhere in the
+// engine, so it was permanently stuck and every Guardian message built on
+// it was reading a dead value.
 //
-// Structure (Steps 203):
-//   Header -> Summary -> Contribution Breakdown -> Timeline -> Guardian -> Advice -> Technical Details
-//
-// Data sources (Step 202 — DO NOT MODIFY):
-//   - TickExplanation.explanationLog[symbol]  — per-tick explanations
-//   - PriceContribution                        — 5-factor decomposition
-//   - StressTestSession.devMarketTemperature   — Guardian mood selector
-//   - StressTestSession.devMarketPhase         — market context
-//
-// Color mapping (Steps 267–271, +Hype 2026-07-20; Company factor removed and
-// Market/Sector/Hype relabeled to Scenario/Sector Skew/Sector Trend
-// 2026-07-29 — see PriceContribution's doc in stress_test_models.dart):
-//   Scenario -> Blue, Sector Skew -> Green, News -> Purple,
-//   Sector Trend -> Deep orange, Noise -> Grey
+// Windows, each a flat olive-tinted panel (ThemeV2.primary @ 8% fill / 20%
+// border — same treatment as the Admin Sandbox on the Profile screen):
+//   1. Today's change — $ and % in two boxes.
+//   2. This tick's factor bars (Market Trends/Sector/News/Sector Hype/Noise).
+//   3. Whole-period factor bars — same 5 factors, averaged across every
+//      tick in explanationLog[symbol] (weighted by each tick's own price
+//      move so bigger swings count more), i.e. what's actually shaped this
+//      position's price from its first tick to now.
+//   4. Raw (unnormalized) drift values for the latest tick — the actual
+//      computed magnitudes behind the normalized % bars above, previously
+//      computed by the engine every tick but never surfaced anywhere.
+//   5. News & Hype — live active event (if any) + a derived history of
+//      past episodes. No event-log field exists in the model (see the
+//      session-reconstruction risk noted above), so history here is
+//      reconstructed from explanationLog's newsRaw/hypeRaw trace fields —
+//      real timing/magnitude/direction, no headline text (not stored
+//      anywhere past the event's own lifetime).
+//   6. Market phase / epoch history for the whole session.
+//   7. Ticks — unchanged from before, per explicit ask.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -25,20 +39,22 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_models.dart';
-import '../../../shared/widgets/guardian/guardian_data.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 
-// ── Factor colors: canonical source is FomoShieldTheme.factor* (Bible
-// Part 9) — this file used to redeclare the same 5 hex values locally,
-// which would have silently drifted from the canonical set on any future
-// palette change (see docs/VISUAL_AUDIT.md, Группа E).
 const _marketColor = FomoShieldTheme.factorMarket;
 const _sectorColor = FomoShieldTheme.factorSector;
 const _newsColor = FomoShieldTheme.factorNews;
 const _hypeColor = FomoShieldTheme.factorHype;
 const _noiseColor = FomoShieldTheme.factorNoise;
+
+BoxDecoration get _olivePanel => BoxDecoration(
+      color: ThemeV2.primary.withValues(alpha: 0.08),
+      borderRadius: FomoShieldTheme.cardRadius,
+      border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.2)),
+    );
 
 class WhyTodayScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -57,8 +73,6 @@ class WhyTodayScreen extends ConsumerStatefulWidget {
 class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _staggerController;
-  bool _technicalExpanded = false;
-  bool _guardianExpanded = false;
 
   @override
   void initState() {
@@ -67,7 +81,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       vsync: this,
       duration: ThemeV2.animNormal,
     );
-    // Trigger entrance animation after first frame
     Future.microtask(() => _staggerController.forward());
   }
 
@@ -87,25 +100,26 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final session = _session;
     if (session == null) return _emptyScreen('Session not found');
 
-    final tickLog = session.explanationLog[widget.symbol];
-    final ticks = tickLog ?? [];
+    final ticks = session.explanationLog[widget.symbol] ?? [];
     final latest = ticks.isNotEmpty ? ticks.last : null;
+    // Whole-period source of truth — folds every tick as it happens, so it
+    // isn't limited to explanationLog's capped last-50 window. Falls back
+    // to deriving from the capped log only if nothing's accumulated yet
+    // (e.g. right after this feature shipped, before any new ticks landed).
+    final diagnostics = ref
+        .read(stressTestProvider.notifier)
+        .whyDiagnosticsFor(widget.sessionId, widget.symbol);
 
-    // Calculate overall change (Steps 209–211)
     final currentPrice =
         session.currentPrices[widget.symbol] ??
         session.basePrices[widget.symbol] ??
         0;
     final basePrice = session.basePrices[widget.symbol] ?? currentPrice;
-    final changePercent = basePrice > 0
-        ? ((currentPrice - basePrice) / basePrice) * 100
-        : 0.0;
+    final priceChange = currentPrice - basePrice;
+    final changePercent = basePrice > 0 ? (priceChange / basePrice) * 100 : 0.0;
     final isPositive = changePercent >= 0;
 
-    // Max display ticks for timeline (to avoid overwhelming UI)
-    final displayTicks = ticks.length > 20
-        ? ticks.sublist(ticks.length - 20)
-        : ticks;
+    final displayTicks = ticks.length > 20 ? ticks.sublist(ticks.length - 20) : ticks;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -118,42 +132,79 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                 physics: const BouncingScrollPhysics(),
                 child: Column(
                   children: [
-                    // 1. Header (Steps 204–207)
-                    _buildHeader(),
-
-                    // News micro-scenario headline (news_event.dart) —
-                    // only shown when THIS symbol is the one currently
-                    // targeted by an active News event.
-                    if (session.activeNewsEvent?.symbol == widget.symbol)
-                      _buildNewsHeadline(session.activeNewsEvent!),
-
-                    // Hype micro-scenario banner (hype/hype_event.dart) —
-                    // only shown when THIS symbol's GICS sector currently
-                    // has an active sector-wide Hype event.
-                    ..._buildHypeBanners(session),
-
-                    // 2. Summary Card (Steps 208–213)
-                    _buildSummaryCard(changePercent, isPositive, latest),
-
-                    // 3. Contribution Breakdown (Steps 214–227)
-                    if (latest != null) _buildContributionBreakdown(latest),
-
-                    // 4. Visual Hierarchy indicator (Steps 228–230)
-                    // ── applied inside _buildContributionBreakdown ──
-
-                    // 5. Timeline (Steps 231–240)
-                    if (displayTicks.isNotEmpty) _buildTimeline(displayTicks),
-
-                    // 6. Guardian Analysis (Steps 241–250)
-                    _buildGuardianAnalysis(session, isPositive),
-
-                    // 7. Investor Advice (Steps 251–256)
+                    _window(
+                      index: 0,
+                      title: "TODAY'S CHANGE",
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _changeBox(
+                              label: 'DOLLARS',
+                              value:
+                                  '${isPositive ? '+' : ''}\$${priceChange.abs().toStringAsFixed(2)}',
+                              color: isPositive ? ThemeV2.success : ThemeV2.loss,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _changeBox(
+                              label: 'PERCENT',
+                              value:
+                                  '${isPositive ? '+' : ''}${changePercent.toStringAsFixed(2)}%',
+                              color: isPositive ? ThemeV2.success : ThemeV2.loss,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     if (latest != null)
-                      _buildInvestorAdvice(latest, isPositive),
-
-                    // 8. Technical Details Accordion (Steps 257–261)
-                    if (latest != null) _buildTechnicalDetails(latest, session),
-
+                      _window(
+                        index: 1,
+                        title: 'THIS TICK — FACTOR BREAKDOWN',
+                        child: _factorBars(latest.contributions),
+                      ),
+                    if (ticks.isNotEmpty)
+                      _window(
+                        index: 2,
+                        title: 'WHOLE PERIOD — FACTOR BREAKDOWN',
+                        subtitle: 'Weighted by each tick\'s own price move — '
+                            '${diagnostics?.tickCount ?? ticks.length} ticks since first purchase'
+                            '${diagnostics == null ? ' (recent only — no cache yet)' : ''}.',
+                        child: _factorBars(
+                          diagnostics?.averaged ?? _aggregateContributions(ticks),
+                        ),
+                      ),
+                    if (latest != null)
+                      _window(
+                        index: 3,
+                        title: 'RAW DRIFT VALUES (LATEST TICK)',
+                        subtitle: 'Unnormalized — before the 5 factors above are scaled to sum to 100%.',
+                        child: Column(
+                          children: [
+                            _rawRow('Market drift', latest.marketDriftRaw),
+                            _rawRow('Sector drift', latest.sectorDriftRaw),
+                            _rawRow('Noise', latest.noiseRaw),
+                            _rawRow('News', latest.newsRaw),
+                            _rawRow('Hype', latest.hypeRaw),
+                          ],
+                        ),
+                      ),
+                    _window(
+                      index: 4,
+                      title: 'NEWS & SECTOR HYPE',
+                      child: _newsAndHypeSection(session, ticks, diagnostics),
+                    ),
+                    if (session.epochHistory.isNotEmpty)
+                      _window(
+                        index: 5,
+                        title: 'MARKET PHASE / EPOCHS',
+                        child: Column(
+                          children: [
+                            for (final e in session.epochHistory.reversed) _epochRow(e),
+                          ],
+                        ),
+                      ),
+                    if (displayTicks.isNotEmpty) _buildTimeline(displayTicks),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -171,96 +222,313 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 64,
-        leadingWidth: 56,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 22),
-          child: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_rounded,
-              size: 22,
-              color: ThemeV2.textPrimary,
-            ),
-            onPressed: () => context.pop(),
-            splashRadius: 22,
-          ),
-        ),
-        title: Text(
-          widget.symbol,
-          style: ThemeV2.caption.copyWith(
-            fontWeight: FontWeight.w700,
-            color: ThemeV2.textPrimary,
-          ),
-        ),
         centerTitle: true,
-        actions: const [SizedBox(width: 56)], // balance with leading
+        title: Text(
+          '${widget.symbol} DIAGNOSTICS',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: ThemeV2.primary,
+            letterSpacing: 1,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.textPrimary),
+          onPressed: () => context.pop(),
+        ),
       ),
     );
   }
 
-  // ─── Header (Steps 204–207) ──────────────────────────────────────────
-  Widget _buildHeader() {
+  // ─── Window shell ────────────────────────────────────────────────────
+  Widget _window({
+    required int index,
+    required String title,
+    String? subtitle,
+    required Widget child,
+  }) {
     return _FadeSlide(
-      index: 0,
+      index: index,
       controller: _staggerController,
       child: Container(
-        height: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Row(
+        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+        decoration: _olivePanel,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Large lightbulb icon (Step 205)
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: ThemeV2.primaryBg,
-                borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+            Text(title, style: FomoShieldTheme.cardTitle()),
+            if (subtitle != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
               ),
-              child: const Icon(
-                Icons.lightbulb_outline_rounded,
-                size: 28,
-                color: ThemeV2.primary,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Why did the price change today?',
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    'AI explanation based on current simulation.',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: ThemeV2.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ],
+            const SizedBox(height: 10),
+            Divider(height: 1, color: ThemeV2.primary.withValues(alpha: 0.15)),
+            const SizedBox(height: 14),
+            child,
           ],
         ),
       ),
     );
   }
 
-  // ─── Remaining-time countdown (News/Hype banners) ────────────────────
+  Widget _changeBox({required String label, required String value, required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.25)),
+        borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            style: interNums(fontSize: 20, fontWeight: FontWeight.w700, color: color),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Factor bars (shared by "this tick" and "whole period") ──────────
+  PriceContribution _aggregateContributions(List<TickExplanation> ticks) {
+    double wMarket = 0, wSector = 0, wNews = 0, wHype = 0, wNoise = 0, totalW = 0;
+    for (final t in ticks) {
+      final w = t.changePercent.abs();
+      final effectiveW = w > 0 ? w : 0.0001;
+      wMarket += t.contributions.marketPct * effectiveW;
+      wSector += t.contributions.sectorPct * effectiveW;
+      wNews += t.contributions.newsPct * effectiveW;
+      wHype += t.contributions.hypePct * effectiveW;
+      wNoise += t.contributions.noisePct * effectiveW;
+      totalW += effectiveW;
+    }
+    if (totalW <= 0) {
+      return const PriceContribution(marketPct: 0, sectorPct: 0, newsPct: 0, noisePct: 0);
+    }
+    return PriceContribution(
+      marketPct: wMarket / totalW,
+      sectorPct: wSector / totalW,
+      newsPct: wNews / totalW,
+      hypePct: wHype / totalW,
+      noisePct: wNoise / totalW,
+    );
+  }
+
+  Widget _factorBars(PriceContribution c) {
+    return Column(
+      children: [
+        _factorBar('Market Trends', c.marketPct, _marketColor),
+        _factorBar('Sector', c.sectorPct, _sectorColor),
+        _factorBar('News', c.newsPct, _newsColor),
+        _factorBar('Sector Hype', c.hypePct, _hypeColor),
+        _factorBar('Noise', c.noisePct, _noiseColor),
+      ],
+    );
+  }
+
+  Widget _factorBar(String label, double percent, Color color) {
+    final clamped = (percent / 100).clamp(0.0, 1.0);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 104,
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: ThemeV2.textPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: SizedBox(
+              height: 8,
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: ThemeV2.primary.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: clamped,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 42,
+            child: Text(
+              '${percent.round()}%',
+              textAlign: TextAlign.right,
+              style: interNums(fontSize: 12.5, fontWeight: FontWeight.w600, color: ThemeV2.textPrimary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Raw drift values ──────────────────────────────────────────────
+  Widget _rawRow(String label, double? raw) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: ThemeV2.caption),
+          Text(
+            raw == null ? '—' : '${raw >= 0 ? '+' : ''}${(raw * 100).toStringAsFixed(3)}%',
+            style: ThemeV2.caption.copyWith(
+              fontWeight: FontWeight.w700,
+              color: ThemeV2.textPrimary,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── News & Hype: live state + whole-period history from the Why
+  // Diagnostics accumulator (folds every tick — see stress_test_why_
+  // diagnostics.dart — so this survives past explanationLog's 50-tick
+  // cap). Empty until the accumulator has folded at least one tick.
+  Widget _newsAndHypeSection(
+    StressTestSession session,
+    List<TickExplanation> ticks,
+    WhyDiagnosticsAccumulator? diagnostics,
+  ) {
+    final newsActive = session.activeNewsEvent?.symbol == widget.symbol
+        ? session.activeNewsEvent
+        : null;
+    final mySector = resolveGicsSector(widget.symbol);
+    final hypeActive = mySector == null
+        ? null
+        : session.activeHypeEvents
+            .where((e) => e.sector == mySector)
+            .firstOrNull;
+
+    final newsEpisodes = diagnostics?.newsEpisodes ?? const <WhyDiagnosticsEpisode>[];
+    final hypeEpisodes = diagnostics?.hypeEpisodes ?? const <WhyDiagnosticsEpisode>[];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (newsActive != null) ...[
+          _liveEventRow(
+            'News — LIVE',
+            newsActive.isPositive,
+            '${newsActive.isPositive ? '+' : ''}${(newsActive.targetAmplitude * 100).toStringAsFixed(1)}% target',
+            _formatRemaining(newsActive.currentTick, newsActive.rampDurationTicks),
+          ),
+          const SizedBox(height: 10),
+        ],
+        if (hypeActive != null) ...[
+          _liveEventRow(
+            'Sector Hype — LIVE',
+            hypeActive.isPositive,
+            '${hypeActive.isPositive ? '+' : ''}${(hypeActive.targetAmplitude * 100).toStringAsFixed(1)}% sector target',
+            _formatRemaining(hypeActive.currentTick, hypeActive.rampDurationTicks),
+          ),
+          const SizedBox(height: 10),
+        ],
+        Text(
+          'NEWS HISTORY (${newsEpisodes.length})',
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.6,
+            color: ThemeV2.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 6),
+        if (newsEpisodes.isEmpty)
+          Text('No News episodes yet.', style: ThemeV2.small)
+        else
+          for (final ep in newsEpisodes) _episodeRow(ep),
+        const SizedBox(height: 14),
+        Text(
+          'SECTOR HYPE HISTORY (${hypeEpisodes.length})',
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.6,
+            color: ThemeV2.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 6),
+        if (hypeEpisodes.isEmpty)
+          Text('No Sector Hype episodes yet.', style: ThemeV2.small)
+        else
+          for (final ep in hypeEpisodes) _episodeRow(ep),
+      ],
+    );
+  }
+
+  Widget _liveEventRow(String label, bool isPositive, String detail, String countdown) {
+    final color = isPositive ? ThemeV2.success : ThemeV2.loss;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isPositive ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+            size: 16,
+            color: color,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '$label — $detail',
+              style: GoogleFonts.inter(fontSize: 12.5, fontWeight: FontWeight.w600, color: ThemeV2.textPrimary),
+            ),
+          ),
+          Text(countdown, style: ThemeV2.small.copyWith(color: color, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+
   /// "≈2h 40m left" style label from ticks remaining on a ramping event.
   String _formatRemaining(int currentTick, int rampDurationTicks) {
-    final ticksLeft = (rampDurationTicks - currentTick).clamp(
-      0,
-      rampDurationTicks,
-    );
+    final ticksLeft = (rampDurationTicks - currentTick).clamp(0, rampDurationTicks);
     final secondsLeft = ticksLeft * tickIntervalSeconds;
     final hours = secondsLeft ~/ 3600;
     final minutes = (secondsLeft % 3600) ~/ 60;
@@ -269,445 +537,78 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     return 'wrapping up';
   }
 
-  // ─── Additional-event card shell (News + Hype banners share this) ────
-  // Redesigned 2026-07-29 to the FomoShieldTheme card standard (see
-  // docs/DESIGN_TOKENS.md) — was previously a raw color-tinted Container,
-  // the only spot on this screen not using the canonical card shell.
-  Widget _buildEventCard({
-    required String cardTitle,
-    required IconData icon,
-    required Color color,
-    required String headline,
-    required String detail,
-    required String countdown,
-  }) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      decoration: FomoShieldTheme.cardDecoration,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _episodeRow(WhyDiagnosticsEpisode ep) {
+    final color = ep.isUp ? ThemeV2.success : ThemeV2.loss;
+    final epochLabel = ep.startEpoch == ep.endEpoch
+        ? 'Epoch ${ep.startEpoch + 1}'
+        : 'Epoch ${ep.startEpoch + 1}–${ep.endEpoch + 1}';
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text(cardTitle, style: FomoShieldTheme.cardTitle()),
+          Icon(
+            ep.isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+            size: 14,
+            color: color,
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: color, size: 22),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        headline,
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: ThemeV2.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        detail,
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: ThemeV2.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        countdown,
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: color,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              epochLabel,
+              style: GoogleFonts.inter(fontSize: 12.5, color: ThemeV2.textPrimary),
             ),
+          ),
+          Text(
+            '${ep.isUp ? '+' : ''}${ep.netPercent.toStringAsFixed(2)}%',
+            style: interNums(fontSize: 12.5, fontWeight: FontWeight.w700, color: color),
           ),
         ],
       ),
     );
   }
 
-  // ─── News headline banner (news_event.dart) ──────────────────────────
-  Widget _buildNewsHeadline(NewsEvent event) {
-    final color = event.isPositive ? ThemeV2.success : ThemeV2.loss;
-    return _FadeSlide(
-      index: 1,
-      controller: _staggerController,
-      child: _buildEventCard(
-        cardTitle: 'ACTIVE NEWS EVENT',
-        icon: event.isPositive
-            ? Icons.trending_up_rounded
-            : Icons.trending_down_rounded,
-        color: color,
-        headline: event.headline,
-        detail: '${event.isPositive ? '+' : ''}'
-            '${(event.targetAmplitude * 100).toStringAsFixed(1)}% target impact on ${widget.symbol}',
-        countdown: _formatRemaining(event.currentTick, event.rampDurationTicks),
-      ),
-    );
-  }
-
-  // ─── Hype banner (hype/hype_event.dart) ──────────────────────────────
-  List<Widget> _buildHypeBanners(StressTestSession session) {
-    final mySector = resolveGicsSector(widget.symbol);
-    if (mySector == null) return const [];
-    for (final event in session.activeHypeEvents) {
-      if (event.sector == mySector) return [_buildHypeBanner(event)];
-    }
-    return const [];
-  }
-
-  Widget _buildHypeBanner(HypeEvent event) {
-    final color = event.isPositive ? ThemeV2.success : ThemeV2.loss;
-    return _FadeSlide(
-      index: 1,
-      controller: _staggerController,
-      child: _buildEventCard(
-        cardTitle: 'ACTIVE SECTOR EVENT',
-        icon: event.isPositive
-            ? Icons.local_fire_department_rounded
-            : Icons.trending_down_rounded,
-        color: color,
-        headline: 'Sector: ${event.sector.label} '
-            '${event.isPositive ? 'rallying' : 'declining'}',
-        detail: '${event.isPositive ? '+' : ''}'
-            '${(event.targetAmplitude * 100).toStringAsFixed(1)}% sector-wide target impact',
-        countdown: _formatRemaining(event.currentTick, event.rampDurationTicks),
-      ),
-    );
-  }
-
-  // ─── Summary Card (Steps 208–213) ────────────────────────────────────
-  Widget _buildSummaryCard(
-    double changePercent,
-    bool isPositive,
-    TickExplanation? latest,
-  ) {
-    final color = isPositive ? ThemeV2.success : ThemeV2.loss;
-
-    return _FadeSlide(
-      index: 1,
-      controller: _staggerController,
-      child: Container(
-        height: 140,
-        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: ThemeV2.borderRadiusLarge,
-          boxShadow: ThemeV2.cardShadow,
-        ),
-        child: Row(
-          children: [
-            // Left color indicator (Steps 212–213)
-            Container(
-              width: 5,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(ThemeV2.radiusLarge),
-                  bottomLeft: Radius.circular(ThemeV2.radiusLarge),
-                ),
-              ),
-            ),
-            // Content
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 24, 24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Large percentage (Step 209)
-                    Text(
-                      '${isPositive ? '+' : ''}${changePercent.toStringAsFixed(2)}%',
-                      style: ThemeV2.displayXL.copyWith(color: color),
-                    ),
-                    const SizedBox(height: 4),
-                    // "Today's Movement" label (Step 210)
-                    Text(
-                      "Today's Movement",
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: ThemeV2.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    // One-sentence explanation from engine (Step 211)
-                    Text(
-                      _buildSummarySentence(latest, isPositive),
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: ThemeV2.textSecondary.withValues(alpha: 0.8),
-                        height: 1.35,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _buildSummarySentence(TickExplanation? latest, bool isPositive) {
-    if (latest == null) {
-      return isPositive
-          ? 'Market sentiment pushed prices higher today.'
-          : 'Market pressure weighed on the asset today.';
-    }
-    // Use existing engine data — find dominant factor
-    final c = latest.contributions;
-    final entries = [
-      ('Scenario', c.marketPct),
-      ('Sector Skew', c.sectorPct),
-      ('News', c.newsPct),
-      ('Sector Trend', c.hypePct),
-      ('Noise', c.noisePct),
-    ];
-    entries.sort((a, b) => b.$2.compareTo(a.$2));
-    final top = entries.first;
-
-    final direction = isPositive ? 'pushed' : 'weighed on';
-    return '${top.$1} was the dominant factor that $direction '
-        '${widget.symbol} today. '
-        '${_factorSentence(top.$1, isPositive)}';
-  }
-
-  /// Factor meanings (see PriceContribution's doc in stress_test_models.dart
-  /// for the full explanation of each):
-  /// - Scenario: the epoch's Bull/Bear/Crash/... regime, applied through
-  ///   THIS asset's own AssetSector — not a single number shared by every
-  ///   holding.
-  /// - Sector Skew: how far this asset's AssetSector drift deviates from
-  ///   the average across everything else in THIS portfolio — a relative
-  ///   measure, not a live event.
-  /// - News: a real single-company headline event (news_event.dart).
-  /// - Sector Trend: a real sector-wide rally/sell-off event
-  ///   (hype/hype_event.dart) — uses GICS sectors, a DIFFERENT
-  ///   classification than Sector Skew's AssetSector.
-  /// - Noise: random tick-level fluctuation, no identifiable driver.
-  String _factorSentence(String factor, bool isPositive) {
-    return switch (factor) {
-      'Scenario' =>
-        isPositive
-            ? 'Broad optimism lifted all assets.'
-            : 'Macro concerns dragged the market.',
-      'Sector Skew' =>
-        isPositive
-            ? 'This sector is outperforming the rest of your portfolio.'
-            : 'This sector is lagging behind the rest of your portfolio.',
-      'News' =>
-        isPositive
-            ? 'Positive news flow supported prices.'
-            : 'Negative headlines affected sentiment.',
-      'Sector Trend' =>
-        isPositive
-            ? 'A sector-wide rally lifted this stock along with its peers.'
-            : 'A sector-wide sell-off dragged this stock down with its peers.',
-      'Noise' => 'Short-term volatility had no clear driver.',
-      _ => '',
-    };
-  }
-
-  // ─── Contribution Breakdown (Steps 214–227) ──────────────────────────
-  Widget _buildContributionBreakdown(TickExplanation latest) {
-    final c = latest.contributions;
-    final factors = <_WhyFactor>[
-      _WhyFactor(
-        'Scenario',
-        '🌍',
-        c.marketPct,
-        _marketColor,
-        "Today's Bull/Bear/Crash regime, applied to this asset's sector.",
-      ),
-      _WhyFactor(
-        'Sector Skew',
-        '🏭',
-        c.sectorPct,
-        _sectorColor,
-        'How this sector compares to the rest of your portfolio.',
-      ),
-      _WhyFactor(
-        'News',
-        '📰',
-        c.newsPct,
-        _newsColor,
-        'News flow, earnings, and external events.',
-      ),
-      _WhyFactor(
-        'Sector Trend',
-        '🔥',
-        c.hypePct,
-        _hypeColor,
-        'Sector-wide rally or sell-off moving all peers together.',
-      ),
-      _WhyFactor(
-        'Noise',
-        '🎲',
-        c.noisePct,
-        _noiseColor,
-        'Random short-term price fluctuations.',
-      ),
-    ];
-
-    // Find dominant factor (Steps 228–230)
-    factors.sort((a, b) => b.percent.compareTo(a.percent));
-    final dominant = factors.first;
-
-    return _FadeSlide(
-      index: 2,
-      controller: _staggerController,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: ThemeV2.borderRadiusLarge,
-          boxShadow: ThemeV2.cardShadow,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Section title (Step 214)
-            Text("What influenced today's movement", style: ThemeV2.section),
-            const SizedBox(height: 20),
-            // Factor rows (Steps 215–227)
-            for (final f in factors) _buildFactorRow(f, f == dominant),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFactorRow(_WhyFactor factor, bool isDominant) {
-    final fraction = (factor.percent / 100).clamp(0.0, 1.0);
-
+  // ─── Market phase / epochs ────────────────────────────────────────
+  Widget _epochRow(EpochRecord e) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Container(
-        height: 72, // ~60px + subtitle (Step 222 + explanation)
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: isDominant
-            ? BoxDecoration(
-                color: ThemeV2.primaryBg.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
-                border: Border(
-                  left: BorderSide(color: ThemeV2.success, width: 3),
-                ),
-              )
-            : null,
-        child: Row(
-          children: [
-            // Icon (Steps 217–221)
-            Text(factor.emoji, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 12),
-            // Title + subtitle
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    factor.label,
-                    style: ThemeV2.caption.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    factor.explanation,
-                    style: ThemeV2.small,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: e.isActive ? ThemeV2.success : ThemeV2.textSecondary.withValues(alpha: 0.4),
             ),
-            const SizedBox(width: 8),
-            // Percentage + Bar
-            SizedBox(
-              width: 120,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${factor.percent.round()}%',
-                    style: ThemeV2.caption.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: isDominant
-                          ? ThemeV2.textPrimary
-                          : ThemeV2.textSecondary,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  // Animated bar (Steps 223–225)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0, end: fraction),
-                      duration: const Duration(milliseconds: 700),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, _) {
-                        return LinearProgressIndicator(
-                          value: value,
-                          minHeight: 8,
-                          backgroundColor: factor.color.withValues(alpha: 0.12),
-                          valueColor: AlwaysStoppedAnimation(factor.color),
-                          borderRadius: BorderRadius.circular(5),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Epoch ${e.index + 1} — ${e.scenario.name}',
+              style: GoogleFonts.inter(fontSize: 12.5, fontWeight: FontWeight.w600, color: ThemeV2.textPrimary),
             ),
-          ],
-        ),
+          ),
+          Text(
+            e.isActive ? 'active' : _fmtDuration(e.duration),
+            style: ThemeV2.small.copyWith(color: ThemeV2.textSecondary),
+          ),
+        ],
       ),
     );
   }
 
-  // ─── Timeline (Steps 231–240) ────────────────────────────────────────
+  String _fmtDuration(Duration d) {
+    if (d.inDays > 0) return '${d.inDays}d ${d.inHours % 24}h';
+    if (d.inHours > 0) return '${d.inHours}h ${d.inMinutes % 60}m';
+    return '${d.inMinutes}m';
+  }
+
+  // ─── Ticks — unchanged per explicit ask ──────────────────────────
   Widget _buildTimeline(List<TickExplanation> ticks) {
-    // Reverse: newest first
     final reversed = ticks.reversed.toList();
 
     return _FadeSlide(
-      index: 3,
+      index: 6,
       controller: _staggerController,
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -720,12 +621,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Section title (Step 231)
-            Text('How the day evolved', style: ThemeV2.section),
+            Text('Ticks', style: ThemeV2.section),
             const SizedBox(height: 16),
-            // Tick cards (Steps 232–240)
-            for (var i = 0; i < reversed.length; i++)
-              _buildTickCard(reversed[i], i),
+            for (var i = 0; i < reversed.length; i++) _buildTickCard(reversed[i], i),
           ],
         ),
       ),
@@ -739,11 +637,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final color = isFlat
         ? ThemeV2.textSecondary
         : isUp
-        ? ThemeV2.success
-        : ThemeV2.loss;
+            ? ThemeV2.success
+            : ThemeV2.loss;
     final arrow = isFlat ? '→' : (isUp ? '⬆' : '⬇');
 
-    // Compute approximate time from epoch index
     final epochNum = tick.epochIndex + 1;
     final timeLabel = 'Epoch $epochNum';
 
@@ -760,18 +657,13 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         ),
         child: Row(
           children: [
-            // Left: time (Step 235)
             SizedBox(
               width: 72,
               child: Text(
                 timeLabel,
-                style: ThemeV2.small.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: ThemeV2.textSecondary,
-                ),
+                style: ThemeV2.small.copyWith(fontWeight: FontWeight.w600, color: ThemeV2.textSecondary),
               ),
             ),
-            // Center: brief event (Step 236)
             Expanded(
               child: Text(
                 _tickEventDescription(tick),
@@ -780,7 +672,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Right: price change (Steps 237–240)
             Row(
               children: [
                 Text(
@@ -810,438 +701,17 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
   String _tickEventDescription(TickExplanation tick) {
     final c = tick.contributions;
     final entries = [
-      ('Scenario', c.marketPct),
-      ('Sector Skew', c.sectorPct),
+      ('Market Trends', c.marketPct),
+      ('Sector', c.sectorPct),
       ('News', c.newsPct),
-      ('Sector Trend', c.hypePct),
+      ('Sector Hype', c.hypePct),
       ('Noise', c.noisePct),
     ];
     entries.sort((a, b) => b.$2.compareTo(a.$2));
     return '${entries.first.$1} moved by ${entries.first.$2.round()}%';
   }
 
-  // ─── Guardian Analysis (Steps 241–250) ───────────────────────────────
-  Widget _buildGuardianAnalysis(StressTestSession session, bool isPositive) {
-    final temperature = session.devMarketTemperature;
-    final state = _guardianStateFromTemperature(temperature);
-    final config = GuardianStateConfig.of(state);
-    final message = GuardianMessages.forTemperature(temperature, state);
-
-    final hasWarning = temperature < -20 || temperature > 70;
-    final isGood = !hasWarning && isPositive;
-
-    return _FadeSlide(
-      index: 4,
-      controller: _staggerController,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: ThemeV2.borderRadiusLarge,
-          boxShadow: ThemeV2.cardShadow,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title (Step 245)
-            Row(
-              children: [
-                Text('Guardian Analysis', style: ThemeV2.section),
-                const Spacer(),
-                if (isGood)
-                  Icon(
-                    Icons.check_circle_rounded,
-                    size: 18,
-                    color: ThemeV2.success,
-                  )
-                else if (hasWarning)
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    size: 18,
-                    color: ThemeV2.loss,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Avatar (Step 243) — 56px
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        config.shieldColor,
-                        config.shieldColor.withValues(alpha: 0.6),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
-                  ),
-                  child: const Icon(
-                    Icons.shield_rounded,
-                    size: 32,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Advice Bubble (Step 244)
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        message,
-                        style: ThemeV2.body.copyWith(
-                          height: 1.45,
-                          color: ThemeV2.textPrimary,
-                        ),
-                        maxLines: _guardianExpanded ? 20 : 4,
-                        overflow: _guardianExpanded
-                            ? TextOverflow.visible
-                            : TextOverflow.ellipsis,
-                      ),
-                      if (message.length > 200) ...[
-                        const SizedBox(height: 4),
-                        GestureDetector(
-                          onTap: () => setState(
-                            () => _guardianExpanded = !_guardianExpanded,
-                          ),
-                          child: Text(
-                            _guardianExpanded ? 'Show Less' : 'Show More',
-                            style: ThemeV2.small.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: ThemeV2.primary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  GuardianState _guardianStateFromTemperature(double temp) {
-    if (temp >= 60) return GuardianState.bull;
-    if (temp >= 20) return GuardianState.sideways;
-    if (temp >= -20) return GuardianState.sideways;
-    if (temp >= -50) return GuardianState.bear;
-    if (temp >= -70) return GuardianState.volatility;
-    return GuardianState.crash;
-  }
-
-  // ─── Investor Advice (Steps 251–256) ─────────────────────────────────
-  Widget _buildInvestorAdvice(TickExplanation latest, bool isPositive) {
-    final bullets = _buildAdviceBullets(latest, isPositive);
-
-    return _FadeSlide(
-      index: 5,
-      controller: _staggerController,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: ThemeV2.borderRadiusLarge,
-          boxShadow: ThemeV2.cardShadow,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title with icon (Steps 252, 254)
-            Row(
-              children: [
-                const Text('🎯', style: TextStyle(fontSize: 20)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'What should a long-term investor notice?',
-                    style: ThemeV2.body.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Bullet points (Steps 255–256)
-            for (final bullet in bullets) ...[
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      margin: const EdgeInsets.only(top: 7),
-                      decoration: BoxDecoration(
-                        color: ThemeV2.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        bullet,
-                        style: ThemeV2.body.copyWith(
-                          height: 1.45,
-                          color: ThemeV2.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  List<String> _buildAdviceBullets(TickExplanation latest, bool isPositive) {
-    final c = latest.contributions;
-    final bullets = <String>[];
-
-    // Dominant factor insight
-    final entries = [
-      ('Scenario', c.marketPct),
-      ('Sector Skew', c.sectorPct),
-      ('News', c.newsPct),
-      ('Sector Trend', c.hypePct),
-      ('Noise', c.noisePct),
-    ];
-    entries.sort((a, b) => b.$2.compareTo(a.$2));
-    final top = entries.first;
-
-    if (top.$2 >= 35) {
-      bullets.add(
-        'Today\'s movement was driven primarily by ${top.$1.toLowerCase()} '
-        'forces (${top.$2.round()}%). Single-factor moves often revert — '
-        'avoid overreacting.',
-      );
-    } else {
-      bullets.add(
-        'Today\'s change came from multiple balanced factors. '
-        'This is normal market behavior — no single narrative dominates.',
-      );
-    }
-
-    // Market phase insight
-    final phase = latest.marketPhase;
-    if (phase.contains('bull')) {
-      bullets.add(
-        'The market is in an uptrend. '
-        'Focus on position sizing — avoid chasing momentum.',
-      );
-    } else if (phase.contains('bear') || phase.contains('crash')) {
-      bullets.add(
-        'The market is under pressure. '
-        'Quality assets often recover — this is when patience matters most.',
-      );
-    } else if (phase.contains('volatil')) {
-      bullets.add(
-        'High volatility means wider price swings. '
-        'Consider smaller position sizes and wider stop-loss levels.',
-      );
-    } else {
-      bullets.add(
-        'Markets are range-bound. '
-        'Sideways movement tests discipline — stick to your plan.',
-      );
-    }
-
-    // Percentage context
-    bullets.add(
-      'A ${latest.changePercent.abs().toStringAsFixed(1)}% change is '
-      '${latest.changePercent.abs() > 3 ? 'notable — review your thesis, not your emotions' : 'within normal daily range — no action needed'}.',
-    );
-
-    // Noise reminder
-    if (c.noisePct > 15) {
-      bullets.add(
-        'Noise accounted for ${c.noisePct.round()}% of today\'s movement — '
-        'most of this will be irrelevant by next week.',
-      );
-    } else {
-      bullets.add(
-        'The signal-to-noise ratio today is healthy. '
-        'Focus on the long-term trend, not intraday fluctuations.',
-      );
-    }
-
-    return bullets.take(5).toList();
-  }
-
-  // ─── Technical Details Accordion (Steps 257–261) ─────────────────────
-  Widget _buildTechnicalDetails(
-    TickExplanation latest,
-    StressTestSession session,
-  ) {
-    return _FadeSlide(
-      index: 6,
-      controller: _staggerController,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: ThemeV2.borderRadiusLarge,
-          boxShadow: ThemeV2.cardShadow,
-        ),
-        child: Column(
-          children: [
-            // Accordion header (Steps 257–259)
-            InkWell(
-              onTap: () =>
-                  setState(() => _technicalExpanded = !_technicalExpanded),
-              borderRadius: BorderRadius.circular(ThemeV2.radiusLarge),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Text(
-                      'Technical Details',
-                      style: ThemeV2.body.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
-                      ),
-                    ),
-                    const Spacer(),
-                    AnimatedRotation(
-                      turns: _technicalExpanded ? 0.5 : 0,
-                      duration: ThemeV2.animNormal,
-                      child: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        size: 22,
-                        color: ThemeV2.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Expandable content (Steps 260–261)
-            AnimatedCrossFade(
-              firstChild: const SizedBox(width: double.infinity),
-              secondChild: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Column(
-                  children: [
-                    Divider(height: 1, color: ThemeV2.divider),
-                    const SizedBox(height: 16),
-                    _techRow(
-                      'Scenario %',
-                      '${latest.contributions.marketPct.round()}%',
-                      _marketColor,
-                    ),
-                    const SizedBox(height: 10),
-                    _techRow(
-                      'Sector Skew %',
-                      '${latest.contributions.sectorPct.round()}%',
-                      _sectorColor,
-                    ),
-                    const SizedBox(height: 10),
-                    _techRow(
-                      'News %',
-                      '${latest.contributions.newsPct.round()}%',
-                      _newsColor,
-                    ),
-                    const SizedBox(height: 10),
-                    _techRow(
-                      'Sector Trend %',
-                      '${latest.contributions.hypePct.round()}%',
-                      _hypeColor,
-                    ),
-                    const SizedBox(height: 10),
-                    _techRow(
-                      'Noise %',
-                      '${latest.contributions.noisePct.round()}%',
-                      _noiseColor,
-                    ),
-                    const SizedBox(height: 16),
-                    Divider(height: 1, color: ThemeV2.divider),
-                    const SizedBox(height: 16),
-                    _techRowMeta('Epoch', '${latest.epochIndex + 1}'),
-                    const SizedBox(height: 8),
-                    _techRowMeta('Phase', latest.marketPhase),
-                    const SizedBox(height: 8),
-                    _techRowMeta(
-                      'Temperature',
-                      '${session.devMarketTemperature.toStringAsFixed(1)}°',
-                    ),
-                    const SizedBox(height: 8),
-                    _techRowMeta(
-                      'Scenario',
-                      latest.scenario.isNotEmpty ? latest.scenario : 'N/A',
-                    ),
-                  ],
-                ),
-              ),
-              crossFadeState: _technicalExpanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              duration: ThemeV2.animNormal,
-              firstCurve: Curves.easeInOut,
-              secondCurve: Curves.easeInOut,
-              sizeCurve: Curves.easeInOut,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _techRow(String label, String value, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(child: Text(label, style: ThemeV2.caption)),
-        Text(
-          value,
-          style: ThemeV2.caption.copyWith(
-            fontWeight: FontWeight.w700,
-            color: ThemeV2.textPrimary,
-            fontFeatures: const [FontFeature.tabularFigures()],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _techRowMeta(String label, String value) {
-    return Row(
-      children: [
-        Expanded(child: Text(label, style: ThemeV2.caption)),
-        Text(
-          value,
-          style: ThemeV2.caption.copyWith(
-            fontWeight: FontWeight.w600,
-            color: ThemeV2.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ─── Empty State (Steps 272–274) ─────────────────────────────────────
+  // ─── Empty states ─────────────────────────────────────────────────
   Widget _buildEmptyState() {
     return Center(
       child: Container(
@@ -1252,17 +722,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
           borderRadius: ThemeV2.borderRadiusLarge,
           boxShadow: ThemeV2.cardShadow,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('📭', style: TextStyle(fontSize: 48)),
-            const SizedBox(height: 16),
-            Text(
-              'No explanation available for this session.',
-              style: ThemeV2.body.copyWith(color: ThemeV2.textSecondary),
-              textAlign: TextAlign.center,
-            ),
-          ],
+        child: Text(
+          'No tick data yet for this position.',
+          style: ThemeV2.body.copyWith(color: ThemeV2.textSecondary),
+          textAlign: TextAlign.center,
         ),
       ),
     );
@@ -1276,21 +739,16 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// MICRO-ANIMATION HELPERS (Steps 262–266)
-// ════════════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════
+// Fade/stagger entrance helpers (unchanged from before the rework)
+// ════════════════════════════════════════════════════════════════════════
 
-/// Fade + Slide entrance animation for card sections (Steps 262, 264).
 class _FadeSlide extends StatelessWidget {
   final int index;
   final AnimationController controller;
   final Widget child;
 
-  const _FadeSlide({
-    required this.index,
-    required this.controller,
-    required this.child,
-  });
+  const _FadeSlide({required this.index, required this.controller, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -1305,10 +763,7 @@ class _FadeSlide extends StatelessWidget {
         );
         return Opacity(
           opacity: t,
-          child: Transform.translate(
-            offset: Offset(0, 24 * (1 - t)),
-            child: child,
-          ),
+          child: Transform.translate(offset: Offset(0, 24 * (1 - t)), child: child),
         );
       },
       child: child,
@@ -1316,17 +771,12 @@ class _FadeSlide extends StatelessWidget {
   }
 }
 
-/// Staggered timeline item — appears one by one (Steps 265–266).
 class _StaggerItem extends StatelessWidget {
   final int index;
   final AnimationController controller;
   final Widget child;
 
-  const _StaggerItem({
-    required this.index,
-    required this.controller,
-    required this.child,
-  });
+  const _StaggerItem({required this.index, required this.controller, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -1342,30 +792,10 @@ class _StaggerItem extends StatelessWidget {
         );
         return Opacity(
           opacity: t,
-          child: Transform.translate(
-            offset: Offset(0, 16 * (1 - t)),
-            child: child,
-          ),
+          child: Transform.translate(offset: Offset(0, 16 * (1 - t)), child: child),
         );
       },
       child: child,
     );
   }
-}
-
-/// Factor data holder (Steps 214–227).
-class _WhyFactor {
-  final String label;
-  final String emoji;
-  final double percent;
-  final Color color;
-  final String explanation;
-
-  const _WhyFactor(
-    this.label,
-    this.emoji,
-    this.percent,
-    this.color,
-    this.explanation,
-  );
 }

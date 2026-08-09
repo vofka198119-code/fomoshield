@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
-import 'stock_detail_helpers.dart';
+import '../../../../../core/theme/typography_helpers.dart';
+import '../../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 
 // ---------------------------------------------------------------------------
-// Stress Test "Your Position" card — split out of the old monolithic
-// stock_detail_screen.dart, restyled to the FomoShieldTheme card standard
-// (was ThemeV2.surface + ad-hoc shadow). Content/logic unchanged.
+// Stress Test "Your Position" card — visual match for real Portfolio's
+// company_detail/widgets/position_section.dart ("MY INVESTMENTS": dark
+// dialLight/dialDark gradient card, same row/label style). No swipeable
+// pages here on purpose — a stress test is one sandbox, not multiple
+// portfolios holding the same symbol, so there's only ever one position to
+// show.
 // ---------------------------------------------------------------------------
 
 class StockPositionCard extends StatelessWidget {
@@ -23,66 +28,91 @@ class StockPositionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isProfitPositive = pnl >= 0;
+    final isUp = pnl >= 0;
+    final pnlColor = isUp ? ThemeV2.success : ThemeV2.loss;
     final costBasis = shares * avgPrice;
     final positionValue = costBasis + pnl;
+    final pnlPercent = costBasis > 0 ? (pnl / costBasis) * 100 : 0.0;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.fromLTRB(22, 14, 22, 18),
-      decoration: FomoShieldTheme.cardDecoration,
+      padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [dialLight, dialDark],
+        ),
+        borderRadius: FomoShieldTheme.cardRadius,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('YOUR POSITION', style: FomoShieldTheme.cardTitle()),
-          const Divider(height: 20, color: Color(0x0F000000)),
-          Row(
-            children: [
-              Expanded(
-                child: _metric(label: 'VALUE', value: fmtFullCurrency(positionValue)),
-              ),
-              Expanded(
-                child: _metric(
-                  label: 'P&L',
-                  value: '${isProfitPositive ? '+' : ''}${fmtFullCurrency(pnl.abs())}',
-                  valueColor: isProfitPositive ? ThemeV2.success : ThemeV2.loss,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _metric(label: 'SHARES', value: shares.toStringAsFixed(2)),
-              ),
-              Expanded(
-                child: _metric(label: 'AVG PRICE', value: fmtFullCurrency(avgPrice)),
-              ),
-            ],
-          ),
+          Text('YOUR POSITION', style: FomoShieldTheme.cardTitle(Colors.white)),
+          const SizedBox(height: 10),
+          Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+          const SizedBox(height: 12),
+          _row('Asset Value', '\$${positionValue.toStringAsFixed(2)}'),
+          const SizedBox(height: 8),
+          _row('Shares', shares.toStringAsFixed(4)),
+          const SizedBox(height: 8),
+          _pnlRow(pnl: pnl, pnlPercent: pnlPercent, isUp: isUp, pnlColor: pnlColor),
+          const SizedBox(height: 8),
+          _row('Avg Cost', '\$${avgPrice.toStringAsFixed(2)}'),
         ],
       ),
     );
   }
 
-  Widget _metric({required String label, required String value, Color? valueColor}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: ThemeV2.caption.copyWith(fontWeight: FontWeight.w500, letterSpacing: 0.8),
+  Widget _row(String label, String value) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: ThemeV2.title.copyWith(
-            color: valueColor ?? ThemeV2.textPrimary,
-            fontFeatures: const [FontFeature.tabularFigures()],
+      ),
+      Text(
+        value,
+        style: interNums(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+      ),
+    ],
+  );
+
+  Widget _pnlRow({
+    required double pnl,
+    required double pnlPercent,
+    required bool isUp,
+    required Color pnlColor,
+  }) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        'Unrealized P&L',
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+      ),
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+            size: 14,
+            color: pnlColor,
           ),
-        ),
-      ],
-    );
-  }
+          const SizedBox(width: 4),
+          Text(
+            '${isUp ? '+' : ''}${pnl.toStringAsFixed(2)} (${pnlPercent.toStringAsFixed(2)}%)',
+            style: interNums(fontSize: 14, fontWeight: FontWeight.w600, color: pnlColor),
+          ),
+        ],
+      ),
+    ],
+  );
 }

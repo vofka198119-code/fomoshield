@@ -13,7 +13,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../stress_test_models.dart';
-import '../../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
+import '../stress_test_naming.dart';
 
 /// Card wrapper: donut chart + centered portfolio metrics + cash capsule,
 /// styled to the standard light card (see reference_widget_card_standard).

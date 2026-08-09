@@ -8,8 +8,8 @@
 
 import 'dart:math' as math;
 import '../../core/services/gics_sector_mapper.dart';
-import '../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import 'stress_test_models.dart';
+import 'stress_test_naming.dart';
 
 // Diversification score vs. holdings count — non-monotonic (too few AND
 // too many holdings both score low). Single source of truth, shared with

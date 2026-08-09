@@ -49,151 +49,150 @@ class NewsScenario {
 const List<NewsScenario> newsScenarios = [
   // ── Positive ──────────────────────────────────────────────────
   NewsScenario(
-    headline: 'Отчет превзошел ожидания',
+    headline: 'Earnings Beat Expectations',
     description:
-        'Компания опубликовала квартальный отчет с выручкой и прибылью выше прогнозов аналитиков.',
+        'The company reported quarterly revenue and profit above analyst forecasts.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Повышение годового прогноза',
+    headline: 'Annual Guidance Raised',
     description:
-        'Руководство улучшило прогноз по выручке и прибыли на текущий финансовый год.',
+        'Management raised its revenue and profit guidance for the current fiscal year.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Крупный контракт',
+    headline: 'Major Contract Signed',
     description:
-        'Компания объявила о заключении многолетнего соглашения с крупным корпоративным клиентом.',
+        'The company announced a multi-year agreement with a large corporate client.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Обратный выкуп акций',
+    headline: 'Share Buyback Announced',
     description:
-        'Совет директоров утвердил масштабную программу обратного выкупа собственных акций.',
+        'The board approved a large-scale program to repurchase the company\'s own shares.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Рост дивидендов',
+    headline: 'Dividend Increase',
     description:
-        'Компания увеличила размер квартальных дивидендов и подтвердила стабильную дивидендную политику.',
+        'The company raised its quarterly dividend and reaffirmed a stable dividend policy.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Успешное завершение сделки',
+    headline: 'Deal Successfully Closed',
     description:
-        'Получены все необходимые разрешения, сделка по приобретению другой компании официально закрыта.',
+        'All required approvals were obtained and the acquisition of another company officially closed.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Одобрение нового продукта',
+    headline: 'New Product Approved',
     description:
-        'Регулятор одобрил вывод нового продукта на рынок, открывая компании дополнительный источник дохода.',
+        'A regulator approved the launch of a new product, opening an additional revenue stream for the company.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Снижение расходов',
+    headline: 'Cost Reduction Program',
     description:
-        'Компания объявила о программе оптимизации, которая должна значительно сократить операционные расходы.',
+        'The company announced an optimization program expected to significantly cut operating expenses.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Погашение долгов',
+    headline: 'Debt Repayment',
     description:
-        'Компания досрочно погасила часть долговой нагрузки и улучшила структуру баланса.',
+        'The company repaid part of its debt load ahead of schedule and improved its balance sheet.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Расширение бизнеса',
+    headline: 'Business Expansion',
     description:
-        'Руководство объявило о выходе на новый международный рынок и запуске локальных операций.',
+        'Management announced entry into a new international market with local operations launching.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Рост клиентской базы',
+    headline: 'Customer Base Growth',
     description:
-        'Количество активных клиентов достигло рекордного уровня за всю историю компании.',
+        'The number of active customers reached a record high for the company.',
     isPositive: true,
   ),
   NewsScenario(
-    headline: 'Стратегическое партнерство',
+    headline: 'Strategic Partnership',
     description:
-        'Компания подписала долгосрочное соглашение о сотрудничестве с одним из лидеров отрасли.',
+        'The company signed a long-term cooperation agreement with an industry leader.',
     isPositive: true,
   ),
   // ── Negative ──────────────────────────────────────────────────
   NewsScenario(
-    headline: 'Отчет оказался слабее ожиданий',
+    headline: 'Earnings Miss Expectations',
     description:
-        'Компания сообщила результаты ниже прогнозов аналитиков по прибыли и выручке.',
+        'The company reported results below analyst forecasts for profit and revenue.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Понижение прогноза',
-    description: 'Руководство ухудшило финансовый прогноз на оставшуюся часть года.',
+    headline: 'Guidance Cut',
+    description: 'Management lowered its financial guidance for the rest of the year.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Срыв сделки',
+    headline: 'Deal Falls Through',
     description:
-        'Планируемое приобретение другой компании отменено после длительных переговоров.',
+        'A planned acquisition of another company was called off after lengthy negotiations.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Отзыв продукции',
+    headline: 'Product Recall',
     description:
-        'Компания начала масштабный отзыв продукции из-за выявленных производственных дефектов.',
+        'The company began a large-scale product recall due to manufacturing defects.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Кибератака',
+    headline: 'Cyberattack',
     description:
-        'Компания подтвердила факт кибератаки, которая затронула часть внутренних систем.',
+        'The company confirmed a cyberattack that affected part of its internal systems.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Уход генерального директора',
-    description: 'Генеральный директор неожиданно объявил об уходе со своего поста.',
+    headline: 'CEO Departure',
+    description: 'The CEO unexpectedly announced their departure from the role.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Судебный иск',
+    headline: 'Lawsuit Filed',
     description:
-        'Против компании подан крупный коллективный иск, связанный с основной деятельностью бизнеса.',
+        'A major class-action lawsuit tied to the company\'s core business was filed against it.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Проблемы с поставками',
+    headline: 'Supply Chain Issues',
     description:
-        'Компания предупредила о перебоях в цепочке поставок и возможных задержках производства.',
+        'The company warned of supply chain disruptions and possible production delays.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Рост долговой нагрузки',
+    headline: 'Debt Load Increase',
     description:
-        'Компания сообщила о значительном увеличении долгов после публикации финансовой отчетности.',
+        'The company reported a significant increase in debt following its latest financial report.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Проверка регулятора',
+    headline: 'Regulatory Investigation',
+    description: 'A regulator opened a formal investigation into the company\'s operations.',
+    isPositive: false,
+  ),
+  NewsScenario(
+    headline: 'Key Client Lost',
+    description: 'One of the company\'s largest clients declined to renew its long-term contract.',
+    isPositive: false,
+  ),
+  NewsScenario(
+    headline: 'Production Halted',
     description:
-        'Регулятор начал официальное расследование в отношении деятельности компании.',
+        'Operations at one of the company\'s main production facilities were temporarily halted due to technical issues.',
     isPositive: false,
   ),
   NewsScenario(
-    headline: 'Потеря ключевого клиента',
-    description: 'Один из крупнейших клиентов отказался продлевать долгосрочный контракт.',
-    isPositive: false,
-  ),
-  NewsScenario(
-    headline: 'Приостановка производства',
+    headline: 'Layoffs Announced',
     description:
-        'Работа одного из основных производственных объектов временно остановлена из-за технических проблем.',
-    isPositive: false,
-  ),
-  NewsScenario(
-    headline: 'Сокращение персонала',
-    description:
-        'Компания объявила о масштабной реструктуризации с сокращением части сотрудников.',
+        'The company announced a major restructuring involving workforce reductions.',
     isPositive: false,
   ),
 ];
@@ -206,8 +205,8 @@ const double _newsChancePerEpochCheck = 0.05;
 
 /// Total signed price move range — magnitude only, sign comes from the
 /// picked [NewsScenario.isPositive].
-const double _newsAmplitudeMin = 0.10;
-const double _newsAmplitudeMax = 0.25;
+const double _newsAmplitudeMin = 0.06;
+const double _newsAmplitudeMax = 0.12;
 
 /// Ramp duration range — deliberately shorter/sharper than the spec/hype
 /// mechanism's full-epoch ramp, per explicit instruction ("более резкий

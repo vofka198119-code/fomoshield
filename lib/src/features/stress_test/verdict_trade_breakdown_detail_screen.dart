@@ -17,11 +17,11 @@ import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../shared/widgets/company_logo.dart';
-import '../assets/screens/stock_detail/widgets/stock_detail_helpers.dart';
 import '../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
 import '../../shared/widgets/stagger_fade_in.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
+import 'stress_test_naming.dart';
 
 class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
   final String sessionId;

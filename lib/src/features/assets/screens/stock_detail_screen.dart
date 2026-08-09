@@ -22,8 +22,8 @@ import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../company_detail/widgets/price_header.dart';
 import '../../company_detail/widgets/company_bottom_bar.dart';
-import 'stock_detail/widgets/stock_detail_helpers.dart';
-import 'stock_detail/widgets/stock_market_status.dart';
+import '../../../shared/widgets/simulated_trading_disclaimer.dart';
+import '../../stress_test/stress_test_naming.dart';
 import 'stock_detail/widgets/stock_sparkline_chart.dart';
 import 'stock_detail/widgets/stock_position_card.dart';
 import 'stock_detail/widgets/stock_why_today_card.dart';
@@ -120,11 +120,8 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     }
 
     List<ChartDataPoint> filtered;
-    final periodDuration = _sparkPeriodCutoffs[_selectedPeriod];
-    if (periodDuration == null) {
-      // StressTestSparkPeriod.max — no time filter, whole history.
-      filtered = allPoints;
-    } else if (_selectedPeriod == StressTestSparkPeriod.d1) {
+    final periodDuration = _sparkPeriodCutoffs[_selectedPeriod]!;
+    if (_selectedPeriod == StressTestSparkPeriod.d1) {
       // 1D is a fixed calendar day (midnight → midnight) — StockSparklineChart
       // further anchors its left edge to wherever today's real data starts
       // (not literal midnight); this just needs to include all of today.
@@ -250,7 +247,6 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     final isPositive = priceChange >= 0;
     final holding = _findHolding(session);
     final logoAsync = ref.watch(cachedLogoProvider(widget.symbol));
-    final phaseInfo = stressTestMarketPhaseDisplay(currentStressTestMarketPhase());
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -270,43 +266,17 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                         logo: logoAsync.valueOrNull,
                         companyName: resolveStressTestCompanyName(ref, widget.symbol),
                         symbol: widget.symbol,
+                        showFsScore: false,
                         price: currentPrice,
                         change: priceChange,
                         changePercent: priceChangePercent,
                         isUp: isPositive,
-                        // Simulated price — never the real NYSE session.
-                        phaseLabel: phaseInfo.label,
-                        phaseLabelColor: phaseInfo.color,
+                        // Simulated market has no real session concept —
+                        // no label, no glow, plain price color throughout.
+                        showSessionLabel: false,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: () => showStressTestMarketHoursSheet(context),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(phaseInfo.emoji, style: const TextStyle(fontSize: 14)),
-                            const SizedBox(width: 6),
-                            Text(
-                              phaseInfo.label,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: phaseInfo.color,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.info_outline_rounded,
-                              size: 14,
-                              color: ThemeV2.textSecondary.withValues(alpha: 0.6),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                     StockSparklineChart(
                       ready: _chartReady,
                       points: _points,
@@ -330,23 +300,16 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       priceChange: priceChange,
                       priceChangePercent: priceChangePercent,
                       isPositive: isPositive,
-                      marketPct: session.explanationLog[widget.symbol]?.isNotEmpty == true
-                          ? session.explanationLog[widget.symbol]!.last.contributions.marketPct
-                          : null,
-                      sectorPct: session.explanationLog[widget.symbol]?.isNotEmpty == true
-                          ? session.explanationLog[widget.symbol]!.last.contributions.sectorPct
-                          : null,
-                      newsPct: session.explanationLog[widget.symbol]?.isNotEmpty == true
-                          ? session.explanationLog[widget.symbol]!.last.contributions.newsPct
-                          : null,
-                      noisePct: session.explanationLog[widget.symbol]?.isNotEmpty == true
-                          ? session.explanationLog[widget.symbol]!.last.contributions.noisePct
-                          : null,
+                      latestExplanation:
+                          session.explanationLog[widget.symbol]?.isNotEmpty == true
+                              ? session.explanationLog[widget.symbol]!.last
+                              : null,
                     ),
                     StockLimitOrdersSection(
                       sessionId: widget.sessionId,
                       symbol: widget.symbol,
                     ),
+                    const SimulatedTradingDisclaimer(),
                     const SizedBox(height: 80),
                   ],
                 ),
@@ -357,11 +320,21 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
               isUp: isPositive,
               onBuy: () => context.push(
                 '/stress-test/${widget.sessionId}/stock/${widget.symbol}/order',
-                extra: {'type': 'buy', 'price': currentPrice},
+                extra: {
+                  'type': 'buy',
+                  'price': currentPrice,
+                  'companyName': resolveStressTestCompanyName(ref, widget.symbol),
+                  'logo': logoAsync.valueOrNull,
+                },
               ),
               onSell: () => context.push(
                 '/stress-test/${widget.sessionId}/stock/${widget.symbol}/order',
-                extra: {'type': 'sell', 'price': currentPrice},
+                extra: {
+                  'type': 'sell',
+                  'price': currentPrice,
+                  'companyName': resolveStressTestCompanyName(ref, widget.symbol),
+                  'logo': logoAsync.valueOrNull,
+                },
               ),
             ),
           ],
@@ -378,49 +351,25 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 64,
-        leadingWidth: 56,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 22),
-          child: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_rounded,
-              size: 22,
-              color: ThemeV2.textPrimary,
-            ),
-            onPressed: () => context.pop(),
-            splashRadius: 22,
+        centerTitle: true,
+        title: Text(
+          'COMPANY CARD',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: ThemeV2.primary,
+            letterSpacing: 1.5,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: const Icon(
-                Icons.bookmark_border_rounded,
-                size: 22,
-                color: ThemeV2.textPrimary,
-              ),
-              splashRadius: 22,
-              onPressed: () {
-                /* TODO: bookmark */
-              },
-            ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: ThemeV2.textPrimary,
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: const Icon(
-                Icons.notifications_none_rounded,
-                size: 22,
-                color: ThemeV2.textPrimary,
-              ),
-              splashRadius: 22,
-              onPressed: () {
-                /* TODO: notifications */
-              },
-            ),
-          ),
-        ],
+          onPressed: () => context.pop(),
+        ),
       ),
     );
   }

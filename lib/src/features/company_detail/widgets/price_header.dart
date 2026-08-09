@@ -37,6 +37,9 @@ class PriceHeader extends StatelessWidget {
   final bool isUp;
   final String changeLabel;
   final int? fsScore;
+  // Stress Test assets aren't real companies and never have a score — set
+  // false there to drop the slot entirely instead of showing an empty box.
+  final bool showFsScore;
   // Overrides the real-NYSE-time phase label/color computed below — for
   // callers whose price isn't a real market price (Stress Test's
   // simulated engine has its own always-open semantics; showing the
@@ -44,6 +47,11 @@ class PriceHeader extends StatelessWidget {
   final String? phaseLabel;
   final Color? phaseLabelColor;
   final bool phaseGlow;
+  // Stress Test's simulated market has no real session concept to show
+  // (always tradeable) and no real NYSE phase to fall back to either —
+  // false there drops the session label from the price cell entirely
+  // instead of showing something fake or misleadingly real.
+  final bool showSessionLabel;
 
   const PriceHeader({
     super.key,
@@ -56,9 +64,11 @@ class PriceHeader extends StatelessWidget {
     required this.isUp,
     this.changeLabel = 'CHANGE',
     this.fsScore,
+    this.showFsScore = true,
     this.phaseLabel,
     this.phaseLabelColor,
     this.phaseGlow = false,
+    this.showSessionLabel = true,
   });
 
   @override
@@ -173,7 +183,7 @@ class PriceHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  flex: 7,
+                  flex: showFsScore ? 7 : 10,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -214,21 +224,23 @@ class PriceHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 10),
-                // FS Score gauge — duplicates FinancialScoreWidget's circle
-                // so the score is visible without scrolling down.
-                Expanded(
-                  flex: 3,
-                  child: fsScore == null
-                      ? Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: ThemeV2.divider),
-                          ),
-                        )
-                      : _fsScoreCell(fsScore!),
-                ),
+                if (showFsScore) ...[
+                  const SizedBox(width: 10),
+                  // FS Score gauge — duplicates FinancialScoreWidget's
+                  // circle so the score is visible without scrolling down.
+                  Expanded(
+                    flex: 3,
+                    child: fsScore == null
+                        ? Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: ThemeV2.divider),
+                            ),
+                          )
+                        : _fsScoreCell(fsScore!),
+                  ),
+                ],
               ],
             ),
           ),
@@ -313,15 +325,17 @@ class PriceHeader extends StatelessWidget {
   }
 
   Widget _priceCell() {
-    final String sessionLabel;
-    final bool isOpen;
-    if (phaseLabel != null) {
-      sessionLabel = phaseLabel!;
-      isOpen = phaseGlow;
-    } else {
-      final phase = resolveMarketClockState(nowInNewYork()).phase;
-      sessionLabel = _phaseLabel(phase);
-      isOpen = phase == MarketPhase.marketOpen;
+    String sessionLabel = '';
+    bool isOpen = false;
+    if (showSessionLabel) {
+      if (phaseLabel != null) {
+        sessionLabel = phaseLabel!;
+        isOpen = phaseGlow;
+      } else {
+        final phase = resolveMarketClockState(nowInNewYork()).phase;
+        sessionLabel = _phaseLabel(phase);
+        isOpen = phase == MarketPhase.marketOpen;
+      }
     }
     final sessionColor = phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
 
@@ -350,24 +364,26 @@ class PriceHeader extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
-              const Spacer(),
-              Text(
-                sessionLabel,
-                style: GoogleFonts.inter(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                  color: sessionColor,
-                  shadows: isOpen
-                      ? [
-                          Shadow(
-                            color: dialBrassLight.withValues(alpha: 0.5),
-                            blurRadius: 6,
-                          ),
-                        ]
-                      : null,
+              if (showSessionLabel) ...[
+                const Spacer(),
+                Text(
+                  sessionLabel,
+                  style: GoogleFonts.inter(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    color: sessionColor,
+                    shadows: isOpen
+                        ? [
+                            Shadow(
+                              color: dialBrassLight.withValues(alpha: 0.5),
+                              blurRadius: 6,
+                            ),
+                          ]
+                        : null,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
           const SizedBox(height: 4),

@@ -67,9 +67,14 @@ class StressTestPendingOrdersNotifier
     return order;
   }
 
+  /// No-ops if the order already filled/cancelled since the caller last
+  /// saw it (e.g. an engine tick filled it while a "See all orders" sheet
+  /// was open) — otherwise this would silently overwrite a filled order's
+  /// status back to cancelled, corrupting its audit trail.
   void cancelOrder(String id) {
     final index = state.indexWhere((o) => o.id == id);
     if (index < 0) return;
+    if (state[index].status != StressTestOrderStatus.pending) return;
     state = [
       for (int i = 0; i < state.length; i++)
         if (i == index)

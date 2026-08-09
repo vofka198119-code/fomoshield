@@ -126,6 +126,11 @@ extension NoiseEngine on StressTestNotifier {
         ),
         marketPhase: scenario.name,
         scenario: scenario.name,
+        marketDriftRaw: marketDriftRaw,
+        sectorDriftRaw: sectorDriftRaw,
+        noiseRaw: noiseRaw,
+        newsRaw: newsRaw,
+        hypeRaw: hypeRaw,
       );
     }
 
@@ -177,6 +182,11 @@ extension NoiseEngine on StressTestNotifier {
       ),
       marketPhase: scenario.name,
       scenario: scenario.name,
+      marketDriftRaw: marketDriftRaw,
+      sectorDriftRaw: sectorDriftRaw,
+      noiseRaw: noiseRaw,
+      newsRaw: newsRaw,
+      hypeRaw: hypeRaw,
     );
   }
 
@@ -522,6 +532,12 @@ extension NoiseEngine on StressTestNotifier {
           symLog = symLog.sublist(symLog.length - _maxExplanationLogEntries);
         }
         explanations[h.symbol] = symLog;
+
+        // Fold into the whole-period Why Diagnostics accumulator BEFORE
+        // the cap above can trim this tick out of explanationLog — see
+        // stress_test_why_diagnostics.dart for why this can't just be
+        // derived from explanationLog after the fact.
+        _foldWhyDiagnostics(session.id, h.symbol, expl);
 
         // Advance the anchor to this tick's result so the NEXT tick (in
         // this same catch-up batch) diffs against its immediate

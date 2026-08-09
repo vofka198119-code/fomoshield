@@ -591,6 +591,11 @@ class TickExplanation {
   /// Сырой noise (стохастический шум) до нормализации.
   final double? noiseRaw;
 
+  /// Сырой News-инкремент (news_event.dart) до нормализации — null/0 when
+  /// this tick's newsPct came from the old synthetic >5%-correction proxy
+  /// rather than a real News event; only non-zero for the latter.
+  final double? newsRaw;
+
   /// Сырой Hype-инкремент (hype/hype_event.dart) до нормализации.
   final double? hypeRaw;
 
@@ -607,6 +612,7 @@ class TickExplanation {
     this.sectorDriftRaw,
     this.recoveryDriftRaw,
     this.noiseRaw,
+    this.newsRaw,
     this.hypeRaw,
   });
 }

@@ -36,6 +36,10 @@ class OrderEntryScreen extends ConsumerStatefulWidget {
   final String symbol;
   final String orderType; // 'buy' or 'sell'
   final double price;
+  // Company name/logo already resolved by the screen that pushed here
+  // (Stock Detail) — mirrors Portfolio's order entry flow.
+  final String? companyName;
+  final String? logo;
 
   const OrderEntryScreen({
     super.key,
@@ -43,6 +47,8 @@ class OrderEntryScreen extends ConsumerStatefulWidget {
     required this.symbol,
     required this.orderType,
     required this.price,
+    this.companyName,
+    this.logo,
   });
 
   @override
@@ -182,7 +188,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       showTradeConfirmationToast(
         context,
         title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
-        subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.symbol} '
+        subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
             'at \$${limitPrice.toStringAsFixed(2)} — Pending',
         icon: Icons.schedule_rounded,
         accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
@@ -226,7 +232,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     showTradeConfirmationToast(
       context,
       title: _isBuy ? 'You Bought' : 'You Sold',
-      subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.symbol} '
+      subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
           'at \$${_currentPrice.toStringAsFixed(2)}',
       icon: Icons.check_circle_rounded,
       accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
@@ -254,7 +260,8 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           children: [
             OrderHeader(
               symbol: widget.symbol,
-              companyName: widget.symbol,
+              companyName: widget.companyName ?? widget.symbol,
+              logo: widget.logo,
               isBuy: _isBuy,
               price: _currentPrice,
             ),
