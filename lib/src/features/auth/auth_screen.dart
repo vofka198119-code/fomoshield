@@ -109,6 +109,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         final response = await SupabaseConfig.client.auth.signUp(
           email: email,
           password: password,
+          emailRedirectTo: 'com.scanco.scanco://login-callback',
         );
 
         // If no session (e.g. email confirmation mode), don't auto-sign-in
