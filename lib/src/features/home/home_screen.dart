@@ -2,18 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
-import '../../core/supabase/supabase_providers.dart';
-import '../monetization/monetization_modal.dart';
-import '../monetization/premium_promo_overlay.dart';
 import 'home_providers.dart';
 import 'widget_order_provider.dart';
 import 'widgets/shield_signal_widget.dart';
 import 'widgets/watchlist_widget.dart';
 import 'widgets/market_clock_widget.dart';
 import 'widgets/portfolio_widget.dart';
-import 'widgets/portfolio_journal_widget.dart';
-import 'widgets/historical_sim_widget.dart';
-import 'widgets/scenario_compare_widget.dart';
 import 'widgets/stress_test_widget.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
@@ -47,21 +41,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       isScrollControlled: true,
       builder: (sheetContext) {
-        final tier = ref.read(subscriptionTierProvider);
         return _WidgetsSettingsSheet(
           initialConfigs: currentConfigs,
           notifier: notifier,
-          isPremium:
-              tier == SubscriptionTier.premium ||
-              tier == SubscriptionTier.admin,
-          onPremiumLockTap: () => showPremiumPromoOverlay(
-            context: context,
-            title: 'Premium widget',
-            durationSeconds: 5,
-            onComplete: () {
-              if (context.mounted) showMonetizationModal(context, ref);
-            },
-          ),
         );
       },
     );
@@ -163,12 +145,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return const MarketClockWidget();
       case 'portfolio':
         return const PortfolioWidget();
-      case 'portfolio_journal':
-        return const PortfolioJournalWidget();
-      case 'historical_sim':
-        return const HistoricalSimWidget();
-      case 'scenario_compare':
-        return const ScenarioCompareWidget();
       case 'stress_test':
         return const StressTestWidget();
       default:
@@ -184,14 +160,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 class _WidgetsSettingsSheet extends StatefulWidget {
   final List<HomeWidgetConfig> initialConfigs;
   final HomeWidgetsNotifier notifier;
-  final bool isPremium;
-  final VoidCallback onPremiumLockTap;
 
   const _WidgetsSettingsSheet({
     required this.initialConfigs,
     required this.notifier,
-    required this.isPremium,
-    required this.onPremiumLockTap,
   });
 
   @override
@@ -240,12 +212,6 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
         return Icons.access_time_filled_rounded;
       case 'portfolio':
         return Icons.account_balance_rounded;
-      case 'portfolio_journal':
-        return Icons.auto_stories_rounded;
-      case 'historical_sim':
-        return Icons.query_stats_rounded;
-      case 'scenario_compare':
-        return Icons.compare_arrows_rounded;
       case 'stress_test':
         return Icons.psychology_rounded;
       default:
@@ -302,18 +268,6 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                           visible: true,
                         ),
                         const HomeWidgetConfig(id: 'watchlist', visible: true),
-                        const HomeWidgetConfig(
-                          id: 'portfolio_journal',
-                          visible: true,
-                        ),
-                        const HomeWidgetConfig(
-                          id: 'historical_sim',
-                          visible: true,
-                        ),
-                        const HomeWidgetConfig(
-                          id: 'scenario_compare',
-                          visible: true,
-                        ),
                       ];
                     });
                   },
@@ -354,10 +308,6 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
               },
               itemBuilder: (context, index) {
                 final config = _configs[index];
-                final isPremiumWidget =
-                    config.id == 'portfolio_journal' ||
-                    config.id == 'historical_sim' ||
-                    config.id == 'scenario_compare';
                 return Container(
                   key: ValueKey(config.id),
                   margin: const EdgeInsets.only(bottom: 8),
@@ -390,56 +340,31 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                         Icon(
                           _widgetIcon(config.id),
                           color: config.visible
-                              ? (isPremiumWidget
-                                    ? ThemeV2.primary
-                                    : ThemeV2.primary)
+                              ? ThemeV2.primary
                               : ThemeV2.textSecondary,
                           size: 22,
                         ),
                       ],
                     ),
-                    title: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            config.displayName,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: config.visible
-                                  ? ThemeV2.textPrimary
-                                  : ThemeV2.textSecondary,
-                            ),
-                          ),
-                        ),
-                        if (isPremiumWidget) ...[
-                          const SizedBox(width: 6),
-                          Icon(
-                            Icons.lock_rounded,
-                            size: 14,
-                            color: widget.isPremium
-                                ? ThemeV2.primary
-                                : ThemeV2.textSecondary,
-                          ),
-                        ],
-                      ],
+                    title: Text(
+                      config.displayName,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: config.visible
+                            ? ThemeV2.textPrimary
+                            : ThemeV2.textSecondary,
+                      ),
                     ),
                     trailing: GestureDetector(
-                      onTap: isPremiumWidget && !widget.isPremium
-                          ? widget.onPremiumLockTap
-                          : () => _toggleVisibility(config.id),
+                      onTap: () => _toggleVisibility(config.id),
                       child: Icon(
-                        isPremiumWidget && !widget.isPremium
-                            ? Icons.lock_rounded
-                            : (config.visible
-                                  ? Icons.visibility_rounded
-                                  : Icons.visibility_off_rounded),
-                        color: isPremiumWidget && !widget.isPremium
+                        config.visible
+                            ? Icons.visibility_rounded
+                            : Icons.visibility_off_rounded,
+                        color: config.visible
                             ? ThemeV2.primary
-                            : (config.visible
-                                  ? ThemeV2.primary
-                                  : ThemeV2.textSecondary),
+                            : ThemeV2.textSecondary,
                         size: 22,
                       ),
                     ),

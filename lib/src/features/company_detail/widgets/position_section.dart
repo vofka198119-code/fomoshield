@@ -65,29 +65,23 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
   Widget build(BuildContext context) {
     final portfolios = ref.watch(portfoliosProvider);
 
+    // Cost basis is pure transaction math (no live price involved), so this
+    // reads straight off Portfolio.holdings instead of going through
+    // portfolioPerformanceProvider — that provider fetches a live Finnhub
+    // quote for EVERY holding in EVERY portfolio, which this widget never
+    // needed just to show avg-cost/shares for one symbol.
     final positions = <_PortfolioPosition>[];
     for (final p in portfolios) {
-      final perf = ref.watch(portfolioPerformanceProvider(p.id));
-      final holding = perf.asData?.value.holdings.firstWhere(
-        (h) => h.symbol == widget.symbol,
-        orElse: () => HoldingPerformance(
-          symbol: widget.symbol,
-          shares: 0,
-          avgCost: 0,
-          totalCost: 0,
-          currentPrice: 0,
-          currentValue: 0,
-          pnl: 0,
-          pnlPercent: 0,
-        ),
-      );
-      final hasPosition = holding != null && holding.shares > 0;
+      final holding = p.holdings[widget.symbol];
+      final shares = holding?['shares'] ?? 0;
+      final hasPosition = shares > 0;
+      final avgCost = hasPosition ? holding!['cost']! / shares : 0.0;
       positions.add((
         portfolioName: p.name,
-        shares: hasPosition ? holding.shares : 0,
-        avgCost: hasPosition ? holding.avgCost : 0,
-        totalValue: hasPosition ? holding.shares * widget.price : 0,
-        totalCost: hasPosition ? holding.shares * holding.avgCost : 0,
+        shares: hasPosition ? shares : 0,
+        avgCost: avgCost,
+        totalValue: hasPosition ? shares * widget.price : 0,
+        totalCost: hasPosition ? holding!['cost']! : 0,
         hasPosition: hasPosition,
       ));
     }

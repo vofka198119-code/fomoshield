@@ -1,27 +1,35 @@
+// ---------------------------------------------------------------------------
+// Portfolio Holdings — pixel-for-pixel copy of Stress Test's own "HOLDINGS"
+// card (stress_test_screen.dart's _buildMyAssets): same card, same 72px
+// logo rows with a donut-color ring, same name/symbol/shares + value/P&L
+// layout, same "More (N)/Less" toggle at a 10-row preview. No chevron — the
+// old WidgetContainer-based header (chevron tied to a tap-to-expand toggle
+// that didn't actually navigate anywhere) is gone along with it; expand/
+// collapse now lives entirely in the "More/Less" button, same as the
+// reference. Row tap still pushes to Company Detail (a real destination,
+// unlike a decorative chevron).
+// ---------------------------------------------------------------------------
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/company_logo.dart';
-import '../../../shared/widgets/widget_container.dart';
+import '../../../shared/widgets/donut_ring_painter.dart';
 import '../portfolio_providers.dart';
-
-// ---------------------------------------------------------------------------
-// Portfolio Holdings Widget — sorted by weight, collapsible, with %
-// ---------------------------------------------------------------------------
 
 class PortfolioHoldingsWidget extends StatefulWidget {
   final String portfolioId;
   final List<HoldingPerformance>? holdings;
-  final String? emptyPortfolioName;
 
   const PortfolioHoldingsWidget({
     super.key,
     required this.portfolioId,
     this.holdings,
-    this.emptyPortfolioName,
   });
 
   @override
@@ -29,6 +37,7 @@ class PortfolioHoldingsWidget extends StatefulWidget {
 }
 
 class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
+  static const int _previewLimit = 10;
   bool _showAll = false;
 
   Widget _addButton(BuildContext context) {
@@ -55,231 +64,245 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
     final holdings = widget.holdings;
 
     if (holdings == null) {
-      return WidgetContainer(
-        title: 'HOLDINGS',
-        trailing: _addButton(context),
-        showFooter: false,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(20),
-            child: Center(
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: ThemeV2.primary,
-                ),
-              ),
-            ),
-          ),
-        ],
+      return Container(
+        width: double.infinity,
+        height: 200,
+        decoration: FomoShieldTheme.cardDecoration,
+        alignment: Alignment.center,
+        child: const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2, color: ThemeV2.primary),
+        ),
       );
     }
 
-    if (holdings.isEmpty) {
-      return _emptyHoldings(context);
-    }
-
-    // Sort by currentValue descending (largest first)
+    // Sort descending by currentValue — same order the Portfolio Balance
+    // donut's legend uses, so donutAllocationColor(i) lines up with the
+    // same color for the same holding across both widgets.
     final sorted = List<HoldingPerformance>.from(holdings)
       ..sort((a, b) => b.currentValue.compareTo(a.currentValue));
-    final totalValue = sorted.fold<double>(0, (s, h) => s + h.currentValue);
-    const int previewLimit = 4;
-    final display = _showAll ? sorted : sorted.take(previewLimit).toList();
+    final display = _showAll ? sorted : sorted.take(_previewLimit).toList();
 
-    return WidgetContainer(
-      title: 'HOLDINGS',
-      onTap: () => setState(() => _showAll = !_showAll),
-      trailing: _addButton(context),
-      showFooter: !_showAll && sorted.length > previewLimit,
-      footerText: '+ ${sorted.length - previewLimit} more',
-      children: display
-          .map((h) => KeyedSubtree(
-                key: ValueKey(h.symbol),
-                child: _HoldingCard(
-                  holding: h,
-                  portfolioId: widget.portfolioId,
-                  weightPercent:
-                      totalValue > 0 ? (h.currentValue / totalValue) * 100 : 0,
-                ),
-              ))
-          .toList(),
-    );
-  }
-
-  Widget _emptyHoldings(BuildContext context) {
-    final name = widget.emptyPortfolioName ?? 'this portfolio';
-    return WidgetContainer(
-      title: 'HOLDINGS',
-      onTap: () => context.push(
-        '/search',
-        extra: {'portfolioId': widget.portfolioId},
-      ),
-      trailing: _addButton(context),
-      showFooter: false,
-      emptyText: 'Nothing here yet',
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Center(
-            child: Column(
-              children: [
-                const Icon(Icons.shopping_bag_rounded,
-                    size: 48, color: ThemeV2.textSecondary),
-                const SizedBox(height: 12),
-                Text('No holdings yet',
-                    style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary)),
-                const SizedBox(height: 8),
-                Text('Search and add companies to "$name"',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                        fontSize: 13, color: ThemeV2.textSecondary)),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () => context.push(
-                    '/search',
-                    extra: {'portfolioId': widget.portfolioId},
-                  ),
-                  icon: const Icon(Icons.search_rounded, size: 18),
-                  label: Text('Find Companies',
-                      style: GoogleFonts.inter(
-                          fontSize: 14, fontWeight: FontWeight.w600)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeV2.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                  ),
-                ),
-              ],
+    return Container(
+      width: double.infinity,
+      decoration: FomoShieldTheme.cardDecoration,
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+              child: Row(
+                children: [
+                  Text('HOLDINGS', style: FomoShieldTheme.cardTitle()),
+                  const Spacer(),
+                  _addButton(context),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+          if (sorted.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'No holdings yet',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: ThemeV2.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Tap + to search and add your first holding',
+                      style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else ...[
+            Divider(
+              height: 1,
+              indent: 16,
+              endIndent: 16,
+              color: Colors.black.withValues(alpha: 0.06),
+            ),
+            for (int i = 0; i < display.length; i++)
+              _HoldingRow(
+                holding: display[i],
+                portfolioId: widget.portfolioId,
+                colorIndex: i,
+                showDivider: i < display.length - 1,
+              ),
+            if (sorted.length > _previewLimit)
+              GestureDetector(
+                onTap: () => setState(() => _showAll = !_showAll),
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(16, 6, 16, 16),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: ThemeV2.primary.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      _showAll ? 'Less' : 'More (${sorted.length - _previewLimit})',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: ThemeV2.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              const SizedBox(height: 8),
+          ],
+        ],
+      ),
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Holding Card (extracted from original portfolio_screen.dart)
-// ---------------------------------------------------------------------------
-
-class _HoldingCard extends ConsumerWidget {
+class _HoldingRow extends ConsumerWidget {
   final HoldingPerformance holding;
   final String portfolioId;
-  final double weightPercent;
+  final int colorIndex;
+  final bool showDivider;
 
-  const _HoldingCard({
+  const _HoldingRow({
     required this.holding,
     required this.portfolioId,
-    this.weightPercent = 0,
+    required this.colorIndex,
+    required this.showDivider,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isUp = holding.pnl >= 0;
+    final isPositive = holding.pnl >= 0;
     final logoAsync = ref.watch(quickLogoProvider(holding.symbol));
     final logoUrl = logoAsync.valueOrNull;
     final companyName =
         ref.watch(resolvedCompanyNameProvider(holding.symbol)).valueOrNull ??
         holding.symbol;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: () => context.push(
-          '/company/${holding.symbol}',
-          extra: {'portfolioId': portfolioId},
-        ),
-        borderRadius: BorderRadius.circular(22),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              CompanyLogo(
-                ticker: holding.symbol,
-                logoUrl: logoUrl,
-                radius: 18,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(companyName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: ThemeV2.textPrimary)),
-                        ),
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: ThemeV2.primary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '${weightPercent.toStringAsFixed(1)}%',
-                            style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: ThemeV2.primary),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(holding.symbol,
-                        style: GoogleFonts.inter(
-                            fontSize: 11, color: ThemeV2.textSecondary)),
-                    const SizedBox(height: 2),
-                    Text(
-                        '${holding.shares.toStringAsFixed(4)} @ \$${holding.avgCost.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                            fontSize: 12, color: ThemeV2.textSecondary)),
-                  ],
+    return GestureDetector(
+      onTap: () => context.push(
+        '/company/${holding.symbol}',
+        extra: {'portfolioId': portfolioId},
+      ),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 72,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: showDivider
+            ? BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    width: 0.5,
+                  ),
+                ),
+              )
+            : null,
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: donutAllocationColor(colorIndex).withValues(alpha: 0.7),
+                  width: 1.5,
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              padding: const EdgeInsets.all(1.5),
+              child: ClipOval(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: CompanyLogo(
+                    ticker: holding.symbol,
+                    logoUrl: logoUrl,
+                    radius: 18,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text('\$${holding.currentValue.toStringAsFixed(2)}',
-                        style: GoogleFonts.inter(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: ThemeV2.textPrimary)),
+                  Text(
+                    companyName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: ThemeV2.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: 2),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                        '${isUp ? '+' : ''}\$${holding.pnl.toStringAsFixed(2)} (${isUp ? '+' : ''}${holding.pnlPercent.toStringAsFixed(2)}%)',
-                        style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: isUp
-                                ? ThemeV2.success
-                                : ThemeV2.loss)),
+                  Text(
+                    holding.symbol,
+                    style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${holding.shares.toStringAsFixed(2)} shares',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    '\$${holding.currentValue.toStringAsFixed(2)}',
+                    style: interNums(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: ThemeV2.textPrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    '${isPositive ? '+' : ''}\$${holding.pnl.toStringAsFixed(2)} '
+                    '(${isPositive ? '+' : ''}${holding.pnlPercent.toStringAsFixed(2)}%)',
+                    style: interNums(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isPositive ? ThemeV2.success : ThemeV2.loss,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 }
-

@@ -9,11 +9,12 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/typography_helpers.dart';
+import '../../../shared/widgets/numeric_keypad.dart';
 import '../portfolio_providers.dart';
 
 // Fallback only — normally the min goal is the portfolio's own
@@ -32,6 +33,7 @@ class SetGoalScreen extends ConsumerStatefulWidget {
 class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
   late final TextEditingController _controller;
   late final bool _isEditing;
+  bool _keypadOpen = false;
 
   @override
   void initState() {
@@ -96,83 +98,99 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'What total portfolio value do you want to reach?',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: ThemeV2.textPrimary,
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(22),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'What total portfolio value do you want to reach?',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: ThemeV2.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'This is your target total balance, not extra profit on top. '
+                      'Minimum \$${minGoal.toStringAsFixed(0)}.',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: ThemeV2.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => setState(() => _keypadOpen = true),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: ThemeV2.surface,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: ThemeV2.divider),
+                        ),
+                        child: Text(
+                          _controller.text.isEmpty
+                              ? '\$ ${minGoal.toStringAsFixed(0)}'
+                              : '\$ ${_controller.text}',
+                          style: interNums(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: _controller.text.isEmpty
+                                ? ThemeV2.textSecondary
+                                : ThemeV2.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                'This is your target total balance, not extra profit on top. '
-                'Minimum \$${minGoal.toStringAsFixed(0)}.',
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: ThemeV2.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              TextField(
+            ),
+            if (_keypadOpen)
+              NumericKeypad(
                 controller: _controller,
-                autofocus: true,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-                ],
-                style: GoogleFonts.inter(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: ThemeV2.textPrimary,
-                ),
-                decoration: InputDecoration(
-                  prefixText: '\$ ',
-                  prefixStyle: GoogleFonts.inter(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.textPrimary,
-                  ),
-                  hintText: minGoal.toStringAsFixed(0),
-                  hintStyle: GoogleFonts.inter(color: ThemeV2.textSecondary),
-                  filled: true,
-                  fillColor: ThemeV2.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(color: ThemeV2.divider),
-                  ),
-                ),
+                onChanged: () => setState(() {}),
+                onDone: () => setState(() => _keypadOpen = false),
+                header: _saveButton(height: 44),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.all(22),
+                child: _saveButton(height: ThemeV2.buttonHeight),
               ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: ThemeV2.buttonHeight,
-                child: ElevatedButton(
-                  onPressed: _save,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeV2.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Save Goal',
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _saveButton({required double height}) {
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: ElevatedButton(
+        onPressed: _save,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ThemeV2.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
           ),
+          elevation: 0,
+        ),
+        child: Text(
+          'Save Goal',
+          style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),
     );

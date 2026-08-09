@@ -7,6 +7,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../portfolio_providers.dart';
 
@@ -397,50 +398,28 @@ class _SegmentedBar extends StatelessWidget {
   final double currentPercent; // -100..100
   const _SegmentedBar({required this.currentPercent});
 
-  static const int _segmentCount = 20;
-  static const double _rangeWidth = 200 / _segmentCount; // 10%
-  static const Color _red = Color(0xFFFF3B30);
-  static const Color _yellow = Color(0xFFFFD600);
-  static const Color _green = Color(0xFF00C853);
-  static const Color _unfilled = Color(0x33FFFFFF); // white @ 20%
-
-  static double _rangeStart(int index) => -100 + index * _rangeWidth;
-
-  static Color _colorForIndex(int index) {
-    final t = (index + 0.5) / _segmentCount; // midpoint, 0..1
-    if (t <= 0.5) return Color.lerp(_red, _yellow, t / 0.5)!;
-    return Color.lerp(_yellow, _green, (t - 0.5) / 0.5)!;
-  }
-
-  double _fillFraction(int index) {
-    final start = _rangeStart(index);
-    if (currentPercent <= start) return 0.0;
-    if (currentPercent >= start + _rangeWidth) return 1.0;
-    return (currentPercent - start) / _rangeWidth;
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 28,
       child: Row(
-        children: List.generate(_segmentCount, (i) {
-          final fraction = _fillFraction(i);
+        children: List.generate(SegmentGaugeMath.segmentCount, (i) {
+          final fraction = SegmentGaugeMath.fillFraction(currentPercent, i);
           return Expanded(
             child: Container(
               margin: EdgeInsets.only(
-                right: i == _segmentCount - 1 ? 0 : 3,
+                right: i == SegmentGaugeMath.segmentCount - 1 ? 0 : 3,
               ),
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: _unfilled,
+                color: SegmentGaugeMath.unfilled,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: fraction > 0
                   ? FractionallySizedBox(
                       widthFactor: fraction,
                       alignment: Alignment.centerLeft,
-                      child: Container(color: _colorForIndex(i)),
+                      child: Container(color: SegmentGaugeMath.colorForIndex(i)),
                     )
                   : null,
             ),

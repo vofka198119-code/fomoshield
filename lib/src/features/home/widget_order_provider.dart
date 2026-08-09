@@ -18,10 +18,6 @@ const List<String> _defaultOrder = [
   'shield_signal',
   'stress_test',
   'watchlist',
-  // Premium widgets (hidden by default for FREE, shown with 🔒)
-  'portfolio_journal',
-  'historical_sim',
-  'scenario_compare',
 ];
 
 String _prefsKey(String? uid) =>
@@ -48,12 +44,6 @@ class HomeWidgetConfig {
         return 'Stress Test';
       case 'portfolio':
         return 'My Portfolio';
-      case 'portfolio_journal':
-        return 'Portfolio Journal';
-      case 'historical_sim':
-        return 'Historical Simulator';
-      case 'scenario_compare':
-        return 'Scenario Comparison';
       default:
         return id;
     }

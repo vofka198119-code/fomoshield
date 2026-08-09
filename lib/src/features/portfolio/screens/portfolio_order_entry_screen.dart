@@ -22,7 +22,11 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/supabase/supabase_providers.dart';
 import '../../../shared/services/finnhub_service.dart';
+import '../../monetization/monetization_modal.dart';
+import '../../monetization/premium_promo_overlay.dart';
+import '../portfolio_limits_provider.dart';
 import '../portfolio_providers.dart';
 import '../../orders/order_model.dart' as orders;
 import '../../orders/order_provider.dart';
@@ -303,6 +307,22 @@ class _PortfolioOrderEntryScreenState
         );
         return;
       }
+
+      // Cap on distinct companies held per portfolio — real Portfolio buys
+      // hit the app's live-quote backend, so an unbounded number of tiny
+      // positions is unbounded live-quote traffic. Only blocks a BUY that
+      // would ADD a new symbol; topping up a symbol already held never
+      // increases the count.
+      final portfolios = ref.read(portfoliosProvider);
+      final portfolio = portfolios.firstWhere((p) => p.id == widget.portfolioId);
+      final alreadyHeld = portfolio.holdings.containsKey(widget.symbol);
+      if (!alreadyHeld) {
+        final maxHoldings = ref.read(maxHoldingsPerPortfolioProvider);
+        if (portfolio.holdings.length >= maxHoldings) {
+          _showHoldingsLimitReached(maxHoldings);
+          return;
+        }
+      }
     }
 
     _executeOrder(
@@ -313,6 +333,57 @@ class _PortfolioOrderEntryScreenState
       amount: amount,
       limitPrice: limitPrice,
     );
+  }
+
+  /// Free tier gets the same premium-upsell stub used elsewhere (real
+  /// payment isn't wired up yet); premium is already at its own higher cap,
+  /// so it just gets a plain notice — there's nothing to upsell them to.
+  void _showHoldingsLimitReached(int maxHoldings) {
+    final tier = ref.read(subscriptionTierProvider);
+    final isPremium =
+        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    if (isPremium) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: ThemeV2.surface,
+          title: Text(
+            'Limit Reached',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: ThemeV2.textPrimary,
+            ),
+          ),
+          content: Text(
+            'You\'ve exceeded the allowed limit on asset purchases for '
+            'this portfolio ($maxHoldings companies).',
+            style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                'OK',
+                style: GoogleFonts.inter(
+                  color: ThemeV2.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showPremiumPromoOverlay(
+        context: context,
+        title: 'Portfolio holding limit reached',
+        durationSeconds: 5,
+        onComplete: () {
+          if (context.mounted) showMonetizationModal(context, ref);
+        },
+      );
+    }
   }
 
   /// Central order execution logic (called directly or after confirmation)

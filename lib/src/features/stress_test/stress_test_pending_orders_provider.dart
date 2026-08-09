@@ -46,6 +46,20 @@ class StressTestPendingOrdersNotifier
           o.sessionId == sessionId && o.status == StressTestOrderStatus.pending)
       .toList();
 
+  /// Cash already committed to this session's pending BUY limit orders —
+  /// mirrors real Portfolio's OrderNotifier.reservedCashForPortfolio.
+  /// Session.cash isn't touched until a limit order actually fills, but it
+  /// shouldn't be offered as "available" a second time to a later order
+  /// placed while the first is still pending.
+  double reservedCashForSession(String sessionId) {
+    double reserved = 0;
+    for (final o in forSession(sessionId)) {
+      if (!o.isBuy) continue;
+      reserved += o.limitPrice * o.quantity;
+    }
+    return reserved;
+  }
+
   StressTestPendingOrder placeLimitOrder({
     required String sessionId,
     required String symbol,

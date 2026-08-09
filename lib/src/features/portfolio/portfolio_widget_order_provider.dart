@@ -11,14 +11,11 @@ import '../../core/supabase/supabase_providers.dart';
 // ---------------------------------------------------------------------------
 
 const List<String> _defaultPortfolioWidgetOrder = [
-  'portfolio_summary',
+  'portfolio_balance',
+  'portfolio_cash',
   'target',
-  'portfolio_allocation',
   'portfolio_holdings',
   'trade_history',
-  'portfolio_journal',
-  'historical_sim',
-  'scenario_compare',
   'my_limit_orders',
 ];
 
@@ -36,22 +33,16 @@ class PortfolioWidgetConfig {
 
   String get displayName {
     switch (id) {
-      case 'portfolio_summary':
-        return 'Portfolio Summary';
+      case 'portfolio_balance':
+        return 'Portfolio Balance';
+      case 'portfolio_cash':
+        return 'Cash Available';
       case 'target':
         return 'Target';
-      case 'portfolio_allocation':
-        return 'Allocation';
       case 'portfolio_holdings':
         return 'Holdings';
       case 'trade_history':
         return 'Trade History';
-      case 'portfolio_journal':
-        return 'Portfolio Journal';
-      case 'historical_sim':
-        return 'Historical Simulator';
-      case 'scenario_compare':
-        return 'Scenario Comparison';
       case 'my_limit_orders':
         return 'My Limit Orders';
       default:
@@ -81,6 +72,28 @@ class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>
     _load();
   }
 
+  // 'portfolio_balance' is pinned first — always at the top, never hidden,
+  // never draggable out of position (mirrors Stress Test's own
+  // 'allocation_chart' pin, see stress_test_widget_order_provider.dart).
+  // Guarded here too, not just in the settings sheet UI, so it holds
+  // regardless of caller.
+  static const _pinnedFirstId = 'portfolio_balance';
+
+  /// Forces the pinned id to the front regardless of whatever order it
+  /// arrived in (e.g. a saved layout from before it was pinned, which
+  /// would otherwise leave it wherever the merge above happens to place it).
+  List<String> _normalizePinned(List<String> ids) {
+    final rest = [...ids]..remove(_pinnedFirstId);
+    return [_pinnedFirstId, ...rest];
+  }
+
+  /// The same default list [resetToDefaults] assigns to `state` — exposed
+  /// so callers outside this class (which can't read the protected `state`
+  /// field) can mirror it without hand-duplicating the widget id list.
+  List<PortfolioWidgetConfig> get defaultConfigs => _defaultPortfolioWidgetOrder
+      .map((id) => PortfolioWidgetConfig(id: id, visible: true))
+      .toList();
+
   void setUserId(String? uid) {
     _userId = uid;
     _load();
@@ -102,6 +115,7 @@ class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>
         order = [...savedOrder, ...missing];
       }
     }
+    order = _normalizePinned(order);
 
     // Load visibility
     final savedVisibility = prefs.getString(visKey);
@@ -135,19 +149,22 @@ class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>
   }
 
   Future<void> reorder(String id, int newIndex) async {
+    if (id == _pinnedFirstId) return;
     final currentIndex = state.indexWhere((c) => c.id == id);
     if (currentIndex < 0) return;
 
     final config = state[currentIndex];
+    final clampedIndex = newIndex.clamp(1, state.length - 1);
     final newList = [...state]
       ..removeAt(currentIndex)
-      ..insert(newIndex.clamp(0, state.length - 1), config);
+      ..insert(clampedIndex, config);
 
     state = newList;
     await _saveLocal();
   }
 
   Future<void> toggleVisibility(String id) async {
+    if (id == _pinnedFirstId) return;
     state = state.map((c) {
       if (c.id == id) return PortfolioWidgetConfig(id: c.id, visible: !c.visible);
       return c;
@@ -156,9 +173,7 @@ class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>
   }
 
   Future<void> resetToDefaults() async {
-    state = _defaultPortfolioWidgetOrder
-        .map((id) => PortfolioWidgetConfig(id: id, visible: true))
-        .toList();
+    state = defaultConfigs;
     await _saveLocal();
   }
 }

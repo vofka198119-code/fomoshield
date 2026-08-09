@@ -194,29 +194,20 @@ class _PriceChartState extends ConsumerState<PriceChart> {
 
   /// Weighted-average cost basis for this symbol across every portfolio
   /// that holds it, or null if the user doesn't hold it anywhere — same
-  /// computation as `PositionSection`'s "Avg Cost" tile.
+  /// computation as `PositionSection`'s "Avg Cost" tile. Reads straight off
+  /// Portfolio.holdings (pure transaction math) rather than
+  /// portfolioPerformanceProvider, which would fetch a live Finnhub quote
+  /// for every holding in every portfolio just to answer this.
   double? _avgCost() {
     final portfolios = ref.watch(portfoliosProvider);
     double totalShares = 0;
     double totalCost = 0;
     for (final p in portfolios) {
-      final perf = ref.watch(portfolioPerformanceProvider(p.id));
-      final holding = perf.asData?.value.holdings.firstWhere(
-        (h) => h.symbol == widget.symbol,
-        orElse: () => HoldingPerformance(
-          symbol: widget.symbol,
-          shares: 0,
-          avgCost: 0,
-          totalCost: 0,
-          currentPrice: 0,
-          currentValue: 0,
-          pnl: 0,
-          pnlPercent: 0,
-        ),
-      );
-      if (holding != null && holding.shares > 0) {
-        totalShares += holding.shares;
-        totalCost += holding.shares * holding.avgCost;
+      final holding = p.holdings[widget.symbol];
+      final shares = holding?['shares'] ?? 0;
+      if (shares > 0) {
+        totalShares += shares;
+        totalCost += holding!['cost']!;
       }
     }
     if (totalShares <= 0) return null;
@@ -399,14 +390,6 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     final touchLineTopY =
         chartMaxY - (dateTooltipHeight / 220) * (chartMaxY - chartMinY);
 
-    // Fill fades out this many px below the line at every x — drawn by
-    // ChartLineGlowPainter (a custom painter), NOT fl_chart's
-    // belowBarData.gradient, which positions its fade relative to the
-    // whole chart box's Y-range rather than the line's own local height —
-    // confirmed on-device to only show fill near the chart's absolute
-    // peak and nowhere else the line dips below it.
-    const fillFadeHeight = 40.0;
-
     return Stack(
       children: [
         Padding(
@@ -430,7 +413,6 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                     painter: ChartLineGlowPainter(
                       pixelPoints: pixelPoints,
                       color: lineColor,
-                      fadeHeight: fillFadeHeight,
                     ),
                   ),
                   LineChart(

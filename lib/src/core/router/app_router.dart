@@ -12,7 +12,6 @@ import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/portfolio/portfolio_screen.dart';
-import '../../features/portfolio/screens/portfolio_assets_screen.dart';
 import '../../features/portfolio/screens/portfolio_order_entry_screen.dart';
 import '../../features/portfolio/screens/set_goal_screen.dart';
 import '../../features/market_clock/market_clock_screen.dart';
@@ -43,6 +42,7 @@ import '../../features/assets/screens/stock_detail_screen.dart';
 import '../../features/assets/screens/why_today_screen.dart';
 import '../../features/assets/screens/order_entry_screen.dart';
 import '../theme/theme_v2.dart';
+import 'navigation_history_provider.dart';
 
 class AppRouter {
   AppRouter._();
@@ -292,15 +292,6 @@ class AppRouter {
         },
       ),
 
-      // ── Portfolio Assets (broker-style screens) ─────────
-      GoRoute(
-        path: '/portfolio/:id/assets',
-        name: 'portfolioAssets',
-        builder: (context, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return PortfolioAssetsScreen(portfolioId: id);
-        },
-      ),
       GoRoute(
         path: '/portfolio/:id/stock/:symbol/order',
         name: 'portfolioOrderEntry',
@@ -420,6 +411,8 @@ class _AppShell extends ConsumerWidget {
                 child: BottomNavigationBar(
                   currentIndex: _currentIndex(context),
                   onTap: (index) {
+                    ref.read(previousTabRouteProvider.notifier).state =
+                        GoRouterState.of(context).uri.toString();
                     switch (index) {
                       case 0:
                         context.go('/home');

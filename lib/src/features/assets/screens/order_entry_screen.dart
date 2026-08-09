@@ -85,7 +85,18 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     }
   }
 
-  double get _availableCash => _session?.cash ?? 0;
+  // Cash still free to commit to a new order — session cash minus whatever
+  // this session's other pending BUY limit orders have already reserved
+  // (see StressTestPendingOrdersNotifier.reservedCashForSession; session
+  // cash isn't touched until a limit buy actually fills, but it shouldn't
+  // be offered twice). Mirrors real Portfolio's own _availableCash.
+  double get _availableCash {
+    final cash = _session?.cash ?? 0;
+    final reserved = ref
+        .read(stressTestPendingOrdersProvider.notifier)
+        .reservedCashForSession(widget.sessionId);
+    return (cash - reserved).clamp(0, double.infinity);
+  }
 
   double get _heldShares {
     final session = _session;
@@ -169,27 +180,50 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       return;
     }
 
+    double? limitPrice;
     if (_selectedOrderType == _OrderType.limit) {
-      final limitPrice = double.tryParse(_limitPriceController.text);
+      limitPrice = double.tryParse(_limitPriceController.text);
       if (limitPrice == null || limitPrice <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Enter a valid limit price')),
         );
         return;
       }
+    }
+
+    // Cash already committed to other pending BUY limit orders isn't free
+    // to spend again — see _availableCash. Same check real Portfolio's
+    // order entry does before placing/executing a buy.
+    if (_isBuy) {
+      final orderCost = shares * (limitPrice ?? _currentPrice);
+      if (orderCost > _availableCash + 0.01) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Not enough available cash — \$${_availableCash.toStringAsFixed(2)} '
+              'free (some is reserved for pending orders)',
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
+    if (_selectedOrderType == _OrderType.limit) {
+      final confirmedLimitPrice = limitPrice!;
       ref.read(stressTestPendingOrdersProvider.notifier).placeLimitOrder(
             sessionId: widget.sessionId,
             symbol: widget.symbol,
             isBuy: _isBuy,
             quantity: shares,
-            limitPrice: limitPrice,
+            limitPrice: confirmedLimitPrice,
           );
 
       showTradeConfirmationToast(
         context,
         title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
         subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-            'at \$${limitPrice.toStringAsFixed(2)} — Pending',
+            'at \$${confirmedLimitPrice.toStringAsFixed(2)} — Pending',
         icon: Icons.schedule_rounded,
         accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
       );

@@ -25,6 +25,7 @@ import '../../core/cache/logo_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 
 import '../../shared/widgets/disclaimer_footer.dart';
+import '../../shared/widgets/donut_ring_painter.dart';
 import '../../shared/widgets/trade_history_tile.dart';
 
 import '../monetization/monetization_modal.dart';
@@ -844,10 +845,9 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color:
-                                        StressTestAllocationChart.allocationColor(
-                                          i,
-                                        ).withValues(alpha: 0.7),
+                                    color: donutAllocationColor(
+                                      i,
+                                    ).withValues(alpha: 0.7),
                                     width: 1.5,
                                   ),
                                 ),

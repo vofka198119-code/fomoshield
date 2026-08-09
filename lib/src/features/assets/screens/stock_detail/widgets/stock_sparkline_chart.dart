@@ -357,14 +357,6 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
     final touchLineTopY =
         chartMaxY - (dateTooltipHeight / chartHeight) * (chartMaxY - chartMinY);
 
-    // Fill fades out this many px below the line at every x — drawn by
-    // ChartLineGlowPainter (a custom painter), NOT fl_chart's
-    // belowBarData.gradient, which positions its fade relative to the
-    // whole chart box's Y-range rather than the line's own local height —
-    // confirmed on-device to only show fill near the chart's absolute
-    // peak and nowhere else the line dips below it.
-    const fillFadeHeight = 40.0;
-
     final intraday =
         widget.selectedPeriod == StressTestSparkPeriod.d1 ||
         widget.selectedPeriod == StressTestSparkPeriod.w1;
@@ -390,7 +382,6 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                     painter: ChartLineGlowPainter(
                       pixelPoints: pixelPoints,
                       color: lineColor,
-                      fadeHeight: fillFadeHeight,
                     ),
                   ),
                   LineChart(

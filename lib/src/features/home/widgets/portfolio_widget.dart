@@ -5,7 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/router/navigation_history_provider.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../../portfolio/portfolio_providers.dart';
 import '../../portfolio/widgets/target_widget.dart' show targetDisplayPercent;
@@ -137,7 +139,10 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
     required Widget child,
   }) {
     return InkWell(
-      onTap: () => context.go('/portfolio'),
+      onTap: () {
+        ref.read(previousTabRouteProvider.notifier).state = '/home';
+        context.go('/portfolio');
+      },
       borderRadius: FomoShieldTheme.cardRadius,
       child: CardFrame(
         showTopBar: false,
@@ -384,29 +389,6 @@ class _VerticalProgressBar extends StatelessWidget {
 
   const _VerticalProgressBar({required this.currentPercent});
 
-  static const int _segmentCount = 20;
-  static const double _rangeWidth = 200 / _segmentCount; // 10%
-  static const Color _red = Color(0xFFFF3B30);
-  static const Color _yellow = Color(0xFFFFD600);
-  static const Color _green = Color(0xFF00C853);
-  static const Color _unfilled = Color(0x33FFFFFF); // white @ 20%
-
-  static double _rangeStart(int index) => -100 + index * _rangeWidth;
-
-  // index 0 = bottom (-100%, red) .. last index = top (+100%, green).
-  static Color _colorForIndex(int index) {
-    final t = (index + 0.5) / _segmentCount;
-    if (t <= 0.5) return Color.lerp(_red, _yellow, t / 0.5)!;
-    return Color.lerp(_yellow, _green, (t - 0.5) / 0.5)!;
-  }
-
-  double _fillFraction(int index) {
-    final start = _rangeStart(index);
-    if (currentPercent <= start) return 0.0;
-    if (currentPercent >= start + _rangeWidth) return 1.0;
-    return (currentPercent - start) / _rangeWidth;
-  }
-
   @override
   Widget build(BuildContext context) {
     final t = ((currentPercent + 100) / 200).clamp(0.0, 1.0); // 0 bottom..1 top
@@ -483,16 +465,17 @@ class _VerticalProgressBar extends StatelessWidget {
                     widthFactor: 0.65,
                     child: Column(
                       verticalDirection: VerticalDirection.up,
-                      children: List.generate(_segmentCount, (i) {
-                        final fraction = _fillFraction(i);
+                      children: List.generate(SegmentGaugeMath.segmentCount, (i) {
+                        final fraction =
+                            SegmentGaugeMath.fillFraction(currentPercent, i);
                         return Expanded(
                           child: Container(
                             margin: EdgeInsets.only(
-                              top: i == _segmentCount - 1 ? 0 : 3,
+                              top: i == SegmentGaugeMath.segmentCount - 1 ? 0 : 3,
                             ),
                             clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
-                              color: _unfilled,
+                              color: SegmentGaugeMath.unfilled,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: fraction > 0
@@ -500,8 +483,8 @@ class _VerticalProgressBar extends StatelessWidget {
                                     alignment: Alignment.bottomCenter,
                                     child: FractionallySizedBox(
                                       heightFactor: fraction,
-                                      child:
-                                          Container(color: _colorForIndex(i)),
+                                      child: Container(
+                                          color: SegmentGaugeMath.colorForIndex(i)),
                                     ),
                                   )
                                 : null,

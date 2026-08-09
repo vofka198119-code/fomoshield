@@ -1,34 +1,45 @@
 // ---------------------------------------------------------------------------
-// Stress Test — Allocation Donut Chart card
-// Extracted from stress_test_screen.dart (Phase 5, step-by-step widget pass).
+// Portfolio Balance — donut allocation ring + centered balance/unrealized
+// P&L + per-holding legend. Pixel-for-pixel copy of Stress Test's own
+// "Portfolio Balance" card (StressTestAllocationChart in
+// stress_test/widgets/stress_test_allocation_chart.dart) — same card
+// decoration, donut painter, fonts, colors, legend shape. Two deliberate
+// differences from that reference: (1) no chevron / tap-through to a detail
+// screen — real Portfolio doesn't have (or need) that drill-down; (2) driven
+// by real Finnhub-backed PortfolioPerformance instead of the stress-test
+// engine's simulated session. Replaces the old separate
+// PortfolioSummaryWidget + PortfolioAllocationWidget (2026-08-09).
 // ---------------------------------------------------------------------------
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
 import '../../../shared/widgets/donut_ring_painter.dart';
-import '../stress_test_models.dart';
-import '../stress_test_naming.dart';
+import '../portfolio_providers.dart';
 
-/// Card wrapper: donut chart + centered portfolio metrics + cash capsule,
-/// styled to the standard light card (see reference_widget_card_standard).
-class StressTestAllocationChart extends ConsumerStatefulWidget {
-  final StressTestSession session;
+class PortfolioBalanceWidget extends ConsumerStatefulWidget {
+  final PortfolioPerformance? performance;
+  final bool isLoading;
+  final bool hasError;
 
-  const StressTestAllocationChart({super.key, required this.session});
+  const PortfolioBalanceWidget({
+    super.key,
+    this.performance,
+    this.isLoading = false,
+    this.hasError = false,
+  });
 
   @override
-  ConsumerState<StressTestAllocationChart> createState() =>
-      _StressTestAllocationChartState();
+  ConsumerState<PortfolioBalanceWidget> createState() =>
+      _PortfolioBalanceWidgetState();
 }
 
-class _StressTestAllocationChartState
-    extends ConsumerState<StressTestAllocationChart> {
+class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget> {
   static const int _legendPreviewLimit = 5;
   bool _showAll = false;
 
@@ -48,32 +59,37 @@ class _StressTestAllocationChartState
 
   @override
   Widget build(BuildContext context) {
-    final session = widget.session;
-    final holdings = session.holdings;
-    final isEmpty = holdings.isEmpty;
-
-    final invested = <({String symbol, double value})>[];
-    double totalInvested = 0;
-    for (final h in holdings) {
-      final price = session.currentPrices[h.symbol] ?? h.entryPrice;
-      final val = h.shares * price;
-      invested.add((symbol: h.symbol, value: val));
-      totalInvested += val;
+    if (widget.isLoading || widget.hasError || widget.performance == null) {
+      return Container(
+        width: double.infinity,
+        height: 260,
+        decoration: FomoShieldTheme.cardDecoration,
+        alignment: Alignment.center,
+        child: widget.hasError
+            ? Text(
+                'Failed to load',
+                style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+              )
+            : const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: ThemeV2.primary),
+              ),
+      );
     }
-    invested.sort((a, b) => b.value.compareTo(a.value));
 
-    final hasData = !isEmpty && totalInvested > 0;
+    final perf = widget.performance!;
+    final holdings = List<HoldingPerformance>.from(perf.holdings)
+      ..sort((a, b) => b.currentValue.compareTo(a.currentValue));
+    final totalInvested = holdings.fold<double>(0, (s, h) => s + h.currentValue);
+    final hasData = holdings.isNotEmpty && totalInvested > 0;
 
-    final portfolioTotal = session.totalValue;
-    // Balance itself already reflects the whole account (cash + positions,
-    // including any realized gains already banked into cash) — this
-    // subtitle shows Unrealized P&L specifically (paper P&L on currently
-    // held positions only), so it stops double-counting realized gains
-    // that are already visible in Balance. Realized P&L lives in its own
-    // row on the Psychology Meter's Session Stats card. Confirmed
-    // 2026-08-07 after a live on-device walkthrough.
-    final pnl = session.unrealizedPnl;
-    final pnlPercent = session.unrealizedPnlPercent;
+    final portfolioTotal = perf.currentValue;
+    // Unrealized P&L only — perf.pnl already excludes realized gains from
+    // past sales (see portfolio_providers.dart), same semantics as Stress
+    // Test's session.unrealizedPnl here.
+    final pnl = perf.pnl;
+    final pnlPercent = perf.pnlPercent;
     final isPositive = pnl >= 0;
     final isZero = pnl == 0;
     final pnlColor = isZero
@@ -91,27 +107,11 @@ class _StressTestAllocationChartState
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          InkWell(
-            onTap: () => context.push('/stress-test/${session.id}/portfolio-balance'),
-            child: SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-                child: Row(
-                  children: [
-                    Text(
-                      'PORTFOLIO BALANCE',
-                      style: FomoShieldTheme.cardTitle(),
-                    ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.chevron_right_rounded,
-                      color: ThemeV2.textSecondary,
-                      size: 20,
-                    ),
-                  ],
-                ),
-              ),
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+              child: Text('PORTFOLIO BALANCE', style: FomoShieldTheme.cardTitle()),
             ),
           ),
           Divider(
@@ -122,10 +122,6 @@ class _StressTestAllocationChartState
           ),
           const SizedBox(height: 16),
           Padding(
-            // Wider than the title's 22px inset on purpose — shrinks the
-            // ring itself so it doesn't dominate the card now that a legend
-            // sits below it (see DonutRingPainter, which derives its
-            // radius from the box size it's given).
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -140,13 +136,13 @@ class _StressTestAllocationChartState
                         size: Size(ringSize, ringSize),
                         painter: DonutRingPainter(
                           shares: hasData
-                              ? invested
-                                    .map((item) => item.value / totalInvested)
+                              ? holdings
+                                    .map((h) => h.currentValue / totalInvested)
                                     .toList()
                               : [1.0],
                           colors: hasData
                               ? List.generate(
-                                  invested.length,
+                                  holdings.length,
                                   (i) => donutAllocationColor(i),
                                 )
                               : [Colors.black.withValues(alpha: 0.06)],
@@ -205,8 +201,8 @@ class _StressTestAllocationChartState
                       var i = 0;
                       i <
                           (_showAll
-                              ? invested.length
-                              : math.min(_legendPreviewLimit, invested.length));
+                              ? holdings.length
+                              : math.min(_legendPreviewLimit, holdings.length));
                       i++
                     )
                       Padding(
@@ -224,10 +220,11 @@ class _StressTestAllocationChartState
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                resolveStressTestCompanyName(
-                                  ref,
-                                  invested[i].symbol,
-                                ),
+                                ref
+                                        .watch(resolvedCompanyNameProvider(
+                                            holdings[i].symbol))
+                                        .valueOrNull ??
+                                    holdings[i].symbol,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
@@ -238,7 +235,7 @@ class _StressTestAllocationChartState
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${(invested[i].value / totalInvested * 100).toStringAsFixed(1)}%',
+                              '${(holdings[i].currentValue / totalInvested * 100).toStringAsFixed(1)}%',
                               style: interNums(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -248,7 +245,7 @@ class _StressTestAllocationChartState
                           ],
                         ),
                       ),
-                    if (invested.length > _legendPreviewLimit)
+                    if (holdings.length > _legendPreviewLimit)
                       GestureDetector(
                         onTap: () => setState(() => _showAll = !_showAll),
                         child: Container(
@@ -262,7 +259,7 @@ class _StressTestAllocationChartState
                             child: Text(
                               _showAll
                                   ? 'Less'
-                                  : 'More (${invested.length - _legendPreviewLimit})',
+                                  : 'More (${holdings.length - _legendPreviewLimit})',
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
