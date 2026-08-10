@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
@@ -49,10 +52,57 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
   }
 
+  // ── Email resend cooldown (Supabase anti-abuse limit) ────────────
+  // Supabase returns e.g. "For security purposes, you can only request
+  // this after 46 seconds." — we parse the number and tick it down live
+  // instead of leaving the frozen sentence on screen.
+  static final _cooldownPattern = RegExp(r'(\d+)\s*seconds?', caseSensitive: false);
+  static const _googleLogoSvg = '''
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+<path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.5 4.5 24 4.5 12.7 4.5 3.5 13.7 3.5 25S12.7 45.5 24 45.5c11 0 20.5-8 20.5-20.5 0-1.4-.1-2.7-.4-4Z"/>
+<path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13.5 24 13.5c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 7.5 29.5 5.5 24 5.5c-7.6 0-14.1 4.3-17.4 10.6Z"/>
+<path fill="#4CAF50" d="M24 44.5c5.4 0 10.3-1.8 14-4.9l-6.5-5.4c-2 1.4-4.6 2.2-7.5 2.2-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.7 40.1 16.3 44.5 24 44.5Z"/>
+<path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.4-2.4 4.4-4.4 5.8l6.5 5.4C40.7 35.9 44.5 30.9 44.5 24c0-1.2-.1-2.4-.3-3.5Z"/>
+</svg>
+''';
+  Timer? _cooldownTimer;
+  int? _cooldownSecondsLeft;
+
+  void _startCooldownFromMessage(String message) {
+    final match = _cooldownPattern.firstMatch(message);
+    if (match == null) return;
+    final seconds = int.parse(match.group(1)!);
+    if (seconds <= 0) return;
+
+    _cooldownTimer?.cancel();
+    setState(() {
+      _cooldownSecondsLeft = seconds;
+      _errorText = 'Please wait $seconds seconds before trying again.';
+    });
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        final left = (_cooldownSecondsLeft ?? 1) - 1;
+        if (left <= 0) {
+          _cooldownSecondsLeft = null;
+          _errorText = null;
+          timer.cancel();
+        } else {
+          _cooldownSecondsLeft = left;
+          _errorText = 'Please wait $left seconds before trying again.';
+        }
+      });
+    });
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _cooldownTimer?.cancel();
     super.dispose();
   }
 
@@ -115,8 +165,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         // If no session (e.g. email confirmation mode), don't auto-sign-in
         if (response.session == null) {
           if (!mounted) return;
+          // Supabase returns an obfuscated user with an empty identities
+          // list (no email actually sent) when this address is already
+          // registered — including via Google — to avoid leaking that
+          // fact to an attacker. Surface it honestly to our own user.
+          final alreadyRegistered = response.user?.identities?.isEmpty ?? false;
           setState(() {
-            _errorText = 'Please check your email to confirm registration.';
+            _errorText = alreadyRegistered
+                ? 'This email is already registered. Try signing in, or use "Continue with Google" if that\'s how you signed up.'
+                : 'Please check your email to confirm registration.';
             _isLoading = false;
           });
           return;
@@ -155,6 +212,81 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         // New registration → always show disclaimer first
         context.go('/disclaimer');
       }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      if (_cooldownPattern.hasMatch(e.message)) {
+        // Supabase email-send cooldown → live countdown, not a brute-force strike
+        setState(() {
+          _isLoading = false;
+        });
+        _startCooldownFromMessage(e.message);
+        return;
+      }
+      _recordFailedAttempt();
+      setState(() {
+        _errorText = _isBlocked ? _blockRemaining : e.message;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      _recordFailedAttempt();
+      setState(() {
+        _errorText = _isBlocked
+            ? _blockRemaining!
+            : 'Something went wrong. Please try again.';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    if (_isBlocked) {
+      setState(() => _errorText = _blockRemaining);
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorText = null;
+    });
+
+    try {
+      final account = await GoogleSignIn.instance.authenticate();
+      final idToken = account.authentication.idToken;
+      if (idToken == null) {
+        throw const AuthException('Google did not return an ID token.');
+      }
+
+      await SupabaseConfig.client.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+      );
+
+      // No password to remember for a Google account — make sure a stale
+      // password auto-login from a previous account doesn't fire on splash.
+      await setIsLoggedIn(false);
+
+      if (!mounted) return;
+      await ref.read(userDataSyncProvider.future);
+
+      if (!mounted) return;
+      final disclaimerAccepted =
+          await ref.read(isDisclaimerAcceptedProvider.future);
+      if (!mounted) return;
+      context.go(disclaimerAccepted ? '/home' : '/disclaimer');
+    } on GoogleSignInException catch (e) {
+      if (!mounted) return;
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        setState(() => _isLoading = false);
+        return;
+      }
+      _recordFailedAttempt();
+      setState(() {
+        _errorText = _isBlocked
+            ? _blockRemaining
+            : 'Google sign-in failed. Please try again.';
+        _isLoading = false;
+      });
     } on AuthException catch (e) {
       if (!mounted) return;
       _recordFailedAttempt();
@@ -312,7 +444,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: (_isLoading || _isBlocked) ? null : _submit,
+                  onPressed: (_isLoading || _isBlocked || _cooldownSecondsLeft != null) ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ThemeV2.primary,
                     foregroundColor: Colors.white,
@@ -332,6 +464,56 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           _isLogin ? 'Sign In' : 'Create Account',
                           style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // "or" divider
+              Row(
+                children: [
+                  const Expanded(child: Divider(color: ThemeV2.surface)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'or',
+                      style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+                    ),
+                  ),
+                  const Expanded(child: Divider(color: ThemeV2.surface)),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // Continue with Google
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: (_isLoading || _isBlocked || _cooldownSecondsLeft != null)
+                      ? null
+                      : _signInWithGoogle,
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    side: const BorderSide(color: ThemeV2.surface),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.string(_googleLogoSvg, width: 20, height: 20),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Continue with Google',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

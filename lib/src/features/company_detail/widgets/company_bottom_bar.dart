@@ -42,40 +42,7 @@ class CompanyBottomBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // BUY button — brand olive fill (same tone as Portfolio Balance
-          // cell: primaryBg flattened to opaque), black text.
-          Expanded(
-            child: Center(
-              child: FractionallySizedBox(
-                widthFactor: 0.94,
-                child: SizedBox(
-                  height: 47,
-                  child: ElevatedButton(
-                    onPressed: onBuy,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Color.alphaBlend(ThemeV2.primaryBg, Colors.white),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'BUY',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // SELL button — dark-green brand gradient, white text.
+          // BUY button — dark-green brand gradient, white text.
           Expanded(
             child: Center(
               child: FractionallySizedBox(
@@ -95,11 +62,11 @@ class CompanyBottomBar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: InkWell(
-                        onTap: onSell,
+                        onTap: onBuy,
                         borderRadius: BorderRadius.circular(18),
                         child: Center(
                           child: Text(
-                            'SELL',
+                            'BUY',
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -107,6 +74,39 @@ class CompanyBottomBar extends StatelessWidget {
                             ),
                           ),
                         ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // SELL button — brand olive fill (same tone as Portfolio Balance
+          // cell: primaryBg flattened to opaque), black text.
+          Expanded(
+            child: Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.94,
+                child: SizedBox(
+                  height: 47,
+                  child: ElevatedButton(
+                    onPressed: onSell,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Color.alphaBlend(ThemeV2.primaryBg, Colors.white),
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'SELL',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
                       ),
                     ),
                   ),

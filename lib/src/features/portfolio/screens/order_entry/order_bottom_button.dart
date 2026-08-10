@@ -6,9 +6,8 @@ import '../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import 'order_amount_section.dart' show OrderInputMode;
 
 // ---------------------------------------------------------------------------
-// Order Bottom Button — "Review Order", restyled to match Company Card's
-// BUY/SELL bar (company_bottom_bar.dart): olive fill + black text for buy,
-// dark-green brand gradient + white text for sell, radius 18.
+// Order Bottom Button — "Place Order": dark-green brand gradient + white
+// text for buy, olive fill + black text for sell, radius 18.
 // ---------------------------------------------------------------------------
 
 class OrderBottomButton extends StatelessWidget {
@@ -98,7 +97,7 @@ class ReviewOrderButton extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Text(
-          'Review Order',
+          'Place Order',
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -109,7 +108,7 @@ class ReviewOrderButton extends StatelessWidget {
       );
     }
 
-    if (isBuy) {
+    if (!isBuy) {
       return Material(
         color: Color.alphaBlend(ThemeV2.primaryBg, Colors.white),
         borderRadius: BorderRadius.circular(18),
@@ -121,7 +120,7 @@ class ReviewOrderButton extends StatelessWidget {
             height: height,
             alignment: Alignment.center,
             child: Text(
-              'Review Order',
+              'Place Order',
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -154,7 +153,7 @@ class ReviewOrderButton extends StatelessWidget {
             height: height,
             alignment: Alignment.center,
             child: Text(
-              'Review Order',
+              'Place Order',
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,

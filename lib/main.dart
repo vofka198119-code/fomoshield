@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'src/core/cache/sector_providers.dart';
 import 'src/core/router/app_router.dart';
@@ -28,6 +29,12 @@ void main() async {
   await Supabase.initialize(
     url: SupabaseConfig.projectUrl,
     publishableKey: SupabaseConfig.anonKey,
+  );
+
+  // Must be called exactly once, before any other GoogleSignIn method.
+  await GoogleSignIn.instance.initialize(
+    clientId: SupabaseConfig.googleIosClientId,
+    serverClientId: SupabaseConfig.googleWebClientId,
   );
 
   // Hydrate the stress-test engine's synchronous GICS-sector cache from
