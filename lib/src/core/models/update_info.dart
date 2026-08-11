@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 /// Represents an available app update from GitHub Releases.
 class UpdateInfo {
