@@ -312,7 +312,7 @@ StrategySubScores computeStrategySubScores({
 
   final sectorTotals = <String, double>{};
   for (final h in holdings) {
-    final sector = stressTestSectorName(h.symbol);
+    final sector = stressTestGicsSector(h.symbol)?.label ?? 'Other';
     sectorTotals[sector] = (sectorTotals[sector] ?? 0) + values[h.symbol]!;
   }
   final maxSectorPct = sectorTotals.values.reduce(math.max) / total;

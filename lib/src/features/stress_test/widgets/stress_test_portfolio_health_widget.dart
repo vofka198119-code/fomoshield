@@ -13,6 +13,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -69,7 +70,7 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
 
       final sectorTotals = <String, double>{};
       for (final h in holdings) {
-        final sector = stressTestSectorName(h.symbol);
+        final sector = stressTestGicsSector(h.symbol)?.label ?? 'Other';
         sectorTotals[sector] = (sectorTotals[sector] ?? 0) + values[h.symbol]!;
       }
       final maxSectorPct = sectorTotals.values.reduce(math.max) / total * 100;

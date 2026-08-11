@@ -91,34 +91,6 @@ String resolveStressTestCompanyName(WidgetRef ref, String symbol) {
   return ref.watch(resolvedCompanyNameProvider(symbol)).valueOrNull ?? symbol;
 }
 
-String stressTestSectorName(String symbol) {
-  const tech = {
-    'AAPL', 'MSFT', 'GOOGL', 'GOOG', 'AMZN', 'META', 'NVDA', 'AMD', 'INTC',
-    'CRM', 'ADBE', 'NFLX', 'CSCO', 'ORCL', 'IBM', 'QCOM', 'TXN', 'AVGO', 'MU',
-  };
-  const finance = {
-    'JPM', 'BAC', 'C', 'GS', 'MS', 'WFC', 'AXP', 'V', 'MA', 'BLK', 'SCHW',
-    'PYPL',
-  };
-  const healthcare = {
-    'JNJ', 'PFE', 'UNH', 'ABBV', 'MRK', 'ABT', 'LLY', 'MDT', 'BMY', 'AMGN',
-  };
-  const consumer = {
-    'KO', 'PEP', 'PG', 'WMT', 'COST', 'MO', 'CL', 'KMB', 'SYY', 'GIS',
-  };
-  if (tech.contains(symbol)) return 'Technology';
-  if (finance.contains(symbol)) return 'Finance';
-  if (healthcare.contains(symbol)) return 'Healthcare';
-  if (consumer.contains(symbol)) return 'Consumer';
-  if (['TSLA', 'DRIF'].contains(symbol)) return 'Automotive';
-  if (['NOVA', 'ZEN', 'MORF', 'PULS', 'NEXO'].contains(symbol)) {
-    return 'Biotech';
-  }
-  if (['AURA', 'VERT'].contains(symbol)) return 'Energy';
-  if (['CORE', 'CASP'].contains(symbol)) return 'Tech';
-  return 'Other';
-}
-
 /// Flavor-text GICS sector for Stress Test's own fictional assets — they
 /// aren't real tickers, so [resolveGicsSector] (which reads live Finnhub
 /// data + the app's static ticker maps) can never classify them.
@@ -136,10 +108,9 @@ const Map<String, GicsSector> _fictionalGicsSectors = {
 };
 
 /// Real GICS sector for a Stress Test holding — resolves real tickers via
-/// [resolveGicsSector] (the same classifier the Hype mechanism and
-/// psychology engine use), falling back to [_fictionalGicsSectors] for the
-/// 10 stress-test-only fictional assets. Unlike [stressTestSectorName]
-/// (a narrow ~50-ticker whitelist), this recognizes ANY real ticker
-/// buyable through Search, not just the curated famous names.
+/// [resolveGicsSector] (the same classifier the Hype mechanism uses),
+/// falling back to [_fictionalGicsSectors] for the 10 stress-test-only
+/// fictional assets. Recognizes ANY real ticker buyable through Search,
+/// not just a curated list of famous names.
 GicsSector? stressTestGicsSector(String symbol) =>
     resolveGicsSector(symbol) ?? _fictionalGicsSectors[symbol];
