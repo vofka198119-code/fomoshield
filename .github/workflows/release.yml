@@ -54,8 +54,13 @@ jobs:
         with:
           flutter-version: '3.x'
           channel: 'stable'
+          cache: true
 
       - run: flutter pub get
+
+      - name: Setup .env
+        run: |
+          echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}" > .env
 
       - run: flutter build apk --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
@@ -76,8 +81,13 @@ jobs:
         with:
           flutter-version: '3.x'
           channel: 'stable'
+          cache: true
 
       - run: flutter pub get
+
+      - name: Setup .env
+        run: |
+          echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}" > .env
 
       - run: flutter build ios --release --no-codesign --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
