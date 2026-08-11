@@ -91,8 +91,12 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           BrowseLane(
             title: 'TOP S&P 500',
             items: _cards(companies.take(_lanePreviewCount).toList()),
-            onSeeAll: () =>
-                showCompanyListSheet(context, 'TOP S&P 500', companies),
+            onSeeAll: () => showCompanyListSheet(
+              context,
+              'TOP S&P 500',
+              companies,
+              onTapSymbol: widget.onTapSymbol,
+            ),
           ),
           for (final sector in GicsSector.values)
             if (bySector[sector] != null)
@@ -105,6 +109,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                   context,
                   sector.label.toUpperCase(),
                   bySector[sector]!,
+                  onTapSymbol: widget.onTapSymbol,
                 ),
               ),
           if (recentlyViewed.isNotEmpty)

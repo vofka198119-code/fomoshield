@@ -180,6 +180,38 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
   }
 
+  /// Full-width tap-through bar styled like a search field — duplicates
+  /// the Holdings widget's "+" mechanic (same _openAddAssetSheet target),
+  /// just more discoverable for first-time users than the small icon.
+  Widget _buildQuickAddSearchBar() {
+    return GestureDetector(
+      onTap: _openAddAssetSheet,
+      child: Container(
+        width: double.infinity,
+        decoration: FomoShieldTheme.cardDecoration,
+        clipBehavior: Clip.antiAlias,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        child: Row(
+          children: [
+            Icon(
+              Icons.search_rounded,
+              color: ThemeV2.textSecondary,
+              size: 20,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Search stocks to add...',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showVerdict() {
     _showDisclaimerModal().then((accepted) {
       if (accepted == true && mounted) {
@@ -456,6 +488,13 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 ),
               ),
             if (isExpired) const SizedBox(height: 12),
+
+            // ── Quick-add search bar — duplicates the Holdings widget's
+            // "+" mechanic (_openAddAssetSheet) as a full-width, always
+            // visible tap target so first-time users don't have to spot
+            // the small "+" inside the Holdings card header. ──
+            _buildQuickAddSearchBar(),
+            const SizedBox(height: 12),
 
             // ── Widgets (reorderable via gear icon; Portfolio Balance
             // pinned first, Timer pinned last — see

@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
 import '../stress_test_models.dart';
@@ -16,18 +17,13 @@ import 'allocation_bar_row.dart';
 
 const double _sectorWarningThreshold = 75.0;
 
-// Every sector stressTestSectorName() can return — kept in sync with that
-// helper so a sector with zero holdings still shows up (as an empty bar)
-// instead of only appearing once the user actually buys into it.
-const _allSectors = [
-  'Technology',
-  'Finance',
-  'Healthcare',
-  'Consumer',
-  'Automotive',
-  'Biotech',
-  'Energy',
-  'Tech',
+// The 11 real GICS sectors (stressTestGicsSector() resolves any real ticker
+// bought via Search into one of these, not just a curated ~50-name
+// whitelist) plus 'Other' for the rare symbol neither it nor the fictional
+// stress-test-asset override can classify — kept as an always-shown bar so
+// a sector with zero holdings appears empty instead of vanishing entirely.
+List<String> get _allSectors => [
+  for (final s in GicsSector.values) s.label,
   'Other',
 ];
 
@@ -44,7 +40,7 @@ class StressTestSectorAllocationCard extends StatelessWidget {
     for (final h in holdings) {
       final price = session.currentPrices[h.symbol] ?? h.entryPrice;
       final val = h.shares * price;
-      final sector = stressTestSectorName(h.symbol);
+      final sector = stressTestGicsSector(h.symbol)?.label ?? 'Other';
       sectorTotals[sector] = (sectorTotals[sector] ?? 0) + val;
       totalInvested += val;
     }
