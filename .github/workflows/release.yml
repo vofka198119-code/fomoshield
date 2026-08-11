@@ -1,0 +1,115 @@
+name: Release
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FULLY AUTOMATED — developer just `git push`, no other steps needed.
+#
+# push to main  →  auto-tag v1.0.0-dev.{run_number}  →  build APK+IPA  →  release
+# push tag v*   →  stable release v1.0.1              →  build APK+IPA  →  release
+#
+# Tester reopens the app → auto-update dialog → download & install.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+on:
+  push:
+    branches: [feature/auto-update]
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  # ── Auto-version: reads pubspec.yaml, sets tag name ────────────────────────
+  version:
+    name: Version
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.set.outputs.tag }}
+      prerelease: ${{ steps.set.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: set
+        run: |
+          VER=$(grep '^version:' pubspec.yaml | sed 's/version: *//')
+          SEMVER="${VER%%+*}"
+
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "tag=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          else
+            echo "tag=v${SEMVER}-dev.$GITHUB_RUN_NUMBER" >> $GITHUB_OUTPUT
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          fi
+
+  # ── Android APK (free ubuntu runner) ──────────────────────────────────────
+  build-android:
+    name: APK
+    needs: [version]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+
+      - run: flutter pub get
+
+      - run: flutter build apk --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  # ── iOS IPA (macos runner, costs 10x minutes) ──────────────────────────────
+  build-ios:
+    name: IPA
+    needs: [version]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+
+      - run: flutter pub get
+
+      - run: flutter build ios --release --no-codesign --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+
+      - run: |
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r app-release.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: build/ios/iphoneos/app-release.ipa
+
+  # ── Create release + auto-create lightweight tag ──────────────────────────
+  release:
+    name: Release
+    needs: [version, build-android, build-ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: apk }
+
+      - uses: actions/download-artifact@v4
+        with: { name: ipa }
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          name: ${{ needs.version.outputs.tag }}
+          prerelease: ${{ needs.version.outputs.prerelease }}
+          files: |
+            app-release.apk
+            app-release.ipa
+          generate_release_notes: true

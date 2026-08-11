@@ -8,6 +8,7 @@ import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
 import 'src/features/orders/pending_orders_checker.dart';
+import 'src/features/update/update_dialog.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,6 +65,19 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
   @override
   void initState() {
     super.initState();
+    // Auto-update: show dialog after 5 seconds — it starts in CHECKING
+    // state (spinner) and calls the GitHub Releases API internally.
+    // Non-blocking — user can dismiss at any time.
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => const UpdateDialog(),
+        );
+      }
+    });
+
     // Delayed so this doesn't compete with everything else the first
     // frame already loads (widget order providers, home widgets, sector
     // cache hydration, ...) — the CPU spike right at cold start is real.

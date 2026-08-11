@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../core/theme/theme_v2.dart';
+import '../update/update_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -81,10 +84,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               ListTile(
                 title: const Text('Version'),
-                trailing: Text(
-                  '1.0.0',
-                  style: GoogleFonts.inter(color: colorScheme.onSurfaceVariant),
+                trailing: FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    final version = snapshot.data?.version ?? '...';
+                    return Text(
+                      version,
+                      style: GoogleFonts.inter(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    );
+                  },
                 ),
+              ),
+              const Divider(height: 1),
+              Consumer(
+                builder: (context, ref, _) {
+                  return ListTile(
+                    title: const Text('Check for Updates'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => const UpdateDialog(),
+                      );
+                    },
+                  );
+                },
               ),
               const Divider(height: 1),
               ListTile(
