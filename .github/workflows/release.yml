@@ -42,16 +42,20 @@ jobs:
             echo "prerelease=true" >> $GITHUB_OUTPUT
           fi
 
-  # ── Android APK (prebuilt Flutter Docker image, no SDK download) ───────────
+  # ── Android APK (ubuntu, cached Flutter SDK) ────────────────────────────────
   build-android:
     name: APK
     needs: [version]
     runs-on: ubuntu-latest
-    container: ghcr.io/cirruslabs/flutter:stable
     steps:
       - uses: actions/checkout@v4
 
-      # Flutter + Android SDK are pre-installed in the container.
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
       - run: flutter pub get
 
       - name: Setup .env
