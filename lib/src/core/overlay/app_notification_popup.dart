@@ -14,9 +14,9 @@ import '../../shared/widgets/company_logo.dart';
 // works from plain Dart notifier code with no BuildContext at all.
 // ---------------------------------------------------------------------------
 
-const Duration _enterDuration = Duration(milliseconds: 350);
+const Duration _enterDuration = Duration(milliseconds: 550);
 const Duration _holdDuration = Duration(milliseconds: 3500);
-const Duration _exitDuration = Duration(milliseconds: 400);
+const Duration _exitDuration = Duration(milliseconds: 450);
 
 /// The one entry point every trigger site should call: records the
 /// notification into history AND shows the popup. Safe to call from
@@ -133,13 +133,13 @@ class _AppNotificationPopupState extends State<_AppNotificationPopup>
             double translateY;
 
             if (t < _enterEnd) {
-              final p = Curves.easeOut.transform(t / _enterEnd);
+              final p = Curves.easeOutCubic.transform(t / _enterEnd);
               translateY = -120 * (1 - p);
             } else if (t < _holdEnd) {
               translateY = 0;
             } else {
               final exitP = (t - _holdEnd) / (1 - _holdEnd);
-              translateY = -120 * Curves.easeIn.transform(exitP);
+              translateY = -120 * Curves.easeInCubic.transform(exitP);
             }
 
             return Transform.translate(offset: Offset(0, translateY), child: child);

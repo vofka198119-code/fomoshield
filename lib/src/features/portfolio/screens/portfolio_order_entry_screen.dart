@@ -39,7 +39,6 @@ import 'order_entry/order_config_section.dart';
 import 'order_entry/order_bottom_button.dart';
 import 'order_entry/amount_keypad.dart';
 import 'order_entry/market_closed_dialog.dart';
-import 'order_entry/trade_confirmation_toast.dart';
 
 /// Order type. Stop/StopLimit exist in the order model and are still fully
 /// handled by _mapOrderType/_executeOrder below, but the UI only exposes
@@ -416,7 +415,6 @@ class _PortfolioOrderEntryScreenState
     if (mounted) {
       final isImmediate = order.status == orders.OrderStatus.filled;
       final companyName = widget.companyName ?? widget.symbol;
-      final accentColor = _isBuy ? ThemeV2.success : ThemeV2.loss;
       final portfolioName = ref
           .read(portfoliosProvider)
           .where((p) => p.id == widget.portfolioId)
@@ -424,14 +422,6 @@ class _PortfolioOrderEntryScreenState
           ?.name;
 
       if (isImmediate) {
-        showTradeConfirmationToast(
-          context,
-          title: _isBuy ? 'You Bought' : 'You Sold',
-          subtitle: '${shares.toStringAsFixed(4)} shares of $companyName '
-              'at \$${_currentPrice.toStringAsFixed(2)}',
-          icon: Icons.check_circle_rounded,
-          accentColor: accentColor,
-        );
         pushAppNotification(
           ref.read(notificationsProvider.notifier),
           AppNotification(
@@ -451,14 +441,6 @@ class _PortfolioOrderEntryScreenState
         );
         context.pop();
       } else {
-        showTradeConfirmationToast(
-          context,
-          title: '${orderType.label} ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
-          subtitle: '${shares.toStringAsFixed(4)} shares of $companyName'
-              '${limitPrice != null ? ' at \$${limitPrice.toStringAsFixed(2)}' : ''} — Pending',
-          icon: Icons.schedule_rounded,
-          accentColor: accentColor,
-        );
         pushAppNotification(
           ref.read(notificationsProvider.notifier),
           AppNotification(

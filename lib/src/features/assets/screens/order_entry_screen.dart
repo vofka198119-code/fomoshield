@@ -29,7 +29,6 @@ import '../../portfolio/screens/order_entry/order_amount_section.dart';
 import '../../portfolio/screens/order_entry/order_config_section.dart';
 import '../../portfolio/screens/order_entry/order_bottom_button.dart';
 import '../../portfolio/screens/order_entry/amount_keypad.dart';
-import '../../portfolio/screens/order_entry/trade_confirmation_toast.dart';
 
 enum _OrderType { market, limit }
 enum _ActiveKeypad { none, amount, limitPrice }
@@ -227,14 +226,6 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
             limitPrice: confirmedLimitPrice,
           );
 
-      showTradeConfirmationToast(
-        context,
-        title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
-        subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-            'at \$${confirmedLimitPrice.toStringAsFixed(2)} — Pending',
-        icon: Icons.schedule_rounded,
-        accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
-      );
       pushAppNotification(
         ref.read(notificationsProvider.notifier),
         AppNotification(
@@ -288,14 +279,6 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       );
     });
 
-    showTradeConfirmationToast(
-      context,
-      title: _isBuy ? 'You Bought' : 'You Sold',
-      subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-          'at \$${_currentPrice.toStringAsFixed(2)}',
-      icon: Icons.check_circle_rounded,
-      accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
-    );
     pushAppNotification(
       ref.read(notificationsProvider.notifier),
       AppNotification(
