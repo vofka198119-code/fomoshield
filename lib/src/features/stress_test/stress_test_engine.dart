@@ -13,11 +13,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/services/gics_sector_mapper.dart';
+import '../../core/models/app_notification.dart';
+import '../../core/notifications/notification_providers.dart';
+import '../../core/overlay/app_notification_popup.dart';
 import '../../shared/services/user_data_service.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/scoring_engine.dart';
 import 'psychology_engine.dart';
 import 'stress_test_models.dart';
+import 'stress_test_naming.dart';
 
 part 'gbm_engine.dart';
 part 'casino_epochs.dart';
@@ -155,9 +159,24 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// что гарантирует детерминизм и отсутствие cross-session утечек.
   final Map<String, Random> _sessionRandom = {};
 
+  /// Price-swing radar (notifications) — sessionId → symbol → last checked
+  /// price/time. In-memory only (resets on app restart, same as
+  /// _sessionRandom) — see _checkPriceSwings in noise_engine.dart.
+  final Map<String, Map<String, ({double price, DateTime checkedAt})>>
+  _swingSnapshots = {};
+
   /// Why Diagnostics — sessionId → symbol → running whole-period
   /// accumulator, admin-only. See stress_test_why_diagnostics.dart.
   final Map<String, Map<String, WhyDiagnosticsAccumulator>> _whyDiagnostics = {};
+
+  /// Callback set externally by the provider definition (where a Ref is
+  /// available) — StressTestNotifier itself isn't constructed with one, so
+  /// events it fires that need to reach the app-wide notification system
+  /// (session completion, News) go through this, mirroring OrderNotifier's
+  /// onTransaction pattern in order_provider.dart.
+  void Function(AppNotification notification)? _onNotify;
+  set onNotify(void Function(AppNotification notification)? cb) =>
+      _onNotify = cb;
 
   /// Override for testing: if set, bypasses real clock for _isMarketOpen.
   /// Allows tests to simulate prices regardless of time/day.
@@ -613,6 +632,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   void deleteSession(String id) {
     state = state.where((s) => s.id != id).toList();
     _sessionRandom.remove(id);
+    _swingSnapshots.remove(id);
     _save();
     _syncToSupabase();
   }
@@ -1033,12 +1053,28 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       _verdictArchive.removeAt(0);
     }
 
+    _onNotify?.call(
+      AppNotification(
+        id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+        type: AppNotificationType.stressTestCompleted,
+        portfolioKind: NotificationPortfolioKind.stressTest,
+        portfolioId: session.id,
+        portfolioLabel: 'Stress Test — ${session.duration.displayName}',
+        title: 'Stress Test Completed',
+        detail: '${session.duration.displayName} test finished — '
+            '${entry.pnlPercent >= 0 ? '+' : ''}${entry.pnlPercent.toStringAsFixed(2)}% — '
+            'tap to view your verdict.',
+        createdAt: DateTime.now(),
+      ),
+    );
+
     // ── Task 1.7: Wipe completed session from active cache ──────
     // The session is removed from `state` below, so when _save()
     // rewrites the active_stress_test_sessions key, this session's
     // heavy payload (ticks, trades, price history) is fully purged.
     state = state.where((s) => s.id != session.id).toList();
     _sessionRandom.remove(session.id);
+    _swingSnapshots.remove(session.id);
     _save();
     _syncToSupabase();
   }
@@ -1115,8 +1151,14 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     final maxAlloc = session.maxSingleAssetAllocation;
     final catSurvived = session.blackSwanSurvived;
 
-    // Calculate FS Score (0-100)
-    int fsScore = _calculateFsScore(session);
+    // FS Score — the same behavioral composite that drives the Strategy/
+    // Diversification/Discipline/Panic/Patience cards below it on the
+    // Verdict screen (TraderPsychologyProfile.compositeScore), not the old
+    // P&L-based formula. Money made/lost no longer moves this number.
+    final safety = safetyMarkerFor(session.holdings);
+    int fsScore = (session.psychologyProfile.compositeScore(safety.score) * 100)
+        .round()
+        .clamp(0, 100);
 
     // Priority chain
     VerdictType primaryType;
@@ -1170,7 +1212,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           'This patient, long-term approach is the hallmark of legendary investors.';
 
       if (catSurvived) {
-        fsScore = (fsScore + 20).clamp(0, 100);
         hasAbsoluteShieldBadge = true;
         title = 'ABSOLUTE SHIELD — Master of Emotions';
         description +=
@@ -1198,45 +1239,6 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       hasDiversificationWarning: hasDiversificationWarning,
       hasAbsoluteShieldBadge: hasAbsoluteShieldBadge,
     );
-  }
-
-  int _calculateFsScore(StressTestSession session) {
-    final totalTrades = session.trades.length;
-    final pnl = session.profitLossPercent;
-    final soldBottom = session.soldAtBottomCount;
-    final boughtPeak = session.boughtAtPeakCount;
-    final maxAlloc = session.maxSingleAssetAllocation;
-    final hasCat = session.hasExperiencedCatastrophe;
-
-    int score = 50; // start at neutral
-
-    // PnL contribution (±30 pts)
-    score += (pnl / 2).round().clamp(-30, 30);
-
-    // Penalty for panic selling (-15 pts per occurrence)
-    score -= soldBottom * 15;
-
-    // Penalty for buying peaks (-10 pts per occurrence)
-    score -= boughtPeak * 10;
-
-    // Penalty for over-trading
-    if (totalTrades > 15) score -= 10;
-    if (totalTrades > 30) score -= 10;
-
-    // Penalty for over-concentration
-    if (maxAlloc > 0.80) {
-      score -= 15;
-    } else if (maxAlloc > 0.50) {
-      score -= 5;
-    }
-
-    // Bonus for surviving catastrophe
-    if (hasCat && session.blackSwanSurvived) score += 20;
-
-    // Bonus for low trading + profit (patient, disciplined behavior)
-    if (totalTrades <= 5 && pnl > 0) score += 15;
-
-    return score.clamp(0, 100);
   }
 
   // ── Chart Data ──────────────────────────────────────────────────
@@ -1325,10 +1327,17 @@ final stressTestProvider =
     StateNotifierProvider<StressTestNotifier, List<StressTestSession>>((ref) {
       final user = ref.watch(currentUserProvider);
       final supabaseService = ref.watch(userDataServiceProvider);
-      return StressTestNotifier(
+      final notifier = StressTestNotifier(
         userId: user?.id,
         supabaseService: supabaseService,
       );
+      notifier.onNotify = (notification) {
+        pushAppNotification(
+          ref.read(notificationsProvider.notifier),
+          notification,
+        );
+      };
+      return notifier;
     });
 
 /// Reactive provider for a stress test session by ID (family).

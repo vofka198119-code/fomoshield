@@ -23,6 +23,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/supabase/supabase_providers.dart';
+import '../../../core/models/app_notification.dart';
+import '../../../core/notifications/notification_providers.dart';
+import '../../../core/overlay/app_notification_popup.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../monetization/monetization_modal.dart';
 import '../../monetization/premium_promo_overlay.dart';
@@ -414,6 +417,11 @@ class _PortfolioOrderEntryScreenState
       final isImmediate = order.status == orders.OrderStatus.filled;
       final companyName = widget.companyName ?? widget.symbol;
       final accentColor = _isBuy ? ThemeV2.success : ThemeV2.loss;
+      final portfolioName = ref
+          .read(portfoliosProvider)
+          .where((p) => p.id == widget.portfolioId)
+          .firstOrNull
+          ?.name;
 
       if (isImmediate) {
         showTradeConfirmationToast(
@@ -424,6 +432,23 @@ class _PortfolioOrderEntryScreenState
           icon: Icons.check_circle_rounded,
           accentColor: accentColor,
         );
+        pushAppNotification(
+          ref.read(notificationsProvider.notifier),
+          AppNotification(
+            id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+            type: _isBuy ? AppNotificationType.buy : AppNotificationType.sell,
+            portfolioKind: NotificationPortfolioKind.real,
+            portfolioId: widget.portfolioId,
+            portfolioLabel: portfolioName,
+            symbol: widget.symbol,
+            companyName: widget.companyName,
+            logoUrl: widget.logo,
+            title: _isBuy ? 'You Bought' : 'You Sold',
+            detail: '${shares.toStringAsFixed(4)} shares of $companyName '
+                'at \$${_currentPrice.toStringAsFixed(2)}',
+            createdAt: DateTime.now(),
+          ),
+        );
         context.pop();
       } else {
         showTradeConfirmationToast(
@@ -433,6 +458,23 @@ class _PortfolioOrderEntryScreenState
               '${limitPrice != null ? ' at \$${limitPrice.toStringAsFixed(2)}' : ''} — Pending',
           icon: Icons.schedule_rounded,
           accentColor: accentColor,
+        );
+        pushAppNotification(
+          ref.read(notificationsProvider.notifier),
+          AppNotification(
+            id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+            type: AppNotificationType.limitOrderPlaced,
+            portfolioKind: NotificationPortfolioKind.real,
+            portfolioId: widget.portfolioId,
+            portfolioLabel: portfolioName,
+            symbol: widget.symbol,
+            companyName: widget.companyName,
+            logoUrl: widget.logo,
+            title: '${orderType.label} ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
+            detail: '${shares.toStringAsFixed(4)} shares of $companyName'
+                '${limitPrice != null ? ' at \$${limitPrice.toStringAsFixed(2)}' : ''} — Pending',
+            createdAt: DateTime.now(),
+          ),
         );
         context.pop();
       }

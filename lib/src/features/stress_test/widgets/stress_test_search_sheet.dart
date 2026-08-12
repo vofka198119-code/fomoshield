@@ -14,6 +14,9 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../core/cache/sector_providers.dart';
+import '../../../core/models/app_notification.dart';
+import '../../../core/notifications/notification_providers.dart';
+import '../../../core/overlay/app_notification_popup.dart';
 import '../stress_test_engine.dart';
 import '../stress_test_models.dart';
 
@@ -172,6 +175,25 @@ class _StressTestSearchSheetState
         isEtf: _selectedIsEtf,
       );
       success = result.success;
+      if (success) {
+        final label = session?.duration.displayName;
+        pushAppNotification(
+          ref.read(notificationsProvider.notifier),
+          AppNotification(
+            id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+            type: AppNotificationType.buy,
+            portfolioKind: NotificationPortfolioKind.stressTest,
+            portfolioId: widget.sessionId,
+            portfolioLabel: label == null ? null : 'Stress Test — $label',
+            symbol: _selectedSymbol,
+            companyName: _selectedDescription,
+            title: 'You Bought',
+            detail: '${(_amount / _selectedPrice).toStringAsFixed(4)} shares of '
+                '$_selectedDescription at \$${_selectedPrice.toStringAsFixed(2)}',
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
     }
 
     if (!mounted) return;
@@ -316,7 +338,7 @@ class _StressTestSearchSheetState
                   : ListView.separated(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       itemCount: _results.length,
-                      separatorBuilder: (_, __) => const Divider(
+                      separatorBuilder: (_, _) => const Divider(
                         height: 1,
                         indent: 56,
                         color: Colors.black12,

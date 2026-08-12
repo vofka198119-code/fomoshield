@@ -11,6 +11,9 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../core/models/app_notification.dart';
+import '../../core/notifications/notification_providers.dart';
+import '../../core/overlay/app_notification_popup.dart';
 import '../../shared/services/user_data_service.dart';
 import '../portfolio/portfolio_providers.dart';
 import 'order_model.dart';
@@ -277,6 +280,18 @@ class OrderNotifier extends StateNotifier<List<Order>> {
         if (portfolioId != null) {
           _applyTransaction(portfolioId, tx);
           transactions.add(tx);
+
+          // Notification for a limit/stop order filling LATER (this method
+          // runs from a background price check, not the order-entry screen
+          // — market orders already notify at their own UI call site, this
+          // covers only the async fill case, which has nowhere else to).
+          final filledOrder = result.results
+              .map((r) => r.updatedOrder)
+              .where((o) => o.orderId == tx.orderId)
+              .firstOrNull;
+          if (filledOrder != null) {
+            _onFill?.call(portfolioId, tx, filledOrder);
+          }
         }
       }
     }
@@ -315,6 +330,14 @@ class OrderNotifier extends StateNotifier<List<Order>> {
 
   set onTransaction(void Function(String portfolioId, Transaction tx)? cb) {
     _onTransaction = cb;
+  }
+
+  /// Callback set externally (where a Ref is available) for a pending
+  /// limit/stop order filling asynchronously — see processPendingOrders.
+  void Function(String portfolioId, Transaction tx, Order order)? _onFill;
+
+  set onFill(void Function(String portfolioId, Transaction tx, Order order)? cb) {
+    _onFill = cb;
   }
 
   String? _findPortfolioForOrder(String symbol) {
@@ -415,6 +438,31 @@ final ordersProvider =
         );
       }
     }
+  };
+
+  notifier.onFill = (portfolioId, tx, order) {
+    final portfolioName = ref
+        .read(portfoliosProvider)
+        .where((p) => p.id == portfolioId)
+        .firstOrNull
+        ?.name;
+    pushAppNotification(
+      ref.read(notificationsProvider.notifier),
+      AppNotification(
+        id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+        type: AppNotificationType.limitOrderFilled,
+        portfolioKind: NotificationPortfolioKind.real,
+        portfolioId: portfolioId,
+        portfolioLabel: portfolioName,
+        symbol: order.assetSymbol,
+        companyName: order.companyName,
+        title: '${order.type.label} ${order.side == OrderSide.buy ? 'Buy' : 'Sell'} '
+            'Order Filled',
+        detail: '${tx.shares.toStringAsFixed(4)} shares of '
+            '${order.companyName ?? order.assetSymbol} at \$${tx.price.toStringAsFixed(2)}',
+        createdAt: DateTime.now(),
+      ),
+    );
   };
 
   return notifier;

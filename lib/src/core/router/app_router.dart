@@ -10,6 +10,7 @@ import '../../features/auth/forgot_password_screen.dart';
 import '../../features/disclaimer/disclaimer_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
+import '../../features/notifications/notifications_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/portfolio/portfolio_screen.dart';
 import '../../features/portfolio/screens/portfolio_order_entry_screen.dart';
@@ -117,6 +118,13 @@ class AppRouter {
         path: '/watchlist',
         name: 'watchlist',
         builder: (context, state) => const WatchlistFullScreen(),
+      ),
+
+      // Notifications — bell icon on Home
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        builder: (context, state) => const NotificationsScreen(),
       ),
 
       // Search — standalone full screen (outside ShellRoute to avoid

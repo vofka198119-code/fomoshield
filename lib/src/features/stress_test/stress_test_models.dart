@@ -655,8 +655,8 @@ class NewsEvent {
   final String headline;
   final bool isPositive;
 
-  /// Total signed price move over the event's full life (e.g. 0.15 = +15%,
-  /// -0.22 = -22%). Matches [isPositive]'s sign.
+  /// Total signed price move over the event's full life (e.g. 0.09 = +9%,
+  /// -0.11 = -11%). Matches [isPositive]'s sign.
   final double targetAmplitude;
 
   final DateTime startedAt;

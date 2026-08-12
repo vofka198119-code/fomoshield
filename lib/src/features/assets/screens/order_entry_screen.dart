@@ -15,6 +15,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/cache/sector_providers.dart';
+import '../../../core/models/app_notification.dart';
+import '../../../core/notifications/notification_providers.dart';
+import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/guardian/guardian_engine.dart';
 import '../../../shared/guardian/guardian_providers.dart';
@@ -75,6 +78,11 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
 
   StressTestSession? get _session {
     return ref.read(stressTestProvider.notifier).getSession(widget.sessionId);
+  }
+
+  String? _stressTestLabel() {
+    final duration = _session?.duration.displayName;
+    return duration == null ? null : 'Stress Test — $duration';
   }
 
   StressTestHolding? _findHolding(StressTestSession session) {
@@ -227,6 +235,23 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         icon: Icons.schedule_rounded,
         accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
       );
+      pushAppNotification(
+        ref.read(notificationsProvider.notifier),
+        AppNotification(
+          id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+          type: AppNotificationType.limitOrderPlaced,
+          portfolioKind: NotificationPortfolioKind.stressTest,
+          portfolioId: widget.sessionId,
+          portfolioLabel: _stressTestLabel(),
+          symbol: widget.symbol,
+          companyName: widget.companyName,
+          logoUrl: widget.logo,
+          title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
+          detail: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
+              'at \$${confirmedLimitPrice.toStringAsFixed(2)} — Pending',
+          createdAt: DateTime.now(),
+        ),
+      );
       Navigator.of(context).pop();
       return;
     }
@@ -270,6 +295,23 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           'at \$${_currentPrice.toStringAsFixed(2)}',
       icon: Icons.check_circle_rounded,
       accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
+    );
+    pushAppNotification(
+      ref.read(notificationsProvider.notifier),
+      AppNotification(
+        id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+        type: _isBuy ? AppNotificationType.buy : AppNotificationType.sell,
+        portfolioKind: NotificationPortfolioKind.stressTest,
+        portfolioId: widget.sessionId,
+        portfolioLabel: _stressTestLabel(),
+        symbol: widget.symbol,
+        companyName: widget.companyName,
+        logoUrl: widget.logo,
+        title: _isBuy ? 'You Bought' : 'You Sold',
+        detail: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
+            'at \$${_currentPrice.toStringAsFixed(2)}',
+        createdAt: DateTime.now(),
+      ),
     );
     Navigator.of(context).pop();
   }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/notifications/notification_providers.dart';
 import 'home_providers.dart';
 import 'widget_order_provider.dart';
 import 'widgets/shield_signal_widget.dart';
@@ -52,6 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final widgetConfigs = ref.watch(homeWidgetsProvider);
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
 
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
 
@@ -69,6 +72,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             letterSpacing: 1.5,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/notifications'),
+            icon: Badge(
+              isLabelVisible: unreadCount > 0,
+              label: Text('$unreadCount'),
+              backgroundColor: ThemeV2.loss,
+              textColor: Colors.white,
+              child: const Icon(
+                Icons.notifications_none_rounded,
+                color: ThemeV2.primary,
+              ),
+            ),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         color: ThemeV2.primary,

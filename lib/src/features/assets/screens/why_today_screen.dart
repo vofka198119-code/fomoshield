@@ -449,7 +449,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       children: [
         if (newsActive != null) ...[
           _liveEventRow(
-            'News — LIVE',
+            'News — LIVE: ${newsActive.headline}',
             newsActive.isPositive,
             '${newsActive.isPositive ? '+' : ''}${(newsActive.targetAmplitude * 100).toStringAsFixed(1)}% target',
             _formatRemaining(newsActive.currentTick, newsActive.rampDurationTicks),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../core/cache/sector_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/widgets/company_logo.dart';
@@ -124,8 +125,10 @@ class _CompanyRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logoEntry = ref.watch(cachedLogoEntryProvider(entry.symbol)).valueOrNull;
-    final sector = resolveGicsSector(entry.symbol, companyName: entry.name);
+    final logoUrl = ref.watch(cachedLogoProvider(entry.symbol)).valueOrNull;
+    final liveSector = ref.watch(cachedGicsSectorProvider(entry.symbol)).valueOrNull;
+    final sector =
+        liveSector ?? resolveGicsSector(entry.symbol, companyName: entry.name);
 
     return ListTile(
       onTap: () {
@@ -140,8 +143,7 @@ class _CompanyRow extends ConsumerWidget {
         ),
         child: CompanyLogo(
           ticker: entry.symbol,
-          logoUrl: logoEntry?.logoUrl,
-          domain: logoEntry?.domain,
+          logoUrl: logoUrl,
           radius: 18,
         ),
       ),

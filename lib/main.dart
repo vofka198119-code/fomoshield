@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'src/core/cache/sector_providers.dart';
+import 'src/core/overlay/app_overlay_host.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
@@ -90,7 +91,7 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
                   scaffoldBackgroundColor: Colors.transparent,
                   canvasColor: Colors.transparent,
                 ),
-                child: child ?? const SizedBox.shrink(),
+                child: AppOverlayHost(child: child ?? const SizedBox.shrink()),
               ),
             ),
           ),

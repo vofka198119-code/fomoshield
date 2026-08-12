@@ -23,7 +23,7 @@ part of 'stress_test_engine.dart';
 //   - 5% roll chance when checked.
 // If it fires: one random holding, one random headline from
 // [newsScenarios] (sign matches the headline's own positive/negative
-// list), a signed total move of 10-25%, ramped in over a random
+// list), a signed total move of 6-12%, ramped in over a random
 // 2-6 hour window with NO reversal — a real news-driven move mostly
 // sticks, it doesn't mechanically snap back to zero the way Hype's
 // overshoot-then-correct curve does.

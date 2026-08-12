@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../core/cache/sector_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/widgets/company_logo.dart';
@@ -42,8 +43,6 @@ class CompanyMiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sector = resolveGicsSector(symbol, companyName: name);
-
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -100,14 +99,22 @@ class CompanyMiniCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    sector?.label ?? symbol,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: ThemeV2.textSecondary,
-                    ),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final liveSector =
+                          ref.watch(cachedGicsSectorProvider(symbol)).valueOrNull;
+                      final sector = liveSector ??
+                          resolveGicsSector(symbol, companyName: name);
+                      return Text(
+                        sector?.label ?? symbol,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: ThemeV2.textSecondary,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

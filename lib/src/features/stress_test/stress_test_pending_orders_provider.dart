@@ -2,8 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/models/app_notification.dart';
+import '../../core/notifications/notification_providers.dart';
+import '../../core/overlay/app_notification_popup.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
+import 'stress_test_naming.dart';
 import 'stress_test_pending_order.dart';
 
 // ---------------------------------------------------------------------------
@@ -136,6 +140,24 @@ class StressTestPendingOrdersNotifier
             ];
             changed = true;
           }
+          final label = session.duration.displayName;
+          pushAppNotification(
+            _ref.read(notificationsProvider.notifier),
+            AppNotification(
+              id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+              type: AppNotificationType.limitOrderFilled,
+              portfolioKind: NotificationPortfolioKind.stressTest,
+              portfolioId: session.id,
+              portfolioLabel: 'Stress Test — $label',
+              symbol: order.symbol,
+              companyName: stressTestCompanyName(order.symbol),
+              title: 'Limit ${order.isBuy ? 'Buy' : 'Sell'} Order Filled',
+              detail: '${order.quantity.toStringAsFixed(4)} shares of '
+                  '${stressTestCompanyName(order.symbol)} at '
+                  '\$${order.limitPrice.toStringAsFixed(2)}',
+              createdAt: DateTime.now(),
+            ),
+          );
         }
       }
     }
