@@ -61,6 +61,8 @@ jobs:
       - name: Setup .env
         run: |
           echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}" > .env
+          echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
+          echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
       - run: flutter build apk --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
@@ -69,9 +71,8 @@ jobs:
           name: apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-  # ── iOS IPA (skipped — unsigned, requires Apple Developer account) ─────────
+  # ── iOS IPA (macos, no containers available, uses caching) ──────────────────
   build-ios:
-    if: false
     name: IPA
     needs: [version]
     runs-on: macos-latest
@@ -89,6 +90,8 @@ jobs:
       - name: Setup .env
         run: |
           echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}" > .env
+          echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
+          echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
       - run: flutter build ios --release --no-codesign --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
@@ -106,11 +109,14 @@ jobs:
   # ── Create release + auto-create lightweight tag ──────────────────────────
   release:
     name: Release
-    needs: [version, build-android]
+    needs: [version, build-android, build-ios]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
         with: { name: apk }
+
+      - uses: actions/download-artifact@v4
+        with: { name: ipa }
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -119,4 +125,5 @@ jobs:
           prerelease: ${{ needs.version.outputs.prerelease }}
           files: |
             app-release.apk
+            app-release.ipa
           generate_release_notes: true
