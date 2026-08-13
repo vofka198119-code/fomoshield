@@ -185,7 +185,7 @@ ThemeV2.backgroundGradient // top→bottom
 LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
-  colors: [Color(0xFFFDFBF5), Color(0xFFC8BFA8)],
+  colors: [Color(0xFFF7F7F5), Color(0xFFDCDBD7)], // neutral, no yellow/pink cast — matches splash bg
 )
 ```
 
