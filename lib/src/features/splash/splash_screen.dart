@@ -11,7 +11,7 @@ import '../auth/auth_providers.dart';
 // Brand shield-logo palette — matches the reference splash mock, kept local
 // to this file the way every other brand-gradient consumer in the app does
 // (see docs/DESIGN_TOKENS.md §6, "no shared brandGradient constant").
-const _shieldDark = Color(0xFF16281F); // wordmark + shield outline
+const _shieldDark = Color(0xFF1C3325); // wordmark + shield outline
 const _goldDeep = Color(0xFFC9A227); // bar chart, deep gold
 const _goldLight = Color(0xFFE8C468); // trend line, light gold (dialBrassLight)
 
@@ -31,7 +31,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     with TickerProviderStateMixin {
   late final AnimationController _entranceController;
   late final AnimationController _progressController;
-  late final AnimationController _pulseController;
 
   late final Future<String> _routeFuture;
   String? _resolvedRoute;
@@ -46,11 +45,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..forward();
-
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
 
     _progressController = AnimationController(
       vsync: this,
@@ -129,7 +123,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   void dispose() {
     _entranceController.dispose();
     _progressController.dispose();
-    _pulseController.dispose();
     super.dispose();
   }
 
@@ -137,15 +130,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Widget build(BuildContext context) {
     final shieldAnim = _stagger(0.0, 0.55);
     final wordmarkAnim = _stagger(0.20, 0.70);
-    final taglineAnim = _stagger(0.35, 0.85);
     final ringAnim = _stagger(0.55, 1.0);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFFF7F7F5),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Extra headroom above the shield — pushes the whole block down
+            // so it doesn't sit crammed into the upper half of the screen.
+            const SizedBox(height: 205),
+
             FadeTransition(
               opacity: shieldAnim,
               child: ScaleTransition(
@@ -153,17 +149,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   begin: 0.85,
                   end: 1.0,
                 ).animate(CurvedAnimation(parent: shieldAnim, curve: Curves.easeOutBack)),
-                child: AnimatedBuilder(
-                  animation: _pulseController,
-                  builder: (context, child) => CustomPaint(
-                    size: const Size(150, 158),
-                    painter: _ShieldLogoPainter(dotPulse: _pulseController.value),
+                child: Transform.translate(
+                  // The shield art sits ~1.6% right-of-center within its
+                  // own PNG canvas (measured, not touching the source
+                  // file) — nudge the rendered widget left to compensate.
+                  offset: const Offset(-4, 0),
+                  child: Image.asset(
+                    'assets/images/fomoshield_logo.png',
+                    width: 250,
+                    height: 250,
                   ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 28),
+            const SizedBox(height: 45),
 
             FadeTransition(
               opacity: wordmarkAnim,
@@ -177,14 +177,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     Text(
                       'FOMO',
                       style: GoogleFonts.inter(
-                        fontSize: 40,
+                        fontSize: 46,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 4,
+                        letterSpacing: 5,
                         color: _shieldDark,
                         height: 1.0,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            offset: const Offset(2, 3),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -194,9 +201,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           child: Text(
                             'S H I E L D',
                             style: GoogleFonts.inter(
-                              fontSize: 15,
+                              fontSize: 17,
                               fontWeight: FontWeight.w600,
-                              letterSpacing: 3,
+                              letterSpacing: 3.5,
                               color: _goldDeep,
                             ),
                           ),
@@ -209,34 +216,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               ),
             ),
 
-            const SizedBox(height: 22),
-
-            FadeTransition(
-              opacity: taglineAnim,
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    color: ThemeV2.textSecondary,
-                    height: 1.5,
-                  ),
-                  children: [
-                    const TextSpan(text: 'Invest with clarity.\nStay protected from '),
-                    TextSpan(
-                      text: 'FOMO',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: _shieldDark,
-                      ),
-                    ),
-                    const TextSpan(text: '.'),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 44),
+            const SizedBox(height: 18),
 
             FadeTransition(
               opacity: ringAnim,
@@ -267,15 +247,15 @@ class _LoadingRing extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          width: 84,
-          height: 84,
+          width: 59,
+          height: 59,
           child: CustomPaint(
             painter: _RingPainter(progress: progress),
             child: Center(
               child: Text(
                 '${(progress * 100).round()}%',
                 style: GoogleFonts.inter(
-                  fontSize: 18,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: _shieldDark,
                   fontFeatures: const [FontFeature.tabularFigures()],
@@ -305,19 +285,19 @@ class _RingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
-    final radius = size.width / 2 - 5;
+    final radius = size.width / 2 - 4;
 
     final track = Paint()
       ..color = _goldLight.withValues(alpha: 0.35)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6
+      ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
     canvas.drawCircle(center, radius, track);
 
     final arc = Paint()
       ..color = ThemeV2.primary
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6
+      ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
@@ -331,129 +311,4 @@ class _RingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RingPainter oldDelegate) =>
       oldDelegate.progress != progress;
-}
-
-/// Hand-built shield + bar-chart + trend-line mark — there is no source
-/// vector asset for the reference design, so this is a from-scratch
-/// approximation tuned by eye against the reference screenshot.
-class _ShieldLogoPainter extends CustomPainter {
-  final double dotPulse; // 0..1, drives the trend-dot's gentle pulse
-  _ShieldLogoPainter({required this.dotPulse});
-
-  Path _shieldPath(Size size) {
-    final w = size.width;
-    final h = size.height;
-    final path = Path()
-      ..moveTo(w * 0.50, h * 0.015)
-      ..cubicTo(w * 0.30, h * 0.00, w * 0.06, h * 0.09, w * 0.06, h * 0.27)
-      ..lineTo(w * 0.06, h * 0.53)
-      ..cubicTo(w * 0.06, h * 0.77, w * 0.21, h * 0.90, w * 0.50, h * 0.995)
-      ..cubicTo(w * 0.79, h * 0.90, w * 0.94, h * 0.77, w * 0.94, h * 0.53)
-      ..lineTo(w * 0.94, h * 0.27)
-      ..cubicTo(w * 0.94, h * 0.09, w * 0.70, h * 0.00, w * 0.50, h * 0.015)
-      ..close();
-    return path;
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final shield = _shieldPath(size);
-
-    // Fill — a touch whiter than the page so the mark reads as a distinct
-    // surface against the app's cream background gradient.
-    canvas.drawPath(shield, Paint()..color = const Color(0xFFFFFEFA));
-
-    // Bars + trend line, clipped to the shield interior.
-    canvas.save();
-    canvas.clipPath(shield);
-    _paintBars(canvas, size);
-    _paintTrendLine(canvas, size);
-    canvas.restore();
-
-    // Thin inner gold border, then the primary outer stroke.
-    canvas.drawPath(
-      shield,
-      Paint()
-        ..color = _goldLight
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.4,
-    );
-    canvas.drawPath(
-      shield,
-      Paint()
-        ..color = _shieldDark
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.2,
-    );
-  }
-
-  void _paintBars(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    // Heights as a fraction of the shield's body, ascending then a small
-    // dip on the last (gold) bar — matches the reference skyline.
-    const heights = [0.16, 0.24, 0.34, 0.46, 0.58, 0.44];
-    final colors = [
-      ThemeV2.primary.withValues(alpha: 0.85),
-      ThemeV2.primary.withValues(alpha: 0.90),
-      ThemeV2.primary,
-      _goldDeep.withValues(alpha: 0.85),
-      _goldDeep,
-      _goldDeep.withValues(alpha: 0.75),
-    ];
-
-    const barCount = 6;
-    const gap = 0.018;
-    final totalGap = gap * (barCount - 1);
-    final barW = (0.76 - totalGap) / barCount * w;
-    var x = w * 0.12;
-    const baseline = 0.80;
-
-    for (var i = 0; i < barCount; i++) {
-      final barH = heights[i] * h;
-      final rect = Rect.fromLTWH(x, h * baseline - barH, barW, barH);
-      canvas.drawRRect(
-        RRect.fromRectAndCorners(
-          rect,
-          topLeft: const Radius.circular(2),
-          topRight: const Radius.circular(2),
-        ),
-        Paint()..color = colors[i],
-      );
-      x += barW + gap * w;
-    }
-  }
-
-  void _paintTrendLine(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final path = Path()
-      ..moveTo(w * 0.14, h * 0.72)
-      ..lineTo(w * 0.34, h * 0.60)
-      ..lineTo(w * 0.46, h * 0.68)
-      ..lineTo(w * 0.62, h * 0.42)
-      ..lineTo(w * 0.72, h * 0.50)
-      ..lineTo(w * 0.88, h * 0.24);
-
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = _goldLight
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.2
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round,
-    );
-
-    final dotRadius = 4.0 + dotPulse * 1.6;
-    canvas.drawCircle(
-      Offset(w * 0.88, h * 0.24),
-      dotRadius,
-      Paint()..color = _goldLight,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _ShieldLogoPainter oldDelegate) =>
-      oldDelegate.dotPulse != dotPulse;
 }

@@ -243,7 +243,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           createdAt: DateTime.now(),
         ),
       );
-      Navigator.of(context).pop();
+      _resetForm();
       return;
     }
 
@@ -296,7 +296,22 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         createdAt: DateTime.now(),
       ),
     );
-    Navigator.of(context).pop();
+    _resetForm();
+  }
+
+  // After a successful order we now stay on this Buy/Sell card (see
+  // _submitOrder) instead of popping back to Company Detail — popping
+  // used to race the notification popup's entrance animation and made it
+  // look like the popup was glitching onto the card underneath.
+  void _resetForm() {
+    setState(() {
+      _amountController.clear();
+      _sliderValue = 0;
+      _activeKeypad = _ActiveKeypad.none;
+      if (_selectedOrderType == _OrderType.limit) {
+        _limitPriceController.text = _currentPrice.toStringAsFixed(2);
+      }
+    });
   }
 
   @override

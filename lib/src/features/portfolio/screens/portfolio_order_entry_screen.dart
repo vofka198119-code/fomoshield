@@ -439,7 +439,7 @@ class _PortfolioOrderEntryScreenState
             createdAt: DateTime.now(),
           ),
         );
-        context.pop();
+        _resetForm();
       } else {
         pushAppNotification(
           ref.read(notificationsProvider.notifier),
@@ -458,9 +458,25 @@ class _PortfolioOrderEntryScreenState
             createdAt: DateTime.now(),
           ),
         );
-        context.pop();
+        _resetForm();
       }
     }
+  }
+
+  // After a successful order we now stay on this Buy/Sell card instead of
+  // popping back to Company Detail — popping used to race the notification
+  // popup's entrance animation and made it look like the popup was
+  // glitching onto the card underneath.
+  void _resetForm() {
+    if (!mounted) return;
+    setState(() {
+      _amountController.clear();
+      _sliderValue = 0;
+      _activeKeypad = _ActiveKeypad.none;
+      if (_selectedOrderType == _OrderType.limit) {
+        _limitPriceController.text = _currentPrice.toStringAsFixed(2);
+      }
+    });
   }
 
   orders.OrderType _mapOrderType(_OrderType type) {

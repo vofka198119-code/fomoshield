@@ -131,18 +131,29 @@ class _AppNotificationPopupState extends State<_AppNotificationPopup>
           builder: (context, child) {
             final t = _controller.value;
             double translateY;
+            double opacity;
 
             if (t < _enterEnd) {
-              final p = Curves.easeOutCubic.transform(t / _enterEnd);
+              final p = Curves.easeInOutCubic.transform(t / _enterEnd);
               translateY = -120 * (1 - p);
+              // Fades in alongside the slide — a pure slide from a
+              // fully-opaque, off-screen start still reads as an abrupt
+              // "pop" the instant it clears the top edge; easing opacity
+              // in over the same interval softens that first moment.
+              opacity = p;
             } else if (t < _holdEnd) {
               translateY = 0;
+              opacity = 1;
             } else {
               final exitP = (t - _holdEnd) / (1 - _holdEnd);
               translateY = -120 * Curves.easeInCubic.transform(exitP);
+              opacity = 1;
             }
 
-            return Transform.translate(offset: Offset(0, translateY), child: child);
+            return Transform.translate(
+              offset: Offset(0, translateY),
+              child: Opacity(opacity: opacity, child: child),
+            );
           },
           child: _card(),
         ),

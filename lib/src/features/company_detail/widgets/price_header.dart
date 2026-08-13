@@ -397,14 +397,6 @@ class PriceHeader extends StatelessWidget {
                   Icons.attach_money_rounded,
                   size: 26,
                   color: sessionColor,
-                  shadows: isOpen
-                      ? [
-                          Shadow(
-                            color: dialBrassLight.withValues(alpha: 0.5),
-                            blurRadius: 6,
-                          ),
-                        ]
-                      : null,
                 ),
                 Text(
                   price.toStringAsFixed(2),
