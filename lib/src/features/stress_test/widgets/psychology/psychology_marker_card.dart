@@ -9,7 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
-import '../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 
 class PsychologyMarkerCard extends StatelessWidget {
   final String title;
@@ -27,14 +27,7 @@ class PsychologyMarkerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       child: Column(
         children: [
           SizedBox(

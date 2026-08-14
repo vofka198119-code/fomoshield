@@ -69,20 +69,27 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
                     for (int i = 0; i < portfolio.transactions.length; i++)
                       Builder(
                         builder: (context) {
-                          final tx = portfolio!.transactions[
-                              portfolio.transactions.length - 1 - i];
+                          final tx =
+                              portfolio!.transactions[portfolio
+                                      .transactions
+                                      .length -
+                                  1 -
+                                  i];
                           return StaggerFadeIn(
                             index: i,
                             child: TradeHistoryTile(
                               symbol: tx.symbol,
                               companyName:
                                   ref
-                                      .watch(resolvedCompanyNameProvider(tx.symbol))
+                                      .watch(
+                                        resolvedCompanyNameProvider(tx.symbol),
+                                      )
                                       .valueOrNull ??
                                   tx.symbol,
                               isBuy: tx.type == TransactionType.buy,
                               totalValue: tx.shares * tx.price,
-                              showDivider: i != portfolio.transactions.length - 1,
+                              showDivider:
+                                  i != portfolio.transactions.length - 1,
                               onTap: () => context.push(
                                 '/portfolio/$portfolioId/trade-detail',
                                 extra: tx,

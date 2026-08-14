@@ -27,7 +27,9 @@ String _randomString(int length) {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
   final sb = StringBuffer();
   for (int i = 0; i < length; i++) {
-    sb.write(chars[(DateTime.now().microsecondsSinceEpoch + i * 7) % chars.length]);
+    sb.write(
+      chars[(DateTime.now().microsecondsSinceEpoch + i * 7) % chars.length],
+    );
   }
   return sb.toString();
 }
@@ -36,8 +38,7 @@ String _randomString(int length) {
 // Preferences keys
 // ---------------------------------------------------------------------------
 
-String _ordersPrefsKey(String? uid) =>
-    uid != null ? 'orders_$uid' : 'orders';
+String _ordersPrefsKey(String? uid) => uid != null ? 'orders_$uid' : 'orders';
 
 // ---------------------------------------------------------------------------
 // Order Notifier
@@ -50,8 +51,7 @@ class OrderNotifier extends StateNotifier<List<Order>> {
   // AFTER loadFromSupabase() and clobbering the just-synced server data.
   bool _loadedFromSupabase = false;
 
-  OrderNotifier(this._service, {required this._userId})
-      : super([]) {
+  OrderNotifier(this._service, {required this._userId}) : super([]) {
     _loadLocal();
   }
 
@@ -79,10 +79,7 @@ class OrderNotifier extends StateNotifier<List<Order>> {
   Future<void> _syncToSupabase() async {
     if (_userId == null) return;
     try {
-      await _service.saveOrders(
-        _userId,
-        state.map((o) => o.toJson()).toList(),
-      );
+      await _service.saveOrders(_userId, state.map((o) => o.toJson()).toList());
     } catch (_) {
       // Non-critical, local state persists
     }
@@ -158,7 +155,9 @@ class OrderNotifier extends StateNotifier<List<Order>> {
   double reservedCashForPortfolio(String portfolioId) {
     double reserved = 0;
     for (final o in state) {
-      if (!o.status.isActive || o.portfolioId != portfolioId || o.side != OrderSide.buy) {
+      if (!o.status.isActive ||
+          o.portfolioId != portfolioId ||
+          o.side != OrderSide.buy) {
         continue;
       }
       final price = o.limitPrice ?? o.stopPrice ?? o.createdPrice;
@@ -180,14 +179,17 @@ class OrderNotifier extends StateNotifier<List<Order>> {
     required String symbol,
     required double heldShares,
   }) {
-    final candidates = state
-        .where((o) =>
-            o.status.isActive &&
-            o.portfolioId == portfolioId &&
-            o.assetSymbol == symbol &&
-            o.side == OrderSide.sell)
-        .toList()
-      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final candidates =
+        state
+            .where(
+              (o) =>
+                  o.status.isActive &&
+                  o.portfolioId == portfolioId &&
+                  o.assetSymbol == symbol &&
+                  o.side == OrderSide.sell,
+            )
+            .toList()
+          ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     double remaining = heldShares;
     final toCancelIds = <String>{};
@@ -336,19 +338,25 @@ class OrderNotifier extends StateNotifier<List<Order>> {
   /// limit/stop order filling asynchronously — see processPendingOrders.
   void Function(String portfolioId, Transaction tx, Order order)? _onFill;
 
-  set onFill(void Function(String portfolioId, Transaction tx, Order order)? cb) {
+  set onFill(
+    void Function(String portfolioId, Transaction tx, Order order)? cb,
+  ) {
     _onFill = cb;
   }
 
   String? _findPortfolioForOrder(String symbol) {
     // Find the first portfolio containing an active order for this symbol
-    final matching = state.where((o) =>
-        o.assetSymbol == symbol &&
-        (o.status == OrderStatus.filled ||
-         o.status == OrderStatus.partiallyFilled));
+    final matching = state.where(
+      (o) =>
+          o.assetSymbol == symbol &&
+          (o.status == OrderStatus.filled ||
+              o.status == OrderStatus.partiallyFilled),
+    );
     if (matching.isNotEmpty) return matching.first.portfolioId;
     // Fallback: find by first active order with this symbol
-    final active = state.where((o) => o.assetSymbol == symbol && o.status.isActive);
+    final active = state.where(
+      (o) => o.assetSymbol == symbol && o.status.isActive,
+    );
     if (active.isNotEmpty) return active.first.portfolioId;
     return null;
   }
@@ -374,8 +382,7 @@ class OrderNotifier extends StateNotifier<List<Order>> {
 // Provider
 // ---------------------------------------------------------------------------
 
-final ordersProvider =
-    StateNotifierProvider<OrderNotifier, List<Order>>((ref) {
+final ordersProvider = StateNotifierProvider<OrderNotifier, List<Order>>((ref) {
   final service = ref.read(userDataServiceProvider);
   final user = ref.watch(currentUserProvider);
   final notifier = OrderNotifier(service, userId: user?.id);
@@ -411,7 +418,9 @@ final ordersProvider =
       }
     }
 
-    ref.read(portfoliosProvider.notifier).addTransaction(portfolioId, enrichedTx);
+    ref
+        .read(portfoliosProvider.notifier)
+        .addTransaction(portfolioId, enrichedTx);
 
     // A sell just reduced (or could reduce) held shares — any other
     // pending sell order for the same symbol may no longer have enough
@@ -456,9 +465,11 @@ final ordersProvider =
         portfolioLabel: portfolioName,
         symbol: order.assetSymbol,
         companyName: order.companyName,
-        title: '${order.type.label} ${order.side == OrderSide.buy ? 'Buy' : 'Sell'} '
+        title:
+            '${order.type.label} ${order.side == OrderSide.buy ? 'Buy' : 'Sell'} '
             'Order Filled',
-        detail: '${tx.shares.toStringAsFixed(4)} shares of '
+        detail:
+            '${tx.shares.toStringAsFixed(4)} shares of '
             '${order.companyName ?? order.assetSymbol} at \$${tx.price.toStringAsFixed(2)}',
         createdAt: DateTime.now(),
       ),
@@ -477,7 +488,9 @@ final activeOrdersProvider = Provider<List<Order>>((ref) {
 /// Provider that returns filled orders (latest first)
 final filledOrdersProvider = Provider<List<Order>>((ref) {
   final allOrders = ref.watch(ordersProvider);
-  final filled = allOrders.where((o) => o.status == OrderStatus.filled).toList();
+  final filled = allOrders
+      .where((o) => o.status == OrderStatus.filled)
+      .toList();
   filled.sort((a, b) => b.createdAt.compareTo(a.createdAt));
   return filled;
 });

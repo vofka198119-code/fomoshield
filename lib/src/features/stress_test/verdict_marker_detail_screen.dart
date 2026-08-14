@@ -71,10 +71,7 @@ VerdictTier? _tierFor(String markerId, VerdictArchiveEntry entry) {
     case 'sector-diversification':
       return diversificationTierForCount(entry.holdingCount);
     case 'safety-marker':
-      return safetyMarkerTierFor(
-        entry.safetyMarker,
-        entry.safetyMarkerHasData,
-      );
+      return safetyMarkerTierFor(entry.safetyMarker, entry.safetyMarkerHasData);
     case 'sector-balance':
       return sectorBalanceTierFor(entry.strategySector, entry.holdingCount);
     case 'concentration':

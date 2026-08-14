@@ -142,10 +142,7 @@ class _TradeDetailCard extends ConsumerWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: accent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
@@ -177,10 +174,7 @@ class _TradeDetailCard extends ConsumerWidget {
             label: 'Total Value',
             value: '\$${(trade.shares * trade.price).toStringAsFixed(2)}',
           ),
-          _DetailRow(
-            label: 'Date',
-            value: _formatDate(trade.date),
-          ),
+          _DetailRow(label: 'Date', value: _formatDate(trade.date)),
           if (trade.realizedPnl != null)
             _DetailRow(
               label: 'Realized P&L',
@@ -198,8 +192,18 @@ class _TradeDetailCard extends ConsumerWidget {
 
   String _formatDate(DateTime d) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }

@@ -62,7 +62,8 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
             child: CircularProgressIndicator(color: ThemeV2.primary),
           ),
           error: (_, _) => _buildContent(isBlocked: false),
-          data: (geo) => _buildContent(isBlocked: geo.isBlocked, reason: geo.reason),
+          data: (geo) =>
+              _buildContent(isBlocked: geo.isBlocked, reason: geo.reason),
         ),
       ),
     );
@@ -76,9 +77,20 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
           child: Column(
             children: [
-              const Icon(Icons.info_outline_rounded, color: ThemeV2.primary, size: 40),
+              const Icon(
+                Icons.info_outline_rounded,
+                color: ThemeV2.primary,
+                size: 40,
+              ),
               const SizedBox(height: 12),
-              Text('Disclaimer', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: ThemeV2.textPrimary)),
+              Text(
+                'Disclaimer',
+                style: GoogleFonts.inter(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: ThemeV2.textPrimary,
+                ),
+              ),
             ],
           ),
         ),
@@ -90,24 +102,47 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.gpp_bad_rounded, color: ThemeV2.loss, size: 64),
+                  const Icon(
+                    Icons.gpp_bad_rounded,
+                    color: ThemeV2.loss,
+                    size: 64,
+                  ),
                   const SizedBox(height: 24),
                   Text(
                     reason ?? 'Access Restricted',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(fontSize: 16, color: ThemeV2.textSecondary, height: 1.5),
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      color: ThemeV2.textSecondary,
+                      height: 1.5,
+                    ),
                   ),
                   const SizedBox(height: 32),
                   SizedBox(
-                    width: double.infinity, height: 52,
+                    width: double.infinity,
+                    height: 52,
                     child: ElevatedButton(
-                      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('The app will now close'), backgroundColor: ThemeV2.loss),
-                      ),
+                      onPressed: () =>
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('The app will now close'),
+                              backgroundColor: ThemeV2.loss,
+                            ),
+                          ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ThemeV2.loss, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        backgroundColor: ThemeV2.loss,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
-                      child: Text('Close App', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600)),
+                      child: Text(
+                        'Close App',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -119,41 +154,53 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               children: [
-                _section('Important Notice',
+                _section(
+                  'Important Notice',
                   'F.O.M.O. Shield is an educational tool designed to help investors understand '
-                  'market behavior and their own decision-making patterns. It does not provide '
-                  'financial advice, investment recommendations, or any form of financial '
-                  'advisory services.'),
+                      'market behavior and their own decision-making patterns. It does not provide '
+                      'financial advice, investment recommendations, or any form of financial '
+                      'advisory services.',
+                ),
                 const SizedBox(height: 16),
-                _section('Independence of FS Scores',
+                _section(
+                  'Independence of FS Scores',
                   'FS Scores and all related analytical materials are the result of F.O.M.O. Shield\'s '
-                  'proprietary analysis based on mathematical models and publicly available data. '
-                  'We do not receive compensation from companies for inclusion in the ratings or '
-                  'for rating changes. FS Scores are not a recommendation to buy, sell, or hold '
-                  'any security.'),
+                      'proprietary analysis based on mathematical models and publicly available data. '
+                      'We do not receive compensation from companies for inclusion in the ratings or '
+                      'for rating changes. FS Scores are not a recommendation to buy, sell, or hold '
+                      'any security.',
+                ),
                 const SizedBox(height: 16),
-                _section('Data Sources',
+                _section(
+                  'Data Sources',
                   'Market data is provided by Finnhub and Wikipedia APIs. While we strive for '
-                  'accuracy, we cannot guarantee that all data is complete, accurate, or '
-                  'up-to-date. Past performance is not indicative of future results. Stress test '
-                  'scenarios are simulations based on mathematical models and historical patterns.'),
+                      'accuracy, we cannot guarantee that all data is complete, accurate, or '
+                      'up-to-date. Past performance is not indicative of future results. Stress test '
+                      'scenarios are simulations based on mathematical models and historical patterns.',
+                ),
                 const SizedBox(height: 16),
-                _section('Geographic Restrictions',
+                _section(
+                  'Geographic Restrictions',
                   'This application is available for global use. Russian language support is '
-                  'provided for global Russian-speaking communities outside Russia and Belarus. '
-                  'Access to this application from Russia and Belarus is strictly prohibited. '
-                  'By accepting this disclaimer, you confirm that you are not accessing this '
-                  'application from within Russia or Belarus.'),
+                      'provided for global Russian-speaking communities outside Russia and Belarus. '
+                      'Access to this application from Russia and Belarus is strictly prohibited. '
+                      'By accepting this disclaimer, you confirm that you are not accessing this '
+                      'application from within Russia or Belarus.',
+                ),
                 const SizedBox(height: 16),
-                _section('Privacy',
+                _section(
+                  'Privacy',
                   'We collect minimal data necessary for app functionality: email address '
-                  '(for account creation), anonymized usage statistics, and device language '
-                  'preferences. We do not sell your data to third parties.'),
+                      '(for account creation), anonymized usage statistics, and device language '
+                      'preferences. We do not sell your data to third parties.',
+                ),
                 const SizedBox(height: 16),
-                _section('Terms Updates',
+                _section(
+                  'Terms Updates',
                   'We reserve the right to update this disclaimer, Terms of Service, and Privacy '
-                  'Policy. In case of changes, the app will notify you and require re-acceptance '
-                  'of the updated terms to continue.'),
+                      'Policy. In case of changes, the app will notify you and require re-acceptance '
+                      'of the updated terms to continue.',
+                ),
                 const SizedBox(height: 24),
               ],
             ),
@@ -165,7 +212,9 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
             decoration: BoxDecoration(
               color: Colors.transparent,
-              border: Border(top: BorderSide(color: Colors.black.withValues(alpha: 0.06))),
+              border: Border(
+                top: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -176,14 +225,18 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: SizedBox(
-                        width: 24, height: 24,
+                        width: 24,
+                        height: 24,
                         child: Checkbox(
                           value: _isChecked,
-                          onChanged: (val) => setState(() => _isChecked = val ?? false),
+                          onChanged: (val) =>
+                              setState(() => _isChecked = val ?? false),
                           activeColor: ThemeV2.primary,
                           checkColor: Colors.white,
                           side: const BorderSide(color: ThemeV2.textSecondary),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
                     ),
@@ -191,25 +244,40 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                     Expanded(
                       child: RichText(
                         text: TextSpan(
-                          style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary, height: 1.5),
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: ThemeV2.textSecondary,
+                            height: 1.5,
+                          ),
                           children: [
-                            const TextSpan(text: 'I confirm that I am at least 18 years old, '
-                                'I am not located in Russia or Belarus, and I fully accept '
-                                'this Disclaimer, the '),
+                            const TextSpan(
+                              text:
+                                  'I confirm that I am at least 18 years old, '
+                                  'I am not located in Russia or Belarus, and I fully accept '
+                                  'this Disclaimer, the ',
+                            ),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
                               child: GestureDetector(
-                                onTap: () => _openLink('https://fomoshield.com/terms'),
+                                onTap: () =>
+                                    _openLink('https://fomoshield.com/terms'),
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     border: Border(
-                                      bottom: BorderSide(color: ThemeV2.primary, width: 0.5),
+                                      bottom: BorderSide(
+                                        color: ThemeV2.primary,
+                                        width: 0.5,
+                                      ),
                                     ),
                                   ),
                                   child: Text(
                                     'Terms of Service',
-                                    style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.primary, height: 1.0),
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: ThemeV2.primary,
+                                      height: 1.0,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -219,16 +287,24 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
                               child: GestureDetector(
-                                onTap: () => _openLink('https://fomoshield.com/privacy'),
+                                onTap: () =>
+                                    _openLink('https://fomoshield.com/privacy'),
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     border: Border(
-                                      bottom: BorderSide(color: ThemeV2.primary, width: 0.5),
+                                      bottom: BorderSide(
+                                        color: ThemeV2.primary,
+                                        width: 0.5,
+                                      ),
                                     ),
                                   ),
                                   child: Text(
                                     'Privacy Policy',
-                                    style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.primary, height: 1.0),
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: ThemeV2.primary,
+                                      height: 1.0,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -242,17 +318,28 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
-                  width: double.infinity, height: 52,
+                  width: double.infinity,
+                  height: 52,
                   child: ElevatedButton(
                     onPressed: _isChecked ? _handleAccept : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _isChecked ? ThemeV2.primary : ThemeV2.surface,
+                      backgroundColor: _isChecked
+                          ? ThemeV2.primary
+                          : ThemeV2.surface,
                       foregroundColor: Colors.white,
                       disabledBackgroundColor: ThemeV2.surface,
                       disabledForegroundColor: ThemeV2.textSecondary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
-                    child: Text('I Accept', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text(
+                      'I Accept',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -266,13 +353,24 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: ThemeV2.primary)),
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: ThemeV2.primary,
+          ),
+        ),
         const SizedBox(height: 8),
-        Text(body, style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary, height: 1.6)),
+        Text(
+          body,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            color: ThemeV2.textSecondary,
+            height: 1.6,
+          ),
+        ),
       ],
     );
   }
 }
-
-
-

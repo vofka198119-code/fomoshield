@@ -97,10 +97,7 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'PORTFOLIO HEALTH',
-                    style: FomoShieldTheme.cardTitle(),
-                  ),
+                  Text('PORTFOLIO HEALTH', style: FomoShieldTheme.cardTitle()),
                   GestureDetector(
                     onTap: () => context.push('/metric-info/portfolio-health'),
                     child: Container(
@@ -108,7 +105,9 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
                       height: 20,
                       decoration: BoxDecoration(
                         color: ThemeV2.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          ThemeV2.radiusSmall,
+                        ),
                       ),
                       alignment: Alignment.center,
                       child: const Icon(

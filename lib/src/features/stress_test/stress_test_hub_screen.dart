@@ -20,11 +20,11 @@ import '../market_clock/market_clock_dial.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 
-// Brand dark-green gradient and the Market Clock ring's gold accent — used
-// for the play-button badge and the "premium" tag below.
-const List<Color> _brandGradient = [dialLight, dialDark];
-List<Shadow> _goldGlow(Color color) =>
-    [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6)];
+// Market Clock ring's gold accent — used for the play-button badge and the
+// "premium" tag below.
+List<Shadow> _goldGlow(Color color) => [
+  Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6),
+];
 
 class StressTestHubScreen extends ConsumerWidget {
   const StressTestHubScreen({super.key});
@@ -140,12 +140,8 @@ class StressTestHubScreen extends ConsumerWidget {
                     .asMap()
                     .entries
                     .map(
-                      (e) => _buildActiveSessionTile(
-                        context,
-                        ref,
-                        e.value,
-                        e.key,
-                      ),
+                      (e) =>
+                          _buildActiveSessionTile(context, ref, e.value, e.key),
                     )
                     .toList(),
               ),
@@ -240,21 +236,16 @@ class StressTestHubScreen extends ConsumerWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [dialLight, dialDark],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: dialDark.withValues(alpha: 0.35),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+        decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16))
+            .copyWith(
+              boxShadow: [
+                BoxShadow(
+                  color: dialDark.withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ],
-        ),
         child: Row(
           children: [
             Container(
@@ -403,14 +394,7 @@ class StressTestHubScreen extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: _brandGradient,
-        ),
-        borderRadius: BorderRadius.circular(5),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
         'premium',
         style: GoogleFonts.inter(
@@ -462,12 +446,7 @@ class StressTestHubScreen extends ConsumerWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: _brandGradient,
-                ),
+              decoration: darkCardDecoration(
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(

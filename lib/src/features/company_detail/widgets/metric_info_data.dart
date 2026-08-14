@@ -285,7 +285,8 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
             'future.',
       ),
       MetricInfoSection(
-        header: 'Can a company have a 0% Dividend Yield and still be '
+        header:
+            'Can a company have a 0% Dividend Yield and still be '
             'excellent?',
         body:
             'Absolutely. Many successful companies choose not to pay '
@@ -824,7 +825,8 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
             '• Forgetting that operating expenses still need to be paid.',
       ),
       MetricInfoSection(
-        header: 'How is Gross Margin different from Operating Margin and '
+        header:
+            'How is Gross Margin different from Operating Margin and '
             'Net Margin?',
         body:
             'Think of profitability as three stages.\n\n'
@@ -2647,7 +2649,8 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
   // screen.
   'guardian-verdict': MetricInfoContent(
     title: 'GUARDIAN\'S VERDICT',
-    subtitle: 'Congratulations — you have completed your portfolio stress '
+    subtitle:
+        'Congratulations — you have completed your portfolio stress '
         'test.',
     showStressTestDisclaimer: true,
     sections: [

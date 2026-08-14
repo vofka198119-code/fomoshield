@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 import '../stress_test_models.dart';
 
 /// Dark-green gradient card (same brand gradient as TARGET / Shield Signal)
@@ -38,14 +38,7 @@ class StressTestCashWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       child: Column(
         children: [
           SizedBox(

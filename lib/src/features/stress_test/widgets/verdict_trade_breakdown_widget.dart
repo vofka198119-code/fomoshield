@@ -23,7 +23,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 import '../stress_test_models.dart';
 
 final _priceFmt = NumberFormat('#,##0.00', 'en_US');
@@ -42,14 +42,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,9 +112,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
+                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
               ),
             ),
       child: Row(

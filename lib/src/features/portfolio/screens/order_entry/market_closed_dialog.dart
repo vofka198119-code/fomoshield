@@ -35,7 +35,11 @@ Future<bool> showMarketClosedDialog(BuildContext context) async {
         'You can still place a Limit order — it will wait and execute once '
         'the market reopens. Or turn on Extended Hours to trade around the '
         'clock.',
-        style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary, height: 1.5),
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          color: ThemeV2.textSecondary,
+          height: 1.5,
+        ),
       ),
       actions: [
         TextButton(

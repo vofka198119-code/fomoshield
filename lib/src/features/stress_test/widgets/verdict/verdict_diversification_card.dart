@@ -16,7 +16,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
-import '../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'verdict_marker_row.dart';
 
 class _DiversificationRow {
@@ -66,14 +66,7 @@ class VerdictDiversificationCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

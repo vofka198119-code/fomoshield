@@ -98,7 +98,10 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         body: Center(
           child: Text(
             'Session not found',
-            style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 14),
+            style: GoogleFonts.inter(
+              color: ThemeV2.textSecondary,
+              fontSize: 14,
+            ),
           ),
         ),
       );
@@ -272,9 +275,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
           'NEWS ${news.symbol}',
           '${news.currentTick}/${news.rampDurationTicks} '
               '(${_remainingLabel(news.currentTick, news.rampDurationTicks)})',
-          news.isPositive
-              ? const Color(0xFF66BB6A)
-              : const Color(0xFFEF5350),
+          news.isPositive ? const Color(0xFF66BB6A) : const Color(0xFFEF5350),
           monoStyle,
         ),
       );
@@ -285,9 +286,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
           'HYPE ${hype.sector.label}',
           '${hype.currentTick}/${hype.rampDurationTicks} '
               '(${_remainingLabel(hype.currentTick, hype.rampDurationTicks)})',
-          hype.isPositive
-              ? const Color(0xFF66BB6A)
-              : const Color(0xFFEF5350),
+          hype.isPositive ? const Color(0xFF66BB6A) : const Color(0xFFEF5350),
           monoStyle,
         ),
       );
@@ -431,9 +430,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: ThemeV2.textSecondary.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: ThemeV2.textSecondary.withValues(alpha: 0.3)),
         color: ThemeV2.surface,
       ),
       child: TextField(
@@ -442,7 +439,10 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textPrimary),
         decoration: InputDecoration(
           hintText: 'Search',
-          hintStyle: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+          hintStyle: GoogleFonts.inter(
+            fontSize: 14,
+            color: ThemeV2.textSecondary,
+          ),
           prefixIcon: const Icon(
             Icons.search_rounded,
             color: ThemeV2.textSecondary,
@@ -504,4 +504,3 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     return NumberFormat('#,##0.00', 'en_US').format(v);
   }
 }
-

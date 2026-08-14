@@ -48,13 +48,14 @@ class WhyDiagnosticsEpisode {
   });
 
   Map<String, dynamic> toJson() => {
-        'startEpoch': startEpoch,
-        'endEpoch': endEpoch,
-        'isUp': isUp,
-        'netPercent': netPercent,
-      };
+    'startEpoch': startEpoch,
+    'endEpoch': endEpoch,
+    'isUp': isUp,
+    'netPercent': netPercent,
+  };
 
-  factory WhyDiagnosticsEpisode.fromJson(Map<String, dynamic> json) => WhyDiagnosticsEpisode(
+  factory WhyDiagnosticsEpisode.fromJson(Map<String, dynamic> json) =>
+      WhyDiagnosticsEpisode(
         startEpoch: json['startEpoch'] as int,
         endEpoch: json['endEpoch'] as int,
         isUp: json['isUp'] as bool,
@@ -88,7 +89,12 @@ class WhyDiagnosticsAccumulator {
   /// tick's own price move (bigger swings count more).
   PriceContribution get averaged {
     if (totalWeight <= 0) {
-      return const PriceContribution(marketPct: 0, sectorPct: 0, newsPct: 0, noisePct: 0);
+      return const PriceContribution(
+        marketPct: 0,
+        sectorPct: 0,
+        newsPct: 0,
+        noisePct: 0,
+      );
     }
     return PriceContribution(
       marketPct: weightedMarket / totalWeight,
@@ -117,7 +123,13 @@ class WhyDiagnosticsAccumulator {
       _newsLastEpoch = t.epochIndex;
       _newsLastPrice = t.priceAfter;
     } else if (_newsStartEpoch != null) {
-      _closeEpisode(newsEpisodes, _newsStartEpoch, _newsStartPrice, _newsLastEpoch, _newsLastPrice);
+      _closeEpisode(
+        newsEpisodes,
+        _newsStartEpoch,
+        _newsStartPrice,
+        _newsLastEpoch,
+        _newsLastPrice,
+      );
       _newsStartEpoch = null;
       _newsStartPrice = null;
       _newsLastEpoch = null;
@@ -131,7 +143,13 @@ class WhyDiagnosticsAccumulator {
       _hypeLastEpoch = t.epochIndex;
       _hypeLastPrice = t.priceAfter;
     } else if (_hypeStartEpoch != null) {
-      _closeEpisode(hypeEpisodes, _hypeStartEpoch, _hypeStartPrice, _hypeLastEpoch, _hypeLastPrice);
+      _closeEpisode(
+        hypeEpisodes,
+        _hypeStartEpoch,
+        _hypeStartPrice,
+        _hypeLastEpoch,
+        _hypeLastPrice,
+      );
       _hypeStartEpoch = null;
       _hypeStartPrice = null;
       _hypeLastEpoch = null;
@@ -146,10 +164,15 @@ class WhyDiagnosticsAccumulator {
     int? lastEpoch,
     double? lastPrice,
   ) {
-    if (startEpoch == null || startPrice == null || lastEpoch == null || lastPrice == null) {
+    if (startEpoch == null ||
+        startPrice == null ||
+        lastEpoch == null ||
+        lastPrice == null) {
       return;
     }
-    final net = startPrice > 0 ? ((lastPrice - startPrice) / startPrice) * 100 : 0.0;
+    final net = startPrice > 0
+        ? ((lastPrice - startPrice) / startPrice) * 100
+        : 0.0;
     into.add(
       WhyDiagnosticsEpisode(
         startEpoch: startEpoch,
@@ -162,24 +185,24 @@ class WhyDiagnosticsAccumulator {
   }
 
   Map<String, dynamic> toJson() => {
-        'weightedMarket': weightedMarket,
-        'weightedSector': weightedSector,
-        'weightedNews': weightedNews,
-        'weightedHype': weightedHype,
-        'weightedNoise': weightedNoise,
-        'totalWeight': totalWeight,
-        'tickCount': tickCount,
-        'newsStartEpoch': _newsStartEpoch,
-        'newsStartPrice': _newsStartPrice,
-        'newsLastEpoch': _newsLastEpoch,
-        'newsLastPrice': _newsLastPrice,
-        'hypeStartEpoch': _hypeStartEpoch,
-        'hypeStartPrice': _hypeStartPrice,
-        'hypeLastEpoch': _hypeLastEpoch,
-        'hypeLastPrice': _hypeLastPrice,
-        'newsEpisodes': newsEpisodes.map((e) => e.toJson()).toList(),
-        'hypeEpisodes': hypeEpisodes.map((e) => e.toJson()).toList(),
-      };
+    'weightedMarket': weightedMarket,
+    'weightedSector': weightedSector,
+    'weightedNews': weightedNews,
+    'weightedHype': weightedHype,
+    'weightedNoise': weightedNoise,
+    'totalWeight': totalWeight,
+    'tickCount': tickCount,
+    'newsStartEpoch': _newsStartEpoch,
+    'newsStartPrice': _newsStartPrice,
+    'newsLastEpoch': _newsLastEpoch,
+    'newsLastPrice': _newsLastPrice,
+    'hypeStartEpoch': _hypeStartEpoch,
+    'hypeStartPrice': _hypeStartPrice,
+    'hypeLastEpoch': _hypeLastEpoch,
+    'hypeLastPrice': _hypeLastPrice,
+    'newsEpisodes': newsEpisodes.map((e) => e.toJson()).toList(),
+    'hypeEpisodes': hypeEpisodes.map((e) => e.toJson()).toList(),
+  };
 
   static WhyDiagnosticsAccumulator fromJson(Map<String, dynamic> json) {
     final acc = WhyDiagnosticsAccumulator()
@@ -199,25 +222,32 @@ class WhyDiagnosticsAccumulator {
       .._hypeLastEpoch = json['hypeLastEpoch'] as int?
       .._hypeLastPrice = (json['hypeLastPrice'] as num?)?.toDouble();
     acc.newsEpisodes.addAll(
-      (json['newsEpisodes'] as List<dynamic>? ?? [])
-          .map((e) => WhyDiagnosticsEpisode.fromJson(e as Map<String, dynamic>)),
+      (json['newsEpisodes'] as List<dynamic>? ?? []).map(
+        (e) => WhyDiagnosticsEpisode.fromJson(e as Map<String, dynamic>),
+      ),
     );
     acc.hypeEpisodes.addAll(
-      (json['hypeEpisodes'] as List<dynamic>? ?? [])
-          .map((e) => WhyDiagnosticsEpisode.fromJson(e as Map<String, dynamic>)),
+      (json['hypeEpisodes'] as List<dynamic>? ?? []).map(
+        (e) => WhyDiagnosticsEpisode.fromJson(e as Map<String, dynamic>),
+      ),
     );
     return acc;
   }
 }
 
-String _whyDiagnosticsKey(String? uid) =>
-    uid != null ? 'stress_test_why_diagnostics_$uid' : 'stress_test_why_diagnostics';
+String _whyDiagnosticsKey(String? uid) => uid != null
+    ? 'stress_test_why_diagnostics_$uid'
+    : 'stress_test_why_diagnostics';
 
 extension WhyDiagnosticsEngine on StressTestNotifier {
   /// Folds one freshly-computed tick into this session+symbol's running
   /// accumulator. Called directly from the tick loop (noise_engine.dart),
   /// not derived from explanationLog afterwards — see file header.
-  void _foldWhyDiagnostics(String sessionId, String symbol, TickExplanation expl) {
+  void _foldWhyDiagnostics(
+    String sessionId,
+    String symbol,
+    TickExplanation expl,
+  ) {
     final bySymbol = _whyDiagnostics.putIfAbsent(sessionId, () => {});
     final acc = bySymbol.putIfAbsent(symbol, () => WhyDiagnosticsAccumulator());
     acc.fold(expl);
@@ -225,8 +255,10 @@ extension WhyDiagnosticsEngine on StressTestNotifier {
 
   /// Read-only accessor for the UI — null if nothing accumulated yet for
   /// this session+symbol.
-  WhyDiagnosticsAccumulator? whyDiagnosticsFor(String sessionId, String symbol) =>
-      _whyDiagnostics[sessionId]?[symbol];
+  WhyDiagnosticsAccumulator? whyDiagnosticsFor(
+    String sessionId,
+    String symbol,
+  ) => _whyDiagnostics[sessionId]?[symbol];
 
   Future<void> _loadWhyDiagnostics() async {
     final prefs = await SharedPreferences.getInstance();
@@ -236,9 +268,11 @@ extension WhyDiagnosticsEngine on StressTestNotifier {
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
       for (final sessionEntry in decoded.entries) {
         final bySymbol = <String, WhyDiagnosticsAccumulator>{};
-        for (final symbolEntry in (sessionEntry.value as Map<String, dynamic>).entries) {
-          bySymbol[symbolEntry.key] =
-              WhyDiagnosticsAccumulator.fromJson(symbolEntry.value as Map<String, dynamic>);
+        for (final symbolEntry
+            in (sessionEntry.value as Map<String, dynamic>).entries) {
+          bySymbol[symbolEntry.key] = WhyDiagnosticsAccumulator.fromJson(
+            symbolEntry.value as Map<String, dynamic>,
+          );
         }
         _whyDiagnostics[sessionEntry.key] = bySymbol;
       }

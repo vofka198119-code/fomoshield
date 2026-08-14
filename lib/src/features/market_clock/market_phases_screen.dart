@@ -122,8 +122,10 @@ class _PhaseListCard extends StatelessWidget {
                 if (isActive) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: ThemeV2.primary,
                       borderRadius: BorderRadius.circular(8),
@@ -217,8 +219,10 @@ class _ClampedBody extends StatelessWidget {
                   onPressed: () =>
                       context.push('/market-clock/period/$windowId'),
                   style: TextButton.styleFrom(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 0,
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),

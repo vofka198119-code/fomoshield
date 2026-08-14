@@ -30,7 +30,11 @@ Future<bool> confirmCancelOrder(BuildContext context) async {
           ),
           GestureDetector(
             onTap: () => Navigator.pop(ctx, false),
-            child: Icon(Icons.close_rounded, size: 20, color: ThemeV2.textSecondary),
+            child: Icon(
+              Icons.close_rounded,
+              size: 20,
+              color: ThemeV2.textSecondary,
+            ),
           ),
         ],
       ),
@@ -39,7 +43,10 @@ Future<bool> confirmCancelOrder(BuildContext context) async {
         children: [
           Text(
             'Are you sure you want to cancel this order?',
-            style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: ThemeV2.textSecondary,
+            ),
           ),
           const SizedBox(height: 22),
           Row(
@@ -49,11 +56,18 @@ Future<bool> confirmCancelOrder(BuildContext context) async {
                   onPressed: () => Navigator.pop(ctx, false),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: ThemeV2.textSecondary,
-                    side: BorderSide(color: ThemeV2.textSecondary.withValues(alpha: 0.35)),
+                    side: BorderSide(
+                      color: ThemeV2.textSecondary.withValues(alpha: 0.35),
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                  child: Text('No', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                  child: Text(
+                    'No',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -65,9 +79,14 @@ Future<bool> confirmCancelOrder(BuildContext context) async {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                  child: Text('Yes', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                  child: Text(
+                    'Yes',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ],

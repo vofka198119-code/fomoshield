@@ -14,7 +14,11 @@ import 'market_clock_engine.dart';
 class MarketPhaseWidget extends StatelessWidget {
   final MarketWindow window;
   final bool isEarlyClose;
-  const MarketPhaseWidget({super.key, required this.window, required this.isEarlyClose});
+  const MarketPhaseWidget({
+    super.key,
+    required this.window,
+    required this.isEarlyClose,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +61,10 @@ class MarketPhaseWidget extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(window.emoji, style: const TextStyle(fontSize: 18)),
+                          Text(
+                            window.emoji,
+                            style: const TextStyle(fontSize: 18),
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -74,7 +81,10 @@ class MarketPhaseWidget extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         window.shortDetail,
-                        style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: ThemeV2.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -89,8 +99,12 @@ class MarketPhaseWidget extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => context.push('/market-clock/period/${window.id}'),
-                  icon: const Icon(Icons.help_outline_rounded, color: ThemeV2.primary),
+                  onPressed: () =>
+                      context.push('/market-clock/period/${window.id}'),
+                  icon: const Icon(
+                    Icons.help_outline_rounded,
+                    color: ThemeV2.primary,
+                  ),
                   tooltip: 'Details',
                 ),
               ],

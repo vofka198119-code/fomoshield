@@ -111,8 +111,7 @@ class WatchlistNotifier extends StateNotifier<List<String>> {
   // empty/stale local cache.
   bool _loadedFromSupabase = false;
 
-  WatchlistNotifier(this._supabaseService, {this._userId})
-      : super([]) {
+  WatchlistNotifier(this._supabaseService, {this._userId}) : super([]) {
     _load();
   }
 
@@ -204,4 +203,3 @@ final marketIndicesProvider = FutureProvider<List<MarketIndex>>((ref) async {
     ];
   }
 });
-

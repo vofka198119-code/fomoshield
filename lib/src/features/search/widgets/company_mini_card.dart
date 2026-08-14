@@ -101,9 +101,11 @@ class CompanyMiniCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Consumer(
                     builder: (context, ref, _) {
-                      final liveSector =
-                          ref.watch(cachedGicsSectorProvider(symbol)).valueOrNull;
-                      final sector = liveSector ??
+                      final liveSector = ref
+                          .watch(cachedGicsSectorProvider(symbol))
+                          .valueOrNull;
+                      final sector =
+                          liveSector ??
                           resolveGicsSector(symbol, companyName: name);
                       return Text(
                         sector?.label ?? symbol,

@@ -82,7 +82,8 @@ extension CasinoEpochsEngine on StressTestNotifier {
     final declineLockedPostCatastrophe =
         epochsSinceLastCatastrophe >= 3 && epochsSinceLastCatastrophe <= 5;
 
-    final bearLocked = declineLockedSessionStart || declineLockedPostCatastrophe;
+    final bearLocked =
+        declineLockedSessionStart || declineLockedPostCatastrophe;
 
     // Anti-stuck Bear correction: after 2+ consecutive Bear declines,
     // hard-redirect to Bull/Sideways/Volatility — prevents death loops.
@@ -320,9 +321,7 @@ extension CasinoEpochsEngine on StressTestNotifier {
         '  casinoLastCatastropheEpoch=${session.casinoLastCatastropheEpoch}',
       );
       // ignore: avoid_print
-      print(
-        '  casinoCatastropheCooldown=${session.casinoCatastropheCooldown}',
-      );
+      print('  casinoCatastropheCooldown=${session.casinoCatastropheCooldown}');
       // ignore: avoid_print
       print('  casinoDeclineStreak=${session.casinoDeclineStreak}');
       // ignore: avoid_print
@@ -358,9 +357,10 @@ extension CasinoEpochsEngine on StressTestNotifier {
     // is the active one fixes this — every regime the roulette landed on
     // now gets a fair (if attenuated, given the cap) say in the price.
     final totalSegments = missedRolls + 1; // + the trailing current epoch
-    final ticksPerSegment = (_maxCatchUpTicks / totalSegments)
-        .floor()
-        .clamp(1, _maxCatchUpTicks);
+    final ticksPerSegment = (_maxCatchUpTicks / totalSegments).floor().clamp(
+      1,
+      _maxCatchUpTicks,
+    );
 
     for (int r = 0; r < missedRolls; r++) {
       // ── Scenario-roll RNG: deterministic per epoch, NOT the shared

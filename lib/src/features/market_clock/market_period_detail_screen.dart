@@ -60,14 +60,24 @@ class MarketPeriodDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _Section(label: 'What\'s Happening?', body: window.whatHappens),
-                  _Section(label: 'Why Does It Matter?', body: window.whyItMatters),
+                  _Section(
+                    label: 'What\'s Happening?',
+                    body: window.whatHappens,
+                  ),
+                  _Section(
+                    label: 'Why Does It Matter?',
+                    body: window.whyItMatters,
+                  ),
                   if (window.dangerForBeginner != null)
-                    _Section(label: 'What Can Go Wrong?', body: window.dangerForBeginner!),
+                    _Section(
+                      label: 'What Can Go Wrong?',
+                      body: window.dangerForBeginner!,
+                    ),
                   _Section(
                     label: 'What Should Beginners Do?',
                     body: window.whatToDo,
-                    isLast: window.stressTestPromoTitle == null &&
+                    isLast:
+                        window.stressTestPromoTitle == null &&
                         window.fomoShieldTip == null,
                   ),
                   if (window.stressTestPromoTitle != null &&
@@ -91,7 +101,11 @@ class _Section extends StatelessWidget {
   final String label;
   final String body;
   final bool isLast;
-  const _Section({required this.label, required this.body, this.isLast = false});
+  const _Section({
+    required this.label,
+    required this.body,
+    this.isLast = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +126,11 @@ class _Section extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             body,
-            style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textPrimary, height: 1.5),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textPrimary,
+              height: 1.5,
+            ),
           ),
         ],
       ),
@@ -160,7 +178,11 @@ class _StressTestPromo extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             body,
-            style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary, height: 1.5),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textSecondary,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 14),
           SizedBox(
@@ -179,7 +201,10 @@ class _StressTestPromo extends StatelessWidget {
               ),
               child: Text(
                 'Open Stress Test',
-                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
@@ -227,7 +252,11 @@ class _TipCallout extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             body,
-            style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textPrimary, height: 1.5),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textPrimary,
+              height: 1.5,
+            ),
           ),
         ],
       ),

@@ -58,7 +58,10 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           child: Text(
             "Couldn't load top companies. Pull to retry shortly.",
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 13),
+            style: GoogleFonts.inter(
+              color: ThemeV2.textSecondary,
+              fontSize: 13,
+            ),
           ),
         ),
       ),
@@ -70,7 +73,10 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
               child: Text(
                 'Top companies list is still being built on the server.',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 13),
+                style: GoogleFonts.inter(
+                  color: ThemeV2.textSecondary,
+                  fontSize: 13,
+                ),
               ),
             ),
           );

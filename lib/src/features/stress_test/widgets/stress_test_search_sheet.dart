@@ -165,13 +165,19 @@ class _StressTestSearchSheetState
     bool success;
     if (isSetup) {
       success = await engine.buyAssetSetup(
-        widget.sessionId, _selectedSymbol, _amount, _selectedPrice,
+        widget.sessionId,
+        _selectedSymbol,
+        _amount,
+        _selectedPrice,
         isEtf: _selectedIsEtf,
       );
     } else {
       // Active phase — use executeTrade
       final result = engine.executeTrade(
-        widget.sessionId, _selectedSymbol, true, _amount,
+        widget.sessionId,
+        _selectedSymbol,
+        true,
+        _amount,
         isEtf: _selectedIsEtf,
       );
       success = result.success;
@@ -188,7 +194,8 @@ class _StressTestSearchSheetState
             symbol: _selectedSymbol,
             companyName: _selectedDescription,
             title: 'You Bought',
-            detail: '${(_amount / _selectedPrice).toStringAsFixed(4)} shares of '
+            detail:
+                '${(_amount / _selectedPrice).toStringAsFixed(4)} shares of '
                 '$_selectedDescription at \$${_selectedPrice.toStringAsFixed(2)}',
             createdAt: DateTime.now(),
           ),
@@ -266,8 +273,10 @@ class _StressTestSearchSheetState
                     fontSize: 14,
                     color: ThemeV2.textSecondary,
                   ),
-                  prefixIcon: const Icon(Icons.search_rounded,
-                      color: ThemeV2.textSecondary),
+                  prefixIcon: const Icon(
+                    Icons.search_rounded,
+                    color: ThemeV2.textSecondary,
+                  ),
                   suffixIcon: _isLoading
                       ? const Padding(
                           padding: EdgeInsets.all(12),
@@ -281,18 +290,21 @@ class _StressTestSearchSheetState
                           ),
                         )
                       : (_searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded,
-                                  size: 20, color: ThemeV2.textSecondary),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _results = [];
-                                  _errorMessage = null;
-                                });
-                              },
-                            )
-                          : null),
+                            ? IconButton(
+                                icon: const Icon(
+                                  Icons.clear_rounded,
+                                  size: 20,
+                                  color: ThemeV2.textSecondary,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _results = [];
+                                    _errorMessage = null;
+                                  });
+                                },
+                              )
+                            : null),
                   filled: true,
                   fillColor: ThemeV2.surface,
                   border: OutlineInputBorder(
@@ -314,10 +326,7 @@ class _StressTestSearchSheetState
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   _errorMessage!,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: ThemeV2.loss,
-                  ),
+                  style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.loss),
                 ),
               ),
 
@@ -345,19 +354,18 @@ class _StressTestSearchSheetState
                       ),
                       itemBuilder: (ctx, i) {
                         final item = _results[i];
-                        final symbol =
-                            (item['symbol'] as String? ?? '').split('.').first;
-                        final desc =
-                            item['description'] as String? ?? symbol;
+                        final symbol = (item['symbol'] as String? ?? '')
+                            .split('.')
+                            .first;
+                        final desc = item['description'] as String? ?? symbol;
                         final type = item['type'] as String? ?? '';
 
                         return ListTile(
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          leading: CompanyLogo(
-                            ticker: symbol,
-                            radius: 20,
+                            horizontal: 8,
+                            vertical: 2,
                           ),
+                          leading: CompanyLogo(ticker: symbol, radius: 20),
                           title: Text(
                             symbol,
                             style: GoogleFonts.inter(
@@ -404,10 +412,7 @@ class _StressTestSearchSheetState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CompanyLogo(
-                          ticker: _selectedSymbol,
-                          radius: 24,
-                        ),
+                        CompanyLogo(ticker: _selectedSymbol, radius: 24),
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,7 +483,9 @@ class _StressTestSearchSheetState
                           borderSide: BorderSide.none,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 18),
+                          horizontal: 20,
+                          vertical: 18,
+                        ),
                       ),
                       style: GoogleFonts.inter(
                         fontSize: 24,
@@ -487,7 +494,8 @@ class _StressTestSearchSheetState
                       ),
                       onChanged: (v) {
                         setState(() {
-                          _amount = double.tryParse(v.replaceAll('\$', '')) ?? 0;
+                          _amount =
+                              double.tryParse(v.replaceAll('\$', '')) ?? 0;
                         });
                       },
                     ),
@@ -562,8 +570,9 @@ class _StressTestSearchSheetState
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ThemeV2.primary,
                           foregroundColor: Colors.white,
-                          disabledBackgroundColor:
-                              ThemeV2.primary.withValues(alpha: 0.4),
+                          disabledBackgroundColor: ThemeV2.primary.withValues(
+                            alpha: 0.4,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -618,4 +627,3 @@ class _StressTestSearchSheetState
     );
   }
 }
-

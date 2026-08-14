@@ -47,7 +47,8 @@ class SearchNotifier extends ChangeNotifier {
         debugPrint('❌ Search error for "$q": $e');
         if (e is DioException && e.type == DioExceptionType.connectionTimeout) {
           errorMessage = 'Connection timed out. Check your internet.';
-        } else if (e is DioException && e.type == DioExceptionType.receiveTimeout) {
+        } else if (e is DioException &&
+            e.type == DioExceptionType.receiveTimeout) {
           errorMessage = 'Server not responding. Try again.';
         } else if (e.toString().contains('API') ||
             e.toString().contains('limit') ||

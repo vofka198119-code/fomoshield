@@ -272,9 +272,10 @@ extension NoiseEngine on StressTestNotifier {
     // ticks oscillating ±1-2% right against it. Scaling dt to the
     // CURRENT epoch's real tick count spreads the scenario's full
     // designed magnitude evenly across the whole epoch instead.
-    final ticksPerEpoch = (rollInterval.inSeconds / _tickSeconds)
-        .round()
-        .clamp(1, 1 << 30);
+    final ticksPerEpoch = (rollInterval.inSeconds / _tickSeconds).round().clamp(
+      1,
+      1 << 30,
+    );
     final dtPerTick = 1.0 / ticksPerEpoch;
     final sqrtDt = sqrt(dtPerTick);
 
@@ -322,8 +323,7 @@ extension NoiseEngine on StressTestNotifier {
                 type: AppNotificationType.news,
                 portfolioKind: NotificationPortfolioKind.stressTest,
                 portfolioId: session.id,
-                portfolioLabel:
-                    'Stress Test — ${session.duration.displayName}',
+                portfolioLabel: 'Stress Test — ${session.duration.displayName}',
                 symbol: newsEvent.symbol,
                 companyName: stressTestCompanyName(newsEvent.symbol),
                 title: newsEvent.headline,
@@ -393,8 +393,10 @@ extension NoiseEngine on StressTestNotifier {
       final hypeIncrements = _hypeTickIncrements(session);
 
       final epochFraction = ticksPerEpoch > 0
-          ? ((epochElapsedTicksNow - (ticks - 1 - tick)) / ticksPerEpoch)
-                .clamp(0.0, 1.0)
+          ? ((epochElapsedTicksNow - (ticks - 1 - tick)) / ticksPerEpoch).clamp(
+              0.0,
+              1.0,
+            )
           : 0.0;
 
       for (final h in session.holdings) {
@@ -427,14 +429,15 @@ extension NoiseEngine on StressTestNotifier {
         final driftMultiplier = regime == _MacroRegime.crash
             ? _crashDriftMultiplier(epochFraction)
             : regime == _MacroRegime.recovery
-            ? _recoveryDriftMultiplier(
-                _recoveryCrashDropPct(session, h.symbol),
-              )
+            ? _recoveryDriftMultiplier(_recoveryCrashDropPct(session, h.symbol))
             : 1.0;
         final effectiveAnnualDrift =
-            params.annualDrift + _varianceDragCompensation(params.annualVolatility);
+            params.annualDrift +
+            _varianceDragCompensation(params.annualVolatility);
         final rawChange =
-            effectiveAnnualDrift * dtPerTick * driftMultiplier + noise + microNoise;
+            effectiveAnnualDrift * dtPerTick * driftMultiplier +
+            noise +
+            microNoise;
         final clampedChange = _clampDrift(rawChange, regime);
         currentPrice = currentPrice * (1 + clampedChange);
         // Gated behind kDebugMode — this fires once per held symbol per
@@ -557,10 +560,7 @@ extension NoiseEngine on StressTestNotifier {
           newsRaw: newsIncrement,
           hypeRaw: hypeIncrement,
         );
-        var symLog = <TickExplanation>[
-          ...(explanations[h.symbol] ?? []),
-          expl,
-        ];
+        var symLog = <TickExplanation>[...(explanations[h.symbol] ?? []), expl];
         // Cap per-symbol log — see _maxExplanationLogEntries.
         if (symLog.length > _maxExplanationLogEntries) {
           symLog = symLog.sublist(symLog.length - _maxExplanationLogEntries);

@@ -5,7 +5,8 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/widgets/company_logo.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
+import '../../market_clock/market_clock_dial.dart'
+    show dialBrassLight, darkCardDecoration;
 import '../../market_clock/market_clock_engine.dart'
     show MarketPhase, nowInNewYork, resolveMarketClockState;
 
@@ -16,11 +17,11 @@ import '../../market_clock/market_clock_engine.dart'
 // ===========================================================================
 
 String _phaseLabel(MarketPhase p) => switch (p) {
-      MarketPhase.preMarket => 'PRE-MARKET',
-      MarketPhase.marketOpen => 'MARKET OPEN',
-      MarketPhase.afterHours => 'POST-MARKET',
-      MarketPhase.closed => 'MARKET CLOSED',
-    };
+  MarketPhase.preMarket => 'PRE-MARKET',
+  MarketPhase.marketOpen => 'MARKET OPEN',
+  MarketPhase.afterHours => 'POST-MARKET',
+  MarketPhase.closed => 'MARKET CLOSED',
+};
 
 // ===========================================================================
 // Price Header — brand dark-green hero card (logo/name/price/change always
@@ -96,14 +97,7 @@ class PriceHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Container(
             padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [dialLight, dialDark],
-              ),
-              borderRadius: FomoShieldTheme.cardRadius,
-            ),
+            decoration: darkCardDecoration(),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -263,14 +257,7 @@ class PriceHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
           Text(
@@ -289,32 +276,35 @@ class PriceHeader extends StatelessWidget {
                 widthFactor: 0.9,
                 heightFactor: 0.9,
                 child: AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: ThemeV2.surface,
-                    border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.1),
-                        blurRadius: 20,
-                        spreadRadius: 3,
+                  aspectRatio: 1,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: ThemeV2.surface,
+                      border: Border.all(
+                        color: color.withValues(alpha: 0.3),
+                        width: 3,
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      '$score',
-                      style: GoogleFonts.inter(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: color,
-                        letterSpacing: -1,
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          spreadRadius: 3,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$score',
+                        style: GoogleFonts.inter(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          color: color,
+                          letterSpacing: -1,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 ),
               ),
             ),
@@ -337,19 +327,13 @@ class PriceHeader extends StatelessWidget {
         isOpen = phase == MarketPhase.marketOpen;
       }
     }
-    final sessionColor = phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
+    final sessionColor =
+        phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -393,28 +377,25 @@ class PriceHeader extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.attach_money_rounded,
-                  size: 26,
-                  color: sessionColor,
-                ),
+                Icon(Icons.attach_money_rounded, size: 26, color: sessionColor),
                 Text(
                   price.toStringAsFixed(2),
-                  style: interNums(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                    color: sessionColor,
-                    height: 1,
-                  ).copyWith(
-                    shadows: isOpen
-                        ? [
-                            Shadow(
-                              color: dialBrassLight.withValues(alpha: 0.5),
-                              blurRadius: 6,
-                            ),
-                          ]
-                        : null,
-                  ),
+                  style:
+                      interNums(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                        color: sessionColor,
+                        height: 1,
+                      ).copyWith(
+                        shadows: isOpen
+                            ? [
+                                Shadow(
+                                  color: dialBrassLight.withValues(alpha: 0.5),
+                                  blurRadius: 6,
+                                ),
+                              ]
+                            : null,
+                      ),
                 ),
               ],
             ),
@@ -454,7 +435,11 @@ class PriceHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: child),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: child,
+          ),
         ],
       ),
     );

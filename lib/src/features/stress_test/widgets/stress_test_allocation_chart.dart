@@ -92,7 +92,8 @@ class _StressTestAllocationChartState
       child: Column(
         children: [
           InkWell(
-            onTap: () => context.push('/stress-test/${session.id}/portfolio-balance'),
+            onTap: () =>
+                context.push('/stress-test/${session.id}/portfolio-balance'),
             child: SizedBox(
               width: double.infinity,
               child: Padding(

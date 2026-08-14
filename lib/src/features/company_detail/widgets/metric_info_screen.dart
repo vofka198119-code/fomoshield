@@ -58,7 +58,8 @@ class MetricInfoScreen extends StatelessWidget {
             for (int i = 0; i < content.sections.length; i++)
               _Section(
                 section: content.sections[i],
-                isLast: i == content.sections.length - 1 &&
+                isLast:
+                    i == content.sections.length - 1 &&
                     !content.showAcademicDisclaimer &&
                     !content.showStressTestDisclaimer,
               ),

@@ -52,9 +52,7 @@ class HomeWidgetConfig {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HomeWidgetConfig &&
-          id == other.id &&
-          visible == other.visible;
+      other is HomeWidgetConfig && id == other.id && visible == other.visible;
 
   @override
   int get hashCode => id.hashCode ^ visible.hashCode;
@@ -71,8 +69,7 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
   // loadFromSupabase() and clobbering the just-synced server data.
   bool _loadedFromSupabase = false;
 
-  HomeWidgetsNotifier(this._supabaseService, {this._userId})
-      : super([]) {
+  HomeWidgetsNotifier(this._supabaseService, {this._userId}) : super([]) {
     _load();
   }
 
@@ -137,7 +134,9 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
   Future<void> _saveLocal() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-        _prefsKey(_userId), state.map((c) => c.id).toList());
+      _prefsKey(_userId),
+      state.map((c) => c.id).toList(),
+    );
     await prefs.setString(
       _prefsVisibilityKey(_userId),
       state.map((c) => '${c.id}:${c.visible}').join(','),
@@ -192,7 +191,7 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
 
 final homeWidgetsProvider =
     StateNotifierProvider<HomeWidgetsNotifier, List<HomeWidgetConfig>>((ref) {
-  final service = ref.read(userDataServiceProvider);
-  final user = ref.watch(currentUserProvider);
-  return HomeWidgetsNotifier(service, userId: user?.id);
-});
+      final service = ref.read(userDataServiceProvider);
+      final user = ref.watch(currentUserProvider);
+      return HomeWidgetsNotifier(service, userId: user?.id);
+    });

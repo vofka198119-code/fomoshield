@@ -40,5 +40,6 @@ final maxHoldingsPerPortfolioProvider = Provider<int>((ref) {
 /// Starting capital for a portfolio at [index] (0-based, existing-portfolio
 /// count before creation). The first portfolio is always $15k regardless of
 /// tier; premium's 2nd/3rd portfolios are $50k each.
-double startingCapitalForIndex(int index) =>
-    index == 0 ? firstPortfolioStartingCapital : additionalPortfolioStartingCapital;
+double startingCapitalForIndex(int index) => index == 0
+    ? firstPortfolioStartingCapital
+    : additionalPortfolioStartingCapital;

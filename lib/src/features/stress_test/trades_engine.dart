@@ -179,8 +179,8 @@ extension TradesEngine on StressTestNotifier {
             activeHypeEvents: session.activeHypeEvents,
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: Map.from(session.priceHistory)..remove(symbol),
-            priceHistoryTimestamps:
-                Map.from(session.priceHistoryTimestamps)..remove(symbol),
+            priceHistoryTimestamps: Map.from(session.priceHistoryTimestamps)
+              ..remove(symbol),
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -428,7 +428,8 @@ extension TradesEngine on StressTestNotifier {
           newHoldings.fold<double>(
             0,
             (sum, h) =>
-                sum + h.shares * (session.currentPrices[h.symbol] ?? h.entryPrice),
+                sum +
+                h.shares * (session.currentPrices[h.symbol] ?? h.entryPrice),
           );
       evaluateBuyTrade(
         profile: session.psychologyProfile,

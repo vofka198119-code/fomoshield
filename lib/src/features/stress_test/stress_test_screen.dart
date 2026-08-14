@@ -193,11 +193,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         child: Row(
           children: [
-            Icon(
-              Icons.search_rounded,
-              color: ThemeV2.textSecondary,
-              size: 20,
-            ),
+            Icon(Icons.search_rounded, color: ThemeV2.textSecondary, size: 20),
             const SizedBox(width: 10),
             Text(
               'Search stocks to add...',
@@ -1022,7 +1018,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
   }
 
-  String _companyName(String symbol) => resolveStressTestCompanyName(ref, symbol);
+  String _companyName(String symbol) =>
+      resolveStressTestCompanyName(ref, symbol);
 
   String _fmtPosition(double v) {
     return _fmtFull(v);

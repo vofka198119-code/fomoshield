@@ -33,8 +33,9 @@ class AssetRowWidget extends ConsumerWidget {
     final costBasis = holding.shares * holding.avgCost;
     final positionValue = costBasis + pnl;
     final totalValue = session.totalValue;
-    final allocation =
-        totalValue > 0 ? (positionValue / totalValue) * 100 : 0.0;
+    final allocation = totalValue > 0
+        ? (positionValue / totalValue) * 100
+        : 0.0;
 
     final logoAsync = ref.watch(cachedLogoProvider(holding.symbol));
 
@@ -43,9 +44,7 @@ class AssetRowWidget extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
         decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Color(0xFFE8E5DF)),
-          ),
+          border: Border(bottom: BorderSide(color: Color(0xFFE8E5DF))),
         ),
         child: Row(
           children: [
@@ -61,8 +60,7 @@ class AssetRowWidget extends ConsumerWidget {
                 ),
                 error: (_, _) =>
                     CompanyLogo(ticker: holding.symbol, radius: 20),
-                loading: () =>
-                    CompanyLogo(ticker: holding.symbol, radius: 20),
+                loading: () => CompanyLogo(ticker: holding.symbol, radius: 20),
               ),
             ),
             const SizedBox(width: 12),
@@ -108,9 +106,7 @@ class AssetRowWidget extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: isPositive
-                        ? ThemeV2.success
-                        : ThemeV2.loss,
+                    color: isPositive ? ThemeV2.success : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -131,4 +127,3 @@ class AssetRowWidget extends ConsumerWidget {
     return NumberFormat('#,##0.00', 'en_US').format(v);
   }
 }
-

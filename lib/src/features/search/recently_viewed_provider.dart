@@ -42,8 +42,9 @@ class RecentlyViewedNotifier extends StateNotifier<List<RecentlyViewedEntry>> {
       final decoded = json.decode(raw) as List;
       state = decoded
           .map(
-            (e) =>
-                RecentlyViewedEntry.fromJson(Map<String, dynamic>.from(e as Map)),
+            (e) => RecentlyViewedEntry.fromJson(
+              Map<String, dynamic>.from(e as Map),
+            ),
           )
           .toList();
     } catch (_) {

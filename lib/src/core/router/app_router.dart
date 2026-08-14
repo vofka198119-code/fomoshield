@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/auth/auth_screen.dart';
 import '../../features/auth/forgot_password_screen.dart';
+import '../supabase/supabase_client.dart';
 
 import '../../features/disclaimer/disclaimer_screen.dart';
 import '../../features/home/home_screen.dart';
@@ -34,7 +36,8 @@ import '../../features/stress_test/stress_test_psychology_meter_screen.dart';
 import '../../features/stress_test/stress_test_trade_history_screen.dart';
 import '../../features/stress_test/stress_test_trade_detail_screen.dart';
 import '../../features/stress_test/verdict_trade_breakdown_detail_screen.dart';
-import '../../features/stress_test/stress_test_models.dart' show StressTestTrade;
+import '../../features/stress_test/stress_test_models.dart'
+    show StressTestTrade;
 import '../../features/portfolio/screens/portfolio_trade_history_screen.dart';
 import '../../features/portfolio/screens/portfolio_trade_detail_screen.dart';
 import '../../features/portfolio/portfolio_providers.dart' show Transaction;
@@ -45,6 +48,29 @@ import '../../features/assets/screens/order_entry_screen.dart';
 import '../theme/theme_v2.dart';
 import 'navigation_history_provider.dart';
 
+/// Bridges a Stream (Supabase's auth-state stream) into a [Listenable] so
+/// GoRouter re-evaluates its `redirect` callback whenever auth state
+/// changes — not just at initial navigation. Standard go_router pattern.
+class _GoRouterRefreshStream extends ChangeNotifier {
+  _GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+// Routes that manage their own auth/session logic — never redirected away
+// from by the session guard below (Splash resolves the real destination
+// itself; Auth/forgot-password/disclaimer are the destinations).
+const _authExemptPaths = {'/', '/auth', '/forgot-password', '/disclaimer'};
+
 class AppRouter {
   AppRouter._();
 
@@ -54,6 +80,18 @@ class AppRouter {
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
+    refreshListenable: _GoRouterRefreshStream(
+      SupabaseConfig.client.auth.onAuthStateChange,
+    ),
+    // Session guard only — if a live Supabase session gets revoked/expires
+    // while the app is already open (not just at cold start, which Splash
+    // already handles), send the user back to /auth instead of leaving
+    // them stranded on a screen that assumes they're signed in.
+    redirect: (context, state) {
+      if (_authExemptPaths.contains(state.matchedLocation)) return null;
+      final hasSession = SupabaseConfig.client.auth.currentSession != null;
+      return hasSession ? null : '/auth';
+    },
     routes: [
       // Auth flow (full screen, no shell)
       GoRoute(
@@ -264,10 +302,7 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           final symbol = state.pathParameters['symbol'] ?? '';
-          return StockDetailScreen(
-            sessionId: id,
-            symbol: symbol.toUpperCase(),
-          );
+          return StockDetailScreen(sessionId: id, symbol: symbol.toUpperCase());
         },
       ),
       GoRoute(
@@ -276,10 +311,7 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           final symbol = state.pathParameters['symbol'] ?? '';
-          return WhyTodayScreen(
-            sessionId: id,
-            symbol: symbol.toUpperCase(),
-          );
+          return WhyTodayScreen(sessionId: id, symbol: symbol.toUpperCase());
         },
       ),
       GoRoute(
@@ -407,9 +439,7 @@ class _AppShell extends ConsumerWidget {
             decoration: BoxDecoration(
               color: ThemeV2.surface.withValues(alpha: 0.75),
               border: Border(
-                top: BorderSide(
-                  color: Colors.black.withValues(alpha: 0.06),
-                ),
+                top: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
               ),
             ),
             child: SafeArea(
@@ -465,4 +495,3 @@ class _AppShell extends ConsumerWidget {
     );
   }
 }
-

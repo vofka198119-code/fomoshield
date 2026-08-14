@@ -5,7 +5,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 import '../../portfolio/portfolio_providers.dart';
 
 // ===========================================================================
@@ -94,18 +94,14 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
-          borderRadius: FomoShieldTheme.cardRadius,
-        ),
+        decoration: darkCardDecoration(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('MY INVESTMENTS', style: FomoShieldTheme.cardTitle(Colors.white)),
+            Text(
+              'MY INVESTMENTS',
+              style: FomoShieldTheme.cardTitle(Colors.white),
+            ),
             const SizedBox(height: 10),
             Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
             if (positions.length > 1) ...[
@@ -182,13 +178,25 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _row('Asset Value', pos.hasPosition ? '\$${pos.totalValue.toStringAsFixed(2)}' : '—'),
+        _row(
+          'Asset Value',
+          pos.hasPosition ? '\$${pos.totalValue.toStringAsFixed(2)}' : '—',
+        ),
         const SizedBox(height: 8),
         _row('Shares', pos.hasPosition ? pos.shares.toStringAsFixed(4) : '—'),
         const SizedBox(height: 8),
-        _pnlRow(pos, pnl: pnl, pnlPercent: pnlPercent, isUp: isUp, pnlColor: pnlColor),
+        _pnlRow(
+          pos,
+          pnl: pnl,
+          pnlPercent: pnlPercent,
+          isUp: isUp,
+          pnlColor: pnlColor,
+        ),
         const SizedBox(height: 8),
-        _row('Avg Cost', pos.hasPosition ? '\$${pos.avgCost.toStringAsFixed(2)}' : '—'),
+        _row(
+          'Avg Cost',
+          pos.hasPosition ? '\$${pos.avgCost.toStringAsFixed(2)}' : '—',
+        ),
       ],
     );
   }
@@ -280,7 +288,10 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
         border: Border.all(color: dialBrassLight, width: 1),
         borderRadius: BorderRadius.circular(6),
         boxShadow: [
-          BoxShadow(color: dialBrassLight.withValues(alpha: 0.35), blurRadius: 4),
+          BoxShadow(
+            color: dialBrassLight.withValues(alpha: 0.35),
+            blurRadius: 4,
+          ),
         ],
       ),
       child: Text(
@@ -312,7 +323,9 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             width: isActive ? 16 : 6,
             height: 6,
             decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.3),
+              color: isActive
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(3),
             ),
           ),

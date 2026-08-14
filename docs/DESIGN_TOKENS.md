@@ -22,13 +22,16 @@
 - Numbers: always `FontWeight.w600` — never `w800`/bold
 
 **Dark/premium card** ("branded" feel — balance/CTA cards, PREMIUM badges, Verdict/stress-test cards):
-- Shell: `LinearGradient(begin: topLeft, end: bottomRight, colors: [dialLight, dialDark])`, both
-  from `lib/src/features/market_clock/market_clock_dial.dart`
-- Radius: `22` for new work (`FomoShieldTheme.cardRadius`) — see §7 for what's actually out there
+- Shell: `darkCardDecoration(borderRadius: BorderRadius.circular(22))` — the radial "instrument
+  panel" gradient, from `lib/src/features/market_clock/market_clock_dial.dart` (unified app-wide
+  2026-08-14, was Market Clock-only before — see §3)
+- Radius: `22` everywhere, no exceptions for full cards (`FomoShieldTheme.cardRadius`, the helper's
+  default) — buttons/pills/badges pass their own smaller radius
 - Divider: `Colors.white.withValues(alpha: 0.12)`, `indent`/`endIndent: 16` — the dominant pattern,
   use this for new work (§3)
 - Text: `Colors.white` / `Colors.white70` / `Colors.white54` — never `ThemeV2.textPrimary/Secondary`
-  (both near-black, illegible on this background)
+  (both near-black, illegible on this background), and never `dialIvory` outside Market Clock's own
+  file (§3)
 
 Two real files already do the light style correctly and are good copy-paste references:
 `lib/src/features/market_clock/market_clock_phase_widget.dart` and
@@ -84,31 +87,50 @@ will render an unintended stripe no other card has.
 
 ## 3. Dark/premium card shell
 
+**Unified 2026-08-14** — every dark card, button, badge, pill and segmented-control highlight in
+the app now uses the same radial "instrument panel" gradient that used to be Market Clock-only.
+User's own words: this was Market Clock's exact look ("цвета градиенты карточки подсвечивания") —
+applied everywhere via one shared helper instead of copy-pasting the gradient at 40+ call sites.
+
 ```dart
 Container(
-  decoration: BoxDecoration(
-    gradient: const LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [dialLight, dialDark],
-    ),
-    borderRadius: BorderRadius.circular(22), // see radius note below
-  ),
+  decoration: darkCardDecoration(borderRadius: BorderRadius.circular(22)),
   child: Column(
     children: [
       // header row, white text
       Divider(height: 1, indent: 16, endIndent: 16, color: Colors.white.withValues(alpha: 0.12)),
-      // body content, white/white70/white54 text
+      // body content, white/white70/white54 text — NOT dialIvory, see below
     ],
   ),
 )
 ```
 
+`darkCardDecoration()` and the underlying `DarkCardPalette` class both live in
+`lib/src/features/market_clock/market_clock_dial.dart`:
+
+```dart
+BoxDecoration darkCardDecoration({
+  BorderRadius? borderRadius,           // defaults to 22 (FomoShieldTheme.cardRadius)
+  DarkCardPalette palette = DarkCardPalette.instrumentPanel,
+}) // → RadialGradient(center: Alignment(0,-0.3), radius: 1.2,
+   //     colors: [gradientStart, gradientMid, gradientEnd], stops: [0,0.6,1]),
+   //   boxShadow: FomoShieldTheme.shadowSoft (every dark card now has this glow)
+```
+
+For the rare shape that can't take a `borderRadius` at all (a circular avatar-style badge), use the
+gradient alone: `darkCardGradient()`.
+
+**This `DarkCardPalette` indirection is deliberate groundwork, not premature abstraction** — user
+asked (2026-08-14) to prepare the seam for a future alternate palette (e.g. a premium theme) without
+building the actual switcher yet. `DarkCardPalette.instrumentPanel` is still the only palette that
+exists; a future one is a new `DarkCardPalette` instance + passing it to `darkCardDecoration(palette:
+...)`, not another pass through every consumer file.
+
 | Property | Value | Source |
 |---|---|---|
-| Gradient | `[dialLight #173A2E, dialDark #0A1B15]`, topLeft→bottomRight | `market_clock_dial.dart` |
+| Gradient | `[dialLight #173A2E, dialMid #0F281F, dialDark #0A1B15]`, radial, center `(0,-0.3)`, radius `1.2`, stops `[0, 0.6, 1.0]` | `market_clock_dial.dart` |
 | Gold accent | `dialBrassLight #E8C468` | same file — icons, "PREMIUM" text, nested-window borders |
-| Title/emphasis text | `Colors.white` | |
+| Title/emphasis text | `Colors.white` — **stays plain white app-wide, deliberately not `dialIvory`** (user explicitly kept white when rolling the gradient out; only Market Clock's own file still uses `dialIvory` directly, not through this helper) | |
 | Secondary/body text | `Colors.white70` | |
 | Tertiary/caption text | `Colors.white54` | |
 | Semantic colors | `ThemeV2.success`/`loss`/`warning`, `FomoShieldTheme.factorHype` unchanged | read fine on dark green |
@@ -122,25 +144,18 @@ BoxDecoration(
 )
 ```
 
-### Radius — NOT unified, don't assume a single value
+A handful of sites keep their own extra `border`/custom `boxShadow` on top of the shared shell —
+use `darkCardDecoration(...).copyWith(border: ..., boxShadow: ...)` for those rather than duplicating
+the gradient inline (e.g. `portfolio_selector.dart`'s gold-bordered premium pills, the "Continue
+Learning" button's tinted shadow).
 
-Full re-grep 2026-08-12 across every full-content dark card (header+divider+body, not buttons/
-badges/chips — see below for those): the real spread is **`{16, 20, 22}`**, not fully settled:
+### Radius — unified to 22 everywhere 2026-08-14
 
-| Radius | Where |
-|---|---|
-| `22` (`FomoShieldTheme.cardRadius`) — **use this for new work** | `market_clock_timing_widget.dart`, `financial_score_widget.dart`, `price_header.dart` (name block), `position_section.dart`, `stock_why_today_card.dart`, `stock_position_card.dart`, `order_amount_section.dart` |
-| `20` — largest single cluster, mostly Verdict/Stress-Test screens | `verdict_trade_breakdown_widget.dart`, `stress_test_portfolio_balance_screen.dart`, `verdict_strategy_card.dart`, `verdict_marker_row.dart`, `verdict_diversification_card.dart`, `stress_test_cash_widget.dart`, `stress_test_sector_allocation_widget.dart`, `stress_test_asset_count_widget.dart`, `psychology_marker_card.dart`, `verdict_trade_breakdown_detail_screen.dart`, `portfolio_cash_widget.dart` |
-| `16` | `stress_test_hub_screen.dart` (promo box), `portfolio_widget.dart` (big widget block), `price_header.dart` (fsScoreCell/session/phase blocks) |
-
-Non-card uses of the same gradient (buttons, pills, chips, segmented-control highlights — don't
-treat these as "card radius drift", they're a different element type) sit at `18` (buttons),
-`14` (a tappable pill), `12` (premium badge pill), and `6` (segmented-control highlight).
-
-**Don't "fix" this silently** — if you're touching one of these files for an unrelated reason and
-notice its radius doesn't match `22`, that's pre-existing, not a bug to casually change; ask before
-mass-editing, since Verdict/Stress-Test's `20` is a large enough cluster it might be an intentional
-sub-family rather than drift.
+Previously a `{16, 20, 22}` spread (see git history if you need the old per-file breakdown) —
+collapsed to a single `22` (`FomoShieldTheme.cardRadius`, `darkCardDecoration()`'s default) across
+every full dark card, as part of the same rollout. Buttons/pills/badges/segmented-control highlights
+keep their own smaller radii (pass `borderRadius:` explicitly) — that's a different element type,
+not radius drift.
 
 ### Divider/border — 4 real patterns, not a grab-bag
 
@@ -297,3 +312,32 @@ until now, and each is a candidate for a shared widget if anyone touches this ar
   (2026-07-20), re-verified 2026-08-12 — still accurate.
 - Radius/divider drift tables, brand-gradient file census, `ThemeV2.radiusSmall/Medium` now-in-use
   finding, and the two §9 patterns: all fresh 2026-08-12, full `lib/` re-grep.
+
+---
+
+## 11. User-confirmed gold-standard widgets (2026-08-14)
+
+User explicitly named these as visually ideal as-is — colors, gradients, cards, highlights, fonts —
+**no changes needed to them**. Captured here purely as the copy-source for future point-fixes
+elsewhere, not as a to-do list:
+
+| Area | File(s) | Pattern it exemplifies |
+|---|---|---|
+| Market Clock | `market_clock_widget.dart` (Home mini card), `market_clock_screen.dart`, `market_clock_phase_widget.dart`, `market_clock_timing_widget.dart`, `market_clock_new_york_time_widget.dart` | Radial instrument-panel dark card (§3) + light card shell (§2) |
+| TARGET | `portfolio/widgets/target_widget.dart` | Light card shell (§2) wrapping a nested `_GraphWindow` panel (now radial, see below) + segmented bidirectional bar + §9A metric-cell goal/remaining boxes |
+| Allocation ring | `shared/widgets/donut_ring_painter.dart` | Shared painter — already the single source for both Stress Test's and real Portfolio's Portfolio Balance cards, byte-identical by design |
+| Holdings | `portfolio/widgets/portfolio_holdings_widget.dart` | Light card shell, 72px row, 40px logo avatar ringed in `donutAllocationColor(i)` |
+| Portfolio Balance | `portfolio/widgets/portfolio_balance_widget.dart` | Light card shell + centered donut + legend rows |
+| Verdict cards | now the unified radial dark shell, §3 | |
+| Company Card / Company Detail | now the unified radial dark shell, §3 (`financial_score_widget.dart`, `price_header.dart`, `position_section.dart`, `stock_why_today_card.dart`, `stock_position_card.dart`) | |
+
+All of the above were re-read from live source 2026-08-14 and already conformed to §2/§3/§9A as
+documented that same day — this pass didn't find drift, it found the exemplars the rest of the doc
+was written from. The one genuinely new finding was the Market Clock radial+`dialIvory` variant.
+
+**Same-day follow-up**: user then asked for that radial variant to become the app-wide dark-card
+standard (not just Market Clock's own look) — done same session, see §3's "Unified 2026-08-14" note.
+TARGET's `_GraphWindow` and CTA button, previously flat-gradient, are now also radial via
+`darkCardDecoration()` like everything else — text stayed plain white, not `dialIvory` (user's
+explicit call). The `20`/`16` radius clusters mentioned in earlier passes were folded into the
+unified `22`.

@@ -101,8 +101,11 @@ class _CompanyListSheet extends StatelessWidget {
                   controller: scrollController,
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   itemCount: companies.length,
-                  separatorBuilder: (_, _) =>
-                      const Divider(height: 1, indent: 68, color: Color(0x0F000000)),
+                  separatorBuilder: (_, _) => const Divider(
+                    height: 1,
+                    indent: 68,
+                    color: Color(0x0F000000),
+                  ),
                   itemBuilder: (context, i) => _CompanyRow(
                     entry: companies[i],
                     onTapSymbol: onTapSymbol,
@@ -126,7 +129,9 @@ class _CompanyRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final logoUrl = ref.watch(cachedLogoProvider(entry.symbol)).valueOrNull;
-    final liveSector = ref.watch(cachedGicsSectorProvider(entry.symbol)).valueOrNull;
+    final liveSector = ref
+        .watch(cachedGicsSectorProvider(entry.symbol))
+        .valueOrNull;
     final sector =
         liveSector ?? resolveGicsSector(entry.symbol, companyName: entry.name);
 
@@ -141,11 +146,7 @@ class _CompanyRow extends ConsumerWidget {
           shape: BoxShape.circle,
           border: Border.all(color: ThemeV2.primary, width: 1.5),
         ),
-        child: CompanyLogo(
-          ticker: entry.symbol,
-          logoUrl: logoUrl,
-          radius: 18,
-        ),
+        child: CompanyLogo(ticker: entry.symbol, logoUrl: logoUrl, radius: 18),
       ),
       title: Text(
         entry.name,

@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 
 class PortfolioCashWidget extends StatelessWidget {
   final double? cash;
@@ -42,14 +42,7 @@ class PortfolioCashWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       child: Column(
         children: [
           SizedBox(

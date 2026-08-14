@@ -8,10 +8,6 @@ import '../../../shared/widgets/card_frame.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../home_providers.dart';
 
-// Same dark-green instrument-panel gradient as the TARGET widget's graph
-// window (market_clock_dial.dart's dialLight/dialDark).
-const List<Color> _priceCellGradient = [dialLight, dialDark];
-
 // ---------------------------------------------------------------------------
 // Shield Signal Widget — S&P 500 / NASDAQ / Dow Jones sentiment, swipeable
 // ---------------------------------------------------------------------------
@@ -20,8 +16,7 @@ class ShieldSignalWidget extends ConsumerStatefulWidget {
   const ShieldSignalWidget({super.key});
 
   @override
-  ConsumerState<ShieldSignalWidget> createState() =>
-      _ShieldSignalWidgetState();
+  ConsumerState<ShieldSignalWidget> createState() => _ShieldSignalWidgetState();
 }
 
 class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
@@ -62,19 +57,28 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
               width: 18,
               height: 18,
               child: CircularProgressIndicator(
-                  strokeWidth: 2, color: ThemeV2.primary),
+                strokeWidth: 2,
+                color: ThemeV2.primary,
+              ),
             ),
             const SizedBox(width: 12),
-            Text('Loading...',
-                style: GoogleFonts.inter(
-                    fontSize: 14, color: ThemeV2.textSecondary)),
+            Text(
+              'Loading...',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
           ],
         ),
-        error: (_, _) => Text('\$– – –',
-            style: interNums(
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-                color: ThemeV2.textPrimary)),
+        error: (_, _) => Text(
+          '\$– – –',
+          style: interNums(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+            color: ThemeV2.textPrimary,
+          ),
+        ),
         data: (indices) {
           if (indices.isEmpty) return const SizedBox.shrink();
           final safeIndex = _index.clamp(0, indices.length - 1);
@@ -200,11 +204,7 @@ class _IndexView extends StatelessWidget {
           value: '\$${index.price.toStringAsFixed(2)}',
           valueFontSize: 18,
           labelFontSize: 14,
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: _priceCellGradient,
-          ),
+          gradient: darkCardGradient(),
           labelColor: changeColor,
           labelGlowColor: changeColor,
           valueColor: Colors.white,
@@ -242,12 +242,7 @@ class _IndexView extends StatelessWidget {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: _priceCellGradient,
-            ),
+          decoration: darkCardDecoration(
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -301,8 +296,14 @@ class _IndexView extends StatelessWidget {
         shadows: labelGlowColor == null
             ? null
             : [
-                Shadow(color: labelGlowColor.withValues(alpha: 0.9), blurRadius: 10),
-                Shadow(color: labelGlowColor.withValues(alpha: 0.5), blurRadius: 20),
+                Shadow(
+                  color: labelGlowColor.withValues(alpha: 0.9),
+                  blurRadius: 10,
+                ),
+                Shadow(
+                  color: labelGlowColor.withValues(alpha: 0.5),
+                  blurRadius: 20,
+                ),
               ],
       ),
     );
@@ -311,8 +312,11 @@ class _IndexView extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(leadingIcon,
-                  size: 16, color: leadingIconColor ?? (labelColor ?? ThemeV2.primary)),
+              Icon(
+                leadingIcon,
+                size: 16,
+                color: leadingIconColor ?? (labelColor ?? ThemeV2.primary),
+              ),
               const SizedBox(width: 6),
               labelText,
             ],
@@ -344,11 +348,7 @@ class _IndexView extends StatelessWidget {
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                labelText,
-                const SizedBox(height: 4),
-                valueText,
-              ],
+              children: [labelText, const SizedBox(height: 4), valueText],
             ),
     );
   }

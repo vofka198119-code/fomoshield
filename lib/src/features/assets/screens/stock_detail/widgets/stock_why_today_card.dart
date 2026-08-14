@@ -6,7 +6,8 @@ import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../core/theme/typography_helpers.dart';
 import '../../../../../core/supabase/supabase_providers.dart';
-import '../../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../../market_clock/market_clock_dial.dart'
+    show darkCardDecoration;
 import '../../../../stress_test/stress_test_models.dart' show TickExplanation;
 import 'stock_detail_helpers.dart';
 
@@ -116,14 +117,7 @@ class StockWhyTodayCard extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: FomoShieldTheme.cardRadius,
-      ),
+      decoration: darkCardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -136,9 +130,13 @@ class StockWhyTodayCard extends ConsumerWidget {
               // debugging tool, not a real user-facing feature.
               if (isAdmin)
                 GestureDetector(
-                  onTap: () => context.push('/stress-test/$sessionId/stock/$symbol/why'),
+                  onTap: () =>
+                      context.push('/stress-test/$sessionId/stock/$symbol/why'),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 7,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
@@ -146,7 +144,11 @@ class StockWhyTodayCard extends ConsumerWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.lightbulb_outline_rounded, size: 14, color: Colors.white),
+                        const Icon(
+                          Icons.lightbulb_outline_rounded,
+                          size: 14,
+                          color: Colors.white,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'Why today?',
@@ -170,20 +172,26 @@ class StockWhyTodayCard extends ConsumerWidget {
               Expanded(
                 child: _changeBox(
                   label: "TODAY'S CHANGE",
-                  value: '${isPositive ? '+' : ''}${fmtFullCurrency(priceChange)}',
+                  value:
+                      '${isPositive ? '+' : ''}${fmtFullCurrency(priceChange)}',
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _changeBox(
                   label: 'PERCENT CHANGE',
-                  value: '${isPositive ? '+' : ''}${priceChangePercent.toStringAsFixed(2)}%',
+                  value:
+                      '${isPositive ? '+' : ''}${priceChangePercent.toStringAsFixed(2)}%',
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          _factorBar('Market Trends', marketPct / 100, FomoShieldTheme.factorMarket),
+          _factorBar(
+            'Market Trends',
+            marketPct / 100,
+            FomoShieldTheme.factorMarket,
+          ),
           const SizedBox(height: 12),
           _factorBar('Sector', sectorPct / 100, FomoShieldTheme.factorSector),
           const SizedBox(height: 12),
@@ -278,7 +286,11 @@ class StockWhyTodayCard extends ConsumerWidget {
           Text(
             value,
             textAlign: TextAlign.center,
-            style: interNums(fontSize: 20, fontWeight: FontWeight.w700, color: color),
+            style: interNums(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -345,7 +357,11 @@ class StockWhyTodayCard extends ConsumerWidget {
           child: Text(
             '${(clamped * 100).round()}%',
             textAlign: TextAlign.right,
-            style: interNums(fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.white),
+            style: interNums(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
         ),
       ],

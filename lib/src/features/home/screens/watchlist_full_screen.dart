@@ -63,8 +63,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(22, 14, 22, 14),
+                          padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
                           child: Row(
                             children: [
                               Text(
@@ -73,9 +72,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                               ),
                               const Spacer(),
                               InkWell(
-                                onTap: _isNavigating
-                                    ? null
-                                    : _navigateToSearch,
+                                onTap: _isNavigating ? null : _navigateToSearch,
                                 borderRadius: BorderRadius.circular(20),
                                 child: const Icon(
                                   Icons.add_rounded,
@@ -168,7 +165,10 @@ class _WatchlistRow extends ConsumerWidget {
     final name = logoEntry?.companyName.isNotEmpty == true
         ? logoEntry!.companyName
         : symbol;
-    final sector = resolveGicsSector(symbol, companyName: logoEntry?.companyName);
+    final sector = resolveGicsSector(
+      symbol,
+      companyName: logoEntry?.companyName,
+    );
 
     return GestureDetector(
       onTap: () => context.push('/company/$symbol'),

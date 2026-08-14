@@ -17,7 +17,8 @@ import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../shared/widgets/company_logo.dart';
-import '../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
+import '../market_clock/market_clock_dial.dart'
+    show dialBrassLight, darkCardDecoration;
 import '../../shared/widgets/stagger_fade_in.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
@@ -143,7 +144,10 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   KeyedSubtree(
                     key: const ValueKey('scenarios'),
-                    child: StaggerFadeIn(index: 4, child: _scenariosCard(entry)),
+                    child: StaggerFadeIn(
+                      index: 4,
+                      child: _scenariosCard(entry),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   KeyedSubtree(
@@ -304,7 +308,8 @@ class _CompaniesCardState extends State<_CompaniesCard> {
         .toList();
     final pnlBySymbol = <String, double>{};
     for (final t in entry.trades.where((t) => !t.isBuy)) {
-      pnlBySymbol[t.symbol] = (pnlBySymbol[t.symbol] ?? 0) + (t.realizedPnl ?? 0);
+      pnlBySymbol[t.symbol] =
+          (pnlBySymbol[t.symbol] ?? 0) + (t.realizedPnl ?? 0);
     }
     for (final e in entry.unrealizedPnlBySymbol.entries) {
       pnlBySymbol[e.key] = (pnlBySymbol[e.key] ?? 0) + e.value;
@@ -337,11 +342,12 @@ class _CompaniesCardState extends State<_CompaniesCard> {
                 pnl: pnlBySymbol[visible[i]] ?? 0,
                 isLast: i == visible.length - 1,
               ),
-          if (symbols.length > _collapsedCount) _MoreLessButton(
-            expanded: _showAll,
-            hiddenCount: symbols.length - _collapsedCount,
-            onTap: () => setState(() => _showAll = !_showAll),
-          ),
+          if (symbols.length > _collapsedCount)
+            _MoreLessButton(
+              expanded: _showAll,
+              hiddenCount: symbols.length - _collapsedCount,
+              onTap: () => setState(() => _showAll = !_showAll),
+            ),
         ],
       ),
     );
@@ -389,11 +395,12 @@ class _TradeHistoryCardState extends State<_TradeHistoryCard> {
           else
             for (int i = 0; i < visible.length; i++)
               _TradeRow(trade: visible[i], isLast: i == visible.length - 1),
-          if (sorted.length > _collapsedCount) _MoreLessButton(
-            expanded: _showAll,
-            hiddenCount: sorted.length - _collapsedCount,
-            onTap: () => setState(() => _showAll = !_showAll),
-          ),
+          if (sorted.length > _collapsedCount)
+            _MoreLessButton(
+              expanded: _showAll,
+              hiddenCount: sorted.length - _collapsedCount,
+              onTap: () => setState(() => _showAll = !_showAll),
+            ),
         ],
       ),
     );
@@ -453,23 +460,13 @@ class _DarkCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (title != null) ...[
-            Text(
-              title!,
-              style: FomoShieldTheme.cardTitle(Colors.white),
-            ),
+            Text(title!, style: FomoShieldTheme.cardTitle(Colors.white)),
             const SizedBox(height: 12),
             Divider(height: 1, color: Colors.white.withValues(alpha: 0.12)),
             const SizedBox(height: 4),
@@ -496,9 +493,7 @@ class _Row extends StatelessWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
+                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
               ),
             ),
       child: Row(
@@ -553,9 +548,7 @@ class _CompanyRow extends ConsumerWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
+                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
               ),
             ),
       child: Row(
@@ -639,9 +632,7 @@ class _TradeRow extends ConsumerWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
+                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
               ),
             ),
       child: Row(
@@ -705,10 +696,7 @@ class _TradeRow extends ConsumerWidget {
               ),
               const SizedBox(height: 3),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: accent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4),

@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../disclaimer/disclaimer_providers.dart';
 import '../auth/auth_providers.dart';
+import '../home/home_providers.dart'
+    show watchlistSymbolsProvider, marketIndicesProvider;
+import '../home/widget_order_provider.dart' show homeWidgetsProvider;
+import '../portfolio/portfolio_providers.dart' show portfoliosProvider;
 
 // Brand shield-logo palette — matches the reference splash mock, kept local
 // to this file the way every other brand-gradient consumer in the app does
@@ -59,41 +64,78 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       if (mounted) setState(() {});
       _maybeNavigate();
     });
+
+    // Fire-and-forget — doesn't gate route resolution, just needs to be
+    // done before the user could possibly reach the "Continue with
+    // Google" button (at least _minSplashDuration away). Moved here from
+    // main()'s blocking pre-runApp sequence 2026-08-14 — it was adding
+    // real time to the black screen before Flutter's first frame, for a
+    // capability nothing needs until the user taps that specific button.
+    GoogleSignIn.instance.initialize(
+      clientId: SupabaseConfig.googleIosClientId,
+      serverClientId: SupabaseConfig.googleWebClientId,
+    );
   }
 
-  /// Same auth/disclaimer resolution the old flat-timer splash did, just
-  /// returning a destination instead of navigating on the spot — lets it
-  /// run concurrently with the minimum-display timer below.
+  /// Auth/disclaimer resolution — returns a destination instead of
+  /// navigating on the spot, so it can run concurrently with the minimum-
+  /// display timer below.
+  ///
+  /// Supabase's SDK already restored any live session during
+  /// `Supabase.initialize()` in main(), before this ever runs — for every
+  /// sign-in method (email/password AND Google) alike. So the only
+  /// question here is whether to honor that restored session (Remember Me
+  /// was checked) or sign back out (it wasn't). No stored password, no
+  /// re-login network call.
   Future<String> _resolveTargetRoute() async {
     try {
-      final isLoggedIn = await ref.read(isLoggedInProvider.future);
-      if (!isLoggedIn) {
+      final rememberMe = await ref.read(isLoggedInProvider.future);
+      if (!rememberMe) {
         await clearAllSessionData();
         return '/auth';
       }
 
-      final savedCreds = await ref.read(savedCredentialsProvider.future);
-      if (savedCreds == null) {
-        await clearAllSessionData();
+      final hasSession = await ref.read(hasSupabaseSessionProvider.future);
+      if (!hasSession) {
         return '/auth';
       }
 
-      try {
-        await SupabaseConfig.client.auth.signInWithPassword(
-          email: savedCreds.email,
-          password: savedCreds.password,
-        );
-      } catch (_) {
-        await clearAllSessionData();
-        return '/auth';
+      final disclaimerAccepted = await ref.read(
+        isDisclaimerAcceptedProvider.future,
+      );
+      if (disclaimerAccepted) {
+        _prefetchHomeData();
+        return '/home';
       }
-
-      final disclaimerAccepted =
-          await ref.read(isDisclaimerAcceptedProvider.future);
-      return disclaimerAccepted ? '/home' : '/disclaimer';
+      return '/disclaimer';
     } catch (_) {
       return '/auth';
     }
+  }
+
+  /// Touches Home's main data providers as early as possible once we know
+  /// we're heading there, so their fetches spend the REST of the splash's
+  /// display time in flight instead of only starting once Home's own
+  /// widgets first build — Home showed empty for a couple seconds after
+  /// hand-off before this (fixed 2026-08-14). Fire-and-forget: Riverpod
+  /// providers start computing as soon as they're read, and stay cached
+  /// app-wide, so Home's own `ref.watch(...)` calls a few seconds later
+  /// pick up the same in-flight (or by then finished) result instead of
+  /// starting fresh. Doesn't cover every nested per-item fetch (e.g. a
+  /// specific portfolio's live performance) — just the top-level providers
+  /// each Home widget watches first.
+  void _prefetchHomeData() {
+    // homeWidgetsProvider decides WHICH widgets to show at all — it starts
+    // at an empty list and loads the real order/visibility from
+    // SharedPreferences asynchronously (see HomeWidgetsNotifier._load() in
+    // widget_order_provider.dart). Until that resolves, Home's body is
+    // completely blank (not loading placeholders — an empty widget list),
+    // which is the actual cause of the multi-second blank Home the user
+    // saw, separate from the per-widget data latency below.
+    ref.read(homeWidgetsProvider);
+    ref.read(portfoliosProvider);
+    ref.read(watchlistSymbolsProvider);
+    ref.read(marketIndicesProvider);
   }
 
   void _maybeNavigate() {
@@ -128,8 +170,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final shieldAnim = _stagger(0.0, 0.55);
-    final wordmarkAnim = _stagger(0.20, 0.70);
     final ringAnim = _stagger(0.55, 1.0);
 
     return Scaffold(
@@ -142,78 +182,71 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             // so it doesn't sit crammed into the upper half of the screen.
             const SizedBox(height: 205),
 
-            FadeTransition(
-              opacity: shieldAnim,
-              child: ScaleTransition(
-                scale: Tween(
-                  begin: 0.85,
-                  end: 1.0,
-                ).animate(CurvedAnimation(parent: shieldAnim, curve: Curves.easeOutBack)),
-                child: Transform.translate(
-                  // The shield art sits ~1.6% right-of-center within its
-                  // own PNG canvas (measured, not touching the source
-                  // file) — nudge the rendered widget left to compensate.
-                  offset: const Offset(-4, 0),
-                  child: Image.asset(
-                    'assets/images/fomoshield_logo.png',
-                    width: 250,
-                    height: 250,
-                  ),
-                ),
+            // No entrance animation here (2026-08-14) — the native
+            // pre-Flutter launch screen (android/.../launch_background.xml)
+            // already shows this same shield mark before this widget ever
+            // builds. Fading/scaling it in again on Flutter's first frame
+            // made it look like the shield flickered or reloaded; showing
+            // it already-in-place instead reads as one continuous image
+            // straight through from tapping the app icon.
+            Transform.translate(
+              // The shield art sits ~1.6% right-of-center within its own
+              // PNG canvas (measured, not touching the source file) —
+              // nudge the rendered widget left to compensate.
+              offset: const Offset(-4, 0),
+              child: Image.asset(
+                'assets/images/fomoshield_logo.png',
+                width: 250,
+                height: 250,
               ),
             ),
 
             const SizedBox(height: 45),
 
-            FadeTransition(
-              opacity: wordmarkAnim,
-              child: SlideTransition(
-                position: Tween(
-                  begin: const Offset(0, 0.15),
-                  end: Offset.zero,
-                ).animate(wordmarkAnim),
-                child: Column(
+            // Also no entrance animation (2026-08-14) — same reasoning as
+            // the shield above: the native launch screen shows this same
+            // wordmark already in place, so it needs to stay static on
+            // Flutter's first frame too, not fade/slide in a second time.
+            Column(
+              children: [
+                Text(
+                  'FOMO',
+                  style: GoogleFonts.inter(
+                    fontSize: 46,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 5,
+                    color: _shieldDark,
+                    height: 1.0,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        offset: const Offset(2, 3),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'FOMO',
-                      style: GoogleFonts.inter(
-                        fontSize: 46,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 5,
-                        color: _shieldDark,
-                        height: 1.0,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            offset: const Offset(2, 3),
-                            blurRadius: 4,
-                          ),
-                        ],
+                    _rule(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        'S H I E L D',
+                        style: GoogleFonts.inter(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 3.5,
+                          color: _goldDeep,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _rule(),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(
-                            'S H I E L D',
-                            style: GoogleFonts.inter(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 3.5,
-                              color: _goldDeep,
-                            ),
-                          ),
-                        ),
-                        _rule(),
-                      ],
-                    ),
+                    _rule(),
                   ],
                 ),
-              ),
+              ],
             ),
 
             const SizedBox(height: 18),
@@ -222,7 +255,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               opacity: ringAnim,
               child: AnimatedBuilder(
                 animation: _progressController,
-                builder: (context, _) => _LoadingRing(progress: _displayProgress),
+                builder: (context, _) =>
+                    _LoadingRing(progress: _displayProgress),
               ),
             ),
           ],
@@ -231,11 +265,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
   }
 
-  Widget _rule() => Container(
-    width: 28,
-    height: 1,
-    color: _goldDeep.withValues(alpha: 0.5),
-  );
+  Widget _rule() =>
+      Container(width: 28, height: 1, color: _goldDeep.withValues(alpha: 0.5));
 }
 
 class _LoadingRing extends StatelessWidget {

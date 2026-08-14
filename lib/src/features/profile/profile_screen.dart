@@ -101,14 +101,8 @@ class ProfileScreen extends ConsumerWidget {
                                   horizontal: 8,
                                   vertical: 3,
                                 ),
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [dialLight, dialDark],
-                                  ),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6)),
+                                decoration: darkCardDecoration(
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   isAdmin ? 'ADMIN' : 'PREMIUM',
@@ -119,8 +113,9 @@ class ProfileScreen extends ConsumerWidget {
                                     letterSpacing: 1,
                                     shadows: [
                                       Shadow(
-                                        color:
-                                            dialBrassLight.withValues(alpha: 0.5),
+                                        color: dialBrassLight.withValues(
+                                          alpha: 0.5,
+                                        ),
                                         blurRadius: 6,
                                       ),
                                     ],
@@ -238,8 +233,7 @@ class ProfileScreen extends ConsumerWidget {
                             .read(portfoliosProvider.notifier)
                             .deletePortfolio(p.id);
                       }
-                      ref.read(activePortfolioIdProvider.notifier).state =
-                          null;
+                      ref.read(activePortfolioIdProvider.notifier).state = null;
                       _showSnack(context, 'All portfolios cleared');
                     },
                   ),
@@ -359,13 +353,19 @@ class ProfileScreen extends ConsumerWidget {
               onPressed: () async {
                 // 1) Clear ALL user session data (SharedPrefs + SecureStorage)
                 await clearAllSessionData();
-                // 2) Invalidate Riverpod providers so they re-load fresh
+                // 2) Invalidate Riverpod providers so they re-load fresh —
+                // isLoggedIn/hasSupabaseSession are cached FutureProviders;
+                // without this, navigating back to Splash mid-session would
+                // read their stale pre-signout value and silently restore
+                // the old session (real bug, found 2026-08-14).
+                ref.invalidate(isLoggedInProvider);
+                ref.invalidate(hasSupabaseSessionProvider);
                 ref.invalidate(watchlistSymbolsProvider);
                 ref.invalidate(portfoliosProvider);
                 ref.invalidate(homeWidgetsProvider);
                 ref.invalidate(searchProvider);
                 ref.invalidate(searchCounterProvider);
-                // 3) Navigate instantly to login (skip Splash 2.5s delay)
+                // 3) Navigate instantly to login (skip Splash's loading delay)
                 if (!context.mounted) return;
                 context.go('/auth');
               },

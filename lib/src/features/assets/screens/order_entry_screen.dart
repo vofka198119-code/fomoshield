@@ -31,6 +31,7 @@ import '../../portfolio/screens/order_entry/order_bottom_button.dart';
 import '../../portfolio/screens/order_entry/amount_keypad.dart';
 
 enum _OrderType { market, limit }
+
 enum _ActiveKeypad { none, amount, limitPrice }
 
 class OrderEntryScreen extends ConsumerStatefulWidget {
@@ -218,7 +219,9 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
 
     if (_selectedOrderType == _OrderType.limit) {
       final confirmedLimitPrice = limitPrice!;
-      ref.read(stressTestPendingOrdersProvider.notifier).placeLimitOrder(
+      ref
+          .read(stressTestPendingOrdersProvider.notifier)
+          .placeLimitOrder(
             sessionId: widget.sessionId,
             symbol: widget.symbol,
             isBuy: _isBuy,
@@ -238,7 +241,8 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           companyName: widget.companyName,
           logoUrl: widget.logo,
           title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
-          detail: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
+          detail:
+              '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
               'at \$${confirmedLimitPrice.toStringAsFixed(2)} — Pending',
           createdAt: DateTime.now(),
         ),
@@ -291,7 +295,8 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         companyName: widget.companyName,
         logoUrl: widget.logo,
         title: _isBuy ? 'You Bought' : 'You Sold',
-        detail: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
+        detail:
+            '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
             'at \$${_currentPrice.toStringAsFixed(2)}',
         createdAt: DateTime.now(),
       ),

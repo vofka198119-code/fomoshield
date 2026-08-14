@@ -167,7 +167,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
   /// Why Diagnostics — sessionId → symbol → running whole-period
   /// accumulator, admin-only. See stress_test_why_diagnostics.dart.
-  final Map<String, Map<String, WhyDiagnosticsAccumulator>> _whyDiagnostics = {};
+  final Map<String, Map<String, WhyDiagnosticsAccumulator>> _whyDiagnostics =
+      {};
 
   /// Callback set externally by the provider definition (where a Ref is
   /// available) — StressTestNotifier itself isn't constructed with one, so
@@ -188,7 +189,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   static bool Function(DateTime)? globalMarketOpenOverride;
 
   StressTestNotifier({this._userId, int? seed, this._supabaseService})
-      : super([]) {
+    : super([]) {
     _random = (seed != null) ? Random(seed) : Random();
     _load();
   }
@@ -595,8 +596,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// or deleting them (real bug, fixed in 45d8d77 — see
   /// project_fomo_shield_widget_polish_and_stress_test_fixes memory).
   bool canCreateSession(int maxConcurrent) {
-    final activeCount =
-        state.where((s) => s.status == StressTestStatus.active).length;
+    final activeCount = state
+        .where((s) => s.status == StressTestStatus.active)
+        .length;
     return activeCount < maxConcurrent;
   }
 
@@ -890,9 +892,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       // anchor now too, so a Recovery pair rolling in right after epoch 0
       // has a real crash-drop % to weight against (same as any other
       // catastrophe mid-test — see casino_epochs.dart's roll sites).
-      preCrashPrices: firstIsCatastrophe
-          ? Map.from(session.currentPrices)
-          : {},
+      preCrashPrices: firstIsCatastrophe ? Map.from(session.currentPrices) : {},
       recoveryStartPrices: const {},
       currentWeights: fatigueWeights,
       psychologyProfile: session.psychologyProfile,
@@ -1061,7 +1061,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         portfolioId: session.id,
         portfolioLabel: 'Stress Test — ${session.duration.displayName}',
         title: 'Stress Test Completed',
-        detail: '${session.duration.displayName} test finished — '
+        detail:
+            '${session.duration.displayName} test finished — '
             '${entry.pnlPercent >= 0 ? '+' : ''}${entry.pnlPercent.toStringAsFixed(2)}% — '
             'tap to view your verdict.',
         createdAt: DateTime.now(),
@@ -1311,8 +1312,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       // approximation — real timestamps (above) replace it going forward.
       final ticksAgo = minLen - 1 - k;
       final time =
-          realTime ??
-          now.subtract(Duration(seconds: ticksAgo * _tickSeconds));
+          realTime ?? now.subtract(Duration(seconds: ticksAgo * _tickSeconds));
       points.add(ChartDataPoint(time, value));
     }
     return points;

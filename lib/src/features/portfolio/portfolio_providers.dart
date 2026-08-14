@@ -40,25 +40,26 @@ class Transaction {
   });
 
   Map<String, dynamic> toJson() => {
-        'symbol': symbol,
-        'type': type.name,
-        'shares': shares,
-        'price': price,
-        'date': date.toIso8601String(),
-        'orderId': orderId,
-        'realizedPnl': realizedPnl,
-      };
+    'symbol': symbol,
+    'type': type.name,
+    'shares': shares,
+    'price': price,
+    'date': date.toIso8601String(),
+    'orderId': orderId,
+    'realizedPnl': realizedPnl,
+  };
 
   factory Transaction.fromJson(Map<String, dynamic> json) => Transaction(
-        symbol: json['symbol'] as String,
-        type: TransactionType.values.firstWhere(
-            (e) => e.name == (json['type'] as String)),
-        shares: (json['shares'] as num).toDouble(),
-        price: (json['price'] as num).toDouble(),
-        date: DateTime.parse(json['date'] as String),
-        orderId: json['orderId'] as String?,
-        realizedPnl: (json['realizedPnl'] as num?)?.toDouble(),
-      );
+    symbol: json['symbol'] as String,
+    type: TransactionType.values.firstWhere(
+      (e) => e.name == (json['type'] as String),
+    ),
+    shares: (json['shares'] as num).toDouble(),
+    price: (json['price'] as num).toDouble(),
+    date: DateTime.parse(json['date'] as String),
+    orderId: json['orderId'] as String?,
+    realizedPnl: (json['realizedPnl'] as num?)?.toDouble(),
+  );
 }
 
 class Portfolio {
@@ -76,9 +77,9 @@ class Portfolio {
     List<Transaction>? transactions,
     DateTime? createdAt,
     this.goalAmount,
-  })  : startingBalance = startingBalance ?? AppConstants.defaultStartingBalance,
-        transactions = transactions ?? [],
-        createdAt = createdAt ?? DateTime.now();
+  }) : startingBalance = startingBalance ?? AppConstants.defaultStartingBalance,
+       transactions = transactions ?? [],
+       createdAt = createdAt ?? DateTime.now();
 
   // ---- Computed ----
 
@@ -112,8 +113,7 @@ class Portfolio {
       if (t.type == TransactionType.buy) {
         map.putIfAbsent(t.symbol, () => {'shares': 0, 'cost': 0});
         map[t.symbol]!['shares'] = map[t.symbol]!['shares']! + t.shares;
-        map[t.symbol]!['cost'] =
-            map[t.symbol]!['cost']! + (t.shares * t.price);
+        map[t.symbol]!['cost'] = map[t.symbol]!['cost']! + (t.shares * t.price);
       } else {
         map.putIfAbsent(t.symbol, () => {'shares': 0, 'cost': 0});
         final curShares = map[t.symbol]!['shares']!;
@@ -134,29 +134,30 @@ class Portfolio {
   // ---- Serialization ----
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'startingBalance': startingBalance,
-        'transactions': transactions.map((t) => t.toJson()).toList(),
-        'createdAt': createdAt.toIso8601String(),
-        'goalAmount': goalAmount,
-      };
+    'id': id,
+    'name': name,
+    'startingBalance': startingBalance,
+    'transactions': transactions.map((t) => t.toJson()).toList(),
+    'createdAt': createdAt.toIso8601String(),
+    'goalAmount': goalAmount,
+  };
 
   factory Portfolio.fromJson(Map<String, dynamic> json) => Portfolio(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        startingBalance: (json['startingBalance'] as num?)?.toDouble() ??
-            AppConstants.defaultStartingBalance,
-        transactions: (json['transactions'] as List<dynamic>?)
-                ?.map((e) =>
-                    Transaction.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'] as String)
-            : DateTime.now(),
-        goalAmount: (json['goalAmount'] as num?)?.toDouble(),
-      );
+    id: json['id'] as String,
+    name: json['name'] as String,
+    startingBalance:
+        (json['startingBalance'] as num?)?.toDouble() ??
+        AppConstants.defaultStartingBalance,
+    transactions:
+        (json['transactions'] as List<dynamic>?)
+            ?.map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
+    createdAt: json['createdAt'] != null
+        ? DateTime.parse(json['createdAt'] as String)
+        : DateTime.now(),
+    goalAmount: (json['goalAmount'] as num?)?.toDouble(),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -171,8 +172,7 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
   // empty/stale local cache (or worse, creating a spurious default portfolio).
   bool _loadedFromSupabase = false;
 
-  PortfolioNotifier(this._supabaseService, {this._userId})
-      : super([]) {
+  PortfolioNotifier(this._supabaseService, {this._userId}) : super([]) {
     _load();
   }
 
@@ -296,10 +296,10 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
 
 final portfoliosProvider =
     StateNotifierProvider<PortfolioNotifier, List<Portfolio>>((ref) {
-  final service = ref.read(userDataServiceProvider);
-  final user = ref.watch(currentUserProvider);
-  return PortfolioNotifier(service, userId: user?.id);
-});
+      final service = ref.read(userDataServiceProvider);
+      final user = ref.watch(currentUserProvider);
+      return PortfolioNotifier(service, userId: user?.id);
+    });
 
 final activePortfolioIdProvider = StateProvider<String?>((ref) => null);
 
@@ -310,6 +310,7 @@ class PortfolioPerformance {
   final double totalInvested;
   final double cash;
   final double currentValue;
+
   /// Unrealized P&L — sum of P&L across currently held positions only.
   /// Does NOT include gains/losses already locked in from past sales.
   final double pnl;
@@ -359,96 +360,106 @@ class HoldingPerformance {
 }
 
 final portfolioPerformanceProvider =
-    FutureProvider.family<PortfolioPerformance, String>((ref, portfolioId) async {
-  final portfolios = ref.watch(portfoliosProvider);
-  final portfolio = portfolios.firstWhere((p) => p.id == portfolioId);
+    FutureProvider.family<PortfolioPerformance, String>((
+      ref,
+      portfolioId,
+    ) async {
+      final portfolios = ref.watch(portfoliosProvider);
+      final portfolio = portfolios.firstWhere((p) => p.id == portfolioId);
 
-  final api = ref.read(finnhubServiceProvider);
-  final holdings = portfolio.holdings;
+      final api = ref.read(finnhubServiceProvider);
+      final holdings = portfolio.holdings;
 
-  if (holdings.isEmpty) {
-    return PortfolioPerformance(
-      portfolioId: portfolio.id,
-      name: portfolio.name,
-      totalInvested: 0,
-      cash: portfolio.cash,
-      currentValue: portfolio.cash,
-      pnl: 0,
-      pnlPercent: 0,
-      startingBalance: portfolio.startingBalance,
-      goalAmount: portfolio.goalAmount,
-      holdings: [],
-    );
-  }
+      if (holdings.isEmpty) {
+        return PortfolioPerformance(
+          portfolioId: portfolio.id,
+          name: portfolio.name,
+          totalInvested: 0,
+          cash: portfolio.cash,
+          currentValue: portfolio.cash,
+          pnl: 0,
+          pnlPercent: 0,
+          startingBalance: portfolio.startingBalance,
+          goalAmount: portfolio.goalAmount,
+          holdings: [],
+        );
+      }
 
-  // Quotes fetched in parallel (used to be a sequential await-in-loop —
-  // one round-trip's latency per holding, stacked). A failed quote falls
-  // back to null and is priced at avgCost below, same as before.
-  final entries = holdings.entries.toList();
-  final quotes = await Future.wait(entries.map((entry) async {
-    try {
-      return await api.quote(entry.key);
-    } catch (_) {
-      return null;
-    }
-  }));
+      // Quotes fetched in parallel (used to be a sequential await-in-loop —
+      // one round-trip's latency per holding, stacked). A failed quote falls
+      // back to null and is priced at avgCost below, same as before.
+      final entries = holdings.entries.toList();
+      final quotes = await Future.wait(
+        entries.map((entry) async {
+          try {
+            return await api.quote(entry.key);
+          } catch (_) {
+            return null;
+          }
+        }),
+      );
 
-  final holdingPerformances = <HoldingPerformance>[];
-  double totalCurrentValue = portfolio.cash;
+      final holdingPerformances = <HoldingPerformance>[];
+      double totalCurrentValue = portfolio.cash;
 
-  for (int i = 0; i < entries.length; i++) {
-    final entry = entries[i];
-    final symbol = entry.key;
-    final shares = entry.value['shares']!;
-    final totalCost = entry.value['cost']!;
-    final avgCost = totalCost / shares;
+      for (int i = 0; i < entries.length; i++) {
+        final entry = entries[i];
+        final symbol = entry.key;
+        final shares = entry.value['shares']!;
+        final totalCost = entry.value['cost']!;
+        final avgCost = totalCost / shares;
 
-    final quote = quotes[i];
-    final currentPrice =
-        quote != null ? ((quote['c'] as num?)?.toDouble() ?? avgCost) : avgCost;
-    final currentValue = shares * currentPrice;
-    totalCurrentValue += currentValue;
+        final quote = quotes[i];
+        final currentPrice = quote != null
+            ? ((quote['c'] as num?)?.toDouble() ?? avgCost)
+            : avgCost;
+        final currentValue = shares * currentPrice;
+        totalCurrentValue += currentValue;
 
-    holdingPerformances.add(HoldingPerformance(
-      symbol: symbol,
-      shares: shares,
-      avgCost: avgCost,
-      totalCost: totalCost,
-      currentPrice: currentPrice,
-      currentValue: currentValue,
-      pnl: currentValue - totalCost,
-      pnlPercent: totalCost > 0
-          ? ((currentValue - totalCost) / totalCost) * 100
-          : 0.0,
-    ));
-  }
+        holdingPerformances.add(
+          HoldingPerformance(
+            symbol: symbol,
+            shares: shares,
+            avgCost: avgCost,
+            totalCost: totalCost,
+            currentPrice: currentPrice,
+            currentValue: currentValue,
+            pnl: currentValue - totalCost,
+            pnlPercent: totalCost > 0
+                ? ((currentValue - totalCost) / totalCost) * 100
+                : 0.0,
+          ),
+        );
+      }
 
-  final totalInvested = portfolio.totalInvested;
-  // Unrealized P&L — sum of P&L on positions currently held, NOT total
-  // account return since start. Selling a position at a gain/loss moves
-  // its slice into cash (visible in currentValue/Cash already) but
-  // shouldn't move this number — it only tracks what's still open. See
-  // 2026-08-07: this used to be `totalCurrentValue - startingBalance`
-  // (a combined figure that silently absorbed every past sale's P&L,
-  // making it look unchanged — or worse, wrong-direction — right after
-  // locking in a gain/loss).
-  final pnl = holdingPerformances.fold(0.0, (sum, h) => sum + h.pnl);
-  final unrealizedCost = holdingPerformances.fold(
-    0.0,
-    (sum, h) => sum + h.totalCost,
-  );
-  final pnlPercent = unrealizedCost > 0 ? (pnl / unrealizedCost) * 100 : 0.0;
+      final totalInvested = portfolio.totalInvested;
+      // Unrealized P&L — sum of P&L on positions currently held, NOT total
+      // account return since start. Selling a position at a gain/loss moves
+      // its slice into cash (visible in currentValue/Cash already) but
+      // shouldn't move this number — it only tracks what's still open. See
+      // 2026-08-07: this used to be `totalCurrentValue - startingBalance`
+      // (a combined figure that silently absorbed every past sale's P&L,
+      // making it look unchanged — or worse, wrong-direction — right after
+      // locking in a gain/loss).
+      final pnl = holdingPerformances.fold(0.0, (sum, h) => sum + h.pnl);
+      final unrealizedCost = holdingPerformances.fold(
+        0.0,
+        (sum, h) => sum + h.totalCost,
+      );
+      final pnlPercent = unrealizedCost > 0
+          ? (pnl / unrealizedCost) * 100
+          : 0.0;
 
-  return PortfolioPerformance(
-    portfolioId: portfolio.id,
-    name: portfolio.name,
-    totalInvested: totalInvested,
-    cash: portfolio.cash,
-    currentValue: totalCurrentValue,
-    pnl: pnl,
-    pnlPercent: pnlPercent,
-    startingBalance: portfolio.startingBalance,
-    goalAmount: portfolio.goalAmount,
-    holdings: holdingPerformances,
-  );
-});
+      return PortfolioPerformance(
+        portfolioId: portfolio.id,
+        name: portfolio.name,
+        totalInvested: totalInvested,
+        cash: portfolio.cash,
+        currentValue: totalCurrentValue,
+        pnl: pnl,
+        pnlPercent: pnlPercent,
+        startingBalance: portfolio.startingBalance,
+        goalAmount: portfolio.goalAmount,
+        holdings: holdingPerformances,
+      );
+    });

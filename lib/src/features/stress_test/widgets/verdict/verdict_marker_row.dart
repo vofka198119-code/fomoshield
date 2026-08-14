@@ -12,7 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
-import '../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 
 class VerdictMarkerRow extends StatelessWidget {
   final String sessionId;
@@ -153,14 +153,7 @@ class VerdictSingleMarkerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,9 +165,8 @@ class VerdictSingleMarkerCard extends StatelessWidget {
               children: [
                 Text(title, style: FomoShieldTheme.cardTitle(Colors.white)),
                 GestureDetector(
-                  onTap: () => context.push(
-                    '/metric-info/psychology-$markerId',
-                  ),
+                  onTap: () =>
+                      context.push('/metric-info/psychology-$markerId'),
                   child: Container(
                     width: 20,
                     height: 20,

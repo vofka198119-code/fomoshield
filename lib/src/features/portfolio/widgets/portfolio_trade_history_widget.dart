@@ -47,7 +47,9 @@ class PortfolioTradeHistoryWidget extends ConsumerWidget {
             (tx) => TradeHistoryTile(
               symbol: tx.symbol,
               companyName:
-                  ref.watch(resolvedCompanyNameProvider(tx.symbol)).valueOrNull ??
+                  ref
+                      .watch(resolvedCompanyNameProvider(tx.symbol))
+                      .valueOrNull ??
                   tx.symbol,
               isBuy: tx.type == TransactionType.buy,
               totalValue: tx.shares * tx.price,

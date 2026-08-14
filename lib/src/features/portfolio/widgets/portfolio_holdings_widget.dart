@@ -33,7 +33,8 @@ class PortfolioHoldingsWidget extends StatefulWidget {
   });
 
   @override
-  State<PortfolioHoldingsWidget> createState() => _PortfolioHoldingsWidgetState();
+  State<PortfolioHoldingsWidget> createState() =>
+      _PortfolioHoldingsWidgetState();
 }
 
 class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
@@ -42,10 +43,8 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
 
   Widget _addButton(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(
-        '/search',
-        extra: {'portfolioId': widget.portfolioId},
-      ),
+      onTap: () =>
+          context.push('/search', extra: {'portfolioId': widget.portfolioId}),
       child: Container(
         width: 30,
         height: 30,
@@ -72,7 +71,10 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
         child: const SizedBox(
           width: 20,
           height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2, color: ThemeV2.primary),
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: ThemeV2.primary,
+          ),
         ),
       );
     }
@@ -120,7 +122,10 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                     const SizedBox(height: 4),
                     Text(
                       'Tap + to search and add your first holding',
-                      style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: ThemeV2.textSecondary,
+                      ),
                     ),
                   ],
                 ),
@@ -153,7 +158,9 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                   ),
                   child: Center(
                     child: Text(
-                      _showAll ? 'Less' : 'More (${sorted.length - _previewLimit})',
+                      _showAll
+                          ? 'Less'
+                          : 'More (${sorted.length - _previewLimit})',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -221,7 +228,9 @@ class _HoldingRow extends ConsumerWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: donutAllocationColor(colorIndex).withValues(alpha: 0.7),
+                  color: donutAllocationColor(
+                    colorIndex,
+                  ).withValues(alpha: 0.7),
                   width: 1.5,
                 ),
               ),
@@ -257,14 +266,20 @@ class _HoldingRow extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     holding.symbol,
-                    style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: ThemeV2.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     '${holding.shares.toStringAsFixed(2)} shares',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: ThemeV2.textSecondary,
+                    ),
                   ),
                 ],
               ),

@@ -108,8 +108,10 @@ class _MarketClockWidgetsSettingsSheetState
                     widget.notifier.resetToDefaults();
                     setState(() {
                       _configs = marketClockDefaultOrder
-                          .map((id) =>
-                              MarketClockWidgetConfig(id: id, visible: true))
+                          .map(
+                            (id) =>
+                                MarketClockWidgetConfig(id: id, visible: true),
+                          )
                           .toList();
                     });
                   },

@@ -9,7 +9,7 @@ import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark;
+    show darkCardDecoration;
 import '../../../../stress_test/stress_test_engine.dart' show ChartDataPoint;
 
 // ---------------------------------------------------------------------------
@@ -222,14 +222,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 6),
               decoration: isSelected
-                  ? BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [dialLight, dialDark],
-                      ),
-                      borderRadius: BorderRadius.circular(6),
-                    )
+                  ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
                   : null,
               child: Text(
                 _periodLabels[period]!,

@@ -21,8 +21,9 @@ const List<String> defaultCompanyWidgetOrder = [
 
 String _orderPrefsKey(String? uid) =>
     uid != null ? 'company_widget_order_$uid' : 'company_widget_order';
-String _visibilityPrefsKey(String? uid) =>
-    uid != null ? 'company_widget_visibility_$uid' : 'company_widget_visibility';
+String _visibilityPrefsKey(String? uid) => uid != null
+    ? 'company_widget_visibility_$uid'
+    : 'company_widget_visibility';
 
 /// Model representing a company detail widget's configuration.
 class CompanyWidgetConfig {
@@ -90,7 +91,9 @@ class CompanyWidgetsNotifier extends StateNotifier<List<CompanyWidgetConfig>> {
     // user last saved their layout).
     if (savedOrder != null) {
       final savedSet = Set<String>.from(savedOrder);
-      final missing = defaultCompanyWidgetOrder.where((id) => !savedSet.contains(id));
+      final missing = defaultCompanyWidgetOrder.where(
+        (id) => !savedSet.contains(id),
+      );
       order = [
         ...savedOrder.where(defaultCompanyWidgetOrder.contains),
         ...missing,
@@ -121,7 +124,9 @@ class CompanyWidgetsNotifier extends StateNotifier<List<CompanyWidgetConfig>> {
   Future<void> _saveLocal() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-        _orderPrefsKey(_userId), state.map((c) => c.id).toList());
+      _orderPrefsKey(_userId),
+      state.map((c) => c.id).toList(),
+    );
     await prefs.setString(
       _visibilityPrefsKey(_userId),
       state.map((c) => '${c.id}:${c.visible}').join(','),
@@ -170,7 +175,9 @@ class CompanyWidgetsNotifier extends StateNotifier<List<CompanyWidgetConfig>> {
 // ---------------------------------------------------------------------------
 
 final companyWidgetsProvider =
-    StateNotifierProvider<CompanyWidgetsNotifier, List<CompanyWidgetConfig>>((ref) {
-  final user = ref.watch(currentUserProvider);
-  return CompanyWidgetsNotifier(userId: user?.id);
-});
+    StateNotifierProvider<CompanyWidgetsNotifier, List<CompanyWidgetConfig>>((
+      ref,
+    ) {
+      final user = ref.watch(currentUserProvider);
+      return CompanyWidgetsNotifier(userId: user?.id);
+    });

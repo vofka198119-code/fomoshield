@@ -75,7 +75,10 @@ class _CompanyAdOverlayState extends State<CompanyAdOverlay>
               const SizedBox(height: 8),
               Text(
                 'Continuing in a moment…',
-                style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: ThemeV2.textSecondary,
+                ),
               ),
               const SizedBox(height: 24),
               AnimatedBuilder(

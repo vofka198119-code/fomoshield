@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
-import '../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../core/theme/typography_helpers.dart';
 import '../../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialDark, dialBrassLight, darkCardDecoration, darkCardGradient;
 
 // ---------------------------------------------------------------------------
 // Order Amount Section — the amount input (plain, no card, green text,
@@ -63,19 +62,15 @@ class OrderAmountSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final displayAmount = double.tryParse(controller.text) ?? 0;
 
-    return Column(
-      children: [
-        _amountInput(displayAmount),
-        _slider(),
-      ],
-    );
+    return Column(children: [_amountInput(displayAmount), _slider()]);
   }
 
   Widget _amountInput(double displayAmount) {
     final hasValue = controller.text.isNotEmpty;
     final numberText = hasValue ? controller.text : '0';
-    final numberColor =
-        hasValue ? ThemeV2.textPrimary : ThemeV2.textPrimary.withValues(alpha: 0.3);
+    final numberColor = hasValue
+        ? ThemeV2.textPrimary
+        : ThemeV2.textPrimary.withValues(alpha: 0.3);
     // Only the newest digit animates in — the rest of the number stays
     // put. Animating the whole string on every keystroke made the entire
     // number flash/strobe instead of reading as a single digit popping in.
@@ -125,7 +120,10 @@ class OrderAmountSection extends StatelessWidget {
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 160),
                           transitionBuilder: (child, anim) => ScaleTransition(
-                            scale: Tween<double>(begin: 0.4, end: 1).animate(anim),
+                            scale: Tween<double>(
+                              begin: 0.4,
+                              end: 1,
+                            ).animate(anim),
                             child: FadeTransition(opacity: anim, child: child),
                           ),
                           child: Text(
@@ -151,7 +149,10 @@ class OrderAmountSection extends StatelessWidget {
           Text(
             inputMode == OrderInputMode.cost ? 'USD' : 'Shares',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: ThemeV2.textSecondary,
+            ),
           ),
           if (displayAmount > 0 && inputMode == OrderInputMode.cost)
             Padding(
@@ -189,18 +190,16 @@ class OrderAmountSection extends StatelessWidget {
   Widget _modeToggle() {
     return GestureDetector(
       onTap: () => onInputModeChanged(
-        inputMode == OrderInputMode.cost ? OrderInputMode.shares : OrderInputMode.cost,
+        inputMode == OrderInputMode.cost
+            ? OrderInputMode.shares
+            : OrderInputMode.cost,
       ),
       child: Container(
         width: 40,
         height: 40,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
+          gradient: darkCardGradient(),
         ),
         alignment: Alignment.center,
         child: const Icon(
@@ -217,14 +216,7 @@ class OrderAmountSection extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
-          borderRadius: FomoShieldTheme.cardRadius,
-        ),
+        decoration: darkCardDecoration(),
         child: Column(
           children: [
             SliderTheme(
@@ -247,7 +239,9 @@ class OrderAmountSection extends StatelessWidget {
                 onChanged: (v) {
                   final maxVal = _maxAmount;
                   final newVal = maxVal * v;
-                  controller.text = newVal > 0 ? newVal.toStringAsFixed(newVal < 1 ? 4 : 2) : '';
+                  controller.text = newVal > 0
+                      ? newVal.toStringAsFixed(newVal < 1 ? 4 : 2)
+                      : '';
                   onSliderChanged(v);
                 },
                 divisions: 20,

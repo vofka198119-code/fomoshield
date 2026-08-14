@@ -15,10 +15,7 @@ class PortfolioAdState {
   final int switchCount;
   final int transactionCount;
 
-  const PortfolioAdState({
-    this.switchCount = 0,
-    this.transactionCount = 0,
-  });
+  const PortfolioAdState({this.switchCount = 0, this.transactionCount = 0});
 }
 
 class PortfolioAdNotifier extends StateNotifier<PortfolioAdState> {
@@ -51,7 +48,9 @@ class PortfolioAdNotifier extends StateNotifier<PortfolioAdState> {
   Future<void> _save() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
-        _prefsKey, '${state.switchCount},${state.transactionCount}');
+      _prefsKey,
+      '${state.switchCount},${state.transactionCount}',
+    );
   }
 
   /// Returns true when an interstitial ad should show (every 5 switches).
@@ -82,15 +81,17 @@ class PortfolioAdNotifier extends StateNotifier<PortfolioAdState> {
 
 final portfolioAdProvider =
     StateNotifierProvider<PortfolioAdNotifier, PortfolioAdState>((ref) {
-  final user = ref.watch(currentUserProvider);
-  return PortfolioAdNotifier(userId: user?.id);
-});
+      final user = ref.watch(currentUserProvider);
+      return PortfolioAdNotifier(userId: user?.id);
+    });
 
 /// Whether the portfolio at [index] (0-based) should show a banner ad.
 /// Free tier: 1st is ad-free, 2nd & 3rd show banner.
 /// Premium/Admin: no banner ads at all.
-final isPortfolioBannerAdSupportedProvider =
-    Provider.family<bool, int>((ref, index) {
+final isPortfolioBannerAdSupportedProvider = Provider.family<bool, int>((
+  ref,
+  index,
+) {
   final tier = ref.watch(subscriptionTierProvider);
   if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) {
     return false;

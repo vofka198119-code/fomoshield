@@ -51,10 +51,10 @@ const _hypeColor = FomoShieldTheme.factorHype;
 const _noiseColor = FomoShieldTheme.factorNoise;
 
 BoxDecoration get _olivePanel => BoxDecoration(
-      color: ThemeV2.primary.withValues(alpha: 0.08),
-      borderRadius: FomoShieldTheme.cardRadius,
-      border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.2)),
-    );
+  color: ThemeV2.primary.withValues(alpha: 0.08),
+  borderRadius: FomoShieldTheme.cardRadius,
+  border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.2)),
+);
 
 class WhyTodayScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -119,7 +119,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final changePercent = basePrice > 0 ? (priceChange / basePrice) * 100 : 0.0;
     final isPositive = changePercent >= 0;
 
-    final displayTicks = ticks.length > 20 ? ticks.sublist(ticks.length - 20) : ticks;
+    final displayTicks = ticks.length > 20
+        ? ticks.sublist(ticks.length - 20)
+        : ticks;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -142,7 +144,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                               label: 'DOLLARS',
                               value:
                                   '${isPositive ? '+' : ''}\$${priceChange.abs().toStringAsFixed(2)}',
-                              color: isPositive ? ThemeV2.success : ThemeV2.loss,
+                              color: isPositive
+                                  ? ThemeV2.success
+                                  : ThemeV2.loss,
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -151,7 +155,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                               label: 'PERCENT',
                               value:
                                   '${isPositive ? '+' : ''}${changePercent.toStringAsFixed(2)}%',
-                              color: isPositive ? ThemeV2.success : ThemeV2.loss,
+                              color: isPositive
+                                  ? ThemeV2.success
+                                  : ThemeV2.loss,
                             ),
                           ),
                         ],
@@ -167,18 +173,21 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                       _window(
                         index: 2,
                         title: 'WHOLE PERIOD — FACTOR BREAKDOWN',
-                        subtitle: 'Weighted by each tick\'s own price move — '
+                        subtitle:
+                            'Weighted by each tick\'s own price move — '
                             '${diagnostics?.tickCount ?? ticks.length} ticks since first purchase'
                             '${diagnostics == null ? ' (recent only — no cache yet)' : ''}.',
                         child: _factorBars(
-                          diagnostics?.averaged ?? _aggregateContributions(ticks),
+                          diagnostics?.averaged ??
+                              _aggregateContributions(ticks),
                         ),
                       ),
                     if (latest != null)
                       _window(
                         index: 3,
                         title: 'RAW DRIFT VALUES (LATEST TICK)',
-                        subtitle: 'Unnormalized — before the 5 factors above are scaled to sum to 100%.',
+                        subtitle:
+                            'Unnormalized — before the 5 factors above are scaled to sum to 100%.',
                         child: Column(
                           children: [
                             _rawRow('Market drift', latest.marketDriftRaw),
@@ -200,7 +209,8 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                         title: 'MARKET PHASE / EPOCHS',
                         child: Column(
                           children: [
-                            for (final e in session.epochHistory.reversed) _epochRow(e),
+                            for (final e in session.epochHistory.reversed)
+                              _epochRow(e),
                           ],
                         ),
                       ),
@@ -233,7 +243,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: ThemeV2.textPrimary,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
@@ -262,7 +275,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: ThemeV2.textSecondary,
+                ),
               ),
             ],
             const SizedBox(height: 10),
@@ -275,7 +291,11 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     );
   }
 
-  Widget _changeBox({required String label, required String value, required Color color}) {
+  Widget _changeBox({
+    required String label,
+    required String value,
+    required Color color,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
@@ -299,7 +319,11 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
           Text(
             value,
             textAlign: TextAlign.center,
-            style: interNums(fontSize: 20, fontWeight: FontWeight.w700, color: color),
+            style: interNums(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -308,7 +332,12 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
 
   // ─── Factor bars (shared by "this tick" and "whole period") ──────────
   PriceContribution _aggregateContributions(List<TickExplanation> ticks) {
-    double wMarket = 0, wSector = 0, wNews = 0, wHype = 0, wNoise = 0, totalW = 0;
+    double wMarket = 0,
+        wSector = 0,
+        wNews = 0,
+        wHype = 0,
+        wNoise = 0,
+        totalW = 0;
     for (final t in ticks) {
       final w = t.changePercent.abs();
       final effectiveW = w > 0 ? w : 0.0001;
@@ -320,7 +349,12 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       totalW += effectiveW;
     }
     if (totalW <= 0) {
-      return const PriceContribution(marketPct: 0, sectorPct: 0, newsPct: 0, noisePct: 0);
+      return const PriceContribution(
+        marketPct: 0,
+        sectorPct: 0,
+        newsPct: 0,
+        noisePct: 0,
+      );
     }
     return PriceContribution(
       marketPct: wMarket / totalW,
@@ -393,7 +427,11 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
             child: Text(
               '${percent.round()}%',
               textAlign: TextAlign.right,
-              style: interNums(fontSize: 12.5, fontWeight: FontWeight.w600, color: ThemeV2.textPrimary),
+              style: interNums(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: ThemeV2.textPrimary,
+              ),
             ),
           ),
         ],
@@ -410,7 +448,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         children: [
           Text(label, style: ThemeV2.caption),
           Text(
-            raw == null ? '—' : '${raw >= 0 ? '+' : ''}${(raw * 100).toStringAsFixed(3)}%',
+            raw == null
+                ? '—'
+                : '${raw >= 0 ? '+' : ''}${(raw * 100).toStringAsFixed(3)}%',
             style: ThemeV2.caption.copyWith(
               fontWeight: FontWeight.w700,
               color: ThemeV2.textPrimary,
@@ -438,11 +478,13 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final hypeActive = mySector == null
         ? null
         : session.activeHypeEvents
-            .where((e) => e.sector == mySector)
-            .firstOrNull;
+              .where((e) => e.sector == mySector)
+              .firstOrNull;
 
-    final newsEpisodes = diagnostics?.newsEpisodes ?? const <WhyDiagnosticsEpisode>[];
-    final hypeEpisodes = diagnostics?.hypeEpisodes ?? const <WhyDiagnosticsEpisode>[];
+    final newsEpisodes =
+        diagnostics?.newsEpisodes ?? const <WhyDiagnosticsEpisode>[];
+    final hypeEpisodes =
+        diagnostics?.hypeEpisodes ?? const <WhyDiagnosticsEpisode>[];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,7 +494,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
             'News — LIVE: ${newsActive.headline}',
             newsActive.isPositive,
             '${newsActive.isPositive ? '+' : ''}${(newsActive.targetAmplitude * 100).toStringAsFixed(1)}% target',
-            _formatRemaining(newsActive.currentTick, newsActive.rampDurationTicks),
+            _formatRemaining(
+              newsActive.currentTick,
+              newsActive.rampDurationTicks,
+            ),
           ),
           const SizedBox(height: 10),
         ],
@@ -461,7 +506,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
             'Sector Hype — LIVE',
             hypeActive.isPositive,
             '${hypeActive.isPositive ? '+' : ''}${(hypeActive.targetAmplitude * 100).toStringAsFixed(1)}% sector target',
-            _formatRemaining(hypeActive.currentTick, hypeActive.rampDurationTicks),
+            _formatRemaining(
+              hypeActive.currentTick,
+              hypeActive.rampDurationTicks,
+            ),
           ),
           const SizedBox(height: 10),
         ],
@@ -498,7 +546,12 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     );
   }
 
-  Widget _liveEventRow(String label, bool isPositive, String detail, String countdown) {
+  Widget _liveEventRow(
+    String label,
+    bool isPositive,
+    String detail,
+    String countdown,
+  ) {
     final color = isPositive ? ThemeV2.success : ThemeV2.loss;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -509,7 +562,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       child: Row(
         children: [
           Icon(
-            isPositive ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+            isPositive
+                ? Icons.arrow_upward_rounded
+                : Icons.arrow_downward_rounded,
             size: 16,
             color: color,
           ),
@@ -517,10 +572,20 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
           Expanded(
             child: Text(
               '$label — $detail',
-              style: GoogleFonts.inter(fontSize: 12.5, fontWeight: FontWeight.w600, color: ThemeV2.textPrimary),
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: ThemeV2.textPrimary,
+              ),
             ),
           ),
-          Text(countdown, style: ThemeV2.small.copyWith(color: color, fontWeight: FontWeight.w600)),
+          Text(
+            countdown,
+            style: ThemeV2.small.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -528,7 +593,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
 
   /// "≈2h 40m left" style label from ticks remaining on a ramping event.
   String _formatRemaining(int currentTick, int rampDurationTicks) {
-    final ticksLeft = (rampDurationTicks - currentTick).clamp(0, rampDurationTicks);
+    final ticksLeft = (rampDurationTicks - currentTick).clamp(
+      0,
+      rampDurationTicks,
+    );
     final secondsLeft = ticksLeft * tickIntervalSeconds;
     final hours = secondsLeft ~/ 3600;
     final minutes = (secondsLeft % 3600) ~/ 60;
@@ -555,12 +623,19 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
           Expanded(
             child: Text(
               epochLabel,
-              style: GoogleFonts.inter(fontSize: 12.5, color: ThemeV2.textPrimary),
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                color: ThemeV2.textPrimary,
+              ),
             ),
           ),
           Text(
             '${ep.isUp ? '+' : ''}${ep.netPercent.toStringAsFixed(2)}%',
-            style: interNums(fontSize: 12.5, fontWeight: FontWeight.w700, color: color),
+            style: interNums(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -578,14 +653,20 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
             height: 8,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: e.isActive ? ThemeV2.success : ThemeV2.textSecondary.withValues(alpha: 0.4),
+              color: e.isActive
+                  ? ThemeV2.success
+                  : ThemeV2.textSecondary.withValues(alpha: 0.4),
             ),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               'Epoch ${e.index + 1} — ${e.scenario.name}',
-              style: GoogleFonts.inter(fontSize: 12.5, fontWeight: FontWeight.w600, color: ThemeV2.textPrimary),
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: ThemeV2.textPrimary,
+              ),
             ),
           ),
           Text(
@@ -623,7 +704,8 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
           children: [
             Text('Ticks', style: ThemeV2.section),
             const SizedBox(height: 16),
-            for (var i = 0; i < reversed.length; i++) _buildTickCard(reversed[i], i),
+            for (var i = 0; i < reversed.length; i++)
+              _buildTickCard(reversed[i], i),
           ],
         ),
       ),
@@ -637,8 +719,8 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final color = isFlat
         ? ThemeV2.textSecondary
         : isUp
-            ? ThemeV2.success
-            : ThemeV2.loss;
+        ? ThemeV2.success
+        : ThemeV2.loss;
     final arrow = isFlat ? '→' : (isUp ? '⬆' : '⬇');
 
     final epochNum = tick.epochIndex + 1;
@@ -661,7 +743,10 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               width: 72,
               child: Text(
                 timeLabel,
-                style: ThemeV2.small.copyWith(fontWeight: FontWeight.w600, color: ThemeV2.textSecondary),
+                style: ThemeV2.small.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: ThemeV2.textSecondary,
+                ),
               ),
             ),
             Expanded(
@@ -748,7 +833,11 @@ class _FadeSlide extends StatelessWidget {
   final AnimationController controller;
   final Widget child;
 
-  const _FadeSlide({required this.index, required this.controller, required this.child});
+  const _FadeSlide({
+    required this.index,
+    required this.controller,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -763,7 +852,10 @@ class _FadeSlide extends StatelessWidget {
         );
         return Opacity(
           opacity: t,
-          child: Transform.translate(offset: Offset(0, 24 * (1 - t)), child: child),
+          child: Transform.translate(
+            offset: Offset(0, 24 * (1 - t)),
+            child: child,
+          ),
         );
       },
       child: child,
@@ -776,7 +868,11 @@ class _StaggerItem extends StatelessWidget {
   final AnimationController controller;
   final Widget child;
 
-  const _StaggerItem({required this.index, required this.controller, required this.child});
+  const _StaggerItem({
+    required this.index,
+    required this.controller,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -792,7 +888,10 @@ class _StaggerItem extends StatelessWidget {
         );
         return Opacity(
           opacity: t,
-          child: Transform.translate(offset: Offset(0, 16 * (1 - t)), child: child),
+          child: Transform.translate(
+            offset: Offset(0, 16 * (1 - t)),
+            child: child,
+          ),
         );
       },
       child: child,

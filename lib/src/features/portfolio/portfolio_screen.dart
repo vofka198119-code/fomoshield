@@ -8,7 +8,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/router/navigation_history_provider.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import 'portfolio_providers.dart';
@@ -51,8 +51,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.primary),
-          onPressed: () =>
-              context.go(ref.read(previousTabRouteProvider)),
+          onPressed: () => context.go(ref.read(previousTabRouteProvider)),
         ),
         title: Text(
           'PORTFOLIO',
@@ -169,7 +168,10 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             Text(
               'Create your first virtual portfolio\nwith \$${NumberFormat('#,##0', 'en_US').format(startingCapital)} starting balance',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: ThemeV2.textSecondary,
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -214,7 +216,10 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           autofocus: true,
           decoration: InputDecoration(
             hintText: 'e.g. Tech Growth',
-            hintStyle: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 14),
+            hintStyle: GoogleFonts.inter(
+              color: ThemeV2.textSecondary,
+              fontSize: 14,
+            ),
             filled: true,
             fillColor: ThemeV2.surfaceDark,
             border: OutlineInputBorder(
@@ -386,7 +391,10 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
         autofocus: true,
         decoration: InputDecoration(
           hintText: 'e.g. Tech Growth',
-          hintStyle: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 14),
+          hintStyle: GoogleFonts.inter(
+            color: ThemeV2.textSecondary,
+            fontSize: 14,
+          ),
           filled: true,
           fillColor: ThemeV2.surfaceDark,
           border: OutlineInputBorder(
@@ -446,4 +454,3 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
     ),
   );
 }
-

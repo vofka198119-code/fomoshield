@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'src/core/cache/sector_providers.dart';
 import 'src/core/overlay/app_overlay_host.dart';
@@ -32,11 +31,14 @@ void main() async {
     publishableKey: SupabaseConfig.anonKey,
   );
 
-  // Must be called exactly once, before any other GoogleSignIn method.
-  await GoogleSignIn.instance.initialize(
-    clientId: SupabaseConfig.googleIosClientId,
-    serverClientId: SupabaseConfig.googleWebClientId,
-  );
+  // GoogleSignIn.instance.initialize() moved off this blocking path
+  // (2026-08-14) — it isn't needed until the user actually taps "Continue
+  // with Google" on the Auth screen, and typically takes noticeably longer
+  // than the other steps here (Play Services round-trip), so leaving it
+  // here was adding real time to the black screen between tapping the app
+  // icon and Flutter's first frame. Kicked off instead from SplashScreen's
+  // own bootstrap, in parallel with its 7s minimum display timer — see
+  // splash_screen.dart's initGoogleSignIn().
 
   // Hydrate the stress-test engine's synchronous GICS-sector cache from
   // disk before the UI (and any resumed simulation ticks) can run — see
@@ -47,10 +49,7 @@ void main() async {
   await container.read(sectorRepositoryProvider).hydrateLiveCache();
 
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const ScanCoApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const ScanCoApp()),
   );
 }
 

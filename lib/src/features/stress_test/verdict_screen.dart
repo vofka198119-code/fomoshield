@@ -16,7 +16,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
-import '../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../market_clock/market_clock_dial.dart'
+    show darkCardDecoration, dialDark;
 import '../../shared/widgets/stagger_fade_in.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
@@ -213,21 +214,18 @@ class VerdictScreen extends ConsumerWidget {
                       onTap: () => context.go('/stress-test-hub'),
                       borderRadius: BorderRadius.circular(14),
                       child: Ink(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [dialLight, dialDark],
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: dialDark.withValues(alpha: 0.35),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
+                        decoration:
+                            darkCardDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                            ).copyWith(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: dialDark.withValues(alpha: 0.35),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           alignment: Alignment.center,
@@ -325,7 +323,6 @@ class VerdictScreen extends ConsumerWidget {
       ),
     );
   }
-
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -429,4 +426,3 @@ class _GuardianVerdictSection extends StatelessWidget {
     );
   }
 }
-

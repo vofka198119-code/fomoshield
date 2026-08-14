@@ -24,8 +24,7 @@ class StressTestMyLimitOrdersWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final orders =
-        ref.watch(stressTestSessionPendingOrdersProvider(sessionId));
+    final orders = ref.watch(stressTestSessionPendingOrdersProvider(sessionId));
     final shown = orders.take(_inlineLimit).toList();
 
     return Container(
@@ -42,7 +41,10 @@ class StressTestMyLimitOrdersWidget extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 14),
               child: Text(
                 'You currently have no active orders',
-                style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: ThemeV2.textSecondary,
+                ),
               ),
             )
           else ...[

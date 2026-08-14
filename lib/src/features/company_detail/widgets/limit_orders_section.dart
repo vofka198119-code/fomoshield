@@ -33,7 +33,10 @@ class LimitOrdersSection extends ConsumerWidget {
 
     final portfolios = ref.watch(portfoliosProvider);
     String portfolioNameFor(String portfolioId) => portfolios
-        .firstWhere((p) => p.id == portfolioId, orElse: () => Portfolio(id: '', name: ''))
+        .firstWhere(
+          (p) => p.id == portfolioId,
+          orElse: () => Portfolio(id: '', name: ''),
+        )
         .name;
 
     final shown = orders.take(_inlineLimit).toList();
@@ -48,7 +51,10 @@ class LimitOrdersSection extends ConsumerWidget {
           Text('LIMIT ORDERS', style: FomoShieldTheme.cardTitle()),
           const Divider(height: 20, color: Color(0x0F000000)),
           for (final order in shown)
-            OrderRowTile(order: order, subtitle: portfolioNameFor(order.portfolioId)),
+            OrderRowTile(
+              order: order,
+              subtitle: portfolioNameFor(order.portfolioId),
+            ),
           if (orders.length > _inlineLimit)
             Padding(
               padding: const EdgeInsets.only(top: 6, bottom: 10),

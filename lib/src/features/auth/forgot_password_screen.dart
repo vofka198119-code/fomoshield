@@ -109,7 +109,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: ThemeV2.textPrimary,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
@@ -160,8 +163,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded,
-                              color: ThemeV2.success, size: 20),
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            color: ThemeV2.success,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             'Check your email',
@@ -193,8 +199,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.info_outlined,
-                                color: ThemeV2.primary, size: 16),
+                            const Icon(
+                              Icons.info_outlined,
+                              color: ThemeV2.primary,
+                              size: 16,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -221,7 +230,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     child: Text(
                       _errorText!,
                       style: GoogleFonts.inter(
-                          fontSize: 13, color: ThemeV2.loss),
+                        fontSize: 13,
+                        color: ThemeV2.loss,
+                      ),
                     ),
                   ),
 
@@ -231,8 +242,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     hintText: 'Email',
-                    prefixIcon:
-                        Icon(Icons.email_outlined, color: ThemeV2.textSecondary),
+                    prefixIcon: Icon(
+                      Icons.email_outlined,
+                      color: ThemeV2.textSecondary,
+                    ),
                   ),
                 ),
 
@@ -305,4 +318,3 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     );
   }
 }
-

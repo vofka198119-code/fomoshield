@@ -88,7 +88,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   children: [
                     for (int i = 0; i < notifications.length; i++) ...[
                       if (i > 0)
-                        const Divider(height: 1, indent: 68, color: Color(0x0F000000)),
+                        const Divider(
+                          height: 1,
+                          indent: 68,
+                          color: Color(0x0F000000),
+                        ),
                       _NotificationRow(
                         notification: notifications[i],
                         expanded: _expandedIds.contains(notifications[i].id),
@@ -108,10 +112,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         padding: const EdgeInsets.all(32),
         child: Text(
           'No notifications yet.',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: ThemeV2.textSecondary,
-          ),
+          style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
       ),
     );

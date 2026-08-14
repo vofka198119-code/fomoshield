@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 
 // ===========================================================================
 // Sticky Bottom Bar: BUY / SELL
@@ -53,12 +53,7 @@ class CompanyBottomBar extends StatelessWidget {
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(18),
                     child: Ink(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [dialLight, dialDark],
-                        ),
+                      decoration: darkCardDecoration(
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: InkWell(
@@ -93,8 +88,10 @@ class CompanyBottomBar extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onSell,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Color.alphaBlend(ThemeV2.primaryBg, Colors.white),
+                      backgroundColor: Color.alphaBlend(
+                        ThemeV2.primaryBg,
+                        Colors.white,
+                      ),
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),

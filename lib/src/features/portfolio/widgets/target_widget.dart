@@ -11,10 +11,6 @@ import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../portfolio_providers.dart';
 
-// Shared gradient for the graph window and the CTA button below it —
-// same instrument-panel dial colors as the Market Clock widget.
-const List<Color> _indicatorGradient = [dialLight, dialDark];
-
 String _fmtCurrency(double amount) =>
     '\$${NumberFormat('#,##0', 'en_US').format(amount)}';
 
@@ -98,9 +94,7 @@ class TargetWidget extends ConsumerWidget {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-            child: _GraphWindow(
-              currentPercent: currentPercent,
-            ),
+            child: _GraphWindow(currentPercent: currentPercent),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -204,7 +198,9 @@ class _GoalSummaryRow extends StatelessWidget {
     required bool alignEnd,
     Color valueColor = ThemeV2.textPrimary,
   }) {
-    final crossAlign = alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final crossAlign = alignEnd
+        ? CrossAxisAlignment.end
+        : CrossAxisAlignment.start;
     final boxAlign = alignEnd ? Alignment.centerRight : Alignment.centerLeft;
     return Column(
       crossAxisAlignment: crossAlign,
@@ -252,12 +248,7 @@ class _SelectGoalButton extends StatelessWidget {
       width: double.infinity,
       height: ThemeV2.buttonHeight,
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: _indicatorGradient,
-          ),
+        decoration: darkCardDecoration(
           borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
         ),
         child: Material(
@@ -294,14 +285,7 @@ class _GraphWindow extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: _indicatorGradient,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -311,11 +295,7 @@ class _GraphWindow extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              _Tick('-100%'),
-              _Tick('0%'),
-              _Tick('+100%'),
-            ],
+            children: const [_Tick('-100%'), _Tick('0%'), _Tick('+100%')],
           ),
         ],
       ),
@@ -354,9 +334,10 @@ class _MarkerRow extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           const pillWidth = 42.0;
-          final x =
-              (t * constraints.maxWidth - pillWidth / 2)
-                  .clamp(0.0, constraints.maxWidth - pillWidth);
+          final x = (t * constraints.maxWidth - pillWidth / 2).clamp(
+            0.0,
+            constraints.maxWidth - pillWidth,
+          );
           return Stack(
             children: [
               Positioned(
@@ -419,7 +400,9 @@ class _SegmentedBar extends StatelessWidget {
                   ? FractionallySizedBox(
                       widthFactor: fraction,
                       alignment: Alignment.centerLeft,
-                      child: Container(color: SegmentGaugeMath.colorForIndex(i)),
+                      child: Container(
+                        color: SegmentGaugeMath.colorForIndex(i),
+                      ),
                     )
                   : null,
             ),

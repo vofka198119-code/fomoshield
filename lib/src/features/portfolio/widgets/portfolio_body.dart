@@ -105,7 +105,10 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                 for (int i = 0; i < visibleWidgets.length; i++)
                   StaggerFadeIn(
                     index: i,
-                    child: _buildWidget(visibleWidgets[i].id, performance: perf),
+                    child: _buildWidget(
+                      visibleWidgets[i].id,
+                      performance: perf,
+                    ),
                   ),
               ],
             ),
@@ -134,10 +137,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(
-                      color: ThemeV2.primary,
-                      width: 0.5,
-                    ),
+                    side: const BorderSide(color: ThemeV2.primary, width: 0.5),
                   ),
                 ),
               ),

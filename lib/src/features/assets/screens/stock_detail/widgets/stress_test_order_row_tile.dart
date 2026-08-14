@@ -42,7 +42,10 @@ class StressTestOrderRowTile extends ConsumerWidget {
             width: 8,
             height: 8,
             margin: const EdgeInsets.only(top: 5, right: 10),
-            decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: accentColor,
+              shape: BoxShape.circle,
+            ),
           ),
           Expanded(
             child: Column(
@@ -59,7 +62,10 @@ class StressTestOrderRowTile extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   companyName,
-                  style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textPrimary),
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: ThemeV2.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -74,12 +80,18 @@ class StressTestOrderRowTile extends ConsumerWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 18, color: ThemeV2.textSecondary),
+            icon: const Icon(
+              Icons.close_rounded,
+              size: 18,
+              color: ThemeV2.textSecondary,
+            ),
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               final confirmed = await confirmCancelOrder(context);
               if (confirmed) {
-                ref.read(stressTestPendingOrdersProvider.notifier).cancelOrder(order.id);
+                ref
+                    .read(stressTestPendingOrdersProvider.notifier)
+                    .cancelOrder(order.id);
               }
             },
           ),

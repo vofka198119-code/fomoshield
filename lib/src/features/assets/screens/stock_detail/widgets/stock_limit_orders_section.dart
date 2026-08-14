@@ -113,7 +113,9 @@ class StockLimitOrdersSection extends ConsumerWidget {
                     // was built from) so a fill mid-session updates/removes
                     // a row here instead of leaving a stale pending entry.
                     final liveOrders = ref
-                        .watch(stressTestSessionPendingOrdersProvider(sessionId))
+                        .watch(
+                          stressTestSessionPendingOrdersProvider(sessionId),
+                        )
                         .where((o) => o.symbol == symbol)
                         .toList();
                     return ListView.builder(

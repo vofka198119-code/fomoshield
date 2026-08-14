@@ -63,12 +63,20 @@ class OrderConfigSection extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline_rounded, color: ThemeV2.textSecondary, size: 16),
+          const Icon(
+            Icons.info_outline_rounded,
+            color: ThemeV2.textSecondary,
+            size: 16,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               infoText,
-              style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary, height: 1.5),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: ThemeV2.textSecondary,
+                height: 1.5,
+              ),
             ),
           ),
         ],
@@ -76,7 +84,10 @@ class OrderConfigSection extends StatelessWidget {
     );
   }
 
-  Widget _extendedHoursToggle(bool extendedHours, ValueChanged<bool> onChanged) {
+  Widget _extendedHoursToggle(
+    bool extendedHours,
+    ValueChanged<bool> onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Container(
@@ -84,7 +95,11 @@ class OrderConfigSection extends StatelessWidget {
         decoration: FomoShieldTheme.cardDecoration,
         child: Row(
           children: [
-            const Icon(Icons.access_time_rounded, color: ThemeV2.textSecondary, size: 20),
+            const Icon(
+              Icons.access_time_rounded,
+              color: ThemeV2.textSecondary,
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -100,7 +115,10 @@ class OrderConfigSection extends StatelessWidget {
                   ),
                   Text(
                     'Off: trade only while the real market is open',
-                    style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: ThemeV2.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -115,5 +133,4 @@ class OrderConfigSection extends StatelessWidget {
       ),
     );
   }
-
 }

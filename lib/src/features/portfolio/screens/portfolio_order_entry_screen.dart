@@ -184,8 +184,9 @@ class _PortfolioOrderEntryScreenState
         .read(portfolioPerformanceProvider(widget.portfolioId))
         .maybeWhen(data: (d) => d, orElse: () => null);
     final cash = performance?.cash ?? 0;
-    final reserved =
-        ref.read(ordersProvider.notifier).reservedCashForPortfolio(widget.portfolioId);
+    final reserved = ref
+        .read(ordersProvider.notifier)
+        .reservedCashForPortfolio(widget.portfolioId);
     return (cash - reserved).clamp(0, double.infinity);
   }
 
@@ -316,7 +317,9 @@ class _PortfolioOrderEntryScreenState
       // would ADD a new symbol; topping up a symbol already held never
       // increases the count.
       final portfolios = ref.read(portfoliosProvider);
-      final portfolio = portfolios.firstWhere((p) => p.id == widget.portfolioId);
+      final portfolio = portfolios.firstWhere(
+        (p) => p.id == widget.portfolioId,
+      );
       final alreadyHeld = portfolio.holdings.containsKey(widget.symbol);
       if (!alreadyHeld) {
         final maxHoldings = ref.read(maxHoldingsPerPortfolioProvider);
@@ -360,7 +363,10 @@ class _PortfolioOrderEntryScreenState
           content: Text(
             'You\'ve exceeded the allowed limit on asset purchases for '
             'this portfolio ($maxHoldings companies).',
-            style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textSecondary,
+            ),
           ),
           actions: [
             TextButton(
@@ -434,7 +440,8 @@ class _PortfolioOrderEntryScreenState
             companyName: widget.companyName,
             logoUrl: widget.logo,
             title: _isBuy ? 'You Bought' : 'You Sold',
-            detail: '${shares.toStringAsFixed(4)} shares of $companyName '
+            detail:
+                '${shares.toStringAsFixed(4)} shares of $companyName '
                 'at \$${_currentPrice.toStringAsFixed(2)}',
             createdAt: DateTime.now(),
           ),
@@ -453,7 +460,8 @@ class _PortfolioOrderEntryScreenState
             companyName: widget.companyName,
             logoUrl: widget.logo,
             title: '${orderType.label} ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
-            detail: '${shares.toStringAsFixed(4)} shares of $companyName'
+            detail:
+                '${shares.toStringAsFixed(4)} shares of $companyName'
                 '${limitPrice != null ? ' at \$${limitPrice.toStringAsFixed(2)}' : ''} — Pending',
             createdAt: DateTime.now(),
           ),

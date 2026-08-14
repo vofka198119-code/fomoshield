@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
-import '../../core/theme/fomo_shield_theme.dart';
 import 'market_clock_dial.dart';
 import 'market_clock_engine.dart';
 import 'market_clock_risk_engine.dart';
@@ -31,15 +30,9 @@ class TierStyle {
 
 const Map<RiskTier, TierStyle> _tierStyles = {
   RiskTier.low: TierStyle(color: ThemeV2.success, label: 'LOW RISK'),
-  RiskTier.moderate: TierStyle(
-    color: ThemeV2.warning,
-    label: 'MODERATE RISK',
-  ),
+  RiskTier.moderate: TierStyle(color: ThemeV2.warning, label: 'MODERATE RISK'),
   RiskTier.high: TierStyle(color: ThemeV2.loss, label: 'HIGH RISK'),
-  RiskTier.closed: TierStyle(
-    color: Colors.white70,
-    label: 'MARKET CLOSED',
-  ),
+  RiskTier.closed: TierStyle(color: Colors.white70, label: 'MARKET CLOSED'),
 };
 
 /// Public accessor so market_clock_risk_detail_screen.dart can show the
@@ -72,14 +65,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
     final style = _tierStyles[tier]!;
 
     return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: FomoShieldTheme.cardRadius,
-      ),
+      decoration: darkCardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

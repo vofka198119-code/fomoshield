@@ -222,17 +222,17 @@ class _CompanyWidgetsSettingsSheetState
                             size: 22,
                           )
                         : GestureDetector(
-                      onTap: () => _toggleVisibility(config.id),
-                      child: Icon(
-                        config.visible
-                            ? Icons.visibility_rounded
-                            : Icons.visibility_off_rounded,
-                        color: config.visible
-                            ? ThemeV2.primary
-                            : ThemeV2.textSecondary,
-                        size: 22,
-                      ),
-                    ),
+                            onTap: () => _toggleVisibility(config.id),
+                            child: Icon(
+                              config.visible
+                                  ? Icons.visibility_rounded
+                                  : Icons.visibility_off_rounded,
+                              color: config.visible
+                                  ? ThemeV2.primary
+                                  : ThemeV2.textSecondary,
+                              size: 22,
+                            ),
+                          ),
                   ),
                 );
               },

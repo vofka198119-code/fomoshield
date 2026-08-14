@@ -56,7 +56,9 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
   double get _minGoal {
     final portfolios = ref.read(portfoliosProvider);
     final portfolio = portfolios.where((p) => p.id == widget.portfolioId);
-    return portfolio.isEmpty ? _fallbackMinGoal : portfolio.first.startingBalance;
+    return portfolio.isEmpty
+        ? _fallbackMinGoal
+        : portfolio.first.startingBalance;
   }
 
   void _save() {
@@ -65,9 +67,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
     if (amount == null || amount < minGoal) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Minimum target is \$${minGoal.toStringAsFixed(0)}',
-          ),
+          content: Text('Minimum target is \$${minGoal.toStringAsFixed(0)}'),
         ),
       );
       return;
@@ -93,7 +93,10 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: ThemeV2.textPrimary,
+          ),
           onPressed: () => context.pop(),
         ),
       ),

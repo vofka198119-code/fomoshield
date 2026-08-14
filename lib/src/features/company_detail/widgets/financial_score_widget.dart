@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 import 'metric_info_data.dart';
 
 // ---------------------------------------------------------------------------
@@ -31,21 +31,18 @@ class FinancialScoreWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
-          borderRadius: FomoShieldTheme.cardRadius,
-        ),
+        decoration: darkCardDecoration(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Title ──
             Row(
               children: [
-                Icon(Icons.shield_rounded, size: 18, color: _gaugeColor(fsScore)),
+                Icon(
+                  Icons.shield_rounded,
+                  size: 18,
+                  color: _gaugeColor(fsScore),
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'FS SCORE',
@@ -76,16 +73,25 @@ class FinancialScoreWidget extends StatelessWidget {
             if (penalty > 0) ...[
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: ThemeV2.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: ThemeV2.warning.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.warning_amber_rounded, size: 14, color: ThemeV2.warning),
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      size: 14,
+                      color: ThemeV2.warning,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'Dividend trap penalty: -$penalty pts',
@@ -103,16 +109,25 @@ class FinancialScoreWidget extends StatelessWidget {
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: ThemeV2.loss.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: ThemeV2.loss.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: ThemeV2.loss.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.warning_amber_rounded, size: 14, color: ThemeV2.loss),
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      size: 14,
+                      color: ThemeV2.loss,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
@@ -141,7 +156,10 @@ class FinancialScoreWidget extends StatelessWidget {
               onTap: () => context.push('/metric-info/fs-score-legal'),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: dialBrassLight, width: 1),
                   borderRadius: BorderRadius.circular(10),
@@ -335,29 +353,37 @@ class _RadarChartPainter extends CustomPainter {
       final y = center.dy + r * math.sin(angle);
 
       // Dot
-      canvas.drawCircle(
-        Offset(x, y),
-        3.5,
-        Paint()..color = dialBrassLight,
-      );
+      canvas.drawCircle(Offset(x, y), 3.5, Paint()..color = dialBrassLight);
 
       // Label at edge
       final labelR = radius + 12;
       final lx = center.dx + labelR * math.cos(angle);
       final ly = center.dy + labelR * math.sin(angle);
-      _drawLabel(canvas, _shortName(marker['name'] as String? ?? ''), Offset(lx, ly), angle);
+      _drawLabel(
+        canvas,
+        _shortName(marker['name'] as String? ?? ''),
+        Offset(lx, ly),
+        angle,
+      );
     }
   }
 
   String _shortName(String name) {
     switch (name) {
-      case 'Valuation': return 'VAL';
-      case 'Financial Health': return 'FIN';
-      case 'Growth Potential': return 'GRW';
-      case 'Efficiency': return 'EFF';
-      case 'Historical Trend': return 'TRD';
-      case 'Shareholder Returns': return 'SHR';
-      default: return name.substring(0, 3).toUpperCase();
+      case 'Valuation':
+        return 'VAL';
+      case 'Financial Health':
+        return 'FIN';
+      case 'Growth Potential':
+        return 'GRW';
+      case 'Efficiency':
+        return 'EFF';
+      case 'Historical Trend':
+        return 'TRD';
+      case 'Shareholder Returns':
+        return 'SHR';
+      default:
+        return name.substring(0, 3).toUpperCase();
     }
   }
 
@@ -375,10 +401,7 @@ class _RadarChartPainter extends CustomPainter {
     )..layout();
 
     // Center the label around the position
-    final offset = Offset(
-      pos.dx - tp.width / 2,
-      pos.dy - tp.height / 2,
-    );
+    final offset = Offset(pos.dx - tp.width / 2, pos.dy - tp.height / 2);
     tp.paint(canvas, offset);
   }
 
@@ -519,4 +542,3 @@ class _MarkerCard extends StatelessWidget {
     );
   }
 }
-

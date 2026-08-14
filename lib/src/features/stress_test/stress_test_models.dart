@@ -1465,58 +1465,60 @@ class VerdictArchiveEntry {
     'unrealizedPnlBySymbol': unrealizedPnlBySymbol,
   };
 
-  factory VerdictArchiveEntry.fromJson(Map<String, dynamic> json) =>
-      VerdictArchiveEntry(
-        sessionId: json['sessionId'] as String,
-        durationLabel: json['durationLabel'] as String? ?? '',
-        startingCash: (json['startingCash'] as num?)?.toDouble() ?? 0,
-        finalValue: (json['finalValue'] as num?)?.toDouble() ?? 0,
-        pnlPercent: (json['pnlPercent'] as num?)?.toDouble() ?? 0,
-        totalTrades: json['totalTrades'] as int? ?? 0,
-        holdingCount: json['holdingCount'] as int? ?? 0,
-        completedAt: json['completedAt'] != null
-            ? DateTime.parse(json['completedAt'] as String)
-            : DateTime.now(),
-        verdict: PsychologicalVerdict.fromJson(
-          json['verdict'] as Map<String, dynamic>,
-        ),
-        // Absent for verdicts archived before this field existed —
-        // backward-compatible empty list, the widget shows a fallback.
-        trades:
-            (json['trades'] as List<dynamic>?)
-                ?.map((t) => StressTestTrade.fromJson(t as Map<String, dynamic>))
-                .toList() ??
-            const [],
-        // Absent for verdicts archived before this field existed — the
-        // marker widgets just show 0, same convention as [trades] above.
-        discipline: (json['discipline'] as num?)?.toDouble() ?? 0,
-        panicResistance: (json['panicResistance'] as num?)?.toDouble() ?? 0,
-        patience: (json['patience'] as num?)?.toDouble() ?? 0,
-        strategyAdherence:
-            (json['strategyAdherence'] as num?)?.toDouble() ?? 0,
-        strategyDiversification:
-            (json['strategyDiversification'] as num?)?.toDouble() ?? 0,
-        strategyConcentration:
-            (json['strategyConcentration'] as num?)?.toDouble() ?? 0,
-        strategySector: (json['strategySector'] as num?)?.toDouble() ?? 0,
-        strategyEtf: (json['strategyEtf'] as num?)?.toDouble() ?? 0,
-        strategyCashBuffer:
-            (json['strategyCashBuffer'] as num?)?.toDouble() ?? 0,
-        safetyMarker: (json['safetyMarker'] as num?)?.toDouble() ?? 0,
-        safetyMarkerHasData: json['safetyMarkerHasData'] as bool? ?? false,
-        // Absent for verdicts archived before this field existed — the
-        // Scenarios Experienced card just shows all zeros.
-        scenarioCounts: (json['scenarioCounts'] as Map<String, dynamic>?)
-                ?.map((k, v) => MapEntry(k, v as int)) ??
-            const {},
-        // Absent for verdicts archived before this field existed — the
-        // Companies card falls back to realized-only P&L (still-held
-        // positions show $0 instead of a real mark-to-market figure).
-        unrealizedPnlBySymbol:
-            (json['unrealizedPnlBySymbol'] as Map<String, dynamic>?)
-                ?.map((k, v) => MapEntry(k, (v as num).toDouble())) ??
-            const {},
-      );
+  factory VerdictArchiveEntry.fromJson(
+    Map<String, dynamic> json,
+  ) => VerdictArchiveEntry(
+    sessionId: json['sessionId'] as String,
+    durationLabel: json['durationLabel'] as String? ?? '',
+    startingCash: (json['startingCash'] as num?)?.toDouble() ?? 0,
+    finalValue: (json['finalValue'] as num?)?.toDouble() ?? 0,
+    pnlPercent: (json['pnlPercent'] as num?)?.toDouble() ?? 0,
+    totalTrades: json['totalTrades'] as int? ?? 0,
+    holdingCount: json['holdingCount'] as int? ?? 0,
+    completedAt: json['completedAt'] != null
+        ? DateTime.parse(json['completedAt'] as String)
+        : DateTime.now(),
+    verdict: PsychologicalVerdict.fromJson(
+      json['verdict'] as Map<String, dynamic>,
+    ),
+    // Absent for verdicts archived before this field existed —
+    // backward-compatible empty list, the widget shows a fallback.
+    trades:
+        (json['trades'] as List<dynamic>?)
+            ?.map((t) => StressTestTrade.fromJson(t as Map<String, dynamic>))
+            .toList() ??
+        const [],
+    // Absent for verdicts archived before this field existed — the
+    // marker widgets just show 0, same convention as [trades] above.
+    discipline: (json['discipline'] as num?)?.toDouble() ?? 0,
+    panicResistance: (json['panicResistance'] as num?)?.toDouble() ?? 0,
+    patience: (json['patience'] as num?)?.toDouble() ?? 0,
+    strategyAdherence: (json['strategyAdherence'] as num?)?.toDouble() ?? 0,
+    strategyDiversification:
+        (json['strategyDiversification'] as num?)?.toDouble() ?? 0,
+    strategyConcentration:
+        (json['strategyConcentration'] as num?)?.toDouble() ?? 0,
+    strategySector: (json['strategySector'] as num?)?.toDouble() ?? 0,
+    strategyEtf: (json['strategyEtf'] as num?)?.toDouble() ?? 0,
+    strategyCashBuffer: (json['strategyCashBuffer'] as num?)?.toDouble() ?? 0,
+    safetyMarker: (json['safetyMarker'] as num?)?.toDouble() ?? 0,
+    safetyMarkerHasData: json['safetyMarkerHasData'] as bool? ?? false,
+    // Absent for verdicts archived before this field existed — the
+    // Scenarios Experienced card just shows all zeros.
+    scenarioCounts:
+        (json['scenarioCounts'] as Map<String, dynamic>?)?.map(
+          (k, v) => MapEntry(k, v as int),
+        ) ??
+        const {},
+    // Absent for verdicts archived before this field existed — the
+    // Companies card falls back to realized-only P&L (still-held
+    // positions show $0 instead of a real mark-to-market figure).
+    unrealizedPnlBySymbol:
+        (json['unrealizedPnlBySymbol'] as Map<String, dynamic>?)?.map(
+          (k, v) => MapEntry(k, (v as num).toDouble()),
+        ) ??
+        const {},
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -1803,111 +1805,111 @@ AssetSector resolveAssetSector(String symbol) {
 /// matrix). Historically this was the sole SSOT; now [resolveGicsSector]
 /// (live Finnhub-backed) takes priority — see [resolveAssetSector].
 const Map<String, AssetSector> _legacyMap = {
-    // ── Tech / Speculative ─────────────────────────────────────────
-    'AAPL': AssetSector.techSpeculative,
-    'MSFT': AssetSector.techSpeculative,
-    'GOOGL': AssetSector.techSpeculative,
-    'GOOG': AssetSector.techSpeculative,
-    'AMZN': AssetSector.techSpeculative,
-    'META': AssetSector.techSpeculative,
-    'NVDA': AssetSector.techSpeculative,
-    'TSLA': AssetSector.techSpeculative,
-    'AMD': AssetSector.techSpeculative,
-    'INTC': AssetSector.techSpeculative,
-    'CRM': AssetSector.techSpeculative,
-    'ADBE': AssetSector.techSpeculative,
-    'NFLX': AssetSector.techSpeculative,
-    'CSCO': AssetSector.techSpeculative,
-    'ORCL': AssetSector.techSpeculative,
-    'IBM': AssetSector.techSpeculative,
-    'QCOM': AssetSector.techSpeculative,
-    'TXN': AssetSector.techSpeculative,
-    'AVGO': AssetSector.techSpeculative,
-    'MU': AssetSector.techSpeculative,
-    'BIIB': AssetSector.techSpeculative,
-    'GILD': AssetSector.techSpeculative,
-    'MRNA': AssetSector.techSpeculative,
-    'ILMN': AssetSector.techSpeculative,
-    'VRTX': AssetSector.techSpeculative,
-    // ── Consumer Staples / Defensive ───────────────────────────────
-    'KO': AssetSector.consumerStaples,
-    'PEP': AssetSector.consumerStaples,
-    'PG': AssetSector.consumerStaples,
-    'WMT': AssetSector.consumerStaples,
-    'COST': AssetSector.consumerStaples,
-    'MO': AssetSector.consumerStaples,
-    'CL': AssetSector.consumerStaples,
-    'KMB': AssetSector.consumerStaples,
-    'SYY': AssetSector.consumerStaples,
-    'GIS': AssetSector.consumerStaples,
-    'JNJ': AssetSector.consumerStaples,
-    'PFE': AssetSector.consumerStaples,
-    'UNH': AssetSector.consumerStaples,
-    'ABBV': AssetSector.consumerStaples,
-    'MRK': AssetSector.consumerStaples,
-    'ABT': AssetSector.consumerStaples,
-    'LLY': AssetSector.consumerStaples,
-    'MDT': AssetSector.consumerStaples,
-    'BMY': AssetSector.consumerStaples,
-    'AMGN': AssetSector.consumerStaples,
-    // ── Cyclical Consumer / Economically Sensitive ─────────────────
-    'JPM': AssetSector.cyclicalConsumer,
-    'BAC': AssetSector.cyclicalConsumer,
-    'C': AssetSector.cyclicalConsumer,
-    'GS': AssetSector.cyclicalConsumer,
-    'MS': AssetSector.cyclicalConsumer,
-    'WFC': AssetSector.cyclicalConsumer,
-    'AXP': AssetSector.cyclicalConsumer,
-    'V': AssetSector.cyclicalConsumer,
-    'MA': AssetSector.cyclicalConsumer,
-    'BLK': AssetSector.cyclicalConsumer,
-    'SCHW': AssetSector.cyclicalConsumer,
-    'PYPL': AssetSector.cyclicalConsumer,
-    'XOM': AssetSector.cyclicalConsumer,
-    'CVX': AssetSector.cyclicalConsumer,
-    'COP': AssetSector.cyclicalConsumer,
-    'EOG': AssetSector.cyclicalConsumer,
-    'SLB': AssetSector.cyclicalConsumer,
-    'OXY': AssetSector.cyclicalConsumer,
-    'MPC': AssetSector.cyclicalConsumer,
-    'PSX': AssetSector.cyclicalConsumer,
-    'BP': AssetSector.cyclicalConsumer,
-    'SHEL': AssetSector.cyclicalConsumer,
-    'WHR': AssetSector.cyclicalConsumer,
-    'HPQ': AssetSector.cyclicalConsumer,
-    'HMC': AssetSector.cyclicalConsumer,
-    'CAT': AssetSector.cyclicalConsumer,
-    'DE': AssetSector.cyclicalConsumer,
-    'FCX': AssetSector.cyclicalConsumer,
-    'X': AssetSector.cyclicalConsumer,
-    'NEM': AssetSector.cyclicalConsumer,
-    'CLF': AssetSector.cyclicalConsumer,
-    // ── Real Estate / REIT ─────────────────────────────────────────
-    'PLD': AssetSector.realEstateREIT,
-    'AMT': AssetSector.realEstateREIT,
-    'CCI': AssetSector.realEstateREIT,
-    'EQIX': AssetSector.realEstateREIT,
-    'PSA': AssetSector.realEstateREIT,
-    'O': AssetSector.realEstateREIT,
-    'SPG': AssetSector.realEstateREIT,
-    'WELL': AssetSector.realEstateREIT,
-    // ── Energy / Oil & Gas ─────────────────────────────────────────
-    'ECL': AssetSector.cyclicalConsumer,
-    // ── ETF Broad Market ───────────────────────────────────────────
-    'SPY': AssetSector.etfBroadMarket,
-    'QQQ': AssetSector.etfBroadMarket,
-    'DIA': AssetSector.etfBroadMarket,
-    'IWM': AssetSector.etfBroadMarket,
-    'VTI': AssetSector.etfBroadMarket,
-    'VOO': AssetSector.etfBroadMarket,
-    'IVV': AssetSector.etfBroadMarket,
-    'SCHB': AssetSector.etfBroadMarket,
-    'ITOT': AssetSector.etfBroadMarket,
-    'VEA': AssetSector.etfBroadMarket,
-    'VWO': AssetSector.etfBroadMarket,
-    'AGG': AssetSector.etfBroadMarket,
-    'BND': AssetSector.etfBroadMarket,
-  };
+  // ── Tech / Speculative ─────────────────────────────────────────
+  'AAPL': AssetSector.techSpeculative,
+  'MSFT': AssetSector.techSpeculative,
+  'GOOGL': AssetSector.techSpeculative,
+  'GOOG': AssetSector.techSpeculative,
+  'AMZN': AssetSector.techSpeculative,
+  'META': AssetSector.techSpeculative,
+  'NVDA': AssetSector.techSpeculative,
+  'TSLA': AssetSector.techSpeculative,
+  'AMD': AssetSector.techSpeculative,
+  'INTC': AssetSector.techSpeculative,
+  'CRM': AssetSector.techSpeculative,
+  'ADBE': AssetSector.techSpeculative,
+  'NFLX': AssetSector.techSpeculative,
+  'CSCO': AssetSector.techSpeculative,
+  'ORCL': AssetSector.techSpeculative,
+  'IBM': AssetSector.techSpeculative,
+  'QCOM': AssetSector.techSpeculative,
+  'TXN': AssetSector.techSpeculative,
+  'AVGO': AssetSector.techSpeculative,
+  'MU': AssetSector.techSpeculative,
+  'BIIB': AssetSector.techSpeculative,
+  'GILD': AssetSector.techSpeculative,
+  'MRNA': AssetSector.techSpeculative,
+  'ILMN': AssetSector.techSpeculative,
+  'VRTX': AssetSector.techSpeculative,
+  // ── Consumer Staples / Defensive ───────────────────────────────
+  'KO': AssetSector.consumerStaples,
+  'PEP': AssetSector.consumerStaples,
+  'PG': AssetSector.consumerStaples,
+  'WMT': AssetSector.consumerStaples,
+  'COST': AssetSector.consumerStaples,
+  'MO': AssetSector.consumerStaples,
+  'CL': AssetSector.consumerStaples,
+  'KMB': AssetSector.consumerStaples,
+  'SYY': AssetSector.consumerStaples,
+  'GIS': AssetSector.consumerStaples,
+  'JNJ': AssetSector.consumerStaples,
+  'PFE': AssetSector.consumerStaples,
+  'UNH': AssetSector.consumerStaples,
+  'ABBV': AssetSector.consumerStaples,
+  'MRK': AssetSector.consumerStaples,
+  'ABT': AssetSector.consumerStaples,
+  'LLY': AssetSector.consumerStaples,
+  'MDT': AssetSector.consumerStaples,
+  'BMY': AssetSector.consumerStaples,
+  'AMGN': AssetSector.consumerStaples,
+  // ── Cyclical Consumer / Economically Sensitive ─────────────────
+  'JPM': AssetSector.cyclicalConsumer,
+  'BAC': AssetSector.cyclicalConsumer,
+  'C': AssetSector.cyclicalConsumer,
+  'GS': AssetSector.cyclicalConsumer,
+  'MS': AssetSector.cyclicalConsumer,
+  'WFC': AssetSector.cyclicalConsumer,
+  'AXP': AssetSector.cyclicalConsumer,
+  'V': AssetSector.cyclicalConsumer,
+  'MA': AssetSector.cyclicalConsumer,
+  'BLK': AssetSector.cyclicalConsumer,
+  'SCHW': AssetSector.cyclicalConsumer,
+  'PYPL': AssetSector.cyclicalConsumer,
+  'XOM': AssetSector.cyclicalConsumer,
+  'CVX': AssetSector.cyclicalConsumer,
+  'COP': AssetSector.cyclicalConsumer,
+  'EOG': AssetSector.cyclicalConsumer,
+  'SLB': AssetSector.cyclicalConsumer,
+  'OXY': AssetSector.cyclicalConsumer,
+  'MPC': AssetSector.cyclicalConsumer,
+  'PSX': AssetSector.cyclicalConsumer,
+  'BP': AssetSector.cyclicalConsumer,
+  'SHEL': AssetSector.cyclicalConsumer,
+  'WHR': AssetSector.cyclicalConsumer,
+  'HPQ': AssetSector.cyclicalConsumer,
+  'HMC': AssetSector.cyclicalConsumer,
+  'CAT': AssetSector.cyclicalConsumer,
+  'DE': AssetSector.cyclicalConsumer,
+  'FCX': AssetSector.cyclicalConsumer,
+  'X': AssetSector.cyclicalConsumer,
+  'NEM': AssetSector.cyclicalConsumer,
+  'CLF': AssetSector.cyclicalConsumer,
+  // ── Real Estate / REIT ─────────────────────────────────────────
+  'PLD': AssetSector.realEstateREIT,
+  'AMT': AssetSector.realEstateREIT,
+  'CCI': AssetSector.realEstateREIT,
+  'EQIX': AssetSector.realEstateREIT,
+  'PSA': AssetSector.realEstateREIT,
+  'O': AssetSector.realEstateREIT,
+  'SPG': AssetSector.realEstateREIT,
+  'WELL': AssetSector.realEstateREIT,
+  // ── Energy / Oil & Gas ─────────────────────────────────────────
+  'ECL': AssetSector.cyclicalConsumer,
+  // ── ETF Broad Market ───────────────────────────────────────────
+  'SPY': AssetSector.etfBroadMarket,
+  'QQQ': AssetSector.etfBroadMarket,
+  'DIA': AssetSector.etfBroadMarket,
+  'IWM': AssetSector.etfBroadMarket,
+  'VTI': AssetSector.etfBroadMarket,
+  'VOO': AssetSector.etfBroadMarket,
+  'IVV': AssetSector.etfBroadMarket,
+  'SCHB': AssetSector.etfBroadMarket,
+  'ITOT': AssetSector.etfBroadMarket,
+  'VEA': AssetSector.etfBroadMarket,
+  'VWO': AssetSector.etfBroadMarket,
+  'AGG': AssetSector.etfBroadMarket,
+  'BND': AssetSector.etfBroadMarket,
+};
 
 /// Reverse mapping from [AssetSector] → representative [MarketSector].
 MarketSector marketSectorToAssetSectorReversed(AssetSector a) => switch (a) {

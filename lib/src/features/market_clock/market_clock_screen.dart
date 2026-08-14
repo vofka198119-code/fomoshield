@@ -129,10 +129,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(
-                      color: ThemeV2.primary,
-                      width: 0.5,
-                    ),
+                    side: const BorderSide(color: ThemeV2.primary, width: 0.5),
                   ),
                 ),
               ),

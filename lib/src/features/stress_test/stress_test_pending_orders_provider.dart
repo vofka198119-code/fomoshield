@@ -46,8 +46,11 @@ class StressTestPendingOrdersNotifier
   }
 
   List<StressTestPendingOrder> forSession(String sessionId) => state
-      .where((o) =>
-          o.sessionId == sessionId && o.status == StressTestOrderStatus.pending)
+      .where(
+        (o) =>
+            o.sessionId == sessionId &&
+            o.status == StressTestOrderStatus.pending,
+      )
       .toList();
 
   /// Cash already committed to this session's pending BUY limit orders —
@@ -117,11 +120,14 @@ class StressTestPendingOrdersNotifier
       for (final order in pending) {
         final price = session.currentPrices[order.symbol];
         if (price == null) continue;
-        final shouldFill =
-            order.isBuy ? price <= order.limitPrice : price >= order.limitPrice;
+        final shouldFill = order.isBuy
+            ? price <= order.limitPrice
+            : price >= order.limitPrice;
         if (!shouldFill) continue;
 
-        final result = _ref.read(stressTestProvider.notifier).executeTrade(
+        final result = _ref
+            .read(stressTestProvider.notifier)
+            .executeTrade(
               session.id,
               order.symbol,
               order.isBuy,
@@ -152,7 +158,8 @@ class StressTestPendingOrdersNotifier
               symbol: order.symbol,
               companyName: stressTestCompanyName(order.symbol),
               title: 'Limit ${order.isBuy ? 'Buy' : 'Sell'} Order Filled',
-              detail: '${order.quantity.toStringAsFixed(4)} shares of '
+              detail:
+                  '${order.quantity.toStringAsFixed(4)} shares of '
                   '${stressTestCompanyName(order.symbol)} at '
                   '\$${order.limitPrice.toStringAsFixed(2)}',
               createdAt: DateTime.now(),
@@ -165,25 +172,31 @@ class StressTestPendingOrdersNotifier
   }
 }
 
-final stressTestPendingOrdersProvider = StateNotifierProvider<
-    StressTestPendingOrdersNotifier, List<StressTestPendingOrder>>((ref) {
-  final notifier = StressTestPendingOrdersNotifier(ref);
-  // Reacts to every stressTestProvider state change (each 20s price tick
-  // included) without needing to touch the existing timer that drives it
-  // (stress_test_screen.dart) — deferred to a microtask so a fill's own
-  // state write never runs synchronously inside this listener callback.
-  ref.listen<List<StressTestSession>>(stressTestProvider, (previous, next) {
-    scheduleMicrotask(() => notifier._checkAllSessions(next));
-  });
-  return notifier;
-});
+final stressTestPendingOrdersProvider =
+    StateNotifierProvider<
+      StressTestPendingOrdersNotifier,
+      List<StressTestPendingOrder>
+    >((ref) {
+      final notifier = StressTestPendingOrdersNotifier(ref);
+      // Reacts to every stressTestProvider state change (each 20s price tick
+      // included) without needing to touch the existing timer that drives it
+      // (stress_test_screen.dart) — deferred to a microtask so a fill's own
+      // state write never runs synchronously inside this listener callback.
+      ref.listen<List<StressTestSession>>(stressTestProvider, (previous, next) {
+        scheduleMicrotask(() => notifier._checkAllSessions(next));
+      });
+      return notifier;
+    });
 
 /// This session's own pending (not yet filled/cancelled) limit orders.
 final stressTestSessionPendingOrdersProvider =
     Provider.family<List<StressTestPendingOrder>, String>((ref, sessionId) {
-  final all = ref.watch(stressTestPendingOrdersProvider);
-  return all
-      .where((o) =>
-          o.sessionId == sessionId && o.status == StressTestOrderStatus.pending)
-      .toList();
-});
+      final all = ref.watch(stressTestPendingOrdersProvider);
+      return all
+          .where(
+            (o) =>
+                o.sessionId == sessionId &&
+                o.status == StressTestOrderStatus.pending,
+          )
+          .toList();
+    });

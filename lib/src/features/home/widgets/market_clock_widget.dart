@@ -65,7 +65,11 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
                     ),
                   ),
                   const Spacer(),
-                  Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.7), size: 20),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white.withValues(alpha: 0.7),
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -100,7 +104,10 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
                       children: [
                         Row(
                           children: [
-                            Text(window.emoji, style: const TextStyle(fontSize: 15)),
+                            Text(
+                              window.emoji,
+                              style: const TextStyle(fontSize: 15),
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(

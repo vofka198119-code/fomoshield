@@ -18,7 +18,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
+import '../../../core/cache/logo_providers.dart'
+    show resolvedCompanyNameProvider;
 import '../../../shared/widgets/donut_ring_painter.dart';
 import '../portfolio_providers.dart';
 
@@ -39,7 +40,8 @@ class PortfolioBalanceWidget extends ConsumerStatefulWidget {
       _PortfolioBalanceWidgetState();
 }
 
-class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget> {
+class _PortfolioBalanceWidgetState
+    extends ConsumerState<PortfolioBalanceWidget> {
   static const int _legendPreviewLimit = 5;
   bool _showAll = false;
 
@@ -68,12 +70,18 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
         child: widget.hasError
             ? Text(
                 'Failed to load',
-                style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: ThemeV2.textSecondary,
+                ),
               )
             : const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: ThemeV2.primary),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: ThemeV2.primary,
+                ),
               ),
       );
     }
@@ -81,7 +89,10 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
     final perf = widget.performance!;
     final holdings = List<HoldingPerformance>.from(perf.holdings)
       ..sort((a, b) => b.currentValue.compareTo(a.currentValue));
-    final totalInvested = holdings.fold<double>(0, (s, h) => s + h.currentValue);
+    final totalInvested = holdings.fold<double>(
+      0,
+      (s, h) => s + h.currentValue,
+    );
     final hasData = holdings.isNotEmpty && totalInvested > 0;
 
     final portfolioTotal = perf.currentValue;
@@ -111,7 +122,10 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
             width: double.infinity,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-              child: Text('PORTFOLIO BALANCE', style: FomoShieldTheme.cardTitle()),
+              child: Text(
+                'PORTFOLIO BALANCE',
+                style: FomoShieldTheme.cardTitle(),
+              ),
             ),
           ),
           Divider(
@@ -221,8 +235,11 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
                             Expanded(
                               child: Text(
                                 ref
-                                        .watch(resolvedCompanyNameProvider(
-                                            holdings[i].symbol))
+                                        .watch(
+                                          resolvedCompanyNameProvider(
+                                            holdings[i].symbol,
+                                          ),
+                                        )
                                         .valueOrNull ??
                                     holdings[i].symbol,
                                 overflow: TextOverflow.ellipsis,

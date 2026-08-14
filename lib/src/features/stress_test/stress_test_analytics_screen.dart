@@ -165,9 +165,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                     icon: pnlPercent >= 0
                         ? Icons.trending_up_rounded
                         : Icons.trending_down_rounded,
-                    color: pnlPercent >= 0
-                        ? ThemeV2.success
-                        : ThemeV2.loss,
+                    color: pnlPercent >= 0 ? ThemeV2.success : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -440,9 +438,7 @@ class StressTestAnalyticsScreen extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: priceChange >= 0
-                        ? ThemeV2.success
-                        : ThemeV2.loss,
+                    color: priceChange >= 0 ? ThemeV2.success : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -637,4 +633,3 @@ class _AnalyticsRadarPainter extends CustomPainter {
   @override
   bool shouldRepaint(_AnalyticsRadarPainter oldDelegate) => true;
 }
-

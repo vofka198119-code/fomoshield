@@ -47,15 +47,15 @@ class StressTestPendingOrder {
       );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'sessionId': sessionId,
-        'symbol': symbol,
-        'isBuy': isBuy,
-        'quantity': quantity,
-        'limitPrice': limitPrice,
-        'createdAt': createdAt.toIso8601String(),
-        'status': status.name,
-      };
+    'id': id,
+    'sessionId': sessionId,
+    'symbol': symbol,
+    'isBuy': isBuy,
+    'quantity': quantity,
+    'limitPrice': limitPrice,
+    'createdAt': createdAt.toIso8601String(),
+    'status': status.name,
+  };
 
   factory StressTestPendingOrder.fromJson(Map<String, dynamic> json) =>
       StressTestPendingOrder(

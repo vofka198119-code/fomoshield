@@ -13,7 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
-import '../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'stress_test_portfolio_balance_widget_order_provider.dart';
@@ -226,14 +226,7 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       child: Column(
         children: [
           SizedBox(

@@ -206,10 +206,7 @@ void evaluateSellTrade({
   if (realizedPnl == null) return;
 
   if (realizedPnl > 0) {
-    profile.panicResistance = (profile.panicResistance + 0.05).clamp(
-      0.0,
-      1.0,
-    );
+    profile.panicResistance = (profile.panicResistance + 0.05).clamp(0.0, 1.0);
     profile.patience = (profile.patience + 0.05).clamp(0.0, 1.0);
     return;
   }
@@ -229,8 +226,10 @@ void evaluateSellTrade({
   }
 
   final severity = lossPct * 0.5 + bottomProximity * 0.5;
-  profile.panicResistance = (profile.panicResistance - severity * 0.30)
-      .clamp(0.0, 1.0);
+  profile.panicResistance = (profile.panicResistance - severity * 0.30).clamp(
+    0.0,
+    1.0,
+  );
 }
 
 /// The 5 independent signals behind the Strategy pillar, plus their
@@ -328,7 +327,8 @@ StrategySubScores computeStrategySubScores({
   final etfCount = holdings
       .where(
         (h) =>
-            h.isEtf || resolveAssetSector(h.symbol) == AssetSector.etfBroadMarket,
+            h.isEtf ||
+            resolveAssetSector(h.symbol) == AssetSector.etfBroadMarket,
       )
       .length;
   final etfScore = etfExposureScoreForCount(etfCount) / 100;

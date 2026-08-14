@@ -64,8 +64,9 @@ class MarketClockWidgetsNotifier
     // any saved ids that have since been retired.
     if (savedOrder != null) {
       final savedSet = Set<String>.from(savedOrder);
-      final missing =
-          marketClockDefaultOrder.where((id) => !savedSet.contains(id));
+      final missing = marketClockDefaultOrder.where(
+        (id) => !savedSet.contains(id),
+      );
       order = [
         ...savedOrder.where((id) => marketClockDefaultOrder.contains(id)),
         ...missing,
@@ -94,8 +95,7 @@ class MarketClockWidgetsNotifier
 
   Future<void> _save() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-        _prefsOrderKey, state.map((c) => c.id).toList());
+    await prefs.setStringList(_prefsOrderKey, state.map((c) => c.id).toList());
     await prefs.setString(
       _prefsVisibilityKey,
       state.map((c) => '${c.id}:${c.visible}').join(','),
@@ -136,7 +136,8 @@ class MarketClockWidgetsNotifier
   }
 }
 
-final marketClockWidgetsProvider = StateNotifierProvider<
-    MarketClockWidgetsNotifier, List<MarketClockWidgetConfig>>(
-  (ref) => MarketClockWidgetsNotifier(),
-);
+final marketClockWidgetsProvider =
+    StateNotifierProvider<
+      MarketClockWidgetsNotifier,
+      List<MarketClockWidgetConfig>
+    >((ref) => MarketClockWidgetsNotifier());

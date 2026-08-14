@@ -21,11 +21,11 @@ import '../../shared/guardian/guardian_providers.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 
-// Brand dark-green gradient and the Market Clock ring's gold accent — used
-// for every "PREMIUM" tag on this screen.
-const List<Color> _brandGradient = [dialLight, dialDark];
-List<Shadow> _goldGlow(Color color) =>
-    [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6)];
+// Market Clock ring's gold accent — used for every "PREMIUM" tag on this
+// screen.
+List<Shadow> _goldGlow(Color color) => [
+  Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6),
+];
 
 class StressTestSetupScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -189,12 +189,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(14),
                 child: Ink(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: _brandGradient,
-                    ),
+                  decoration: darkCardDecoration(
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: InkWell(
@@ -255,12 +250,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: _brandGradient,
-              ),
+            decoration: darkCardDecoration(
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -463,12 +453,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         horizontal: 8,
                         vertical: 3,
                       ),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: _brandGradient,
-                        ),
+                      decoration: darkCardDecoration(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -488,12 +473,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         horizontal: 8,
                         vertical: 3,
                       ),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: _brandGradient,
-                        ),
+                      decoration: darkCardDecoration(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -761,7 +741,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                             style: OutlinedButton.styleFrom(
                               foregroundColor: ThemeV2.textSecondary,
                               side: BorderSide(
-                                color: ThemeV2.textSecondary.withValues(alpha: 0.3),
+                                color: ThemeV2.textSecondary.withValues(
+                                  alpha: 0.3,
+                                ),
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -1020,9 +1002,8 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                             ? _accentColor
                             : ThemeV2.textSecondary.withValues(alpha: 0.3),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: ThemeV2.textSecondary.withValues(
-                          alpha: 0.2,
-                        ),
+                        disabledBackgroundColor: ThemeV2.textSecondary
+                            .withValues(alpha: 0.2),
                         disabledForegroundColor: Colors.white38,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -1238,4 +1219,3 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
     );
   }
 }
-

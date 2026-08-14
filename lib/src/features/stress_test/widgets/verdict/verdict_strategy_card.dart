@@ -10,7 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
-import '../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'verdict_marker_row.dart';
 
 class _StrategyRow {
@@ -60,14 +60,7 @@ class VerdictStrategyCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(22)),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +70,10 @@ class VerdictStrategyCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('STRATEGY', style: FomoShieldTheme.cardTitle(Colors.white)),
+                Text(
+                  'STRATEGY',
+                  style: FomoShieldTheme.cardTitle(Colors.white),
+                ),
                 GestureDetector(
                   onTap: () => context.push('/metric-info/psychology-strategy'),
                   child: Container(

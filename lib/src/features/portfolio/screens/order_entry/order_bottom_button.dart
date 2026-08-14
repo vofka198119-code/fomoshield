@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
-import '../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'order_amount_section.dart' show OrderInputMode;
 
 // ---------------------------------------------------------------------------
@@ -44,7 +44,10 @@ class OrderBottomButton extends StatelessWidget {
                 children: [
                   Text(
                     inputMode == OrderInputMode.cost ? 'Cost:' : 'Qty:',
-                    style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: ThemeV2.textSecondary,
+                    ),
                   ),
                   Text(
                     inputMode == OrderInputMode.cost
@@ -137,14 +140,7 @@ class ReviewOrderButton extends StatelessWidget {
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(18),
       child: Ink(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
-          borderRadius: BorderRadius.circular(18),
-        ),
+        decoration: darkCardDecoration(borderRadius: BorderRadius.circular(18)),
         child: InkWell(
           onTap: onSubmit,
           borderRadius: BorderRadius.circular(18),

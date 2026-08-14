@@ -8,7 +8,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../../portfolio/portfolio_providers.dart';
 import '../company_detail_provider.dart'
     show chartHoverPriceProvider, chartPeriodChangeProvider;
@@ -279,14 +279,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 6),
               decoration: isSelected
-                  ? BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [dialLight, dialDark],
-                      ),
-                      borderRadius: BorderRadius.circular(6),
-                    )
+                  ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
                   : null,
               child: Text(
                 period.label,

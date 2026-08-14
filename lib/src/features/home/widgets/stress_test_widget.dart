@@ -18,12 +18,11 @@ import '../../market_clock/market_clock_dial.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 
-// Brand dark-green gradient (same as TARGET/Shield Signal) and the Market
-// Clock ring's gold accent — used for the play-button badge and every
-// "PREMIUM" tag below.
-const List<Color> _brandGradient = [dialLight, dialDark];
-List<Shadow> _goldGlow(Color color) =>
-    [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6)];
+// Market Clock ring's gold accent — used for the play-button badge and
+// every "PREMIUM" tag below.
+List<Shadow> _goldGlow(Color color) => [
+  Shadow(color: color.withValues(alpha: 0.5), blurRadius: 6),
+];
 
 class StressTestWidget extends ConsumerWidget {
   const StressTestWidget({super.key});
@@ -114,9 +113,7 @@ class StressTestWidget extends ConsumerWidget {
 
     // ── Active sessions ────────────────────────────────────────────
     if (activeSessions.isNotEmpty) {
-      final preview = activeSessions.take(2).toList().asMap().entries.map((
-        e,
-      ) {
+      final preview = activeSessions.take(2).toList().asMap().entries.map((e) {
         return _buildActiveSessionTile(context, ref, e.value, e.key);
       }).toList();
       children.addAll(preview);
@@ -156,12 +153,7 @@ class StressTestWidget extends ConsumerWidget {
                     horizontal: 8,
                     vertical: 3,
                   ),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: _brandGradient,
-                    ),
+                  decoration: darkCardDecoration(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -302,14 +294,7 @@ class StressTestWidget extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: _brandGradient,
-        ),
-        borderRadius: BorderRadius.circular(5),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
         'premium',
         style: GoogleFonts.inter(
@@ -341,12 +326,7 @@ class StressTestWidget extends ConsumerWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: _brandGradient,
-                ),
+              decoration: darkCardDecoration(
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -421,9 +401,7 @@ class StressTestWidget extends ConsumerWidget {
     } catch (_) {}
 
     final verdictTitle = verdict?.title ?? '—';
-    final pnlColor = session.profitLoss >= 0
-        ? ThemeV2.success
-        : ThemeV2.loss;
+    final pnlColor = session.profitLoss >= 0 ? ThemeV2.success : ThemeV2.loss;
 
     return InkWell(
       key: ValueKey('st_completed_${session.id}'),
@@ -437,12 +415,7 @@ class StressTestWidget extends ConsumerWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: _brandGradient,
-                ),
+              decoration: darkCardDecoration(
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
@@ -496,4 +469,3 @@ class StressTestWidget extends ConsumerWidget {
     );
   }
 }
-

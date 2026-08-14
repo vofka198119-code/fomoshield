@@ -73,7 +73,11 @@ class OrderHeader extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: ThemeV2.primary, width: 1.5),
                     ),
-                    child: CompanyLogo(ticker: symbol, logoUrl: logo, radius: 16),
+                    child: CompanyLogo(
+                      ticker: symbol,
+                      logoUrl: logo,
+                      radius: 16,
+                    ),
                   ),
                 ),
               ],
@@ -117,21 +121,32 @@ class OrderTypeTabs extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 28, 16, 8),
       child: Row(
         children: [
-          Expanded(child: _tab(context, 'Market', !isLimit, () => onChanged(false))),
+          Expanded(
+            child: _tab(context, 'Market', !isLimit, () => onChanged(false)),
+          ),
           const SizedBox(width: 8),
-          Expanded(child: _tab(context, 'Limit', isLimit, () => onChanged(true))),
+          Expanded(
+            child: _tab(context, 'Limit', isLimit, () => onChanged(true)),
+          ),
         ],
       ),
     );
   }
 
-  Widget _tab(BuildContext context, String label, bool active, VoidCallback onTap) {
+  Widget _tab(
+    BuildContext context,
+    String label,
+    bool active,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: active ? ThemeV2.primary.withValues(alpha: 0.08) : Colors.transparent,
+          color: active
+              ? ThemeV2.primary.withValues(alpha: 0.08)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: active ? ThemeV2.primary : ThemeV2.divider),
         ),

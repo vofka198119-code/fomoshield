@@ -64,16 +64,21 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
         context,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-          child: Text('No portfolio',
-              style: GoogleFonts.inter(
-                  fontSize: 14, color: ThemeV2.textSecondary)),
+          child: Text(
+            'No portfolio',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
         ),
       );
     }
 
     final activeId = ref.watch(activePortfolioIdProvider);
-    int index =
-        activeId != null ? portfolios.indexWhere((p) => p.id == activeId) : 0;
+    int index = activeId != null
+        ? portfolios.indexWhere((p) => p.id == activeId)
+        : 0;
     if (index < 0) index = 0;
     _currentIndex = _currentIndex.clamp(0, portfolios.length - 1);
 
@@ -184,14 +189,7 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
   Widget _premiumPill() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(12)),
       child: Text(
         'PREMIUM',
         style: GoogleFonts.inter(
@@ -244,8 +242,9 @@ class _PortfolioPerformanceView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final performanceAsync =
-        ref.watch(portfolioPerformanceProvider(portfolioId));
+    final performanceAsync = ref.watch(
+      portfolioPerformanceProvider(portfolioId),
+    );
 
     return performanceAsync.when(
       loading: () => Row(
@@ -254,19 +253,28 @@ class _PortfolioPerformanceView extends ConsumerWidget {
             width: 18,
             height: 18,
             child: CircularProgressIndicator(
-                strokeWidth: 2, color: ThemeV2.primary),
+              strokeWidth: 2,
+              color: ThemeV2.primary,
+            ),
           ),
           const SizedBox(width: 12),
-          Text('Loading...',
-              style: GoogleFonts.inter(
-                  fontSize: 14, color: ThemeV2.textSecondary)),
+          Text(
+            'Loading...',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
         ],
       ),
-      error: (_, _) => Text('\$– – –',
-          style: interNums(
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-              color: ThemeV2.textPrimary)),
+      error: (_, _) => Text(
+        '\$– – –',
+        style: interNums(
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+          color: ThemeV2.textPrimary,
+        ),
+      ),
       data: (perf) {
         final isUp = perf.pnl >= 0;
         final pnlColor = isUp ? ThemeV2.success : ThemeV2.loss;
@@ -321,9 +329,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Expanded(
-                child: _VerticalProgressBar(currentPercent: barPercent),
-              ),
+              Expanded(child: _VerticalProgressBar(currentPercent: barPercent)),
             ],
           ),
         );
@@ -404,14 +410,7 @@ class _VerticalProgressBar extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(10, 10, 12, 14),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       // Same window title treatment as the cells to the left (label above
       // content), just in white — the cells' primary-green label color
       // would be invisible against this dark gradient. The window itself
@@ -465,13 +464,19 @@ class _VerticalProgressBar extends StatelessWidget {
                     widthFactor: 0.65,
                     child: Column(
                       verticalDirection: VerticalDirection.up,
-                      children: List.generate(SegmentGaugeMath.segmentCount, (i) {
-                        final fraction =
-                            SegmentGaugeMath.fillFraction(currentPercent, i);
+                      children: List.generate(SegmentGaugeMath.segmentCount, (
+                        i,
+                      ) {
+                        final fraction = SegmentGaugeMath.fillFraction(
+                          currentPercent,
+                          i,
+                        );
                         return Expanded(
                           child: Container(
                             margin: EdgeInsets.only(
-                              top: i == SegmentGaugeMath.segmentCount - 1 ? 0 : 3,
+                              top: i == SegmentGaugeMath.segmentCount - 1
+                                  ? 0
+                                  : 3,
                             ),
                             clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
@@ -484,7 +489,10 @@ class _VerticalProgressBar extends StatelessWidget {
                                     child: FractionallySizedBox(
                                       heightFactor: fraction,
                                       child: Container(
-                                          color: SegmentGaugeMath.colorForIndex(i)),
+                                        color: SegmentGaugeMath.colorForIndex(
+                                          i,
+                                        ),
+                                      ),
                                     ),
                                   )
                                 : null,

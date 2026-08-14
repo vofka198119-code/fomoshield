@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../core/theme/typography_helpers.dart';
-import '../../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../../market_clock/market_clock_dial.dart'
+    show darkCardDecoration;
 
 // ---------------------------------------------------------------------------
 // Stress Test "Your Position" card — visual match for real Portfolio's
@@ -37,14 +38,7 @@ class StockPositionCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: FomoShieldTheme.cardRadius,
-      ),
+      decoration: darkCardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -56,7 +50,12 @@ class StockPositionCard extends StatelessWidget {
           const SizedBox(height: 8),
           _row('Shares', shares.toStringAsFixed(4)),
           const SizedBox(height: 8),
-          _pnlRow(pnl: pnl, pnlPercent: pnlPercent, isUp: isUp, pnlColor: pnlColor),
+          _pnlRow(
+            pnl: pnl,
+            pnlPercent: pnlPercent,
+            isUp: isUp,
+            pnlColor: pnlColor,
+          ),
           const SizedBox(height: 8),
           _row('Avg Cost', '\$${avgPrice.toStringAsFixed(2)}'),
         ],
@@ -77,7 +76,11 @@ class StockPositionCard extends StatelessWidget {
       ),
       Text(
         value,
-        style: interNums(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+        style: interNums(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
       ),
     ],
   );
@@ -109,7 +112,11 @@ class StockPositionCard extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '${isUp ? '+' : ''}${pnl.toStringAsFixed(2)} (${pnlPercent.toStringAsFixed(2)}%)',
-            style: interNums(fontSize: 14, fontWeight: FontWeight.w600, color: pnlColor),
+            style: interNums(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: pnlColor,
+            ),
           ),
         ],
       ),

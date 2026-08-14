@@ -548,8 +548,18 @@ DateTime nowInNewYork() {
 
 bool _isEasternDaylightTime(DateTime utc) {
   final year = utc.year;
-  final dstStartUtc = DateTime.utc(year, 3, _nthWeekdayDay(year, 3, DateTime.sunday, 2), 7);
-  final dstEndUtc = DateTime.utc(year, 11, _nthWeekdayDay(year, 11, DateTime.sunday, 1), 6);
+  final dstStartUtc = DateTime.utc(
+    year,
+    3,
+    _nthWeekdayDay(year, 3, DateTime.sunday, 2),
+    7,
+  );
+  final dstEndUtc = DateTime.utc(
+    year,
+    11,
+    _nthWeekdayDay(year, 11, DateTime.sunday, 1),
+    6,
+  );
   return !utc.isBefore(dstStartUtc) && utc.isBefore(dstEndUtc);
 }
 
@@ -560,7 +570,9 @@ int _nthWeekdayDay(int year, int month, int weekday, int n) {
 }
 
 int _lastWeekdayDay(int year, int month, int weekday) {
-  final firstOfNextMonth = month == 12 ? DateTime(year + 1, 1, 1) : DateTime(year, month + 1, 1);
+  final firstOfNextMonth = month == 12
+      ? DateTime(year + 1, 1, 1)
+      : DateTime(year, month + 1, 1);
   final lastDay = firstOfNextMonth.subtract(const Duration(days: 1));
   final diff = (lastDay.weekday - weekday + 7) % 7;
   return lastDay.day - diff;
@@ -586,14 +598,17 @@ DateTime _easterSunday(int year) {
 }
 
 DateTime _observedFixed(DateTime date) {
-  if (date.weekday == DateTime.saturday) return date.subtract(const Duration(days: 1));
+  if (date.weekday == DateTime.saturday)
+    return date.subtract(const Duration(days: 1));
   if (date.weekday == DateTime.sunday) return date.add(const Duration(days: 1));
   return date;
 }
 
-bool _isSameDate(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
+bool _isSameDate(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;
 
-bool isWeekend(DateTime dateEt) => dateEt.weekday == DateTime.saturday || dateEt.weekday == DateTime.sunday;
+bool isWeekend(DateTime dateEt) =>
+    dateEt.weekday == DateTime.saturday || dateEt.weekday == DateTime.sunday;
 
 /// Full-closure NYSE holidays. Nth-weekday and Easter-derived dates are
 /// recomputed for [dateEt]'s year, not hardcoded — see docs/MARKET_CLOCK_SPEC.md
@@ -610,7 +625,11 @@ bool isFullClosureHoliday(DateTime dateEt) {
     _observedFixed(DateTime(y, 6, 19)), // Juneteenth
     _observedFixed(DateTime(y, 7, 4)), // Independence Day
     DateTime(y, 9, _nthWeekdayDay(y, 9, DateTime.monday, 1)), // Labor Day
-    DateTime(y, 11, _nthWeekdayDay(y, 11, DateTime.thursday, 4)), // Thanksgiving
+    DateTime(
+      y,
+      11,
+      _nthWeekdayDay(y, 11, DateTime.thursday, 4),
+    ), // Thanksgiving
     _observedFixed(DateTime(y, 12, 25)), // Christmas Day
   ];
   return holidays.any((d) => _isSameDate(d, dateEt));
@@ -620,11 +639,16 @@ bool isFullClosureHoliday(DateTime dateEt) {
 /// weekend — approximates the "may not apply" caveat from the source list).
 bool isEarlyCloseDay(DateTime dateEt) {
   final y = dateEt.year;
-  final thanksgiving = DateTime(y, 11, _nthWeekdayDay(y, 11, DateTime.thursday, 4));
+  final thanksgiving = DateTime(
+    y,
+    11,
+    _nthWeekdayDay(y, 11, DateTime.thursday, 4),
+  );
   final blackFriday = thanksgiving.add(const Duration(days: 1));
   final christmasEve = DateTime(y, 12, 24);
   if (_isSameDate(dateEt, blackFriday)) return true;
-  if (_isSameDate(dateEt, christmasEve) && !isWeekend(christmasEve)) return true;
+  if (_isSameDate(dateEt, christmasEve) && !isWeekend(christmasEve))
+    return true;
   return false;
 }
 
@@ -681,7 +705,13 @@ MarketClockState resolveMarketClockState(DateTime nowEt) {
     }
     if (minuteOfDay < 570) {
       final w = minuteOfDay < 420 ? marketWindows[0] : marketWindows[1];
-      return MarketClockState(nowEt: nowEt, phase: w.phase, window: w, isHoliday: false, isEarlyCloseDay: true);
+      return MarketClockState(
+        nowEt: nowEt,
+        phase: w.phase,
+        window: w,
+        isHoliday: false,
+        isEarlyCloseDay: true,
+      );
     }
     if (minuteOfDay < 630) {
       return MarketClockState(
@@ -722,7 +752,13 @@ MarketClockState resolveMarketClockState(DateTime nowEt) {
   for (final w in marketWindows) {
     if (w.id == 'closed') continue;
     if (minuteOfDay >= w.startMinute && minuteOfDay < w.endMinute) {
-      return MarketClockState(nowEt: nowEt, phase: w.phase, window: w, isHoliday: false, isEarlyCloseDay: false);
+      return MarketClockState(
+        nowEt: nowEt,
+        phase: w.phase,
+        window: w,
+        isHoliday: false,
+        isEarlyCloseDay: false,
+      );
     }
   }
 

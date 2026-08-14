@@ -56,7 +56,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   // Supabase returns e.g. "For security purposes, you can only request
   // this after 46 seconds." — we parse the number and tick it down live
   // instead of leaving the frozen sentence on screen.
-  static final _cooldownPattern = RegExp(r'(\d+)\s*seconds?', caseSensitive: false);
+  static final _cooldownPattern = RegExp(
+    r'(\d+)\s*seconds?',
+    caseSensitive: false,
+  );
   static const _googleLogoSvg = '''
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
 <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.5 4.5 24 4.5 12.7 4.5 3.5 13.7 3.5 25S12.7 45.5 24 45.5c11 0 20.5-8 20.5-20.5 0-1.4-.1-2.7-.4-4Z"/>
@@ -186,13 +189,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
       if (!mounted) return;
 
-      // ── Save credentials + is_logged_in flag if "Remember Me" ──
-      if (_rememberMe) {
-        await ref.read(rememberMeProvider.notifier).save(email, password);
-        await setIsLoggedIn(true);
-      } else {
-        await setIsLoggedIn(false);
-      }
+      // ── Record the "Remember Me" choice — Supabase itself already
+      // persists the session either way; this only decides whether Splash
+      // honors that on next cold start or signs back out ──
+      await setIsLoggedIn(_rememberMe);
+      ref.invalidate(isLoggedInProvider);
+      ref.invalidate(hasSupabaseSessionProvider);
 
       if (!mounted) return;
 
@@ -204,8 +206,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       // ── Navigate based on sign-in vs sign-up ──────────────────
       if (_isLogin) {
         // Existing user signing in → check disclaimer status
-        final disclaimerAccepted =
-            await ref.read(isDisclaimerAcceptedProvider.future);
+        final disclaimerAccepted = await ref.read(
+          isDisclaimerAcceptedProvider.future,
+        );
         if (!mounted) return;
         context.go(disclaimerAccepted ? '/home' : '/disclaimer');
       } else {
@@ -262,16 +265,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         idToken: idToken,
       );
 
-      // No password to remember for a Google account — make sure a stale
-      // password auto-login from a previous account doesn't fire on splash.
-      await setIsLoggedIn(false);
+      // Same "Remember Me" choice as email/password sign-in — Supabase
+      // persists the session for Google accounts too, so there's no reason
+      // to special-case this to always sign back out on next cold start.
+      await setIsLoggedIn(_rememberMe);
+      ref.invalidate(isLoggedInProvider);
+      ref.invalidate(hasSupabaseSessionProvider);
 
       if (!mounted) return;
       await ref.read(userDataSyncProvider.future);
 
       if (!mounted) return;
-      final disclaimerAccepted =
-          await ref.read(isDisclaimerAcceptedProvider.future);
+      final disclaimerAccepted = await ref.read(
+        isDisclaimerAcceptedProvider.future,
+      );
       if (!mounted) return;
       context.go(disclaimerAccepted ? '/home' : '/disclaimer');
     } on GoogleSignInException catch (e) {
@@ -316,15 +323,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
-
-              // Back
-              IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.textPrimary),
-                onPressed: () => context.go('/'),
-              ),
-
-              const SizedBox(height: 24),
+              const SizedBox(height: 64),
 
               // Title
               Text(
@@ -364,7 +363,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   hintText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined, color: ThemeV2.textSecondary),
+                  prefixIcon: Icon(
+                    Icons.email_outlined,
+                    color: ThemeV2.textSecondary,
+                  ),
                 ),
               ),
 
@@ -376,13 +378,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   hintText: 'Password',
-                  prefixIcon: const Icon(Icons.lock_outlined, color: ThemeV2.textSecondary),
+                  prefixIcon: const Icon(
+                    Icons.lock_outlined,
+                    color: ThemeV2.textSecondary,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                       color: ThemeV2.textSecondary,
                     ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
               ),
@@ -397,7 +405,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     onPressed: () => context.push('/forgot-password'),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 8),
+                        horizontal: 4,
+                        vertical: 8,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
@@ -422,17 +432,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     height: 24,
                     child: Checkbox(
                       value: _rememberMe,
-                      onChanged: (val) => setState(() => _rememberMe = val ?? false),
+                      onChanged: (val) =>
+                          setState(() => _rememberMe = val ?? false),
                       activeColor: ThemeV2.primary,
                       checkColor: Colors.white,
                       side: const BorderSide(color: ThemeV2.textSecondary),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     'Remember me',
-                    style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: ThemeV2.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -444,12 +460,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: (_isLoading || _isBlocked || _cooldownSecondsLeft != null) ? null : _submit,
+                  onPressed:
+                      (_isLoading || _isBlocked || _cooldownSecondsLeft != null)
+                      ? null
+                      : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ThemeV2.primary,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: ThemeV2.surface,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                   child: _isLoading
                       ? const SizedBox(
@@ -462,7 +483,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         )
                       : Text(
                           _isLogin ? 'Sign In' : 'Create Account',
-                          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                 ),
               ),
@@ -477,7 +501,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       'or',
-                      style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: ThemeV2.textSecondary,
+                      ),
                     ),
                   ),
                   const Expanded(child: Divider(color: ThemeV2.surface)),
@@ -491,13 +518,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 width: double.infinity,
                 height: 52,
                 child: OutlinedButton(
-                  onPressed: (_isLoading || _isBlocked || _cooldownSecondsLeft != null)
+                  onPressed:
+                      (_isLoading || _isBlocked || _cooldownSecondsLeft != null)
                       ? null
                       : _signInWithGoogle,
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Colors.white,
                     side: const BorderSide(color: ThemeV2.surface),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -524,8 +554,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _isLogin ? "Don't have an account?" : 'Already have an account?',
-                    style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 13),
+                    _isLogin
+                        ? "Don't have an account?"
+                        : 'Already have an account?',
+                    style: GoogleFonts.inter(
+                      color: ThemeV2.textSecondary,
+                      fontSize: 13,
+                    ),
                   ),
                   TextButton(
                     onPressed: () => setState(() {
@@ -534,7 +569,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     }),
                     child: Text(
                       _isLogin ? 'Sign Up' : 'Sign In',
-                      style: GoogleFonts.inter(color: ThemeV2.primary, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.inter(
+                        color: ThemeV2.primary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -546,4 +585,3 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 }
-

@@ -61,7 +61,10 @@ class _WatchlistTile extends ConsumerWidget {
     final name = logoEntry?.companyName.isNotEmpty == true
         ? logoEntry!.companyName
         : symbol;
-    final sector = resolveGicsSector(symbol, companyName: logoEntry?.companyName);
+    final sector = resolveGicsSector(
+      symbol,
+      companyName: logoEntry?.companyName,
+    );
 
     return InkWell(
       onTap: () => context.push('/company/$symbol'),
@@ -122,4 +125,3 @@ class _WatchlistTile extends ConsumerWidget {
     );
   }
 }
-

@@ -94,15 +94,14 @@ class _PortfolioSelector extends ConsumerWidget {
             horizontal: gold ? 12 : 16,
             vertical: 8,
           ),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [dialLight, dialDark],
-            ),
-            border: gold ? Border.all(color: dialBrassLight, width: 1) : null,
-            borderRadius: BorderRadius.circular(20),
-          ),
+          decoration:
+              darkCardDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ).copyWith(
+                border: gold
+                    ? Border.all(color: dialBrassLight, width: 1)
+                    : null,
+              ),
           child: content,
         ),
       ),
@@ -119,15 +118,9 @@ class _PortfolioSelector extends ConsumerWidget {
       onTap: () => _showCreatePortfolioDialog(context, ref),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
-          border: Border.all(color: dialBrassLight, width: 1),
+        decoration: darkCardDecoration(
           borderRadius: BorderRadius.circular(20),
-        ),
+        ).copyWith(border: Border.all(color: dialBrassLight, width: 1)),
         child: Text(
           'My Portfolio',
           style: GoogleFonts.inter(
@@ -153,18 +146,13 @@ class _PortfolioSelector extends ConsumerWidget {
       ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
-          border: Border.all(
-            color: dialBrassLight.withValues(alpha: 0.6),
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(20),
-        ),
+        decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20))
+            .copyWith(
+              border: Border.all(
+                color: dialBrassLight.withValues(alpha: 0.6),
+                width: 1,
+              ),
+            ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -205,5 +193,4 @@ class _PortfolioSelector extends ConsumerWidget {
       }
     }
   }
-
 }

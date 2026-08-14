@@ -28,11 +28,11 @@ class DocumentVersions {
   }
 
   Map<String, dynamic> toJson() => {
-        'disclaimer_version': disclaimerVersion,
-        'privacy_policy_version': privacyPolicyVersion,
-        'terms_version': termsVersion,
-        'updated_at': updatedAt,
-      };
+    'disclaimer_version': disclaimerVersion,
+    'privacy_policy_version': privacyPolicyVersion,
+    'terms_version': termsVersion,
+    'updated_at': updatedAt,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -83,8 +83,14 @@ class AcceptedVersionsNotifier extends StateNotifier<DocumentVersions?> {
 
   Future<void> accept(DocumentVersions versions) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('${_prefix}disclaimer_version', versions.disclaimerVersion);
-    await prefs.setString('${_prefix}privacy_policy_version', versions.privacyPolicyVersion);
+    await prefs.setString(
+      '${_prefix}disclaimer_version',
+      versions.disclaimerVersion,
+    );
+    await prefs.setString(
+      '${_prefix}privacy_policy_version',
+      versions.privacyPolicyVersion,
+    );
     await prefs.setString('${_prefix}terms_version', versions.termsVersion);
     await prefs.setString('${_prefix}updated_at', versions.updatedAt);
     state = versions;
@@ -102,8 +108,8 @@ class AcceptedVersionsNotifier extends StateNotifier<DocumentVersions?> {
 
 final acceptedVersionsProvider =
     StateNotifierProvider<AcceptedVersionsNotifier, DocumentVersions?>((ref) {
-  return AcceptedVersionsNotifier();
-});
+      return AcceptedVersionsNotifier();
+    });
 
 // ---------------------------------------------------------------------------
 // Versions Match Check (for disclaimer screen — uses StateNotifier)
