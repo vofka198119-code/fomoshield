@@ -12,6 +12,7 @@ enum AppNotificationType {
   news,
   stressTestCompleted,
   priceSwing,
+  goalUpdated,
 }
 
 /// Which of the app's two separate portfolio systems this notification

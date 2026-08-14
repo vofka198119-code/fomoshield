@@ -146,6 +146,8 @@ class _NotificationRow extends StatelessWidget {
         return Icons.flag_rounded;
       case AppNotificationType.priceSwing:
         return Icons.bolt_rounded;
+      case AppNotificationType.goalUpdated:
+        return Icons.track_changes_rounded;
     }
   }
 

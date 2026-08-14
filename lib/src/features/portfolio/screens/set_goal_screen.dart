@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/models/app_notification.dart';
+import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../shared/widgets/numeric_keypad.dart';
@@ -32,7 +34,8 @@ class SetGoalScreen extends ConsumerStatefulWidget {
 
 class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
   late final TextEditingController _controller;
-  late final bool _isEditing;
+  late bool _isEditing;
+  double? _previousGoal;
   bool _keypadOpen = false;
 
   @override
@@ -42,6 +45,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
     final portfolio = portfolios.where((p) => p.id == widget.portfolioId);
     final currentGoal = portfolio.isEmpty ? null : portfolio.first.goalAmount;
     _isEditing = currentGoal != null;
+    _previousGoal = currentGoal;
     _controller = TextEditingController(
       text: currentGoal != null ? currentGoal.toStringAsFixed(0) : '',
     );
@@ -73,7 +77,28 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
       return;
     }
     ref.read(portfoliosProvider.notifier).setGoal(widget.portfolioId, amount);
-    context.pop();
+
+    final previous = _previousGoal;
+    showTransientAppNotificationPopup(
+      AppNotification(
+        id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+        type: AppNotificationType.goalUpdated,
+        portfolioKind: NotificationPortfolioKind.real,
+        portfolioId: widget.portfolioId,
+        title: previous == null ? 'Goal Set' : 'Goal Updated',
+        detail: previous == null
+            ? 'Target set to \$${amount.toStringAsFixed(0)}'
+            : 'New target \$${amount.toStringAsFixed(0)} '
+                  '(${amount >= previous ? '+' : '-'}\$${(amount - previous).abs().toStringAsFixed(0)})',
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    setState(() {
+      _previousGoal = amount;
+      _isEditing = true;
+      _keypadOpen = false;
+    });
   }
 
   @override

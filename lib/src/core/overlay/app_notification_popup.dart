@@ -26,10 +26,13 @@ void pushAppNotification(
   AppNotification notification,
 ) {
   notifier.add(notification);
-  _showAppNotificationPopup(notification);
+  showTransientAppNotificationPopup(notification);
 }
 
-void _showAppNotificationPopup(AppNotification notification) {
+/// Shows the popup card without recording it into notification history —
+/// for confirmations that matter in the moment but don't belong in the
+/// bell's history (e.g. "goal updated").
+void showTransientAppNotificationPopup(AppNotification notification) {
   final overlayState = appOverlayKey.currentState;
   if (overlayState == null) return; // app not mounted yet — still recorded
   late OverlayEntry entry;
@@ -59,6 +62,8 @@ IconData _iconFor(AppNotificationType type) {
       return Icons.flag_rounded;
     case AppNotificationType.priceSwing:
       return Icons.bolt_rounded;
+    case AppNotificationType.goalUpdated:
+      return Icons.track_changes_rounded;
   }
 }
 
