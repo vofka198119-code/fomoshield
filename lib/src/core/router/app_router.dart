@@ -29,7 +29,6 @@ import '../../features/stress_test/stress_test_setup_screen.dart';
 import '../../features/stress_test/stress_test_screen.dart';
 import '../../features/stress_test/verdict_screen.dart';
 import '../../features/stress_test/verdict_marker_detail_screen.dart';
-import '../../features/stress_test/stress_test_analytics_screen.dart';
 import '../../features/stress_test/stress_test_hub_screen.dart';
 import '../../features/stress_test/stress_test_portfolio_balance_screen.dart';
 import '../../features/stress_test/stress_test_psychology_meter_screen.dart';
@@ -233,14 +232,6 @@ class AppRouter {
           final id = state.pathParameters['id'] ?? '';
           final markerId = state.pathParameters['markerId'] ?? '';
           return VerdictMarkerDetailScreen(sessionId: id, markerId: markerId);
-        },
-      ),
-      GoRoute(
-        path: '/stress-test/:id/analytics',
-        name: 'stressTestAnalytics',
-        builder: (context, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return StressTestAnalyticsScreen(sessionId: id);
         },
       ),
       GoRoute(

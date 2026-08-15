@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../auth/auth_providers.dart';
@@ -14,6 +15,13 @@ import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
+
+Future<void> _openLink(String url) async {
+  final uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -55,10 +63,12 @@ class ProfileScreen extends ConsumerWidget {
                   CircleAvatar(
                     radius: 28,
                     backgroundColor: () {
-                      if (isAdmin)
+                      if (isAdmin) {
                         return ThemeV2.primary.withValues(alpha: 0.15);
-                      if (isPremium)
+                      }
+                      if (isPremium) {
                         return ThemeV2.primary.withValues(alpha: 0.15);
+                      }
                       return ThemeV2.primary.withValues(alpha: 0.15);
                     }(),
                     child: Icon(
@@ -313,7 +323,7 @@ class ProfileScreen extends ConsumerWidget {
                     Icons.chevron_right,
                     color: ThemeV2.textSecondary,
                   ),
-                  onTap: () {},
+                  onTap: () => _openLink('https://fomoshield.app/privacy'),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -325,7 +335,7 @@ class ProfileScreen extends ConsumerWidget {
                     Icons.chevron_right,
                     color: ThemeV2.textSecondary,
                   ),
-                  onTap: () {},
+                  onTap: () => _openLink('https://fomoshield.app/terms'),
                 ),
                 const Divider(height: 1),
                 ListTile(

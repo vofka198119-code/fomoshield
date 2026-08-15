@@ -8,7 +8,6 @@
 //   Card 4 – Corporate events (ex-div dates, dividends, popup)
 //   Card 5 – Trade history (last 10, reversed)
 //   Timer card at bottom
-//   Analytics card → navigates to full analytics screen
 //   Disclaimer footer
 // ---------------------------------------------------------------------------
 
@@ -444,101 +443,115 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
 
-    return RefreshIndicator(
-      color: ThemeV2.primary,
-      backgroundColor: ThemeV2.surface,
-      onRefresh: () async {
-        ref.read(stressTestProvider.notifier).refreshPrices(widget.sessionId);
-        ref.read(stressTestRefreshProvider.notifier).state++;
-        await Future.delayed(const Duration(milliseconds: 500));
-      },
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Verdict / Exit button ──────────────────────────
-            // Always at top when applicable, not reorderable.
-            if (isExpired)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _showVerdict,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeV2.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+    return Column(
+      children: [
+        // ── Quick-add search bar — pinned under the AppBar (not part of
+        // the scrollable body) so it stays reachable while swiping through
+        // widgets below. Duplicates the Holdings widget's "+" mechanic
+        // (_openAddAssetSheet) as a full-width, always visible tap target
+        // so first-time users don't have to spot the small "+" inside the
+        // Holdings card header. ──
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          child: _buildQuickAddSearchBar(),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            color: ThemeV2.primary,
+            backgroundColor: ThemeV2.surface,
+            onRefresh: () async {
+              ref
+                  .read(stressTestProvider.notifier)
+                  .refreshPrices(widget.sessionId);
+              ref.read(stressTestRefreshProvider.notifier).state++;
+              await Future.delayed(const Duration(milliseconds: 500));
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Verdict / Exit button ──────────────────────────
+                  // Always at top when applicable, not reorderable.
+                  if (isExpired)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _showVerdict,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ThemeV2.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          'GET PSYCHOLOGIST VERDICT',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (isExpired) const SizedBox(height: 12),
+
+                  // ── Widgets (reorderable via gear icon; Portfolio Balance
+                  // pinned first, Timer pinned last — see
+                  // stress_test_widget_order_provider.dart) ──
+                  for (final cfg in visibleWidgets) ...[
+                    _buildWidgetById(cfg.id, session),
+                    const SizedBox(height: 12),
+                  ],
+
+                  const SizedBox(height: 4),
+
+                  // ── Add widgets button ───────────────────────────
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: _showWidgetSettingsSheet,
+                      icon: const Icon(
+                        Icons.add_rounded,
+                        color: ThemeV2.primary,
+                        size: 20,
+                      ),
+                      label: Text(
+                        'Add widgets',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: ThemeV2.primary,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: const BorderSide(
+                            color: ThemeV2.primary,
+                            width: 0.5,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  child: Text(
-                    'GET PSYCHOLOGIST VERDICT',
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 14,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
-              ),
-            if (isExpired) const SizedBox(height: 12),
+                  const SizedBox(height: 16),
 
-            // ── Quick-add search bar — duplicates the Holdings widget's
-            // "+" mechanic (_openAddAssetSheet) as a full-width, always
-            // visible tap target so first-time users don't have to spot
-            // the small "+" inside the Holdings card header. ──
-            _buildQuickAddSearchBar(),
-            const SizedBox(height: 12),
-
-            // ── Widgets (reorderable via gear icon; Portfolio Balance
-            // pinned first, Timer pinned last — see
-            // stress_test_widget_order_provider.dart) ──
-            for (final cfg in visibleWidgets) ...[
-              _buildWidgetById(cfg.id, session),
-              const SizedBox(height: 12),
-            ],
-
-            const SizedBox(height: 4),
-
-            // ── Add widgets button ───────────────────────────
-            Center(
-              child: TextButton.icon(
-                onPressed: _showWidgetSettingsSheet,
-                icon: const Icon(
-                  Icons.add_rounded,
-                  color: ThemeV2.primary,
-                  size: 20,
-                ),
-                label: Text(
-                  'Add widgets',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.primary,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: ThemeV2.primary, width: 0.5),
-                  ),
-                ),
+                  // ── Disclaimer (always at bottom) ────────────────
+                  const DisclaimerFooter(),
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-
-            // ── Disclaimer (always at bottom) ────────────────
-            const DisclaimerFooter(),
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

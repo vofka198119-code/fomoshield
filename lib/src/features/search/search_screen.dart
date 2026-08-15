@@ -292,10 +292,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             ],
                           ),
                           onTap: () async {
-                            ref
-                                .read(searchProvider.notifier)
-                                .selectCompany(symbol);
-
                             // ── Check search counter ───────────────────────
                             final tier = ref.read(subscriptionTierProvider);
                             final canSearch =

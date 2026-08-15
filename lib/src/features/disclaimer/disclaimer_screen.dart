@@ -180,15 +180,6 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                 ),
                 const SizedBox(height: 16),
                 _section(
-                  'Geographic Restrictions',
-                  'This application is available for global use. Russian language support is '
-                      'provided for global Russian-speaking communities outside Russia and Belarus. '
-                      'Access to this application from Russia and Belarus is strictly prohibited. '
-                      'By accepting this disclaimer, you confirm that you are not accessing this '
-                      'application from within Russia or Belarus.',
-                ),
-                const SizedBox(height: 16),
-                _section(
                   'Privacy',
                   'We collect minimal data necessary for app functionality: email address '
                       '(for account creation), anonymized usage statistics, and device language '
@@ -252,16 +243,15 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                           children: [
                             const TextSpan(
                               text:
-                                  'I confirm that I am at least 18 years old, '
-                                  'I am not located in Russia or Belarus, and I fully accept '
-                                  'this Disclaimer, the ',
+                                  'I confirm that I am at least 18 years old '
+                                  'and I fully accept this Disclaimer, the ',
                             ),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
                               child: GestureDetector(
                                 onTap: () =>
-                                    _openLink('https://fomoshield.com/terms'),
+                                    _openLink('https://fomoshield.app/terms'),
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     border: Border(
@@ -287,8 +277,9 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
                               child: GestureDetector(
-                                onTap: () =>
-                                    _openLink('https://fomoshield.com/privacy'),
+                                onTap: () => _openLink(
+                                  'https://fomoshield.app/privacy',
+                                ),
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     border: Border(

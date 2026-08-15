@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
+import '../../../shared/widgets/simulated_trading_disclaimer.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/notifications/notification_providers.dart';
@@ -405,219 +406,225 @@ class _StressTestSearchSheetState
             Expanded(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20, 8, 20, bottomInset + 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Company info
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CompanyLogo(ticker: _selectedSymbol, radius: 24),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _selectedSymbol,
-                              style: GoogleFonts.inter(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: ThemeV2.textPrimary,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Company info
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CompanyLogo(ticker: _selectedSymbol, radius: 24),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _selectedSymbol,
+                                style: GoogleFonts.inter(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: ThemeV2.textPrimary,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _selectedDescription,
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                color: ThemeV2.textSecondary,
+                              Text(
+                                _selectedDescription,
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  color: ThemeV2.textSecondary,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Price info
+                      Text(
+                        'Current price: \$${_selectedPrice.toStringAsFixed(2)}',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: ThemeV2.textSecondary,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Price info
-                    Text(
-                      'Current price: \$${_selectedPrice.toStringAsFixed(2)}',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: ThemeV2.textSecondary,
                       ),
-                    ),
-                    const SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
-                    // Quick amounts
-                    Text(
-                      'How much do you want to invest?',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
+                      // Quick amounts
+                      Text(
+                        'How much do you want to invest?',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: ThemeV2.textPrimary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Amount text field
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        prefixText: '\$ ',
-                        prefixStyle: GoogleFonts.inter(
+                      // Amount text field
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          prefixText: '\$ ',
+                          prefixStyle: GoogleFonts.inter(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: ThemeV2.textPrimary,
+                          ),
+                          hintText: '500',
+                          hintStyle: GoogleFonts.inter(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: ThemeV2.textSecondary,
+                          ),
+                          filled: true,
+                          fillColor: ThemeV2.surface,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 18,
+                          ),
+                        ),
+                        style: GoogleFonts.inter(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
                           color: ThemeV2.textPrimary,
                         ),
-                        hintText: '500',
-                        hintStyle: GoogleFonts.inter(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: ThemeV2.textSecondary,
-                        ),
-                        filled: true,
-                        fillColor: ThemeV2.surface,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 18,
-                        ),
+                        onChanged: (v) {
+                          setState(() {
+                            _amount =
+                                double.tryParse(v.replaceAll('\$', '')) ?? 0;
+                          });
+                        },
                       ),
-                      style: GoogleFonts.inter(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: ThemeV2.textPrimary,
-                      ),
-                      onChanged: (v) {
-                        setState(() {
-                          _amount =
-                              double.tryParse(v.replaceAll('\$', '')) ?? 0;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                    // Quick select chips
-                    Wrap(
-                      spacing: 8,
-                      children: [100, 500, 1000, 2500, 5000].map((v) {
-                        final selected = _amount == v;
-                        return ChoiceChip(
-                          label: Text(
-                            '\$$v',
+                      // Quick select chips
+                      Wrap(
+                        spacing: 8,
+                        children: [100, 500, 1000, 2500, 5000].map((v) {
+                          final selected = _amount == v;
+                          return ChoiceChip(
+                            label: Text(
+                              '\$$v',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: selected
+                                    ? Colors.white
+                                    : ThemeV2.textPrimary,
+                              ),
+                            ),
+                            selected: selected,
+                            selectedColor: ThemeV2.primary,
+                            backgroundColor: ThemeV2.surface,
+                            onSelected: (_) =>
+                                setState(() => _amount = v.toDouble()),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            side: BorderSide.none,
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Exceeds-cash hint (proactive — mirrors the engine's own check)
+                      if (_amount > 0 && exceedsCash)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            'Exceeds available cash (\$${availableCash.toStringAsFixed(0)})',
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: selected
-                                  ? Colors.white
-                                  : ThemeV2.textPrimary,
+                              color: ThemeV2.loss,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+
+                      // Error
+                      if (_errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            _errorMessage!,
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: ThemeV2.loss,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+
+                      const SimulatedTradingDisclaimer(),
+                      const SizedBox(height: 16),
+
+                      // Buy button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _isLoading || _amount <= 0 || exceedsCash
+                              ? null
+                              : _confirmPurchase,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ThemeV2.primary,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: ThemeV2.primary.withValues(
+                              alpha: 0.4,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          selected: selected,
-                          selectedColor: ThemeV2.primary,
-                          backgroundColor: ThemeV2.surface,
-                          onSelected: (_) =>
-                              setState(() => _amount = v.toDouble()),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          side: BorderSide.none,
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 8),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  'Buy \$${_amount.toStringAsFixed(0)} worth',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
 
-                    // Exceeds-cash hint (proactive — mirrors the engine's own check)
-                    if (_amount > 0 && exceedsCash)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
+                      // Back button
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _showAmountInput = false;
+                            _selectedSymbol = '';
+                            _selectedDescription = '';
+                            _selectedPrice = 0;
+                            _errorMessage = null;
+                          });
+                        },
                         child: Text(
-                          'Exceeds available cash (\$${availableCash.toStringAsFixed(0)})',
+                          'Choose another company',
                           style: GoogleFonts.inter(
                             fontSize: 13,
-                            color: ThemeV2.loss,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-
-                    // Error
-                    if (_errorMessage != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(
-                          _errorMessage!,
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            color: ThemeV2.loss,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-
-                    // Buy button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isLoading || _amount <= 0 || exceedsCash
-                            ? null
-                            : _confirmPurchase,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ThemeV2.primary,
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor: ThemeV2.primary.withValues(
-                            alpha: 0.4,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            color: ThemeV2.textSecondary,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(
-                                'Buy \$${_amount.toStringAsFixed(0)} worth',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Back button
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _showAmountInput = false;
-                          _selectedSymbol = '';
-                          _selectedDescription = '';
-                          _selectedPrice = 0;
-                          _errorMessage = null;
-                        });
-                      },
-                      child: Text(
-                        'Choose another company',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: ThemeV2.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

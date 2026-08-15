@@ -11,8 +11,7 @@ import 'metric_info_data.dart';
 // ---------------------------------------------------------------------------
 // Financial Score Widget — gauge + radar chart + 6 marker details. Named
 // distinctly from Stress Test's unrelated behavioral "Psychology Meter"
-// (which also produces a 0-100 number) — see
-// docs/CODEBASE_REFERENCE.md section 4.5.
+// (which also produces a 0-100 number via TraderPsychologyProfile.compositeScore).
 // ---------------------------------------------------------------------------
 
 class FinancialScoreWidget extends StatelessWidget {

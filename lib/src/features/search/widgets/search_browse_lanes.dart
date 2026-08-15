@@ -121,15 +121,34 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           if (recentlyViewed.isNotEmpty)
             BrowseLane(
               title: 'RECENTLY VIEWED',
-              items: [
-                for (int i = 0; i < recentlyViewed.length; i++)
-                  CompanyMiniCard(
-                    symbol: recentlyViewed[i].symbol,
-                    name: recentlyViewed[i].name,
-                    onTap: () => widget.onTapSymbol(recentlyViewed[i].symbol),
-                    showDivider: i < recentlyViewed.length - 1,
-                  ),
-              ],
+              items: _cards(
+                recentlyViewed
+                    .take(_lanePreviewCount)
+                    .map(
+                      (e) => TopCompanyEntry(
+                        symbol: e.symbol,
+                        name: e.name,
+                        marketCap: 0,
+                      ),
+                    )
+                    .toList(),
+              ),
+              onSeeAll: recentlyViewed.length > _lanePreviewCount
+                  ? () => showCompanyListSheet(
+                      context,
+                      'RECENTLY VIEWED',
+                      recentlyViewed
+                          .map(
+                            (e) => TopCompanyEntry(
+                              symbol: e.symbol,
+                              name: e.name,
+                              marketCap: 0,
+                            ),
+                          )
+                          .toList(),
+                      onTapSymbol: widget.onTapSymbol,
+                    )
+                  : null,
             ),
         ];
 
