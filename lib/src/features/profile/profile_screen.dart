@@ -14,12 +14,94 @@ import '../search/search_provider.dart';
 import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
+import '../../shared/services/finnhub_service.dart';
+
+/// App version + build number, read from the actual installed build (not
+/// hardcoded) — build number auto-increments on every commit, see
+/// .git/hooks/pre-commit.
+final packageInfoProvider = FutureProvider<PackageInfo>(
+  (ref) => PackageInfo.fromPlatform(),
+);
 
 Future<void> _openLink(String url) async {
   final uri = Uri.parse(url);
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(
+        'Delete Account?',
+        style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+      ),
+      content: Text(
+        'This permanently deletes your account and all your data — '
+        'portfolios, watchlist, stress test history. This cannot be undone.',
+        style: GoogleFonts.inter(fontSize: 14),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: Text(
+            'Cancel',
+            style: GoogleFonts.inter(color: ThemeV2.textSecondary),
+          ),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(
+            'Delete',
+            style: GoogleFonts.inter(
+              color: ThemeV2.loss,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true || !context.mounted) return;
+
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) =>
+        const Center(child: CircularProgressIndicator(color: ThemeV2.primary)),
+  );
+
+  try {
+    await FinnhubService().deleteAccount();
+    await clearAllSessionData();
+    if (!context.mounted) return;
+    Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
+    // Same cache invalidation as Sign Out — see that button's comment.
+    ref.invalidate(isLoggedInProvider);
+    ref.invalidate(hasSupabaseSessionProvider);
+    ref.invalidate(watchlistSymbolsProvider);
+    ref.invalidate(portfoliosProvider);
+    ref.invalidate(homeWidgetsProvider);
+    ref.invalidate(searchProvider);
+    ref.invalidate(searchCounterProvider);
+    if (!context.mounted) return;
+    context.go('/auth');
+  } catch (_) {
+    if (!context.mounted) return;
+    Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Could not delete account. Please try again.',
+          style: GoogleFonts.inter(fontSize: 13),
+        ),
+        backgroundColor: ThemeV2.loss,
+      ),
+    );
   }
 }
 
@@ -353,7 +435,25 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
+
+          Center(
+            child: ref
+                .watch(packageInfoProvider)
+                .when(
+                  data: (info) => Text(
+                    'v${info.version} (build ${info.buildNumber})',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: ThemeV2.textSecondary.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
+                ),
+          ),
+
+          const SizedBox(height: 16),
 
           // ── Sign Out ─────────────────────────────────────────────
           SizedBox(
@@ -388,6 +488,33 @@ class ProfileScreen extends ConsumerWidget {
                 side: BorderSide(color: ThemeV2.loss.withValues(alpha: 0.3)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // ── Delete Account ───────────────────────────────────────
+          // Deliberately lower visual weight than Sign Out (smaller,
+          // muted) — rare/dangerous action, shouldn't compete with the
+          // common one, but still reachable in one tap per Apple App Store
+          // Review Guideline 5.1.1(v) (in-app account deletion required).
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: TextButton.icon(
+              onPressed: () => _confirmDeleteAccount(context, ref),
+              icon: Icon(
+                Icons.delete_forever_rounded,
+                color: ThemeV2.loss.withValues(alpha: 0.55),
+                size: 20,
+              ),
+              label: Text(
+                'Delete Account',
+                style: GoogleFonts.inter(
+                  color: ThemeV2.loss.withValues(alpha: 0.55),
+                  fontSize: 13,
                 ),
               ),
             ),

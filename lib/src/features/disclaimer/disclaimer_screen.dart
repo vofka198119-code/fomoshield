@@ -181,9 +181,10 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                 const SizedBox(height: 16),
                 _section(
                   'Privacy',
-                  'We collect minimal data necessary for app functionality: email address '
-                      '(for account creation), anonymized usage statistics, and device language '
-                      'preferences. We do not sell your data to third parties.',
+                  'We collect minimal data necessary for app functionality: your email '
+                      'address (for account creation) and the data you generate inside the '
+                      'app (portfolios, watchlist, simulations). We do not sell your data '
+                      'to third parties.',
                 ),
                 const SizedBox(height: 16),
                 _section(

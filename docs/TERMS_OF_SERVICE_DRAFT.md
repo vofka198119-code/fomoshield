@@ -58,7 +58,7 @@ are based on mathematical models and historical patterns, not predictions.
 
 You're responsible for keeping your login credentials secure and for all
 activity under your account. Tell us immediately if you suspect unauthorized
-access ([contact email]).
+access (fomoshield@gmail.com).
 
 ## 7. Premium Subscription
 
@@ -84,16 +84,15 @@ unlawful purpose.
 
 ## 9. Intellectual Property
 
-The App, its design, text, and branding are owned by [LEGAL ENTITY / YOUR
-NAME]. You're granted a personal, non-transferable license to use the App
-for its intended purpose — nothing here transfers ownership of the App to
-you.
+The App, its design, text, and branding are owned by Volodymyr Oleksiienko.
+You're granted a personal, non-transferable license to use the App for its
+intended purpose — nothing here transfers ownership of the App to you.
 
 ## 10. Termination
 
 We may suspend or terminate your account if you violate these Terms. You
-can delete your account at any time from [Profile settings — confirm this
-exists / add if not].
+can delete your account at any time from Profile → Delete Account —
+this permanently removes your account and all associated data.
 
 ## 11. Disclaimer of Warranties
 
@@ -112,8 +111,8 @@ responsibility.
 
 ## 13. Governing Law
 
-These Terms are governed by the laws of [JURISDICTION — fill in based on
-where the legal entity is registered].
+These Terms are governed by the laws of Latvia, the operator's country of
+residence.
 
 ## 14. Changes to These Terms
 
@@ -123,5 +122,4 @@ today.
 
 ## 15. Contact
 
-Questions about these Terms: [legal@fomoshield.app or same contact as
-Privacy Policy]
+Questions about these Terms: fomoshield@gmail.com

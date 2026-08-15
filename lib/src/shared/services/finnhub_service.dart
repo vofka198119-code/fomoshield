@@ -176,35 +176,35 @@ class FinnhubService {
 
   /// Exchanges to explicitly exclude (e.g. Warsaw, Mexico, etc.)
   static const _excludedSuffixes = {
-    '.WA',  // Warsaw
-    '.MX',  // Mexico
-    '.BC',  // Colombia
-    '.LM',  // Chile
-    '.IS',  // Israel
-    '.TA',  // Tel Aviv
-    '.SS',  // Shanghai
-    '.SZ',  // Shenzhen
-    '.HK',  // Hong Kong
-    '.TW',  // Taiwan
-    '.KS',  // Korea
-    '.KQ',  // KOSDAQ
-    '.T',   // Tokyo
-    '.F',   // Frankfurt (we keep .DE for Xetra)
-    '.BE',  // Berlin
-    '.MU',  // Munich
-    '.HA',  // Hanover
-    '.SG',  // Singapore
-    '.OL',  // Oslo
-    '.ST',  // Stockholm
-    '.CO',  // Copenhagen
-    '.HE',  // Helsinki
-    '.VI',  // Vienna
-    '.AT',  // Athens
-    '.IR',  // Irish
-    '.LS',  // Lisbon
-    '.PA',  // Euronext Paris
-    '.AS',  // Euronext Amsterdam
-    '.BR',  // Euronext Brussels
+    '.WA', // Warsaw
+    '.MX', // Mexico
+    '.BC', // Colombia
+    '.LM', // Chile
+    '.IS', // Israel
+    '.TA', // Tel Aviv
+    '.SS', // Shanghai
+    '.SZ', // Shenzhen
+    '.HK', // Hong Kong
+    '.TW', // Taiwan
+    '.KS', // Korea
+    '.KQ', // KOSDAQ
+    '.T', // Tokyo
+    '.F', // Frankfurt (we keep .DE for Xetra)
+    '.BE', // Berlin
+    '.MU', // Munich
+    '.HA', // Hanover
+    '.SG', // Singapore
+    '.OL', // Oslo
+    '.ST', // Stockholm
+    '.CO', // Copenhagen
+    '.HE', // Helsinki
+    '.VI', // Vienna
+    '.AT', // Athens
+    '.IR', // Irish
+    '.LS', // Lisbon
+    '.PA', // Euronext Paris
+    '.AS', // Euronext Amsterdam
+    '.BR', // Euronext Brussels
   };
 
   Future<List<Map<String, dynamic>>> search(String query) async {
@@ -329,9 +329,7 @@ class FinnhubService {
       final c = (q['c'] as num?)?.toDouble() ?? 0;
       final dp = (q['dp'] as num?)?.toDouble() ?? 0;
       final pc = (q['pc'] as num?)?.toDouble() ?? 0;
-      debugPrint(
-        '📊 quote($symbol): c=$c dp=$dp pc=$pc',
-      );
+      debugPrint('📊 quote($symbol): c=$c dp=$dp pc=$pc');
       return {'c': c, 'dp': dp, 'pc': pc};
     } catch (e) {
       debugPrint('❌ previousTradingDayQuote error for $symbol: $e');
@@ -403,6 +401,21 @@ class FinnhubService {
     '/candles/$symbol',
     params: {'resolution': resolution, 'from': from, 'to': to},
   );
+
+  /// Current Disclaimer/Privacy Policy/Terms version numbers, uncached —
+  /// this is a compliance check, a stale answer defeats its purpose.
+  Future<Map<String, dynamic>> documentVersions() async {
+    final response = await _backendDio.get('/config/versions');
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  /// Permanently deletes the signed-in user's account and all their data.
+  /// Cascades server-side (ON DELETE CASCADE on the Supabase tables) —
+  /// there is nothing left to clean up client-side except the local
+  /// session itself, which the caller is responsible for clearing.
+  Future<void> deleteAccount() async {
+    await _backendDio.delete('/account');
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -413,7 +426,9 @@ class FinnhubService {
 // directly wherever `ref` is available.
 // ---------------------------------------------------------------------------
 
-final finnhubServiceProvider = Provider<FinnhubService>((ref) => FinnhubService());
+final finnhubServiceProvider = Provider<FinnhubService>(
+  (ref) => FinnhubService(),
+);
 
 class _CacheEntry {
   final dynamic data;

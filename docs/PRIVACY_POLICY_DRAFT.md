@@ -9,7 +9,8 @@
 > is not linked from the app or the server yet.
 
 **Last updated:** [DATE — fill in when published]
-**Effective for app version:** [VERSION]
+**Effective for app version:** 1.0.0 (confirm this still matches
+`pubspec.yaml` at the time you actually publish)
 
 ---
 
@@ -19,11 +20,11 @@ F.O.M.O. Shield ("the App", "we", "us") is an educational investing-simulation
 app. This policy explains what data we collect, why, and what rights you have
 over it.
 
-**Data controller:** [LEGAL ENTITY NAME OR YOUR FULL NAME]
-**Contact for privacy questions:** [privacy@fomoshield.app — needs to actually
-be set up as a working inbox, e.g. via Namecheap email forwarding to your
-real address]
-**Business address (required for some stores/regulators):** [ADDRESS]
+**Data controller:** Volodymyr Oleksiienko (individual developer, not a
+registered company)
+**Contact for privacy questions:** fomoshield@gmail.com
+**Business address:** not applicable — operated by an individual, not a
+registered legal entity.
 
 ## 2. What This App Is (and Isn't)
 
@@ -39,8 +40,6 @@ numbers, bank details, or real trading credentials, because the app has none.
 | Category | What | Why |
 |---|---|---|
 | Account | Email address (via Supabase Auth, or via Google Sign-In if you use that option) | Create and secure your account, password-reset/login |
-| Usage | Anonymized in-app usage statistics (which features are used, not tied to your identity beyond your account) | Understand what's useful, fix bugs |
-| Device | Device language/locale setting | Show the app in the right language |
 | Your own data | Watchlist symbols, portfolio/stress-test simulation state, goals you set | Core app functionality — this is the product |
 
 We do **not** collect: real payment/card details (Premium, if purchased, is
@@ -51,9 +50,9 @@ credentials, precise GPS location, or contacts/photos/microphone access.
 
 - **Consent** — you actively accept this policy and the Disclaimer at sign-up,
   and can withdraw consent by deleting your account.
-- **Legitimate interest** — anonymized usage analytics to keep the app
-  working and improve it, where this doesn't override your own privacy
-  rights.
+- **Legitimate interest** — securing our backend and preventing abuse (e.g.
+  rate-limiting, API authentication), where this doesn't override your own
+  privacy rights.
 - **Contract necessity** — your email is required to create and operate your
   account; without it we can't provide the service.
 
@@ -68,19 +67,25 @@ the minimum data needed for its function:
 - **Finnhub** and **Wikipedia APIs** — provide market data and company
   information; we query them on your behalf via our own backend, they don't
   receive your personal data.
-- **Our own backend server** ([scanco-backend], hosted at [HOST/REGION —
-  fill in, e.g. Hetzner/Germany]) — proxies market-data requests and stores
-  app configuration.
+- **Our own backend server** (proxies market-data requests and stores app
+  configuration), hosted by Hetzner Online GmbH in Nuremberg, Germany.
 - **Email delivery** (Gmail SMTP) — sends account-related emails
   (verification, password reset).
 
-We do not sell your data to advertisers or data brokers.
+We do not sell your data to advertisers or data brokers. [Verified 2026-08-15
+against the live codebase: no ad network SDK or analytics SDK is integrated
+today — the "Sponsored Content" box shown to free-tier users is a static
+placeholder with no data collection behind it. If a real ad network or
+analytics SDK is added later, this section needs a new processor entry
+before that ships.]
 
 ## 6. Data Retention
 
-We keep your account data for as long as your account is active. If you
-delete your account, we delete your personal data within [X days — fill in,
-e.g. 30] except where we're legally required to keep records longer.
+We keep your account data for as long as your account is active. You can
+delete your account at any time from Profile → Delete Account — this
+permanently and immediately removes your account and all associated data
+(portfolios, watchlist, stress-test history), except where we're legally
+required to keep records longer.
 
 ## 7. Your Rights
 
@@ -89,22 +94,22 @@ the right to:
 
 - **Access** the personal data we hold about you.
 - **Correct** inaccurate data.
-- **Delete** your data ("right to be forgotten").
+- **Delete** your data ("right to be forgotten") — self-service, instant,
+  via Profile → Delete Account in the App.
 - **Export** your data in a portable format.
 - **Object to or restrict** certain processing.
 - **Withdraw consent** at any time (this doesn't affect processing already
   done before withdrawal).
 
-To exercise any of these, contact us at [privacy@fomoshield.app]. We'll
-respond within [30 days, per GDPR's standard timeline].
+To exercise any of these, contact us at fomoshield@gmail.com. We'll
+respond within 30 days (GDPR's standard timeline).
 
 ## 8. International Data Transfers
 
-Our backend server is located in [COUNTRY — confirm from hosting provider].
-[If this is inside the EU/EEA: "Because this is within the EU/EEA, no
-additional transfer safeguard is required." If outside: needs Standard
-Contractual Clauses or another GDPR transfer mechanism — flag this to a
-lawyer if the server isn't EU-based.]
+Our backend server is located in Germany (Nuremberg, hosted by Hetzner
+Online GmbH — confirmed 2026-08-15 via IP lookup). Because this is within
+the EU/EEA, no additional international-transfer safeguard (e.g. Standard
+Contractual Clauses) is required for EU/UK users' data.
 
 ## 9. Children's Privacy
 
@@ -120,8 +125,10 @@ tracking cookie and isn't shared with third parties.
 
 ## 11. Security
 
-We use industry-standard measures (HTTPS/TLS encryption in transit, access
-controls on our database) to protect your data. No system is 100% secure,
+We use industry-standard measures to protect your data: all traffic between
+the App and our servers is encrypted in transit (HTTPS/TLS), and our
+database enforces row-level security so each account can only ever read or
+write its own data, even at the database layer. No system is 100% secure,
 and we can't guarantee absolute security.
 
 ## 12. Changes to This Policy
@@ -132,4 +139,4 @@ continue.
 
 ## 13. Contact
 
-Questions about this policy: [privacy@fomoshield.app]
+Questions about this policy: fomoshield@gmail.com
