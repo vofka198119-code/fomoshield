@@ -19,23 +19,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
 import '../stress_test_models.dart';
-
-final _priceFmt = NumberFormat('#,##0.00', 'en_US');
-final _wholeFmt = NumberFormat('#,##0', 'en_US');
 
 class VerdictTradeBreakdownWidget extends StatelessWidget {
   final VerdictArchiveEntry entry;
 
   const VerdictTradeBreakdownWidget({super.key, required this.entry});
-
-  String _fmtMoney(double v) =>
-      '${v >= 0 ? '+' : '-'}\$${_priceFmt.format(v.abs())}';
 
   @override
   Widget build(BuildContext context) {
@@ -84,15 +78,9 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
               children: [
                 _statRow('Total Trades', '${entry.totalTrades}'),
                 _statRow('Holdings', '${entry.holdingCount}'),
-                _statRow('Final P&L', _fmtMoney(totalPnl)),
-                _statRow(
-                  'Final Balance',
-                  '\$${_wholeFmt.format(entry.finalValue)}',
-                ),
-                _statRow(
-                  'Starting Cash',
-                  '\$${_wholeFmt.format(entry.startingCash)}',
-                ),
+                _statRow('Final P&L', formatUsdSigned(totalPnl)),
+                _statRow('Final Balance', formatUsd(entry.finalValue)),
+                _statRow('Starting Cash', formatUsd(entry.startingCash)),
                 _statRow('Test Duration', entry.durationLabel, isLast: true),
               ],
             ),

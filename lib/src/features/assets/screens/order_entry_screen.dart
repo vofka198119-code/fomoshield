@@ -21,6 +21,7 @@ import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/guardian/guardian_engine.dart';
 import '../../../shared/guardian/guardian_providers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_pending_orders_provider.dart';
@@ -208,7 +209,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Not enough available cash — \$${_availableCash.toStringAsFixed(2)} '
+              'Not enough available cash — ${formatUsd(_availableCash)} '
               'free (some is reserved for pending orders)',
             ),
           ),
@@ -243,7 +244,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
           detail:
               '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-              'at \$${confirmedLimitPrice.toStringAsFixed(2)} — Pending',
+              'at ${formatUsd(confirmedLimitPrice)} — Pending',
           createdAt: DateTime.now(),
         ),
       );
@@ -297,7 +298,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         title: _isBuy ? 'You Bought' : 'You Sold',
         detail:
             '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-            'at \$${_currentPrice.toStringAsFixed(2)}',
+            'at ${formatUsd(_currentPrice)}',
         createdAt: DateTime.now(),
       ),
     );

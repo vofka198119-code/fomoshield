@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/supabase/supabase_providers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../monetization/monetization_modal.dart';
 import '../../market_clock/market_clock_dial.dart';
@@ -361,7 +362,7 @@ class StressTestWidget extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '\$${session.totalValue.toStringAsFixed(0)}',
+                  formatUsd(session.totalValue),
                   style: interNums(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -370,7 +371,7 @@ class StressTestWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${session.unrealizedPnl >= 0 ? '+' : '-'}\$${session.unrealizedPnl.abs().toStringAsFixed(0)}',
+                  formatUsdSigned(session.unrealizedPnl),
                   style: interNums(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

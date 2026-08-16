@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
 
@@ -23,20 +24,6 @@ class PortfolioCashWidget extends StatelessWidget {
     this.isLoading = false,
     this.hasError = false,
   });
-
-  /// Full number format with commas and fixed 2 decimals — e.g. $15,000.00
-  String _fmtFull(double v) {
-    final parts = v.toStringAsFixed(2).split('.');
-    final intStr = parts[0];
-    final buf = StringBuffer();
-    for (int i = 0; i < intStr.length; i++) {
-      if (i > 0 && (intStr.length - i) % 3 == 0) buf.write(',');
-      buf.write(intStr[i]);
-    }
-    buf.write('.');
-    buf.write(parts[1]);
-    return buf.toString();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +74,7 @@ class PortfolioCashWidget extends StatelessWidget {
                       ),
                     )
                   : Text(
-                      '\$${_fmtFull(cash!)}',
+                      formatUsd(cash!),
                       textAlign: TextAlign.center,
                       style:
                           interNums(

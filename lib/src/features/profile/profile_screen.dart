@@ -42,8 +42,10 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
         style: GoogleFonts.inter(fontWeight: FontWeight.w700),
       ),
       content: Text(
-        'This permanently deletes your account and all your data — '
-        'portfolios, watchlist, stress test history. This cannot be undone.',
+        'You\'ll have 14 days to restore your account after this. If you '
+        'don\'t restore it within that window, your account and all your '
+        'data — portfolios, watchlist, stress test history — will be '
+        'permanently erased, with no way to recover it.',
         style: GoogleFonts.inter(fontSize: 14),
       ),
       actions: [
@@ -77,7 +79,10 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
   );
 
   try {
-    await FinnhubService().deleteAccount();
+    // Schedules deletion 14 days out instead of an immediate hard delete —
+    // see finnhub_service.dart's doc comment and accountCleanup.js on the
+    // backend for the actual sweep that does the permanent erase.
+    await FinnhubService().scheduleAccountDeletion();
     await clearAllSessionData();
     if (!context.mounted) return;
     Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
@@ -430,13 +435,23 @@ class ProfileScreen extends ConsumerWidget {
             child: ref
                 .watch(packageInfoProvider)
                 .when(
-                  data: (info) => Text(
-                    'v${info.version} (build ${info.buildNumber})',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: ThemeV2.textSecondary.withValues(alpha: 0.5),
-                    ),
-                  ),
+                  data: (info) {
+                    // Compact "1.0.004" form — major.minor from the version
+                    // string, build number zero-padded to 3 digits, instead
+                    // of the old "v1.0.0 (build 4)".
+                    final versionParts = info.version.split('.');
+                    final majorMinor = versionParts.length >= 2
+                        ? '${versionParts[0]}.${versionParts[1]}'
+                        : info.version;
+                    final build = info.buildNumber.padLeft(3, '0');
+                    return Text(
+                      'v$majorMinor.$build',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: ThemeV2.textSecondary.withValues(alpha: 0.5),
+                      ),
+                    );
+                  },
                   loading: () => const SizedBox.shrink(),
                   error: (_, _) => const SizedBox.shrink(),
                 ),

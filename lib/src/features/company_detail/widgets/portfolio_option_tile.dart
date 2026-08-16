@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
 
@@ -74,7 +75,7 @@ class PortfolioOptionTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '\$${cash.toStringAsFixed(2)} available',
+                    '${formatUsd(cash)} available',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: ThemeV2.textSecondary,

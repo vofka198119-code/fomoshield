@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../shared/utils/currency_format.dart';
 
 // ---------------------------------------------------------------------------
 // Limit Price Input — no card box, everything center-stacked: a big green
@@ -98,7 +99,7 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
                   behavior: HitTestBehavior.opaque,
                   onTap: widget.onTapField,
                   child: Text(
-                    '\$${_value.toStringAsFixed(2)}',
+                    formatUsd(_value),
                     style: interNums(
                       fontSize: 30,
                       fontWeight: FontWeight.w600,

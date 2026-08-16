@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../shared/utils/currency_format.dart';
 import '../../../../shared/widgets/company_logo.dart';
 
 // ---------------------------------------------------------------------------
@@ -86,7 +87,7 @@ class OrderHeader extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '\$${price.toStringAsFixed(2)}',
+          formatUsd(price),
           textAlign: TextAlign.center,
           style: interNums(
             fontSize: 28,

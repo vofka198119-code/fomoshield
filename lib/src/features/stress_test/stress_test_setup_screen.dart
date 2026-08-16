@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
@@ -346,7 +347,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            '\$${session.cash.toStringAsFixed(2)}',
+            formatUsd(session.cash),
             style: interNums(
               fontSize: 32,
               fontWeight: FontWeight.w800,
@@ -356,7 +357,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'of \$${session.startingCash.toStringAsFixed(0)} total',
+            'of ${formatUsd(session.startingCash)} total',
             style: interNums(fontSize: 12, color: Colors.white60),
           ),
         ],

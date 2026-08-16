@@ -9,6 +9,8 @@ import '../../features/auth/auth_screen.dart';
 import '../../features/auth/forgot_password_screen.dart';
 import '../supabase/supabase_client.dart';
 
+import '../../features/auth/account_restore_screen.dart';
+import '../../shared/services/finnhub_service.dart' show AccountDeletionStatus;
 import '../../features/disclaimer/disclaimer_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
@@ -115,6 +117,20 @@ class AppRouter {
         path: '/disclaimer',
         name: 'disclaimer',
         builder: (context, state) => const DisclaimerScreen(),
+      ),
+
+      // Account Restore — full-block gate for a pending-deletion account,
+      // see resolvePostAuthRoute() in auth_providers.dart.
+      GoRoute(
+        path: '/account-restore',
+        name: 'accountRestore',
+        builder: (context, state) {
+          final status = state.extra as AccountDeletionStatus?;
+          return AccountRestoreScreen(
+            daysRemaining: status?.daysRemaining ?? 0,
+            deleteAt: status?.deleteAt,
+          );
+        },
       ),
 
       // Company detail (full screen, no shell)

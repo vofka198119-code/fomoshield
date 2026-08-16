@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/typography_helpers.dart';
+import '../../../../../shared/utils/currency_format.dart';
 import '../../../../orders/order_cancel_dialog.dart';
 import '../../../../stress_test/stress_test_pending_order.dart';
 import '../../../../stress_test/stress_test_pending_orders_provider.dart';
@@ -69,7 +70,7 @@ class StressTestOrderRowTile extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Limit Price \$${order.limitPrice.toStringAsFixed(2)}',
+                  'Limit Price ${formatUsd(order.limitPrice)}',
                   style: interNums(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,

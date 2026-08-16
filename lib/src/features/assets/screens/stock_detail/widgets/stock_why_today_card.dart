@@ -9,7 +9,7 @@ import '../../../../../core/supabase/supabase_providers.dart';
 import '../../../../market_clock/market_clock_dial.dart'
     show darkCardDecoration;
 import '../../../../stress_test/stress_test_models.dart' show TickExplanation;
-import 'stock_detail_helpers.dart';
+import '../../../../../shared/utils/currency_format.dart';
 
 // ---------------------------------------------------------------------------
 // Stress Test "Why Today" card — dark dialLight/dialDark family (matches
@@ -172,8 +172,7 @@ class StockWhyTodayCard extends ConsumerWidget {
               Expanded(
                 child: _changeBox(
                   label: "TODAY'S CHANGE",
-                  value:
-                      '${isPositive ? '+' : ''}${fmtFullCurrency(priceChange)}',
+                  value: formatUsdSigned(priceChange),
                 ),
               ),
               const SizedBox(width: 10),

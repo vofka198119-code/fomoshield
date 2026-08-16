@@ -43,6 +43,7 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../../shared/utils/currency_format.dart';
 
 const _marketColor = FomoShieldTheme.factorMarket;
 const _sectorColor = FomoShieldTheme.factorSector;
@@ -142,8 +143,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                           Expanded(
                             child: _changeBox(
                               label: 'DOLLARS',
-                              value:
-                                  '${isPositive ? '+' : ''}\$${priceChange.abs().toStringAsFixed(2)}',
+                              value: formatUsdSigned(priceChange),
                               color: isPositive
                                   ? ThemeV2.success
                                   : ThemeV2.loss,

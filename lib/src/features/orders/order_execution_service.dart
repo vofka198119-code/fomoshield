@@ -9,6 +9,7 @@
 import 'dart:math';
 import 'order_model.dart';
 import '../portfolio/portfolio_providers.dart';
+import '../../shared/utils/currency_format.dart';
 
 /// Result of evaluating/executing a single order
 class OrderExecutionResult {
@@ -334,7 +335,7 @@ class OrderExecutionService {
       transaction: tx,
       wasExecuted: true,
       message: isFull
-          ? 'Filled at \$${executionPrice.toStringAsFixed(2)}'
+          ? 'Filled at ${formatUsd(executionPrice)}'
           : 'Partially filled',
     );
   }

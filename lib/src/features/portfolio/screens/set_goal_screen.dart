@@ -16,6 +16,7 @@ import '../../../core/models/app_notification.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/numeric_keypad.dart';
 import '../portfolio_providers.dart';
 
@@ -70,9 +71,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
     final minGoal = _minGoal;
     if (amount == null || amount < minGoal) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Minimum target is \$${minGoal.toStringAsFixed(0)}'),
-        ),
+        SnackBar(content: Text('Minimum target is ${formatUsd(minGoal)}')),
       );
       return;
     }
@@ -87,9 +86,9 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
         portfolioId: widget.portfolioId,
         title: previous == null ? 'Goal Set' : 'Goal Updated',
         detail: previous == null
-            ? 'Target set to \$${amount.toStringAsFixed(0)}'
-            : 'New target \$${amount.toStringAsFixed(0)} '
-                  '(${amount >= previous ? '+' : '-'}\$${(amount - previous).abs().toStringAsFixed(0)})',
+            ? 'Target set to ${formatUsd(amount)}'
+            : 'New target ${formatUsd(amount)} '
+                  '(${formatUsdSigned(amount - previous)})',
         createdAt: DateTime.now(),
       ),
     );
@@ -145,7 +144,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                     const SizedBox(height: 6),
                     Text(
                       'This is your target total balance, not extra profit on top. '
-                      'Minimum \$${minGoal.toStringAsFixed(0)}.',
+                      'Minimum ${formatUsd(minGoal)}.',
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: ThemeV2.textSecondary,

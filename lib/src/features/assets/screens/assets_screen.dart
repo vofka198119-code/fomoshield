@@ -11,11 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../widgets/asset_row_widget.dart';
 
 /// Asset list sort mode
@@ -370,7 +370,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
           const SizedBox(height: 4),
           // Главная сумма — жирный Serif
           Text(
-            '\$${_fmt(totalValue)}',
+            formatUsd(totalValue),
             style: GoogleFonts.playfairDisplay(
               fontSize: 36,
               fontWeight: FontWeight.w700,
@@ -393,7 +393,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                '${isPositive ? '+' : ''}\$${_fmt(unrealizedPnl.abs())} '
+                '${formatUsdSigned(unrealizedPnl)} '
                 '(${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
                 style: GoogleFonts.inter(
                   fontSize: 12,
@@ -418,7 +418,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                '\$${_fmt(startCash)}',
+                formatUsd(startCash),
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -504,9 +504,5 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         ),
       ),
     );
-  }
-
-  String _fmt(double v) {
-    return NumberFormat('#,##0.00', 'en_US').format(v);
   }
 }

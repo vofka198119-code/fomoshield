@@ -14,10 +14,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
-import 'package:intl/intl.dart' hide TextDirection;
 import '../../features/stress_test/stress_test_models.dart';
 import '../../features/stress_test/psychology_engine.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../utils/currency_format.dart';
 
 /// Data for the Psychology Meter.
 class PsychologyMeterData {
@@ -287,8 +287,6 @@ class PsychologyAnalyticsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nf = NumberFormat('#,##0.00', 'en_US');
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -300,14 +298,14 @@ class PsychologyAnalyticsSection extends StatelessWidget {
         _statRow('Epochs', '${data.epochsPassed}'),
         _statRow(
           'Unrealized P&L',
-          '\$${nf.format(data.unrealizedPnl)}',
+          formatUsdSigned(data.unrealizedPnl),
           valueColor: data.unrealizedPnl >= 0
               ? FomoShieldTheme.positive
               : FomoShieldTheme.negative,
         ),
         _statRow(
           'Realized P&L',
-          '\$${nf.format(data.realizedPnl)}',
+          formatUsdSigned(data.realizedPnl),
           valueColor: data.realizedPnl >= 0
               ? FomoShieldTheme.positive
               : FomoShieldTheme.negative,
@@ -368,10 +366,7 @@ class _PsychologyMeterBody extends StatelessWidget {
       children: [
         FsScoreRing(score: avgScore),
         const SizedBox(height: 20),
-        _SubIndexRow(
-          label: 'Strategy Score',
-          value: data.strategicScore / 100,
-        ),
+        _SubIndexRow(label: 'Strategy Score', value: data.strategicScore / 100),
         _SubIndexRow(
           label: 'Psychology Score',
           value: data.psychologicalScore / 100,
@@ -418,9 +413,7 @@ class FsScoreRing extends StatelessWidget {
         final sideBottomExtent = radius * _sideSin + _outerPad;
         final centerY = topExtent + 8;
         final height =
-            centerY +
-            math.max(sideBottomExtent, _pillTopGap + _pillHeight) +
-            8;
+            centerY + math.max(sideBottomExtent, _pillTopGap + _pillHeight) + 8;
         final center = Offset(width / 2, centerY);
 
         return SizedBox(
@@ -1166,4 +1159,3 @@ class _AuditSheetContent extends StatelessWidget {
 void showPsychologyAudit(BuildContext context, PsychologyMeterData data) {
   _showAuditSheet(context, data);
 }
-

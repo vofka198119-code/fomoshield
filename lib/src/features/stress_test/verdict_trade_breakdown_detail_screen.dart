@@ -11,11 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
@@ -28,8 +28,6 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
   final String sessionId;
 
   const VerdictTradeBreakdownDetailScreen({super.key, required this.sessionId});
-
-  static final _priceFmt = NumberFormat('#,##0.00', 'en_US');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -206,9 +204,6 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
   int _totalAssetsEverHeld(VerdictArchiveEntry entry) =>
       entry.trades.where((t) => t.isBuy).map((t) => t.symbol).toSet().length;
 
-  String _fmtMoney(double v) =>
-      '${v >= 0 ? '+' : '-'}\$${_priceFmt.format(v.abs())}';
-
   /// Plain-English labels — never the raw enum/jargon names (per explicit
   /// ask: no bare "Bull"/"Bear").
   String _scenarioLabel(MarketScenario s) => switch (s) {
@@ -258,25 +253,22 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
       title: 'FINANCIAL SUMMARY',
       child: Column(
         children: [
-          _Row(
-            label: 'Starting Amount',
-            value: '\$${_priceFmt.format(entry.startingCash)}',
-          ),
+          _Row(label: 'Starting Amount', value: formatUsd(entry.startingCash)),
           _Row(
             label: 'Total P&L (Realized + Unrealized)',
-            value: _fmtMoney(totalPnl),
+            value: formatUsdSigned(totalPnl),
           ),
           _Row(
             label: 'Profitable Sells (${profitSells.length})',
-            value: _fmtMoney(totalProfit),
+            value: formatUsdSigned(totalProfit),
           ),
           _Row(
             label: 'Losing Sells (${lossSells.length})',
-            value: _fmtMoney(totalLoss),
+            value: formatUsdSigned(totalLoss),
           ),
           _Row(
             label: 'Final Balance',
-            value: '\$${_priceFmt.format(entry.finalValue)}',
+            value: formatUsd(entry.finalValue),
             isLast: true,
           ),
         ],
@@ -606,7 +598,7 @@ class _CompanyRow extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            '${isPositive ? '+' : '-'}\$${VerdictTradeBreakdownDetailScreen._priceFmt.format(pnl.abs())}',
+            formatUsdSigned(pnl),
             style: interNums(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -693,7 +685,7 @@ class _TradeRow extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '\$${VerdictTradeBreakdownDetailScreen._priceFmt.format(totalValue)}',
+                formatUsd(totalValue),
                 style: interNums(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,

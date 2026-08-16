@@ -6,6 +6,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/router/navigation_history_provider.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
@@ -298,20 +299,19 @@ class _PortfolioPerformanceView extends ConsumerWidget {
                   children: [
                     _cell(
                       label: 'PORTFOLIO BALANCE',
-                      value: '\$${perf.currentValue.toStringAsFixed(2)}',
+                      value: formatUsd(perf.currentValue),
                       bgColor: ThemeV2.primaryBg,
                     ),
                     const SizedBox(height: 6),
                     _cell(
                       label: 'CASH AVAILABLE',
-                      value: '\$${perf.cash.toStringAsFixed(2)}',
+                      value: formatUsd(perf.cash),
                       bgColor: ThemeV2.primaryBg,
                     ),
                     const SizedBox(height: 6),
                     _cell(
                       label: 'UNREALIZED P&L',
-                      value:
-                          '${isUp ? '+' : ''}\$${perf.pnl.toStringAsFixed(2)}',
+                      value: formatUsdSigned(perf.pnl),
                       valueFontSize: 14,
                       bgColor: pnlBg,
                       valueColor: pnlColor,

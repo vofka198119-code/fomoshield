@@ -4,6 +4,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
@@ -203,7 +204,7 @@ class PriceHeader extends StatelessWidget {
                             const SizedBox(width: 3),
                             Flexible(
                               child: Text(
-                                '${isUp ? '+' : ''}${change.toStringAsFixed(2)}\$ (${isUp ? '+' : ''}${changePercent.toStringAsFixed(2)}%)',
+                                '${formatUsdSigned(change)} (${isUp ? '+' : ''}${changePercent.toStringAsFixed(2)}%)',
                                 style: interNums(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,

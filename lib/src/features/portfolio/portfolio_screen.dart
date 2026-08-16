@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/router/navigation_history_provider.dart';
@@ -22,6 +21,7 @@ import 'widgets/portfolio_cash_widget.dart';
 import 'widgets/target_widget.dart';
 import 'widgets/portfolio_holdings_widget.dart';
 import 'widgets/portfolio_trade_history_widget.dart';
+import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import 'widgets/my_limit_orders_widget.dart';
@@ -167,7 +167,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Create your first virtual portfolio\nwith \$${NumberFormat('#,##0', 'en_US').format(startingCapital)} starting balance',
+              'Create your first virtual portfolio\nwith ${formatUsd(startingCapital)} starting balance',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,

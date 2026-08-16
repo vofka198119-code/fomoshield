@@ -27,6 +27,7 @@ import '../../../core/models/app_notification.dart';
 import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../shared/services/finnhub_service.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../monetization/monetization_modal.dart';
 import '../../monetization/premium_promo_overlay.dart';
 import '../portfolio_limits_provider.dart';
@@ -303,7 +304,7 @@ class _PortfolioOrderEntryScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Not enough available cash — \$${_availableCash.toStringAsFixed(2)} '
+              'Not enough available cash — ${formatUsd(_availableCash)} '
               'free (some is reserved for pending orders)',
             ),
           ),
@@ -442,7 +443,7 @@ class _PortfolioOrderEntryScreenState
             title: _isBuy ? 'You Bought' : 'You Sold',
             detail:
                 '${shares.toStringAsFixed(4)} shares of $companyName '
-                'at \$${_currentPrice.toStringAsFixed(2)}',
+                'at ${formatUsd(_currentPrice)}',
             createdAt: DateTime.now(),
           ),
         );
@@ -462,7 +463,7 @@ class _PortfolioOrderEntryScreenState
             title: '${orderType.label} ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
             detail:
                 '${shares.toStringAsFixed(4)} shares of $companyName'
-                '${limitPrice != null ? ' at \$${limitPrice.toStringAsFixed(2)}' : ''} — Pending',
+                '${limitPrice != null ? ' at ${formatUsd(limitPrice)}' : ''} — Pending',
             createdAt: DateTime.now(),
           ),
         );

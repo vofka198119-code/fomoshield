@@ -29,9 +29,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../stress_test_engine.dart';
@@ -54,8 +54,6 @@ const Map<_ValuePeriod, Duration> _periodCutoffs = {
   _ValuePeriod.m3: Duration(days: 90),
   _ValuePeriod.y1: Duration(days: 365),
 };
-
-final _priceFmt = NumberFormat('#,##0.00', 'en_US');
 
 /// Time-bucket averaging: splits [domainStart, domainEnd] into [maxBuckets]
 /// equal time slices and averages every raw point that falls in the same
@@ -550,7 +548,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
           top: 0,
           right: 3,
           child: Text(
-            '\$${_priceFmt.format(maxValue)}',
+            formatUsd(maxValue),
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -562,7 +560,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
           bottom: 0,
           right: 3,
           child: Text(
-            '\$${_priceFmt.format(minValue)}',
+            formatUsd(minValue),
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,

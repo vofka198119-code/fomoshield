@@ -14,6 +14,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/company_logo.dart';
 import 'stress_test_models.dart';
 import 'stress_test_naming.dart';
@@ -172,20 +173,16 @@ class _TradeDetailCard extends ConsumerWidget {
             label: trade.isBuy ? 'Shares Bought' : 'Shares Sold',
             value: trade.shares.toStringAsFixed(4),
           ),
-          _DetailRow(
-            label: 'Price per Share',
-            value: '\$${trade.price.toStringAsFixed(2)}',
-          ),
+          _DetailRow(label: 'Price per Share', value: formatUsd(trade.price)),
           _DetailRow(
             label: 'Total Value',
-            value: '\$${(trade.shares * trade.price).toStringAsFixed(2)}',
+            value: formatUsd(trade.shares * trade.price),
           ),
           _DetailRow(label: 'Date', value: _formatDate(trade.date)),
           if (trade.realizedPnl != null)
             _DetailRow(
               label: 'Realized P&L',
-              value:
-                  '${trade.realizedPnl! >= 0 ? '+' : '-'}\$${trade.realizedPnl!.abs().toStringAsFixed(2)}',
+              value: formatUsdSigned(trade.realizedPnl!),
               valueColor: trade.realizedPnl! >= 0
                   ? ThemeV2.success
                   : ThemeV2.loss,

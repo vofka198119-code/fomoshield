@@ -18,6 +18,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
 import '../portfolio_providers.dart';
@@ -292,7 +293,7 @@ class _HoldingRow extends ConsumerWidget {
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    '\$${holding.currentValue.toStringAsFixed(2)}',
+                    formatUsd(holding.currentValue),
                     style: interNums(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -304,7 +305,7 @@ class _HoldingRow extends ConsumerWidget {
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    '${isPositive ? '+' : ''}\$${holding.pnl.toStringAsFixed(2)} '
+                    '${formatUsdSigned(holding.pnl)} '
                     '(${isPositive ? '+' : ''}${holding.pnlPercent.toStringAsFixed(2)}%)',
                     style: interNums(
                       fontSize: 12,

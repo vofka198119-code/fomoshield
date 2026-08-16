@@ -7,6 +7,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../../portfolio/portfolio_providers.dart';
@@ -546,7 +547,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
           top: 0,
           right: 3,
           child: Text(
-            '\$${maxPrice.toStringAsFixed(2)}',
+            formatUsd(maxPrice),
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -558,7 +559,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
           bottom: 0,
           right: 3,
           child: Text(
-            '\$${minPrice.toStringAsFixed(2)}',
+            formatUsd(minPrice),
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -571,7 +572,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             top: (avgLineTop - 14).clamp(0.0, 220.0 - 14),
             right: 3,
             child: Text(
-              '\$${avgCost.toStringAsFixed(2)}',
+              formatUsd(avgCost),
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,

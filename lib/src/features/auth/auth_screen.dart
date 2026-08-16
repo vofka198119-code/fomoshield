@@ -9,7 +9,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../shared/services/user_data_service.dart';
-import '../disclaimer/disclaimer_providers.dart';
 import 'auth_providers.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
@@ -205,12 +204,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
       // ── Navigate based on sign-in vs sign-up ──────────────────
       if (_isLogin) {
-        // Existing user signing in → check disclaimer status
-        final disclaimerAccepted = await ref.read(
-          isDisclaimerAcceptedProvider.future,
-        );
+        // Existing user signing in → check pending-deletion, then disclaimer
+        final resolved = await resolvePostAuthRoute(ref);
         if (!mounted) return;
-        context.go(disclaimerAccepted ? '/home' : '/disclaimer');
+        context.go(resolved.route, extra: resolved.extra);
       } else {
         // New registration → always show disclaimer first
         context.go('/disclaimer');
@@ -276,11 +273,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       await ref.read(userDataSyncProvider.future);
 
       if (!mounted) return;
-      final disclaimerAccepted = await ref.read(
-        isDisclaimerAcceptedProvider.future,
-      );
+      final resolved = await resolvePostAuthRoute(ref);
       if (!mounted) return;
-      context.go(disclaimerAccepted ? '/home' : '/disclaimer');
+      context.go(resolved.route, extra: resolved.extra);
     } on GoogleSignInException catch (e) {
       if (!mounted) return;
       if (e.code == GoogleSignInExceptionCode.canceled) {

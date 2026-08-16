@@ -14,6 +14,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../orders/order_model.dart';
 import '../../orders/order_provider.dart';
@@ -182,31 +183,27 @@ class _TradeDetailCard extends ConsumerWidget {
           if (order?.limitPrice != null)
             _DetailRow(
               label: 'Limit Price',
-              value: '\$${order!.limitPrice!.toStringAsFixed(2)}',
+              value: formatUsd(order!.limitPrice!),
             ),
           if (order?.stopPrice != null)
             _DetailRow(
               label: 'Stop Price',
-              value: '\$${order!.stopPrice!.toStringAsFixed(2)}',
+              value: formatUsd(order!.stopPrice!),
             ),
           _DetailRow(
             label: isBuy ? 'Shares Bought' : 'Shares Sold',
             value: tx.shares.toStringAsFixed(4),
           ),
-          _DetailRow(
-            label: 'Price per Share',
-            value: '\$${tx.price.toStringAsFixed(2)}',
-          ),
+          _DetailRow(label: 'Price per Share', value: formatUsd(tx.price)),
           _DetailRow(
             label: 'Total Value',
-            value: '\$${(tx.shares * tx.price).toStringAsFixed(2)}',
+            value: formatUsd(tx.shares * tx.price),
           ),
           _DetailRow(label: 'Date', value: _formatDate(tx.date)),
           if (tx.realizedPnl != null)
             _DetailRow(
               label: 'Realized P&L',
-              value:
-                  '${tx.realizedPnl! >= 0 ? '+' : '-'}\$${tx.realizedPnl!.abs().toStringAsFixed(2)}',
+              value: formatUsdSigned(tx.realizedPnl!),
               valueColor: tx.realizedPnl! >= 0 ? ThemeV2.success : ThemeV2.loss,
               isLast: true,
             ),

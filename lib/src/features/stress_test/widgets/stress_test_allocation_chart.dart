@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
 import '../stress_test_models.dart';
 import '../stress_test_naming.dart';
@@ -31,20 +32,6 @@ class _StressTestAllocationChartState
     extends ConsumerState<StressTestAllocationChart> {
   static const int _legendPreviewLimit = 5;
   bool _showAll = false;
-
-  /// Full number format with commas and fixed 2 decimals — e.g. $15,000.00
-  String _fmtFull(double v) {
-    final parts = v.toStringAsFixed(2).split('.');
-    final intStr = parts[0];
-    final buf = StringBuffer();
-    for (int i = 0; i < intStr.length; i++) {
-      if (i > 0 && (intStr.length - i) % 3 == 0) buf.write(',');
-      buf.write(intStr[i]);
-    }
-    buf.write('.');
-    buf.write(parts[1]);
-    return buf.toString();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,8 +69,8 @@ class _StressTestAllocationChartState
         ? ThemeV2.success
         : ThemeV2.loss;
     final pnlText = isZero
-        ? '\$0.00'
-        : '${isPositive ? '+' : '-'}\$${_fmtFull(pnl.abs())} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
+        ? formatUsd(0)
+        : '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
 
     return Container(
       width: double.infinity,
@@ -168,7 +155,7 @@ class _StressTestAllocationChartState
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            '\$${_fmtFull(portfolioTotal)}',
+                            formatUsd(portfolioTotal),
                             style: interNums(
                               fontSize: 28,
                               fontWeight: FontWeight.w600,

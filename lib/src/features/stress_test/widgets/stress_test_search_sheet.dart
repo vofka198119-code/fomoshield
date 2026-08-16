@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/simulated_trading_disclaimer.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/models/app_notification.dart';
@@ -197,7 +198,7 @@ class _StressTestSearchSheetState
             title: 'You Bought',
             detail:
                 '${(_amount / _selectedPrice).toStringAsFixed(4)} shares of '
-                '$_selectedDescription at \$${_selectedPrice.toStringAsFixed(2)}',
+                '$_selectedDescription at ${formatUsd(_selectedPrice)}',
             createdAt: DateTime.now(),
           ),
         );
@@ -443,7 +444,7 @@ class _StressTestSearchSheetState
 
                       // Price info
                       Text(
-                        'Current price: \$${_selectedPrice.toStringAsFixed(2)}',
+                        'Current price: ${formatUsd(_selectedPrice)}',
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           color: ThemeV2.textSecondary,
@@ -511,7 +512,7 @@ class _StressTestSearchSheetState
                           final selected = _amount == v;
                           return ChoiceChip(
                             label: Text(
-                              '\$$v',
+                              formatUsd(v),
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -539,7 +540,7 @@ class _StressTestSearchSheetState
                         Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Text(
-                            'Exceeds available cash (\$${availableCash.toStringAsFixed(0)})',
+                            'Exceeds available cash (${formatUsd(availableCash)})',
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: ThemeV2.loss,
@@ -593,7 +594,7 @@ class _StressTestSearchSheetState
                                   ),
                                 )
                               : Text(
-                                  'Buy \$${_amount.toStringAsFixed(0)} worth',
+                                  'Buy ${formatUsd(_amount)} worth',
                                   style: GoogleFonts.inter(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w800,

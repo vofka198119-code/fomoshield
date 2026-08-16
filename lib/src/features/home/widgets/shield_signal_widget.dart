@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../home_providers.dart';
@@ -201,7 +202,7 @@ class _IndexView extends StatelessWidget {
       children: [
         _cell(
           label: index.name,
-          value: '\$${index.price.toStringAsFixed(2)}',
+          value: formatUsd(index.price),
           valueFontSize: 18,
           labelFontSize: 14,
           gradient: darkCardGradient(),
@@ -219,8 +220,7 @@ class _IndexView extends StatelessWidget {
             Expanded(
               child: _cell(
                 label: 'CHANGE',
-                value:
-                    '${isUp ? '+' : ''}\$${index.changeAbs.toStringAsFixed(2)}',
+                value: formatUsdSigned(index.changeAbs),
                 valueFontSize: 14,
                 bgColor: changeBg,
                 valueColor: changeColor,

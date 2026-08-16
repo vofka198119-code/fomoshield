@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../portfolio_providers.dart';
-
-String _fmtCurrency(double amount) =>
-    '\$${NumberFormat('#,##0', 'en_US').format(amount)}';
 
 /// Maps a portfolio's current total value onto the -100%/0%/+100% scale.
 /// Below starting capital: -100%..0% spans $0..startingBalance (fixed).
@@ -128,18 +125,17 @@ class _GoalSummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final goalText = goalAmount != null ? _fmtCurrency(goalAmount!) : '—';
+    final goalText = goalAmount != null ? formatUsd(goalAmount!) : '—';
 
     String remainingText = '—';
     Color remainingColor = ThemeV2.textPrimary;
     Color remainingBg = ThemeV2.primaryBg;
     if (remaining != null) {
+      remainingText = formatUsdSigned(-remaining!);
       if (remaining! > 0) {
-        remainingText = '-${_fmtCurrency(remaining!)}';
         remainingColor = ThemeV2.loss;
         remainingBg = ThemeV2.lossBg;
       } else {
-        remainingText = '+${_fmtCurrency(-remaining!)}';
         remainingColor = ThemeV2.success;
         remainingBg = ThemeV2.successBg;
       }

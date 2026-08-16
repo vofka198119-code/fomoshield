@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../shared/utils/currency_format.dart';
 import '../../../market_clock/market_clock_dial.dart'
     show dialDark, dialBrassLight, darkCardDecoration, darkCardGradient;
 
@@ -171,7 +172,7 @@ class OrderAmountSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '≈ \$${(displayAmount * currentPrice).toStringAsFixed(2)}',
+                '≈ ${formatUsd(displayAmount * currentPrice)}',
                 textAlign: TextAlign.center,
                 style: interNums(
                   fontSize: 15,

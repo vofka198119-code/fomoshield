@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../order_model.dart';
 import '../order_provider.dart';
 import '../order_cancel_dialog.dart';
@@ -74,7 +75,7 @@ class OrderRowTile extends ConsumerWidget {
                 if (price != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    '${order.type.label} Price \$${price.toStringAsFixed(2)}',
+                    '${order.type.label} Price ${formatUsd(price)}',
                     style: interNums(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,

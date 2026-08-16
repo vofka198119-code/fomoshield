@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
+import '../../shared/utils/currency_format.dart';
 import '../../core/overlay/app_notification_popup.dart';
 import '../../shared/services/user_data_service.dart';
 import '../portfolio/portfolio_providers.dart';
@@ -470,7 +471,7 @@ final ordersProvider = StateNotifierProvider<OrderNotifier, List<Order>>((ref) {
             'Order Filled',
         detail:
             '${tx.shares.toStringAsFixed(4)} shares of '
-            '${order.companyName ?? order.assetSymbol} at \$${tx.price.toStringAsFixed(2)}',
+            '${order.companyName ?? order.assetSymbol} at ${formatUsd(tx.price)}',
         createdAt: DateTime.now(),
       ),
     );

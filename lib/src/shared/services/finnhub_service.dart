@@ -409,13 +409,54 @@ class FinnhubService {
     return Map<String, dynamic>.from(response.data as Map);
   }
 
-  /// Permanently deletes the signed-in user's account and all their data.
-  /// Cascades server-side (ON DELETE CASCADE on the Supabase tables) —
-  /// there is nothing left to clean up client-side except the local
-  /// session itself, which the caller is responsible for clearing.
+  /// Permanently deletes the signed-in user's account and all their data,
+  /// immediately, with no recovery. Kept for potential admin/manual use —
+  /// the app's own Delete Account button calls [scheduleAccountDeletion]
+  /// instead, which gives a 14-day recovery window.
   Future<void> deleteAccount() async {
     await _backendDio.delete('/account');
   }
+
+  /// Marks the signed-in account for deletion — the account keeps working
+  /// normally (still signs in, all data intact) unless/until it's hard-
+  /// deleted by the server's daily sweep after the recovery window closes.
+  /// See [restoreAccount] and [accountDeletionStatus].
+  Future<void> scheduleAccountDeletion() async {
+    await _backendDio.post('/account/schedule-deletion');
+  }
+
+  /// Cancels a pending deletion for the signed-in account.
+  Future<void> restoreAccount() async {
+    await _backendDio.post('/account/restore');
+  }
+
+  /// Whether the signed-in account is currently pending deletion, and how
+  /// many days are left to restore it. Checked right after sign-in/session
+  /// resume to decide whether to show the full-block Restore Account
+  /// screen instead of the app.
+  Future<AccountDeletionStatus> accountDeletionStatus() async {
+    final response = await _backendDio.get('/account/status');
+    final data = Map<String, dynamic>.from(response.data as Map);
+    return AccountDeletionStatus(
+      pendingDeletion: data['pendingDeletion'] as bool? ?? false,
+      daysRemaining: (data['daysRemaining'] as num?)?.toInt() ?? 0,
+      deleteAt: data['deleteAt'] != null
+          ? DateTime.tryParse(data['deleteAt'] as String)
+          : null,
+    );
+  }
+}
+
+class AccountDeletionStatus {
+  final bool pendingDeletion;
+  final int daysRemaining;
+  final DateTime? deleteAt;
+
+  const AccountDeletionStatus({
+    required this.pendingDeletion,
+    required this.daysRemaining,
+    this.deleteAt,
+  });
 }
 
 // ---------------------------------------------------------------------------

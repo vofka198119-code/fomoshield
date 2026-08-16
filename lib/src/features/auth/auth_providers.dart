@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../shared/services/finnhub_service.dart';
+import '../disclaimer/disclaimer_providers.dart';
 
 // ---------------------------------------------------------------------------
 // Supabase Session Check (for splash screen)
@@ -56,4 +58,37 @@ Future<void> clearAllSessionData() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool('is_logged_in', false);
   await SupabaseConfig.client.auth.signOut();
+}
+
+// ---------------------------------------------------------------------------
+// Post-auth destination — shared by SplashScreen (cold-start session
+// resume) and AuthScreen (email/password + Google sign-in), so a
+// pending-deletion account is caught the same way no matter how the user
+// ends up authenticated.
+// ---------------------------------------------------------------------------
+
+/// Resolves where a just-authenticated (or session-resumed) user should
+/// land: the full-block Restore Account screen if this account is pending
+/// deletion (2026-08-16, see profile_screen.dart's Delete Account flow),
+/// otherwise the existing disclaimer-gate → home logic. A failed status
+/// check (network hiccup) doesn't block sign-in — falls through to normal
+/// resolution, same as every other non-critical startup check. `extra`
+/// carries the deletion status through to AccountRestoreScreen when the
+/// route is '/account-restore' — GoRouter's `extra:` param, not encoded in
+/// the route string itself.
+Future<({String route, Object? extra})> resolvePostAuthRoute(
+  WidgetRef ref,
+) async {
+  try {
+    final status = await FinnhubService().accountDeletionStatus();
+    if (status.pendingDeletion) {
+      return (route: '/account-restore', extra: status);
+    }
+  } catch (_) {
+    // Ignore — see doc comment above.
+  }
+  final disclaimerAccepted = await ref.read(
+    isDisclaimerAcceptedProvider.future,
+  );
+  return (route: disclaimerAccepted ? '/home' : '/disclaimer', extra: null);
 }

@@ -330,3 +330,23 @@ CREATE OR REPLACE TRIGGER protect_subscription_columns_trigger
     BEFORE UPDATE ON public.users
     FOR EACH ROW
     EXECUTE FUNCTION public.protect_subscription_columns();
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 009
+-- Table: users (COLUMN)
+-- Description: 14-day soft-delete for account deletion (2026-08-16). The
+--              "Delete Account" button previously called
+--              supabaseAdmin.auth.admin.deleteUser() directly — immediate,
+--              permanent, no recovery. Now it only sets this timestamp;
+--              the account keeps existing untouched. A daily sweep on the
+--              backend (see scanco-backend's src/services/accountCleanup.js)
+--              hard-deletes any account whose deletion_requested_at is more
+--              than 14 days old. Signing back in while this is set routes
+--              the user to a full-block "Restore Account" screen instead of
+--              the app (see app_router.dart's session guard) — restoring
+--              just clears this column back to NULL.
+-- =============================================================================
+
+ALTER TABLE public.users
+ADD COLUMN IF NOT EXISTS deletion_requested_at TIMESTAMPTZ NULL DEFAULT NULL;

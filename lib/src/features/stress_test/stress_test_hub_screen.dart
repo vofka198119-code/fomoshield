@@ -16,6 +16,7 @@ import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
+import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/widget_container.dart';
 import '../market_clock/market_clock_dial.dart';
 import 'stress_test_models.dart';
@@ -434,7 +435,6 @@ class StressTestHubScreen extends ConsumerWidget {
     // paper P&L on currently held positions specifically, matching the
     // same fix on the main Portfolio Balance card. Confirmed 2026-08-07.
     final plDollar = session.unrealizedPnl;
-    final plSign = plDollar >= 0 ? '+' : '-';
     final plColor = plDollar >= 0 ? ThemeV2.success : ThemeV2.loss;
 
     return InkWell(
@@ -482,7 +482,7 @@ class StressTestHubScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '\$${session.totalValue.toStringAsFixed(0)}',
+                  formatUsd(session.totalValue),
                   style: interNums(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -491,7 +491,7 @@ class StressTestHubScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '$plSign\$${plDollar.abs().toStringAsFixed(0)}',
+                  formatUsdSigned(plDollar),
                   style: interNums(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -548,7 +548,7 @@ class StressTestHubScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Final: \$${entry.finalValue.toStringAsFixed(0)} · ${entry.holdingCount} holdings · ${entry.totalTrades} trades',
+                    'Final: ${formatUsd(entry.finalValue)} · ${entry.holdingCount} holdings · ${entry.totalTrades} trades',
                     style: interNums(
                       fontSize: 11,
                       color: ThemeV2.textSecondary,

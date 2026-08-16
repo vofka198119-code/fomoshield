@@ -22,6 +22,7 @@ import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../shared/widgets/company_logo.dart';
+import '../../shared/utils/currency_format.dart';
 
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/widgets/donut_ring_painter.dart';
@@ -748,20 +749,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
   }
 
-  /// Full number format with commas and fixed 2 decimals — e.g. $15,000.00
-  String _fmtFull(double v) {
-    final parts = v.toStringAsFixed(2).split('.');
-    final intStr = parts[0];
-    final buf = StringBuffer();
-    for (int i = 0; i < intStr.length; i++) {
-      if (i > 0 && (intStr.length - i) % 3 == 0) buf.write(',');
-      buf.write(intStr[i]);
-    }
-    buf.write('.');
-    buf.write(parts[1]);
-    return buf.toString();
-  }
-
   /// Reactive wrapper for _buildMyAssets — watches the provider
   /// and rebuilds when holdings change.
   Widget _buildMyAssetsSection() {
@@ -975,7 +962,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                   FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      '\$${_fmtPosition(positionValue)}',
+                                      formatUsd(positionValue),
                                       style: interNums(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
@@ -987,7 +974,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                   FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      '${isPositive ? '+' : ''}\$${pnl.toStringAsFixed(2)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
+                                      '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
                                       style: interNums(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -1039,10 +1026,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 
   String _companyName(String symbol) =>
       resolveStressTestCompanyName(ref, symbol);
-
-  String _fmtPosition(double v) {
-    return _fmtFull(v);
-  }
 
   // ── Timer Bar — real-time countdown (ticks every second) ──────
 
@@ -1295,7 +1278,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '\$${session.totalValue.toStringAsFixed(2)}',
+                        formatUsd(session.totalValue),
                         style: interNums(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,

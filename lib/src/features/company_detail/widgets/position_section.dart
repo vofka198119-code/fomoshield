@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
 import '../../portfolio/portfolio_providers.dart';
@@ -178,10 +179,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _row(
-          'Asset Value',
-          pos.hasPosition ? '\$${pos.totalValue.toStringAsFixed(2)}' : '—',
-        ),
+        _row('Asset Value', pos.hasPosition ? formatUsd(pos.totalValue) : '—'),
         const SizedBox(height: 8),
         _row('Shares', pos.hasPosition ? pos.shares.toStringAsFixed(4) : '—'),
         const SizedBox(height: 8),
@@ -193,10 +191,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
           pnlColor: pnlColor,
         ),
         const SizedBox(height: 8),
-        _row(
-          'Avg Cost',
-          pos.hasPosition ? '\$${pos.avgCost.toStringAsFixed(2)}' : '—',
-        ),
+        _row('Avg Cost', pos.hasPosition ? formatUsd(pos.avgCost) : '—'),
       ],
     );
   }
@@ -265,7 +260,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             ),
             const SizedBox(width: 4),
             Text(
-              '${isUp ? '+' : ''}${pnl.toStringAsFixed(2)} (${pnlPercent.toStringAsFixed(2)}%)',
+              '${formatUsdSigned(pnl)} (${pnlPercent.toStringAsFixed(2)}%)',
               style: interNums(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,

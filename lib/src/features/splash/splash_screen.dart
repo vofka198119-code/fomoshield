@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
-import '../disclaimer/disclaimer_providers.dart';
 import '../auth/auth_providers.dart';
 import '../home/home_providers.dart'
     show watchlistSymbolsProvider, marketIndicesProvider;
@@ -37,8 +36,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late final AnimationController _entranceController;
   late final AnimationController _progressController;
 
-  late final Future<String> _routeFuture;
-  String? _resolvedRoute;
+  late final Future<({String route, Object? extra})> _routeFuture;
+  ({String route, Object? extra})? _resolved;
   bool _routeReady = false;
   bool _navigated = false;
 
@@ -58,8 +57,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _progressController.forward();
 
     _routeFuture = _resolveTargetRoute();
-    _routeFuture.then((route) {
-      _resolvedRoute = route;
+    _routeFuture.then((resolved) {
+      _resolved = resolved;
       _routeReady = true;
       if (mounted) setState(() {});
       _maybeNavigate();
@@ -87,29 +86,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   /// question here is whether to honor that restored session (Remember Me
   /// was checked) or sign back out (it wasn't). No stored password, no
   /// re-login network call.
-  Future<String> _resolveTargetRoute() async {
+  Future<({String route, Object? extra})> _resolveTargetRoute() async {
     try {
       final rememberMe = await ref.read(isLoggedInProvider.future);
       if (!rememberMe) {
         await clearAllSessionData();
-        return '/auth';
+        return (route: '/auth', extra: null);
       }
 
       final hasSession = await ref.read(hasSupabaseSessionProvider.future);
       if (!hasSession) {
-        return '/auth';
+        return (route: '/auth', extra: null);
       }
 
-      final disclaimerAccepted = await ref.read(
-        isDisclaimerAcceptedProvider.future,
-      );
-      if (disclaimerAccepted) {
-        _prefetchHomeData();
-        return '/home';
-      }
-      return '/disclaimer';
+      final resolved = await resolvePostAuthRoute(ref);
+      if (resolved.route == '/home') _prefetchHomeData();
+      return resolved;
     } catch (_) {
-      return '/auth';
+      return (route: '/auth', extra: null);
     }
   }
 
@@ -143,7 +137,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     if (!_progressController.isCompleted || !_routeReady) return;
     _navigated = true;
     Future.delayed(const Duration(milliseconds: 250), () {
-      if (mounted) context.go(_resolvedRoute!);
+      if (mounted) context.go(_resolved!.route, extra: _resolved!.extra);
     });
   }
 

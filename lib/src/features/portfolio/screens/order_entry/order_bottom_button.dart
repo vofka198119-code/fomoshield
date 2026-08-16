@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../shared/utils/currency_format.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'order_amount_section.dart' show OrderInputMode;
 
@@ -51,7 +52,7 @@ class OrderBottomButton extends StatelessWidget {
                   ),
                   Text(
                     inputMode == OrderInputMode.cost
-                        ? '\$${displayAmount.toStringAsFixed(2)}'
+                        ? formatUsd(displayAmount)
                         : '${displayAmount.toStringAsFixed(4)} sh.',
                     style: interNums(
                       fontSize: 12,

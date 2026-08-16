@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../core/overlay/app_notification_popup.dart';
+import '../../shared/utils/currency_format.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'stress_test_naming.dart';
@@ -161,7 +162,7 @@ class StressTestPendingOrdersNotifier
               detail:
                   '${order.quantity.toStringAsFixed(4)} shares of '
                   '${stressTestCompanyName(order.symbol)} at '
-                  '\$${order.limitPrice.toStringAsFixed(2)}',
+                  '${formatUsd(order.limitPrice)}',
               createdAt: DateTime.now(),
             ),
           );

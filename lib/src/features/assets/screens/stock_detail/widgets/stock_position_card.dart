@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../core/theme/typography_helpers.dart';
+import '../../../../../shared/utils/currency_format.dart';
 import '../../../../market_clock/market_clock_dial.dart'
     show darkCardDecoration;
 
@@ -46,7 +47,7 @@ class StockPositionCard extends StatelessWidget {
           const SizedBox(height: 10),
           Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
           const SizedBox(height: 12),
-          _row('Asset Value', '\$${positionValue.toStringAsFixed(2)}'),
+          _row('Asset Value', formatUsd(positionValue)),
           const SizedBox(height: 8),
           _row('Shares', shares.toStringAsFixed(4)),
           const SizedBox(height: 8),
@@ -57,7 +58,7 @@ class StockPositionCard extends StatelessWidget {
             pnlColor: pnlColor,
           ),
           const SizedBox(height: 8),
-          _row('Avg Cost', '\$${avgPrice.toStringAsFixed(2)}'),
+          _row('Avg Cost', formatUsd(avgPrice)),
         ],
       ),
     );
@@ -111,7 +112,7 @@ class StockPositionCard extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            '${isUp ? '+' : ''}${pnl.toStringAsFixed(2)} (${pnlPercent.toStringAsFixed(2)}%)',
+            '${formatUsdSigned(pnl)} (${pnlPercent.toStringAsFixed(2)}%)',
             style: interNums(
               fontSize: 14,
               fontWeight: FontWeight.w600,
