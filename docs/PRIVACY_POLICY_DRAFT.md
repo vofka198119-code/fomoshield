@@ -71,13 +71,17 @@ the minimum data needed for its function:
   configuration), hosted by Hetzner Online GmbH in Nuremberg, Germany.
 - **Email delivery** (Gmail SMTP) — sends account-related emails
   (verification, password reset).
+- **Firebase Crashlytics** (Google) — if the App crashes or hits an
+  unhandled error, automatically sends a crash report with basic device
+  diagnostics (device model, OS version, app version, the crash's stack
+  trace) so we can find and fix the bug. This is not tied to your account,
+  email, or identity.
 
-We do not sell your data to advertisers or data brokers. [Verified 2026-08-15
-against the live codebase: no ad network SDK or analytics SDK is integrated
-today — the "Sponsored Content" box shown to free-tier users is a static
-placeholder with no data collection behind it. If a real ad network or
-analytics SDK is added later, this section needs a new processor entry
-before that ships.]
+We do not sell your data to advertisers or data brokers, and no ad network
+or behavioral-analytics SDK is integrated into the App. The "Sponsored
+Content" box shown to free-tier users is a static placeholder with no data
+collection behind it. If a real ad network is added later, this section
+will be updated with a new processor entry before that ships.
 
 ## 6. Data Retention
 

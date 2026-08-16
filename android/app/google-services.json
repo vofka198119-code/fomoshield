@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "801612723460",
+    "project_id": "fomo-shield",
+    "storage_bucket": "fomo-shield.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801612723460:android:fe92c1140189bfcda24c51",
+        "android_client_info": {
+          "package_name": "com.scanco.scanco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRAqojfoRyiK0Q9xcFBU92ECbe0aUf_Z4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
