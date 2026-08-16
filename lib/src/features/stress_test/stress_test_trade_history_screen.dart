@@ -48,45 +48,51 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: session == null
-          ? const Center(child: Text('Session not found'))
-          : session.trades.isEmpty
-          ? const Center(child: Text('No trades yet'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Container(
-                decoration: FomoShieldTheme.cardDecoration,
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  children: [
-                    for (int i = 0; i < session.trades.length; i++)
-                      Builder(
-                        builder: (context) {
-                          final trade =
-                              session.trades[session.trades.length - 1 - i];
-                          return StaggerFadeIn(
-                            index: i,
-                            child: TradeHistoryTile(
-                              symbol: trade.symbol,
-                              companyName: resolveStressTestCompanyName(
-                                ref,
-                                trade.symbol,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: session == null
+            ? const Center(child: Text('Session not found'))
+            : session.trades.isEmpty
+            ? const Center(child: Text('No trades yet'))
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Container(
+                  decoration: FomoShieldTheme.cardDecoration,
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      for (int i = 0; i < session.trades.length; i++)
+                        Builder(
+                          builder: (context) {
+                            final trade =
+                                session.trades[session.trades.length - 1 - i];
+                            return StaggerFadeIn(
+                              index: i,
+                              child: TradeHistoryTile(
+                                symbol: trade.symbol,
+                                companyName: resolveStressTestCompanyName(
+                                  ref,
+                                  trade.symbol,
+                                ),
+                                isBuy: trade.isBuy,
+                                totalValue: trade.shares * trade.price,
+                                showDivider: i != session.trades.length - 1,
+                                onTap: () => context.push(
+                                  '/stress-test/$sessionId/trade-detail',
+                                  extra: trade,
+                                ),
                               ),
-                              isBuy: trade.isBuy,
-                              totalValue: trade.shares * trade.price,
-                              showDivider: i != session.trades.length - 1,
-                              onTap: () => context.push(
-                                '/stress-test/$sessionId/trade-detail',
-                                extra: trade,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                  ],
+                            );
+                          },
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 }

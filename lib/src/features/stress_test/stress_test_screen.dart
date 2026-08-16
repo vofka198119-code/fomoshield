@@ -312,13 +312,19 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         ),
         actions: [],
       ),
-      body: isCompleted
-          ? _buildCompletedView(session)
-          : isActive
-          ? (session.holdings.isEmpty && session.trades.isEmpty
-                ? _buildActiveEmptyView()
-                : _buildActiveView(session))
-          : _buildSetupView(session),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: isCompleted
+            ? _buildCompletedView(session)
+            : isActive
+            ? (session.holdings.isEmpty && session.trades.isEmpty
+                  ? _buildActiveEmptyView()
+                  : _buildActiveView(session))
+            : _buildSetupView(session),
+      ),
     );
   }
 

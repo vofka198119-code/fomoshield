@@ -37,54 +37,60 @@ class RiskStatusDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: window == null
-          ? const SizedBox()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Builder(
-                    builder: (context) {
-                      final style = tierStyleFor(window.riskTier);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            style.label,
-                            style: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800,
-                              color: style.color,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: window == null
+            ? const SizedBox()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Builder(
+                      builder: (context) {
+                        final style = tierStyleFor(window.riskTier);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              style.label,
+                              style: GoogleFonts.inter(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: style.color,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            window.shortHeadline,
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: ThemeV2.textSecondary,
+                            const SizedBox(height: 4),
+                            Text(
+                              window.shortHeadline,
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: ThemeV2.textSecondary,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                          _Section(
-                            label: 'Why Now?',
-                            body: window.riskMetrics.whyNow,
-                          ),
-                          const SizedBox(height: 18),
-                          _Section(
-                            label: 'What Should You Do?',
-                            body: window.riskMetrics.whatToDo,
-                            isLast: true,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
+                            const SizedBox(height: 20),
+                            _Section(
+                              label: 'Why Now?',
+                              body: window.riskMetrics.whyNow,
+                            ),
+                            const SizedBox(height: 18),
+                            _Section(
+                              label: 'What Should You Do?',
+                              body: window.riskMetrics.whatToDo,
+                              isLast: true,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 }

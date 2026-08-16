@@ -55,53 +55,61 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: portfolio == null
-          ? const Center(child: Text('Portfolio not found'))
-          : portfolio.transactions.isEmpty
-          ? const Center(child: Text('No trades yet'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Container(
-                decoration: FomoShieldTheme.cardDecoration,
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  children: [
-                    for (int i = 0; i < portfolio.transactions.length; i++)
-                      Builder(
-                        builder: (context) {
-                          final tx =
-                              portfolio!.transactions[portfolio
-                                      .transactions
-                                      .length -
-                                  1 -
-                                  i];
-                          return StaggerFadeIn(
-                            index: i,
-                            child: TradeHistoryTile(
-                              symbol: tx.symbol,
-                              companyName:
-                                  ref
-                                      .watch(
-                                        resolvedCompanyNameProvider(tx.symbol),
-                                      )
-                                      .valueOrNull ??
-                                  tx.symbol,
-                              isBuy: tx.type == TransactionType.buy,
-                              totalValue: tx.shares * tx.price,
-                              showDivider:
-                                  i != portfolio.transactions.length - 1,
-                              onTap: () => context.push(
-                                '/portfolio/$portfolioId/trade-detail',
-                                extra: tx,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: portfolio == null
+            ? const Center(child: Text('Portfolio not found'))
+            : portfolio.transactions.isEmpty
+            ? const Center(child: Text('No trades yet'))
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Container(
+                  decoration: FomoShieldTheme.cardDecoration,
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      for (int i = 0; i < portfolio.transactions.length; i++)
+                        Builder(
+                          builder: (context) {
+                            final tx =
+                                portfolio!.transactions[portfolio
+                                        .transactions
+                                        .length -
+                                    1 -
+                                    i];
+                            return StaggerFadeIn(
+                              index: i,
+                              child: TradeHistoryTile(
+                                symbol: tx.symbol,
+                                companyName:
+                                    ref
+                                        .watch(
+                                          resolvedCompanyNameProvider(
+                                            tx.symbol,
+                                          ),
+                                        )
+                                        .valueOrNull ??
+                                    tx.symbol,
+                                isBuy: tx.type == TransactionType.buy,
+                                totalValue: tx.shares * tx.price,
+                                showDivider:
+                                    i != portfolio.transactions.length - 1,
+                                onTap: () => context.push(
+                                  '/portfolio/$portfolioId/trade-detail',
+                                  extra: tx,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                  ],
+                            );
+                          },
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 }

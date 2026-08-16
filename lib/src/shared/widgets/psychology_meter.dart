@@ -21,7 +21,11 @@ import '../../core/theme/fomo_shield_theme.dart';
 
 /// Data for the Psychology Meter.
 class PsychologyMeterData {
-  final double fsScore; // 0-100 composite
+  final double fsScore; // 0-100, now equal to psychologicalScore — kept
+  // as the field name every existing ring/label reads, see
+  // psychologicalScore's doc for why the underlying formula changed.
+  final double psychologicalScore; // 0-100, Discipline/Panic/Patience only
+  final double strategicScore; // 0-100, portfolio-construction signals only
   final double panicResistance; // 0.0-1.0
   final double discipline; // 0.0-1.0
   final double patience; // 0.0-1.0
@@ -52,6 +56,8 @@ class PsychologyMeterData {
 
   const PsychologyMeterData({
     required this.fsScore,
+    required this.psychologicalScore,
+    required this.strategicScore,
     required this.panicResistance,
     required this.discipline,
     required this.patience,
@@ -74,8 +80,16 @@ class PsychologyMeterData {
   });
 
   factory PsychologyMeterData.fromProfile(TraderPsychologyProfile profile) {
+    final psychScore = (profile.psychologicalScore() * 100)
+        .round()
+        .clamp(0, 100)
+        .toDouble();
     return PsychologyMeterData(
-      fsScore: (profile.compositeScore(0) * 100).round().clamp(0, 100).toDouble(),
+      fsScore: psychScore,
+      psychologicalScore: psychScore,
+      // No holdings available in this factory (profile-only, unused by any
+      // current call site) — strategyAdherence is the closest approximation.
+      strategicScore: (profile.strategyAdherence * 100).clamp(0, 100),
       panicResistance: profile.panicResistance,
       discipline: profile.discipline,
       patience: profile.patience,
@@ -112,12 +126,32 @@ class PsychologyMeterData {
     }
 
     final safetyMarker = safetyMarkerFor(session.holdings).score;
+    final strategySubScores = computeStrategySubScores(
+      holdings: session.holdings,
+      cash: session.cash,
+    );
+    final psychScore = (profile.psychologicalScore() * 100)
+        .round()
+        .clamp(0, 100)
+        .toDouble();
+    final stratScore =
+        (computeStrategicScore(
+                  diversification: strategySubScores.diversification,
+                  sector: strategySubScores.sector,
+                  concentration: strategySubScores.concentration,
+                  etf: strategySubScores.etf,
+                  cashBuffer: strategySubScores.cashBuffer,
+                  safetyMarker: safetyMarker,
+                ) *
+                100)
+            .round()
+            .clamp(0, 100)
+            .toDouble();
 
     return PsychologyMeterData(
-      fsScore: (profile.compositeScore(safetyMarker) * 100)
-          .round()
-          .clamp(0, 100)
-          .toDouble(),
+      fsScore: psychScore,
+      psychologicalScore: psychScore,
+      strategicScore: stratScore,
       panicResistance: profile.panicResistance,
       discipline: profile.discipline,
       patience: profile.patience,
@@ -323,25 +357,24 @@ class _PsychologyMeterBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ring shows the average of the two 2026-08-16-split scores — this
+    // compact card is a quick glance, not the place for a per-signal
+    // breakdown (that's what the Psychology Meter detail screen's own
+    // Strategy Score / Psychology Score circles + Discipline/Panic/
+    // Patience/Strategy/Diversification cards are for).
+    final avgScore = (data.psychologicalScore + data.strategicScore) / 2;
+
     return Column(
       children: [
-        FsScoreRing(score: data.fsScore),
+        FsScoreRing(score: avgScore),
         const SizedBox(height: 20),
         _SubIndexRow(
-          label: 'Panic',
-          value: data.panicResistance,
+          label: 'Strategy Score',
+          value: data.strategicScore / 100,
         ),
         _SubIndexRow(
-          label: 'Discipline',
-          value: data.discipline,
-        ),
-        _SubIndexRow(
-          label: 'Patience',
-          value: data.patience,
-        ),
-        _SubIndexRow(
-          label: 'Strategy',
-          value: data.strategyAdherence,
+          label: 'Psychology Score',
+          value: data.psychologicalScore / 100,
           isLast: true,
         ),
       ],
@@ -675,7 +708,7 @@ class _SubIndexRow extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 76,
+            width: 112,
             child: Text(
               label,
               maxLines: 1,
@@ -950,7 +983,7 @@ class _AuditSheetContent extends StatelessWidget {
                 icon: Icons.psychology_outlined,
                 iconColor: _fsScoreColor(fsScore),
                 title: 'Live Action Audit',
-                subtitle: 'FS Score: ${fsScore.round()}/100',
+                subtitle: 'Psychology Score: ${fsScore.round()}/100',
               ),
               const SizedBox(height: 20),
 

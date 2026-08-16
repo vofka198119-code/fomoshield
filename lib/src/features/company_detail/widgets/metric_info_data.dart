@@ -2373,32 +2373,52 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
     ],
   ),
   'investor-score': MetricInfoContent(
-    title: 'Investor Score',
-    subtitle: 'Your Overall Investment Profile',
+    title: 'Psychology & Strategy Scores',
+    subtitle: 'Two Sides of Your Investment Behavior',
     showStressTestDisclaimer: true,
     sections: [
       MetricInfoSection(
-        header: 'What Does This Widget Show?',
+        header: 'What Do These Widgets Show?',
         body:
-            'Investor Score is a combined indicator that evaluates '
-            'your overall investment approach.\n\n'
-            'It does not measure:\n\n'
+            'Your investment behavior is evaluated as two separate '
+            'scores, not one blended number.\n\n'
+            'They do not measure:\n\n'
             'how much money you made;\n'
             'how fast your portfolio grew;\n'
             'whether you will make a profit in the future.\n\n'
-            'Instead, it answers a different question:\n\n'
-            '"How closely does your investment behavior match the '
-            'habits of a disciplined long-term investor?"',
+            'Instead, each answers its own question:\n\n'
+            '"Psychology Score" — how closely does your behavior '
+            'during the test match the habits of a disciplined '
+            'investor?\n\n'
+            '"Strategy Score" — how well is your portfolio actually '
+            'built, independent of how you behaved while building it?',
       ),
       MetricInfoSection(
-        header: 'How Is Your Score Calculated?',
+        header: 'Why Two Scores Instead of One?',
         body:
-            'Your final score combines several important aspects of '
-            'investor behavior.\n\n'
-            'Each indicator represents a different part of your '
-            'investment personality.\n\n'
-            'Together, they create a broader picture of how you '
-            'manage decisions, risk, and emotions.',
+            'A trader can behave perfectly — no panic selling, no '
+            'chasing headlines, plenty of patience — while still '
+            'holding a badly built portfolio: everything in one '
+            'stock, no cash reserve, no ETFs. The opposite is also '
+            'possible: a well-diversified portfolio assembled through '
+            'impulsive, emotional trades.\n\n'
+            'Blending both into a single number let one side hide '
+            'problems on the other. Keeping them separate means each '
+            'score tells you something you can actually act on.',
+      ),
+      MetricInfoSection(
+        header: '🧠 PSYCHOLOGY SCORE — Discipline, Panic, Patience',
+        body:
+            'How you behaved during the test: whether you followed a '
+            'plan, how you reacted to market drops, and whether you '
+            'gave your decisions time to play out.',
+      ),
+      MetricInfoSection(
+        header: '📊 STRATEGY SCORE — Concentration, ETF Exposure, Cash '
+            'Buffer, Sector Balance, Diversification, Safety Marker',
+        body:
+            'How your portfolio is actually built, right now — '
+            'independent of the decisions that got it there.',
       ),
       MetricInfoSection(
         header: '🧩 Diversification — How Your Portfolio Is Built',
@@ -2467,8 +2487,12 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
             'Patience allows good ideas enough time to develop.',
       ),
       MetricInfoSection(
-        header: 'How Should You Understand Your Score?',
+        header: 'How Should You Understand Your Scores?',
         body:
+            'The same 5 tiers apply to both scores independently — a '
+            '75 Psychology Score and a 75 Strategy Score mean the same '
+            'thing about each side of your investing, they just don\'t '
+            'have to match each other.\n\n'
             '🔴 0–20 — Beginner Investor\n'
             'Your investment process is currently strongly influenced '
             'by emotions and short-term reactions. The main goal is '
@@ -2499,14 +2523,14 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
       MetricInfoSection(
         header: 'The Main Purpose of This Widget',
         body:
-            'This score is not designed to tell you:\n\n'
+            'These scores are not designed to tell you:\n\n'
             '"You are a good investor."\n\n'
             'or\n\n'
             '"You are a bad investor."\n\n'
-            'Its purpose is to show:\n\n'
+            'Their purpose is to show:\n\n'
             '"Which investment habits are helping you, and which ones '
             'may limit your long-term progress."\n\n'
-            'Every investor can improve their score.\n\n'
+            'Every investor can improve both scores.\n\n'
             'Not by trying to predict every market movement.\n\n'
             'But by improving their own decision-making process.',
       ),
@@ -2523,8 +2547,9 @@ const Map<String, MetricInfoContent> metricInfoRegistry = {
             'your decisions;\n'
             'your discipline.\n\n'
             'Your portfolio shows what you own.\n\n'
-            'Your Investor Score shows what kind of investor you are '
-            'becoming.',
+            'Your Psychology Score shows how you\'re deciding. Your '
+            'Strategy Score shows what you\'re building. Together, '
+            'they show what kind of investor you are becoming.',
       ),
     ],
   ),

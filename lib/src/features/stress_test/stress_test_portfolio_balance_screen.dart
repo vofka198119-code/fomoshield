@@ -61,56 +61,62 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            if (session != null) ...[
-              for (int i = 0; i < visibleWidgets.length; i++) ...[
-                StaggerFadeIn(
-                  index: i,
-                  child: _buildWidgetById(visibleWidgets[i].id, session),
-                ),
-                const SizedBox(height: 16),
-              ],
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              if (session != null) ...[
+                for (int i = 0; i < visibleWidgets.length; i++) ...[
+                  StaggerFadeIn(
+                    index: i,
+                    child: _buildWidgetById(visibleWidgets[i].id, session),
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
-              // ── Add widgets button ───────────────────────────
-              Center(
-                child: TextButton.icon(
-                  onPressed: () => _showWidgetSettingsSheet(context, ref),
-                  icon: const Icon(
-                    Icons.add_rounded,
-                    color: ThemeV2.primary,
-                    size: 20,
-                  ),
-                  label: Text(
-                    'Add widgets',
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                // ── Add widgets button ───────────────────────────
+                Center(
+                  child: TextButton.icon(
+                    onPressed: () => _showWidgetSettingsSheet(context, ref),
+                    icon: const Icon(
+                      Icons.add_rounded,
                       color: ThemeV2.primary,
+                      size: 20,
                     ),
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      side: const BorderSide(
+                    label: Text(
+                      'Add widgets',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                         color: ThemeV2.primary,
-                        width: 0.5,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        side: const BorderSide(
+                          color: ThemeV2.primary,
+                          width: 0.5,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              // ── Educational disclaimer ───────────────────────
-              _educationalDisclaimer(),
+                // ── Educational disclaimer ───────────────────────
+                _educationalDisclaimer(),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

@@ -76,33 +76,39 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             ),
         ],
       ),
-      body: notifications.isEmpty
-          ? _emptyState()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-              child: Container(
-                decoration: FomoShieldTheme.cardDecoration,
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (int i = 0; i < notifications.length; i++) ...[
-                      if (i > 0)
-                        const Divider(
-                          height: 1,
-                          indent: 68,
-                          color: Color(0x0F000000),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: notifications.isEmpty
+            ? _emptyState()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                child: Container(
+                  decoration: FomoShieldTheme.cardDecoration,
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (int i = 0; i < notifications.length; i++) ...[
+                        if (i > 0)
+                          const Divider(
+                            height: 1,
+                            indent: 68,
+                            color: Color(0x0F000000),
+                          ),
+                        _NotificationRow(
+                          notification: notifications[i],
+                          expanded: _expandedIds.contains(notifications[i].id),
+                          onTap: () => _handleTap(notifications[i]),
                         ),
-                      _NotificationRow(
-                        notification: notifications[i],
-                        expanded: _expandedIds.contains(notifications[i].id),
-                        onTap: () => _handleTap(notifications[i]),
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 

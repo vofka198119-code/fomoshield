@@ -65,18 +65,24 @@ class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            for (int i = 0; i < allWindows.length; i++) ...[
-              if (i > 0) const SizedBox(height: 16),
-              _PhaseListCard(
-                window: allWindows[i],
-                isActive: allWindows[i].id == _activeWindowId,
-              ),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              for (int i = 0; i < allWindows.length; i++) ...[
+                if (i > 0) const SizedBox(height: 16),
+                _PhaseListCard(
+                  window: allWindows[i],
+                  isActive: allWindows[i].id == _activeWindowId,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

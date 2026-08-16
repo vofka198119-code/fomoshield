@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/router/navigation_history_provider.dart';
 import '../../core/supabase/supabase_providers.dart';

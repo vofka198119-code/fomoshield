@@ -43,7 +43,6 @@ class VerdictMarkerRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _color;
-    final percent = (score * 100).clamp(0.0, 100.0);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -63,66 +62,41 @@ class VerdictMarkerRow extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                GestureDetector(
-                  onTap: () => context.push(
-                    '/stress-test/$sessionId/verdict/marker/$markerId',
-                  ),
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.help_outline_rounded,
-                      size: 13,
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ),
-              ],
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
             ),
           ),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${percent.round()}',
-                style: GoogleFonts.inter(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  color: color,
-                  letterSpacing: -1,
+          // Single tap target for "see detailed result" — replaces both the
+          // raw score number and the row's own separate "?" icon (2026-08-16,
+          // both did the same thing, kept only this one; the card HEADER's
+          // own "?" — general explanatory article, not this row's detail
+          // screen — is untouched).
+          GestureDetector(
+            onTap: () => context.push(
+              '/stress-test/$sessionId/verdict/marker/$markerId',
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _statusWord,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
                 ),
-              ),
-              Text(
-                _statusWord,
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
-              ),
-            ],
+                Icon(Icons.chevron_right_rounded, size: 18, color: color),
+              ],
+            ),
           ),
         ],
       ),

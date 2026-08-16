@@ -135,59 +135,65 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: Column(
-        children: [
-          // ── Developer Trace Bar (only when enabled) ─────────────
-          if (session.enableDeveloperTrace) _buildDevTraceBar(session),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: Column(
+          children: [
+            // ── Developer Trace Bar (only when enabled) ─────────────
+            if (session.enableDeveloperTrace) _buildDevTraceBar(session),
 
-          // ── Total Balance Header ─────────────────────────────
-          _buildBalanceHeader(
-            totalValue: totalValue,
-            unrealizedPnl: unrealizedPnl,
-            pnlPercent: pnlPercent,
-            isPositive: isPositive,
-            startCash: startCash,
-          ),
+            // ── Total Balance Header ─────────────────────────────
+            _buildBalanceHeader(
+              totalValue: totalValue,
+              unrealizedPnl: unrealizedPnl,
+              pnlPercent: pnlPercent,
+              isPositive: isPositive,
+              startCash: startCash,
+            ),
 
-          // ── Search Bar ───────────────────────────────────────
-          _buildSearchBar(),
+            // ── Search Bar ───────────────────────────────────────
+            _buildSearchBar(),
 
-          // ── Sort Toggle ──────────────────────────────────────
-          _buildSortToggle(),
+            // ── Sort Toggle ──────────────────────────────────────
+            _buildSortToggle(),
 
-          // ── Divider ──────────────────────────────────────────
-          const Divider(height: 1, color: ThemeV2.divider),
+            // ── Divider ──────────────────────────────────────────
+            const Divider(height: 1, color: ThemeV2.divider),
 
-          // ── Assets List ──────────────────────────────────────
-          Expanded(
-            child: holdings.isEmpty
-                ? Center(
-                    child: Text(
-                      'No assets',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: ThemeV2.textSecondary,
+            // ── Assets List ──────────────────────────────────────
+            Expanded(
+              child: holdings.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No assets',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: ThemeV2.textSecondary,
+                        ),
                       ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: holdings.length,
+                      itemBuilder: (context, index) {
+                        final h = holdings[index];
+                        return AssetRowWidget(
+                          holding: h,
+                          session: session,
+                          onTap: () {
+                            context.push(
+                              '/stress-test/${widget.sessionId}/stock/${h.symbol}',
+                            );
+                          },
+                        );
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: holdings.length,
-                    itemBuilder: (context, index) {
-                      final h = holdings[index];
-                      return AssetRowWidget(
-                        holding: h,
-                        session: session,
-                        onTap: () {
-                          context.push(
-                            '/stress-test/${widget.sessionId}/stock/${h.symbol}',
-                          );
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

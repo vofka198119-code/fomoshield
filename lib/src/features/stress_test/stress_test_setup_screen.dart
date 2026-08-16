@@ -155,56 +155,62 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           onPressed: () => context.go('/stress-test-hub'),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Cash Balance ────────────────────────────────────
-            _buildBalanceCard(session),
-            const SizedBox(height: 24),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Cash Balance ────────────────────────────────────
+              _buildBalanceCard(session),
+              const SizedBox(height: 24),
 
-            // ── Duration Selector ────────────────────────────────
-            Text(
-              'TEST DURATION',
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: ThemeV2.primary,
-                letterSpacing: 1.2,
+              // ── Duration Selector ────────────────────────────────
+              Text(
+                'TEST DURATION',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: ThemeV2.primary,
+                  letterSpacing: 1.2,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            _buildDurationSelector(),
-            const SizedBox(height: 24),
+              const SizedBox(height: 12),
+              _buildDurationSelector(),
+              const SizedBox(height: 24),
 
-            // ── Premium Badge (for free users) ──────────────────
-            _buildPremiumBadge(),
-            const SizedBox(height: 12),
+              // ── Premium Badge (for free users) ──────────────────
+              _buildPremiumBadge(),
+              const SizedBox(height: 12),
 
-            // ── Start Button ────────────────────────────────────
-            SizedBox(
-              width: double.infinity,
-              child: Material(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
-                child: Ink(
-                  decoration: darkCardDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: InkWell(
-                    onTap: _startTest,
-                    borderRadius: BorderRadius.circular(14),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Center(
-                        child: Text(
-                          'START STRESS TEST',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1,
-                            color: Colors.white,
+              // ── Start Button ────────────────────────────────────
+              SizedBox(
+                width: double.infinity,
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
+                  child: Ink(
+                    decoration: darkCardDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: InkWell(
+                      onTap: _startTest,
+                      borderRadius: BorderRadius.circular(14),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: Text(
+                            'START STRESS TEST',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -212,13 +218,13 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // ── Disclaimer ─────────────────────────────────────
-            const DisclaimerFooter(),
-            const SizedBox(height: 8),
-          ],
+              // ── Disclaimer ─────────────────────────────────────
+              const DisclaimerFooter(),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );

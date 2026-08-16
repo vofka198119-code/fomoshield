@@ -50,57 +50,65 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           ),
         ),
       ),
-      body: watchlistSymbols.isEmpty
-          ? _emptyState()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-              child: Column(
-                children: [
-                  Container(
-                    decoration: FomoShieldTheme.cardDecoration,
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-                          child: Row(
-                            children: [
-                              Text(
-                                'WATCHLIST',
-                                style: FomoShieldTheme.cardTitle(),
-                              ),
-                              const Spacer(),
-                              InkWell(
-                                onTap: _isNavigating ? null : _navigateToSearch,
-                                borderRadius: BorderRadius.circular(20),
-                                child: const Icon(
-                                  Icons.add_rounded,
-                                  color: ThemeV2.primary,
-                                  size: 22,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: watchlistSymbols.isEmpty
+            ? _emptyState()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: FomoShieldTheme.cardDecoration,
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'WATCHLIST',
+                                  style: FomoShieldTheme.cardTitle(),
                                 ),
-                              ),
-                            ],
+                                const Spacer(),
+                                InkWell(
+                                  onTap: _isNavigating
+                                      ? null
+                                      : _navigateToSearch,
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: const Icon(
+                                    Icons.add_rounded,
+                                    color: ThemeV2.primary,
+                                    size: 22,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Divider(
-                          height: 1,
-                          indent: 16,
-                          endIndent: 16,
-                          color: Colors.black.withValues(alpha: 0.06),
-                        ),
-                        for (int i = 0; i < watchlistSymbols.length; i++)
-                          _WatchlistRow(
-                            key: ValueKey(watchlistSymbols[i]),
-                            symbol: watchlistSymbols[i],
-                            showDivider: i < watchlistSymbols.length - 1,
+                          Divider(
+                            height: 1,
+                            indent: 16,
+                            endIndent: 16,
+                            color: Colors.black.withValues(alpha: 0.06),
                           ),
-                      ],
+                          for (int i = 0; i < watchlistSymbols.length; i++)
+                            _WatchlistRow(
+                              key: ValueKey(watchlistSymbols[i]),
+                              symbol: watchlistSymbols[i],
+                              showDivider: i < watchlistSymbols.length - 1,
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 

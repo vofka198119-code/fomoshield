@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../auth/auth_providers.dart';
@@ -509,7 +510,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
 
           const DisclaimerFooter(),
-          const SizedBox(height: 40),
+          SizedBox(height: shellBottomClearance(context)),
         ],
       ),
     );

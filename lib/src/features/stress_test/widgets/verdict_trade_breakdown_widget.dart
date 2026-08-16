@@ -27,6 +27,7 @@ import '../../market_clock/market_clock_dial.dart'
 import '../stress_test_models.dart';
 
 final _priceFmt = NumberFormat('#,##0.00', 'en_US');
+final _wholeFmt = NumberFormat('#,##0', 'en_US');
 
 class VerdictTradeBreakdownWidget extends StatelessWidget {
   final VerdictArchiveEntry entry;
@@ -86,11 +87,11 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
                 _statRow('Final P&L', _fmtMoney(totalPnl)),
                 _statRow(
                   'Final Balance',
-                  '\$${entry.finalValue.toStringAsFixed(0)}',
+                  '\$${_wholeFmt.format(entry.finalValue)}',
                 ),
                 _statRow(
                   'Starting Cash',
-                  '\$${entry.startingCash.toStringAsFixed(0)}',
+                  '\$${_wholeFmt.format(entry.startingCash)}',
                 ),
                 _statRow('Test Duration', entry.durationLabel, isLast: true),
               ],

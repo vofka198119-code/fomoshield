@@ -60,12 +60,18 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: tx == null
-          ? const Center(child: Text('Trade not found'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: _TradeDetailCard(tx: tx, order: order),
-            ),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: tx == null
+            ? const Center(child: Text('Trade not found'))
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: _TradeDetailCard(tx: tx, order: order),
+              ),
+      ),
     );
   }
 }

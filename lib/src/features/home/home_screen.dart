@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/notifications/notification_providers.dart';
 import 'home_providers.dart';
@@ -145,7 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               const DisclaimerFooter(),
-              const SizedBox(height: 100),
+              SizedBox(height: shellBottomClearance(context)),
             ],
           ),
         ),

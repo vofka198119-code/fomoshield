@@ -41,53 +41,59 @@ class MetricInfoScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              content.subtitle,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: ThemeV2.primary,
-              ),
-            ),
-            const SizedBox(height: 20),
-            for (int i = 0; i < content.sections.length; i++)
-              _Section(
-                section: content.sections[i],
-                isLast:
-                    i == content.sections.length - 1 &&
-                    !content.showAcademicDisclaimer &&
-                    !content.showStressTestDisclaimer,
-              ),
-            if (content.showAcademicDisclaimer) ...[
-              const SizedBox(height: 18),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                'Educational & Academic Disclaimer',
+                content.subtitle,
                 style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: ThemeV2.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: ThemeV2.primary,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                'The methodology, definitions, and analytical principles '
-                'presented here are based on standard corporate finance '
-                'theory and valuation frameworks taught in leading business '
-                'schools. Provided strictly for educational purposes.',
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  color: ThemeV2.textSecondary,
+              const SizedBox(height: 20),
+              for (int i = 0; i < content.sections.length; i++)
+                _Section(
+                  section: content.sections[i],
+                  isLast:
+                      i == content.sections.length - 1 &&
+                      !content.showAcademicDisclaimer &&
+                      !content.showStressTestDisclaimer,
                 ),
-              ),
+              if (content.showAcademicDisclaimer) ...[
+                const SizedBox(height: 18),
+                Text(
+                  'Educational & Academic Disclaimer',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: ThemeV2.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'The methodology, definitions, and analytical principles '
+                  'presented here are based on standard corporate finance '
+                  'theory and valuation frameworks taught in leading business '
+                  'schools. Provided strictly for educational purposes.',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    color: ThemeV2.textSecondary,
+                  ),
+                ),
+              ],
+              if (content.showStressTestDisclaimer)
+                const StressTestVerdictDisclaimer(),
             ],
-            if (content.showStressTestDisclaimer)
-              const StressTestVerdictDisclaimer(),
-          ],
+          ),
         ),
       ),
     );

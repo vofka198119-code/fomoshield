@@ -93,48 +93,57 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          children: [
-            for (int i = 0; i < visibleWidgets.length; i++) ...[
-              if (i > 0) const SizedBox(height: 24),
-              KeyedSubtree(
-                key: ValueKey(visibleWidgets[i].id),
-                child: _buildWidget(visibleWidgets[i].id),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Column(
+            children: [
+              for (int i = 0; i < visibleWidgets.length; i++) ...[
+                if (i > 0) const SizedBox(height: 24),
+                KeyedSubtree(
+                  key: ValueKey(visibleWidgets[i].id),
+                  child: _buildWidget(visibleWidgets[i].id),
+                ),
+              ],
+              const SizedBox(height: 24),
+              // Add widgets button
+              Center(
+                child: TextButton.icon(
+                  onPressed: _showWidgetsBottomSheet,
+                  icon: const Icon(
+                    Icons.add_rounded,
+                    color: ThemeV2.primary,
+                    size: 20,
+                  ),
+                  label: Text(
+                    'Add widgets',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: ThemeV2.primary,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      side: const BorderSide(
+                        color: ThemeV2.primary,
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ],
-            const SizedBox(height: 24),
-            // Add widgets button
-            Center(
-              child: TextButton.icon(
-                onPressed: _showWidgetsBottomSheet,
-                icon: const Icon(
-                  Icons.add_rounded,
-                  color: ThemeV2.primary,
-                  size: 20,
-                ),
-                label: Text(
-                  'Add widgets',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.primary,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: ThemeV2.primary, width: 0.5),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

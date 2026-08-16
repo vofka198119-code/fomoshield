@@ -350,6 +350,29 @@ StrategySubScores computeStrategySubScores({
   );
 }
 
+/// The portfolio-construction half of the split score (0.0-1.0) — every
+/// signal shown on the Strategy/Diversification cards, each weighted
+/// directly here instead of being squeezed through the old lagging
+/// `strategyAdherence` EMA into just 15% of one blended composite
+/// (2026-08-16 split — see [TraderPsychologyProfile.psychologicalScore]
+/// for the counterpart). Always computed fresh from the same numbers the
+/// individual bars/rows already show, so this can never disagree with them
+/// the way the old lagging value could.
+double computeStrategicScore({
+  required double diversification,
+  required double sector,
+  required double concentration,
+  required double etf,
+  required double cashBuffer,
+  required double safetyMarker,
+}) =>
+    diversification * 0.25 +
+    sector * 0.20 +
+    concentration * 0.20 +
+    etf * 0.15 +
+    cashBuffer * 0.10 +
+    safetyMarker * 0.10;
+
 /// Evaluates the Strategy pillar — called once per trade (buy or sell),
 /// never per-tick. The old version (`recordGoodDiversification`/
 /// `recordOverconcentration` in noise_engine.dart) fired every 20s tick

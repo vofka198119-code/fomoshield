@@ -178,7 +178,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
               ),
             ],
             const DisclaimerFooter(),
-            const SizedBox(height: 100),
+            SizedBox(height: shellBottomClearance(context)),
           ],
         ),
       ),

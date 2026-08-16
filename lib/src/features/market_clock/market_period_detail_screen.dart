@@ -27,72 +27,81 @@ class MarketPeriodDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: window == null
-          ? const SizedBox()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(window.emoji, style: const TextStyle(fontSize: 28)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          window.fullTitle,
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: ThemeV2.textPrimary,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: window == null
+            ? const SizedBox()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          window.emoji,
+                          style: const TextStyle(fontSize: 28),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            window.fullTitle,
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: ThemeV2.textPrimary,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      window.timeRangeLabel,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: ThemeV2.primary,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    window.timeRangeLabel,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeV2.primary,
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  _Section(
-                    label: 'What\'s Happening?',
-                    body: window.whatHappens,
-                  ),
-                  _Section(
-                    label: 'Why Does It Matter?',
-                    body: window.whyItMatters,
-                  ),
-                  if (window.dangerForBeginner != null)
+                    const SizedBox(height: 20),
                     _Section(
-                      label: 'What Can Go Wrong?',
-                      body: window.dangerForBeginner!,
+                      label: 'What\'s Happening?',
+                      body: window.whatHappens,
                     ),
-                  _Section(
-                    label: 'What Should Beginners Do?',
-                    body: window.whatToDo,
-                    isLast:
-                        window.stressTestPromoTitle == null &&
-                        window.fomoShieldTip == null,
-                  ),
-                  if (window.stressTestPromoTitle != null &&
-                      window.stressTestPromoBody != null) ...[
-                    _StressTestPromo(
-                      title: window.stressTestPromoTitle!,
-                      body: window.stressTestPromoBody!,
+                    _Section(
+                      label: 'Why Does It Matter?',
+                      body: window.whyItMatters,
                     ),
-                    const SizedBox(height: 18),
+                    if (window.dangerForBeginner != null)
+                      _Section(
+                        label: 'What Can Go Wrong?',
+                        body: window.dangerForBeginner!,
+                      ),
+                    _Section(
+                      label: 'What Should Beginners Do?',
+                      body: window.whatToDo,
+                      isLast:
+                          window.stressTestPromoTitle == null &&
+                          window.fomoShieldTip == null,
+                    ),
+                    if (window.stressTestPromoTitle != null &&
+                        window.stressTestPromoBody != null) ...[
+                      _StressTestPromo(
+                        title: window.stressTestPromoTitle!,
+                        body: window.stressTestPromoBody!,
+                      ),
+                      const SizedBox(height: 18),
+                    ],
+                    if (window.fomoShieldTip != null)
+                      _TipCallout(body: window.fomoShieldTip!),
                   ],
-                  if (window.fomoShieldTip != null)
-                    _TipCallout(body: window.fomoShieldTip!),
-                ],
+                ),
               ),
-            ),
+      ),
     );
   }
 }

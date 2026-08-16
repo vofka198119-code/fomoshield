@@ -131,16 +131,22 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: (entry == null || marker == null)
-          ? const Center(child: Text('Not available.'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: _MarkerDetailBody(
-                label: marker.label,
-                score: marker.score(entry),
-                tier: _tierFor(markerId, entry),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: (entry == null || marker == null)
+            ? const Center(child: Text('Not available.'))
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: _MarkerDetailBody(
+                  label: marker.label,
+                  score: marker.score(entry),
+                  tier: _tierFor(markerId, entry),
+                ),
               ),
-            ),
+      ),
     );
   }
 }

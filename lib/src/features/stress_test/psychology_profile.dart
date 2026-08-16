@@ -74,6 +74,17 @@ class TraderPsychologyProfile {
         safetyMarkerScore * 0.15;
   }
 
+  /// The behavioral half of the split score (0.0-1.0) — Discipline, Panic
+  /// Resistance, Patience only, no portfolio-construction signals mixed in.
+  /// Replaces [compositeScore] as what's actually shown as the headline
+  /// score everywhere (2026-08-16): the old single blended score let strong
+  /// psychology mask a badly built portfolio, since Strategy/Safety were
+  /// squeezed into just 15% combined. Weights keep panic/discipline/
+  /// patience's original relative proportions from [compositeScore]
+  /// (22/26/22), renormalized to sum to 1.0 on their own.
+  double psychologicalScore() =>
+      discipline * 0.37 + panicResistance * 0.32 + patience * 0.31;
+
   Map<String, dynamic> toJson() => {
     'panicResistance': panicResistance,
     'discipline': discipline,

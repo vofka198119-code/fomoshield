@@ -55,12 +55,18 @@ class StressTestTradeDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: t == null
-          ? const Center(child: Text('Trade not found'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: _TradeDetailCard(trade: t),
-            ),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: t == null
+            ? const Center(child: Text('Trade not found'))
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: _TradeDetailCard(trade: t),
+              ),
+      ),
     );
   }
 }

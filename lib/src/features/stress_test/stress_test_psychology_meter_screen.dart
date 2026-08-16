@@ -57,46 +57,64 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: session == null || data == null
-          ? const SizedBox.shrink()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  _FsScoreGaugeCard(data: data),
-                  const SizedBox(height: 16),
-                  PsychologyDisciplineCard(
-                    discipline: session.psychologyProfile.discipline,
-                  ),
-                  const SizedBox(height: 16),
-                  PsychologyPanicCard(
-                    panicResistance: session.psychologyProfile.panicResistance,
-                  ),
-                  const SizedBox(height: 16),
-                  PsychologyPatienceCard(
-                    patience: session.psychologyProfile.patience,
-                  ),
-                  const SizedBox(height: 16),
-                  PsychologyStrategyCard(session: session),
-                  const SizedBox(height: 16),
-                  PsychologyDiversificationCard(session: session),
-                  const SizedBox(height: 16),
-                  _PsychologyMeterDetailCard(data: data),
-                  const StressTestVerdictDisclaimer(),
-                ],
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: session == null || data == null
+            ? const SizedBox.shrink()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    _FsScoreGaugeCard(
+                      score: data.strategicScore,
+                      label: 'STRATEGY SCORE',
+                    ),
+                    const SizedBox(height: 16),
+                    PsychologyStrategyCard(session: session),
+                    const SizedBox(height: 16),
+                    PsychologyDiversificationCard(session: session),
+                    const SizedBox(height: 24),
+                    _FsScoreGaugeCard(
+                      score: data.psychologicalScore,
+                      label: 'PSYCHOLOGY SCORE',
+                    ),
+                    const SizedBox(height: 16),
+                    PsychologyDisciplineCard(
+                      discipline: session.psychologyProfile.discipline,
+                    ),
+                    const SizedBox(height: 16),
+                    PsychologyPanicCard(
+                      panicResistance:
+                          session.psychologyProfile.panicResistance,
+                    ),
+                    const SizedBox(height: 16),
+                    PsychologyPatienceCard(
+                      patience: session.psychologyProfile.patience,
+                    ),
+                    const SizedBox(height: 16),
+                    _PsychologyMeterDetailCard(data: data),
+                    const StressTestVerdictDisclaimer(),
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 }
 
-/// Duplicates the FS Score speedometer gauge (also shown compact on the
-/// main Stress Test screen's PsychologyMeter card) here on the detail
-/// screen too — same light card shell as the other detail-screen cards.
+/// FS Score speedometer gauge card — used for both halves of the
+/// 2026-08-16 split (Strategy Score, Psychology Score), same light card
+/// shell as the other detail-screen cards. Also shown compact on the main
+/// Stress Test screen's PsychologyMeter card (that one stays single-gauge,
+/// see PsychologyMeter/FsScoreRing in psychology_meter.dart).
 class _FsScoreGaugeCard extends StatelessWidget {
-  final PsychologyMeterData data;
+  final double score;
+  final String label;
 
-  const _FsScoreGaugeCard({required this.data});
+  const _FsScoreGaugeCard({required this.score, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +130,7 @@ class _FsScoreGaugeCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('FS SCORE', style: FomoShieldTheme.cardTitle()),
+                Text(label, style: FomoShieldTheme.cardTitle()),
                 GestureDetector(
                   onTap: () => context.push('/metric-info/investor-score'),
                   child: Container(
@@ -141,7 +159,7 @@ class _FsScoreGaugeCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
-            child: FsScoreRing(score: data.fsScore),
+            child: FsScoreRing(score: score),
           ),
         ],
       ),
