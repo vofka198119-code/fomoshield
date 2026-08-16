@@ -122,7 +122,7 @@ class _PortfolioSelector extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
         ).copyWith(border: Border.all(color: dialBrassLight, width: 1)),
         child: Text(
-          'My Portfolio',
+          AppLocalizations.of(context)!.homeWidgetPortfolio,
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
@@ -138,7 +138,7 @@ class _PortfolioSelector extends ConsumerWidget {
       key: key,
       onTap: () => showPremiumPromoOverlay(
         context: context,
-        title: 'Additional portfolio',
+        title: AppLocalizations.of(context)!.portfolioAdditionalPromoTitle,
         durationSeconds: 5,
         onComplete: () {
           if (context.mounted) showMonetizationModal(context, ref);
@@ -159,7 +159,7 @@ class _PortfolioSelector extends ConsumerWidget {
             Icon(Icons.lock_rounded, size: 12, color: dialBrassLight),
             const SizedBox(width: 5),
             Text(
-              'Create New Portfolio',
+              AppLocalizations.of(context)!.portfolioCreateNewSlot,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -184,7 +184,7 @@ class _PortfolioSelector extends ConsumerWidget {
       if (showAd && context.mounted) {
         showPremiumPromoOverlay(
           context: context,
-          title: 'Portfolio switched',
+          title: AppLocalizations.of(context)!.portfolioSwitchedPromoTitle,
           durationSeconds: 5,
           onComplete: () {
             if (context.mounted) showMonetizationModal(context, ref);

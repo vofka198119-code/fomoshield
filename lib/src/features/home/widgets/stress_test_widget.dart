@@ -18,6 +18,7 @@ import '../../monetization/monetization_modal.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 // Market Clock ring's gold accent — used for the play-button badge and
 // every "PREMIUM" tag below.
@@ -62,7 +63,7 @@ class StressTestWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Active Tests',
+                  AppLocalizations.of(context)!.stressTestActiveTests,
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -99,6 +100,7 @@ class StressTestWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final sessions = ref.watch(stressTestProvider);
     final activeSessions = sessions
         .where((s) => s.status == StressTestStatus.active)
@@ -132,7 +134,7 @@ class StressTestWidget extends ConsumerWidget {
           child: Row(
             children: [
               Text(
-                'МОИ РЕЗУЛЬТАТЫ',
+                l10n.stressTestMyResults,
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -158,7 +160,7 @@ class StressTestWidget extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'PREMIUM',
+                    l10n.profilePremiumBadge,
                     style: GoogleFonts.inter(
                       fontSize: 8,
                       fontWeight: FontWeight.w800,
@@ -179,7 +181,7 @@ class StressTestWidget extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Text(
-              '+${completedSessions.length - 2} more completed',
+              l10n.stressTestMoreCompleted(completedSessions.length - 2),
               style: GoogleFonts.inter(
                 fontSize: 11,
                 color: ThemeV2.textSecondary,
@@ -194,7 +196,7 @@ class StressTestWidget extends ConsumerWidget {
     // No content at all — show empty state
     if (children.isEmpty) {
       return WidgetContainer(
-        title: 'MY STRESS TEST',
+        title: l10n.stressTestWidgetTitle,
         showFooter: false,
         children: [
           Padding(
@@ -209,7 +211,7 @@ class StressTestWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'No active tests',
+                  l10n.stressTestNoActiveTests,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
@@ -218,7 +220,7 @@ class StressTestWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Start a new test from the bottom panel',
+                  l10n.stressTestStartNewTest,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 11,
@@ -233,7 +235,7 @@ class StressTestWidget extends ConsumerWidget {
     }
 
     return WidgetContainer(
-      title: 'MY STRESS TEST',
+      title: l10n.stressTestWidgetTitle,
       onTap: activeSessions.length > 2
           ? () => _showAllTestsSheet(context, ref)
           : null,
@@ -281,7 +283,7 @@ class StressTestWidget extends ConsumerWidget {
             borderRadius: BorderRadius.circular(5),
           ),
           child: Text(
-            'GO PREMIUM',
+            AppLocalizations.of(context)!.stressTestGoPremium,
             style: GoogleFonts.inter(
               fontSize: 8,
               fontWeight: FontWeight.w700,
@@ -297,7 +299,7 @@ class StressTestWidget extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
-        'premium',
+        AppLocalizations.of(context)!.stressTestPremiumLowercase,
         style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w700,
@@ -342,7 +344,9 @@ class StressTestWidget extends ConsumerWidget {
                 children: [
                   Flexible(
                     child: Text(
-                      'Active — ${session.duration.displayName}',
+                      AppLocalizations.of(
+                        context,
+                      )!.stressTestActiveLabel(session.duration.displayName),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

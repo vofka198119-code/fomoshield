@@ -16,6 +16,7 @@ import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/services/finnhub_service.dart';
 
@@ -34,32 +35,30 @@ Future<void> _openLink(String url) async {
 }
 
 Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context)!;
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
       title: Text(
-        'Delete Account?',
+        l10n.profileDeleteAccountTitle,
         style: GoogleFonts.inter(fontWeight: FontWeight.w700),
       ),
       content: Text(
-        'You\'ll have 14 days to restore your account after this. If you '
-        'don\'t restore it within that window, your account and all your '
-        'data — portfolios, watchlist, stress test history — will be '
-        'permanently erased, with no way to recover it.',
+        l10n.profileDeleteAccountBody,
         style: GoogleFonts.inter(fontSize: 14),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(false),
           child: Text(
-            'Cancel',
+            l10n.profileCancel,
             style: GoogleFonts.inter(color: ThemeV2.textSecondary),
           ),
         ),
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(true),
           child: Text(
-            'Delete',
+            l10n.profileDelete,
             style: GoogleFonts.inter(
               color: ThemeV2.loss,
               fontWeight: FontWeight.w700,
@@ -102,7 +101,7 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Could not delete account. Please try again.',
+          l10n.profileDeleteFailed,
           style: GoogleFonts.inter(fontSize: 13),
         ),
         backgroundColor: ThemeV2.loss,
@@ -116,11 +115,12 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(currentUserProvider);
     final subscriptionTier = ref.watch(subscriptionTierProvider);
     final isAdmin = ref.watch(isAdminProvider);
 
-    final email = user?.email ?? 'Not signed in';
+    final email = user?.email ?? l10n.profileNotSignedIn;
     final displayName = email.split('@').first;
     final isPremium = subscriptionTier == SubscriptionTier.premium;
 
@@ -130,7 +130,7 @@ class ProfileScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'PROFILE',
+          l10n.profileTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -203,7 +203,9 @@ class ProfileScreen extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  isAdmin ? 'ADMIN' : 'PREMIUM',
+                                  isAdmin
+                                      ? l10n.profileAdminBadge
+                                      : l10n.profilePremiumBadge,
                                   style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
@@ -361,35 +363,35 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // ── Language ─────────────────────────────────────────────
-          _section('Preferences'),
+          _section(l10n.profilePreferencesSection),
           Card(
             child: ListTile(
               leading: const Icon(Icons.language, color: ThemeV2.primary),
               title: Text(
-                'Language',
+                l10n.languageTitle,
                 style: GoogleFonts.inter(color: ThemeV2.textPrimary),
               ),
               trailing: const Icon(
                 Icons.chevron_right,
                 color: ThemeV2.textSecondary,
               ),
-              onTap: () {},
+              onTap: () => context.push('/language'),
             ),
           ),
 
           const SizedBox(height: 24),
 
           // ── Statistics ────────────────────────────────────────────
-          _section('Statistics'),
+          _section(l10n.profileStatisticsSection),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _statItem('Days', '1'),
-                  _statItem('Companies', '0'),
-                  _statItem('Tests', '0'),
+                  _statItem(l10n.profileStatDays, '1'),
+                  _statItem(l10n.profileStatCompanies, '0'),
+                  _statItem(l10n.profileStatTests, '0'),
                 ],
               ),
             ),
@@ -398,13 +400,13 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // ── Legal ─────────────────────────────────────────────────
-          _section('Legal'),
+          _section(l10n.profileLegalSection),
           Card(
             child: Column(
               children: [
                 ListTile(
                   title: Text(
-                    'Privacy Policy',
+                    l10n.profilePrivacyPolicy,
                     style: GoogleFonts.inter(color: ThemeV2.textPrimary),
                   ),
                   trailing: const Icon(
@@ -416,7 +418,7 @@ class ProfileScreen extends ConsumerWidget {
                 const Divider(height: 1),
                 ListTile(
                   title: Text(
-                    'Terms of Use',
+                    l10n.profileTermsOfUse,
                     style: GoogleFonts.inter(color: ThemeV2.textPrimary),
                   ),
                   trailing: const Icon(
@@ -485,7 +487,7 @@ class ProfileScreen extends ConsumerWidget {
               },
               icon: const Icon(Icons.logout_rounded, color: ThemeV2.loss),
               label: Text(
-                'Sign Out',
+                l10n.profileSignOut,
                 style: GoogleFonts.inter(color: ThemeV2.loss, fontSize: 15),
               ),
               style: OutlinedButton.styleFrom(
@@ -515,7 +517,7 @@ class ProfileScreen extends ConsumerWidget {
                 size: 20,
               ),
               label: Text(
-                'Delete Account',
+                l10n.profileDeleteAccount,
                 style: GoogleFonts.inter(
                   color: ThemeV2.loss.withValues(alpha: 0.55),
                   fontSize: 13,
@@ -613,6 +615,7 @@ class ProfileScreen extends ConsumerWidget {
 class _PremiumStatusCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final details = ref.watch(premiumDetailsProvider);
 
     return Container(
@@ -635,14 +638,14 @@ class _PremiumStatusCard extends ConsumerWidget {
         ],
       ),
       child: details.when(
-        data: (data) => _buildContent(data),
+        data: (data) => _buildContent(l10n, data),
         loading: () => _buildShimmer(),
-        error: (_, _) => _buildContent(null),
+        error: (_, _) => _buildContent(l10n, null),
       ),
     );
   }
 
-  Widget _buildContent(PremiumDetails? details) {
+  Widget _buildContent(AppLocalizations l10n, PremiumDetails? details) {
     final isLifetime = details?.isLifetime ?? false;
     final daysLeft = details?.daysRemaining ?? 0;
     final isExpired = details?.isExpired ?? false;
@@ -671,7 +674,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Premium Active',
+                    l10n.premiumActive,
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -680,10 +683,10 @@ class _PremiumStatusCard extends ConsumerWidget {
                   ),
                   Text(
                     isLifetime
-                        ? 'Lifetime subscription'
+                        ? l10n.premiumLifetime
                         : isExpired
-                        ? 'Subscription expired'
-                        : '${daysLeft}d remaining',
+                        ? l10n.premiumExpired
+                        : l10n.premiumDaysRemaining(daysLeft),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: ThemeV2.primary.withValues(alpha: 0.7),
@@ -711,7 +714,9 @@ class _PremiumStatusCard extends ConsumerWidget {
                   ),
                 ),
                 child: Text(
-                  isExpired ? 'EXPIRED' : '${daysLeft}d',
+                  isExpired
+                      ? l10n.premiumExpiredBadge
+                      : l10n.premiumDaysBadge(daysLeft),
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -742,15 +747,15 @@ class _PremiumStatusCard extends ConsumerWidget {
         ),
         const SizedBox(height: 14),
         // Benefits list
-        _benefitRow(Icons.search_rounded, 'Unlimited daily searches'),
+        _benefitRow(Icons.search_rounded, l10n.premiumBenefitSearches),
         const SizedBox(height: 6),
-        _benefitRow(Icons.account_balance_rounded, 'Up to 3 portfolios'),
+        _benefitRow(Icons.account_balance_rounded, l10n.premiumBenefitPortfolios),
         const SizedBox(height: 6),
-        _benefitRow(Icons.monetization_on_rounded, '\$50,000 starting capital'),
+        _benefitRow(Icons.monetization_on_rounded, l10n.premiumBenefitCapital),
         const SizedBox(height: 6),
-        _benefitRow(Icons.psychology_rounded, 'Up to 5 stress tests'),
+        _benefitRow(Icons.psychology_rounded, l10n.premiumBenefitStressTests),
         const SizedBox(height: 6),
-        _benefitRow(Icons.block_rounded, 'Ad-free experience'),
+        _benefitRow(Icons.block_rounded, l10n.premiumBenefitAdFree),
       ],
     );
   }

@@ -22,6 +22,7 @@ import '../../../core/cache/logo_providers.dart'
     show resolvedCompanyNameProvider;
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../portfolio_providers.dart';
 
 class PortfolioBalanceWidget extends ConsumerStatefulWidget {
@@ -48,6 +49,7 @@ class _PortfolioBalanceWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (widget.isLoading || widget.hasError || widget.performance == null) {
       return Container(
         width: double.infinity,
@@ -56,7 +58,7 @@ class _PortfolioBalanceWidgetState
         alignment: Alignment.center,
         child: widget.hasError
             ? Text(
-                'Failed to load',
+                l10n.commonFailedToLoad,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: ThemeV2.textSecondary,
@@ -110,7 +112,7 @@ class _PortfolioBalanceWidgetState
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Text(
-                'PORTFOLIO BALANCE',
+                l10n.portfolioBalanceLabel,
                 style: FomoShieldTheme.cardTitle(),
               ),
             ),
@@ -154,7 +156,7 @@ class _PortfolioBalanceWidgetState
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'BALANCE',
+                            l10n.balanceRingLabel,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -262,8 +264,10 @@ class _PortfolioBalanceWidgetState
                           child: Center(
                             child: Text(
                               _showAll
-                                  ? 'Less'
-                                  : 'More (${holdings.length - _legendPreviewLimit})',
+                                  ? l10n.commonLess
+                                  : l10n.commonMoreCount(
+                                      holdings.length - _legendPreviewLimit,
+                                    ),
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,

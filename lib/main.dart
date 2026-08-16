@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,11 +8,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
 import 'src/core/cache/sector_providers.dart';
+import 'src/core/localization/language_provider.dart';
 import 'src/core/overlay/app_overlay_host.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
 import 'src/features/orders/pending_orders_checker.dart';
+import 'src/l10n/gen/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -91,10 +94,21 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
 
   @override
   Widget build(BuildContext context) {
+    final languageOverride = ref.watch(languageProvider);
     return MaterialApp.router(
       title: 'F.O.M.O. Shield',
       debugShowCheckedModeBanner: false,
       theme: ThemeV2.lightTheme,
+      // null follows the device's system locale; a non-null value is the
+      // user's explicit Profile → Language override (language_provider.dart).
+      locale: languageOverride,
+      supportedLocales: const [Locale('en'), Locale('ru')],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: AppRouter.router,
       builder: (context, child) {
         return Container(

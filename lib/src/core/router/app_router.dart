@@ -23,6 +23,8 @@ import '../../features/market_clock/market_clock_screen.dart';
 import '../../features/market_clock/market_period_detail_screen.dart';
 import '../../features/market_clock/market_clock_risk_detail_screen.dart';
 import '../../features/market_clock/market_phases_screen.dart';
+import '../../features/profile/language_picker_screen.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
 import '../../features/company_detail/widgets/metric_info_screen.dart';
@@ -117,6 +119,12 @@ class AppRouter {
         path: '/disclaimer',
         name: 'disclaimer',
         builder: (context, state) => const DisclaimerScreen(),
+      ),
+
+      GoRoute(
+        path: '/language',
+        name: 'language',
+        builder: (context, state) => const LanguagePickerScreen(),
       ),
 
       // Account Restore — full-block gate for a pending-deletion account,
@@ -454,6 +462,12 @@ class _AppShell extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: BottomNavigationBar(
+                  // Cyrillic glyphs run visibly wider than Latin at the same
+                  // character count — "Стресс-тест" was clipping to
+                  // "Стресс-т…" at the default 12/14px label sizes. Shrunk
+                  // a couple px so every language's longest label fits.
+                  selectedFontSize: 12,
+                  unselectedFontSize: 10,
                   currentIndex: _currentIndex(context),
                   onTap: (index) {
                     ref.read(previousTabRouteProvider.notifier).state =
@@ -471,26 +485,26 @@ class _AppShell extends ConsumerWidget {
                         context.go('/profile');
                     }
                   },
-                  items: const [
+                  items: [
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.shield_rounded),
-                      label: 'Home',
+                      icon: const Icon(Icons.shield_rounded),
+                      label: AppLocalizations.of(context)!.navHome,
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.search_rounded),
-                      label: 'Search',
+                      icon: const Icon(Icons.search_rounded),
+                      label: AppLocalizations.of(context)!.navSearch,
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.account_balance_rounded),
-                      label: 'Portfolio',
+                      icon: const Icon(Icons.account_balance_rounded),
+                      label: AppLocalizations.of(context)!.navPortfolio,
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.psychology_rounded),
-                      label: 'Stress Test',
+                      icon: const Icon(Icons.psychology_rounded),
+                      label: AppLocalizations.of(context)!.navStressTest,
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.person_rounded),
-                      label: 'Profile',
+                      icon: const Icon(Icons.person_rounded),
+                      label: AppLocalizations.of(context)!.navProfile,
                     ),
                   ],
                 ),

@@ -21,6 +21,7 @@ import '../../../core/cache/logo_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../portfolio_providers.dart';
 
 class PortfolioHoldingsWidget extends StatefulWidget {
@@ -61,6 +62,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final holdings = widget.holdings;
 
     if (holdings == null) {
@@ -99,7 +101,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text('HOLDINGS', style: FomoShieldTheme.cardTitle()),
+                  Text(l10n.holdingsTitle, style: FomoShieldTheme.cardTitle()),
                   const Spacer(),
                   _addButton(context),
                 ],
@@ -113,7 +115,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                 child: Column(
                   children: [
                     Text(
-                      'No holdings yet',
+                      l10n.holdingsEmpty,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -122,7 +124,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Tap + to search and add your first holding',
+                      l10n.holdingsEmptyHint,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: ThemeV2.textSecondary,
@@ -160,8 +162,10 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                   child: Center(
                     child: Text(
                       _showAll
-                          ? 'Less'
-                          : 'More (${sorted.length - _previewLimit})',
+                          ? l10n.commonLess
+                          : l10n.commonMoreCount(
+                              sorted.length - _previewLimit,
+                            ),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -274,7 +278,9 @@ class _HoldingRow extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${holding.shares.toStringAsFixed(2)} shares',
+                    AppLocalizations.of(
+                      context,
+                    )!.sharesCount(holding.shares.toStringAsFixed(2)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(

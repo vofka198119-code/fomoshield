@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/services/user_data_service.dart';
 import 'auth_providers.dart';
 
@@ -31,13 +32,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   int _failedAttempts = 0;
   DateTime? _blockedUntil;
 
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+
   bool get _isBlocked =>
       _blockedUntil != null && DateTime.now().isBefore(_blockedUntil!);
 
   String? get _blockRemaining {
     if (!_isBlocked) return null;
     final remaining = _blockedUntil!.difference(DateTime.now()).inSeconds;
-    return 'Too many attempts. Try again in $remaining seconds.';
+    return _l10n.authTooManyAttempts(remaining);
   }
 
   void _recordFailedAttempt() {
@@ -79,7 +82,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     _cooldownTimer?.cancel();
     setState(() {
       _cooldownSecondsLeft = seconds;
-      _errorText = 'Please wait $seconds seconds before trying again.';
+      _errorText = _l10n.authWaitSeconds(seconds);
     });
     _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
@@ -94,7 +97,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           timer.cancel();
         } else {
           _cooldownSecondsLeft = left;
-          _errorText = 'Please wait $left seconds before trying again.';
+          _errorText = _l10n.authWaitSeconds(left);
         }
       });
     });
@@ -119,7 +122,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      setState(() => _errorText = 'Please fill in all fields');
+      setState(() => _errorText = _l10n.authPleaseFillFields);
       return;
     }
 
@@ -149,7 +152,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           // Sign in succeeded → user already exists with this email+password
           if (!mounted) return;
           setState(() {
-            _errorText = 'A user with this email is already registered.';
+            _errorText = _l10n.authEmailAlreadyRegistered;
             _isLoading = false;
           });
           return;
@@ -174,8 +177,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           final alreadyRegistered = response.user?.identities?.isEmpty ?? false;
           setState(() {
             _errorText = alreadyRegistered
-                ? 'This email is already registered. Try signing in, or use "Continue with Google" if that\'s how you signed up.'
-                : 'Please check your email to confirm registration.';
+                ? _l10n.authEmailAlreadyRegisteredGoogle
+                : _l10n.authCheckEmailConfirm;
             _isLoading = false;
           });
           return;
@@ -233,7 +236,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       setState(() {
         _errorText = _isBlocked
             ? _blockRemaining!
-            : 'Something went wrong. Please try again.';
+            : _l10n.authSomethingWentWrong;
         _isLoading = false;
       });
     }
@@ -286,7 +289,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       setState(() {
         _errorText = _isBlocked
             ? _blockRemaining
-            : 'Google sign-in failed. Please try again.';
+            : _l10n.authGoogleSignInFailed;
         _isLoading = false;
       });
     } on AuthException catch (e) {
@@ -302,7 +305,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       setState(() {
         _errorText = _isBlocked
             ? _blockRemaining!
-            : 'Something went wrong. Please try again.';
+            : _l10n.authSomethingWentWrong;
         _isLoading = false;
       });
     }
@@ -310,6 +313,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -322,7 +326,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
               // Title
               Text(
-                _isLogin ? 'Welcome back' : 'Create account',
+                _isLogin ? l10n.authWelcomeBack : l10n.authCreateAccount,
                 style: GoogleFonts.inter(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
@@ -332,8 +336,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               const SizedBox(height: 8),
               Text(
                 _isLogin
-                    ? 'Sign in to continue investing with discipline'
-                    : 'Start your journey to disciplined investing',
+                    ? l10n.authSignInSubtitle
+                    : l10n.authSignUpSubtitle,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: ThemeV2.textSecondary,
@@ -356,9 +360,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  hintText: 'Email',
-                  prefixIcon: Icon(
+                decoration: InputDecoration(
+                  hintText: l10n.authEmailHint,
+                  prefixIcon: const Icon(
                     Icons.email_outlined,
                     color: ThemeV2.textSecondary,
                   ),
@@ -372,7 +376,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  hintText: 'Password',
+                  hintText: l10n.authPasswordHint,
                   prefixIcon: const Icon(
                     Icons.lock_outlined,
                     color: ThemeV2.textSecondary,
@@ -407,7 +411,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     child: Text(
-                      'Forgot Password?',
+                      l10n.authForgotPassword,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: ThemeV2.primary,
@@ -439,7 +443,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Remember me',
+                    l10n.authRememberMe,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: ThemeV2.textSecondary,
@@ -477,7 +481,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           ),
                         )
                       : Text(
-                          _isLogin ? 'Sign In' : 'Create Account',
+                          _isLogin
+                              ? l10n.authSignIn
+                              : l10n.authCreateAccountButton,
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -495,7 +501,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
-                      'or',
+                      l10n.authOr,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: ThemeV2.textSecondary,
@@ -530,7 +536,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       SvgPicture.string(_googleLogoSvg, width: 20, height: 20),
                       const SizedBox(width: 12),
                       Text(
-                        'Continue with Google',
+                        l10n.authContinueWithGoogle,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -549,9 +555,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _isLogin
-                        ? "Don't have an account?"
-                        : 'Already have an account?',
+                    _isLogin ? l10n.authNoAccount : l10n.authHaveAccount,
                     style: GoogleFonts.inter(
                       color: ThemeV2.textSecondary,
                       fontSize: 13,
@@ -563,7 +567,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       _errorText = null;
                     }),
                     child: Text(
-                      _isLogin ? 'Sign Up' : 'Sign In',
+                      _isLogin ? l10n.authSignUp : l10n.authSignIn,
                       style: GoogleFonts.inter(
                         color: ThemeV2.primary,
                         fontSize: 13,

@@ -13,6 +13,22 @@ import 'search_counter_provider.dart';
 import 'search_provider.dart';
 import 'widgets/exchange_badge.dart';
 import 'widgets/search_browse_lanes.dart';
+import '../../l10n/gen/app_localizations.dart';
+
+String _searchErrorText(AppLocalizations l10n, SearchErrorType type) {
+  switch (type) {
+    case SearchErrorType.connectionTimeout:
+      return l10n.searchErrorConnectionTimeout;
+    case SearchErrorType.serverNotResponding:
+      return l10n.searchErrorServerNotResponding;
+    case SearchErrorType.noInternet:
+      return l10n.searchErrorNoInternet;
+    case SearchErrorType.rateLimited:
+      return l10n.searchErrorRateLimited;
+    case SearchErrorType.generic:
+      return l10n.searchErrorGeneric;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Search Screen
@@ -41,6 +57,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(searchProvider);
 
     // Set when opened via a specific portfolio's "+" (e.g. Holdings widget)
@@ -65,7 +82,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           backgroundColor: Colors.transparent,
           centerTitle: true,
           title: Text(
-            'SEARCH',
+            l10n.searchTitle,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -89,7 +106,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   onChanged: (q) =>
                       ref.read(searchProvider.notifier).onSearchInput(q),
                   decoration: InputDecoration(
-                    hintText: 'Search ticker or company...',
+                    hintText: l10n.searchHint,
                     hintStyle: GoogleFonts.inter(
                       color: ThemeV2.textSecondary,
                       fontSize: 14,
@@ -177,7 +194,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                state.errorMessage != null
+                                state.errorType != null
                                     ? Icons.cloud_off_rounded
                                     : Icons.search_off_rounded,
                                 color: ThemeV2.textSecondary,
@@ -185,17 +202,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                state.errorMessage ?? 'No results',
+                                state.errorType != null
+                                    ? _searchErrorText(l10n, state.errorType!)
+                                    : l10n.searchNoResults,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.inter(
                                   color: ThemeV2.textSecondary,
                                   fontSize: 14,
                                 ),
                               ),
-                              if (state.errorMessage != null) ...[
+                              if (state.errorType != null) ...[
                                 const SizedBox(height: 8),
                                 Text(
-                                  'The API key may be exhausted. Try again shortly.',
+                                  l10n.searchApiExhausted,
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.inter(
                                     color: ThemeV2.textSecondary,

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/notifications/notification_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'home_providers.dart';
 import 'widget_order_provider.dart';
 import 'widgets/shield_signal_widget.dart';
@@ -123,7 +124,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     size: 20,
                   ),
                   label: Text(
-                    'Add widgets',
+                    AppLocalizations.of(context)!.homeAddWidgets,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -240,6 +241,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -263,7 +265,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
             child: Row(
               children: [
                 Text(
-                  'Widget Settings',
+                  l10n.homeWidgetSettingsTitle,
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -291,7 +293,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                     });
                   },
                   child: Text(
-                    'Reset',
+                    l10n.homeReset,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: ThemeV2.primary,
@@ -366,7 +368,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                       ],
                     ),
                     title: Text(
-                      config.displayName,
+                      config.displayName(l10n),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

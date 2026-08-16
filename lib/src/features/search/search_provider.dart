@@ -12,12 +12,23 @@ final searchProvider = ChangeNotifierProvider<SearchNotifier>(
   (ref) => SearchNotifier(ref.read(finnhubServiceProvider)),
 );
 
+/// Kept as a type instead of a raw error string — this provider has no
+/// BuildContext to localize through, so the UI layer (search_screen.dart)
+/// maps this to the actual displayed text via AppLocalizations.
+enum SearchErrorType {
+  connectionTimeout,
+  serverNotResponding,
+  noInternet,
+  rateLimited,
+  generic,
+}
+
 class SearchNotifier extends ChangeNotifier {
   final FinnhubService _api;
   List<Map<String, dynamic>> results = [];
   bool isLoading = false;
   String query = '';
-  String? errorMessage;
+  SearchErrorType? errorType;
   Timer? _debounce;
 
   // Bumped on every keystroke; a pending request only applies its result if
@@ -31,7 +42,7 @@ class SearchNotifier extends ChangeNotifier {
   /// Called on every keystroke — debounces 500ms before actual API call
   void onSearchInput(String q) {
     query = q;
-    errorMessage = null;
+    errorType = null;
     _debounce?.cancel();
     final requestId = ++_requestId;
 
@@ -47,7 +58,7 @@ class SearchNotifier extends ChangeNotifier {
 
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       List<Map<String, dynamic>> newResults = [];
-      String? newError;
+      SearchErrorType? newError;
       try {
         newResults = await _api.searchLocal(q);
       } catch (e) {
@@ -55,17 +66,17 @@ class SearchNotifier extends ChangeNotifier {
         if (e is DioException) {
           switch (e.type) {
             case DioExceptionType.connectionTimeout:
-              newError = 'Connection timed out. Check your internet.';
+              newError = SearchErrorType.connectionTimeout;
             case DioExceptionType.receiveTimeout:
-              newError = 'Server not responding. Try again.';
+              newError = SearchErrorType.serverNotResponding;
             case DioExceptionType.connectionError:
-              newError = 'No internet connection.';
+              newError = SearchErrorType.noInternet;
             case DioExceptionType.badResponse:
               newError = e.response?.statusCode == 429
-                  ? 'API limit reached. Please try again later.'
-                  : "Couldn't load results. Try again.";
+                  ? SearchErrorType.rateLimited
+                  : SearchErrorType.generic;
             default:
-              newError = "Couldn't load results. Try again.";
+              newError = SearchErrorType.generic;
           }
         }
       }
@@ -73,7 +84,7 @@ class SearchNotifier extends ChangeNotifier {
       if (requestId != _requestId) return; // superseded by a newer keystroke
 
       results = newResults;
-      errorMessage = newError;
+      errorType = newError;
       isLoading = false;
       notifyListeners();
     });

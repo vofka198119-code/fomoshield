@@ -1,0 +1,230 @@
+{
+  "@@locale": "en",
+
+  "navHome": "Home",
+  "navSearch": "Search",
+  "navPortfolio": "Portfolio",
+  "navStressTest": "Stress Test",
+  "navProfile": "Profile",
+
+  "languageTitle": "Language",
+  "languageSystemDefault": "System Default",
+  "languageEnglish": "English",
+  "languageRussian": "Русский",
+  "languagePickerSubtitle": "Choose the language for the app's interface.",
+
+  "authWelcomeBack": "Welcome back",
+  "authCreateAccount": "Create account",
+  "authSignInSubtitle": "Sign in to continue investing with discipline",
+  "authSignUpSubtitle": "Start your journey to disciplined investing",
+  "authEmailHint": "Email",
+  "authPasswordHint": "Password",
+  "authForgotPassword": "Forgot Password?",
+  "authRememberMe": "Remember me",
+  "authSignIn": "Sign In",
+  "authCreateAccountButton": "Create Account",
+  "authOr": "or",
+  "authContinueWithGoogle": "Continue with Google",
+  "authNoAccount": "Don't have an account?",
+  "authHaveAccount": "Already have an account?",
+  "authSignUp": "Sign Up",
+  "authPleaseFillFields": "Please fill in all fields",
+  "authEmailAlreadyRegistered": "A user with this email is already registered.",
+  "authEmailAlreadyRegisteredGoogle": "This email is already registered. Try signing in, or use \"Continue with Google\" if that's how you signed up.",
+  "authCheckEmailConfirm": "Please check your email to confirm registration.",
+  "authSomethingWentWrong": "Something went wrong. Please try again.",
+  "authGoogleSignInFailed": "Google sign-in failed. Please try again.",
+  "authTooManyAttempts": "Too many attempts. Try again in {seconds} seconds.",
+  "@authTooManyAttempts": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "authWaitSeconds": "Please wait {seconds} seconds before trying again.",
+  "@authWaitSeconds": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+
+  "profileTitle": "PROFILE",
+  "profileNotSignedIn": "Not signed in",
+  "profileAdminBadge": "ADMIN",
+  "profilePremiumBadge": "PREMIUM",
+  "profilePreferencesSection": "Preferences",
+  "profileStatisticsSection": "Statistics",
+  "profileStatDays": "Days",
+  "profileStatCompanies": "Companies",
+  "profileStatTests": "Tests",
+  "profileLegalSection": "Legal",
+  "profilePrivacyPolicy": "Privacy Policy",
+  "profileTermsOfUse": "Terms of Use",
+  "profileSignOut": "Sign Out",
+  "profileDeleteAccount": "Delete Account",
+  "profileDeleteAccountTitle": "Delete Account?",
+  "profileDeleteAccountBody": "You'll have 14 days to restore your account after this. If you don't restore it within that window, your account and all your data — portfolios, watchlist, stress test history — will be permanently erased, with no way to recover it.",
+  "profileCancel": "Cancel",
+  "profileDelete": "Delete",
+  "profileDeleteFailed": "Could not delete account. Please try again.",
+
+  "premiumActive": "Premium Active",
+  "premiumLifetime": "Lifetime subscription",
+  "premiumExpired": "Subscription expired",
+  "premiumDaysRemaining": "{days}d remaining",
+  "@premiumDaysRemaining": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "premiumExpiredBadge": "EXPIRED",
+  "premiumDaysBadge": "{days}d",
+  "@premiumDaysBadge": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "premiumBenefitSearches": "Unlimited daily searches",
+  "premiumBenefitPortfolios": "Up to 3 portfolios",
+  "premiumBenefitCapital": "$50,000 starting capital",
+  "premiumBenefitStressTests": "Up to 5 stress tests",
+  "premiumBenefitAdFree": "Ad-free experience",
+
+  "homeAddWidgets": "Add widgets",
+  "homeWidgetSettingsTitle": "Widget Settings",
+  "homeReset": "Reset",
+  "homeWidgetShieldSignal": "Shield Signal",
+  "homeWidgetWatchlist": "Watchlist",
+  "homeWidgetMarketClock": "Market Clock",
+  "homeWidgetPortfolio": "My Portfolio",
+
+  "commonLoading": "Loading...",
+
+  "shieldSignalTitle": "SHIELD SIGNAL",
+  "shieldSignalChange": "CHANGE",
+  "shieldSignalChangePercent": "CHANGE %",
+  "moodBullishTitle": "Bullish Momentum",
+  "moodBullishBody": "Buyers are clearly leading today's market. Strong demand is pushing prices higher across many companies, and positive news or growing optimism is encouraging investors to keep buying. Momentum is on the bulls' side — just remember, even strong trends eventually slow down, so avoid chasing prices out of excitement.",
+  "moodSteadyClimbTitle": "Steady Climb",
+  "moodSteadyClimbBody": "Buyers have a slight advantage today. Demand is a little stronger than selling pressure, pushing the index higher. The move is healthy and controlled, with no signs of panic or excessive excitement — confidence is slowly building.",
+  "moodWaitingTitle": "Waiting for Direction",
+  "moodWaitingBody": "The market is taking a breath. Buyers and sellers are evenly matched, so prices are moving very little. Nothing unusual is happening right now — investors are simply waiting for the next piece of important news before choosing a direction.",
+  "moodCautionTitle": "Growing Caution",
+  "moodCautionBody": "Sellers have gained a small advantage. The market is drifting lower, but there are no signs of panic. Small pullbacks like this are a normal part of investing.",
+  "moodStormTitle": "Storm Warning",
+  "moodStormBody": "Fear is spreading through the market. Selling pressure is much stronger than buying, causing prices to fall quickly. Sharp declines can feel uncomfortable, but emotional decisions often make difficult days even worse.",
+
+  "watchlistTitle": "WATCHLIST",
+  "watchlistEmpty": "Nothing here yet",
+
+  "marketClockTitle": "MARKET CLOCK",
+  "marketClockNewYorkTime": "NEW YORK TIME",
+
+  "portfolioWidgetNoPortfolio": "No portfolio",
+  "portfolioWidgetTitle": "PORTFOLIO",
+  "portfolioBalanceLabel": "PORTFOLIO BALANCE",
+  "portfolioCashLabel": "CASH AVAILABLE",
+  "portfolioUnrealizedPnl": "UNREALIZED P&L",
+  "targetLabel": "TARGET",
+
+  "stressTestWidgetTitle": "MY STRESS TEST",
+  "stressTestActiveTests": "Active Tests",
+  "stressTestMyResults": "MY RESULTS",
+  "stressTestMoreCompleted": "+{count} more completed",
+  "@stressTestMoreCompleted": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "stressTestNoActiveTests": "No active tests",
+  "stressTestStartNewTest": "Start a new test from the bottom panel",
+  "stressTestGoPremium": "GO PREMIUM",
+  "stressTestPremiumLowercase": "premium",
+  "stressTestActiveLabel": "Active — {duration}",
+  "@stressTestActiveLabel": {
+    "placeholders": {
+      "duration": { "type": "String" }
+    }
+  },
+
+  "searchTitle": "SEARCH",
+  "searchHint": "Search ticker or company...",
+  "searchNoResults": "No results",
+  "searchApiExhausted": "The API key may be exhausted. Try again shortly.",
+  "searchErrorConnectionTimeout": "Connection timed out. Check your internet.",
+  "searchErrorServerNotResponding": "Server not responding. Try again.",
+  "searchErrorNoInternet": "No internet connection.",
+  "searchErrorRateLimited": "API limit reached. Please try again later.",
+  "searchErrorGeneric": "Couldn't load results. Try again.",
+  "searchTopSp500": "TOP S&P 500",
+  "searchRecentlyViewed": "RECENTLY VIEWED",
+  "searchTopCompaniesBuilding": "Top companies list is still being built on the server.",
+  "searchTopCompaniesLoadError": "Couldn't load top companies. Pull to retry shortly.",
+
+  "portfolioRenameMenu": "Rename Portfolio",
+  "portfolioResetMenu": "Reset Portfolio",
+  "portfolioDeleteMenu": "Delete Portfolio",
+  "portfolioNoPortfoliosYet": "No portfolios yet",
+  "portfolioCreateFirstMsg": "Create your first virtual portfolio\nwith {amount} starting balance",
+  "@portfolioCreateFirstMsg": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "portfolioCreateButton": "Create Portfolio",
+  "portfolioNameHint": "e.g. Tech Growth",
+  "portfolioSave": "Save",
+  "portfolioResetDialogTitle": "Reset Portfolio?",
+  "portfolioResetDialogBody": "All holdings and history will be cleared.\nBalance will be restored to its original amount.",
+  "portfolioDeleteDialogTitle": "Delete Portfolio?",
+  "portfolioDeleteDialogBody": "All holdings and history will be lost.",
+  "portfolioCannotDeleteLast": "Cannot delete the last portfolio. Create a new one first.",
+  "portfolioNewDialogTitle": "New Portfolio",
+  "portfolioFreeLimitOne": "FREE limit: 1 portfolio. Upgrade to Premium (3).",
+  "portfolioMaxReached": "Max {max} portfolios reached.",
+  "@portfolioMaxReached": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+  "portfolioCreate": "Create",
+  "portfolioAdditionalPromoTitle": "Additional portfolio",
+  "portfolioSwitchedPromoTitle": "Portfolio switched",
+  "portfolioCreateNewSlot": "Create New Portfolio",
+
+  "commonFailedToLoad": "Failed to load",
+  "commonLess": "Less",
+  "commonMoreCount": "More ({count})",
+  "@commonMoreCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "balanceRingLabel": "BALANCE",
+
+  "targetGoalLabel": "GOAL",
+  "targetLeftToGoal": "LEFT TO GOAL",
+  "targetChangeGoal": "Change Goal",
+  "targetSelectGoal": "Select Goal",
+
+  "holdingsTitle": "HOLDINGS",
+  "holdingsEmpty": "No holdings yet",
+  "holdingsEmptyHint": "Tap + to search and add your first holding",
+  "sharesCount": "{count} shares",
+  "@sharesCount": {
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  },
+
+  "tradeHistoryTitle": "TRADE HISTORY",
+
+  "myLimitOrdersTitle": "MY LIMIT ORDERS",
+  "myLimitOrdersSheetTitle": "My Limit Orders",
+  "myLimitOrdersEmpty": "You currently have no active orders",
+  "myLimitOrdersSeeAll": "See all {count} orders",
+  "@myLimitOrdersSeeAll": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  }
+}

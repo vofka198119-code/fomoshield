@@ -6,6 +6,7 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../home_providers.dart';
 
@@ -48,6 +49,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final indicesAsync = ref.watch(marketIndicesProvider);
 
     return _shell(
@@ -64,7 +66,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
             ),
             const SizedBox(width: 12),
             Text(
-              'Loading...',
+              l10n.commonLoading,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: ThemeV2.textSecondary,
@@ -138,7 +140,10 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text('SHIELD SIGNAL', style: FomoShieldTheme.cardTitle()),
+            child: Text(
+              AppLocalizations.of(context)!.shieldSignalTitle,
+              style: FomoShieldTheme.cardTitle(),
+            ),
           ),
           Divider(
             height: 1,
@@ -192,10 +197,11 @@ class _IndexView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isUp = index.change >= 0;
     final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
     final changeBg = isUp ? ThemeV2.successBg : ThemeV2.lossBg;
-    final mood = _moodFor(index.change);
+    final mood = _moodFor(l10n, index.change);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -219,7 +225,7 @@ class _IndexView extends StatelessWidget {
           children: [
             Expanded(
               child: _cell(
-                label: 'CHANGE',
+                label: l10n.shieldSignalChange,
                 value: formatUsdSigned(index.changeAbs),
                 valueFontSize: 14,
                 bgColor: changeBg,
@@ -229,7 +235,7 @@ class _IndexView extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: _cell(
-                label: 'CHANGE %',
+                label: l10n.shieldSignalChangePercent,
                 value: '${isUp ? '+' : ''}${index.change.toStringAsFixed(2)}%',
                 valueFontSize: 14,
                 bgColor: changeBg,
@@ -356,51 +362,20 @@ class _IndexView extends StatelessWidget {
   /// Emotional headline + body, keyed by the day's percent move. Thresholds
   /// split each direction into a "small" and "strong" band, with a ±0.1%
   /// dead zone in the middle counting as neutral.
-  _Mood _moodFor(double changePercent) {
+  _Mood _moodFor(AppLocalizations l10n, double changePercent) {
     if (changePercent >= 1.0) {
-      return const _Mood(
-        'Bullish Momentum',
-        'Buyers are clearly leading today\'s market. Strong demand is '
-            'pushing prices higher across many companies, and positive news '
-            'or growing optimism is encouraging investors to keep buying. '
-            'Momentum is on the bulls\' side — just remember, even strong '
-            'trends eventually slow down, so avoid chasing prices out of '
-            'excitement.',
-      );
+      return _Mood(l10n.moodBullishTitle, l10n.moodBullishBody);
     }
     if (changePercent > 0.1) {
-      return const _Mood(
-        'Steady Climb',
-        'Buyers have a slight advantage today. Demand is a little stronger '
-            'than selling pressure, pushing the index higher. The move is '
-            'healthy and controlled, with no signs of panic or excessive '
-            'excitement — confidence is slowly building.',
-      );
+      return _Mood(l10n.moodSteadyClimbTitle, l10n.moodSteadyClimbBody);
     }
     if (changePercent >= -0.1) {
-      return const _Mood(
-        'Waiting for Direction',
-        'The market is taking a breath. Buyers and sellers are evenly '
-            'matched, so prices are moving very little. Nothing unusual is '
-            'happening right now — investors are simply waiting for the '
-            'next piece of important news before choosing a direction.',
-      );
+      return _Mood(l10n.moodWaitingTitle, l10n.moodWaitingBody);
     }
     if (changePercent >= -1.0) {
-      return const _Mood(
-        'Growing Caution',
-        'Sellers have gained a small advantage. The market is drifting '
-            'lower, but there are no signs of panic. Small pullbacks like '
-            'this are a normal part of investing.',
-      );
+      return _Mood(l10n.moodCautionTitle, l10n.moodCautionBody);
     }
-    return const _Mood(
-      'Storm Warning',
-      'Fear is spreading through the market. Selling pressure is much '
-          'stronger than buying, causing prices to fall quickly. Sharp '
-          'declines can feel uncomfortable, but emotional decisions often '
-          'make difficult days even worse.',
-    );
+    return _Mood(l10n.moodStormTitle, l10n.moodStormBody);
   }
 }
 

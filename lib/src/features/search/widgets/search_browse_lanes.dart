@@ -9,6 +9,7 @@ import '../top_companies_provider.dart';
 import 'browse_lane.dart';
 import 'company_list_sheet.dart';
 import 'company_mini_card.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Browse Lanes — shown on the empty-query state. "TOP S&P 500" + per-sector
@@ -45,6 +46,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final recentlyViewed = ref.watch(recentlyViewedProvider);
     final topCompanies = ref.watch(topCompaniesProvider);
 
@@ -56,7 +58,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            "Couldn't load top companies. Pull to retry shortly.",
+            l10n.searchTopCompaniesLoadError,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: ThemeV2.textSecondary,
@@ -71,7 +73,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
-                'Top companies list is still being built on the server.',
+                l10n.searchTopCompaniesBuilding,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   color: ThemeV2.textSecondary,
@@ -95,11 +97,11 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
         // was firing ~50+ simultaneous network calls on open.
         final lanes = <BrowseLane>[
           BrowseLane(
-            title: 'TOP S&P 500',
+            title: l10n.searchTopSp500,
             items: _cards(companies.take(_lanePreviewCount).toList()),
             onSeeAll: () => showCompanyListSheet(
               context,
-              'TOP S&P 500',
+              l10n.searchTopSp500,
               companies,
               onTapSymbol: widget.onTapSymbol,
             ),
@@ -120,7 +122,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
               ),
           if (recentlyViewed.isNotEmpty)
             BrowseLane(
-              title: 'RECENTLY VIEWED',
+              title: l10n.searchRecentlyViewed,
               items: _cards(
                 recentlyViewed
                     .take(_lanePreviewCount)
@@ -136,7 +138,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
               onSeeAll: recentlyViewed.length > _lanePreviewCount
                   ? () => showCompanyListSheet(
                       context,
-                      'RECENTLY VIEWED',
+                      l10n.searchRecentlyViewed,
                       recentlyViewed
                           .map(
                             (e) => TopCompanyEntry(

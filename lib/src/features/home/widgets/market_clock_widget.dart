@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../features/market_clock/market_clock_dial.dart';
 import '../../../features/market_clock/market_clock_engine.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Market Clock Widget — Home mini card. Same instrument-panel dial as the
@@ -56,7 +57,7 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
               child: Row(
                 children: [
                   Text(
-                    'MARKET CLOCK',
+                    AppLocalizations.of(context)!.marketClockTitle,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -82,7 +83,7 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
-                'NEW YORK TIME',
+                AppLocalizations.of(context)!.marketClockNewYorkTime,
                 style: GoogleFonts.inter(
                   fontSize: 9,
                   fontWeight: FontWeight.w700,

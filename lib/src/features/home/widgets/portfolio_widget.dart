@@ -12,6 +12,7 @@ import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../../portfolio/portfolio_providers.dart';
 import '../../portfolio/widgets/target_widget.dart' show targetDisplayPercent;
+import '../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Portfolio Widget — Live portfolio summary for Home screen
@@ -66,7 +67,7 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           child: Text(
-            'No portfolio',
+            AppLocalizations.of(context)!.portfolioWidgetNoPortfolio,
             style: GoogleFonts.inter(
               fontSize: 14,
               color: ThemeV2.textSecondary,
@@ -140,10 +141,12 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
   /// Card chrome + header, shared by loading/error/empty/data states.
   Widget _shell(
     BuildContext context, {
-    String title = 'PORTFOLIO',
+    String? title,
     bool showPremiumBadge = false,
     required Widget child,
   }) {
+    final resolvedTitle =
+        title ?? AppLocalizations.of(context)!.portfolioWidgetTitle;
     return InkWell(
       onTap: () {
         ref.read(previousTabRouteProvider.notifier).state = '/home';
@@ -162,14 +165,14 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
                 children: [
                   Flexible(
                     child: Text(
-                      title,
+                      resolvedTitle,
                       style: FomoShieldTheme.cardTitle(),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (showPremiumBadge) ...[
                     const SizedBox(width: 8),
-                    _premiumPill(),
+                    _premiumPill(context),
                   ],
                 ],
               ),
@@ -187,12 +190,12 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
     );
   }
 
-  Widget _premiumPill() {
+  Widget _premiumPill(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(12)),
       child: Text(
-        'PREMIUM',
+        AppLocalizations.of(context)!.profilePremiumBadge,
         style: GoogleFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w800,
@@ -243,6 +246,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final performanceAsync = ref.watch(
       portfolioPerformanceProvider(portfolioId),
     );
@@ -260,7 +264,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            'Loading...',
+            l10n.commonLoading,
             style: GoogleFonts.inter(
               fontSize: 14,
               color: ThemeV2.textSecondary,
@@ -298,19 +302,19 @@ class _PortfolioPerformanceView extends ConsumerWidget {
                 child: Column(
                   children: [
                     _cell(
-                      label: 'PORTFOLIO BALANCE',
+                      label: l10n.portfolioBalanceLabel,
                       value: formatUsd(perf.currentValue),
                       bgColor: ThemeV2.primaryBg,
                     ),
                     const SizedBox(height: 6),
                     _cell(
-                      label: 'CASH AVAILABLE',
+                      label: l10n.portfolioCashLabel,
                       value: formatUsd(perf.cash),
                       bgColor: ThemeV2.primaryBg,
                     ),
                     const SizedBox(height: 6),
                     _cell(
-                      label: 'UNREALIZED P&L',
+                      label: l10n.portfolioUnrealizedPnl,
                       value: formatUsdSigned(perf.pnl),
                       valueFontSize: 14,
                       bgColor: pnlBg,
@@ -318,7 +322,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
                     ),
                     const SizedBox(height: 6),
                     _cell(
-                      label: 'CHANGE',
+                      label: l10n.shieldSignalChange,
                       value:
                           '${isUp ? '+' : ''}${perf.pnlPercent.toStringAsFixed(2)}%',
                       valueFontSize: 14,
@@ -421,7 +425,7 @@ class _VerticalProgressBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'TARGET',
+            AppLocalizations.of(context)!.targetLabel,
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,

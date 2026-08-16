@@ -9,6 +9,7 @@ import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../portfolio_providers.dart';
 
 /// Maps a portfolio's current total value onto the -100%/0%/+100% scale.
@@ -81,7 +82,10 @@ class TargetWidget extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text('TARGET', style: FomoShieldTheme.cardTitle()),
+            child: Text(
+              AppLocalizations.of(context)!.targetLabel,
+              style: FomoShieldTheme.cardTitle(),
+            ),
           ),
           Divider(
             height: 1,
@@ -145,7 +149,7 @@ class _GoalSummaryRow extends StatelessWidget {
       children: [
         Expanded(
           child: _summaryBox(
-            label: 'GOAL',
+            label: AppLocalizations.of(context)!.targetGoalLabel,
             value: goalText,
             alignEnd: false,
             bgColor: ThemeV2.primaryBg,
@@ -154,7 +158,7 @@ class _GoalSummaryRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _summaryBox(
-            label: 'LEFT TO GOAL',
+            label: AppLocalizations.of(context)!.targetLeftToGoal,
             value: remainingText,
             valueColor: remainingColor,
             alignEnd: true,
@@ -254,7 +258,9 @@ class _SelectGoalButton extends StatelessWidget {
             onTap: () => context.push('/portfolio/$portfolioId/goal'),
             child: Center(
               child: Text(
-                hasGoal ? 'Change Goal' : 'Select Goal',
+                hasGoal
+                    ? AppLocalizations.of(context)!.targetChangeGoal
+                    : AppLocalizations.of(context)!.targetSelectGoal,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,

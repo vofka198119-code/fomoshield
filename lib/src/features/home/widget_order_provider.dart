@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/services/user_data_service.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Home Widget Order Provider (SharedPreferences-backed)
@@ -32,18 +33,18 @@ class HomeWidgetConfig {
 
   const HomeWidgetConfig({required this.id, required this.visible});
 
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (id) {
       case 'shield_signal':
-        return 'Shield Signal';
+        return l10n.homeWidgetShieldSignal;
       case 'watchlist':
-        return 'Watchlist';
+        return l10n.homeWidgetWatchlist;
       case 'news':
-        return 'Market Clock';
+        return l10n.homeWidgetMarketClock;
       case 'stress_test':
-        return 'Stress Test';
+        return l10n.navStressTest;
       case 'portfolio':
-        return 'My Portfolio';
+        return l10n.homeWidgetPortfolio;
       default:
         return id;
     }
