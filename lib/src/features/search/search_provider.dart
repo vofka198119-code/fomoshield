@@ -63,9 +63,9 @@ class SearchNotifier extends ChangeNotifier {
             case DioExceptionType.badResponse:
               newError = e.response?.statusCode == 429
                   ? 'API limit reached. Please try again later.'
-                  : null;
+                  : "Couldn't load results. Try again.";
             default:
-              newError = null;
+              newError = "Couldn't load results. Try again.";
           }
         }
       }

@@ -4,11 +4,6 @@
 // Diversification), reached via "More" on that marker's VerdictMarkerCard
 // on the Session Complete screen. One generic screen keyed by markerId,
 // same pattern as MetricInfoScreen's /metric-info/:id.
-//
-// Body copy is a placeholder for now — the real per-marker diagnosis text
-// (why this score, what to do differently) gets filled in one marker at a
-// time in a follow-up pass. The score itself is real, read from the
-// archived VerdictArchiveEntry.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';

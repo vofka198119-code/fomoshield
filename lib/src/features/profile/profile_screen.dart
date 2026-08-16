@@ -419,18 +419,6 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   onTap: () => _openLink('https://fomoshield.app/terms'),
                 ),
-                const Divider(height: 1),
-                ListTile(
-                  title: Text(
-                    'Methodology',
-                    style: GoogleFonts.inter(color: ThemeV2.textPrimary),
-                  ),
-                  trailing: const Icon(
-                    Icons.chevron_right,
-                    color: ThemeV2.textSecondary,
-                  ),
-                  onTap: () {},
-                ),
               ],
             ),
           ),

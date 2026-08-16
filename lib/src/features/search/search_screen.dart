@@ -117,21 +117,53 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   : state.query.isEmpty
                   ? SearchBrowseLanes(
                       onTapSymbol: (symbol) {
-                        if (stressTestSource == 'stress-test' &&
-                            stressTestSessionId != null) {
-                          context.push(
-                            '/stress-test/$stressTestSessionId/stock/$symbol',
-                          );
-                          return;
-                        }
-                        context.push(
-                          '/company/$symbol',
-                          extra: portfolioId != null
-                              ? {'portfolioId': portfolioId}
-                              : null,
-                        );
+                        // Same check+consume+navigate-inside-debounce
+                        // sequence as the typed-result ListTile below —
+                        // browsing a lane counts as a search too, so it
+                        // shares the same counter and double-tap guard.
+                        ref
+                            .read(debouncerProvider)
+                            .run(() async {
+                              final tier = ref.read(subscriptionTierProvider);
+                              final canSearch =
+                                  tier == SubscriptionTier.premium ||
+                                  tier == SubscriptionTier.admin ||
+                                  ref.read(searchCounterProvider) > 0;
+
+                              if (!canSearch) {
+                                if (context.mounted) {
+                                  showMonetizationModal(context, ref);
+                                }
+                                return;
+                              }
+
+                              if (tier != SubscriptionTier.premium &&
+                                  tier != SubscriptionTier.admin) {
+                                await ref
+                                    .read(searchCounterProvider.notifier)
+                                    .consumeSearch();
+                              }
+
+                              if (!context.mounted) return;
+
+                              if (stressTestSource == 'stress-test' &&
+                                  stressTestSessionId != null) {
+                                context.push(
+                                  '/stress-test/$stressTestSessionId/stock/$symbol',
+                                );
+                                return;
+                              }
+                              context.push(
+                                '/company/$symbol',
+                                extra: portfolioId != null
+                                    ? {'portfolioId': portfolioId}
+                                    : null,
+                              );
+                            });
                       },
                     )
+                  : state.query.length < 2
+                  ? const SizedBox.shrink()
                   : state.results.isEmpty && state.query.isNotEmpty
                   ? Center(
                       child: Padding(
@@ -291,57 +323,63 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               ),
                             ],
                           ),
-                          onTap: () async {
-                            // ── Check search counter ───────────────────────
-                            final tier = ref.read(subscriptionTierProvider);
-                            final canSearch =
-                                tier == SubscriptionTier.premium ||
-                                tier == SubscriptionTier.admin ||
-                                ref.read(searchCounterProvider) > 0;
-
-                            if (!canSearch) {
-                              showMonetizationModal(context, ref);
-                              return;
-                            }
-
-                            // Consume one search (no-op for premium)
-                            if (tier != SubscriptionTier.premium &&
-                                tier != SubscriptionTier.admin) {
-                              await ref
-                                  .read(searchCounterProvider.notifier)
-                                  .consumeSearch();
-                            }
-
-                            if (!context.mounted) return;
-
-                            // Check if navigating from stress-test context
-                            final extra =
-                                GoRouterState.of(context).extra
-                                    as Map<String, dynamic>?;
-                            final source = extra?['source'] as String?;
-                            final sessionId = extra?['sessionId'] as String?;
-
-                            // Debounce 1s guard against double-tap
-                            if (source == 'stress-test' && sessionId != null) {
-                              ref
-                                  .read(debouncerProvider)
-                                  .run(
-                                    () => context.push(
-                                      '/stress-test/$sessionId/stock/$symbol',
-                                    ),
+                          onTap: () {
+                            // Whole check+consume+navigate sequence runs
+                            // inside the debounce so a fast double-tap only
+                            // executes it once — previously the counter
+                            // check/consume ran synchronously on every tap
+                            // while only navigation was debounced, so a
+                            // double-tap could burn 2 searches for 1 visit.
+                            ref
+                                .read(debouncerProvider)
+                                .run(() async {
+                                  final tier = ref.read(
+                                    subscriptionTierProvider,
                                   );
-                            } else {
-                              ref
-                                  .read(debouncerProvider)
-                                  .run(
-                                    () => context.push(
+                                  final canSearch =
+                                      tier == SubscriptionTier.premium ||
+                                      tier == SubscriptionTier.admin ||
+                                      ref.read(searchCounterProvider) > 0;
+
+                                  if (!canSearch) {
+                                    if (context.mounted) {
+                                      showMonetizationModal(context, ref);
+                                    }
+                                    return;
+                                  }
+
+                                  // Consume one search (no-op for premium)
+                                  if (tier != SubscriptionTier.premium &&
+                                      tier != SubscriptionTier.admin) {
+                                    await ref
+                                        .read(searchCounterProvider.notifier)
+                                        .consumeSearch();
+                                  }
+
+                                  if (!context.mounted) return;
+
+                                  // Check if navigating from stress-test context
+                                  final extra =
+                                      GoRouterState.of(context).extra
+                                          as Map<String, dynamic>?;
+                                  final source = extra?['source'] as String?;
+                                  final sessionId =
+                                      extra?['sessionId'] as String?;
+
+                                  if (source == 'stress-test' &&
+                                      sessionId != null) {
+                                    context.push(
+                                      '/stress-test/$sessionId/stock/$symbol',
+                                    );
+                                  } else {
+                                    context.push(
                                       '/company/$symbol',
                                       extra: portfolioId != null
                                           ? {'portfolioId': portfolioId}
                                           : null,
-                                    ),
-                                  );
-                            }
+                                    );
+                                  }
+                                });
                           },
                         );
                       },
