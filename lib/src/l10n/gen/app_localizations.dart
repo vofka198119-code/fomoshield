@@ -476,6 +476,24 @@ abstract class AppLocalizations {
   /// **'Ad-free experience'**
   String get premiumBenefitAdFree;
 
+  /// No description provided for @tradeBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'BUY'**
+  String get tradeBuy;
+
+  /// No description provided for @tradeSell.
+  ///
+  /// In en, this message translates to:
+  /// **'SELL'**
+  String get tradeSell;
+
+  /// No description provided for @disclaimerFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer: F.O.M.O. Shield is for educational and entertainment purposes only. We are not registered investment advisors. All trading decisions are solely your responsibility. Past performance does not guarantee future results.'**
+  String get disclaimerFooter;
+
   /// No description provided for @homeAddWidgets.
   ///
   /// In en, this message translates to:
@@ -716,6 +734,599 @@ abstract class AppLocalizations {
   /// **'Active — {duration}'**
   String stressTestActiveLabel(String duration);
 
+  /// No description provided for @stressTestHubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'STRESS TEST'**
+  String get stressTestHubTitle;
+
+  /// No description provided for @stressTestCompletedTestsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Tests'**
+  String get stressTestCompletedTestsSheetTitle;
+
+  /// No description provided for @stressTestActiveTestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE TESTS'**
+  String get stressTestActiveTestsTitle;
+
+  /// No description provided for @stressTestCompletedTestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPLETED TESTS'**
+  String get stressTestCompletedTestsTitle;
+
+  /// No description provided for @stressTestNoCompletedTestsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No completed tests yet'**
+  String get stressTestNoCompletedTestsYet;
+
+  /// No description provided for @stressTestNoTestsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No stress tests yet'**
+  String get stressTestNoTestsYet;
+
+  /// No description provided for @stressTestNoTestsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the button above to start your first test'**
+  String get stressTestNoTestsHint;
+
+  /// No description provided for @stressTestNewTest.
+  ///
+  /// In en, this message translates to:
+  /// **'New Stress Test'**
+  String get stressTestNewTest;
+
+  /// No description provided for @stressTestActiveCountFree.
+  ///
+  /// In en, this message translates to:
+  /// **'{active}/{max} active · Premium = 5 at once'**
+  String stressTestActiveCountFree(int active, int max);
+
+  /// No description provided for @stressTestEmotionalResilience.
+  ///
+  /// In en, this message translates to:
+  /// **'Test your emotional resilience'**
+  String get stressTestEmotionalResilience;
+
+  /// No description provided for @stressTestLimitReachedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stress test limit reached'**
+  String get stressTestLimitReachedTitle;
+
+  /// No description provided for @stressTestMaxSessionsReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum active test sessions reached'**
+  String get stressTestMaxSessionsReached;
+
+  /// No description provided for @stressTestArchiveSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Final: {amount} · {holdings} holdings · {trades} trades'**
+  String stressTestArchiveSummary(String amount, int holdings, int trades);
+
+  /// No description provided for @stressTestSessionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Session not found'**
+  String get stressTestSessionNotFound;
+
+  /// No description provided for @stressTestSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stress Test Setup'**
+  String get stressTestSetupTitle;
+
+  /// No description provided for @stressTestDurationSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TEST DURATION'**
+  String get stressTestDurationSectionTitle;
+
+  /// No description provided for @stressTestStartButton.
+  ///
+  /// In en, this message translates to:
+  /// **'START STRESS TEST'**
+  String get stressTestStartButton;
+
+  /// No description provided for @stressTestSlot1Free.
+  ///
+  /// In en, this message translates to:
+  /// **'Test slot 1/2 free · Upgrade for 5 at once & no ads'**
+  String get stressTestSlot1Free;
+
+  /// No description provided for @stressTestSlot2Free.
+  ///
+  /// In en, this message translates to:
+  /// **'Test slot 2/2 free · Premium = 5 at once, no ads'**
+  String get stressTestSlot2Free;
+
+  /// No description provided for @stressTestAvailableCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Cash'**
+  String get stressTestAvailableCash;
+
+  /// No description provided for @stressTestOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'of {amount} total'**
+  String stressTestOfTotal(String amount);
+
+  /// No description provided for @stressTestCustomDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom ({days} days)'**
+  String stressTestCustomDays(int days);
+
+  /// No description provided for @stressTestInfiniteMinWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Infinite — Min. 2 weeks'**
+  String get stressTestInfiniteMinWeeks;
+
+  /// No description provided for @stressTestPremiumFeatureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Feature'**
+  String get stressTestPremiumFeatureTitle;
+
+  /// No description provided for @stressTestPremiumFeatureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This test duration is available exclusively to Premium subscribers. Upgrade to unlock unlimited possibilities.'**
+  String get stressTestPremiumFeatureBody;
+
+  /// No description provided for @stressTestUpgradeToPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get stressTestUpgradeToPremium;
+
+  /// No description provided for @stressTestNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get stressTestNotNow;
+
+  /// No description provided for @stressTestCustomDurationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Test Duration'**
+  String get stressTestCustomDurationTitle;
+
+  /// No description provided for @stressTestCustomDurationWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Once started, a custom-duration test cannot be interrupted or stopped early. The simulation will run for the full period you select below.'**
+  String get stressTestCustomDurationWarning;
+
+  /// No description provided for @stressTestDaysCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String stressTestDaysCount(int days);
+
+  /// No description provided for @stressTestMinDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Min: 5 days'**
+  String get stressTestMinDays;
+
+  /// No description provided for @stressTestMaxDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Max: 365 days'**
+  String get stressTestMaxDays;
+
+  /// No description provided for @commonApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get commonApply;
+
+  /// No description provided for @stressTestPremiumFeatureAllCaps.
+  ///
+  /// In en, this message translates to:
+  /// **'PREMIUM FEATURE'**
+  String get stressTestPremiumFeatureAllCaps;
+
+  /// No description provided for @stressTestRiskDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'RISK & SIMULATION DISCLAIMER'**
+  String get stressTestRiskDisclaimerTitle;
+
+  /// No description provided for @stressTestScrollToAgree.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll to the end to agree'**
+  String get stressTestScrollToAgree;
+
+  /// No description provided for @stressTestReadFullDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'You have read the full disclaimer'**
+  String get stressTestReadFullDisclaimer;
+
+  /// No description provided for @stressTestIAgreeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'I Agree — Start Test'**
+  String get stressTestIAgreeStart;
+
+  /// No description provided for @stressTestDisclaimerIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This stress test uses a specialized algorithmic engine that simulates extreme market scenarios, including prolonged bear trends, systemic crises, and complete financial market collapses.'**
+  String get stressTestDisclaimerIntro;
+
+  /// No description provided for @stressTestDisclaimerAck.
+  ///
+  /// In en, this message translates to:
+  /// **'Before starting the simulation, please read and acknowledge the following:'**
+  String get stressTestDisclaimerAck;
+
+  /// No description provided for @stressTestBulletScenarios.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulated Scenarios — The crashes, crises, and market movements generated by the engine are hypothetical mathematical models. They are designed to test portfolio resilience under stress and do not constitute a forecast of real market behavior.'**
+  String get stressTestBulletScenarios;
+
+  /// No description provided for @stressTestBulletNotAdvice.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Financial Advice — The final verdict, analytics, and any conclusions drawn from this test are for informational and educational purposes only. They do not constitute personalized investment advice, a recommendation to buy or sell assets, or any form of financial solicitation.'**
+  String get stressTestBulletNotAdvice;
+
+  /// No description provided for @stressTestBulletObjective.
+  ///
+  /// In en, this message translates to:
+  /// **'Objective Mathematical Assessment — The final verdict and scoring are generated automatically. Our engine is built on recognized scientific methods (including Monte Carlo simulation, tail-risk analysis, and modern portfolio stress-testing models). The algorithm is fully independent: it eliminates human bias, emotion, or third-party commercial interests. However, it is important to remember that any mathematical model has its limitations and cannot predict absolutely every real-market scenario.'**
+  String get stressTestBulletObjective;
+
+  /// No description provided for @stressTestBulletLiability.
+  ///
+  /// In en, this message translates to:
+  /// **'Limitation of Liability — A positive test result (i.e., your portfolio successfully \"survived\" a simulated market crash) does not guarantee similar real-world performance. The platform and its developers assume no responsibility for your investment decisions, nor for any direct or indirect losses, including but not limited to loss of capital in real markets.'**
+  String get stressTestBulletLiability;
+
+  /// No description provided for @stressTestBulletPastPerformance.
+  ///
+  /// In en, this message translates to:
+  /// **'Past performance within this simulator does not guarantee, predict, or reflect real-world market outcomes. All trading activities in real life carry substantial risk and are made solely at your own discretion and responsibility.'**
+  String get stressTestBulletPastPerformance;
+
+  /// No description provided for @stressTestEndOfDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'▸ End of Disclaimer'**
+  String get stressTestEndOfDisclaimer;
+
+  /// No description provided for @stressTestUnlimitedTesting.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Testing'**
+  String get stressTestUnlimitedTesting;
+
+  /// No description provided for @stressTestInfiniteUpsellBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The Infinite duration stress test is available exclusively to Premium subscribers. Upgrade to unlock:'**
+  String get stressTestInfiniteUpsellBody;
+
+  /// No description provided for @stressTestUpsellUnlimitedDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited test duration'**
+  String get stressTestUpsellUnlimitedDuration;
+
+  /// No description provided for @stressTestUpsellFullCrashScenarios.
+  ///
+  /// In en, this message translates to:
+  /// **'Full market crash scenarios'**
+  String get stressTestUpsellFullCrashScenarios;
+
+  /// No description provided for @stressTestUpsellAdvancedAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced portfolio analytics'**
+  String get stressTestUpsellAdvancedAnalytics;
+
+  /// No description provided for @stressTestAccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stress test access'**
+  String get stressTestAccessTitle;
+
+  /// No description provided for @stressTestPortfolioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'STRESS TEST PORTFOLIO'**
+  String get stressTestPortfolioTitle;
+
+  /// No description provided for @stressTestNotStartedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Test not started yet'**
+  String get stressTestNotStartedYet;
+
+  /// No description provided for @stressTestGoBackToSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back to setup and start the test'**
+  String get stressTestGoBackToSetup;
+
+  /// No description provided for @stressTestGoToSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Setup'**
+  String get stressTestGoToSetup;
+
+  /// No description provided for @stressTestStartBuildingPortfolio.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Building Your Portfolio'**
+  String get stressTestStartBuildingPortfolio;
+
+  /// No description provided for @stressTestTapToAddFirstPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to search stocks\nand add your first position.'**
+  String get stressTestTapToAddFirstPosition;
+
+  /// No description provided for @stressTestSearchStocksHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search stocks to add...'**
+  String get stressTestSearchStocksHint;
+
+  /// No description provided for @stressTestGetVerdict.
+  ///
+  /// In en, this message translates to:
+  /// **'GET PSYCHOLOGIST VERDICT'**
+  String get stressTestGetVerdict;
+
+  /// No description provided for @stressTestNoAssetsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No assets yet'**
+  String get stressTestNoAssetsYet;
+
+  /// No description provided for @stressTestNoActivePositions.
+  ///
+  /// In en, this message translates to:
+  /// **'No active positions'**
+  String get stressTestNoActivePositions;
+
+  /// No description provided for @stressTestTapToAddFirstAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to search and add your first asset'**
+  String get stressTestTapToAddFirstAsset;
+
+  /// No description provided for @stressTestTapToBuyAssets.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap (+) to buy assets'**
+  String get stressTestTapToBuyAssets;
+
+  /// No description provided for @stressTestTestComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Complete'**
+  String get stressTestTestComplete;
+
+  /// No description provided for @stressTestTimeRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Remaining'**
+  String get stressTestTimeRemaining;
+
+  /// No description provided for @stressTestElapsedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Elapsed Time'**
+  String get stressTestElapsedTime;
+
+  /// No description provided for @stressTestCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d {hours}h {minutes}m {seconds}s'**
+  String stressTestCountdown(
+    String days,
+    String hours,
+    String minutes,
+    String seconds,
+  );
+
+  /// No description provided for @stressTestEpochNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Epoch #{number}'**
+  String stressTestEpochNumber(int number);
+
+  /// No description provided for @stressTestFinishTestButton.
+  ///
+  /// In en, this message translates to:
+  /// **'FINISH TEST'**
+  String get stressTestFinishTestButton;
+
+  /// No description provided for @stressTestFinishTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish Test'**
+  String get stressTestFinishTest;
+
+  /// No description provided for @stressTestFinishTestConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'End this test now and get your verdict? This can\'t be undone.'**
+  String get stressTestFinishTestConfirm;
+
+  /// No description provided for @stressTestFinalBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'FINAL BALANCE'**
+  String get stressTestFinalBalance;
+
+  /// No description provided for @stressTestViewVerdict.
+  ///
+  /// In en, this message translates to:
+  /// **'VIEW PSYCHOLOGIST VERDICT'**
+  String get stressTestViewVerdict;
+
+  /// No description provided for @stressTestWidgetPortfolioBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio Balance'**
+  String get stressTestWidgetPortfolioBalance;
+
+  /// No description provided for @stressTestWidgetCashAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Available'**
+  String get stressTestWidgetCashAvailable;
+
+  /// No description provided for @stressTestWidgetPsychologyMeter.
+  ///
+  /// In en, this message translates to:
+  /// **'Psychology Meter'**
+  String get stressTestWidgetPsychologyMeter;
+
+  /// No description provided for @stressTestWidgetHoldings.
+  ///
+  /// In en, this message translates to:
+  /// **'Holdings'**
+  String get stressTestWidgetHoldings;
+
+  /// No description provided for @stressTestWidgetPriceChart.
+  ///
+  /// In en, this message translates to:
+  /// **'Price Chart'**
+  String get stressTestWidgetPriceChart;
+
+  /// No description provided for @stressTestWidgetEpochs.
+  ///
+  /// In en, this message translates to:
+  /// **'Epochs'**
+  String get stressTestWidgetEpochs;
+
+  /// No description provided for @stressTestWidgetTradeHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade History'**
+  String get stressTestWidgetTradeHistory;
+
+  /// No description provided for @stressTestWidgetLimitOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'My Limit Orders'**
+  String get stressTestWidgetLimitOrders;
+
+  /// No description provided for @stressTestWidgetTimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Timer'**
+  String get stressTestWidgetTimer;
+
+  /// No description provided for @stressTestInvestmentDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTMENT DISCLAIMER\n& LIMITATION OF LIABILITY'**
+  String get stressTestInvestmentDisclaimerTitle;
+
+  /// No description provided for @stressTestInvestmentDisclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This verdict is generated automatically by a mathematical model based solely on your simulated historical behavior within this closed testing environment. It is provided for educational and illustrative purposes only and does NOT constitute personalized investment, legal, or financial advice. Past performance within this simulator does not guarantee, predict, or reflect real-world market outcomes. Final financial decisions, asset purchases, or trading activities in real life carry substantial risk and are made solely at your own discretion and responsibility. The creators of F.O.M.O. Shield accept no liability for financial losses incurred in real-world trading.'**
+  String get stressTestInvestmentDisclaimerBody;
+
+  /// No description provided for @stressTestIUnderstandAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'I Understand & Accept'**
+  String get stressTestIUnderstandAccept;
+
+  /// No description provided for @stressTestPsychologyMeterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PSYCHOLOGY METER'**
+  String get stressTestPsychologyMeterTitle;
+
+  /// No description provided for @stressTestStrategyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategy Score'**
+  String get stressTestStrategyScore;
+
+  /// No description provided for @stressTestPsychologyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Psychology Score'**
+  String get stressTestPsychologyScore;
+
+  /// No description provided for @stressTestScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SCORE'**
+  String get stressTestScoreLabel;
+
+  /// No description provided for @stressTestAnalyticsTotalTrades.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Trades'**
+  String get stressTestAnalyticsTotalTrades;
+
+  /// No description provided for @stressTestAnalyticsTradesBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Trades Buy'**
+  String get stressTestAnalyticsTradesBuy;
+
+  /// No description provided for @stressTestAnalyticsTradesSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Trades Sell'**
+  String get stressTestAnalyticsTradesSell;
+
+  /// No description provided for @stressTestAnalyticsUnrealizedPnl.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrealized P&L'**
+  String get stressTestAnalyticsUnrealizedPnl;
+
+  /// No description provided for @stressTestAnalyticsRealizedPnl.
+  ///
+  /// In en, this message translates to:
+  /// **'Realized P&L'**
+  String get stressTestAnalyticsRealizedPnl;
+
+  /// No description provided for @stressTestPriceChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PRICE CHART'**
+  String get stressTestPriceChartTitle;
+
+  /// No description provided for @stressTestChartNotEnoughData.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data yet'**
+  String get stressTestChartNotEnoughData;
+
+  /// No description provided for @stressTestChartNotEnoughDataForPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data for this period'**
+  String get stressTestChartNotEnoughDataForPeriod;
+
   /// No description provided for @searchTitle.
   ///
   /// In en, this message translates to:
@@ -920,6 +1531,12 @@ abstract class AppLocalizations {
   /// **'Failed to load'**
   String get commonFailedToLoad;
 
+  /// No description provided for @commonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get commonOther;
+
   /// No description provided for @commonLess.
   ///
   /// In en, this message translates to:
@@ -1015,6 +1632,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See all {count} orders'**
   String myLimitOrdersSeeAll(int count);
+
+  /// No description provided for @gicsSectorTechnology.
+  ///
+  /// In en, this message translates to:
+  /// **'Technology'**
+  String get gicsSectorTechnology;
+
+  /// No description provided for @gicsSectorFinancials.
+  ///
+  /// In en, this message translates to:
+  /// **'Financials'**
+  String get gicsSectorFinancials;
+
+  /// No description provided for @gicsSectorHealthCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Care'**
+  String get gicsSectorHealthCare;
+
+  /// No description provided for @gicsSectorConsumerDiscretionary.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumer Discretionary'**
+  String get gicsSectorConsumerDiscretionary;
+
+  /// No description provided for @gicsSectorConsumerStaples.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumer Staples'**
+  String get gicsSectorConsumerStaples;
+
+  /// No description provided for @gicsSectorEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get gicsSectorEnergy;
+
+  /// No description provided for @gicsSectorIndustrials.
+  ///
+  /// In en, this message translates to:
+  /// **'Industrials'**
+  String get gicsSectorIndustrials;
+
+  /// No description provided for @gicsSectorMaterials.
+  ///
+  /// In en, this message translates to:
+  /// **'Materials'**
+  String get gicsSectorMaterials;
+
+  /// No description provided for @gicsSectorCommunicationServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Communication Services'**
+  String get gicsSectorCommunicationServices;
+
+  /// No description provided for @gicsSectorRealEstate.
+  ///
+  /// In en, this message translates to:
+  /// **'Real Estate'**
+  String get gicsSectorRealEstate;
+
+  /// No description provided for @gicsSectorUtilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Utilities'**
+  String get gicsSectorUtilities;
+
+  /// No description provided for @testDuration1Week.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Week'**
+  String get testDuration1Week;
+
+  /// No description provided for @testDuration1Month.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Month'**
+  String get testDuration1Month;
+
+  /// No description provided for @testDuration3Months.
+  ///
+  /// In en, this message translates to:
+  /// **'3 Months'**
+  String get testDuration3Months;
+
+  /// No description provided for @testDurationInfinite.
+  ///
+  /// In en, this message translates to:
+  /// **'Infinite'**
+  String get testDurationInfinite;
+
+  /// No description provided for @testDurationCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get testDurationCustom;
 }
 
 class _AppLocalizationsDelegate

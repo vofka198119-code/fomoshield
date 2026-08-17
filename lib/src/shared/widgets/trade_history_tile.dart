@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../utils/currency_format.dart';
 import 'company_logo.dart';
 
@@ -140,7 +141,9 @@ class TradeHistoryTile extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      isBuy ? 'BUY' : 'SELL',
+                      isBuy
+                          ? AppLocalizations.of(context)!.tradeBuy
+                          : AppLocalizations.of(context)!.tradeSell,
                       style: GoogleFonts.inter(
                         fontSize: 9,
                         fontWeight: FontWeight.w700,

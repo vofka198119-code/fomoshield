@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
@@ -33,7 +34,7 @@ class StressTestCashWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Text(
-                'CASH AVAILABLE',
+                AppLocalizations.of(context)!.portfolioCashLabel,
                 style: FomoShieldTheme.cardTitle(Colors.white),
               ),
             ),

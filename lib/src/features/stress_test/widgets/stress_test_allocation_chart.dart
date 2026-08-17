@@ -12,6 +12,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/utils/currency_format.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
 import '../stress_test_models.dart';
 import '../stress_test_naming.dart';
@@ -35,6 +36,7 @@ class _StressTestAllocationChartState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final session = widget.session;
     final holdings = session.holdings;
     final isEmpty = holdings.isEmpty;
@@ -88,7 +90,7 @@ class _StressTestAllocationChartState
                 child: Row(
                   children: [
                     Text(
-                      'PORTFOLIO BALANCE',
+                      l10n.portfolioBalanceLabel,
                       style: FomoShieldTheme.cardTitle(),
                     ),
                     const Spacer(),
@@ -145,7 +147,7 @@ class _StressTestAllocationChartState
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'BALANCE',
+                            l10n.balanceRingLabel,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -249,8 +251,10 @@ class _StressTestAllocationChartState
                           child: Center(
                             child: Text(
                               _showAll
-                                  ? 'Less'
-                                  : 'More (${invested.length - _legendPreviewLimit})',
+                                  ? l10n.commonLess
+                                  : l10n.commonMoreCount(
+                                      invested.length - _legendPreviewLimit,
+                                    ),
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,

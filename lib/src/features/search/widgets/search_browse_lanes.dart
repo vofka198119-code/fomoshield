@@ -109,13 +109,13 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           for (final sector in GicsSector.values)
             if (bySector[sector] != null)
               BrowseLane(
-                title: sector.label.toUpperCase(),
+                title: sector.localizedLabel(l10n).toUpperCase(),
                 items: _cards(
                   bySector[sector]!.take(_lanePreviewCount).toList(),
                 ),
                 onSeeAll: () => showCompanyListSheet(
                   context,
-                  sector.label.toUpperCase(),
+                  sector.localizedLabel(l10n).toUpperCase(),
                   bySector[sector]!,
                   onTapSymbol: widget.onTapSymbol,
                 ),

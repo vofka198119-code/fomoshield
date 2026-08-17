@@ -123,7 +123,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   size: 20,
                 ),
                 label: Text(
-                  'Add widgets',
+                  AppLocalizations.of(context)!.homeAddWidgets,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

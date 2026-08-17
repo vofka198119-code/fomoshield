@@ -17,6 +17,7 @@ import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
 import '../../features/stress_test/psychology_engine.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../utils/currency_format.dart';
 
 /// Data for the Psychology Meter.
@@ -217,7 +218,10 @@ class PsychologyMeter extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text('PSYCHOLOGY METER', style: FomoShieldTheme.cardTitle()),
+                  Text(
+                    AppLocalizations.of(context)!.stressTestPsychologyMeterTitle,
+                    style: FomoShieldTheme.cardTitle(),
+                  ),
                   const SizedBox(width: 6),
                   GestureDetector(
                     onTap: () => context.push('/metric-info/investor-score'),
@@ -287,24 +291,25 @@ class PsychologyAnalyticsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _statRow('Total Trades', '${data.totalTrades}'),
-        _statRow('Trades Buy', '${data.buyTrades}'),
-        _statRow('Trades Sell', '${data.sellTrades}'),
-        _statRow('Holdings', '${data.holdingCount}'),
+        _statRow(l10n.stressTestAnalyticsTotalTrades, '${data.totalTrades}'),
+        _statRow(l10n.stressTestAnalyticsTradesBuy, '${data.buyTrades}'),
+        _statRow(l10n.stressTestAnalyticsTradesSell, '${data.sellTrades}'),
+        _statRow(l10n.stressTestWidgetHoldings, '${data.holdingCount}'),
         _statRow('ETF', '${data.etfCount}'),
-        _statRow('Epochs', '${data.epochsPassed}'),
+        _statRow(l10n.stressTestWidgetEpochs, '${data.epochsPassed}'),
         _statRow(
-          'Unrealized P&L',
+          l10n.stressTestAnalyticsUnrealizedPnl,
           formatUsdSigned(data.unrealizedPnl),
           valueColor: data.unrealizedPnl >= 0
               ? FomoShieldTheme.positive
               : FomoShieldTheme.negative,
         ),
         _statRow(
-          'Realized P&L',
+          l10n.stressTestAnalyticsRealizedPnl,
           formatUsdSigned(data.realizedPnl),
           valueColor: data.realizedPnl >= 0
               ? FomoShieldTheme.positive
@@ -361,14 +366,18 @@ class _PsychologyMeterBody extends StatelessWidget {
     // Strategy Score / Psychology Score circles + Discipline/Panic/
     // Patience/Strategy/Diversification cards are for).
     final avgScore = (data.psychologicalScore + data.strategicScore) / 2;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       children: [
         FsScoreRing(score: avgScore),
         const SizedBox(height: 20),
-        _SubIndexRow(label: 'Strategy Score', value: data.strategicScore / 100),
         _SubIndexRow(
-          label: 'Psychology Score',
+          label: l10n.stressTestStrategyScore,
+          value: data.strategicScore / 100,
+        ),
+        _SubIndexRow(
+          label: l10n.stressTestPsychologyScore,
           value: data.psychologicalScore / 100,
           isLast: true,
         ),
@@ -460,7 +469,7 @@ class FsScoreRing extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'SCORE',
+                          AppLocalizations.of(context)!.stressTestScoreLabel,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
                             fontSize: 10,

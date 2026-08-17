@@ -215,6 +215,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get premiumBenefitAdFree => 'Без рекламы';
 
   @override
+  String get tradeBuy => 'ПОКУПКА';
+
+  @override
+  String get tradeSell => 'ПРОДАЖА';
+
+  @override
+  String get disclaimerFooter =>
+      'Дисклеймер: F.O.M.O. Shield создан исключительно в образовательных и развлекательных целях. Мы не являемся зарегистрированными инвестиционными консультантами. Все торговые решения принимаются исключительно на ваш страх и риск. Результаты в прошлом не гарантируют результатов в будущем.';
+
+  @override
   String get homeAddWidgets => 'Добавить виджеты';
 
   @override
@@ -344,6 +354,345 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get stressTestHubTitle => 'СТРЕСС-ТЕСТ';
+
+  @override
+  String get stressTestCompletedTestsSheetTitle => 'Завершённые тесты';
+
+  @override
+  String get stressTestActiveTestsTitle => 'АКТИВНЫЕ ТЕСТЫ';
+
+  @override
+  String get stressTestCompletedTestsTitle => 'ЗАВЕРШЁННЫЕ ТЕСТЫ';
+
+  @override
+  String get stressTestNoCompletedTestsYet => 'Завершённых тестов пока нет';
+
+  @override
+  String get stressTestNoTestsYet => 'Стресс-тестов пока нет';
+
+  @override
+  String get stressTestNoTestsHint =>
+      'Нажмите кнопку выше, чтобы начать первый тест';
+
+  @override
+  String get stressTestNewTest => 'Новый стресс-тест';
+
+  @override
+  String stressTestActiveCountFree(int active, int max) {
+    return '$active/$max активно · Premium = до 5 одновременно';
+  }
+
+  @override
+  String get stressTestEmotionalResilience =>
+      'Проверьте свою устойчивость к эмоциям';
+
+  @override
+  String get stressTestLimitReachedTitle => 'Достигнут лимит стресс-тестов';
+
+  @override
+  String get stressTestMaxSessionsReached => 'Достигнут лимит активных тестов';
+
+  @override
+  String stressTestArchiveSummary(String amount, int holdings, int trades) {
+    return 'Итог: $amount · $holdings активов · $trades сделок';
+  }
+
+  @override
+  String get stressTestSessionNotFound => 'Сессия не найдена';
+
+  @override
+  String get stressTestSetupTitle => 'Настройка стресс-теста';
+
+  @override
+  String get stressTestDurationSectionTitle => 'ДЛИТЕЛЬНОСТЬ ТЕСТА';
+
+  @override
+  String get stressTestStartButton => 'НАЧАТЬ СТРЕСС-ТЕСТ';
+
+  @override
+  String get stressTestSlot1Free =>
+      'Слот 1/2 бесплатно · Premium — до 5 сразу и без рекламы';
+
+  @override
+  String get stressTestSlot2Free =>
+      'Слот 2/2 бесплатно · Premium — до 5 сразу, без рекламы';
+
+  @override
+  String get stressTestAvailableCash => 'Доступные средства';
+
+  @override
+  String stressTestOfTotal(String amount) {
+    return 'из $amount всего';
+  }
+
+  @override
+  String stressTestCustomDays(int days) {
+    return 'Свой вариант ($days дн.)';
+  }
+
+  @override
+  String get stressTestInfiniteMinWeeks => 'Бесконечный — мин. 2 недели';
+
+  @override
+  String get stressTestPremiumFeatureTitle => 'Премиум-функция';
+
+  @override
+  String get stressTestPremiumFeatureBody =>
+      'Эта длительность теста доступна только подписчикам Premium. Перейдите на Premium, чтобы открыть неограниченные возможности.';
+
+  @override
+  String get stressTestUpgradeToPremium => 'Перейти на Premium';
+
+  @override
+  String get stressTestNotNow => 'Не сейчас';
+
+  @override
+  String get stressTestCustomDurationTitle => 'Своя длительность теста';
+
+  @override
+  String get stressTestCustomDurationWarning =>
+      'После запуска тест со своей длительностью нельзя прервать или остановить досрочно. Симуляция будет выполняться весь выбранный ниже период.';
+
+  @override
+  String stressTestDaysCount(int days) {
+    return '$days дн.';
+  }
+
+  @override
+  String get stressTestMinDays => 'Мин.: 5 дней';
+
+  @override
+  String get stressTestMaxDays => 'Макс.: 365 дней';
+
+  @override
+  String get commonApply => 'Применить';
+
+  @override
+  String get stressTestPremiumFeatureAllCaps => 'ПРЕМИУМ-ФУНКЦИЯ';
+
+  @override
+  String get stressTestRiskDisclaimerTitle => 'РИСКИ И ДИСКЛЕЙМЕР СИМУЛЯЦИИ';
+
+  @override
+  String get stressTestScrollToAgree =>
+      'Прокрутите до конца, чтобы согласиться';
+
+  @override
+  String get stressTestReadFullDisclaimer =>
+      'Вы прочитали дисклеймер полностью';
+
+  @override
+  String get stressTestIAgreeStart => 'Согласен — начать тест';
+
+  @override
+  String get stressTestDisclaimerIntro =>
+      'Этот стресс-тест использует специализированный алгоритмический движок, который симулирует экстремальные рыночные сценарии, включая затяжные медвежьи тренды, системные кризисы и полные обвалы финансовых рынков.';
+
+  @override
+  String get stressTestDisclaimerAck =>
+      'Перед началом симуляции, пожалуйста, прочитайте и подтвердите следующее:';
+
+  @override
+  String get stressTestBulletScenarios =>
+      'Симулированные сценарии — обвалы, кризисы и рыночные движения, генерируемые движком, являются гипотетическими математическими моделями. Они предназначены для проверки устойчивости портфеля в стрессовых условиях и не являются прогнозом реального поведения рынка.';
+
+  @override
+  String get stressTestBulletNotAdvice =>
+      'Это не финансовая консультация — итоговый вердикт, аналитика и любые выводы, сделанные по результатам этого теста, предназначены только для информационных и образовательных целей. Они не являются персональной инвестиционной консультацией, рекомендацией покупать или продавать активы, а также любой формой финансового предложения.';
+
+  @override
+  String get stressTestBulletObjective =>
+      'Объективная математическая оценка — итоговый вердикт и баллы формируются автоматически. Наш движок построен на признанных научных методах (включая симуляцию Монте-Карло, анализ хвостовых рисков и современные модели стресс-тестирования портфеля). Алгоритм полностью независим: он исключает человеческую предвзятость, эмоции и коммерческие интересы третьих сторон. Тем не менее важно помнить, что любая математическая модель имеет свои ограничения и не может предсказать абсолютно каждый реальный рыночный сценарий.';
+
+  @override
+  String get stressTestBulletLiability =>
+      'Ограничение ответственности — положительный результат теста (то есть успешное «выживание» вашего портфеля при симулированном обвале рынка) не гарантирует аналогичного результата в реальных условиях. Платформа и её разработчики не несут ответственности за ваши инвестиционные решения, а также за любые прямые или косвенные убытки, включая, помимо прочего, потерю капитала на реальных рынках.';
+
+  @override
+  String get stressTestBulletPastPerformance =>
+      'Прошлые результаты в этом симуляторе не гарантируют, не прогнозируют и не отражают реальные рыночные результаты. Любая торговая деятельность в реальной жизни сопряжена с существенным риском и осуществляется исключительно по вашему собственному усмотрению и под вашу ответственность.';
+
+  @override
+  String get stressTestEndOfDisclaimer => '▸ Конец дисклеймера';
+
+  @override
+  String get stressTestUnlimitedTesting => 'Неограниченное тестирование';
+
+  @override
+  String get stressTestInfiniteUpsellBody =>
+      'Стресс-тест с бесконечной длительностью доступен исключительно подписчикам Premium. Перейдите на Premium, чтобы получить:';
+
+  @override
+  String get stressTestUpsellUnlimitedDuration =>
+      'Неограниченную длительность теста';
+
+  @override
+  String get stressTestUpsellFullCrashScenarios =>
+      'Полные сценарии обвала рынка';
+
+  @override
+  String get stressTestUpsellAdvancedAnalytics =>
+      'Расширенную аналитику портфеля';
+
+  @override
+  String get stressTestAccessTitle => 'Доступ к стресс-тесту';
+
+  @override
+  String get stressTestPortfolioTitle => 'ПОРТФЕЛЬ СТРЕСС-ТЕСТА';
+
+  @override
+  String get stressTestNotStartedYet => 'Тест ещё не начат';
+
+  @override
+  String get stressTestGoBackToSetup =>
+      'Вернитесь к настройке и запустите тест';
+
+  @override
+  String get stressTestGoToSetup => 'К настройке';
+
+  @override
+  String get stressTestStartBuildingPortfolio => 'Начните собирать портфель';
+
+  @override
+  String get stressTestTapToAddFirstPosition =>
+      'Нажмите +, чтобы найти акции\nи добавить первую позицию.';
+
+  @override
+  String get stressTestSearchStocksHint => 'Найти акции для добавления...';
+
+  @override
+  String get stressTestGetVerdict => 'ПОЛУЧИТЬ ВЕРДИКТ ПСИХОЛОГА';
+
+  @override
+  String get stressTestNoAssetsYet => 'Активов пока нет';
+
+  @override
+  String get stressTestNoActivePositions => 'Нет активных позиций';
+
+  @override
+  String get stressTestTapToAddFirstAsset =>
+      'Нажмите +, чтобы найти и добавить первый актив';
+
+  @override
+  String get stressTestTapToBuyAssets => 'Нажмите (+), чтобы купить активы';
+
+  @override
+  String get stressTestTestComplete => 'Тест завершён';
+
+  @override
+  String get stressTestTimeRemaining => 'Осталось времени';
+
+  @override
+  String get stressTestElapsedTime => 'Прошло времени';
+
+  @override
+  String stressTestCountdown(
+    String days,
+    String hours,
+    String minutes,
+    String seconds,
+  ) {
+    return '$daysд $hoursч $minutesм $secondsс';
+  }
+
+  @override
+  String stressTestEpochNumber(int number) {
+    return 'Эпоха #$number';
+  }
+
+  @override
+  String get stressTestFinishTestButton => 'ЗАВЕРШИТЬ ТЕСТ';
+
+  @override
+  String get stressTestFinishTest => 'Завершить тест';
+
+  @override
+  String get stressTestFinishTestConfirm =>
+      'Завершить тест сейчас и получить вердикт? Это действие нельзя отменить.';
+
+  @override
+  String get stressTestFinalBalance => 'ИТОГОВЫЙ БАЛАНС';
+
+  @override
+  String get stressTestViewVerdict => 'ПОСМОТРЕТЬ ВЕРДИКТ ПСИХОЛОГА';
+
+  @override
+  String get stressTestWidgetPortfolioBalance => 'Баланс портфеля';
+
+  @override
+  String get stressTestWidgetCashAvailable => 'Доступные средства';
+
+  @override
+  String get stressTestWidgetPsychologyMeter => 'Индикатор психологии';
+
+  @override
+  String get stressTestWidgetHoldings => 'Активы';
+
+  @override
+  String get stressTestWidgetPriceChart => 'График цены';
+
+  @override
+  String get stressTestWidgetEpochs => 'Эпохи';
+
+  @override
+  String get stressTestWidgetTradeHistory => 'История сделок';
+
+  @override
+  String get stressTestWidgetLimitOrders => 'Мои лимитные ордера';
+
+  @override
+  String get stressTestWidgetTimer => 'Таймер';
+
+  @override
+  String get stressTestInvestmentDisclaimerTitle =>
+      'ИНВЕСТИЦИОННЫЙ ДИСКЛЕЙМЕР\nИ ОГРАНИЧЕНИЕ ОТВЕТСТВЕННОСТИ';
+
+  @override
+  String get stressTestInvestmentDisclaimerBody =>
+      'Этот вердикт формируется автоматически математической моделью исключительно на основе вашего смоделированного исторического поведения в этой закрытой тестовой среде. Он предоставляется только в образовательных и иллюстративных целях и НЕ является персональной инвестиционной, юридической или финансовой консультацией. Прошлые результаты в этом симуляторе не гарантируют, не прогнозируют и не отражают реальные рыночные результаты. Итоговые финансовые решения, покупка активов или торговая деятельность в реальной жизни сопряжены с существенным риском и осуществляются исключительно по вашему собственному усмотрению и под вашу ответственность. Создатели F.O.M.O. Shield не несут ответственности за финансовые убытки, понесённые при реальной торговле.';
+
+  @override
+  String get stressTestIUnderstandAccept => 'Понимаю и принимаю';
+
+  @override
+  String get stressTestPsychologyMeterTitle => 'ИНДИКАТОР ПСИХОЛОГИИ';
+
+  @override
+  String get stressTestStrategyScore => 'Стратегия';
+
+  @override
+  String get stressTestPsychologyScore => 'Психология';
+
+  @override
+  String get stressTestScoreLabel => 'БАЛЛ';
+
+  @override
+  String get stressTestAnalyticsTotalTrades => 'Всего сделок';
+
+  @override
+  String get stressTestAnalyticsTradesBuy => 'Покупки';
+
+  @override
+  String get stressTestAnalyticsTradesSell => 'Продажи';
+
+  @override
+  String get stressTestAnalyticsUnrealizedPnl => 'Нереализ. P&L';
+
+  @override
+  String get stressTestAnalyticsRealizedPnl => 'Реализ. P&L';
+
+  @override
+  String get stressTestPriceChartTitle => 'ГРАФИК ЦЕНЫ';
+
+  @override
+  String get stressTestChartNotEnoughData => 'Пока недостаточно данных';
+
+  @override
+  String get stressTestChartNotEnoughDataForPeriod =>
+      'Недостаточно данных за этот период';
+
+  @override
   String get searchTitle => 'ПОИСК';
 
   @override
@@ -461,6 +810,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonFailedToLoad => 'Не удалось загрузить';
 
   @override
+  String get commonOther => 'Прочее';
+
+  @override
   String get commonLess => 'Свернуть';
 
   @override
@@ -514,4 +866,52 @@ class AppLocalizationsRu extends AppLocalizations {
   String myLimitOrdersSeeAll(int count) {
     return 'Показать все ордера ($count)';
   }
+
+  @override
+  String get gicsSectorTechnology => 'Технологии';
+
+  @override
+  String get gicsSectorFinancials => 'Финансы';
+
+  @override
+  String get gicsSectorHealthCare => 'Здравоохранение';
+
+  @override
+  String get gicsSectorConsumerDiscretionary => 'Потребительский цикл.';
+
+  @override
+  String get gicsSectorConsumerStaples => 'Потребительские товары';
+
+  @override
+  String get gicsSectorEnergy => 'Энергетика';
+
+  @override
+  String get gicsSectorIndustrials => 'Промышленность';
+
+  @override
+  String get gicsSectorMaterials => 'Материалы';
+
+  @override
+  String get gicsSectorCommunicationServices => 'Телекоммуникации';
+
+  @override
+  String get gicsSectorRealEstate => 'Недвижимость';
+
+  @override
+  String get gicsSectorUtilities => 'Коммунальные услуги';
+
+  @override
+  String get testDuration1Week => '1 неделя';
+
+  @override
+  String get testDuration1Month => '1 месяц';
+
+  @override
+  String get testDuration3Months => '3 месяца';
+
+  @override
+  String get testDurationInfinite => 'Бесконечный';
+
+  @override
+  String get testDurationCustom => 'Свой вариант';
 }

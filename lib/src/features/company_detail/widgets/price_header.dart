@@ -4,6 +4,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../market_clock/market_clock_dial.dart'
@@ -150,7 +151,7 @@ class PriceHeader extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            sector.label,
+                            sector.localizedLabel(AppLocalizations.of(context)!),
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,

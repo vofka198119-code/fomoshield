@@ -32,6 +32,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/utils/currency_format.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../stress_test_engine.dart';
@@ -212,7 +213,10 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+            child: Text(
+              AppLocalizations.of(context)!.stressTestPriceChartTitle,
+              style: FomoShieldTheme.cardTitle(),
+            ),
           ),
           const SizedBox(height: 10),
           Padding(
@@ -283,11 +287,12 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
   }
 
   Widget _buildChartArea() {
+    final l10n = AppLocalizations.of(context)!;
     final points = _getPoints();
     if (points.length < 2) {
       return Center(
         child: Text(
-          'Not enough data yet',
+          l10n.stressTestChartNotEnoughData,
           style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
         ),
       );
@@ -313,7 +318,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
       if (filtered.length < 2) {
         return Center(
           child: Text(
-            'Not enough data for this period',
+            l10n.stressTestChartNotEnoughDataForPeriod,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,
@@ -340,7 +345,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
       if (filtered.length < 2) {
         return Center(
           child: Text(
-            'Not enough data for this period',
+            l10n.stressTestChartNotEnoughDataForPeriod,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,

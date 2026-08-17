@@ -14,6 +14,7 @@ import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import '../../shared/utils/currency_format.dart';
@@ -67,7 +68,9 @@ class StressTestHubScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Completed Tests',
+                  AppLocalizations.of(
+                    sheetContext,
+                  )!.stressTestCompletedTestsSheetTitle,
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -107,6 +110,7 @@ class StressTestHubScreen extends ConsumerWidget {
         .where((s) => s.status == StressTestStatus.active)
         .toList();
     final archive = ref.watch(verdictArchiveProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -114,7 +118,7 @@ class StressTestHubScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'STRESS TEST',
+          l10n.stressTestHubTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -136,7 +140,7 @@ class StressTestHubScreen extends ConsumerWidget {
             // ── Active Sessions ─────────────────────────────────────
             if (activeSessions.isNotEmpty) ...[
               WidgetContainer(
-                title: 'ACTIVE TESTS',
+                title: l10n.stressTestActiveTestsTitle,
                 showFooter: false,
                 children: activeSessions
                     .asMap()
@@ -152,7 +156,7 @@ class StressTestHubScreen extends ConsumerWidget {
 
             // ── Verdict Archive (WidgetContainer — always visible) ─
             WidgetContainer(
-              title: 'COMPLETED TESTS',
+              title: l10n.stressTestCompletedTestsTitle,
               onTap: archive.length > _archivePreviewLimit
                   ? () => _showAllArchiveSheet(context, archive)
                   : null,
@@ -170,7 +174,7 @@ class StressTestHubScreen extends ConsumerWidget {
                         ),
                         child: Center(
                           child: Text(
-                            'No completed tests yet',
+                            l10n.stressTestNoCompletedTestsYet,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: ThemeV2.textSecondary,
@@ -195,7 +199,7 @@ class StressTestHubScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'No stress tests yet',
+                      l10n.stressTestNoTestsYet,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -204,7 +208,7 @@ class StressTestHubScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Tap the button above to start your first test',
+                      l10n.stressTestNoTestsHint,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: ThemeV2.textSecondary,
@@ -232,6 +236,7 @@ class StressTestHubScreen extends ConsumerWidget {
     final maxSessions = ref.read(maxStressTestSessionsProvider);
     final tier = ref.read(subscriptionTierProvider);
     final isFree = tier == SubscriptionTier.free;
+    final l10n = AppLocalizations.of(context)!;
 
     return InkWell(
       onTap: () => _startNewTest(context, ref),
@@ -269,7 +274,7 @@ class StressTestHubScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'New Stress Test',
+                    l10n.stressTestNewTest,
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -279,8 +284,11 @@ class StressTestHubScreen extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     isFree
-                        ? '$activeCount/$maxSessions active · Premium = 5 at once'
-                        : 'Test your emotional resilience',
+                        ? l10n.stressTestActiveCountFree(
+                            activeCount,
+                            maxSessions,
+                          )
+                        : l10n.stressTestEmotionalResilience,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: Colors.white70,
@@ -298,7 +306,7 @@ class StressTestHubScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  'PREMIUM',
+                  l10n.profilePremiumBadge,
                   style: GoogleFonts.inter(
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -332,10 +340,11 @@ class StressTestHubScreen extends ConsumerWidget {
     // premium: 5 at once) — no lifetime cap. Completing or deleting a
     // test frees its slot for a new one.
     if (activeCount >= maxSessions) {
+      final l10n = AppLocalizations.of(context)!;
       if (tier == SubscriptionTier.free) {
         showPremiumPromoOverlay(
           context: context,
-          title: 'Stress test limit reached',
+          title: l10n.stressTestLimitReachedTitle,
           durationSeconds: 5,
           onComplete: () {
             if (context.mounted) showMonetizationModal(context, ref);
@@ -343,7 +352,7 @@ class StressTestHubScreen extends ConsumerWidget {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Maximum active test sessions reached')),
+          SnackBar(content: Text(l10n.stressTestMaxSessionsReached)),
         );
       }
       return;
@@ -382,7 +391,7 @@ class StressTestHubScreen extends ConsumerWidget {
             borderRadius: BorderRadius.circular(5),
           ),
           child: Text(
-            'GO PREMIUM',
+            AppLocalizations.of(context)!.stressTestGoPremium,
             style: GoogleFonts.inter(
               fontSize: 8,
               fontWeight: FontWeight.w700,
@@ -398,7 +407,7 @@ class StressTestHubScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
-        'premium',
+        AppLocalizations.of(context)!.stressTestPremiumLowercase,
         style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w700,
@@ -436,6 +445,7 @@ class StressTestHubScreen extends ConsumerWidget {
     // same fix on the main Portfolio Balance card. Confirmed 2026-08-07.
     final plDollar = session.unrealizedPnl;
     final plColor = plDollar >= 0 ? ThemeV2.success : ThemeV2.loss;
+    final l10n = AppLocalizations.of(context)!;
 
     return InkWell(
       key: ValueKey('st_${session.id}'),
@@ -462,7 +472,9 @@ class StressTestHubScreen extends ConsumerWidget {
                 children: [
                   Flexible(
                     child: Text(
-                      'Active — ${session.duration.displayName}',
+                      l10n.stressTestActiveLabel(
+                        session.duration.localizedLabel(l10n),
+                      ),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -510,6 +522,7 @@ class StressTestHubScreen extends ConsumerWidget {
 
   Widget _buildArchiveTile(BuildContext context, VerdictArchiveEntry entry) {
     final pnlColor = entry.pnlPercent >= 0 ? ThemeV2.success : ThemeV2.loss;
+    final l10n = AppLocalizations.of(context)!;
 
     return InkWell(
       key: ValueKey('archive_${entry.sessionId}'),
@@ -548,7 +561,11 @@ class StressTestHubScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Final: ${formatUsd(entry.finalValue)} · ${entry.holdingCount} holdings · ${entry.totalTrades} trades',
+                    l10n.stressTestArchiveSummary(
+                      formatUsd(entry.finalValue),
+                      entry.holdingCount,
+                      entry.totalTrades,
+                    ),
                     style: interNums(
                       fontSize: 11,
                       color: ThemeV2.textSecondary,

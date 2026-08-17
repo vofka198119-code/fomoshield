@@ -21,6 +21,7 @@ import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../../shared/utils/currency_format.dart';
 
@@ -93,7 +94,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         if (showAd) {
           showPremiumPromoOverlay(
             context: context,
-            title: 'Stress test access',
+            title: AppLocalizations.of(context)!.stressTestAccessTitle,
             durationSeconds: 5,
             onComplete: () {
               if (context.mounted) showMonetizationModal(context, ref);
@@ -184,6 +185,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   /// the Holdings widget's "+" mechanic (same _openAddAssetSheet target),
   /// just more discoverable for first-time users than the small icon.
   Widget _buildQuickAddSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: _openAddAssetSheet,
       child: Container(
@@ -196,7 +198,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             Icon(Icons.search_rounded, color: ThemeV2.textSecondary, size: 20),
             const SizedBox(width: 10),
             Text(
-              'Search stocks to add...',
+              l10n.stressTestSearchStocksHint,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: ThemeV2.textSecondary,
@@ -264,6 +266,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       },
     );
     final session = ref.watch(stressTestSessionProvider(widget.sessionId));
+    final l10n = AppLocalizations.of(context)!;
     if (session == null) {
       return Scaffold(
         backgroundColor: Colors.transparent,
@@ -272,7 +275,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           toolbarHeight: 64,
           centerTitle: true,
           title: Text(
-            'STRESS TEST PORTFOLIO',
+            l10n.stressTestPortfolioTitle,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -281,7 +284,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             ),
           ),
         ),
-        body: const Center(child: Text('Session not found')),
+        body: Center(child: Text(l10n.stressTestSessionNotFound)),
       );
     }
 
@@ -295,7 +298,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         toolbarHeight: 64,
         centerTitle: true,
         title: Text(
-          'STRESS TEST PORTFOLIO',
+          l10n.stressTestPortfolioTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -332,6 +335,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // ── Setup View ───────────────────────────────────────────────────
 
   Widget _buildSetupView(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -343,7 +347,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Test not started yet',
+            l10n.stressTestNotStartedYet,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -352,7 +356,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Go back to setup and start the test',
+            l10n.stressTestGoBackToSetup,
             style: GoogleFonts.inter(
               fontSize: 14,
               color: ThemeV2.textSecondary,
@@ -362,7 +366,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ElevatedButton(
             onPressed: () =>
                 context.push('/stress-test/${widget.sessionId}/setup'),
-            child: const Text('Go to Setup'),
+            child: Text(l10n.stressTestGoToSetup),
           ),
         ],
       ),
@@ -372,6 +376,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // ── Startup Empty View — shown when no trades have been made yet ──
 
   Widget _buildActiveEmptyView() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -396,7 +401,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Start Building Your Portfolio',
+              l10n.stressTestStartBuildingPortfolio,
               style: GoogleFonts.inter(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -406,7 +411,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Tap the + button to search stocks\nand add your first position.',
+              l10n.stressTestTapToAddFirstPosition,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -444,6 +449,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   }
 
   Widget _buildActiveView(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     final isExpired = _isExpired(session);
     final widgetConfigs = ref.watch(
       stressTestWidgetOrderProvider(widget.sessionId),
@@ -495,7 +501,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                           ),
                         ),
                         child: Text(
-                          'GET PSYCHOLOGIST VERDICT',
+                          l10n.stressTestGetVerdict,
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w800,
                             fontSize: 14,
@@ -526,7 +532,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                         size: 20,
                       ),
                       label: Text(
-                        'Add widgets',
+                        l10n.homeAddWidgets,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -565,6 +571,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   /// Dispatch method — builds a widget by its config id.
   /// Returns [SizedBox.shrink] if the widget's conditions aren't met.
   Widget _buildWidgetById(String id, StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     switch (id) {
       case 'allocation_chart':
         return StressTestAllocationChart(session: session);
@@ -610,7 +617,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         final allTrades = session.trades.reversed.toList();
         final displayTrades = allTrades.take(5).toList();
         return _buildSectionCard(
-          title: 'TRADE HISTORY',
+          title: l10n.tradeHistoryTitle,
           noInnerPadding: true,
           child: Column(
             children: [
@@ -649,7 +656,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        'More (${allTrades.length - 5})',
+                        l10n.commonMoreCount(allTrades.length - 5),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -768,6 +775,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // Always wrapped in _buildSectionCard with a (+) add button in header.
 
   Widget _buildMyAssets(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     final holdings = session.holdings;
 
     // Sort same as allocation chart — by value descending
@@ -796,7 +804,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     final displayList = _showAllAssets ? sorted : sorted.take(10).toList();
 
     return _buildSectionCard(
-      title: 'HOLDINGS',
+      title: l10n.holdingsTitle,
       trailing: addButton,
       noInnerPadding: true,
       child: holdings.isEmpty
@@ -807,8 +815,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   children: [
                     Text(
                       session.trades.isEmpty
-                          ? 'No assets yet'
-                          : 'No active positions',
+                          ? l10n.stressTestNoAssetsYet
+                          : l10n.stressTestNoActivePositions,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -818,8 +826,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     const SizedBox(height: 4),
                     Text(
                       session.trades.isEmpty
-                          ? 'Tap + to search and add your first asset'
-                          : 'Tap (+) to buy assets',
+                          ? l10n.stressTestTapToAddFirstAsset
+                          : l10n.stressTestTapToBuyAssets,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: ThemeV2.textSecondary,
@@ -942,7 +950,9 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      '${h.shares.toStringAsFixed(2)} shares',
+                                      l10n.sharesCount(
+                                        h.shares.toStringAsFixed(2),
+                                      ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.inter(
@@ -1008,8 +1018,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                       child: Center(
                         child: Text(
                           _showAllAssets
-                              ? 'Less'
-                              : 'More (${sorted.length - 10})',
+                              ? l10n.commonLess
+                              : l10n.commonMoreCount(sorted.length - 10),
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -1031,6 +1041,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 
   Widget _buildTimerBar(StressTestSession session) {
     if (session.startedAt == null) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
 
     final now = DateTime.now();
     final total = _getTestDuration(session);
@@ -1045,31 +1056,39 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     Color timerColor;
 
     if (isExpiredTimer) {
-      label = 'Test Complete';
-      timeText = '0d 00h 00m 00s';
+      label = l10n.stressTestTestComplete;
+      timeText = l10n.stressTestCountdown('0', '00', '00', '00');
       timerColor = ThemeV2.loss;
     } else if (isCountdown && remaining != null) {
-      label = 'Time Remaining';
+      label = l10n.stressTestTimeRemaining;
       timerColor = ThemeV2.textPrimary;
       final d = remaining.inDays;
       final h = remaining.inHours % 24;
       final m = remaining.inMinutes % 60;
       final s = remaining.inSeconds % 60;
-      timeText =
-          '${d}d ${h.toString().padLeft(2, '0')}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
+      timeText = l10n.stressTestCountdown(
+        '$d',
+        h.toString().padLeft(2, '0'),
+        m.toString().padLeft(2, '0'),
+        s.toString().padLeft(2, '0'),
+      );
       if (remaining.inDays < 1) timerColor = ThemeV2.warning;
       if (remaining.inHours < 1) timerColor = ThemeV2.loss;
     } else {
       // Infinite with no expiry — show elapsed
-      label = 'Elapsed Time';
+      label = l10n.stressTestElapsedTime;
       timerColor = ThemeV2.textPrimary;
       final elapsed = now.difference(session.startedAt!);
       final d = elapsed.inDays;
       final h = elapsed.inHours % 24;
       final m = elapsed.inMinutes % 60;
       final s = elapsed.inSeconds % 60;
-      timeText =
-          '${d}d ${h.toString().padLeft(2, '0')}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
+      timeText = l10n.stressTestCountdown(
+        '$d',
+        h.toString().padLeft(2, '0'),
+        m.toString().padLeft(2, '0'),
+        s.toString().padLeft(2, '0'),
+      );
     }
 
     // Infinite ("until bored") past its 14-day minimum: the countdown is
@@ -1142,7 +1161,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   session.epochHistory.isNotEmpty &&
                   session.startedAt != null)
                 Text(
-                  'Epoch #${session.epochHistory.length}',
+                  l10n.stressTestEpochNumber(session.epochHistory.length),
                   style: interNums(
                     fontSize: 11,
                     color: ThemeV2.textSecondary,
@@ -1166,7 +1185,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   ),
                 ),
                 child: Text(
-                  'FINISH TEST',
+                  l10n.stressTestFinishTestButton,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
@@ -1184,13 +1203,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // ── Finish Test (Infinite mode manual completion) ──────────────────
 
   void _confirmFinishInfiniteTest(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ThemeV2.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Finish Test?',
+          '${l10n.stressTestFinishTest}?',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -1198,14 +1218,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
         ),
         content: Text(
-          "End this test now and get your verdict? This can't be undone.",
+          l10n.stressTestFinishTestConfirm,
           style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Cancel',
+              l10n.profileCancel,
               style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
@@ -1220,7 +1240,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
               }
             },
             child: Text(
-              'Finish Test',
+              l10n.stressTestFinishTest,
               style: GoogleFonts.inter(
                 color: ThemeV2.primary,
                 fontWeight: FontWeight.w600,
@@ -1235,6 +1255,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // ── Completed View ─────────────────────────────────────────────
 
   Widget _buildCompletedView(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -1268,7 +1289,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'FINAL BALANCE',
+                        l10n.stressTestFinalBalance,
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -1322,7 +1343,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 ),
               ),
               child: Text(
-                'VIEW PSYCHOLOGIST VERDICT',
+                l10n.stressTestViewVerdict,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w800,
                   fontSize: 14,
@@ -1404,6 +1425,7 @@ class _StressTestWidgetSettingsSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -1431,7 +1453,7 @@ class _StressTestWidgetSettingsSheetState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Widget Settings',
+                    l10n.homeWidgetSettingsTitle,
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -1454,7 +1476,7 @@ class _StressTestWidgetSettingsSheetState
                       });
                     },
                     child: Text(
-                      'Reset',
+                      l10n.homeReset,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -1522,7 +1544,7 @@ class _StressTestWidgetSettingsSheetState
                       ],
                     ),
                     title: Text(
-                      config.displayName,
+                      config.displayName(l10n),
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -1594,6 +1616,7 @@ class _DisclaimerModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     bool accepted = false;
+    final l10n = AppLocalizations.of(context)!;
 
     return StatefulBuilder(
       builder: (context, setState) => Padding(
@@ -1615,7 +1638,7 @@ class _DisclaimerModal extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'INVESTMENT DISCLAIMER\n& LIMITATION OF LIABILITY',
+              l10n.stressTestInvestmentDisclaimerTitle,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
@@ -1625,16 +1648,7 @@ class _DisclaimerModal extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'This verdict is generated automatically by a mathematical model based '
-              'solely on your simulated historical behavior within this closed testing '
-              'environment. It is provided for educational and illustrative purposes '
-              'only and does NOT constitute personalized investment, legal, or financial '
-              'advice. Past performance within this simulator does not guarantee, predict, '
-              'or reflect real-world market outcomes. Final financial decisions, asset '
-              'purchases, or trading activities in real life carry substantial risk and '
-              'are made solely at your own discretion and responsibility. The creators of '
-              'F.O.M.O. Shield accept no liability for financial losses incurred in '
-              'real-world trading.',
+              l10n.stressTestInvestmentDisclaimerBody,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 color: ThemeV2.textSecondary,
@@ -1656,7 +1670,7 @@ class _DisclaimerModal extends ConsumerWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'I Understand & Accept',
+                      l10n.stressTestIUnderstandAccept,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

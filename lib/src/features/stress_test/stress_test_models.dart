@@ -7,6 +7,7 @@
 
 import 'dart:math';
 import '../../core/services/gics_sector_mapper.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'psychology_profile.dart';
 
 export 'psychology_profile.dart';
@@ -37,7 +38,9 @@ enum TestDuration {
     };
   }
 
-  /// Display name for the UI.
+  /// Display name for the UI. English-only — for non-UI callers (engine/
+  /// notification text) that have no [BuildContext]. UI call sites should
+  /// use [localizedLabel] instead.
   String get displayName {
     return switch (this) {
       TestDuration.week1 => '1 Week',
@@ -45,6 +48,18 @@ enum TestDuration {
       TestDuration.months3 => '3 Months',
       TestDuration.infinite => 'Infinite',
       TestDuration.custom => 'Custom',
+    };
+  }
+
+  /// Localized display name for the UI — use this instead of [displayName]
+  /// anywhere a [BuildContext] is available.
+  String localizedLabel(AppLocalizations l10n) {
+    return switch (this) {
+      TestDuration.week1 => l10n.testDuration1Week,
+      TestDuration.month1 => l10n.testDuration1Month,
+      TestDuration.months3 => l10n.testDuration3Months,
+      TestDuration.infinite => l10n.testDurationInfinite,
+      TestDuration.custom => l10n.testDurationCustom,
     };
   }
 

@@ -1,3 +1,4 @@
+import '../../l10n/gen/app_localizations.dart';
 import 'company_tag_mapper.dart';
 
 /// The 11 standard GICS (Global Industry Classification Standard) sectors.
@@ -31,6 +32,23 @@ extension GicsSectorLabel on GicsSector {
     GicsSector.communicationServices => 'Communication Services',
     GicsSector.realEstate => 'Real Estate',
     GicsSector.utilities => 'Utilities',
+  };
+
+  /// Localized display name for the UI — use this instead of [label]
+  /// anywhere a [BuildContext] is available. [label] stays English-only
+  /// for non-UI callers (engine/notification text) that have no context.
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+    GicsSector.technology => l10n.gicsSectorTechnology,
+    GicsSector.financials => l10n.gicsSectorFinancials,
+    GicsSector.healthCare => l10n.gicsSectorHealthCare,
+    GicsSector.consumerDiscretionary => l10n.gicsSectorConsumerDiscretionary,
+    GicsSector.consumerStaples => l10n.gicsSectorConsumerStaples,
+    GicsSector.energy => l10n.gicsSectorEnergy,
+    GicsSector.industrials => l10n.gicsSectorIndustrials,
+    GicsSector.materials => l10n.gicsSectorMaterials,
+    GicsSector.communicationServices => l10n.gicsSectorCommunicationServices,
+    GicsSector.realEstate => l10n.gicsSectorRealEstate,
+    GicsSector.utilities => l10n.gicsSectorUtilities,
   };
 }
 

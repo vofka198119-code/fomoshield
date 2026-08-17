@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../monetization/monetization_modal.dart';
@@ -77,10 +78,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     final maxSessions = ref.read(maxStressTestSessionsProvider);
 
     if (activeCount >= maxSessions) {
+      final l10n = AppLocalizations.of(context)!;
       if (tier == SubscriptionTier.free) {
         showPremiumPromoOverlay(
           context: context,
-          title: 'Stress test limit reached',
+          title: l10n.stressTestLimitReachedTitle,
           durationSeconds: 5,
           onComplete: () {
             if (context.mounted) showMonetizationModal(context, ref);
@@ -88,7 +90,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Maximum active test sessions reached')),
+          SnackBar(content: Text(l10n.stressTestMaxSessionsReached)),
         );
       }
       return;
@@ -118,13 +120,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final session = _session;
+    final l10n = AppLocalizations.of(context)!;
     if (session == null) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: Text(
-            'Stress Test',
+            l10n.navStressTest,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -132,7 +135,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
             ),
           ),
         ),
-        body: const Center(child: Text('Session not found')),
+        body: Center(child: Text(l10n.stressTestSessionNotFound)),
       );
     }
 
@@ -141,7 +144,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
-          'Stress Test Setup',
+          l10n.stressTestSetupTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -172,7 +175,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
               // ── Duration Selector ────────────────────────────────
               Text(
-                'TEST DURATION',
+                l10n.stressTestDurationSectionTitle,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
@@ -205,7 +208,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Center(
                           child: Text(
-                            'START STRESS TEST',
+                            l10n.stressTestStartButton,
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
@@ -245,6 +248,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
         .where((s) => s.status == StressTestStatus.active)
         .length;
     final isFirst = activeCount == 0;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -261,7 +265,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              'PREMIUM',
+              l10n.profilePremiumBadge,
               style: GoogleFonts.inter(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
@@ -274,9 +278,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              isFirst
-                  ? 'Test slot 1/2 free · Upgrade for 5 at once & no ads'
-                  : 'Test slot 2/2 free · Premium = 5 at once, no ads',
+              isFirst ? l10n.stressTestSlot1Free : l10n.stressTestSlot2Free,
               style: GoogleFonts.inter(
                 fontSize: 12,
                 color: ThemeV2.primary,
@@ -293,6 +295,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     final tier = ref.watch(subscriptionTierProvider);
     final isPremium =
         tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -313,7 +316,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           Row(
             children: [
               Text(
-                'Available Cash',
+                l10n.stressTestAvailableCash,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   color: Colors.white70,
@@ -332,7 +335,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'PREMIUM',
+                    l10n.profilePremiumBadge,
                     style: GoogleFonts.inter(
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
@@ -357,7 +360,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'of ${formatUsd(session.startingCash)} total',
+            l10n.stressTestOfTotal(formatUsd(session.startingCash)),
             style: interNums(fontSize: 12, color: Colors.white60),
           ),
         ],
@@ -375,6 +378,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
     // Always show all 5 options; Free gets lock on Infinite & Custom
     final durations = TestDuration.values;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -436,10 +440,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                   Expanded(
                     child: Text(
                       isCustomRow && isPremium
-                          ? 'Custom ($_customDurationDays days)'
+                          ? l10n.stressTestCustomDays(_customDurationDays)
                           : isInfiniteRow && isPremium
-                          ? 'Infinite — Min. 2 weeks'
-                          : d.displayName,
+                          ? l10n.stressTestInfiniteMinWeeks
+                          : d.localizedLabel(l10n),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         color: isPremiumLocked
@@ -464,7 +468,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        'PREMIUM',
+                        l10n.profilePremiumBadge,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
@@ -484,7 +488,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        'PREMIUM',
+                        l10n.profilePremiumBadge,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
@@ -492,14 +496,6 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                           letterSpacing: 1.2,
                           shadows: _goldGlow(dialBrassLight),
                         ),
-                      ),
-                    )
-                  else
-                    Text(
-                      d.label,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: ThemeV2.textSecondary,
                       ),
                     ),
                 ],
@@ -513,6 +509,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
   /// Prompts a Free user to subscribe when tapping a locked feature.
   void _showPremiumUpsell() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
@@ -530,7 +527,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Premium Feature',
+                l10n.stressTestPremiumFeatureTitle,
                 style: GoogleFonts.inter(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
@@ -539,8 +536,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'This test duration is available exclusively to Premium '
-                'subscribers. Upgrade to unlock unlimited possibilities.',
+                l10n.stressTestPremiumFeatureBody,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 13,
@@ -565,7 +561,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     ),
                   ),
                   child: Text(
-                    'Upgrade to Premium',
+                    l10n.stressTestUpgradeToPremium,
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.w800,
                       fontSize: 14,
@@ -577,7 +573,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
                 child: Text(
-                  'Not now',
+                  l10n.stressTestNotNow,
                   style: GoogleFonts.inter(
                     color: ThemeV2.textSecondary,
                     fontSize: 13,
@@ -603,6 +599,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     }
 
     int tempDays = _customDurationDays;
+    final l10n = AppLocalizations.of(context)!;
 
     showModalBottomSheet(
       context: context,
@@ -639,7 +636,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                   const SizedBox(height: 20),
 
                   Text(
-                    'Custom Test Duration',
+                    l10n.stressTestCustomDurationTitle,
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -670,9 +667,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Once started, a custom-duration test cannot be '
-                            'interrupted or stopped early. The simulation will '
-                            'run for the full period you select below.',
+                            l10n.stressTestCustomDurationWarning,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: ThemeV2.textSecondary,
@@ -688,7 +683,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                   // Day count display
                   Center(
                     child: Text(
-                      '$tempDays days',
+                      l10n.stressTestDaysCount(tempDays),
                       style: interNums(
                         fontSize: 36,
                         fontWeight: FontWeight.w800,
@@ -708,7 +703,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     inactiveColor: const Color(
                       0xFFD4AF37,
                     ).withValues(alpha: 0.2),
-                    label: '$tempDays days',
+                    label: l10n.stressTestDaysCount(tempDays),
                     onChanged: (v) {
                       setSheetState(() => tempDays = v.round());
                     },
@@ -720,14 +715,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Min: 5 days',
+                        l10n.stressTestMinDays,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: ThemeV2.textSecondary,
                         ),
                       ),
                       Text(
-                        'Max: 365 days',
+                        l10n.stressTestMaxDays,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: ThemeV2.textSecondary,
@@ -757,7 +752,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                               ),
                             ),
                             child: Text(
-                              'Cancel',
+                              l10n.profileCancel,
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
@@ -787,7 +782,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                               ),
                             ),
                             child: Text(
-                              'Apply',
+                              l10n.commonApply,
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 14,
@@ -876,6 +871,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
   Widget build(BuildContext context) {
     final isFreeInfinite =
         !widget.isPremium && widget.selectedDuration == TestDuration.infinite;
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       backgroundColor: ThemeV2.surface,
@@ -903,8 +899,8 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
             // Title
             Text(
               isFreeInfinite
-                  ? 'PREMIUM FEATURE'
-                  : 'RISK & SIMULATION DISCLAIMER',
+                  ? l10n.stressTestPremiumFeatureAllCaps
+                  : l10n.stressTestRiskDisclaimerTitle,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
@@ -935,7 +931,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'Scroll to the end to agree',
+                    l10n.stressTestScrollToAgree,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: ThemeV2.textSecondary,
@@ -954,7 +950,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'You have read the full disclaimer',
+                    l10n.stressTestReadFullDisclaimer,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: ThemeV2.success,
@@ -985,7 +981,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                         ),
                       ),
                       child: Text(
-                        'Cancel',
+                        l10n.profileCancel,
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
@@ -1018,8 +1014,8 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                       ),
                       child: Text(
                         isFreeInfinite
-                            ? 'Upgrade to Premium'
-                            : 'I Agree — Start Test',
+                            ? l10n.stressTestUpgradeToPremium
+                            : l10n.stressTestIAgreeStart,
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
@@ -1039,6 +1035,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
 
   /// Full disclaimer scrollable body (shown to all users except free+Infinite)
   Widget _buildDisclaimerBody() {
+    final l10n = AppLocalizations.of(context)!;
     return Flexible(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -1054,10 +1051,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'This stress test uses a specialized algorithmic engine '
-                    'that simulates extreme market scenarios, including '
-                    'prolonged bear trends, systemic crises, and complete '
-                    'financial market collapses.',
+                    l10n.stressTestDisclaimerIntro,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: ThemeV2.textPrimary,
@@ -1067,8 +1061,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Before starting the simulation, please read and '
-                    'acknowledge the following:',
+                    l10n.stressTestDisclaimerAck,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: ThemeV2.textPrimary,
@@ -1076,57 +1069,18 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _bulletPoint(
-                    'Simulated Scenarios — The crashes, crises, and '
-                    'market movements generated by the engine are '
-                    'hypothetical mathematical models. They are designed '
-                    'to test portfolio resilience under stress and do not '
-                    'constitute a forecast of real market behavior.',
-                  ),
+                  _bulletPoint(l10n.stressTestBulletScenarios),
                   const SizedBox(height: 12),
-                  _bulletPoint(
-                    'Not Financial Advice — The final verdict, analytics, '
-                    'and any conclusions drawn from this test are for '
-                    'informational and educational purposes only. They do '
-                    'not constitute personalized investment advice, a '
-                    'recommendation to buy or sell assets, or any form of '
-                    'financial solicitation.',
-                  ),
+                  _bulletPoint(l10n.stressTestBulletNotAdvice),
                   const SizedBox(height: 12),
-                  _bulletPoint(
-                    'Objective Mathematical Assessment — The final verdict '
-                    'and scoring are generated automatically. Our engine '
-                    'is built on recognized scientific methods (including '
-                    'Monte Carlo simulation, tail-risk analysis, and '
-                    'modern portfolio stress-testing models). The algorithm '
-                    'is fully independent: it eliminates human bias, '
-                    'emotion, or third-party commercial interests. However, '
-                    'it is important to remember that any mathematical '
-                    'model has its limitations and cannot predict '
-                    'absolutely every real-market scenario.',
-                  ),
+                  _bulletPoint(l10n.stressTestBulletObjective),
                   const SizedBox(height: 12),
-                  _bulletPoint(
-                    'Limitation of Liability — A positive test result '
-                    '(i.e., your portfolio successfully "survived" a '
-                    'simulated market crash) does not guarantee similar '
-                    'real-world performance. The platform and its '
-                    'developers assume no responsibility for your '
-                    'investment decisions, nor for any direct or indirect '
-                    'losses, including but not limited to loss of capital '
-                    'in real markets.',
-                  ),
+                  _bulletPoint(l10n.stressTestBulletLiability),
                   const SizedBox(height: 12),
-                  _bulletPoint(
-                    'Past performance within this simulator does not '
-                    'guarantee, predict, or reflect real-world market '
-                    'outcomes. All trading activities in real life carry '
-                    'substantial risk and are made solely at your own '
-                    'discretion and responsibility.',
-                  ),
+                  _bulletPoint(l10n.stressTestBulletPastPerformance),
                   const SizedBox(height: 8),
                   Text(
-                    '▸ End of Disclaimer',
+                    l10n.stressTestEndOfDisclaimer,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: ThemeV2.textSecondary.withValues(alpha: 0.3),
@@ -1144,6 +1098,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
 
   /// Upsell shown when a Free user selects Infinite duration
   Widget _buildInfiniteUpsell() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -1157,7 +1112,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
           Icon(Icons.workspace_premium_rounded, size: 48, color: _accentColor),
           const SizedBox(height: 16),
           Text(
-            'Unlimited Testing',
+            l10n.stressTestUnlimitedTesting,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w800,
@@ -1166,8 +1121,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
           ),
           const SizedBox(height: 12),
           Text(
-            'The Infinite duration stress test is available exclusively '
-            'to Premium subscribers. Upgrade to unlock:',
+            l10n.stressTestInfiniteUpsellBody,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,
@@ -1175,13 +1129,22 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
             ),
           ),
           const SizedBox(height: 16),
-          _upsellRow(Icons.all_inclusive_rounded, 'Unlimited test duration'),
+          _upsellRow(
+            Icons.all_inclusive_rounded,
+            l10n.stressTestUpsellUnlimitedDuration,
+          ),
           const SizedBox(height: 8),
-          _upsellRow(Icons.speed_rounded, 'Full market crash scenarios'),
+          _upsellRow(
+            Icons.speed_rounded,
+            l10n.stressTestUpsellFullCrashScenarios,
+          ),
           const SizedBox(height: 8),
-          _upsellRow(Icons.analytics_rounded, 'Advanced portfolio analytics'),
+          _upsellRow(
+            Icons.analytics_rounded,
+            l10n.stressTestUpsellAdvancedAnalytics,
+          ),
           const SizedBox(height: 8),
-          _upsellRow(Icons.block_rounded, 'Ad-free experience'),
+          _upsellRow(Icons.block_rounded, l10n.premiumBenefitAdFree),
         ],
       ),
     );

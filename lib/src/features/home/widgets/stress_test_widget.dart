@@ -318,6 +318,7 @@ class StressTestWidget extends ConsumerWidget {
     int index,
   ) {
     final tierBadge = _tierBadge(ref, context, index);
+    final l10n = AppLocalizations.of(context)!;
 
     return InkWell(
       key: ValueKey('st_${session.id}'),
@@ -344,9 +345,9 @@ class StressTestWidget extends ConsumerWidget {
                 children: [
                   Flexible(
                     child: Text(
-                      AppLocalizations.of(
-                        context,
-                      )!.stressTestActiveLabel(session.duration.displayName),
+                      l10n.stressTestActiveLabel(
+                        session.duration.localizedLabel(l10n),
+                      ),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -407,6 +408,7 @@ class StressTestWidget extends ConsumerWidget {
 
     final verdictTitle = verdict?.title ?? '—';
     final pnlColor = session.profitLoss >= 0 ? ThemeV2.success : ThemeV2.loss;
+    final l10n = AppLocalizations.of(context)!;
 
     return InkWell(
       key: ValueKey('st_completed_${session.id}'),
@@ -444,7 +446,7 @@ class StressTestWidget extends ConsumerWidget {
                   ),
                   const SizedBox(height: 1),
                   Text(
-                    session.duration.displayName,
+                    session.duration.localizedLabel(l10n),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: ThemeV2.textSecondary,
