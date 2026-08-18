@@ -5,6 +5,7 @@ import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../../shared/widgets/company_logo.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Order Header — plain top bar (back arrow + centered "BUY/SELL Company"
@@ -36,6 +37,7 @@ class OrderHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         SafeArea(
@@ -54,7 +56,7 @@ class OrderHeader extends StatelessWidget {
                 Expanded(
                   child: Center(
                     child: Text(
-                      '${isBuy ? 'BUY' : 'SELL'} $companyName',
+                      '${isBuy ? l10n.tradeBuy : l10n.tradeSell} $companyName',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(

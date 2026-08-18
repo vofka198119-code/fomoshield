@@ -91,6 +91,18 @@
 
   "tradeBuy": "BUY",
   "tradeSell": "SELL",
+  "tradeDetailTitle": "TRADE DETAIL",
+  "tradeNotFound": "Trade not found",
+  "tradeOrderTypeLabel": "Order Type",
+  "tradeMarketType": "Market",
+  "tradeLimitPriceLabel": "Limit Price",
+  "tradeStopPriceLabel": "Stop Price",
+  "tradeSharesBoughtLabel": "Shares Bought",
+  "tradeSharesSoldLabel": "Shares Sold",
+  "tradePricePerShareLabel": "Price per Share",
+  "tradeTotalValueLabel": "Total Value",
+  "tradeDateLabel": "Date",
+  "tradeRealizedPnlLabel": "Realized P&L",
 
   "disclaimerFooter": "Disclaimer: F.O.M.O. Shield is for educational and entertainment purposes only. We are not registered investment advisors. All trading decisions are solely your responsibility. Past performance does not guarantee future results.",
 
@@ -396,5 +408,93 @@
   "testDuration1Month": "1 Month",
   "testDuration3Months": "3 Months",
   "testDurationInfinite": "Infinite",
-  "testDurationCustom": "Custom"
+  "testDurationCustom": "Custom",
+
+  "stressTestAddAsset": "Add Asset",
+  "stressTestConfirmPurchase": "Confirm Purchase",
+  "stressTestSearchCompanyHint": "Search company (e.g. Apple, Cola)...",
+  "stressTestSearchFailedError": "Search failed. Check your connection.",
+  "stressTestTypeMinChars": "Type at least 2 characters to search",
+  "stressTestNoResultsFound": "No results found",
+  "stressTestNoPriceData": "No price data available for {symbol}.",
+  "@stressTestNoPriceData": {
+    "placeholders": {
+      "symbol": { "type": "String" }
+    }
+  },
+  "stressTestFetchPriceError": "Could not fetch price for {symbol}.",
+  "@stressTestFetchPriceError": {
+    "placeholders": {
+      "symbol": { "type": "String" }
+    }
+  },
+  "stressTestNotEnoughCashError": "Not enough cash or unable to trade.",
+  "stressTestCurrentPriceLabel": "Current price: {price}",
+  "@stressTestCurrentPriceLabel": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "stressTestHowMuchInvest": "How much do you want to invest?",
+  "stressTestExceedsCash": "Exceeds available cash ({cash})",
+  "@stressTestExceedsCash": {
+    "placeholders": {
+      "cash": { "type": "String" }
+    }
+  },
+  "stressTestBuyAmountWorth": "Buy {amount} worth",
+  "@stressTestBuyAmountWorth": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "stressTestChooseAnotherCompany": "Choose another company",
+
+  "verdictTradeBreakdownTitle": "TRADE BREAKDOWN",
+  "verdictSessionNotFound": "Session not found",
+  "verdictTestDurationLabel": "Test Duration",
+  "verdictDurationDays": "{days} days",
+  "@verdictDurationDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "verdictStatisticsTitle": "STATISTICS",
+  "verdictTotalTradesLabel": "Total Trades",
+  "verdictBoughtLabel": "Bought",
+  "verdictSoldLabel": "Sold",
+  "verdictTotalAssetsTitle": "TOTAL ASSETS",
+  "verdictAssetsHeldTotalLabel": "Assets Held (Total)",
+  "verdictAssetsAtEndLabel": "Assets at Test End",
+  "verdictFinancialSummaryTitle": "FINANCIAL SUMMARY",
+  "verdictStartingAmountLabel": "Starting Amount",
+  "verdictTotalPnlLabel": "Total P&L (Realized + Unrealized)",
+  "verdictProfitableSellsLabel": "Profitable Sells ({count})",
+  "@verdictProfitableSellsLabel": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "verdictLosingSellsLabel": "Losing Sells ({count})",
+  "@verdictLosingSellsLabel": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "verdictFinalBalanceLabel": "Final Balance",
+  "verdictScenariosTitle": "SCENARIOS EXPERIENCED",
+  "verdictScenarioBull": "Bull Trend",
+  "verdictScenarioBear": "Bear Trend",
+  "verdictScenarioSideways": "Sideways Market",
+  "verdictScenarioVolatility": "Volatility",
+  "verdictScenarioRecovery": "Recovery",
+  "verdictScenarioHype": "Market Hype",
+  "verdictScenarioSpeculation": "Speculation",
+  "verdictScenarioBlackSwan": "Black Swan",
+  "verdictScenarioCrash": "Crash",
+  "verdictCompaniesTitle": "COMPANIES",
+  "verdictNoCompaniesTraded": "No companies traded.",
+  "verdictNoTradesYet": "No trades yet.",
+  "verdictTradeBreakdownDisclaimerTitle": "Disclaimer",
+  "verdictTradeBreakdownDisclaimerBody": "The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user's own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future."
 }

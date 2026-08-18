@@ -56,7 +56,10 @@ class NumericKeypad extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
         decoration: const BoxDecoration(
-          color: ThemeV2.surface,
+          // Matches backgroundGradient's bottom stop so the sheet blends
+          // into the grey strip above the system nav bar instead of
+          // showing a stark white-to-grey seam.
+          color: Color(0xFFDCDBD7),
           border: Border(top: BorderSide(color: ThemeV2.divider)),
         ),
         child: Column(
@@ -108,7 +111,7 @@ class NumericKeypad extends StatelessWidget {
             height: 50,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: ThemeV2.surfaceDark,
+              color: Color.alphaBlend(ThemeV2.primaryBg, Colors.white),
               borderRadius: BorderRadius.circular(14),
             ),
             child: label == '⌫'

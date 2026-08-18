@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -448,66 +447,63 @@ class _AppShell extends ConsumerWidget {
       body: child,
       bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            decoration: BoxDecoration(
-              color: ThemeV2.surface.withValues(alpha: 0.75),
-              border: Border(
-                top: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: ThemeV2.surface,
+            border: Border(
+              top: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
             ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: BottomNavigationBar(
-                  // Cyrillic glyphs run visibly wider than Latin at the same
-                  // character count — "Стресс-тест" was clipping to
-                  // "Стресс-т…" at the default 12/14px label sizes. Shrunk
-                  // a couple px so every language's longest label fits.
-                  selectedFontSize: 12,
-                  unselectedFontSize: 10,
-                  currentIndex: _currentIndex(context),
-                  onTap: (index) {
-                    ref.read(previousTabRouteProvider.notifier).state =
-                        GoRouterState.of(context).uri.toString();
-                    switch (index) {
-                      case 0:
-                        context.go('/home');
-                      case 1:
-                        context.push('/search');
-                      case 2:
-                        context.go('/portfolio');
-                      case 3:
-                        _onStressTestTap(context, ref);
-                      case 4:
-                        context.go('/profile');
-                    }
-                  },
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: const Icon(Icons.shield_rounded),
-                      label: AppLocalizations.of(context)!.navHome,
-                    ),
-                    BottomNavigationBarItem(
-                      icon: const Icon(Icons.search_rounded),
-                      label: AppLocalizations.of(context)!.navSearch,
-                    ),
-                    BottomNavigationBarItem(
-                      icon: const Icon(Icons.account_balance_rounded),
-                      label: AppLocalizations.of(context)!.navPortfolio,
-                    ),
-                    BottomNavigationBarItem(
-                      icon: const Icon(Icons.psychology_rounded),
-                      label: AppLocalizations.of(context)!.navStressTest,
-                    ),
-                    BottomNavigationBarItem(
-                      icon: const Icon(Icons.person_rounded),
-                      label: AppLocalizations.of(context)!.navProfile,
-                    ),
-                  ],
-                ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: BottomNavigationBar(
+                // Cyrillic glyphs run visibly wider than Latin at the same
+                // character count — "Стресс-тест" was clipping to
+                // "Стресс-т…" at the default 12/14px label sizes. Shrunk
+                // a couple px so every language's longest label fits.
+                selectedFontSize: 12,
+                unselectedFontSize: 10,
+                currentIndex: _currentIndex(context),
+                onTap: (index) {
+                  ref.read(previousTabRouteProvider.notifier).state =
+                      GoRouterState.of(context).uri.toString();
+                  switch (index) {
+                    case 0:
+                      context.go('/home');
+                    case 1:
+                      context.push('/search');
+                    case 2:
+                      context.go('/portfolio');
+                    case 3:
+                      _onStressTestTap(context, ref);
+                    case 4:
+                      context.go('/profile');
+                  }
+                },
+                items: [
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.shield_rounded),
+                    label: AppLocalizations.of(context)!.navHome,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.search_rounded),
+                    label: AppLocalizations.of(context)!.navSearch,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.account_balance_rounded),
+                    label: AppLocalizations.of(context)!.navPortfolio,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.psychology_rounded),
+                    label: AppLocalizations.of(context)!.navStressTest,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.person_rounded),
+                    label: AppLocalizations.of(context)!.navProfile,
+                  ),
+                ],
               ),
             ),
           ),

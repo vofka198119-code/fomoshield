@@ -222,6 +222,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tradeSell => 'SELL';
 
   @override
+  String get tradeDetailTitle => 'TRADE DETAIL';
+
+  @override
+  String get tradeNotFound => 'Trade not found';
+
+  @override
+  String get tradeOrderTypeLabel => 'Order Type';
+
+  @override
+  String get tradeMarketType => 'Market';
+
+  @override
+  String get tradeLimitPriceLabel => 'Limit Price';
+
+  @override
+  String get tradeStopPriceLabel => 'Stop Price';
+
+  @override
+  String get tradeSharesBoughtLabel => 'Shares Bought';
+
+  @override
+  String get tradeSharesSoldLabel => 'Shares Sold';
+
+  @override
+  String get tradePricePerShareLabel => 'Price per Share';
+
+  @override
+  String get tradeTotalValueLabel => 'Total Value';
+
+  @override
+  String get tradeDateLabel => 'Date';
+
+  @override
+  String get tradeRealizedPnlLabel => 'Realized P&L';
+
+  @override
   String get disclaimerFooter =>
       'Disclaimer: F.O.M.O. Shield is for educational and entertainment purposes only. We are not registered investment advisors. All trading decisions are solely your responsibility. Past performance does not guarantee future results.';
 
@@ -911,4 +947,162 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get testDurationCustom => 'Custom';
+
+  @override
+  String get stressTestAddAsset => 'Add Asset';
+
+  @override
+  String get stressTestConfirmPurchase => 'Confirm Purchase';
+
+  @override
+  String get stressTestSearchCompanyHint =>
+      'Search company (e.g. Apple, Cola)...';
+
+  @override
+  String get stressTestSearchFailedError =>
+      'Search failed. Check your connection.';
+
+  @override
+  String get stressTestTypeMinChars => 'Type at least 2 characters to search';
+
+  @override
+  String get stressTestNoResultsFound => 'No results found';
+
+  @override
+  String stressTestNoPriceData(String symbol) {
+    return 'No price data available for $symbol.';
+  }
+
+  @override
+  String stressTestFetchPriceError(String symbol) {
+    return 'Could not fetch price for $symbol.';
+  }
+
+  @override
+  String get stressTestNotEnoughCashError =>
+      'Not enough cash or unable to trade.';
+
+  @override
+  String stressTestCurrentPriceLabel(String price) {
+    return 'Current price: $price';
+  }
+
+  @override
+  String get stressTestHowMuchInvest => 'How much do you want to invest?';
+
+  @override
+  String stressTestExceedsCash(String cash) {
+    return 'Exceeds available cash ($cash)';
+  }
+
+  @override
+  String stressTestBuyAmountWorth(String amount) {
+    return 'Buy $amount worth';
+  }
+
+  @override
+  String get stressTestChooseAnotherCompany => 'Choose another company';
+
+  @override
+  String get verdictTradeBreakdownTitle => 'TRADE BREAKDOWN';
+
+  @override
+  String get verdictSessionNotFound => 'Session not found';
+
+  @override
+  String get verdictTestDurationLabel => 'Test Duration';
+
+  @override
+  String verdictDurationDays(int days) {
+    return '$days days';
+  }
+
+  @override
+  String get verdictStatisticsTitle => 'STATISTICS';
+
+  @override
+  String get verdictTotalTradesLabel => 'Total Trades';
+
+  @override
+  String get verdictBoughtLabel => 'Bought';
+
+  @override
+  String get verdictSoldLabel => 'Sold';
+
+  @override
+  String get verdictTotalAssetsTitle => 'TOTAL ASSETS';
+
+  @override
+  String get verdictAssetsHeldTotalLabel => 'Assets Held (Total)';
+
+  @override
+  String get verdictAssetsAtEndLabel => 'Assets at Test End';
+
+  @override
+  String get verdictFinancialSummaryTitle => 'FINANCIAL SUMMARY';
+
+  @override
+  String get verdictStartingAmountLabel => 'Starting Amount';
+
+  @override
+  String get verdictTotalPnlLabel => 'Total P&L (Realized + Unrealized)';
+
+  @override
+  String verdictProfitableSellsLabel(int count) {
+    return 'Profitable Sells ($count)';
+  }
+
+  @override
+  String verdictLosingSellsLabel(int count) {
+    return 'Losing Sells ($count)';
+  }
+
+  @override
+  String get verdictFinalBalanceLabel => 'Final Balance';
+
+  @override
+  String get verdictScenariosTitle => 'SCENARIOS EXPERIENCED';
+
+  @override
+  String get verdictScenarioBull => 'Bull Trend';
+
+  @override
+  String get verdictScenarioBear => 'Bear Trend';
+
+  @override
+  String get verdictScenarioSideways => 'Sideways Market';
+
+  @override
+  String get verdictScenarioVolatility => 'Volatility';
+
+  @override
+  String get verdictScenarioRecovery => 'Recovery';
+
+  @override
+  String get verdictScenarioHype => 'Market Hype';
+
+  @override
+  String get verdictScenarioSpeculation => 'Speculation';
+
+  @override
+  String get verdictScenarioBlackSwan => 'Black Swan';
+
+  @override
+  String get verdictScenarioCrash => 'Crash';
+
+  @override
+  String get verdictCompaniesTitle => 'COMPANIES';
+
+  @override
+  String get verdictNoCompaniesTraded => 'No companies traded.';
+
+  @override
+  String get verdictNoTradesYet => 'No trades yet.';
+
+  @override
+  String get verdictTradeBreakdownDisclaimerTitle => 'Disclaimer';
+
+  @override
+  String get verdictTradeBreakdownDisclaimerBody =>
+      'The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user\'s own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.';
 }

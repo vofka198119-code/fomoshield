@@ -221,6 +221,42 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tradeSell => 'ПРОДАЖА';
 
   @override
+  String get tradeDetailTitle => 'ДЕТАЛИ СДЕЛКИ';
+
+  @override
+  String get tradeNotFound => 'Сделка не найдена';
+
+  @override
+  String get tradeOrderTypeLabel => 'Тип ордера';
+
+  @override
+  String get tradeMarketType => 'Рыночный';
+
+  @override
+  String get tradeLimitPriceLabel => 'Лимитная цена';
+
+  @override
+  String get tradeStopPriceLabel => 'Стоп-цена';
+
+  @override
+  String get tradeSharesBoughtLabel => 'Куплено акций';
+
+  @override
+  String get tradeSharesSoldLabel => 'Продано акций';
+
+  @override
+  String get tradePricePerShareLabel => 'Цена за акцию';
+
+  @override
+  String get tradeTotalValueLabel => 'Общая сумма';
+
+  @override
+  String get tradeDateLabel => 'Дата';
+
+  @override
+  String get tradeRealizedPnlLabel => 'Реализ. P&L';
+
+  @override
   String get disclaimerFooter =>
       'Дисклеймер: F.O.M.O. Shield создан исключительно в образовательных и развлекательных целях. Мы не являемся зарегистрированными инвестиционными консультантами. Все торговые решения принимаются исключительно на ваш страх и риск. Результаты в прошлом не гарантируют результатов в будущем.';
 
@@ -914,4 +950,162 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get testDurationCustom => 'Свой вариант';
+
+  @override
+  String get stressTestAddAsset => 'Добавить актив';
+
+  @override
+  String get stressTestConfirmPurchase => 'Подтвердите покупку';
+
+  @override
+  String get stressTestSearchCompanyHint =>
+      'Поиск компании (например, Apple, Cola)...';
+
+  @override
+  String get stressTestSearchFailedError =>
+      'Ошибка поиска. Проверьте соединение.';
+
+  @override
+  String get stressTestTypeMinChars => 'Введите минимум 2 символа для поиска';
+
+  @override
+  String get stressTestNoResultsFound => 'Ничего не найдено';
+
+  @override
+  String stressTestNoPriceData(String symbol) {
+    return 'Нет данных о цене для $symbol.';
+  }
+
+  @override
+  String stressTestFetchPriceError(String symbol) {
+    return 'Не удалось получить цену для $symbol.';
+  }
+
+  @override
+  String get stressTestNotEnoughCashError =>
+      'Недостаточно средств или сделка невозможна.';
+
+  @override
+  String stressTestCurrentPriceLabel(String price) {
+    return 'Текущая цена: $price';
+  }
+
+  @override
+  String get stressTestHowMuchInvest => 'Сколько вы хотите вложить?';
+
+  @override
+  String stressTestExceedsCash(String cash) {
+    return 'Превышает доступные средства ($cash)';
+  }
+
+  @override
+  String stressTestBuyAmountWorth(String amount) {
+    return 'Купить на $amount';
+  }
+
+  @override
+  String get stressTestChooseAnotherCompany => 'Выбрать другую компанию';
+
+  @override
+  String get verdictTradeBreakdownTitle => 'ДЕТАЛИ СДЕЛОК';
+
+  @override
+  String get verdictSessionNotFound => 'Сессия не найдена';
+
+  @override
+  String get verdictTestDurationLabel => 'Длительность теста';
+
+  @override
+  String verdictDurationDays(int days) {
+    return '$days дн.';
+  }
+
+  @override
+  String get verdictStatisticsTitle => 'СТАТИСТИКА';
+
+  @override
+  String get verdictTotalTradesLabel => 'Всего сделок';
+
+  @override
+  String get verdictBoughtLabel => 'Куплено';
+
+  @override
+  String get verdictSoldLabel => 'Продано';
+
+  @override
+  String get verdictTotalAssetsTitle => 'ВСЕГО АКТИВОВ';
+
+  @override
+  String get verdictAssetsHeldTotalLabel => 'Активов держали (всего)';
+
+  @override
+  String get verdictAssetsAtEndLabel => 'Активов на конец теста';
+
+  @override
+  String get verdictFinancialSummaryTitle => 'ФИНАНСОВЫЙ ИТОГ';
+
+  @override
+  String get verdictStartingAmountLabel => 'Начальная сумма';
+
+  @override
+  String get verdictTotalPnlLabel => 'Общий P&L (реализ. + нереализ.)';
+
+  @override
+  String verdictProfitableSellsLabel(int count) {
+    return 'Прибыльные продажи ($count)';
+  }
+
+  @override
+  String verdictLosingSellsLabel(int count) {
+    return 'Убыточные продажи ($count)';
+  }
+
+  @override
+  String get verdictFinalBalanceLabel => 'Итоговый баланс';
+
+  @override
+  String get verdictScenariosTitle => 'ПРОЙДЕННЫЕ СЦЕНАРИИ';
+
+  @override
+  String get verdictScenarioBull => 'Бычий тренд';
+
+  @override
+  String get verdictScenarioBear => 'Медвежий тренд';
+
+  @override
+  String get verdictScenarioSideways => 'Боковой рынок';
+
+  @override
+  String get verdictScenarioVolatility => 'Волатильность';
+
+  @override
+  String get verdictScenarioRecovery => 'Восстановление';
+
+  @override
+  String get verdictScenarioHype => 'Ажиотаж на рынке';
+
+  @override
+  String get verdictScenarioSpeculation => 'Спекуляция';
+
+  @override
+  String get verdictScenarioBlackSwan => 'Чёрный лебедь';
+
+  @override
+  String get verdictScenarioCrash => 'Обвал';
+
+  @override
+  String get verdictCompaniesTitle => 'КОМПАНИИ';
+
+  @override
+  String get verdictNoCompaniesTraded => 'Сделок по компаниям не было.';
+
+  @override
+  String get verdictNoTradesYet => 'Сделок пока нет.';
+
+  @override
+  String get verdictTradeBreakdownDisclaimerTitle => 'Дисклеймер';
+
+  @override
+  String get verdictTradeBreakdownDisclaimerBody =>
+      'Результаты этого стресс-теста являются исключительно результатом компьютерной симуляции и предоставлены только в образовательных и учебных целях. Они основаны на заданных моделью сценариях и исторических рыночных событиях и не отражают, не предсказывают и не гарантируют результаты какого-либо портфеля в реальных рыночных условиях.\n\nРеальное поведение рынка, отдельных компаний и финансовых активов может существенно отличаться от результатов симуляции. Прошлые рыночные события и результаты не гарантируют аналогичных результатов в будущем.\n\nЛюбые оценки, рейтинги, вердикты или иные показатели, представленные в тесте, не являются инвестиционной, финансовой или иной профессиональной консультацией, а также не являются рекомендацией, предложением или побуждением покупать либо продавать какой-либо финансовый актив или основанием для принятия инвестиционных решений.\n\nЛюбое решение, принятое с использованием или с учётом информации, предоставленной приложением, принимается исключительно по усмотрению и на риск пользователя. Мы не гарантируем прибыль и не несём ответственности за какие-либо финансовые потери, убытки или упущенную выгоду, возникшие в результате использования симуляции или её результатов.\n\nЦель стресс-теста — помочь пользователям изучить рыночные сценарии, принципы инвестирования и собственное поведение в смоделированной среде, а не предсказать будущее.';
 }

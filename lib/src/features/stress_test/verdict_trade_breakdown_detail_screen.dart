@@ -23,6 +23,7 @@ import '../../shared/widgets/stagger_fade_in.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'stress_test_naming.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
   final String sessionId;
@@ -31,6 +32,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final archive = ref.watch(verdictArchiveProvider);
     final entry = archive.cast<VerdictArchiveEntry?>().firstWhere(
       (e) => e?.sessionId == sessionId,
@@ -51,7 +53,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'TRADE BREAKDOWN',
+          l10n.verdictTradeBreakdownTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -66,7 +68,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
         left: false,
         right: false,
         child: entry == null
-            ? const Center(child: Text('Session not found'))
+            ? Center(child: Text(l10n.verdictSessionNotFound))
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -77,8 +79,8 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                         index: 0,
                         child: _DarkCard(
                           child: _Row(
-                            label: 'Test Duration',
-                            value: _durationDays(entry.durationLabel),
+                            label: l10n.verdictTestDurationLabel,
+                            value: _durationDays(l10n, entry.durationLabel),
                             isLast: true,
                           ),
                         ),
@@ -90,20 +92,20 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       child: StaggerFadeIn(
                         index: 1,
                         child: _DarkCard(
-                          title: 'STATISTICS',
+                          title: l10n.verdictStatisticsTitle,
                           child: Column(
                             children: [
                               _Row(
-                                label: 'Total Trades',
+                                label: l10n.verdictTotalTradesLabel,
                                 value: '${entry.totalTrades}',
                               ),
                               _Row(
-                                label: 'Bought',
+                                label: l10n.verdictBoughtLabel,
                                 value:
                                     '${entry.trades.where((t) => t.isBuy).length}',
                               ),
                               _Row(
-                                label: 'Sold',
+                                label: l10n.verdictSoldLabel,
                                 value:
                                     '${entry.trades.where((t) => !t.isBuy).length}',
                                 isLast: true,
@@ -119,15 +121,15 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       child: StaggerFadeIn(
                         index: 2,
                         child: _DarkCard(
-                          title: 'TOTAL ASSETS',
+                          title: l10n.verdictTotalAssetsTitle,
                           child: Column(
                             children: [
                               _Row(
-                                label: 'Assets Held (Total)',
+                                label: l10n.verdictAssetsHeldTotalLabel,
                                 value: '${_totalAssetsEverHeld(entry)}',
                               ),
                               _Row(
-                                label: 'Assets at Test End',
+                                label: l10n.verdictAssetsAtEndLabel,
                                 value: '${entry.holdingCount}',
                                 isLast: true,
                               ),
@@ -141,7 +143,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       key: const ValueKey('financialSummary'),
                       child: StaggerFadeIn(
                         index: 3,
-                        child: _financialSummaryCard(entry),
+                        child: _financialSummaryCard(l10n, entry),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -149,7 +151,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       key: const ValueKey('scenarios'),
                       child: StaggerFadeIn(
                         index: 4,
-                        child: _scenariosCard(entry),
+                        child: _scenariosCard(l10n, entry),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -185,14 +187,14 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
   /// Fixed-duration presets map to real day counts; Infinite/Custom have no
   /// stored day count on VerdictArchiveEntry (only the display label), so
   /// they fall back to showing the label itself.
-  String _durationDays(String durationLabel) {
+  String _durationDays(AppLocalizations l10n, String durationLabel) {
     switch (durationLabel) {
       case '1 Week':
-        return '7 days';
+        return l10n.verdictDurationDays(7);
       case '1 Month':
-        return '30 days';
+        return l10n.verdictDurationDays(30);
       case '3 Months':
-        return '90 days';
+        return l10n.verdictDurationDays(90);
       default:
         return durationLabel;
     }
@@ -206,27 +208,27 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
 
   /// Plain-English labels — never the raw enum/jargon names (per explicit
   /// ask: no bare "Bull"/"Bear").
-  String _scenarioLabel(MarketScenario s) => switch (s) {
-    MarketScenario.bull => 'Bull Trend',
-    MarketScenario.bear => 'Bear Trend',
-    MarketScenario.sideways => 'Sideways Market',
-    MarketScenario.volatility => 'Volatility',
-    MarketScenario.recovery => 'Recovery',
-    MarketScenario.hype => 'Market Hype',
-    MarketScenario.speculation => 'Speculation',
-    MarketScenario.blackSwan => 'Black Swan',
-    MarketScenario.crash => 'Crash',
+  String _scenarioLabel(AppLocalizations l10n, MarketScenario s) => switch (s) {
+    MarketScenario.bull => l10n.verdictScenarioBull,
+    MarketScenario.bear => l10n.verdictScenarioBear,
+    MarketScenario.sideways => l10n.verdictScenarioSideways,
+    MarketScenario.volatility => l10n.verdictScenarioVolatility,
+    MarketScenario.recovery => l10n.verdictScenarioRecovery,
+    MarketScenario.hype => l10n.verdictScenarioHype,
+    MarketScenario.speculation => l10n.verdictScenarioSpeculation,
+    MarketScenario.blackSwan => l10n.verdictScenarioBlackSwan,
+    MarketScenario.crash => l10n.verdictScenarioCrash,
   };
 
-  Widget _scenariosCard(VerdictArchiveEntry entry) {
+  Widget _scenariosCard(AppLocalizations l10n, VerdictArchiveEntry entry) {
     final scenarios = MarketScenario.values;
     return _DarkCard(
-      title: 'SCENARIOS EXPERIENCED',
+      title: l10n.verdictScenariosTitle,
       child: Column(
         children: [
           for (int i = 0; i < scenarios.length; i++)
             _Row(
-              label: _scenarioLabel(scenarios[i]),
+              label: _scenarioLabel(l10n, scenarios[i]),
               value: '${entry.scenarioCounts[scenarios[i].name] ?? 0}',
               isLast: i == scenarios.length - 1,
             ),
@@ -235,7 +237,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _financialSummaryCard(VerdictArchiveEntry entry) {
+  Widget _financialSummaryCard(AppLocalizations l10n, VerdictArchiveEntry entry) {
     final sells = entry.trades.where((t) => !t.isBuy).toList();
     final profitSells = sells.where((t) => (t.realizedPnl ?? 0) > 0).toList();
     final lossSells = sells.where((t) => (t.realizedPnl ?? 0) < 0).toList();
@@ -250,24 +252,27 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
     final totalPnl = entry.finalValue - entry.startingCash;
 
     return _DarkCard(
-      title: 'FINANCIAL SUMMARY',
+      title: l10n.verdictFinancialSummaryTitle,
       child: Column(
         children: [
-          _Row(label: 'Starting Amount', value: formatUsd(entry.startingCash)),
           _Row(
-            label: 'Total P&L (Realized + Unrealized)',
+            label: l10n.verdictStartingAmountLabel,
+            value: formatUsd(entry.startingCash),
+          ),
+          _Row(
+            label: l10n.verdictTotalPnlLabel,
             value: formatUsdSigned(totalPnl),
           ),
           _Row(
-            label: 'Profitable Sells (${profitSells.length})',
+            label: l10n.verdictProfitableSellsLabel(profitSells.length),
             value: formatUsdSigned(totalProfit),
           ),
           _Row(
-            label: 'Losing Sells (${lossSells.length})',
+            label: l10n.verdictLosingSellsLabel(lossSells.length),
             value: formatUsdSigned(totalLoss),
           ),
           _Row(
-            label: 'Final Balance',
+            label: l10n.verdictFinalBalanceLabel,
             value: formatUsd(entry.finalValue),
             isLast: true,
           ),
@@ -298,6 +303,7 @@ class _CompaniesCardState extends State<_CompaniesCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final entry = widget.entry;
     final symbols = entry.trades
         .where((t) => t.isBuy)
@@ -319,14 +325,14 @@ class _CompaniesCardState extends State<_CompaniesCard> {
     final visible = _showAll ? symbols : symbols.take(_collapsedCount).toList();
 
     return _DarkCard(
-      title: 'COMPANIES',
+      title: l10n.verdictCompaniesTitle,
       child: Column(
         children: [
           if (symbols.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text(
-                'No companies traded.',
+                l10n.verdictNoCompaniesTraded,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: Colors.white.withValues(alpha: 0.6),
@@ -372,18 +378,19 @@ class _TradeHistoryCardState extends State<_TradeHistoryCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final sorted = widget.entry.trades.reversed.toList();
     final visible = _showAll ? sorted : sorted.take(_collapsedCount).toList();
 
     return _DarkCard(
-      title: 'TRADE HISTORY',
+      title: l10n.tradeHistoryTitle,
       child: Column(
         children: [
           if (sorted.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text(
-                'No trades yet.',
+                l10n.verdictNoTradesYet,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: Colors.white.withValues(alpha: 0.6),
@@ -421,6 +428,7 @@ class _MoreLessButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(top: 4, bottom: 10),
       child: GestureDetector(
@@ -434,7 +442,7 @@ class _MoreLessButton extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              expanded ? 'Less' : 'More ($hiddenCount)',
+              expanded ? l10n.commonLess : l10n.commonMoreCount(hiddenCount),
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -619,6 +627,7 @@ class _TradeRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final logoAsync = ref.watch(cachedLogoProvider(trade.symbol));
     final companyName = resolveStressTestCompanyName(ref, trade.symbol);
     final accent = trade.isBuy ? ThemeV2.success : ThemeV2.loss;
@@ -700,7 +709,7 @@ class _TradeRow extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  trade.isBuy ? 'BUY' : 'SELL',
+                  trade.isBuy ? l10n.tradeBuy : l10n.tradeSell,
                   style: GoogleFonts.inter(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
@@ -721,12 +730,13 @@ class _TradeBreakdownDisclaimer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
         children: [
           Text(
-            'Disclaimer',
+            l10n.verdictTradeBreakdownDisclaimerTitle,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 10,
@@ -736,32 +746,7 @@ class _TradeBreakdownDisclaimer extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'The results of this stress test are solely the results of a '
-            'computer-generated simulation and are provided for '
-            'educational and training purposes only. They are based on '
-            'model-defined scenarios and historical market events and do '
-            'not represent, predict, or guarantee the performance of any '
-            'portfolio under real-world market conditions.\n\n'
-            'Actual market behavior, individual companies, and financial '
-            'assets may differ substantially from the results of the '
-            'simulation. Past market events and performance do not '
-            'guarantee similar outcomes in the future.\n\n'
-            'Any scores, ratings, verdicts, or other indicators presented '
-            'in the test do not constitute investment, financial, or '
-            'other professional advice, nor do they constitute a '
-            'recommendation, offer, or solicitation to buy or sell any '
-            'financial asset or serve as a basis for making investment '
-            'decisions.\n\n'
-            'Any decision made using or taking into account information '
-            'provided by the application is made solely at the user\'s '
-            'own discretion and risk. We do not guarantee profits and are '
-            'not responsible for any financial losses, damages, or lost '
-            'profits resulting from the use of the simulation or its '
-            'results.\n\n'
-            'The purpose of the stress test is to help users learn about '
-            'market scenarios, investment principles, and their own '
-            'behavior in a simulated environment — not to predict the '
-            'future.',
+            l10n.verdictTradeBreakdownDisclaimerBody,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,

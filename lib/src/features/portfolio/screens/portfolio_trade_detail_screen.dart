@@ -19,6 +19,7 @@ import '../../../shared/widgets/company_logo.dart';
 import '../../orders/order_model.dart';
 import '../../orders/order_provider.dart';
 import '../portfolio_providers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 class PortfolioTradeDetailScreen extends ConsumerWidget {
   final String portfolioId;
@@ -32,6 +33,7 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final tx = transaction;
     final orders = ref.watch(ordersProvider);
     final order = tx?.orderId == null
@@ -52,7 +54,7 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'TRADE DETAIL',
+          l10n.tradeDetailTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -67,7 +69,7 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
         left: false,
         right: false,
         child: tx == null
-            ? const Center(child: Text('Trade not found'))
+            ? Center(child: Text(l10n.tradeNotFound))
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: _TradeDetailCard(tx: tx, order: order),
@@ -85,6 +87,7 @@ class _TradeDetailCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isBuy = tx.type == TransactionType.buy;
     final accent = isBuy ? ThemeV2.success : ThemeV2.loss;
     final companyName =
@@ -166,7 +169,7 @@ class _TradeDetailCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  isBuy ? 'BUY' : 'SELL',
+                  isBuy ? l10n.tradeBuy : l10n.tradeSell,
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -179,30 +182,36 @@ class _TradeDetailCard extends ConsumerWidget {
           const SizedBox(height: 20),
           Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
           const SizedBox(height: 16),
-          _DetailRow(label: 'Order Type', value: order?.type.label ?? 'Market'),
+          _DetailRow(
+            label: l10n.tradeOrderTypeLabel,
+            value: order?.type.label ?? l10n.tradeMarketType,
+          ),
           if (order?.limitPrice != null)
             _DetailRow(
-              label: 'Limit Price',
+              label: l10n.tradeLimitPriceLabel,
               value: formatUsd(order!.limitPrice!),
             ),
           if (order?.stopPrice != null)
             _DetailRow(
-              label: 'Stop Price',
+              label: l10n.tradeStopPriceLabel,
               value: formatUsd(order!.stopPrice!),
             ),
           _DetailRow(
-            label: isBuy ? 'Shares Bought' : 'Shares Sold',
+            label: isBuy ? l10n.tradeSharesBoughtLabel : l10n.tradeSharesSoldLabel,
             value: tx.shares.toStringAsFixed(4),
           ),
-          _DetailRow(label: 'Price per Share', value: formatUsd(tx.price)),
           _DetailRow(
-            label: 'Total Value',
+            label: l10n.tradePricePerShareLabel,
+            value: formatUsd(tx.price),
+          ),
+          _DetailRow(
+            label: l10n.tradeTotalValueLabel,
             value: formatUsd(tx.shares * tx.price),
           ),
-          _DetailRow(label: 'Date', value: _formatDate(tx.date)),
+          _DetailRow(label: l10n.tradeDateLabel, value: _formatDate(tx.date)),
           if (tx.realizedPnl != null)
             _DetailRow(
-              label: 'Realized P&L',
+              label: l10n.tradeRealizedPnlLabel,
               value: formatUsdSigned(tx.realizedPnl!),
               valueColor: tx.realizedPnl! >= 0 ? ThemeV2.success : ThemeV2.loss,
               isLast: true,

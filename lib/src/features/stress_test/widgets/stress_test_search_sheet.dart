@@ -21,6 +21,7 @@ import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../stress_test_engine.dart';
 import '../stress_test_models.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 /// Shows a search bottom sheet for adding assets to a stress test session.
 /// Returns `true` if at least one asset was purchased.
@@ -108,7 +109,7 @@ class _StressTestSearchSheetState
         setState(() {
           _results = [];
           _isLoading = false;
-          _errorMessage = 'Search failed. Check your connection.';
+          _errorMessage = AppLocalizations.of(context)!.stressTestSearchFailedError;
         });
       }
     });
@@ -132,7 +133,9 @@ class _StressTestSearchSheetState
       if (price <= 0) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'No price data available for $symbol.';
+          _errorMessage = AppLocalizations.of(
+            context,
+          )!.stressTestNoPriceData(symbol);
         });
         return;
       }
@@ -149,7 +152,9 @@ class _StressTestSearchSheetState
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Could not fetch price for $symbol.';
+        _errorMessage = AppLocalizations.of(
+          context,
+        )!.stressTestFetchPriceError(symbol);
       });
     }
   }
@@ -217,7 +222,11 @@ class _StressTestSearchSheetState
       ref.read(sectorRepositoryProvider).loadSector(_selectedSymbol);
       Navigator.of(context).pop(true);
     } else {
-      setState(() => _errorMessage = 'Not enough cash or unable to trade.');
+      setState(
+        () => _errorMessage = AppLocalizations.of(
+          context,
+        )!.stressTestNotEnoughCashError,
+      );
     }
   }
 
@@ -229,6 +238,7 @@ class _StressTestSearchSheetState
     final availableCash =
         ref.watch(stressTestSessionProvider(widget.sessionId))?.cash ?? 0;
     final exceedsCash = _amount > availableCash;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -253,7 +263,9 @@ class _StressTestSearchSheetState
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
             child: Text(
-              _showAmountInput ? 'Confirm Purchase' : 'Add Asset',
+              _showAmountInput
+                  ? l10n.stressTestConfirmPurchase
+                  : l10n.stressTestAddAsset,
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -270,7 +282,7 @@ class _StressTestSearchSheetState
                 controller: _searchController,
                 autofocus: true,
                 decoration: InputDecoration(
-                  hintText: 'Search company (e.g. Apple, Cola)...',
+                  hintText: l10n.stressTestSearchCompanyHint,
                   hintStyle: GoogleFonts.inter(
                     fontSize: 14,
                     color: ThemeV2.textSecondary,
@@ -338,8 +350,8 @@ class _StressTestSearchSheetState
                   ? Center(
                       child: Text(
                         _searchController.text.length < 2
-                            ? 'Type at least 2 characters to search'
-                            : 'No results found',
+                            ? l10n.stressTestTypeMinChars
+                            : l10n.stressTestNoResultsFound,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           color: ThemeV2.textSecondary,
@@ -444,7 +456,9 @@ class _StressTestSearchSheetState
 
                       // Price info
                       Text(
-                        'Current price: ${formatUsd(_selectedPrice)}',
+                        l10n.stressTestCurrentPriceLabel(
+                          formatUsd(_selectedPrice),
+                        ),
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           color: ThemeV2.textSecondary,
@@ -454,7 +468,7 @@ class _StressTestSearchSheetState
 
                       // Quick amounts
                       Text(
-                        'How much do you want to invest?',
+                        l10n.stressTestHowMuchInvest,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -540,7 +554,9 @@ class _StressTestSearchSheetState
                         Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Text(
-                            'Exceeds available cash (${formatUsd(availableCash)})',
+                            l10n.stressTestExceedsCash(
+                              formatUsd(availableCash),
+                            ),
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: ThemeV2.loss,
@@ -594,7 +610,9 @@ class _StressTestSearchSheetState
                                   ),
                                 )
                               : Text(
-                                  'Buy ${formatUsd(_amount)} worth',
+                                  l10n.stressTestBuyAmountWorth(
+                                    formatUsd(_amount),
+                                  ),
                                   style: GoogleFonts.inter(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w800,
@@ -616,7 +634,7 @@ class _StressTestSearchSheetState
                           });
                         },
                         child: Text(
-                          'Choose another company',
+                          l10n.stressTestChooseAnotherCompany,
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             color: ThemeV2.textSecondary,

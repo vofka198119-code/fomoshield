@@ -488,6 +488,78 @@ abstract class AppLocalizations {
   /// **'SELL'**
   String get tradeSell;
 
+  /// No description provided for @tradeDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TRADE DETAIL'**
+  String get tradeDetailTitle;
+
+  /// No description provided for @tradeNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade not found'**
+  String get tradeNotFound;
+
+  /// No description provided for @tradeOrderTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Type'**
+  String get tradeOrderTypeLabel;
+
+  /// No description provided for @tradeMarketType.
+  ///
+  /// In en, this message translates to:
+  /// **'Market'**
+  String get tradeMarketType;
+
+  /// No description provided for @tradeLimitPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Price'**
+  String get tradeLimitPriceLabel;
+
+  /// No description provided for @tradeStopPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop Price'**
+  String get tradeStopPriceLabel;
+
+  /// No description provided for @tradeSharesBoughtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares Bought'**
+  String get tradeSharesBoughtLabel;
+
+  /// No description provided for @tradeSharesSoldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares Sold'**
+  String get tradeSharesSoldLabel;
+
+  /// No description provided for @tradePricePerShareLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per Share'**
+  String get tradePricePerShareLabel;
+
+  /// No description provided for @tradeTotalValueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Value'**
+  String get tradeTotalValueLabel;
+
+  /// No description provided for @tradeDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get tradeDateLabel;
+
+  /// No description provided for @tradeRealizedPnlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Realized P&L'**
+  String get tradeRealizedPnlLabel;
+
   /// No description provided for @disclaimerFooter.
   ///
   /// In en, this message translates to:
@@ -1728,6 +1800,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom'**
   String get testDurationCustom;
+
+  /// No description provided for @stressTestAddAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Asset'**
+  String get stressTestAddAsset;
+
+  /// No description provided for @stressTestConfirmPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Purchase'**
+  String get stressTestConfirmPurchase;
+
+  /// No description provided for @stressTestSearchCompanyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search company (e.g. Apple, Cola)...'**
+  String get stressTestSearchCompanyHint;
+
+  /// No description provided for @stressTestSearchFailedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Search failed. Check your connection.'**
+  String get stressTestSearchFailedError;
+
+  /// No description provided for @stressTestTypeMinChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Type at least 2 characters to search'**
+  String get stressTestTypeMinChars;
+
+  /// No description provided for @stressTestNoResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get stressTestNoResultsFound;
+
+  /// No description provided for @stressTestNoPriceData.
+  ///
+  /// In en, this message translates to:
+  /// **'No price data available for {symbol}.'**
+  String stressTestNoPriceData(String symbol);
+
+  /// No description provided for @stressTestFetchPriceError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not fetch price for {symbol}.'**
+  String stressTestFetchPriceError(String symbol);
+
+  /// No description provided for @stressTestNotEnoughCashError.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough cash or unable to trade.'**
+  String get stressTestNotEnoughCashError;
+
+  /// No description provided for @stressTestCurrentPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current price: {price}'**
+  String stressTestCurrentPriceLabel(String price);
+
+  /// No description provided for @stressTestHowMuchInvest.
+  ///
+  /// In en, this message translates to:
+  /// **'How much do you want to invest?'**
+  String get stressTestHowMuchInvest;
+
+  /// No description provided for @stressTestExceedsCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Exceeds available cash ({cash})'**
+  String stressTestExceedsCash(String cash);
+
+  /// No description provided for @stressTestBuyAmountWorth.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {amount} worth'**
+  String stressTestBuyAmountWorth(String amount);
+
+  /// No description provided for @stressTestChooseAnotherCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose another company'**
+  String get stressTestChooseAnotherCompany;
+
+  /// No description provided for @verdictTradeBreakdownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TRADE BREAKDOWN'**
+  String get verdictTradeBreakdownTitle;
+
+  /// No description provided for @verdictSessionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Session not found'**
+  String get verdictSessionNotFound;
+
+  /// No description provided for @verdictTestDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Duration'**
+  String get verdictTestDurationLabel;
+
+  /// No description provided for @verdictDurationDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String verdictDurationDays(int days);
+
+  /// No description provided for @verdictStatisticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'STATISTICS'**
+  String get verdictStatisticsTitle;
+
+  /// No description provided for @verdictTotalTradesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Trades'**
+  String get verdictTotalTradesLabel;
+
+  /// No description provided for @verdictBoughtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought'**
+  String get verdictBoughtLabel;
+
+  /// No description provided for @verdictSoldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get verdictSoldLabel;
+
+  /// No description provided for @verdictTotalAssetsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL ASSETS'**
+  String get verdictTotalAssetsTitle;
+
+  /// No description provided for @verdictAssetsHeldTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets Held (Total)'**
+  String get verdictAssetsHeldTotalLabel;
+
+  /// No description provided for @verdictAssetsAtEndLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets at Test End'**
+  String get verdictAssetsAtEndLabel;
+
+  /// No description provided for @verdictFinancialSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FINANCIAL SUMMARY'**
+  String get verdictFinancialSummaryTitle;
+
+  /// No description provided for @verdictStartingAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting Amount'**
+  String get verdictStartingAmountLabel;
+
+  /// No description provided for @verdictTotalPnlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total P&L (Realized + Unrealized)'**
+  String get verdictTotalPnlLabel;
+
+  /// No description provided for @verdictProfitableSellsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Profitable Sells ({count})'**
+  String verdictProfitableSellsLabel(int count);
+
+  /// No description provided for @verdictLosingSellsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Losing Sells ({count})'**
+  String verdictLosingSellsLabel(int count);
+
+  /// No description provided for @verdictFinalBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Balance'**
+  String get verdictFinalBalanceLabel;
+
+  /// No description provided for @verdictScenariosTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SCENARIOS EXPERIENCED'**
+  String get verdictScenariosTitle;
+
+  /// No description provided for @verdictScenarioBull.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull Trend'**
+  String get verdictScenarioBull;
+
+  /// No description provided for @verdictScenarioBear.
+  ///
+  /// In en, this message translates to:
+  /// **'Bear Trend'**
+  String get verdictScenarioBear;
+
+  /// No description provided for @verdictScenarioSideways.
+  ///
+  /// In en, this message translates to:
+  /// **'Sideways Market'**
+  String get verdictScenarioSideways;
+
+  /// No description provided for @verdictScenarioVolatility.
+  ///
+  /// In en, this message translates to:
+  /// **'Volatility'**
+  String get verdictScenarioVolatility;
+
+  /// No description provided for @verdictScenarioRecovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery'**
+  String get verdictScenarioRecovery;
+
+  /// No description provided for @verdictScenarioHype.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Hype'**
+  String get verdictScenarioHype;
+
+  /// No description provided for @verdictScenarioSpeculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Speculation'**
+  String get verdictScenarioSpeculation;
+
+  /// No description provided for @verdictScenarioBlackSwan.
+  ///
+  /// In en, this message translates to:
+  /// **'Black Swan'**
+  String get verdictScenarioBlackSwan;
+
+  /// No description provided for @verdictScenarioCrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Crash'**
+  String get verdictScenarioCrash;
+
+  /// No description provided for @verdictCompaniesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPANIES'**
+  String get verdictCompaniesTitle;
+
+  /// No description provided for @verdictNoCompaniesTraded.
+  ///
+  /// In en, this message translates to:
+  /// **'No companies traded.'**
+  String get verdictNoCompaniesTraded;
+
+  /// No description provided for @verdictNoTradesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No trades yet.'**
+  String get verdictNoTradesYet;
+
+  /// No description provided for @verdictTradeBreakdownDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer'**
+  String get verdictTradeBreakdownDisclaimerTitle;
+
+  /// No description provided for @verdictTradeBreakdownDisclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user\'s own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.'**
+  String get verdictTradeBreakdownDisclaimerBody;
 }
 
 class _AppLocalizationsDelegate
