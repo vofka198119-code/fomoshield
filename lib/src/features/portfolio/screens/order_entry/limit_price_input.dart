@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
 import '../../../../shared/utils/currency_format.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Limit Price Input — no card box, everything center-stacked: a big green
@@ -68,12 +69,13 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
       child: Column(
         children: [
           Text(
-            'LIMIT PRICE',
+            l10n.orderEntryLimitPriceTitle,
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -84,8 +86,8 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
           const SizedBox(height: 6),
           Text(
             widget.isBuy
-                ? 'Choose a price below the current price for Buy orders'
-                : 'Choose a price above the current price for Sell orders',
+                ? l10n.orderEntryLimitPriceHintBuy
+                : l10n.orderEntryLimitPriceHintSell,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textPrimary),
           ),

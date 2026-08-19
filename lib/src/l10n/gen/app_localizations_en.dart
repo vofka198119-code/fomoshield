@@ -1105,4 +1105,366 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get verdictTradeBreakdownDisclaimerBody =>
       'The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user\'s own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.';
+
+  @override
+  String get commonRetry => 'Retry';
+
+  @override
+  String get watchlistLimitFree =>
+      'FREE limit: 30 companies. Upgrade to Premium (50).';
+
+  @override
+  String watchlistLimitMax(int max) {
+    return 'Max $max companies reached.';
+  }
+
+  @override
+  String get companyDetailTitle => 'COMPANY OVERVIEW';
+
+  @override
+  String get companyDetailSponsoredTitle => 'Sponsored content';
+
+  @override
+  String get companyDetailWatchAdBody =>
+      'Please watch a short ad to continue viewing company details.';
+
+  @override
+  String get companyDetailWatchAdButton => 'Watch 3s Ad';
+
+  @override
+  String get companyDetailUpgradeNoAds => 'Upgrade to Premium — no ads';
+
+  @override
+  String get companyDetailLoadError => 'Could not load company data';
+
+  @override
+  String get companyDetailLoadErrorBody =>
+      'The market data API may be temporarily unavailable. Please try again.';
+
+  @override
+  String get companyDetailNoPortfolios =>
+      'No portfolios yet. Create one first.';
+
+  @override
+  String get companyDetailSelectPortfolioTitle => 'Select Portfolio';
+
+  @override
+  String companyDetailSelectPortfolioBodyBuy(String symbol) {
+    return 'Where do you want to buy $symbol?';
+  }
+
+  @override
+  String companyDetailSelectPortfolioBodySell(String symbol) {
+    return 'Where do you want to sell $symbol?';
+  }
+
+  @override
+  String get companyDetailChangeLabel => 'CHANGE';
+
+  @override
+  String companyDetailChangePeriodLabel(String period) {
+    return 'CHANGE ($period)';
+  }
+
+  @override
+  String get commonNotAvailable => 'N/A';
+
+  @override
+  String get companyDetailKeyMetricsTitle => 'KEY METRICS';
+
+  @override
+  String get companyDetailMetricPe => 'P/E';
+
+  @override
+  String get companyDetailMetricDividendYield => 'Dividend Yield';
+
+  @override
+  String get companyDetailMetricNetMargin => 'Net Margin';
+
+  @override
+  String get companyDetailMetricOperatingMargin => 'Operating Margin';
+
+  @override
+  String get companyDetailMetricGrossMargin => 'Gross Margin';
+
+  @override
+  String get companyDetailMetricRoe => 'ROE';
+
+  @override
+  String get companyDetailPriceLabel => 'PRICE';
+
+  @override
+  String get companyDetailFsScoreLabel => 'FS SCORE';
+
+  @override
+  String get companyDetailPhasePreMarket => 'PRE-MARKET';
+
+  @override
+  String get companyDetailPhaseMarketOpen => 'MARKET OPEN';
+
+  @override
+  String get companyDetailPhasePostMarket => 'POST-MARKET';
+
+  @override
+  String get companyDetailPhaseMarketClosed => 'MARKET CLOSED';
+
+  @override
+  String get companyDetailPositionTitle => 'MY INVESTMENTS';
+
+  @override
+  String get companyDetailAssetValueLabel => 'Asset Value';
+
+  @override
+  String get companyDetailSharesLabel => 'Shares';
+
+  @override
+  String get companyDetailAvgCostLabel => 'Avg Cost';
+
+  @override
+  String get companyDetailLimitOrdersTitle => 'LIMIT ORDERS';
+
+  @override
+  String companyDetailSymbolLimitOrdersTitle(String symbol) {
+    return '$symbol Limit Orders';
+  }
+
+  @override
+  String companyDetailDividendTrapPenalty(int pts) {
+    return 'Dividend trap penalty: -$pts pts';
+  }
+
+  @override
+  String companyDetailCatastrophicLossPenalty(int pts) {
+    return 'Catastrophic loss penalty: -$pts pts (net margin below -100%)';
+  }
+
+  @override
+  String get companyDetailLegalDisclaimerMethodology =>
+      'Legal Disclaimer & Methodology';
+
+  @override
+  String get companyDetailMarkerValuation => 'Valuation';
+
+  @override
+  String get companyDetailMarkerFinancialHealth => 'Financial Health';
+
+  @override
+  String get companyDetailMarkerGrowthPotential => 'Growth Potential';
+
+  @override
+  String get companyDetailMarkerEfficiency => 'Efficiency';
+
+  @override
+  String get companyDetailMarkerHistoricalTrend => 'Historical Trend';
+
+  @override
+  String get companyDetailMarkerShareholderReturns => 'Shareholder Returns';
+
+  @override
+  String get companyDetailMarkerDescValuation => 'P/E vs sector average';
+
+  @override
+  String get companyDetailMarkerDescFinancialHealth => 'Debt/Equity ratio';
+
+  @override
+  String get companyDetailMarkerDescGrowth => 'Revenue & EPS 5Y growth';
+
+  @override
+  String get companyDetailMarkerDescEfficiency => 'Net margin & ROE';
+
+  @override
+  String get companyDetailMarkerDescHistoricalTrend => '5Y share price CAGR';
+
+  @override
+  String get companyDetailMarkerDescShareholderReturns =>
+      'Dividends & buybacks';
+
+  @override
+  String get companyDetailRatingExcellent => 'Excellent';
+
+  @override
+  String get companyDetailRatingGood => 'Good';
+
+  @override
+  String get companyDetailRatingAverage => 'Average';
+
+  @override
+  String get companyDetailRatingWeak => 'Weak';
+
+  @override
+  String get companyDetailRatingPoor => 'Poor';
+
+  @override
+  String get companyWidgetPriceHeader => 'Price & Header';
+
+  @override
+  String get companyWidgetKeyMetrics => 'Key Metrics';
+
+  @override
+  String get companyWidgetFinancialScore => 'Financial Score';
+
+  @override
+  String get companyWidgetPosition => 'Your Position';
+
+  @override
+  String get companyWidgetLimitOrders => 'Limit Orders';
+
+  @override
+  String companyDetailCashAvailable(String cash) {
+    return '$cash available';
+  }
+
+  @override
+  String get companyDetailAcademicDisclaimerTitle =>
+      'Educational & Academic Disclaimer';
+
+  @override
+  String get companyDetailAcademicDisclaimerBody =>
+      'The methodology, definitions, and analytical principles presented here are based on standard corporate finance theory and valuation frameworks taught in leading business schools. Provided strictly for educational purposes.';
+
+  @override
+  String get companyDetailAdTitle => 'Sponsored Ad';
+
+  @override
+  String get companyDetailAdContinuing => 'Continuing in a moment…';
+
+  @override
+  String get companyDetailNoPriceDataAvailable => 'No price data available';
+
+  @override
+  String get companyDetailChartLoadError => 'Failed to load chart';
+
+  @override
+  String get companyDetailChartNotEnoughData => 'Not enough data';
+
+  @override
+  String get commonOk => 'OK';
+
+  @override
+  String get orderEntryTabMarket => 'Market';
+
+  @override
+  String get orderEntryTabLimit => 'Limit';
+
+  @override
+  String get orderEntryExtendedHoursTitle => 'Extended Hours';
+
+  @override
+  String get orderEntryExtendedHoursSubtitle =>
+      'Off: trade only while the real market is open';
+
+  @override
+  String get orderEntrySimulatedDisclaimerTitle =>
+      'Simulated Trading & Non-Brokerage Disclaimer';
+
+  @override
+  String get orderEntrySimulatedDisclaimerBody =>
+      'This application is not a registered broker-dealer, investment advisor, or financial institution, and does not provide order execution services for real financial markets.\n\nAll buy and sell operations are performed exclusively on a simulated account using virtual currency (Paper Trading). Transactions executed within this app are intended solely for educational purposes, do not result in the purchase or ownership of actual securities, create no shareholder rights, and carry no real-world financial or legal force.';
+
+  @override
+  String get orderEntryUnitUsd => 'USD';
+
+  @override
+  String get orderEntryUnitShares => 'Shares';
+
+  @override
+  String orderEntryApproxShares(String shares) {
+    return '≈ $shares shares';
+  }
+
+  @override
+  String get orderEntryLimitPriceTitle => 'LIMIT PRICE';
+
+  @override
+  String get orderEntryLimitPriceHintBuy =>
+      'Choose a price below the current price for Buy orders';
+
+  @override
+  String get orderEntryLimitPriceHintSell =>
+      'Choose a price above the current price for Sell orders';
+
+  @override
+  String get orderEntryCostLabel => 'Cost:';
+
+  @override
+  String get orderEntryQtyLabel => 'Qty:';
+
+  @override
+  String orderEntrySharesAbbrev(String shares) {
+    return '$shares sh.';
+  }
+
+  @override
+  String get orderEntryPlaceOrder => 'Place Order';
+
+  @override
+  String get orderEntryMarketClosedTitle => 'Market Closed';
+
+  @override
+  String get orderEntryMarketClosedBody =>
+      'Sorry, the market is currently closed, so Market orders can\'t be filled right now.\n\nYou can still place a Limit order — it will wait and execute once the market reopens. Or turn on Extended Hours to trade around the clock.';
+
+  @override
+  String get orderEntryPlaceLimitInstead => 'Place Limit Order Instead';
+
+  @override
+  String get orderEntryEnterAmount => 'Enter an amount';
+
+  @override
+  String get orderEntryInvalidQuantity => 'Invalid quantity';
+
+  @override
+  String get orderEntryEnterValidLimitPrice => 'Enter a valid limit price';
+
+  @override
+  String orderEntryNotEnoughCash(String cash) {
+    return 'Not enough available cash — $cash free (some is reserved for pending orders)';
+  }
+
+  @override
+  String get orderEntryInfoMarket =>
+      'Market orders execute at the best available price. Execution is guaranteed, but the final price may differ from expectations.';
+
+  @override
+  String get orderEntryInfoLimit =>
+      'Limit orders execute only at the specified price or better. Partial or full execution is not guaranteed.';
+
+  @override
+  String get orderEntryInfoStop =>
+      'Stop orders activate when the stop price is reached, then execute as a market order.';
+
+  @override
+  String get orderEntryInfoStopLimit =>
+      'Stop-limit orders activate when the stop price is reached, then execute as a limit order.';
+
+  @override
+  String get stressTestOrderInfoMarket =>
+      'Market orders execute at the best available simulated price. Execution is guaranteed, but the final price may differ from expectations.';
+
+  @override
+  String get stressTestOrderInfoLimit =>
+      'Limit orders execute only once the simulated price reaches your chosen price or better. Execution is not guaranteed.';
+
+  @override
+  String get orderEntryHoldingsLimitTitle => 'Limit Reached';
+
+  @override
+  String orderEntryHoldingsLimitBody(int max) {
+    return 'You\'ve exceeded the allowed limit on asset purchases for this portfolio ($max companies).';
+  }
+
+  @override
+  String get orderEntryHoldingsLimitPromoTitle =>
+      'Portfolio holding limit reached';
+
+  @override
+  String get orderEntryPriceLoadError => 'Could not load the current price';
+
+  @override
+  String get companyDetailDisclaimerTitle =>
+      'Educational Purpose & Legal Disclaimer';
+
+  @override
+  String get companyDetailDisclaimerBody =>
+      'This application operates strictly as an educational simulator designed to help users learn how to analyze and understand business fundamentals. Evaluation scores and analytics are derived from public corporate financial filings, as well as academic frameworks from leading universities and established financial literacy textbooks.\n\nDisplayed market prices and metrics may be delayed, estimated, or differ from live exchange prices. Content within this app does not constitute a solicitation, recommendation, or offer to buy or sell any financial security. All trading decisions are made solely and independently by the user. The developers do not provide financial services and bear no liability for any potential lost profits, financial losses, or loss of real-world capital.\n\nContinued use of this application constitutes your full acknowledgment and acceptance of this disclaimer, including the release of developers from any liability. Failure to read this disclaimer does not exempt the user from compliance nor provide grounds for any claims, disputes, or legal actions.';
 }

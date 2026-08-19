@@ -4,6 +4,7 @@ import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
+import '../../../../l10n/gen/app_localizations.dart';
 import 'order_amount_section.dart' show OrderInputMode;
 
 // ---------------------------------------------------------------------------
@@ -27,6 +28,7 @@ class OrderBottomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
       decoration: BoxDecoration(
@@ -44,7 +46,9 @@ class OrderBottomButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    inputMode == OrderInputMode.cost ? 'Cost:' : 'Qty:',
+                    inputMode == OrderInputMode.cost
+                        ? l10n.orderEntryCostLabel
+                        : l10n.orderEntryQtyLabel,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: ThemeV2.textSecondary,
@@ -53,7 +57,9 @@ class OrderBottomButton extends StatelessWidget {
                   Text(
                     inputMode == OrderInputMode.cost
                         ? formatUsd(displayAmount)
-                        : '${displayAmount.toStringAsFixed(4)} sh.',
+                        : l10n.orderEntrySharesAbbrev(
+                            displayAmount.toStringAsFixed(4),
+                          ),
                     style: interNums(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -89,6 +95,7 @@ class ReviewOrderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final canExecute = onSubmit != null;
 
     if (!canExecute) {
@@ -101,7 +108,7 @@ class ReviewOrderButton extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Text(
-          'Place Order',
+          l10n.orderEntryPlaceOrder,
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -124,7 +131,7 @@ class ReviewOrderButton extends StatelessWidget {
             height: height,
             alignment: Alignment.center,
             child: Text(
-              'Place Order',
+              l10n.orderEntryPlaceOrder,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -150,7 +157,7 @@ class ReviewOrderButton extends StatelessWidget {
             height: height,
             alignment: Alignment.center,
             child: Text(
-              'Place Order',
+              l10n.orderEntryPlaceOrder,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,

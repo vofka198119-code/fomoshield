@@ -2076,6 +2076,636 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user\'s own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.'**
   String get verdictTradeBreakdownDisclaimerBody;
+
+  /// No description provided for @commonRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get commonRetry;
+
+  /// No description provided for @watchlistLimitFree.
+  ///
+  /// In en, this message translates to:
+  /// **'FREE limit: 30 companies. Upgrade to Premium (50).'**
+  String get watchlistLimitFree;
+
+  /// No description provided for @watchlistLimitMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Max {max} companies reached.'**
+  String watchlistLimitMax(int max);
+
+  /// No description provided for @companyDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPANY OVERVIEW'**
+  String get companyDetailTitle;
+
+  /// No description provided for @companyDetailSponsoredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored content'**
+  String get companyDetailSponsoredTitle;
+
+  /// No description provided for @companyDetailWatchAdBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please watch a short ad to continue viewing company details.'**
+  String get companyDetailWatchAdBody;
+
+  /// No description provided for @companyDetailWatchAdButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch 3s Ad'**
+  String get companyDetailWatchAdButton;
+
+  /// No description provided for @companyDetailUpgradeNoAds.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium — no ads'**
+  String get companyDetailUpgradeNoAds;
+
+  /// No description provided for @companyDetailLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load company data'**
+  String get companyDetailLoadError;
+
+  /// No description provided for @companyDetailLoadErrorBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The market data API may be temporarily unavailable. Please try again.'**
+  String get companyDetailLoadErrorBody;
+
+  /// No description provided for @companyDetailNoPortfolios.
+  ///
+  /// In en, this message translates to:
+  /// **'No portfolios yet. Create one first.'**
+  String get companyDetailNoPortfolios;
+
+  /// No description provided for @companyDetailSelectPortfolioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Portfolio'**
+  String get companyDetailSelectPortfolioTitle;
+
+  /// No description provided for @companyDetailSelectPortfolioBodyBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do you want to buy {symbol}?'**
+  String companyDetailSelectPortfolioBodyBuy(String symbol);
+
+  /// No description provided for @companyDetailSelectPortfolioBodySell.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do you want to sell {symbol}?'**
+  String companyDetailSelectPortfolioBodySell(String symbol);
+
+  /// No description provided for @companyDetailChangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CHANGE'**
+  String get companyDetailChangeLabel;
+
+  /// No description provided for @companyDetailChangePeriodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CHANGE ({period})'**
+  String companyDetailChangePeriodLabel(String period);
+
+  /// No description provided for @commonNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get commonNotAvailable;
+
+  /// No description provided for @companyDetailKeyMetricsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'KEY METRICS'**
+  String get companyDetailKeyMetricsTitle;
+
+  /// No description provided for @companyDetailMetricPe.
+  ///
+  /// In en, this message translates to:
+  /// **'P/E'**
+  String get companyDetailMetricPe;
+
+  /// No description provided for @companyDetailMetricDividendYield.
+  ///
+  /// In en, this message translates to:
+  /// **'Dividend Yield'**
+  String get companyDetailMetricDividendYield;
+
+  /// No description provided for @companyDetailMetricNetMargin.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Margin'**
+  String get companyDetailMetricNetMargin;
+
+  /// No description provided for @companyDetailMetricOperatingMargin.
+  ///
+  /// In en, this message translates to:
+  /// **'Operating Margin'**
+  String get companyDetailMetricOperatingMargin;
+
+  /// No description provided for @companyDetailMetricGrossMargin.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross Margin'**
+  String get companyDetailMetricGrossMargin;
+
+  /// No description provided for @companyDetailMetricRoe.
+  ///
+  /// In en, this message translates to:
+  /// **'ROE'**
+  String get companyDetailMetricRoe;
+
+  /// No description provided for @companyDetailPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PRICE'**
+  String get companyDetailPriceLabel;
+
+  /// No description provided for @companyDetailFsScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'FS SCORE'**
+  String get companyDetailFsScoreLabel;
+
+  /// No description provided for @companyDetailPhasePreMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'PRE-MARKET'**
+  String get companyDetailPhasePreMarket;
+
+  /// No description provided for @companyDetailPhaseMarketOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET OPEN'**
+  String get companyDetailPhaseMarketOpen;
+
+  /// No description provided for @companyDetailPhasePostMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'POST-MARKET'**
+  String get companyDetailPhasePostMarket;
+
+  /// No description provided for @companyDetailPhaseMarketClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET CLOSED'**
+  String get companyDetailPhaseMarketClosed;
+
+  /// No description provided for @companyDetailPositionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MY INVESTMENTS'**
+  String get companyDetailPositionTitle;
+
+  /// No description provided for @companyDetailAssetValueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Value'**
+  String get companyDetailAssetValueLabel;
+
+  /// No description provided for @companyDetailSharesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares'**
+  String get companyDetailSharesLabel;
+
+  /// No description provided for @companyDetailAvgCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg Cost'**
+  String get companyDetailAvgCostLabel;
+
+  /// No description provided for @companyDetailLimitOrdersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'LIMIT ORDERS'**
+  String get companyDetailLimitOrdersTitle;
+
+  /// No description provided for @companyDetailSymbolLimitOrdersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{symbol} Limit Orders'**
+  String companyDetailSymbolLimitOrdersTitle(String symbol);
+
+  /// No description provided for @companyDetailDividendTrapPenalty.
+  ///
+  /// In en, this message translates to:
+  /// **'Dividend trap penalty: -{pts} pts'**
+  String companyDetailDividendTrapPenalty(int pts);
+
+  /// No description provided for @companyDetailCatastrophicLossPenalty.
+  ///
+  /// In en, this message translates to:
+  /// **'Catastrophic loss penalty: -{pts} pts (net margin below -100%)'**
+  String companyDetailCatastrophicLossPenalty(int pts);
+
+  /// No description provided for @companyDetailLegalDisclaimerMethodology.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal Disclaimer & Methodology'**
+  String get companyDetailLegalDisclaimerMethodology;
+
+  /// No description provided for @companyDetailMarkerValuation.
+  ///
+  /// In en, this message translates to:
+  /// **'Valuation'**
+  String get companyDetailMarkerValuation;
+
+  /// No description provided for @companyDetailMarkerFinancialHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Health'**
+  String get companyDetailMarkerFinancialHealth;
+
+  /// No description provided for @companyDetailMarkerGrowthPotential.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth Potential'**
+  String get companyDetailMarkerGrowthPotential;
+
+  /// No description provided for @companyDetailMarkerEfficiency.
+  ///
+  /// In en, this message translates to:
+  /// **'Efficiency'**
+  String get companyDetailMarkerEfficiency;
+
+  /// No description provided for @companyDetailMarkerHistoricalTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Historical Trend'**
+  String get companyDetailMarkerHistoricalTrend;
+
+  /// No description provided for @companyDetailMarkerShareholderReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Shareholder Returns'**
+  String get companyDetailMarkerShareholderReturns;
+
+  /// No description provided for @companyDetailMarkerDescValuation.
+  ///
+  /// In en, this message translates to:
+  /// **'P/E vs sector average'**
+  String get companyDetailMarkerDescValuation;
+
+  /// No description provided for @companyDetailMarkerDescFinancialHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt/Equity ratio'**
+  String get companyDetailMarkerDescFinancialHealth;
+
+  /// No description provided for @companyDetailMarkerDescGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue & EPS 5Y growth'**
+  String get companyDetailMarkerDescGrowth;
+
+  /// No description provided for @companyDetailMarkerDescEfficiency.
+  ///
+  /// In en, this message translates to:
+  /// **'Net margin & ROE'**
+  String get companyDetailMarkerDescEfficiency;
+
+  /// No description provided for @companyDetailMarkerDescHistoricalTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'5Y share price CAGR'**
+  String get companyDetailMarkerDescHistoricalTrend;
+
+  /// No description provided for @companyDetailMarkerDescShareholderReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Dividends & buybacks'**
+  String get companyDetailMarkerDescShareholderReturns;
+
+  /// No description provided for @companyDetailRatingExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get companyDetailRatingExcellent;
+
+  /// No description provided for @companyDetailRatingGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get companyDetailRatingGood;
+
+  /// No description provided for @companyDetailRatingAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get companyDetailRatingAverage;
+
+  /// No description provided for @companyDetailRatingWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get companyDetailRatingWeak;
+
+  /// No description provided for @companyDetailRatingPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get companyDetailRatingPoor;
+
+  /// No description provided for @companyWidgetPriceHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Price & Header'**
+  String get companyWidgetPriceHeader;
+
+  /// No description provided for @companyWidgetKeyMetrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Metrics'**
+  String get companyWidgetKeyMetrics;
+
+  /// No description provided for @companyWidgetFinancialScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Score'**
+  String get companyWidgetFinancialScore;
+
+  /// No description provided for @companyWidgetPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Position'**
+  String get companyWidgetPosition;
+
+  /// No description provided for @companyWidgetLimitOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Orders'**
+  String get companyWidgetLimitOrders;
+
+  /// No description provided for @companyDetailCashAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{cash} available'**
+  String companyDetailCashAvailable(String cash);
+
+  /// No description provided for @companyDetailAcademicDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Educational & Academic Disclaimer'**
+  String get companyDetailAcademicDisclaimerTitle;
+
+  /// No description provided for @companyDetailAcademicDisclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The methodology, definitions, and analytical principles presented here are based on standard corporate finance theory and valuation frameworks taught in leading business schools. Provided strictly for educational purposes.'**
+  String get companyDetailAcademicDisclaimerBody;
+
+  /// No description provided for @companyDetailAdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored Ad'**
+  String get companyDetailAdTitle;
+
+  /// No description provided for @companyDetailAdContinuing.
+  ///
+  /// In en, this message translates to:
+  /// **'Continuing in a moment…'**
+  String get companyDetailAdContinuing;
+
+  /// No description provided for @companyDetailNoPriceDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No price data available'**
+  String get companyDetailNoPriceDataAvailable;
+
+  /// No description provided for @companyDetailChartLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load chart'**
+  String get companyDetailChartLoadError;
+
+  /// No description provided for @companyDetailChartNotEnoughData.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data'**
+  String get companyDetailChartNotEnoughData;
+
+  /// No description provided for @commonOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get commonOk;
+
+  /// No description provided for @orderEntryTabMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Market'**
+  String get orderEntryTabMarket;
+
+  /// No description provided for @orderEntryTabLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit'**
+  String get orderEntryTabLimit;
+
+  /// No description provided for @orderEntryExtendedHoursTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extended Hours'**
+  String get orderEntryExtendedHoursTitle;
+
+  /// No description provided for @orderEntryExtendedHoursSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Off: trade only while the real market is open'**
+  String get orderEntryExtendedHoursSubtitle;
+
+  /// No description provided for @orderEntrySimulatedDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulated Trading & Non-Brokerage Disclaimer'**
+  String get orderEntrySimulatedDisclaimerTitle;
+
+  /// No description provided for @orderEntrySimulatedDisclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This application is not a registered broker-dealer, investment advisor, or financial institution, and does not provide order execution services for real financial markets.\n\nAll buy and sell operations are performed exclusively on a simulated account using virtual currency (Paper Trading). Transactions executed within this app are intended solely for educational purposes, do not result in the purchase or ownership of actual securities, create no shareholder rights, and carry no real-world financial or legal force.'**
+  String get orderEntrySimulatedDisclaimerBody;
+
+  /// No description provided for @orderEntryUnitUsd.
+  ///
+  /// In en, this message translates to:
+  /// **'USD'**
+  String get orderEntryUnitUsd;
+
+  /// No description provided for @orderEntryUnitShares.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares'**
+  String get orderEntryUnitShares;
+
+  /// No description provided for @orderEntryApproxShares.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {shares} shares'**
+  String orderEntryApproxShares(String shares);
+
+  /// No description provided for @orderEntryLimitPriceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'LIMIT PRICE'**
+  String get orderEntryLimitPriceTitle;
+
+  /// No description provided for @orderEntryLimitPriceHintBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a price below the current price for Buy orders'**
+  String get orderEntryLimitPriceHintBuy;
+
+  /// No description provided for @orderEntryLimitPriceHintSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a price above the current price for Sell orders'**
+  String get orderEntryLimitPriceHintSell;
+
+  /// No description provided for @orderEntryCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost:'**
+  String get orderEntryCostLabel;
+
+  /// No description provided for @orderEntryQtyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Qty:'**
+  String get orderEntryQtyLabel;
+
+  /// No description provided for @orderEntrySharesAbbrev.
+  ///
+  /// In en, this message translates to:
+  /// **'{shares} sh.'**
+  String orderEntrySharesAbbrev(String shares);
+
+  /// No description provided for @orderEntryPlaceOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Place Order'**
+  String get orderEntryPlaceOrder;
+
+  /// No description provided for @orderEntryMarketClosedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Closed'**
+  String get orderEntryMarketClosedTitle;
+
+  /// No description provided for @orderEntryMarketClosedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorry, the market is currently closed, so Market orders can\'t be filled right now.\n\nYou can still place a Limit order — it will wait and execute once the market reopens. Or turn on Extended Hours to trade around the clock.'**
+  String get orderEntryMarketClosedBody;
+
+  /// No description provided for @orderEntryPlaceLimitInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Place Limit Order Instead'**
+  String get orderEntryPlaceLimitInstead;
+
+  /// No description provided for @orderEntryEnterAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount'**
+  String get orderEntryEnterAmount;
+
+  /// No description provided for @orderEntryInvalidQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid quantity'**
+  String get orderEntryInvalidQuantity;
+
+  /// No description provided for @orderEntryEnterValidLimitPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid limit price'**
+  String get orderEntryEnterValidLimitPrice;
+
+  /// No description provided for @orderEntryNotEnoughCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough available cash — {cash} free (some is reserved for pending orders)'**
+  String orderEntryNotEnoughCash(String cash);
+
+  /// No description provided for @orderEntryInfoMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Market orders execute at the best available price. Execution is guaranteed, but the final price may differ from expectations.'**
+  String get orderEntryInfoMarket;
+
+  /// No description provided for @orderEntryInfoLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit orders execute only at the specified price or better. Partial or full execution is not guaranteed.'**
+  String get orderEntryInfoLimit;
+
+  /// No description provided for @orderEntryInfoStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop orders activate when the stop price is reached, then execute as a market order.'**
+  String get orderEntryInfoStop;
+
+  /// No description provided for @orderEntryInfoStopLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop-limit orders activate when the stop price is reached, then execute as a limit order.'**
+  String get orderEntryInfoStopLimit;
+
+  /// No description provided for @stressTestOrderInfoMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Market orders execute at the best available simulated price. Execution is guaranteed, but the final price may differ from expectations.'**
+  String get stressTestOrderInfoMarket;
+
+  /// No description provided for @stressTestOrderInfoLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit orders execute only once the simulated price reaches your chosen price or better. Execution is not guaranteed.'**
+  String get stressTestOrderInfoLimit;
+
+  /// No description provided for @orderEntryHoldingsLimitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Reached'**
+  String get orderEntryHoldingsLimitTitle;
+
+  /// No description provided for @orderEntryHoldingsLimitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve exceeded the allowed limit on asset purchases for this portfolio ({max} companies).'**
+  String orderEntryHoldingsLimitBody(int max);
+
+  /// No description provided for @orderEntryHoldingsLimitPromoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio holding limit reached'**
+  String get orderEntryHoldingsLimitPromoTitle;
+
+  /// No description provided for @orderEntryPriceLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the current price'**
+  String get orderEntryPriceLoadError;
+
+  /// No description provided for @companyDetailDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Educational Purpose & Legal Disclaimer'**
+  String get companyDetailDisclaimerTitle;
+
+  /// No description provided for @companyDetailDisclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This application operates strictly as an educational simulator designed to help users learn how to analyze and understand business fundamentals. Evaluation scores and analytics are derived from public corporate financial filings, as well as academic frameworks from leading universities and established financial literacy textbooks.\n\nDisplayed market prices and metrics may be delayed, estimated, or differ from live exchange prices. Content within this app does not constitute a solicitation, recommendation, or offer to buy or sell any financial security. All trading decisions are made solely and independently by the user. The developers do not provide financial services and bear no liability for any potential lost profits, financial losses, or loss of real-world capital.\n\nContinued use of this application constitutes your full acknowledgment and acceptance of this disclaimer, including the release of developers from any liability. Failure to read this disclaimer does not exempt the user from compliance nor provide grounds for any claims, disputes, or legal actions.'**
+  String get companyDetailDisclaimerBody;
 }
 
 class _AppLocalizationsDelegate

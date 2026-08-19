@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../orders/order_provider.dart';
 import '../../orders/widgets/order_row_tile.dart';
 import '../../orders/widgets/order_list_sheet.dart';
@@ -24,6 +25,7 @@ class LimitOrdersSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final orders = ref
         .watch(activeOrdersProvider)
         .where((o) => o.assetSymbol == symbol)
@@ -48,7 +50,7 @@ class LimitOrdersSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('LIMIT ORDERS', style: FomoShieldTheme.cardTitle()),
+          Text(l10n.companyDetailLimitOrdersTitle, style: FomoShieldTheme.cardTitle()),
           const Divider(height: 20, color: Color(0x0F000000)),
           for (final order in shown)
             OrderRowTile(
@@ -62,12 +64,12 @@ class LimitOrdersSection extends ConsumerWidget {
                 child: TextButton(
                   onPressed: () => showOrderListSheet(
                     context,
-                    title: '$symbol Limit Orders',
+                    title: l10n.companyDetailSymbolLimitOrdersTitle(symbol),
                     orders: orders,
                     subtitleFor: (o) => portfolioNameFor(o.portfolioId),
                   ),
                   child: Text(
-                    'See all ${orders.length} orders',
+                    l10n.myLimitOrdersSeeAll(orders.length),
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../stress_test/widgets/verdict/stress_test_verdict_disclaimer.dart';
 import 'metric_info_data.dart';
 
@@ -18,6 +19,7 @@ class MetricInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -71,7 +73,7 @@ class MetricInfoScreen extends StatelessWidget {
               if (content.showAcademicDisclaimer) ...[
                 const SizedBox(height: 18),
                 Text(
-                  'Educational & Academic Disclaimer',
+                  l10n.companyDetailAcademicDisclaimerTitle,
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -80,10 +82,7 @@ class MetricInfoScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'The methodology, definitions, and analytical principles '
-                  'presented here are based on standard corporate finance '
-                  'theory and valuation frameworks taught in leading business '
-                  'schools. Provided strictly for educational purposes.',
+                  l10n.companyDetailAcademicDisclaimerBody,
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     color: ThemeV2.textSecondary,

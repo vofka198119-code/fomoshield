@@ -28,6 +28,7 @@ import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/utils/currency_format.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../monetization/monetization_modal.dart';
 import '../../monetization/premium_promo_overlay.dart';
 import '../portfolio_limits_provider.dart';
@@ -204,20 +205,16 @@ class _PortfolioOrderEntryScreenState
     return _heldShares;
   }
 
-  String get _infoText {
+  String _infoText(AppLocalizations l10n) {
     switch (_selectedOrderType) {
       case _OrderType.market:
-        return 'Market orders execute at the best available price. '
-            'Execution is guaranteed, but the final price may differ from expectations.';
+        return l10n.orderEntryInfoMarket;
       case _OrderType.limit:
-        return 'Limit orders execute only at the specified price or better. '
-            'Partial or full execution is not guaranteed.';
+        return l10n.orderEntryInfoLimit;
       case _OrderType.stop:
-        return 'Stop orders activate when the stop price is reached, then '
-            'execute as a market order.';
+        return l10n.orderEntryInfoStop;
       case _OrderType.stopLimit:
-        return 'Stop-limit orders activate when the stop price is reached, then '
-            'execute as a limit order.';
+        return l10n.orderEntryInfoStopLimit;
     }
   }
 
@@ -241,11 +238,12 @@ class _PortfolioOrderEntryScreenState
   }
 
   Future<void> _submitOrder() async {
+    final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter an amount')));
+      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryEnterAmount)));
       return;
     }
 
@@ -259,7 +257,7 @@ class _PortfolioOrderEntryScreenState
     if (shares <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Invalid quantity')));
+      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryInvalidQuantity)));
       return;
     }
 
@@ -290,7 +288,7 @@ class _PortfolioOrderEntryScreenState
       limitPrice = double.tryParse(_limitPriceController.text);
       if (limitPrice == null || limitPrice <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enter a valid limit price')),
+          SnackBar(content: Text(l10n.orderEntryEnterValidLimitPrice)),
         );
         return;
       }
@@ -304,8 +302,7 @@ class _PortfolioOrderEntryScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Not enough available cash — ${formatUsd(_availableCash)} '
-              'free (some is reserved for pending orders)',
+              l10n.orderEntryNotEnoughCash(formatUsd(_availableCash)),
             ),
           ),
         );
@@ -325,7 +322,7 @@ class _PortfolioOrderEntryScreenState
       if (!alreadyHeld) {
         final maxHoldings = ref.read(maxHoldingsPerPortfolioProvider);
         if (portfolio.holdings.length >= maxHoldings) {
-          _showHoldingsLimitReached(maxHoldings);
+          _showHoldingsLimitReached(l10n, maxHoldings);
           return;
         }
       }
@@ -344,7 +341,7 @@ class _PortfolioOrderEntryScreenState
   /// Free tier gets the same premium-upsell stub used elsewhere (real
   /// payment isn't wired up yet); premium is already at its own higher cap,
   /// so it just gets a plain notice — there's nothing to upsell them to.
-  void _showHoldingsLimitReached(int maxHoldings) {
+  void _showHoldingsLimitReached(AppLocalizations l10n, int maxHoldings) {
     final tier = ref.read(subscriptionTierProvider);
     final isPremium =
         tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
@@ -354,7 +351,7 @@ class _PortfolioOrderEntryScreenState
         builder: (ctx) => AlertDialog(
           backgroundColor: ThemeV2.surface,
           title: Text(
-            'Limit Reached',
+            l10n.orderEntryHoldingsLimitTitle,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -362,8 +359,7 @@ class _PortfolioOrderEntryScreenState
             ),
           ),
           content: Text(
-            'You\'ve exceeded the allowed limit on asset purchases for '
-            'this portfolio ($maxHoldings companies).',
+            l10n.orderEntryHoldingsLimitBody(maxHoldings),
             style: GoogleFonts.inter(
               fontSize: 14,
               color: ThemeV2.textSecondary,
@@ -373,7 +369,7 @@ class _PortfolioOrderEntryScreenState
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: Text(
-                'OK',
+                l10n.commonOk,
                 style: GoogleFonts.inter(
                   color: ThemeV2.primary,
                   fontWeight: FontWeight.w600,
@@ -386,7 +382,7 @@ class _PortfolioOrderEntryScreenState
     } else {
       showPremiumPromoOverlay(
         context: context,
-        title: 'Portfolio holding limit reached',
+        title: l10n.orderEntryHoldingsLimitPromoTitle,
         durationSeconds: 5,
         onComplete: () {
           if (context.mounted) showMonetizationModal(context, ref);
@@ -503,13 +499,14 @@ class _PortfolioOrderEntryScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_isLoading) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: Text(
-            '${_isBuy ? 'Buy' : 'Sell'} ${widget.symbol}',
+            '${_isBuy ? l10n.tradeBuy : l10n.tradeSell} ${widget.symbol}',
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -535,7 +532,7 @@ class _PortfolioOrderEntryScreenState
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: Text(
-            '${_isBuy ? 'Buy' : 'Sell'} ${widget.symbol}',
+            '${_isBuy ? l10n.tradeBuy : l10n.tradeSell} ${widget.symbol}',
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -564,7 +561,7 @@ class _PortfolioOrderEntryScreenState
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Could not load the current price',
+                  l10n.orderEntryPriceLoadError,
                   style: GoogleFonts.inter(
                     color: ThemeV2.textPrimary,
                     fontSize: 16,
@@ -576,7 +573,7 @@ class _PortfolioOrderEntryScreenState
                 ElevatedButton.icon(
                   onPressed: _fetchPrice,
                   icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: const Text('Retry'),
+                  label: Text(l10n.commonRetry),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ThemeV2.primary,
                     foregroundColor: Colors.white,
@@ -638,7 +635,7 @@ class _PortfolioOrderEntryScreenState
                         _limitPriceController.clear();
                         _activeKeypad = _ActiveKeypad.limitPrice;
                       }),
-                      infoText: _infoText,
+                      infoText: _infoText(l10n),
                       extendedHours: _extendedHours,
                       onExtendedHoursChanged: _setExtendedHours,
                     ),

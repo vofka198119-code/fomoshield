@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Market Closed Dialog — shown when a Market order is attempted with
@@ -10,6 +11,7 @@ import '../../../../core/theme/theme_v2.dart';
 
 /// Returns true if the user tapped "Place Limit Order Instead".
 Future<bool> showMarketClosedDialog(BuildContext context) async {
+  final l10n = AppLocalizations.of(context)!;
   final result = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
@@ -20,7 +22,7 @@ Future<bool> showMarketClosedDialog(BuildContext context) async {
           const Icon(Icons.schedule_rounded, color: ThemeV2.primary, size: 22),
           const SizedBox(width: 10),
           Text(
-            'Market Closed',
+            l10n.orderEntryMarketClosedTitle,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -30,11 +32,7 @@ Future<bool> showMarketClosedDialog(BuildContext context) async {
         ],
       ),
       content: Text(
-        'Sorry, the market is currently closed, so Market orders can\'t be '
-        'filled right now.\n\n'
-        'You can still place a Limit order — it will wait and execute once '
-        'the market reopens. Or turn on Extended Hours to trade around the '
-        'clock.',
+        l10n.orderEntryMarketClosedBody,
         style: GoogleFonts.inter(
           fontSize: 13,
           color: ThemeV2.textSecondary,
@@ -45,14 +43,14 @@ Future<bool> showMarketClosedDialog(BuildContext context) async {
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
           child: Text(
-            'OK',
+            l10n.commonOk,
             style: GoogleFonts.inter(color: ThemeV2.textSecondary),
           ),
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
           child: Text(
-            'Place Limit Order Instead',
+            l10n.orderEntryPlaceLimitInstead,
             style: GoogleFonts.inter(
               color: ThemeV2.primary,
               fontWeight: FontWeight.w600,

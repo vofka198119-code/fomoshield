@@ -7,18 +7,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 class SimulatedTradingDisclaimer extends StatelessWidget {
   const SimulatedTradingDisclaimer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
         children: [
           Text(
-            'Simulated Trading & Non-Brokerage Disclaimer',
+            l10n.orderEntrySimulatedDisclaimerTitle,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 10,
@@ -28,15 +30,7 @@ class SimulatedTradingDisclaimer extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'This application is not a registered broker-dealer, investment '
-            'advisor, or financial institution, and does not provide order '
-            'execution services for real financial markets.\n\n'
-            'All buy and sell operations are performed exclusively on a '
-            'simulated account using virtual currency (Paper Trading). '
-            'Transactions executed within this app are intended solely for '
-            'educational purposes, do not result in the purchase or '
-            'ownership of actual securities, create no shareholder rights, '
-            'and carry no real-world financial or legal force.',
+            l10n.orderEntrySimulatedDisclaimerBody,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,

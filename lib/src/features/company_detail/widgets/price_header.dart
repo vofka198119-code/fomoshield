@@ -18,11 +18,11 @@ import '../../market_clock/market_clock_engine.dart'
 // local clock, so this always agrees with the actual NYSE session.
 // ===========================================================================
 
-String _phaseLabel(MarketPhase p) => switch (p) {
-  MarketPhase.preMarket => 'PRE-MARKET',
-  MarketPhase.marketOpen => 'MARKET OPEN',
-  MarketPhase.afterHours => 'POST-MARKET',
-  MarketPhase.closed => 'MARKET CLOSED',
+String _phaseLabel(AppLocalizations l10n, MarketPhase p) => switch (p) {
+  MarketPhase.preMarket => l10n.companyDetailPhasePreMarket,
+  MarketPhase.marketOpen => l10n.companyDetailPhaseMarketOpen,
+  MarketPhase.afterHours => l10n.companyDetailPhasePostMarket,
+  MarketPhase.closed => l10n.companyDetailPhaseMarketClosed,
 };
 
 // ===========================================================================
@@ -76,6 +76,7 @@ class PriceHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
     // Home Portfolio widget's cell fills are a 10%-alpha tint meant for a
     // light card background — flattened against white here so it still
@@ -183,7 +184,7 @@ class PriceHeader extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _priceCell(),
+                      _priceCell(l10n),
                       const SizedBox(height: 10),
                       // Change — fill/colors unchanged for now (still the
                       // olive/success/loss tint used elsewhere), just
@@ -234,7 +235,7 @@ class PriceHeader extends StatelessWidget {
                               border: Border.all(color: ThemeV2.divider),
                             ),
                           )
-                        : _fsScoreCell(fsScore!),
+                        : _fsScoreCell(l10n, fsScore!),
                   ),
                 ],
               ],
@@ -253,7 +254,7 @@ class PriceHeader extends StatelessWidget {
 
   // Green-gradient card duplicating FinancialScoreWidget's circular gauge,
   // so the score is visible right at the top without scrolling down.
-  Widget _fsScoreCell(int score) {
+  Widget _fsScoreCell(AppLocalizations l10n, int score) {
     final color = _gaugeColor(score);
 
     return Container(
@@ -263,7 +264,7 @@ class PriceHeader extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'FS SCORE',
+            l10n.companyDetailFsScoreLabel,
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
@@ -316,7 +317,7 @@ class PriceHeader extends StatelessWidget {
     );
   }
 
-  Widget _priceCell() {
+  Widget _priceCell(AppLocalizations l10n) {
     String sessionLabel = '';
     bool isOpen = false;
     if (showSessionLabel) {
@@ -325,7 +326,7 @@ class PriceHeader extends StatelessWidget {
         isOpen = phaseGlow;
       } else {
         final phase = resolveMarketClockState(nowInNewYork()).phase;
-        sessionLabel = _phaseLabel(phase);
+        sessionLabel = _phaseLabel(l10n, phase);
         isOpen = phase == MarketPhase.marketOpen;
       }
     }
@@ -342,7 +343,7 @@ class PriceHeader extends StatelessWidget {
           Row(
             children: [
               Text(
-                'PRICE',
+                l10n.companyDetailPriceLabel,
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,

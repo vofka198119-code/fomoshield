@@ -22,6 +22,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../shared/guardian/guardian_engine.dart';
 import '../../../shared/guardian/guardian_providers.dart';
 import '../../../shared/utils/currency_format.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_pending_orders_provider.dart';
@@ -121,14 +122,12 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         widget.price;
   }
 
-  String get _infoText {
+  String _infoText(AppLocalizations l10n) {
     switch (_selectedOrderType) {
       case _OrderType.market:
-        return 'Market orders execute at the best available simulated price. '
-            'Execution is guaranteed, but the final price may differ from expectations.';
+        return l10n.stressTestOrderInfoMarket;
       case _OrderType.limit:
-        return 'Limit orders execute only once the simulated price reaches your '
-            'chosen price or better. Execution is not guaranteed.';
+        return l10n.stressTestOrderInfoLimit;
     }
   }
 
@@ -162,11 +161,12 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
   }
 
   void _submitOrder() {
+    final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter an amount')));
+      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryEnterAmount)));
       return;
     }
 
@@ -185,7 +185,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     if (shares <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Invalid quantity')));
+      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryInvalidQuantity)));
       return;
     }
 
@@ -194,7 +194,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       limitPrice = double.tryParse(_limitPriceController.text);
       if (limitPrice == null || limitPrice <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enter a valid limit price')),
+          SnackBar(content: Text(l10n.orderEntryEnterValidLimitPrice)),
         );
         return;
       }
@@ -209,8 +209,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Not enough available cash — ${formatUsd(_availableCash)} '
-              'free (some is reserved for pending orders)',
+              l10n.orderEntryNotEnoughCash(formatUsd(_availableCash)),
             ),
           ),
         );
@@ -322,12 +321,13 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = _session;
     if (session == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: Text('Session not found')),
+        body: Center(child: Text(l10n.stressTestSessionNotFound)),
       );
     }
 
@@ -378,7 +378,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                         _limitPriceController.clear();
                         _activeKeypad = _ActiveKeypad.limitPrice;
                       }),
-                      infoText: _infoText,
+                      infoText: _infoText(l10n),
                       // No Extended Hours — simulated market is always open.
                     ),
                   ],

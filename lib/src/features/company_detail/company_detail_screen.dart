@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
@@ -103,6 +104,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_showAd) {
       return Scaffold(
         backgroundColor: Colors.transparent,
@@ -124,7 +126,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Sponsored content',
+                  l10n.companyDetailSponsoredTitle,
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -133,7 +135,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Please watch a short ad to continue viewing company details.',
+                  l10n.companyDetailWatchAdBody,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 14,
@@ -155,7 +157,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                       ),
                     ),
                     child: Text(
-                      'Watch 3s Ad',
+                      l10n.companyDetailWatchAdButton,
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w700,
                         fontSize: 15,
@@ -169,7 +171,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     showMonetizationModal(context, ref);
                   },
                   child: Text(
-                    'Upgrade to Premium — no ads',
+                    l10n.companyDetailUpgradeNoAds,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: ThemeV2.primary,
@@ -217,7 +219,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Could not load company data',
+                  l10n.companyDetailLoadError,
                   style: GoogleFonts.inter(
                     color: ThemeV2.textPrimary,
                     fontSize: 18,
@@ -227,7 +229,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'The market data API may be temporarily unavailable. Please try again.',
+                  l10n.companyDetailLoadErrorBody,
                   style: GoogleFonts.inter(
                     color: ThemeV2.textSecondary,
                     fontSize: 14,
@@ -240,7 +242,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     ref.invalidate(companyDetailProvider(widget.symbol));
                   },
                   icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: const Text('Retry'),
+                  label: Text(l10n.commonRetry),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ThemeV2.primary,
                     foregroundColor: Colors.white,
@@ -309,10 +311,11 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
   }
 
   void _openOrderEntry(String type) {
+    final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.read(portfoliosProvider);
     if (portfolios.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No portfolios yet. Create one first.')),
+        SnackBar(content: Text(l10n.companyDetailNoPortfolios)),
       );
       return;
     }
@@ -358,7 +361,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Select Portfolio',
+              l10n.companyDetailSelectPortfolioTitle,
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -367,8 +370,9 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Where do you want to ${type == 'buy' ? 'buy' : 'sell'} '
-              '${widget.symbol}?',
+              type == 'buy'
+                  ? l10n.companyDetailSelectPortfolioBodyBuy(widget.symbol)
+                  : l10n.companyDetailSelectPortfolioBodySell(widget.symbol),
               style: GoogleFonts.inter(
                 fontSize: 13,
                 color: ThemeV2.textSecondary,
@@ -400,6 +404,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final profile = widget.data['profile'] as Map<String, dynamic>? ?? {};
     final quote = widget.data['quote'] as Map<String, dynamic>? ?? {};
     final metrics = widget.data['metrics'] as Map<String, dynamic>? ?? {};
@@ -435,7 +440,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      'COMPANY OVERVIEW',
+                      l10n.companyDetailTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
@@ -473,8 +478,8 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             SnackBar(
                               content: Text(
                                 maxW == 30
-                                    ? 'FREE limit: 30 companies. Upgrade to Premium (50).'
-                                    : 'Max $maxW companies reached.',
+                                    ? l10n.watchlistLimitFree
+                                    : l10n.watchlistLimitMax(maxW),
                                 style: GoogleFonts.inter(fontSize: 13),
                               ),
                               backgroundColor: ThemeV2.primary,
@@ -535,7 +540,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             size: 20,
                           ),
                           label: Text(
-                            'Add widgets',
+                            l10n.homeAddWidgets,
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -567,7 +572,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                         child: Column(
                           children: [
                             Text(
-                              'Educational Purpose & Legal Disclaimer',
+                              l10n.companyDetailDisclaimerTitle,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 10,
@@ -577,32 +582,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'This application operates strictly as an '
-                              'educational simulator designed to help users '
-                              'learn how to analyze and understand business '
-                              'fundamentals. Evaluation scores and analytics '
-                              'are derived from public corporate financial '
-                              'filings, as well as academic frameworks from '
-                              'leading universities and established financial '
-                              'literacy textbooks.\n\n'
-                              'Displayed market prices and metrics may be '
-                              'delayed, estimated, or differ from live '
-                              'exchange prices. Content within this app does '
-                              'not constitute a solicitation, recommendation, '
-                              'or offer to buy or sell any financial security. '
-                              'All trading decisions are made solely and '
-                              'independently by the user. The developers do '
-                              'not provide financial services and bear no '
-                              'liability for any potential lost profits, '
-                              'financial losses, or loss of real-world '
-                              'capital.\n\n'
-                              'Continued use of this application constitutes '
-                              'your full acknowledgment and acceptance of '
-                              'this disclaimer, including the release of '
-                              'developers from any liability. Failure to read '
-                              'this disclaimer does not exempt the user from '
-                              'compliance nor provide grounds for any claims, '
-                              'disputes, or legal actions.',
+                              l10n.companyDetailDisclaimerBody,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 9,
@@ -650,6 +630,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
   }) {
     switch (id) {
       case 'price_header':
+        final l10n = AppLocalizations.of(context)!;
         final hoverPrice = ref.watch(chartHoverPriceProvider(symbol));
         final periodChange = ref.watch(chartPeriodChangeProvider(symbol));
         final shownChange = periodChange?.change ?? change;
@@ -665,8 +646,8 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
               changePercent: shownChangePercent,
               isUp: shownChange >= 0,
               changeLabel: periodChange != null
-                  ? 'CHANGE (${periodChange.periodLabel})'
-                  : 'CHANGE',
+                  ? l10n.companyDetailChangePeriodLabel(periodChange.periodLabel)
+                  : l10n.companyDetailChangeLabel,
               fsScore: scoreData['financial_score'] as int?,
             ),
             const SizedBox(height: 16),

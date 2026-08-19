@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Company Detail Widget Order Provider (SharedPreferences-backed)
@@ -32,20 +33,20 @@ class CompanyWidgetConfig {
 
   const CompanyWidgetConfig({required this.id, required this.visible});
 
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (id) {
       case 'price_header':
-        return 'Price & Header';
+        return l10n.companyWidgetPriceHeader;
       case 'chart':
-        return 'Price Chart';
+        return l10n.stressTestWidgetPriceChart;
       case 'key_metrics':
-        return 'Key Metrics';
+        return l10n.companyWidgetKeyMetrics;
       case 'financial_score':
-        return 'Financial Score';
+        return l10n.companyWidgetFinancialScore;
       case 'position':
-        return 'Your Position';
+        return l10n.companyWidgetPosition;
       case 'limit_orders':
-        return 'Limit Orders';
+        return l10n.companyWidgetLimitOrders;
       default:
         return id;
     }

@@ -1108,4 +1108,368 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get verdictTradeBreakdownDisclaimerBody =>
       'Результаты этого стресс-теста являются исключительно результатом компьютерной симуляции и предоставлены только в образовательных и учебных целях. Они основаны на заданных моделью сценариях и исторических рыночных событиях и не отражают, не предсказывают и не гарантируют результаты какого-либо портфеля в реальных рыночных условиях.\n\nРеальное поведение рынка, отдельных компаний и финансовых активов может существенно отличаться от результатов симуляции. Прошлые рыночные события и результаты не гарантируют аналогичных результатов в будущем.\n\nЛюбые оценки, рейтинги, вердикты или иные показатели, представленные в тесте, не являются инвестиционной, финансовой или иной профессиональной консультацией, а также не являются рекомендацией, предложением или побуждением покупать либо продавать какой-либо финансовый актив или основанием для принятия инвестиционных решений.\n\nЛюбое решение, принятое с использованием или с учётом информации, предоставленной приложением, принимается исключительно по усмотрению и на риск пользователя. Мы не гарантируем прибыль и не несём ответственности за какие-либо финансовые потери, убытки или упущенную выгоду, возникшие в результате использования симуляции или её результатов.\n\nЦель стресс-теста — помочь пользователям изучить рыночные сценарии, принципы инвестирования и собственное поведение в смоделированной среде, а не предсказать будущее.';
+
+  @override
+  String get commonRetry => 'Повторить';
+
+  @override
+  String get watchlistLimitFree =>
+      'Бесплатный лимит: 30 компаний. Premium — до 50.';
+
+  @override
+  String watchlistLimitMax(int max) {
+    return 'Достигнут лимит: $max компаний.';
+  }
+
+  @override
+  String get companyDetailTitle => 'О КОМПАНИИ';
+
+  @override
+  String get companyDetailSponsoredTitle => 'Спонсорский контент';
+
+  @override
+  String get companyDetailWatchAdBody =>
+      'Посмотрите короткую рекламу, чтобы продолжить просмотр информации о компании.';
+
+  @override
+  String get companyDetailWatchAdButton => 'Смотреть рекламу (3с)';
+
+  @override
+  String get companyDetailUpgradeNoAds => 'Перейти на Premium — без рекламы';
+
+  @override
+  String get companyDetailLoadError => 'Не удалось загрузить данные компании';
+
+  @override
+  String get companyDetailLoadErrorBody =>
+      'API рыночных данных может быть временно недоступен. Попробуйте ещё раз.';
+
+  @override
+  String get companyDetailNoPortfolios =>
+      'Портфелей пока нет. Сначала создайте один.';
+
+  @override
+  String get companyDetailSelectPortfolioTitle => 'Выбор портфеля';
+
+  @override
+  String companyDetailSelectPortfolioBodyBuy(String symbol) {
+    return 'В какой портфель вы хотите купить $symbol?';
+  }
+
+  @override
+  String companyDetailSelectPortfolioBodySell(String symbol) {
+    return 'В какой портфель вы хотите продать $symbol?';
+  }
+
+  @override
+  String get companyDetailChangeLabel => 'ИЗМЕНЕНИЕ';
+
+  @override
+  String companyDetailChangePeriodLabel(String period) {
+    return 'ИЗМЕНЕНИЕ ($period)';
+  }
+
+  @override
+  String get commonNotAvailable => 'Н/Д';
+
+  @override
+  String get companyDetailKeyMetricsTitle => 'КЛЮЧЕВЫЕ ПОКАЗАТЕЛИ';
+
+  @override
+  String get companyDetailMetricPe => 'P/E';
+
+  @override
+  String get companyDetailMetricDividendYield => 'Дивидендная доходность';
+
+  @override
+  String get companyDetailMetricNetMargin => 'Чистая маржа';
+
+  @override
+  String get companyDetailMetricOperatingMargin => 'Операционная маржа';
+
+  @override
+  String get companyDetailMetricGrossMargin => 'Валовая маржа';
+
+  @override
+  String get companyDetailMetricRoe => 'ROE';
+
+  @override
+  String get companyDetailPriceLabel => 'ЦЕНА';
+
+  @override
+  String get companyDetailFsScoreLabel => 'FS ОЦЕНКА';
+
+  @override
+  String get companyDetailPhasePreMarket => 'ПРЕДТОРГИ';
+
+  @override
+  String get companyDetailPhaseMarketOpen => 'РЫНОК ОТКРЫТ';
+
+  @override
+  String get companyDetailPhasePostMarket => 'ПОСТТОРГИ';
+
+  @override
+  String get companyDetailPhaseMarketClosed => 'РЫНОК ЗАКРЫТ';
+
+  @override
+  String get companyDetailPositionTitle => 'МОИ ИНВЕСТИЦИИ';
+
+  @override
+  String get companyDetailAssetValueLabel => 'Стоимость актива';
+
+  @override
+  String get companyDetailSharesLabel => 'Акции';
+
+  @override
+  String get companyDetailAvgCostLabel => 'Средняя цена';
+
+  @override
+  String get companyDetailLimitOrdersTitle => 'ЛИМИТНЫЕ ОРДЕРА';
+
+  @override
+  String companyDetailSymbolLimitOrdersTitle(String symbol) {
+    return 'Лимитные ордера $symbol';
+  }
+
+  @override
+  String companyDetailDividendTrapPenalty(int pts) {
+    return 'Штраф за дивидендную ловушку: -$pts б.';
+  }
+
+  @override
+  String companyDetailCatastrophicLossPenalty(int pts) {
+    return 'Штраф за критический убыток: -$pts б. (чистая маржа ниже -100%)';
+  }
+
+  @override
+  String get companyDetailLegalDisclaimerMethodology =>
+      'Юридический дисклеймер и методология';
+
+  @override
+  String get companyDetailMarkerValuation => 'Оценка стоимости';
+
+  @override
+  String get companyDetailMarkerFinancialHealth => 'Финансовое здоровье';
+
+  @override
+  String get companyDetailMarkerGrowthPotential => 'Потенциал роста';
+
+  @override
+  String get companyDetailMarkerEfficiency => 'Эффективность';
+
+  @override
+  String get companyDetailMarkerHistoricalTrend => 'Исторический тренд';
+
+  @override
+  String get companyDetailMarkerShareholderReturns => 'Доход акционеров';
+
+  @override
+  String get companyDetailMarkerDescValuation => 'P/E относительно сектора';
+
+  @override
+  String get companyDetailMarkerDescFinancialHealth =>
+      'Соотношение долг/капитал';
+
+  @override
+  String get companyDetailMarkerDescGrowth => 'Рост выручки и EPS за 5 лет';
+
+  @override
+  String get companyDetailMarkerDescEfficiency => 'Чистая маржа и ROE';
+
+  @override
+  String get companyDetailMarkerDescHistoricalTrend =>
+      'CAGR цены акции за 5 лет';
+
+  @override
+  String get companyDetailMarkerDescShareholderReturns => 'Дивиденды и байбэки';
+
+  @override
+  String get companyDetailRatingExcellent => 'Отлично';
+
+  @override
+  String get companyDetailRatingGood => 'Хорошо';
+
+  @override
+  String get companyDetailRatingAverage => 'Средне';
+
+  @override
+  String get companyDetailRatingWeak => 'Слабо';
+
+  @override
+  String get companyDetailRatingPoor => 'Плохо';
+
+  @override
+  String get companyWidgetPriceHeader => 'Цена и заголовок';
+
+  @override
+  String get companyWidgetKeyMetrics => 'Ключевые показатели';
+
+  @override
+  String get companyWidgetFinancialScore => 'Финансовая оценка';
+
+  @override
+  String get companyWidgetPosition => 'Ваша позиция';
+
+  @override
+  String get companyWidgetLimitOrders => 'Лимитные ордера';
+
+  @override
+  String companyDetailCashAvailable(String cash) {
+    return '$cash доступно';
+  }
+
+  @override
+  String get companyDetailAcademicDisclaimerTitle =>
+      'Образовательный и академический дисклеймер';
+
+  @override
+  String get companyDetailAcademicDisclaimerBody =>
+      'Представленная здесь методология, определения и аналитические принципы основаны на стандартной теории корпоративных финансов и моделях оценки, преподаваемых в ведущих бизнес-школах. Предоставлено исключительно в образовательных целях.';
+
+  @override
+  String get companyDetailAdTitle => 'Спонсорская реклама';
+
+  @override
+  String get companyDetailAdContinuing => 'Продолжение через мгновение…';
+
+  @override
+  String get companyDetailNoPriceDataAvailable => 'Нет данных о цене';
+
+  @override
+  String get companyDetailChartLoadError => 'Не удалось загрузить график';
+
+  @override
+  String get companyDetailChartNotEnoughData => 'Недостаточно данных';
+
+  @override
+  String get commonOk => 'ОК';
+
+  @override
+  String get orderEntryTabMarket => 'Рыночная';
+
+  @override
+  String get orderEntryTabLimit => 'Лимитная';
+
+  @override
+  String get orderEntryExtendedHoursTitle => 'Расширенные часы';
+
+  @override
+  String get orderEntryExtendedHoursSubtitle =>
+      'Выкл.: торговля только пока открыт реальный рынок';
+
+  @override
+  String get orderEntrySimulatedDisclaimerTitle =>
+      'Дисклеймер: симулированная торговля, не брокерская деятельность';
+
+  @override
+  String get orderEntrySimulatedDisclaimerBody =>
+      'Это приложение не является зарегистрированным брокером-дилером, инвестиционным консультантом или финансовой организацией и не предоставляет услуги по исполнению ордеров на реальных финансовых рынках.\n\nВсе операции покупки и продажи выполняются исключительно на симулированном счёте с использованием виртуальной валюты (Paper Trading). Сделки, совершённые в этом приложении, предназначены исключительно для образовательных целей, не приводят к покупке или владению реальными ценными бумагами, не создают прав акционера и не имеют реальной финансовой или юридической силы.';
+
+  @override
+  String get orderEntryUnitUsd => 'USD';
+
+  @override
+  String get orderEntryUnitShares => 'Акции';
+
+  @override
+  String orderEntryApproxShares(String shares) {
+    return '≈ $shares акций';
+  }
+
+  @override
+  String get orderEntryLimitPriceTitle => 'ЛИМИТНАЯ ЦЕНА';
+
+  @override
+  String get orderEntryLimitPriceHintBuy =>
+      'Выберите цену ниже текущей для ордера на покупку';
+
+  @override
+  String get orderEntryLimitPriceHintSell =>
+      'Выберите цену выше текущей для ордера на продажу';
+
+  @override
+  String get orderEntryCostLabel => 'Стоимость:';
+
+  @override
+  String get orderEntryQtyLabel => 'Кол-во:';
+
+  @override
+  String orderEntrySharesAbbrev(String shares) {
+    return '$shares шт.';
+  }
+
+  @override
+  String get orderEntryPlaceOrder => 'Разместить ордер';
+
+  @override
+  String get orderEntryMarketClosedTitle => 'Рынок закрыт';
+
+  @override
+  String get orderEntryMarketClosedBody =>
+      'Извините, рынок сейчас закрыт, поэтому рыночные ордера не могут быть исполнены прямо сейчас.\n\nВы всё ещё можете разместить лимитный ордер — он будет ждать и исполнится, когда рынок снова откроется. Либо включите расширенные часы, чтобы торговать круглосуточно.';
+
+  @override
+  String get orderEntryPlaceLimitInstead => 'Разместить лимитный ордер вместо';
+
+  @override
+  String get orderEntryEnterAmount => 'Введите сумму';
+
+  @override
+  String get orderEntryInvalidQuantity => 'Некорректное количество';
+
+  @override
+  String get orderEntryEnterValidLimitPrice =>
+      'Введите корректную лимитную цену';
+
+  @override
+  String orderEntryNotEnoughCash(String cash) {
+    return 'Недостаточно доступных средств — свободно $cash (часть зарезервирована под ожидающие ордера)';
+  }
+
+  @override
+  String get orderEntryInfoMarket =>
+      'Рыночные ордера исполняются по лучшей доступной цене. Исполнение гарантировано, но итоговая цена может отличаться от ожидаемой.';
+
+  @override
+  String get orderEntryInfoLimit =>
+      'Лимитные ордера исполняются только по указанной цене или лучше. Частичное или полное исполнение не гарантировано.';
+
+  @override
+  String get orderEntryInfoStop =>
+      'Стоп-ордера активируются при достижении стоп-цены, после чего исполняются как рыночный ордер.';
+
+  @override
+  String get orderEntryInfoStopLimit =>
+      'Стоп-лимит ордера активируются при достижении стоп-цены, после чего исполняются как лимитный ордер.';
+
+  @override
+  String get stressTestOrderInfoMarket =>
+      'Рыночные ордера исполняются по лучшей доступной симулированной цене. Исполнение гарантировано, но итоговая цена может отличаться от ожидаемой.';
+
+  @override
+  String get stressTestOrderInfoLimit =>
+      'Лимитные ордера исполняются, только когда симулированная цена достигнет выбранной вами цены или лучше. Исполнение не гарантировано.';
+
+  @override
+  String get orderEntryHoldingsLimitTitle => 'Достигнут лимит';
+
+  @override
+  String orderEntryHoldingsLimitBody(int max) {
+    return 'Вы превысили допустимый лимит на покупку активов для этого портфеля ($max компаний).';
+  }
+
+  @override
+  String get orderEntryHoldingsLimitPromoTitle =>
+      'Достигнут лимит активов портфеля';
+
+  @override
+  String get orderEntryPriceLoadError => 'Не удалось загрузить текущую цену';
+
+  @override
+  String get companyDetailDisclaimerTitle =>
+      'Образовательное назначение и юридический дисклеймер';
+
+  @override
+  String get companyDetailDisclaimerBody =>
+      'Это приложение работает исключительно как образовательный симулятор, созданный, чтобы помочь пользователям научиться анализировать и понимать финансовые показатели бизнеса. Оценки и аналитика формируются на основе публичной финансовой отчётности компаний, а также академических моделей ведущих университетов и признанных учебников по финансовой грамотности.\n\nОтображаемые рыночные цены и показатели могут быть задержаны, оценочны или отличаться от реальных биржевых цен. Содержимое приложения не является предложением, рекомендацией или побуждением покупать либо продавать какие-либо финансовые активы. Все торговые решения принимаются исключительно и самостоятельно пользователем. Разработчики не оказывают финансовых услуг и не несут ответственности за какую-либо упущенную выгоду, финансовые потери или потерю реального капитала.\n\nПродолжая использовать это приложение, вы полностью подтверждаете и принимаете условия данного дисклеймера, включая освобождение разработчиков от какой-либо ответственности. Отсутствие ознакомления с данным дисклеймером не освобождает пользователя от соблюдения его условий и не даёт оснований для каких-либо претензий, споров или судебных исков.';
 }

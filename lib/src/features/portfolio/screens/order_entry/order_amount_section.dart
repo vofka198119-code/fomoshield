@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
 import '../../../../shared/utils/currency_format.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import '../../../market_clock/market_clock_dial.dart'
     show dialDark, dialBrassLight, darkCardDecoration, darkCardGradient;
 
@@ -61,12 +62,13 @@ class OrderAmountSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final displayAmount = double.tryParse(controller.text) ?? 0;
 
-    return Column(children: [_amountInput(displayAmount), _slider()]);
+    return Column(children: [_amountInput(l10n, displayAmount), _slider()]);
   }
 
-  Widget _amountInput(double displayAmount) {
+  Widget _amountInput(AppLocalizations l10n, double displayAmount) {
     final hasValue = controller.text.isNotEmpty;
     final numberText = hasValue ? controller.text : '0';
     final numberColor = hasValue
@@ -148,7 +150,9 @@ class OrderAmountSection extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            inputMode == OrderInputMode.cost ? 'USD' : 'Shares',
+            inputMode == OrderInputMode.cost
+                ? l10n.orderEntryUnitUsd
+                : l10n.orderEntryUnitShares,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 12,
@@ -159,7 +163,11 @@ class OrderAmountSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '≈ ${currentPrice > 0 ? (displayAmount / currentPrice).toStringAsFixed(4) : '0'} shares',
+                l10n.orderEntryApproxShares(
+                  currentPrice > 0
+                      ? (displayAmount / currentPrice).toStringAsFixed(4)
+                      : '0',
+                ),
                 textAlign: TextAlign.center,
                 style: interNums(
                   fontSize: 15,

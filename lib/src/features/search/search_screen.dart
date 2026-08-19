@@ -325,8 +325,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                             SnackBar(
                                               content: Text(
                                                 maxW == 30
-                                                    ? 'FREE limit: 30 companies. Upgrade to Premium (50).'
-                                                    : 'Max $maxW companies reached.',
+                                                    ? l10n.watchlistLimitFree
+                                                    : l10n.watchlistLimitMax(
+                                                        maxW,
+                                                      ),
                                                 style: GoogleFonts.inter(
                                                   fontSize: 13,
                                                 ),

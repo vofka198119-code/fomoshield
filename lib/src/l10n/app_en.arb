@@ -496,5 +496,176 @@
   "verdictNoCompaniesTraded": "No companies traded.",
   "verdictNoTradesYet": "No trades yet.",
   "verdictTradeBreakdownDisclaimerTitle": "Disclaimer",
-  "verdictTradeBreakdownDisclaimerBody": "The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user's own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future."
+  "verdictTradeBreakdownDisclaimerBody": "The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user's own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.",
+
+  "commonRetry": "Retry",
+
+  "watchlistLimitFree": "FREE limit: 30 companies. Upgrade to Premium (50).",
+  "watchlistLimitMax": "Max {max} companies reached.",
+  "@watchlistLimitMax": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+
+  "companyDetailTitle": "COMPANY OVERVIEW",
+  "companyDetailSponsoredTitle": "Sponsored content",
+  "companyDetailWatchAdBody": "Please watch a short ad to continue viewing company details.",
+  "companyDetailWatchAdButton": "Watch 3s Ad",
+  "companyDetailUpgradeNoAds": "Upgrade to Premium — no ads",
+  "companyDetailLoadError": "Could not load company data",
+  "companyDetailLoadErrorBody": "The market data API may be temporarily unavailable. Please try again.",
+  "companyDetailNoPortfolios": "No portfolios yet. Create one first.",
+  "companyDetailSelectPortfolioTitle": "Select Portfolio",
+  "companyDetailSelectPortfolioBodyBuy": "Where do you want to buy {symbol}?",
+  "@companyDetailSelectPortfolioBodyBuy": {
+    "placeholders": {
+      "symbol": { "type": "String" }
+    }
+  },
+  "companyDetailSelectPortfolioBodySell": "Where do you want to sell {symbol}?",
+  "@companyDetailSelectPortfolioBodySell": {
+    "placeholders": {
+      "symbol": { "type": "String" }
+    }
+  },
+  "companyDetailChangeLabel": "CHANGE",
+  "companyDetailChangePeriodLabel": "CHANGE ({period})",
+  "@companyDetailChangePeriodLabel": {
+    "placeholders": {
+      "period": { "type": "String" }
+    }
+  },
+  "commonNotAvailable": "N/A",
+
+  "companyDetailKeyMetricsTitle": "KEY METRICS",
+  "companyDetailMetricPe": "P/E",
+  "companyDetailMetricDividendYield": "Dividend Yield",
+  "companyDetailMetricNetMargin": "Net Margin",
+  "companyDetailMetricOperatingMargin": "Operating Margin",
+  "companyDetailMetricGrossMargin": "Gross Margin",
+  "companyDetailMetricRoe": "ROE",
+
+  "companyDetailPriceLabel": "PRICE",
+  "companyDetailFsScoreLabel": "FS SCORE",
+  "companyDetailPhasePreMarket": "PRE-MARKET",
+  "companyDetailPhaseMarketOpen": "MARKET OPEN",
+  "companyDetailPhasePostMarket": "POST-MARKET",
+  "companyDetailPhaseMarketClosed": "MARKET CLOSED",
+  "companyDetailPositionTitle": "MY INVESTMENTS",
+  "companyDetailAssetValueLabel": "Asset Value",
+  "companyDetailSharesLabel": "Shares",
+  "companyDetailAvgCostLabel": "Avg Cost",
+  "companyDetailLimitOrdersTitle": "LIMIT ORDERS",
+  "companyDetailSymbolLimitOrdersTitle": "{symbol} Limit Orders",
+  "@companyDetailSymbolLimitOrdersTitle": {
+    "placeholders": {
+      "symbol": { "type": "String" }
+    }
+  },
+  "companyDetailDividendTrapPenalty": "Dividend trap penalty: -{pts} pts",
+  "@companyDetailDividendTrapPenalty": {
+    "placeholders": {
+      "pts": { "type": "int" }
+    }
+  },
+  "companyDetailCatastrophicLossPenalty": "Catastrophic loss penalty: -{pts} pts (net margin below -100%)",
+  "@companyDetailCatastrophicLossPenalty": {
+    "placeholders": {
+      "pts": { "type": "int" }
+    }
+  },
+  "companyDetailLegalDisclaimerMethodology": "Legal Disclaimer & Methodology",
+  "companyDetailMarkerValuation": "Valuation",
+  "companyDetailMarkerFinancialHealth": "Financial Health",
+  "companyDetailMarkerGrowthPotential": "Growth Potential",
+  "companyDetailMarkerEfficiency": "Efficiency",
+  "companyDetailMarkerHistoricalTrend": "Historical Trend",
+  "companyDetailMarkerShareholderReturns": "Shareholder Returns",
+  "companyDetailMarkerDescValuation": "P/E vs sector average",
+  "companyDetailMarkerDescFinancialHealth": "Debt/Equity ratio",
+  "companyDetailMarkerDescGrowth": "Revenue & EPS 5Y growth",
+  "companyDetailMarkerDescEfficiency": "Net margin & ROE",
+  "companyDetailMarkerDescHistoricalTrend": "5Y share price CAGR",
+  "companyDetailMarkerDescShareholderReturns": "Dividends & buybacks",
+  "companyDetailRatingExcellent": "Excellent",
+  "companyDetailRatingGood": "Good",
+  "companyDetailRatingAverage": "Average",
+  "companyDetailRatingWeak": "Weak",
+  "companyDetailRatingPoor": "Poor",
+  "companyWidgetPriceHeader": "Price & Header",
+  "companyWidgetKeyMetrics": "Key Metrics",
+  "companyWidgetFinancialScore": "Financial Score",
+  "companyWidgetPosition": "Your Position",
+  "companyWidgetLimitOrders": "Limit Orders",
+  "companyDetailCashAvailable": "{cash} available",
+  "@companyDetailCashAvailable": {
+    "placeholders": {
+      "cash": { "type": "String" }
+    }
+  },
+  "companyDetailAcademicDisclaimerTitle": "Educational & Academic Disclaimer",
+  "companyDetailAcademicDisclaimerBody": "The methodology, definitions, and analytical principles presented here are based on standard corporate finance theory and valuation frameworks taught in leading business schools. Provided strictly for educational purposes.",
+  "companyDetailAdTitle": "Sponsored Ad",
+  "companyDetailAdContinuing": "Continuing in a moment…",
+  "companyDetailNoPriceDataAvailable": "No price data available",
+  "companyDetailChartLoadError": "Failed to load chart",
+  "companyDetailChartNotEnoughData": "Not enough data",
+  "commonOk": "OK",
+
+  "orderEntryTabMarket": "Market",
+  "orderEntryTabLimit": "Limit",
+  "orderEntryExtendedHoursTitle": "Extended Hours",
+  "orderEntryExtendedHoursSubtitle": "Off: trade only while the real market is open",
+  "orderEntrySimulatedDisclaimerTitle": "Simulated Trading & Non-Brokerage Disclaimer",
+  "orderEntrySimulatedDisclaimerBody": "This application is not a registered broker-dealer, investment advisor, or financial institution, and does not provide order execution services for real financial markets.\n\nAll buy and sell operations are performed exclusively on a simulated account using virtual currency (Paper Trading). Transactions executed within this app are intended solely for educational purposes, do not result in the purchase or ownership of actual securities, create no shareholder rights, and carry no real-world financial or legal force.",
+  "orderEntryUnitUsd": "USD",
+  "orderEntryUnitShares": "Shares",
+  "orderEntryApproxShares": "≈ {shares} shares",
+  "@orderEntryApproxShares": {
+    "placeholders": {
+      "shares": { "type": "String" }
+    }
+  },
+  "orderEntryLimitPriceTitle": "LIMIT PRICE",
+  "orderEntryLimitPriceHintBuy": "Choose a price below the current price for Buy orders",
+  "orderEntryLimitPriceHintSell": "Choose a price above the current price for Sell orders",
+  "orderEntryCostLabel": "Cost:",
+  "orderEntryQtyLabel": "Qty:",
+  "orderEntrySharesAbbrev": "{shares} sh.",
+  "@orderEntrySharesAbbrev": {
+    "placeholders": {
+      "shares": { "type": "String" }
+    }
+  },
+  "orderEntryPlaceOrder": "Place Order",
+  "orderEntryMarketClosedTitle": "Market Closed",
+  "orderEntryMarketClosedBody": "Sorry, the market is currently closed, so Market orders can't be filled right now.\n\nYou can still place a Limit order — it will wait and execute once the market reopens. Or turn on Extended Hours to trade around the clock.",
+  "orderEntryPlaceLimitInstead": "Place Limit Order Instead",
+  "orderEntryEnterAmount": "Enter an amount",
+  "orderEntryInvalidQuantity": "Invalid quantity",
+  "orderEntryEnterValidLimitPrice": "Enter a valid limit price",
+  "orderEntryNotEnoughCash": "Not enough available cash — {cash} free (some is reserved for pending orders)",
+  "@orderEntryNotEnoughCash": {
+    "placeholders": {
+      "cash": { "type": "String" }
+    }
+  },
+  "orderEntryInfoMarket": "Market orders execute at the best available price. Execution is guaranteed, but the final price may differ from expectations.",
+  "orderEntryInfoLimit": "Limit orders execute only at the specified price or better. Partial or full execution is not guaranteed.",
+  "orderEntryInfoStop": "Stop orders activate when the stop price is reached, then execute as a market order.",
+  "orderEntryInfoStopLimit": "Stop-limit orders activate when the stop price is reached, then execute as a limit order.",
+  "stressTestOrderInfoMarket": "Market orders execute at the best available simulated price. Execution is guaranteed, but the final price may differ from expectations.",
+  "stressTestOrderInfoLimit": "Limit orders execute only once the simulated price reaches your chosen price or better. Execution is not guaranteed.",
+  "orderEntryHoldingsLimitTitle": "Limit Reached",
+  "orderEntryHoldingsLimitBody": "You've exceeded the allowed limit on asset purchases for this portfolio ({max} companies).",
+  "@orderEntryHoldingsLimitBody": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+  "orderEntryHoldingsLimitPromoTitle": "Portfolio holding limit reached",
+  "orderEntryPriceLoadError": "Could not load the current price",
+  "companyDetailDisclaimerTitle": "Educational Purpose & Legal Disclaimer",
+  "companyDetailDisclaimerBody": "This application operates strictly as an educational simulator designed to help users learn how to analyze and understand business fundamentals. Evaluation scores and analytics are derived from public corporate financial filings, as well as academic frameworks from leading universities and established financial literacy textbooks.\n\nDisplayed market prices and metrics may be delayed, estimated, or differ from live exchange prices. Content within this app does not constitute a solicitation, recommendation, or offer to buy or sell any financial security. All trading decisions are made solely and independently by the user. The developers do not provide financial services and bear no liability for any potential lost profits, financial losses, or loss of real-world capital.\n\nContinued use of this application constitutes your full acknowledgment and acceptance of this disclaimer, including the release of developers from any liability. Failure to read this disclaimer does not exempt the user from compliance nor provide grounds for any claims, disputes, or legal actions."
 }

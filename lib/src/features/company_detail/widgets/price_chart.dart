@@ -9,6 +9,7 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../../portfolio/portfolio_providers.dart';
 import '../company_detail_provider.dart'
@@ -160,7 +161,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
       final status = data['s'] as String? ?? '';
       if (status == 'no_data') {
         setState(() {
-          _error = 'No price data available';
+          _error = AppLocalizations.of(context)!.companyDetailNoPriceDataAvailable;
           _isLoading = false;
         });
         return;
@@ -186,7 +187,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Failed to load chart';
+          _error = AppLocalizations.of(context)!.companyDetailChartLoadError;
           _isLoading = false;
         });
       }
@@ -217,6 +218,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final avgCost = _avgCost();
 
     return Container(
@@ -231,7 +233,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+            child: Text(l10n.stressTestPriceChartTitle, style: FomoShieldTheme.cardTitle()),
           ),
           const SizedBox(height: 10),
           Padding(
@@ -337,7 +339,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     if (closes.length < 2) {
       return Center(
         child: Text(
-          'Not enough data',
+          AppLocalizations.of(context)!.companyDetailChartNotEnoughData,
           style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
         ),
       );

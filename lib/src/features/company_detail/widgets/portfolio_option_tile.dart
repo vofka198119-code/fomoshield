@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
@@ -25,6 +26,7 @@ class PortfolioOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -69,13 +71,13 @@ class PortfolioOptionTile extends StatelessWidget {
                       ),
                       if (isPremium) ...[
                         const SizedBox(width: 6),
-                        _premiumBadge(),
+                        _premiumBadge(l10n),
                       ],
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${formatUsd(cash)} available',
+                    l10n.companyDetailCashAvailable(formatUsd(cash)),
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: ThemeV2.textSecondary,
@@ -91,12 +93,12 @@ class PortfolioOptionTile extends StatelessWidget {
     );
   }
 
-  Widget _premiumBadge() {
+  Widget _premiumBadge(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
-        'PREMIUM',
+        l10n.profilePremiumBadge,
         style: GoogleFonts.inter(
           fontSize: 8,
           fontWeight: FontWeight.w800,

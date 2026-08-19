@@ -120,16 +120,27 @@ class OrderTypeTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 28, 16, 8),
       child: Row(
         children: [
           Expanded(
-            child: _tab(context, 'Market', !isLimit, () => onChanged(false)),
+            child: _tab(
+              context,
+              l10n.orderEntryTabMarket,
+              !isLimit,
+              () => onChanged(false),
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: _tab(context, 'Limit', isLimit, () => onChanged(true)),
+            child: _tab(
+              context,
+              l10n.orderEntryTabLimit,
+              isLimit,
+              () => onChanged(true),
+            ),
           ),
         ],
       ),
