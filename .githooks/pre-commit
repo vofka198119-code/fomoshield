@@ -1,0 +1,14 @@
+#!/bin/sh
+# Auto-bumps pubspec.yaml's build number (the "+N" after the semantic
+# version) on every commit — App Store/Play Store require this to strictly
+# increase on every submission, and this makes it happen automatically
+# instead of remembering to do it by hand before a release build. The
+# semantic version (1.0.0) is untouched — that stays a deliberate, manual
+# decision for actual product releases.
+FILE="pubspec.yaml"
+CURRENT=$(grep '^version:' "$FILE" | sed 's/version: //')
+BASE="${CURRENT%+*}"
+BUILD="${CURRENT#*+}"
+NEXT_BUILD=$((BUILD + 1))
+sed -i "s/^version: .*/version: ${BASE}+${NEXT_BUILD}/" "$FILE"
+git add "$FILE"
