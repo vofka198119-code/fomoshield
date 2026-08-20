@@ -16,6 +16,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../market_clock/market_clock_dial.dart'
     show darkCardDecoration, dialDark;
 import '../../shared/widgets/stagger_fade_in.dart';
@@ -35,6 +36,7 @@ class VerdictScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final archive = ref.watch(verdictArchiveProvider);
     final entry = archive.cast<VerdictArchiveEntry?>().firstWhere(
       (e) => e?.sessionId == sessionId,
@@ -47,7 +49,7 @@ class VerdictScreen extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: Text(
-            'Verdict',
+            l10n.verdictTitle,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -55,8 +57,8 @@ class VerdictScreen extends ConsumerWidget {
             ),
           ),
         ),
-        body: const Center(
-          child: Text('Verdict not available — complete the test first.'),
+        body: Center(
+          child: Text(l10n.verdictNotAvailable),
         ),
       );
     }
@@ -67,7 +69,7 @@ class VerdictScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'SESSION COMPLETE',
+          l10n.verdictSessionCompleteTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -267,7 +269,7 @@ class VerdictScreen extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             alignment: Alignment.center,
                             child: Text(
-                              'Continue Learning',
+                              l10n.verdictContinueLearning,
                               style: GoogleFonts.inter(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
@@ -293,7 +295,7 @@ class VerdictScreen extends ConsumerWidget {
                         context.go('/home');
                       },
                       child: Text(
-                        'Back to Home',
+                        l10n.verdictBackToHome,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           color: ThemeV2.textSecondary,
@@ -383,15 +385,9 @@ class VerdictScreen extends ConsumerWidget {
 class _GuardianVerdictSection extends StatelessWidget {
   const _GuardianVerdictSection();
 
-  static const _headline = 'YOU MADE IT THROUGH';
-  static const _shortText =
-      'Your stress test is complete. You experienced different market '
-      'conditions and saw how your portfolio and decisions responded. Now '
-      'it\'s time to see what your results reveal about your investment '
-      'behavior.';
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -424,7 +420,7 @@ class _GuardianVerdictSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'GUARDIAN\'S VERDICT',
+                  l10n.verdictGuardianVerdictLabel,
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -434,7 +430,7 @@ class _GuardianVerdictSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _headline,
+                  l10n.verdictGuardianHeadline,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
@@ -443,7 +439,7 @@ class _GuardianVerdictSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  _shortText,
+                  l10n.verdictGuardianShortText,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -455,7 +451,7 @@ class _GuardianVerdictSection extends StatelessWidget {
                 GestureDetector(
                   onTap: () => context.push('/metric-info/guardian-verdict'),
                   child: Text(
-                    'View your analysis →',
+                    l10n.verdictViewYourAnalysis,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,

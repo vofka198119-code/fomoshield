@@ -21,6 +21,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
@@ -33,6 +34,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final totalPnl = entry.finalValue - entry.startingCash;
 
     return Container(
@@ -49,7 +51,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'TRADE BREAKDOWN',
+                  l10n.verdictTradeBreakdownTitle,
                   style: FomoShieldTheme.cardTitle(Colors.white),
                 ),
                 GestureDetector(
@@ -76,12 +78,16 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _statRow('Total Trades', '${entry.totalTrades}'),
-                _statRow('Holdings', '${entry.holdingCount}'),
-                _statRow('Final P&L', formatUsdSigned(totalPnl)),
-                _statRow('Final Balance', formatUsd(entry.finalValue)),
-                _statRow('Starting Cash', formatUsd(entry.startingCash)),
-                _statRow('Test Duration', entry.durationLabel, isLast: true),
+                _statRow(l10n.verdictTotalTradesLabel, '${entry.totalTrades}'),
+                _statRow(l10n.verdictHoldingsLabel, '${entry.holdingCount}'),
+                _statRow(l10n.verdictFinalPnlLabel, formatUsdSigned(totalPnl)),
+                _statRow(l10n.verdictFinalBalanceLabel, formatUsd(entry.finalValue)),
+                _statRow(l10n.verdictStartingCashLabel, formatUsd(entry.startingCash)),
+                _statRow(
+                  l10n.verdictTestDurationLabel,
+                  entry.durationLabel,
+                  isLast: true,
+                ),
               ],
             ),
           ),

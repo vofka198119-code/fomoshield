@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'widgets/verdict/sector_diversification_tiers.dart';
@@ -61,29 +62,42 @@ double _cashBufferScore(VerdictArchiveEntry e) => e.strategyCashBuffer;
 
 /// Picks the long-form tier content for markers that have one — null for
 /// markers still on the generic threshold-based placeholder.
-VerdictTier? _tierFor(String markerId, VerdictArchiveEntry entry) {
+VerdictTier? _tierFor(
+  AppLocalizations l10n,
+  String markerId,
+  VerdictArchiveEntry entry,
+) {
   switch (markerId) {
     case 'sector-diversification':
-      return diversificationTierForCount(entry.holdingCount);
+      return diversificationTierForCount(l10n, entry.holdingCount);
     case 'safety-marker':
-      return safetyMarkerTierFor(entry.safetyMarker, entry.safetyMarkerHasData);
+      return safetyMarkerTierFor(
+        l10n,
+        entry.safetyMarker,
+        entry.safetyMarkerHasData,
+      );
     case 'sector-balance':
-      return sectorBalanceTierFor(entry.strategySector, entry.holdingCount);
+      return sectorBalanceTierFor(l10n, entry.strategySector, entry.holdingCount);
     case 'concentration':
       return concentrationTierFor(
+        l10n,
         entry.strategyConcentration,
         entry.holdingCount,
       );
     case 'etf-exposure':
-      return etfExposureTierFor(entry.strategyEtf, entry.holdingCount);
+      return etfExposureTierFor(l10n, entry.strategyEtf, entry.holdingCount);
     case 'cash-buffer':
-      return cashBufferTierFor(entry.strategyCashBuffer, entry.holdingCount);
+      return cashBufferTierFor(
+        l10n,
+        entry.strategyCashBuffer,
+        entry.holdingCount,
+      );
     case 'discipline':
-      return disciplineTierFor(entry.discipline, entry.totalTrades);
+      return disciplineTierFor(l10n, entry.discipline, entry.totalTrades);
     case 'panic':
-      return panicTierFor(entry.panicResistance, entry.totalTrades);
+      return panicTierFor(l10n, entry.panicResistance, entry.totalTrades);
     case 'patience':
-      return patienceTierFor(entry.patience, entry.totalTrades);
+      return patienceTierFor(l10n, entry.patience, entry.totalTrades);
     default:
       return null;
   }
@@ -101,6 +115,7 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final archive = ref.watch(verdictArchiveProvider);
     final entry = archive.cast<VerdictArchiveEntry?>().firstWhere(
       (e) => e?.sessionId == sessionId,
@@ -137,13 +152,13 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
         left: false,
         right: false,
         child: (entry == null || marker == null)
-            ? const Center(child: Text('Not available.'))
+            ? Center(child: Text(l10n.verdictMarkerNotAvailable))
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: _MarkerDetailBody(
                   label: marker.label,
                   score: marker.score(entry),
-                  tier: _tierFor(markerId, entry),
+                  tier: _tierFor(l10n, markerId, entry),
                 ),
               ),
       ),
@@ -170,6 +185,7 @@ class _MarkerDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final percent = (score * 100).clamp(0.0, 100.0);
     final color = _color;
 
@@ -199,7 +215,7 @@ class _MarkerDetailBody extends StatelessWidget {
                 SizedBox(
                   width: 100,
                   child: Text(
-                    'FS SCORE',
+                    l10n.companyDetailFsScoreLabel,
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -224,7 +240,7 @@ class _MarkerDetailBody extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: FomoShieldTheme.cardDecoration,
             child: Text(
-              'Detailed feedback for $label is coming soon.',
+              l10n.verdictMarkerFeedbackComingSoon(label),
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,
