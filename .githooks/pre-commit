@@ -10,5 +10,5 @@ CURRENT=$(grep '^version:' "$FILE" | sed 's/version: //')
 BASE="${CURRENT%+*}"
 BUILD="${CURRENT#*+}"
 NEXT_BUILD=$((BUILD + 1))
-sed -i "s/^version: .*/version: ${BASE}+${NEXT_BUILD}/" "$FILE"
+sed "s/^version: .*/version: ${BASE}+${NEXT_BUILD}/" "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
 git add "$FILE"
