@@ -7212,6 +7212,984 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Below, you will find a detailed analysis of your actions and your portfolio throughout the simulation. Each indicator is based on your actual decisions and the events that occurred during the test.\n\nThe system analyzes: which assets you selected; how diversified your portfolio was; when you bought; when you sold; how you behaved during market declines; how frequently you changed your positions; whether you demonstrated patience; how you managed risk and your cash reserve; how closely your behavior matched the principles of disciplined long-term investing.\n\nYour actions are processed through an objective algorithmic analysis that produces individual behavioral indicators and an overall investor profile.\n\nThis is not about simply telling you \"You did this right.\" or \"You did this wrong.\" Instead, the system shows: what happened, why it matters, and which investment skill you may want to develop further.\n\nYour result should therefore not be treated as a final judgment. It is not a prediction of your future financial results, and it is not a measure of you as a person. It is a snapshot of your behavior within this particular simulation.\n\nAnd if you don\'t like your result — that\'s actually a good thing. Because here, you have an opportunity that is much harder to get in real life: make mistakes in the simulator, study your decisions, try again, and gradually learn to recognize and avoid classic investment mistakes before they become real-world problems.'**
   String get metricInfoGuardianVerdictSection4Body;
+
+  /// No description provided for @marketClockWindowEarlyPreMarketShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Early Pre-Market'**
+  String get marketClockWindowEarlyPreMarketShortHeadline;
+
+  /// No description provided for @marketClockWindowEarlyPreMarketShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Low liquidity, risky spreads'**
+  String get marketClockWindowEarlyPreMarketShortDetail;
+
+  /// No description provided for @marketClockWindowEarlyPreMarketFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Early Pre-Market'**
+  String get marketClockWindowEarlyPreMarketFullTitle;
+
+  /// No description provided for @marketClockWindowEarlyPreMarketWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the earliest stage of trading. The stock market hasn\'t officially opened yet, but electronic trading has already begun.\n\nAt this time, the market is mostly active with large investment funds, institutional traders, and companies reacting to overnight news.\n\nThere are very few regular investors trading, which makes the market feel quiet and almost empty.\n\nImagine walking into a supermarket an hour before it officially opens. Only a few people are inside, some shelves are still being stocked, and prices don\'t always reflect what they\'ll be later in the day.\n\nThat\'s exactly what the market is like during the Early Pre-Market.'**
+  String get marketClockWindowEarlyPreMarketWhatHappens;
+
+  /// No description provided for @marketClockWindowEarlyPreMarketWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'The biggest issue during this session is low liquidity.\n\nThere simply aren\'t many buyers and sellers available.\n\nBecause of that, the difference between the buying price and the selling price (called the spread) can become surprisingly large.\n\nFor example, a stock may have closed yesterday at \$100, but the next available seller may only be willing to sell it for \$102.\n\nIf you place a Market Order, your broker may execute the trade at that much higher price.\n\nYou could lose money before the trading day has even begun.'**
+  String get marketClockWindowEarlyPreMarketWhyItMatters;
+
+  /// No description provided for @marketClockWindowEarlyPreMarketDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices can jump sharply after a single large trade because there aren\'t enough orders to keep prices stable.\n\nThis often creates dramatic moves on the chart that disappear once more traders join the market.\n\nMany beginners see a sudden spike and think:\n\n\"The stock is taking off! I have to buy right now!\"\n\nA few minutes later, the excitement fades and the price returns to where it started.'**
+  String get marketClockWindowEarlyPreMarketDangerForBeginner;
+
+  /// No description provided for @marketClockWindowEarlyPreMarketWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re investing for the long term, the best decision is usually to wait.\n\nIf you absolutely need to buy or sell during this session, always use a Limit Order.\n\nA Limit Order lets you choose the maximum price you\'re willing to pay, protecting you from unexpected price jumps.'**
+  String get marketClockWindowEarlyPreMarketWhatToDo;
+
+  /// No description provided for @marketClockWindowEarlyPreMarketFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'If it feels like you\'re about to miss an incredible opportunity, you\'re probably looking at a low-liquidity move.\n\nDon\'t rush.\n\nOnce the regular market opens, prices often become much more stable.'**
+  String get marketClockWindowEarlyPreMarketFomoShieldTip;
+
+  /// No description provided for @marketClockWindowPreMarketReportsShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-Market & News'**
+  String get marketClockWindowPreMarketReportsShortHeadline;
+
+  /// No description provided for @marketClockWindowPreMarketReportsShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'High risk, earnings releases'**
+  String get marketClockWindowPreMarketReportsShortDetail;
+
+  /// No description provided for @marketClockWindowPreMarketReportsFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-Market'**
+  String get marketClockWindowPreMarketReportsFullTitle;
+
+  /// No description provided for @marketClockWindowPreMarketReportsWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'The market is waking up.\n\nMore investors begin placing trades, banks analyze overnight developments, and traders prepare for the opening bell.\n\nThis is also when many companies release their quarterly earnings, while the U.S. government often publishes important economic reports such as inflation, employment, and GDP data.\n\nOne news release can move a stock by 10–20% before the market officially opens.'**
+  String get marketClockWindowPreMarketReportsWhatHappens;
+
+  /// No description provided for @marketClockWindowPreMarketReportsWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the period when the market tries to answer one important question:\n\n\"Is today\'s news good or bad?\"\n\nThousands of investors read the same information but reach completely different conclusions.\n\nSome start buying.\n\nOthers begin selling.\n\nSome decide to lock in profits.\n\nAs a result, prices can change direction several times within just a few minutes.'**
+  String get marketClockWindowPreMarketReportsWhyItMatters;
+
+  /// No description provided for @marketClockWindowPreMarketReportsDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'This session is driven by emotions.\n\nA beginner may see a stock rising 12% before the opening bell and think:\n\n\"If I don\'t buy now, I\'ll miss the opportunity.\"\n\nTen minutes later, additional details appear...\n\nThe stock suddenly drops instead.\n\nSituations like this happen far more often than most beginners expect.'**
+  String get marketClockWindowPreMarketReportsDangerForBeginner;
+
+  /// No description provided for @marketClockWindowPreMarketReportsWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this time to prepare, not to react.\n\nCheck which companies are reporting earnings today.\n\nRead the news.\n\nReview your investment plan.\n\nBut don\'t try to predict where prices will move over the next five minutes.'**
+  String get marketClockWindowPreMarketReportsWhatToDo;
+
+  /// No description provided for @marketClockWindowPreMarketReportsFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Successful investors don\'t need to react first.\n\nMaking calm, informed decisions is almost always better than chasing fast-moving prices.'**
+  String get marketClockWindowPreMarketReportsFomoShieldTip;
+
+  /// No description provided for @marketClockWindowOpeningBellShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening Bell'**
+  String get marketClockWindowOpeningBellShortHeadline;
+
+  /// No description provided for @marketClockWindowOpeningBellShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Peak volatility, opening chaos'**
+  String get marketClockWindowOpeningBellShortDetail;
+
+  /// No description provided for @marketClockWindowOpeningBellFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening Bell'**
+  String get marketClockWindowOpeningBellFullTitle;
+
+  /// No description provided for @marketClockWindowOpeningBellWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'The New York Stock Exchange officially opens.\n\nMillions of investors from around the world begin trading at the same time.\n\nOrders that were placed overnight and during Pre-Market are executed.\n\nBanks, pension funds, investment firms, trading algorithms, and individual investors all become active together.\n\nBillions of dollars change hands during the first hour of trading.'**
+  String get marketClockWindowOpeningBellWhatHappens;
+
+  /// No description provided for @marketClockWindowOpeningBellWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'This is usually the busiest hour of the entire trading day.\n\nPrices can move quickly in both directions.\n\nAt first, it may look like the market has no clear direction.\n\nIn reality, it\'s simply trying to find a fair price after processing all the overnight news.'**
+  String get marketClockWindowOpeningBellWhyItMatters;
+
+  /// No description provided for @marketClockWindowOpeningBellDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'The first 15–30 minutes are often called the most volatile part of the day.\n\nEven if you\'ve chosen an excellent company, its stock price may briefly fall before continuing higher later.\n\nMany beginners panic when they see those early red numbers and sell quality investments for no good reason.'**
+  String get marketClockWindowOpeningBellDangerForBeginner;
+
+  /// No description provided for @marketClockWindowOpeningBellWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re new to investing, there\'s usually no need to trade immediately after the opening bell.\n\nWaiting just 20–30 minutes often allows the market to settle down.\n\nOnce the initial wave of emotions passes, price movements become much easier to understand.'**
+  String get marketClockWindowOpeningBellWhatToDo;
+
+  /// No description provided for @marketClockWindowOpeningBellFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'The market stays open all day.\n\nGreat opportunities rarely disappear within the first few minutes, but emotional mistakes can last much longer.'**
+  String get marketClockWindowOpeningBellFomoShieldTip;
+
+  /// No description provided for @marketClockWindowMorningSessionShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Trend'**
+  String get marketClockWindowMorningSessionShortHeadline;
+
+  /// No description provided for @marketClockWindowMorningSessionShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Best time for calm trading'**
+  String get marketClockWindowMorningSessionShortDetail;
+
+  /// No description provided for @marketClockWindowMorningSessionFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Session'**
+  String get marketClockWindowMorningSessionFullTitle;
+
+  /// No description provided for @marketClockWindowMorningSessionWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'The first hour of trading is over, and the market has finally settled down.\n\nMost of the emotional buying and selling has already happened. Large investment funds have made their decisions and are now carrying out their plans more steadily.\n\nIf they decided to buy this morning, they\'ll likely continue buying throughout the session. If they decided to sell, they\'ll do it in a more controlled way.\n\nPrice movements become smoother, and the market\'s overall direction is much easier to recognize.\n\nThis is when the market stops reacting emotionally and starts behaving more rationally.'**
+  String get marketClockWindowMorningSessionWhatHappens;
+
+  /// No description provided for @marketClockWindowMorningSessionWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'Many experienced investors consider this one of the best times to trade.\n\nThere are plenty of buyers and sellers, which means orders are filled quickly and at fair prices.\n\nThe difference between the buying and selling price (the spread) is usually very small, and unexpected price swings become less common.\n\nIf the market has chosen a direction for the day, it\'s often much easier to see it during this session.'**
+  String get marketClockWindowMorningSessionWhyItMatters;
+
+  /// No description provided for @marketClockWindowMorningSessionDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'This is one of the safest periods of the trading day, but beginners still make one common mistake.\n\nThey see that a stock has already moved a little and think:\n\n\"I missed my chance.\"\n\nOr they notice a small pullback and assume something is wrong with the company.\n\nIn reality, small price movements are completely normal.\n\nA stock doesn\'t need to stay perfectly still to be a good long-term investment.'**
+  String get marketClockWindowMorningSessionDangerForBeginner;
+
+  /// No description provided for @marketClockWindowMorningSessionWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re investing for the long term, this is often one of the best times to place your planned trades.\n\nThe market has already shown its direction, liquidity is high, and prices tend to be more stable than they were during the opening minutes.\n\nStick to your investment plan instead of reacting to every small movement.'**
+  String get marketClockWindowMorningSessionWhatToDo;
+
+  /// No description provided for @marketClockWindowMorningSessionFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Good investing rarely requires perfect timing.\n\nIf you\'ve done your research and understand why you\'re buying a company, a calm market is usually your best friend.'**
+  String get marketClockWindowMorningSessionFomoShieldTip;
+
+  /// No description provided for @marketClockWindowLunchHourShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch Hour'**
+  String get marketClockWindowLunchHourShortHeadline;
+
+  /// No description provided for @marketClockWindowLunchHourShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet lull, low activity'**
+  String get marketClockWindowLunchHourShortDetail;
+
+  /// No description provided for @marketClockWindowLunchHourFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch Hour'**
+  String get marketClockWindowLunchHourFullTitle;
+
+  /// No description provided for @marketClockWindowLunchHourWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'This is usually the quietest part of the trading day.\n\nMany professional traders take a lunch break, portfolio managers step away from their desks, and European markets begin closing for the day.\n\nWith fewer active participants, trading volume drops noticeably.\n\nIf the market felt like a rushing river this morning, it now feels more like a calm lake.'**
+  String get marketClockWindowLunchHourWhatHappens;
+
+  /// No description provided for @marketClockWindowLunchHourWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'When fewer people are trading, prices tend to move much more slowly.\n\nMany stocks spend this period moving sideways without any clear direction.\n\nThis isn\'t a sign that something is wrong.\n\nIt\'s simply a natural part of the market\'s daily rhythm.\n\nNot every hour needs to be exciting.'**
+  String get marketClockWindowLunchHourWhyItMatters;
+
+  /// No description provided for @marketClockWindowLunchHourDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'Ironically, the biggest risk during Lunch Hour is boredom.\n\nMany beginners open their investing app, notice that nothing exciting is happening, and feel the urge to place a trade anyway.\n\nThey aren\'t buying because they found a great investment.\n\nThey\'re buying simply because they want to do something.\n\nThese emotional \"boredom trades\" often become expensive lessons.'**
+  String get marketClockWindowLunchHourDangerForBeginner;
+
+  /// No description provided for @marketClockWindowLunchHourWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re following a long-term investment plan, it\'s perfectly fine to make your scheduled purchases during this session.\n\nIf you\'re just watching the market, use the quieter hours wisely.\n\nRead company reports.\n\nResearch businesses you\'re interested in.\n\nOr simply take a break yourself.\n\nSometimes, the best trade is the one you never make.'**
+  String get marketClockWindowLunchHourWhatToDo;
+
+  /// No description provided for @marketClockWindowLunchHourFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have to trade every day to become a successful investor.\n\nPatience is one of the most valuable skills you can develop.'**
+  String get marketClockWindowLunchHourFomoShieldTip;
+
+  /// No description provided for @marketClockWindowMidAfternoonShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon Session'**
+  String get marketClockWindowMidAfternoonShortHeadline;
+
+  /// No description provided for @marketClockWindowMidAfternoonShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Steady trading, Fed reactions'**
+  String get marketClockWindowMidAfternoonShortDetail;
+
+  /// No description provided for @marketClockWindowMidAfternoonFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mid-Afternoon'**
+  String get marketClockWindowMidAfternoonFullTitle;
+
+  /// No description provided for @marketClockWindowMidAfternoonWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'The market begins to wake up again.\n\nTraders return to their desks, trading activity increases, and prices become more active once again.\n\nOn certain days, this is also when the U.S. Federal Reserve (the Fed) announces interest rate decisions or other important economic updates.\n\nThese announcements can change the mood of the entire market within minutes.\n\nOn quieter days, the market simply continues the trend that was established earlier in the morning.'**
+  String get marketClockWindowMidAfternoonWhatHappens;
+
+  /// No description provided for @marketClockWindowMidAfternoonWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'By this point, the market has already absorbed most of the morning\'s news.\n\nIf new economic data is released, large investors may quickly adjust their positions.\n\nThis can create another wave of strong price movements.\n\nUnderstanding what\'s happening during this period helps you avoid being surprised by sudden volatility.'**
+  String get marketClockWindowMidAfternoonWhyItMatters;
+
+  /// No description provided for @marketClockWindowMidAfternoonDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'On a normal trading day, this session is relatively calm.\n\nHowever, on days when the Federal Reserve makes important announcements, volatility can increase dramatically.\n\nStocks, indexes, and even the entire market may change direction within minutes.\n\nMany beginners see these sudden moves and jump into the market without understanding what caused them.\n\nUnfortunately, prices often reverse just as quickly.'**
+  String get marketClockWindowMidAfternoonDangerForBeginner;
+
+  /// No description provided for @marketClockWindowMidAfternoonWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Before placing a trade, take a quick look at the economic calendar.\n\nIf an important Federal Reserve announcement or major economic report is scheduled, consider waiting until the market has had time to react.\n\nOn regular trading days, this is another excellent period for calm and well-planned investing.'**
+  String get marketClockWindowMidAfternoonWhatToDo;
+
+  /// No description provided for @marketClockWindowMidAfternoonFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Experienced investors know that they don\'t have to trade every market event.\n\nSometimes protecting your money simply means waiting for the market to become clear again.'**
+  String get marketClockWindowMidAfternoonFomoShieldTip;
+
+  /// No description provided for @marketClockWindowPowerHourShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Power Hour'**
+  String get marketClockWindowPowerHourShortHeadline;
+
+  /// No description provided for @marketClockWindowPowerHourShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Final push, heavy volume'**
+  String get marketClockWindowPowerHourShortDetail;
+
+  /// No description provided for @marketClockWindowPowerHourFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Power Hour'**
+  String get marketClockWindowPowerHourFullTitle;
+
+  /// No description provided for @marketClockWindowPowerHourWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'The trading day is coming to an end.\n\nFor the market, this is like the final minutes of a championship game—everyone wants to finish strong.\n\nDay traders begin closing their positions to avoid overnight risk.\n\nLarge investment funds rebalance their portfolios before the closing bell.\n\nTrading algorithms execute thousands of remaining orders.\n\nAs a result, trading activity increases rapidly, and the market becomes much more energetic.'**
+  String get marketClockWindowPowerHourWhatHappens;
+
+  /// No description provided for @marketClockWindowPowerHourWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'Power Hour is usually the second busiest period of the entire trading day.\n\nTrading volume rises sharply, and price movements often become stronger and more decisive.\n\nStocks that spent most of the day moving sideways may suddenly break out in one direction.\n\nMany daily highs and lows are set during the final hour before the market closes.'**
+  String get marketClockWindowPowerHourWhyItMatters;
+
+  /// No description provided for @marketClockWindowPowerHourDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'High activity also means higher volatility.\n\nA stock that looked stable all afternoon can suddenly jump or fall several percent within minutes.\n\nMany beginners mistake these fast moves for the beginning of a major trend.\n\nThey rush to buy because they fear missing out...\n\nOr they panic and sell because they believe a crash has started.\n\nIn reality, these moves are often caused by traders closing positions before the market closes—not by a change in the company\'s long-term value.'**
+  String get marketClockWindowPowerHourDangerForBeginner;
+
+  /// No description provided for @marketClockWindowPowerHourWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re following a well-prepared investment plan, this can be a perfectly reasonable time to buy or sell.\n\nHowever, never make a decision simply because a price suddenly starts moving faster.\n\nBefore placing an order, ask yourself one simple question:\n\n\"Am I following my investment plan, or am I reacting to emotions?\"\n\nIf the answer is emotions, it\'s usually better to wait.'**
+  String get marketClockWindowPowerHourWhatToDo;
+
+  /// No description provided for @marketClockWindowPowerHourFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Not every dramatic price move is a great opportunity.\n\nSometimes the smartest investor is simply the one who stays calm while everyone else is rushing.'**
+  String get marketClockWindowPowerHourFomoShieldTip;
+
+  /// No description provided for @marketClockWindowAfterHoursShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'After-Hours'**
+  String get marketClockWindowAfterHoursShortHeadline;
+
+  /// No description provided for @marketClockWindowAfterHoursShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Market closed, evening earnings'**
+  String get marketClockWindowAfterHoursShortDetail;
+
+  /// No description provided for @marketClockWindowAfterHoursFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'After-Hours'**
+  String get marketClockWindowAfterHoursFullTitle;
+
+  /// No description provided for @marketClockWindowAfterHoursWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'The regular trading session has officially ended.\n\nFor many people, it looks like the stock market is closed.\n\nIn reality, electronic trading continues during the After-Hours session.\n\nThis is also when many of the world\'s largest companies release their quarterly earnings reports.\n\nCompanies like Apple, Microsoft, Amazon, Alphabet, Meta, and many others often publish their results shortly after the closing bell.\n\nInvestors immediately begin reacting to the news.'**
+  String get marketClockWindowAfterHoursWhatHappens;
+
+  /// No description provided for @marketClockWindowAfterHoursWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'A single earnings report can completely change how investors value a company.\n\nIf the results are better than expected, the stock may jump 10–20%.\n\nIf the company disappoints investors, the price can fall just as quickly.\n\nThe challenge is that far fewer people are trading after hours.\n\nWith lower liquidity, even relatively small orders can move prices significantly.'**
+  String get marketClockWindowAfterHoursWhyItMatters;
+
+  /// No description provided for @marketClockWindowAfterHoursDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'After-Hours trading is one of the riskiest times for beginners.\n\nImagine a stock closed at \$100.\n\nAfter the earnings report, the next available seller wants \$112, while the highest buyer is only offering \$108.\n\nThe gap between buying and selling prices becomes unusually wide.\n\nIf you place a Market Order, you may end up paying far more than you expected.\n\nThe first reaction to earnings is also heavily driven by emotion.\n\nMany investors read the headlines before they fully understand the report.\n\nPrices can swing dramatically several times before settling down.'**
+  String get marketClockWindowAfterHoursDangerForBeginner;
+
+  /// No description provided for @marketClockWindowAfterHoursWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s usually no reason to rush.\n\nUse this time to read the earnings report, understand what actually happened, and see how experienced investors are interpreting the results.\n\nVery often, the market finds a much more reasonable price after the regular session opens the next day.\n\nPatience is usually rewarded.'**
+  String get marketClockWindowAfterHoursWhatToDo;
+
+  /// No description provided for @marketClockWindowAfterHoursFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing the first five minutes after an earnings report rarely changes your long-term success.\n\nMaking a calm decision is usually far more valuable than making a fast one.'**
+  String get marketClockWindowAfterHoursFomoShieldTip;
+
+  /// No description provided for @marketClockWindowClosedShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange Closed'**
+  String get marketClockWindowClosedShortHeadline;
+
+  /// No description provided for @marketClockWindowClosedShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'No trading overnight'**
+  String get marketClockWindowClosedShortDetail;
+
+  /// No description provided for @marketClockWindowClosedFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Closed'**
+  String get marketClockWindowClosedFullTitle;
+
+  /// No description provided for @marketClockWindowClosedWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'The market is now completely closed.\n\nRegular trading has ended, and no new trades are being executed.\n\nBehind the scenes, exchanges process millions of completed transactions, update records, and prepare their systems for the next trading day.\n\nFor investors, this is the quietest part of the day.\n\nPrices stop moving.\n\nThe noise disappears.\n\nAnd for the first time all day, there\'s no pressure to make immediate decisions.'**
+  String get marketClockWindowClosedWhatHappens;
+
+  /// No description provided for @marketClockWindowClosedWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the perfect time to think clearly.\n\nWithout constantly watching prices rise and fall, it\'s much easier to focus on what really matters.\n\nMany experienced investors spend more time researching companies after the market closes than they spend actually trading.\n\nThe best investment decisions are often made when the market is quiet—not when it\'s moving.'**
+  String get marketClockWindowClosedWhyItMatters;
+
+  /// No description provided for @marketClockWindowClosedDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'The biggest mistake beginners make during Market Closed isn\'t trading.\n\nIt\'s overthinking.\n\nMany people spend hours reading endless headlines, trying to predict exactly what the market will do tomorrow.\n\nThe truth is simple:\n\nNobody knows.\n\nGood news doesn\'t always push prices higher.\n\nBad news doesn\'t always make stocks fall.\n\nTrying to predict every move usually creates unnecessary stress.'**
+  String get marketClockWindowClosedDangerForBeginner;
+
+  /// No description provided for @marketClockWindowClosedWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this quiet time wisely.\n\nReview your portfolio.\n\nRead company earnings and annual reports.\n\nLearn more about the businesses you own—or plan to own.\n\nCheck whether your investments still match your long-term goals.\n\nAnd finally...\n\nGet some rest.\n\nThe market will always be there tomorrow, and clear decisions are much easier to make with a fresh mind.'**
+  String get marketClockWindowClosedWhatToDo;
+
+  /// No description provided for @marketClockWindowClosedFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'The best investors aren\'t the ones who spend all day watching charts.\n\nThey\'re the ones who truly understand the businesses they invest in—and have the patience to stick with their plan.'**
+  String get marketClockWindowClosedFomoShieldTip;
+
+  /// No description provided for @marketClockWindowWeekendClosedShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend'**
+  String get marketClockWindowWeekendClosedShortHeadline;
+
+  /// No description provided for @marketClockWindowWeekendClosedShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Markets reopen Monday'**
+  String get marketClockWindowWeekendClosedShortDetail;
+
+  /// No description provided for @marketClockWindowWeekendClosedFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend'**
+  String get marketClockWindowWeekendClosedFullTitle;
+
+  /// No description provided for @marketClockWindowWeekendClosedTimeRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday – Sunday'**
+  String get marketClockWindowWeekendClosedTimeRangeLabel;
+
+  /// No description provided for @marketClockWindowWeekendClosedWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'The U.S. stock market is closed for the weekend.\n\nNo stocks are being bought or sold, prices aren\'t changing, and new orders won\'t be executed until the market reopens.\n\nThis is a normal part of the market\'s schedule. Even the world\'s largest financial markets need time to pause.'**
+  String get marketClockWindowWeekendClosedWhatHappens;
+
+  /// No description provided for @marketClockWindowWeekendClosedWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'While the market is closed, the world keeps moving.\n\nCompanies continue running their businesses.\n\nEconomic news is released.\n\nPolitical events can happen.\n\nBy Monday morning, all of that information is reflected in stock prices.\n\nThis is why markets sometimes open noticeably higher or lower after the weekend.'**
+  String get marketClockWindowWeekendClosedWhyItMatters;
+
+  /// No description provided for @marketClockWindowWeekendClosedDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'Many beginners spend the entire weekend worrying about what the market might do on Monday.\n\nThey constantly read headlines and try to predict every possible outcome.\n\nThe truth is that no one knows exactly how the market will open.\n\nTrying to guess every move usually creates stress—not better investment decisions.'**
+  String get marketClockWindowWeekendClosedDangerForBeginner;
+
+  /// No description provided for @marketClockWindowWeekendClosedWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekends are a great opportunity to become a better investor.\n\nReview your portfolio.\n\nRead about the companies you own.\n\nLearn something new about investing.\n\nOr simply take a break and enjoy your weekend.\n\nA clear mind often leads to better decisions than watching charts all day.'**
+  String get marketClockWindowWeekendClosedWhatToDo;
+
+  /// No description provided for @marketClockWindowWeekendClosedFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Real markets may be closed today, but learning never takes a day off.'**
+  String get marketClockWindowWeekendClosedFomoShieldTip;
+
+  /// No description provided for @marketClockWindowWeekendClosedStressTestPromoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'While the market is closed...'**
+  String get marketClockWindowWeekendClosedStressTestPromoTitle;
+
+  /// No description provided for @marketClockWindowWeekendClosedStressTestPromoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The Stress Test is always available.\n\nPractice building portfolios, reacting to market events, and making investment decisions without risking real money.\n\nThe simulator is designed to help you understand how markets behave and build discipline before investing in live markets.\n\nEvery trade inside Stress Test is completely independent of real market prices, so you can experiment, learn from mistakes, and improve with confidence.'**
+  String get marketClockWindowWeekendClosedStressTestPromoBody;
+
+  /// No description provided for @marketClockWindowMarketHolidayShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Holiday'**
+  String get marketClockWindowMarketHolidayShortHeadline;
+
+  /// No description provided for @marketClockWindowMarketHolidayShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange closed for a holiday'**
+  String get marketClockWindowMarketHolidayShortDetail;
+
+  /// No description provided for @marketClockWindowMarketHolidayFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Holiday'**
+  String get marketClockWindowMarketHolidayFullTitle;
+
+  /// No description provided for @marketClockWindowMarketHolidayTimeRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'All day'**
+  String get marketClockWindowMarketHolidayTimeRangeLabel;
+
+  /// No description provided for @marketClockWindowMarketHolidayWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'Today the U.S. stock market is closed because of an official exchange holiday.\n\nNo regular trading takes place, and orders will wait until the next trading session.\n\nThis happens several times each year during major U.S. holidays.'**
+  String get marketClockWindowMarketHolidayWhatHappens;
+
+  /// No description provided for @marketClockWindowMarketHolidayWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'A market holiday is not the same as a market problem.\n\nNothing unusual is happening.\n\nTrading simply pauses according to the exchange calendar.\n\nHowever, news can still be released while the market is closed.\n\nWhen trading resumes, prices may adjust to everything that happened during the break.'**
+  String get marketClockWindowMarketHolidayWhyItMatters;
+
+  /// No description provided for @marketClockWindowMarketHolidayDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'Some beginners think the market is \"frozen\" because something bad has happened.\n\nIn reality, exchange holidays are planned well in advance.\n\nThere\'s no reason to worry just because trading is paused for the day.'**
+  String get marketClockWindowMarketHolidayDangerForBeginner;
+
+  /// No description provided for @marketClockWindowMarketHolidayWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Take advantage of the quieter day.\n\nRead company reports.\n\nReview your investment goals.\n\nOrganize your watchlist.\n\nOr spend some time improving your investing knowledge.\n\nEvery experienced investor started by learning.'**
+  String get marketClockWindowMarketHolidayWhatToDo;
+
+  /// No description provided for @marketClockWindowMarketHolidayFomoShieldTip.
+  ///
+  /// In en, this message translates to:
+  /// **'The best investors don\'t improve only when the market is open.\n\nThey improve every day.'**
+  String get marketClockWindowMarketHolidayFomoShieldTip;
+
+  /// No description provided for @marketClockWindowMarketHolidayStressTestPromoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep practicing'**
+  String get marketClockWindowMarketHolidayStressTestPromoTitle;
+
+  /// No description provided for @marketClockWindowMarketHolidayStressTestPromoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Although the live market is closed, the Stress Test remains fully available.\n\nIt\'s the perfect place to practice buying, selling, portfolio management, and emotional discipline without risking real money.\n\nYou can explore different strategies, make mistakes safely, and better understand how markets react in different situations.\n\nWhen the real market opens again, you\'ll return with more experience and greater confidence.'**
+  String get marketClockWindowMarketHolidayStressTestPromoBody;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionShortHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Early Close Day'**
+  String get marketClockWindowEarlyCloseSessionShortHeadline;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionShortDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Market closes at 1:00 PM ET'**
+  String get marketClockWindowEarlyCloseSessionShortDetail;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Early Close Day'**
+  String get marketClockWindowEarlyCloseSessionFullTitle;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'Today the exchange is operating on a shortened schedule and will close at 1:00 PM ET instead of 4:00 PM.'**
+  String get marketClockWindowEarlyCloseSessionWhatHappens;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionWhyItMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s less time to get orders filled — trading activity and volume compress into a shorter window.'**
+  String get marketClockWindowEarlyCloseSessionWhyItMatters;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionDangerForBeginner.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s easy to forget about the early close and place an order that won\'t execute today.'**
+  String get marketClockWindowEarlyCloseSessionDangerForBeginner;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan your trades ahead of time and don\'t leave important orders for the second half of the day.'**
+  String get marketClockWindowEarlyCloseSessionWhatToDo;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionStressTestPromoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try it risk-free first'**
+  String get marketClockWindowEarlyCloseSessionStressTestPromoTitle;
+
+  /// No description provided for @marketClockWindowEarlyCloseSessionStressTestPromoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A shortened, faster-moving session can feel unfamiliar. Practice it in Stress Test — no real money on the line, just real market conditions to learn from.'**
+  String get marketClockWindowEarlyCloseSessionStressTestPromoBody;
+
+  /// No description provided for @marketClockRiskEarlyPreMarketWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'The market has only just started to wake up. There are very few buyers and sellers, so even small trades can move prices much more than usual. Liquidity is low, spreads are wide, and prices may not reflect a company\'s true value.'**
+  String get marketClockRiskEarlyPreMarketWhyNow;
+
+  /// No description provided for @marketClockRiskEarlyPreMarketWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Unless you have a specific reason to trade, it\'s usually better to wait. Use this quiet time to review your watchlist, read company news, and prepare your plan for the day. If you must trade, always consider using a Limit Order instead of a Market Order.'**
+  String get marketClockRiskEarlyPreMarketWhatToDo;
+
+  /// No description provided for @marketClockRiskPreMarketReportsWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Trading activity increases as more participants enter the market. This is also when many companies publish earnings reports and important U.S. economic data is released. Prices often react quickly and may continue changing as investors digest the news.'**
+  String get marketClockRiskPreMarketReportsWhyNow;
+
+  /// No description provided for @marketClockRiskPreMarketReportsWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus on understanding the news rather than reacting to it immediately. Review earnings reports, check the economic calendar, and see how the market responds before making a decision.'**
+  String get marketClockRiskPreMarketReportsWhatToDo;
+
+  /// No description provided for @marketClockRiskOpeningBellWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'The regular trading session begins and millions of overnight orders are executed at once. Trading volume is extremely high, but so is volatility. The market is searching for a fair price after processing all the overnight information.'**
+  String get marketClockRiskOpeningBellWhyNow;
+
+  /// No description provided for @marketClockRiskOpeningBellWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'For beginners, patience is often the best strategy. Give the market 20-30 minutes to settle before making planned long-term investments. Avoid making decisions based on the first sharp price movements.'**
+  String get marketClockRiskOpeningBellWhatToDo;
+
+  /// No description provided for @marketClockRiskMorningSessionWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'The early volatility has faded, liquidity remains high, and price movements become more stable. This is often one of the most balanced periods of the trading day.'**
+  String get marketClockRiskMorningSessionWhyNow;
+
+  /// No description provided for @marketClockRiskMorningSessionWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re investing for the long term, this is generally one of the best times to execute your planned purchases. Continue focusing on company fundamentals rather than short-term price fluctuations.'**
+  String get marketClockRiskMorningSessionWhatToDo;
+
+  /// No description provided for @marketClockRiskLunchHourWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Trading activity slows as many professional traders step away for lunch. Price movements become quieter and the market often moves sideways.'**
+  String get marketClockRiskLunchHourWhyNow;
+
+  /// No description provided for @marketClockRiskLunchHourWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a good time to research companies, review financial statements, or make planned long-term investments without feeling rushed. Don\'t trade simply because the market seems quiet.'**
+  String get marketClockRiskLunchHourWhatToDo;
+
+  /// No description provided for @marketClockRiskMidAfternoonWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity picks up again as traders return. On certain days, Federal Reserve announcements or important economic reports can significantly increase volatility.'**
+  String get marketClockRiskMidAfternoonWhyNow;
+
+  /// No description provided for @marketClockRiskMidAfternoonWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Before placing a trade, check whether major economic events are scheduled. On normal days, this is another comfortable period for long-term investing. On Fed days, consider waiting until the market reacts.'**
+  String get marketClockRiskMidAfternoonWhatToDo;
+
+  /// No description provided for @marketClockRiskPowerHourWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'The final hour of trading is highly active as day traders close positions and investment funds rebalance portfolios. Strong price movements are common.'**
+  String get marketClockRiskPowerHourWhyNow;
+
+  /// No description provided for @marketClockRiskPowerHourWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid chasing fast-moving prices. If you\'re making a planned investment, stick to your strategy rather than reacting to late-day excitement.'**
+  String get marketClockRiskPowerHourWhatToDo;
+
+  /// No description provided for @marketClockRiskAfterHoursWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Many companies release earnings after the market closes. At the same time, fewer traders are active, which can lead to large price swings and wider spreads.'**
+  String get marketClockRiskAfterHoursWhyNow;
+
+  /// No description provided for @marketClockRiskAfterHoursWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'This is usually a better time to read earnings reports and analyze the news than to trade. Waiting until the next regular session often leads to calmer and more informed decisions.'**
+  String get marketClockRiskAfterHoursWhatToDo;
+
+  /// No description provided for @marketClockRiskEarlyCloseSessionWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Today the U.S. stock market is operating on a shortened schedule.\n\nMany institutional investors, banks, and professional traders finish their work earlier than usual, so market activity gradually decreases as the day goes on. With fewer participants, some stocks may trade less actively, while others can experience unexpected price movements due to lower trading volume.\n\nThe biggest risk is a false sense of calm. Although the market may appear quiet, lower participation means that even relatively small trades can have a greater impact on prices. Bid-ask spreads may widen, and price movements can become less predictable.\n\nAnother important factor is that many investors prefer to reduce or close positions before a long holiday weekend to avoid holding risk while the market is closed. This can create additional selling pressure, even when there is no negative news about a company.'**
+  String get marketClockRiskEarlyCloseSessionWhyNow;
+
+  /// No description provided for @marketClockRiskEarlyCloseSessionWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re investing for the long term and your decision has already been made, a shortened trading day is not necessarily a reason to avoid investing.\n\nHowever, if your trade isn\'t time-sensitive, waiting until the next full trading session often provides better liquidity and more stable market conditions.\n\nUse the extra time to review your watchlist, read company reports, or practice in Stress Test.\n\nAn early market close isn\'t a reason to rush your decisions. Sometimes the smartest move is simply to wait for the next full trading day, when the market returns to normal conditions.'**
+  String get marketClockRiskEarlyCloseSessionWhatToDo;
+
+  /// No description provided for @marketClockRiskClosedWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'The market is closed and no trades are taking place. This is the perfect opportunity to step away from price movements and focus on learning.'**
+  String get marketClockRiskClosedWhyNow;
+
+  /// No description provided for @marketClockRiskClosedWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your portfolio, read company reports, and prepare your plan for the next trading day. You can also practice in Stress Test, where every trade is simulated and completely independent of the live market.'**
+  String get marketClockRiskClosedWhatToDo;
+
+  /// No description provided for @marketClockRiskWeekendHolidayWhyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'The stock market is closed, but the world keeps moving. News, politics, and company announcements continue, even though no trading takes place.'**
+  String get marketClockRiskWeekendHolidayWhyNow;
+
+  /// No description provided for @marketClockRiskWeekendHolidayWhatToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the opportunity to learn without pressure. Explore new companies, improve your investing knowledge, or practice in Stress Test. It\'s a safe environment where you can build confidence, develop discipline, and test ideas without risking real money.'**
+  String get marketClockRiskWeekendHolidayWhatToDo;
+
+  /// No description provided for @marketClockNewYorkTimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW YORK TIME'**
+  String get marketClockNewYorkTimeTitle;
+
+  /// No description provided for @marketClockMacroPhasePreMarketLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PRE-MARKET'**
+  String get marketClockMacroPhasePreMarketLabel;
+
+  /// No description provided for @marketClockMacroPhaseMarketOpenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET OPEN'**
+  String get marketClockMacroPhaseMarketOpenLabel;
+
+  /// No description provided for @marketClockMacroPhaseAfterHoursLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AFTER HOURS'**
+  String get marketClockMacroPhaseAfterHoursLabel;
+
+  /// No description provided for @marketClockMacroPhaseMarketClosedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET CLOSED'**
+  String get marketClockMacroPhaseMarketClosedLabel;
+
+  /// No description provided for @marketClockCountdownEnds.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends {time}'**
+  String marketClockCountdownEnds(String time);
+
+  /// No description provided for @marketClockCountdownStarts.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts {time}'**
+  String marketClockCountdownStarts(String time);
+
+  /// No description provided for @marketClockWidgetDisplayNameNyTime.
+  ///
+  /// In en, this message translates to:
+  /// **'New York Time'**
+  String get marketClockWidgetDisplayNameNyTime;
+
+  /// No description provided for @marketClockWidgetDisplayNameMarketPhase.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Phase'**
+  String get marketClockWidgetDisplayNameMarketPhase;
+
+  /// No description provided for @marketClockWidgetDisplayNameTimingIndicator.
+  ///
+  /// In en, this message translates to:
+  /// **'FOMO Shield Status'**
+  String get marketClockWidgetDisplayNameTimingIndicator;
+
+  /// No description provided for @marketPhaseWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET PHASE'**
+  String get marketPhaseWidgetTitle;
+
+  /// No description provided for @marketPhaseWidgetDetailsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get marketPhaseWidgetDetailsTooltip;
+
+  /// No description provided for @marketClockFomoShieldStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FOMO SHIELD STATUS'**
+  String get marketClockFomoShieldStatusTitle;
+
+  /// No description provided for @marketClockRiskDetailWhyNowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Why Now?'**
+  String get marketClockRiskDetailWhyNowLabel;
+
+  /// No description provided for @marketClockRiskDetailWhatToDoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What Should You Do?'**
+  String get marketClockRiskDetailWhatToDoLabel;
+
+  /// No description provided for @marketClockScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET CLOCK'**
+  String get marketClockScreenTitle;
+
+  /// No description provided for @marketClockAddWidgetsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add widgets'**
+  String get marketClockAddWidgetsButton;
+
+  /// No description provided for @marketClockRiskTierLowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'LOW RISK'**
+  String get marketClockRiskTierLowLabel;
+
+  /// No description provided for @marketClockRiskTierModerateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'MODERATE RISK'**
+  String get marketClockRiskTierModerateLabel;
+
+  /// No description provided for @marketClockRiskTierHighLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HIGH RISK'**
+  String get marketClockRiskTierHighLabel;
+
+  /// No description provided for @marketClockRiskTierClosedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET CLOSED'**
+  String get marketClockRiskTierClosedLabel;
+
+  /// No description provided for @marketClockMetricLiquidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Liquidity'**
+  String get marketClockMetricLiquidity;
+
+  /// No description provided for @marketClockMetricVolatility.
+  ///
+  /// In en, this message translates to:
+  /// **'Volatility'**
+  String get marketClockMetricVolatility;
+
+  /// No description provided for @marketClockMetricNewsRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'News Risk'**
+  String get marketClockMetricNewsRisk;
+
+  /// No description provided for @marketClockMetricFomoShield.
+  ///
+  /// In en, this message translates to:
+  /// **'F.O.M.O. Shield'**
+  String get marketClockMetricFomoShield;
+
+  /// No description provided for @marketClockRiskScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'RISK SCORE'**
+  String get marketClockRiskScoreLabel;
+
+  /// No description provided for @marketClockWidgetSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Settings'**
+  String get marketClockWidgetSettingsTitle;
+
+  /// No description provided for @marketClockWidgetSettingsReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get marketClockWidgetSettingsReset;
+
+  /// No description provided for @marketPeriodDetailFallbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PERIOD'**
+  String get marketPeriodDetailFallbackTitle;
+
+  /// No description provided for @marketPeriodDetailWhatsHappeningLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s Happening?'**
+  String get marketPeriodDetailWhatsHappeningLabel;
+
+  /// No description provided for @marketPeriodDetailWhyDoesItMatterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Why Does It Matter?'**
+  String get marketPeriodDetailWhyDoesItMatterLabel;
+
+  /// No description provided for @marketPeriodDetailWhatCanGoWrongLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What Can Go Wrong?'**
+  String get marketPeriodDetailWhatCanGoWrongLabel;
+
+  /// No description provided for @marketPeriodDetailWhatShouldBeginnersDoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What Should Beginners Do?'**
+  String get marketPeriodDetailWhatShouldBeginnersDoLabel;
+
+  /// No description provided for @marketPeriodDetailOpenStressTestButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Stress Test'**
+  String get marketPeriodDetailOpenStressTestButton;
+
+  /// No description provided for @marketPeriodDetailFomoShieldTipLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'F.O.M.O. SHIELD TIP'**
+  String get marketPeriodDetailFomoShieldTipLabel;
+
+  /// No description provided for @marketPhasesScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET PHASES'**
+  String get marketPhasesScreenTitle;
+
+  /// No description provided for @marketPhasesScreenNowBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'NOW'**
+  String get marketPhasesScreenNowBadge;
+
+  /// No description provided for @marketPhasesScreenMoreLink.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get marketPhasesScreenMoreLink;
 }
 
 class _AppLocalizationsDelegate

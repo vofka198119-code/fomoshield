@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 import 'market_clock_new_york_time_widget.dart';
 import 'market_clock_phase_widget.dart';
@@ -25,9 +26,11 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
   @override
   void initState() {
     super.initState();
-    _state = resolveMarketClockState(nowInNewYork());
+    final l10n = AppLocalizations.of(context)!;
+    _state = resolveMarketClockState(l10n, nowInNewYork());
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() => _state = resolveMarketClockState(nowInNewYork()));
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _state = resolveMarketClockState(l10n, nowInNewYork()));
     });
   }
 
@@ -75,6 +78,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final widgetConfigs = ref.watch(marketClockWidgetsProvider);
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
 
@@ -84,7 +88,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'MARKET CLOCK',
+          l10n.marketClockScreenTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -120,7 +124,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
                     size: 20,
                   ),
                   label: Text(
-                    'Add widgets',
+                    l10n.marketClockAddWidgetsButton,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

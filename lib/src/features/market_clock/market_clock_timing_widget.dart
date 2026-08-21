@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_dial.dart';
 import 'market_clock_engine.dart';
 import 'market_clock_risk_engine.dart';
@@ -28,16 +29,29 @@ class TierStyle {
   const TierStyle({required this.color, required this.label});
 }
 
-const Map<RiskTier, TierStyle> _tierStyles = {
-  RiskTier.low: TierStyle(color: ThemeV2.success, label: 'LOW RISK'),
-  RiskTier.moderate: TierStyle(color: ThemeV2.warning, label: 'MODERATE RISK'),
-  RiskTier.high: TierStyle(color: ThemeV2.loss, label: 'HIGH RISK'),
-  RiskTier.closed: TierStyle(color: Colors.white70, label: 'MARKET CLOSED'),
+Map<RiskTier, TierStyle> _tierStylesFor(AppLocalizations l10n) => {
+  RiskTier.low: TierStyle(
+    color: ThemeV2.success,
+    label: l10n.marketClockRiskTierLowLabel,
+  ),
+  RiskTier.moderate: TierStyle(
+    color: ThemeV2.warning,
+    label: l10n.marketClockRiskTierModerateLabel,
+  ),
+  RiskTier.high: TierStyle(
+    color: ThemeV2.loss,
+    label: l10n.marketClockRiskTierHighLabel,
+  ),
+  RiskTier.closed: TierStyle(
+    color: Colors.white70,
+    label: l10n.marketClockRiskTierClosedLabel,
+  ),
 };
 
 /// Public accessor so market_clock_risk_detail_screen.dart can show the
 /// same label/color the widget uses, without exposing the whole map.
-TierStyle tierStyleFor(RiskTier tier) => _tierStyles[tier]!;
+TierStyle tierStyleFor(AppLocalizations l10n, RiskTier tier) =>
+    _tierStylesFor(l10n)[tier]!;
 
 /// Thin gold-bordered "window" — same instrument-panel language as the
 /// clock's digital readout / corner panels (dialBrassLight border on a
@@ -60,9 +74,10 @@ class FomoShieldStatusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final metrics = window.riskMetrics;
-    final tier = window.riskTier;
-    final style = _tierStyles[tier]!;
+    final l10n = AppLocalizations.of(context)!;
+    final metrics = window.riskMetricsFor(l10n);
+    final tier = window.riskTierFor(l10n);
+    final style = _tierStylesFor(l10n)[tier]!;
 
     return Container(
       decoration: darkCardDecoration(),
@@ -77,7 +92,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                 Icon(Icons.shield_rounded, color: dialBrassLight, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'FOMO SHIELD STATUS',
+                  l10n.marketClockFomoShieldStatusTitle,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -101,13 +116,19 @@ class FomoShieldStatusWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ── Bars first (phone-friendly — full width) ────────
-                _metricBar('Liquidity', metrics.liquidity),
+                _metricBar(l10n.marketClockMetricLiquidity, metrics.liquidity),
                 const SizedBox(height: 10),
-                _metricBar('Volatility', metrics.volatility),
+                _metricBar(
+                  l10n.marketClockMetricVolatility,
+                  metrics.volatility,
+                ),
                 const SizedBox(height: 10),
-                _metricBar('News Risk', metrics.newsRisk),
+                _metricBar(l10n.marketClockMetricNewsRisk, metrics.newsRisk),
                 const SizedBox(height: 10),
-                _metricBar('F.O.M.O. Shield', metrics.fomoShield),
+                _metricBar(
+                  l10n.marketClockMetricFomoShield,
+                  metrics.fomoShield,
+                ),
                 const SizedBox(height: 16),
 
                 // ── Description window + Risk Score window, side by
@@ -180,7 +201,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                'RISK SCORE',
+                                l10n.marketClockRiskScoreLabel,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.inter(
                                   fontSize: 9,

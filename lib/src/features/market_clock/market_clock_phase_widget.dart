@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 
 // ---------------------------------------------------------------------------
@@ -22,6 +23,7 @@ class MarketPhaseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: FomoShieldTheme.cardDecoration,
       child: Column(
@@ -33,7 +35,10 @@ class MarketPhaseWidget extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text('MARKET PHASE', style: FomoShieldTheme.cardTitle()),
+                  Text(
+                    l10n.marketPhaseWidgetTitle,
+                    style: FomoShieldTheme.cardTitle(),
+                  ),
                   const Spacer(),
                   const Icon(
                     Icons.chevron_right_rounded,
@@ -105,7 +110,7 @@ class MarketPhaseWidget extends StatelessWidget {
                     Icons.help_outline_rounded,
                     color: ThemeV2.primary,
                   ),
-                  tooltip: 'Details',
+                  tooltip: l10n.marketPhaseWidgetDetailsTooltip,
                 ),
               ],
             ),

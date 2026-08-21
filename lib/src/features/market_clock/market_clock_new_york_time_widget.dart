@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_dial.dart';
 import 'market_clock_engine.dart';
 
@@ -17,6 +18,7 @@ class NewYorkTimeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: marketClockCardDecoration(),
       child: Column(
@@ -25,7 +27,7 @@ class NewYorkTimeWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
             child: Text(
-              'NEW YORK TIME',
+              l10n.marketClockNewYorkTimeTitle,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -88,32 +90,32 @@ class _MacroPhase {
 /// on a non-trading day these countdowns still tick against the ordinary
 /// daily cycle rather than the next actual trading day. Acceptable v1
 /// simplification; revisit if it reads as wrong on a real weekend.
-const _macroPhases = [
+List<_MacroPhase> _macroPhasesFor(AppLocalizations l10n) => [
   _MacroPhase(
     phase: MarketPhase.preMarket,
     icon: Icons.wb_twilight,
-    label: 'PRE-MARKET',
+    label: l10n.marketClockMacroPhasePreMarketLabel,
     start: 240,
     end: 570,
   ),
   _MacroPhase(
     phase: MarketPhase.marketOpen,
     icon: Icons.wb_sunny_rounded,
-    label: 'MARKET OPEN',
+    label: l10n.marketClockMacroPhaseMarketOpenLabel,
     start: 570,
     end: 960,
   ),
   _MacroPhase(
     phase: MarketPhase.afterHours,
     icon: Icons.nightlight_round,
-    label: 'AFTER HOURS',
+    label: l10n.marketClockMacroPhaseAfterHoursLabel,
     start: 960,
     end: 1200,
   ),
   _MacroPhase(
     phase: MarketPhase.closed,
     icon: Icons.bedtime_rounded,
-    label: 'MARKET CLOSED',
+    label: l10n.marketClockMacroPhaseMarketClosedLabel,
     start: 1200,
     end: 240,
   ),
@@ -146,6 +148,8 @@ class _MarketClockInstrumentPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final macroPhases = _macroPhasesFor(l10n);
     final panelSize = area / 2;
     final dialSize = area * 0.62;
     // True circle, radius matched tightly to the dial's own outer edge (incl.
@@ -211,10 +215,10 @@ class _MarketClockInstrumentPanel extends StatelessWidget {
               showDigitalReadout: true,
             ),
           ),
-          corner(_Corner.topLeft, _macroPhases[0]),
-          corner(_Corner.topRight, _macroPhases[1]),
-          corner(_Corner.bottomRight, _macroPhases[2]),
-          corner(_Corner.bottomLeft, _macroPhases[3]),
+          corner(_Corner.topLeft, macroPhases[0]),
+          corner(_Corner.topRight, macroPhases[1]),
+          corner(_Corner.bottomRight, macroPhases[2]),
+          corner(_Corner.bottomLeft, macroPhases[3]),
         ],
       ),
     );
@@ -269,6 +273,7 @@ class _CornerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final accent = active
         ? _macroPhaseColor(macro.phase)
         : Colors.white.withValues(alpha: 0.4);
@@ -285,8 +290,8 @@ class _CornerPanel extends StatelessWidget {
       color: dialIvory,
     );
     final timerString = active
-        ? 'Ends ${_formatHm(remainingMinutes)}'
-        : 'Starts ${_formatHm(remainingMinutes)}';
+        ? l10n.marketClockCountdownEnds(_formatHm(remainingMinutes))
+        : l10n.marketClockCountdownStarts(_formatHm(remainingMinutes));
 
     // The notch only bites into the corner nearest the dial, so a thin band
     // along the panel's OUTER edge (top edge for top panels, bottom edge

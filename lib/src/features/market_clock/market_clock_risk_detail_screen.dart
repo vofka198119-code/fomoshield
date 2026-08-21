@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 import 'market_clock_risk_engine.dart';
 import 'market_clock_timing_widget.dart' show tierStyleFor;
@@ -20,7 +21,8 @@ class RiskStatusDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final window = findWindowById(windowId);
+    final l10n = AppLocalizations.of(context)!;
+    final window = findWindowById(l10n, windowId);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -28,7 +30,7 @@ class RiskStatusDetailScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'FOMO SHIELD STATUS',
+          l10n.marketClockFomoShieldStatusTitle,
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w800,
@@ -51,7 +53,10 @@ class RiskStatusDetailScreen extends StatelessWidget {
                   children: [
                     Builder(
                       builder: (context) {
-                        final style = tierStyleFor(window.riskTier);
+                        final style = tierStyleFor(
+                          l10n,
+                          window.riskTierFor(l10n),
+                        );
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -74,13 +79,13 @@ class RiskStatusDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 20),
                             _Section(
-                              label: 'Why Now?',
-                              body: window.riskMetrics.whyNow,
+                              label: l10n.marketClockRiskDetailWhyNowLabel,
+                              body: window.riskMetricsFor(l10n).whyNow,
                             ),
                             const SizedBox(height: 18),
                             _Section(
-                              label: 'What Should You Do?',
-                              body: window.riskMetrics.whatToDo,
+                              label: l10n.marketClockRiskDetailWhatToDoLabel,
+                              body: window.riskMetricsFor(l10n).whatToDo,
                               isLast: true,
                             ),
                           ],

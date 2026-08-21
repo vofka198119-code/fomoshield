@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../stress_test/stress_test_hub_screen.dart';
 import 'market_clock_engine.dart';
 
@@ -10,7 +11,8 @@ class MarketPeriodDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final window = findWindowById(windowId);
+    final l10n = AppLocalizations.of(context)!;
+    final window = findWindowById(l10n, windowId);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -18,7 +20,8 @@ class MarketPeriodDetailScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          window?.shortHeadline.toUpperCase() ?? 'PERIOD',
+          window?.shortHeadline.toUpperCase() ??
+              l10n.marketPeriodDetailFallbackTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -69,20 +72,20 @@ class MarketPeriodDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     _Section(
-                      label: 'What\'s Happening?',
+                      label: l10n.marketPeriodDetailWhatsHappeningLabel,
                       body: window.whatHappens,
                     ),
                     _Section(
-                      label: 'Why Does It Matter?',
+                      label: l10n.marketPeriodDetailWhyDoesItMatterLabel,
                       body: window.whyItMatters,
                     ),
                     if (window.dangerForBeginner != null)
                       _Section(
-                        label: 'What Can Go Wrong?',
+                        label: l10n.marketPeriodDetailWhatCanGoWrongLabel,
                         body: window.dangerForBeginner!,
                       ),
                     _Section(
-                      label: 'What Should Beginners Do?',
+                      label: l10n.marketPeriodDetailWhatShouldBeginnersDoLabel,
                       body: window.whatToDo,
                       isLast:
                           window.stressTestPromoTitle == null &&
@@ -157,6 +160,7 @@ class _StressTestPromo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -209,7 +213,7 @@ class _StressTestPromo extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Open Stress Test',
+                l10n.marketPeriodDetailOpenStressTestButton,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -232,6 +236,7 @@ class _TipCallout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -248,7 +253,7 @@ class _TipCallout extends StatelessWidget {
               const Text('💡', style: TextStyle(fontSize: 16)),
               const SizedBox(width: 8),
               Text(
-                'F.O.M.O. SHIELD TIP',
+                l10n.marketPeriodDetailFomoShieldTipLabel,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,

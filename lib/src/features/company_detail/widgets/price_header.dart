@@ -10,11 +10,11 @@ import '../../../shared/widgets/company_logo.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
 import '../../market_clock/market_clock_engine.dart'
-    show MarketPhase, nowInNewYork, resolveMarketClockState;
+    show MarketPhase, nowInNewYork, resolveMarketPhase;
 
 // ===========================================================================
 // Market session label — reuses Market Clock's real Eastern-time engine
-// (nowInNewYork/resolveMarketClockState, DST-aware) instead of the phone's
+// (nowInNewYork/resolveMarketPhase, DST-aware) instead of the phone's
 // local clock, so this always agrees with the actual NYSE session.
 // ===========================================================================
 
@@ -325,7 +325,7 @@ class PriceHeader extends StatelessWidget {
         sessionLabel = phaseLabel!;
         isOpen = phaseGlow;
       } else {
-        final phase = resolveMarketClockState(nowInNewYork()).phase;
+        final phase = resolveMarketPhase(nowInNewYork());
         sessionLabel = _phaseLabel(l10n, phase);
         isOpen = phase == MarketPhase.marketOpen;
       }

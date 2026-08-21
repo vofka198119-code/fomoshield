@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_widget_order_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -72,6 +73,7 @@ class _MarketClockWidgetsSettingsSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -95,7 +97,7 @@ class _MarketClockWidgetsSettingsSheetState
             child: Row(
               children: [
                 Text(
-                  'Widget Settings',
+                  l10n.marketClockWidgetSettingsTitle,
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -116,7 +118,7 @@ class _MarketClockWidgetsSettingsSheetState
                     });
                   },
                   child: Text(
-                    'Reset',
+                    l10n.marketClockWidgetSettingsReset,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: ThemeV2.primary,
@@ -190,7 +192,7 @@ class _MarketClockWidgetsSettingsSheetState
                       ],
                     ),
                     title: Text(
-                      config.displayName,
+                      config.displayName(l10n),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

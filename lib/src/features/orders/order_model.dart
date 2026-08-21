@@ -195,10 +195,8 @@ class Order {
 /// about weekends/holidays/early closes — all things a naive hour/minute
 /// check here used to get wrong.
 MarketSession currentMarketSession() {
-  final state = market_clock.resolveMarketClockState(
-    market_clock.nowInNewYork(),
-  );
-  switch (state.phase) {
+  final phase = market_clock.resolveMarketPhase(market_clock.nowInNewYork());
+  switch (phase) {
     case market_clock.MarketPhase.preMarket:
       return MarketSession.preMarket;
     case market_clock.MarketPhase.marketOpen:

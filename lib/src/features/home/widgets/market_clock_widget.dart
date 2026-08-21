@@ -27,9 +27,11 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
   @override
   void initState() {
     super.initState();
-    _state = resolveMarketClockState(nowInNewYork());
+    final l10n = AppLocalizations.of(context)!;
+    _state = resolveMarketClockState(l10n, nowInNewYork());
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() => _state = resolveMarketClockState(nowInNewYork()));
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _state = resolveMarketClockState(l10n, nowInNewYork()));
     });
   }
 
