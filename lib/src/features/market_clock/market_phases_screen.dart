@@ -25,10 +25,13 @@ class MarketPhasesScreen extends StatefulWidget {
 class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
   late Timer _timer;
   late String _activeWindowId;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
     final l10n = AppLocalizations.of(context)!;
     _activeWindowId = resolveMarketClockState(l10n, nowInNewYork()).window.id;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {

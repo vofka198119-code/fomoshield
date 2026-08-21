@@ -22,10 +22,13 @@ class MarketClockScreen extends ConsumerStatefulWidget {
 class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
   late Timer _timer;
   late MarketClockState _state;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
     final l10n = AppLocalizations.of(context)!;
     _state = resolveMarketClockState(l10n, nowInNewYork());
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
