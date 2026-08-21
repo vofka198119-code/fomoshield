@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../order_model.dart';
 import '../order_provider.dart';
@@ -26,6 +27,7 @@ class OrderRowTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isBuy = order.side == OrderSide.buy;
     final accentColor = isBuy ? ThemeV2.success : ThemeV2.loss;
     final price = order.limitPrice ?? order.stopPrice;
@@ -57,7 +59,13 @@ class OrderRowTile extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${isBuy ? 'Buy' : 'Sell'} ${formatOrderQuantity(order.quantity)} shares',
+                  isBuy
+                      ? l10n.stressTestOrderRowBuyLine(
+                          formatOrderQuantity(order.quantity),
+                        )
+                      : l10n.stressTestOrderRowSellLine(
+                          formatOrderQuantity(order.quantity),
+                        ),
                   style: interNums(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -75,7 +83,10 @@ class OrderRowTile extends ConsumerWidget {
                 if (price != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    '${order.type.label} Price ${formatUsd(price)}',
+                    l10n.orderRowTilePriceLabel(
+                      order.type.label,
+                      formatUsd(price),
+                    ),
                     style: interNums(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,

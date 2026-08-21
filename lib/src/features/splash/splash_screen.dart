@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../auth/auth_providers.dart';
 import '../home/home_providers.dart'
     show watchlistSymbolsProvider, marketIndicesProvider;
@@ -291,7 +292,7 @@ class _LoadingRing extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          'Loading...',
+          AppLocalizations.of(context)!.commonLoading,
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w500,

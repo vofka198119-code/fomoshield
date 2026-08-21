@@ -5233,4 +5233,277 @@ class AppLocalizationsRu extends AppLocalizations {
   String stressTestOrderRowLimitPriceLine(String price) {
     return 'Лимитная цена $price';
   }
+
+  @override
+  String get monetizationModalTitle => 'Достигнут лимит поиска';
+
+  @override
+  String get monetizationModalDescription =>
+      'Вы использовали все бесплатные поиски. Оформите Premium для безлимитного поиска или посмотрите рекламу, чтобы получить ещё 15.';
+
+  @override
+  String get monetizationModalUpgradeButton => 'Оформить Premium';
+
+  @override
+  String get monetizationModalWatchAdButton =>
+      'Посмотреть рекламу (+15 поисков)';
+
+  @override
+  String get monetizationModalCounterResetAdmin =>
+      '🔧 Счётчик сброшен до 15 (админ)';
+
+  @override
+  String get monetizationModalResetCounterAdmin => 'Сбросить счётчик (админ)';
+
+  @override
+  String get monetizationModalSponsoredAd => 'Спонсорская реклама';
+
+  @override
+  String get monetizationModalRewardText =>
+      'Ваша награда: +15 бесплатных поисков';
+
+  @override
+  String monetizationModalSecondsRemaining(int seconds) {
+    return 'Осталось $seconds с';
+  }
+
+  @override
+  String get monetizationModalSkip => 'Пропустить';
+
+  @override
+  String get monetizationModalComingSoon => '🏗️ Подписка Premium — скоро!';
+
+  @override
+  String get monetizationModalRewardEarned => '✓ Получено ещё 15 поисков!';
+
+  @override
+  String get premiumPromoOverlayBarrierLabel => 'Промо-заставка Premium';
+
+  @override
+  String get premiumPromoOverlayDefaultTitle => 'Функция Premium';
+
+  @override
+  String get premiumPromoOverlayBadge => 'PREMIUM';
+
+  @override
+  String get premiumPromoOverlaySubtitle =>
+      'Оформите подписку, чтобы открыть это и многое другое';
+
+  @override
+  String get premiumPromoOverlayFeatureAdFree => 'Полностью без рекламы';
+
+  @override
+  String premiumPromoOverlaySecondsShort(int seconds) {
+    return '$seconds с';
+  }
+
+  @override
+  String premiumPromoOverlayClosingIn(int seconds) {
+    return 'Закроется через $seconds с…';
+  }
+
+  @override
+  String get premiumPromoOverlayClose => 'Закрыть';
+
+  @override
+  String get disclaimerScreenTitle => 'Дисклеймер';
+
+  @override
+  String get disclaimerScreenAccessRestricted => 'Доступ ограничен';
+
+  @override
+  String get disclaimerScreenAppWillClose => 'Приложение сейчас закроется';
+
+  @override
+  String get disclaimerScreenCloseAppButton => 'Закрыть приложение';
+
+  @override
+  String get disclaimerScreenImportantNoticeTitle => 'Важное уведомление';
+
+  @override
+  String get disclaimerScreenImportantNoticeBody =>
+      'F.O.M.O. Shield — образовательный инструмент, созданный, чтобы помочь инвесторам понять поведение рынка и собственные модели принятия решений. Приложение не предоставляет финансовые консультации, инвестиционные рекомендации или какие-либо консультационные услуги.';
+
+  @override
+  String get disclaimerScreenFsScoresTitle => 'Независимость FS Score';
+
+  @override
+  String get disclaimerScreenFsScoresBody =>
+      'FS Score и все связанные аналитические материалы — результат собственного анализа F.O.M.O. Shield на основе математических моделей и общедоступных данных. Мы не получаем вознаграждение от компаний за включение в рейтинги или изменение оценок. FS Score не являются рекомендацией покупать, продавать или держать какую-либо ценную бумагу.';
+
+  @override
+  String get disclaimerScreenDataSourcesTitle => 'Источники данных';
+
+  @override
+  String get disclaimerScreenDataSourcesBody =>
+      'Рыночные данные предоставляются через API Finnhub и Wikipedia. Мы стремимся к точности, но не можем гарантировать полноту, точность или актуальность всех данных. Прошлые результаты не гарантируют будущих. Сценарии стресс-теста — это симуляции на основе математических моделей и исторических закономерностей.';
+
+  @override
+  String get disclaimerScreenPrivacyTitle => 'Конфиденциальность';
+
+  @override
+  String get disclaimerScreenPrivacyBody =>
+      'Мы собираем минимум данных, необходимых для работы приложения: ваш email (для создания аккаунта) и данные, которые вы создаёте внутри приложения (портфели, список отслеживания, симуляции). Мы не продаём ваши данные третьим лицам.';
+
+  @override
+  String get disclaimerScreenTermsUpdatesTitle => 'Обновления условий';
+
+  @override
+  String get disclaimerScreenTermsUpdatesBody =>
+      'Мы оставляем за собой право обновлять этот дисклеймер, Условия использования и Политику конфиденциальности. В случае изменений приложение уведомит вас и потребует повторного принятия обновлённых условий для продолжения работы.';
+
+  @override
+  String get disclaimerScreenAcceptPrefix =>
+      'Я подтверждаю, что мне есть 18 лет, и полностью принимаю этот дисклеймер, ';
+
+  @override
+  String get disclaimerScreenTermsOfServiceLink => 'Условия использования';
+
+  @override
+  String get disclaimerScreenAcceptAndThe => ', а также ';
+
+  @override
+  String get disclaimerScreenPrivacyPolicyLink => 'Политику конфиденциальности';
+
+  @override
+  String get disclaimerScreenAcceptButton => 'Принимаю';
+
+  @override
+  String get accountRestoreScreenRestoreFailed =>
+      'Не удалось восстановить аккаунт. Попробуйте ещё раз.';
+
+  @override
+  String get accountRestoreScreenTitle => 'Аккаунт назначен к удалению';
+
+  @override
+  String accountRestoreScreenDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'У вас осталось $count дня, чтобы восстановить аккаунт',
+      many: 'У вас осталось $count дней, чтобы восстановить аккаунт',
+      few: 'У вас осталось $count дня, чтобы восстановить аккаунт',
+      one: 'У вас остался $count день, чтобы восстановить аккаунт',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String accountRestoreScreenDeletionWarningSuffix(String date) {
+    return ' — после $date он будет удалён навсегда, без возможности восстановления';
+  }
+
+  @override
+  String get accountRestoreScreenAboutToErase =>
+      'Этот аккаунт будет удалён навсегда, без возможности восстановления.';
+
+  @override
+  String get accountRestoreScreenRestoreButton => 'Восстановить аккаунт';
+
+  @override
+  String get forgotPasswordScreenEnterEmail => 'Пожалуйста, введите ваш email';
+
+  @override
+  String forgotPasswordScreenWaitSeconds(int seconds) {
+    return 'Подождите $seconds сек. перед повторным запросом.';
+  }
+
+  @override
+  String get forgotPasswordScreenTitle => 'Сброс пароля';
+
+  @override
+  String get forgotPasswordScreenSubtitle =>
+      'Введите email, и мы отправим вам ссылку\nдля сброса пароля.';
+
+  @override
+  String get forgotPasswordScreenCheckEmail => 'Проверьте почту';
+
+  @override
+  String get forgotPasswordScreenSentMessage =>
+      'Если этот email зарегистрирован в системе, мы отправили на него ссылку для сброса пароля.';
+
+  @override
+  String get forgotPasswordScreenDevModeNote =>
+      'Режим разработки: ссылка для сброса выводится в консоль отладки.';
+
+  @override
+  String get forgotPasswordScreenSendButton => 'Отправить ссылку';
+
+  @override
+  String get forgotPasswordScreenBackToSignIn => 'Назад ко входу';
+
+  @override
+  String get authGoogleNoIdToken => 'Google не вернул ID-токен.';
+
+  @override
+  String get watchlistFullScreenEmptyTitle => 'Пока нет компаний';
+
+  @override
+  String get watchlistFullScreenEmptySubtitle =>
+      'Нажмите +, чтобы найти и добавить компании';
+
+  @override
+  String get watchlistFullScreenSearchButton => 'Найти компании';
+
+  @override
+  String orderRowTilePriceLabel(String orderType, String price) {
+    return '$orderType: цена $price';
+  }
+
+  @override
+  String get orderCancelDialogTitle => 'Отменить ордер?';
+
+  @override
+  String get orderCancelDialogBody =>
+      'Вы уверены, что хотите отменить этот ордер?';
+
+  @override
+  String get orderCancelDialogNo => 'Нет';
+
+  @override
+  String get orderCancelDialogYes => 'Да';
+
+  @override
+  String orderAmountSectionApproxUsd(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get orderEntryNotifYouBought => 'Вы купили';
+
+  @override
+  String get orderEntryNotifYouSold => 'Вы продали';
+
+  @override
+  String orderEntryNotifFilledDetail(
+    String quantity,
+    String companyName,
+    String price,
+  ) {
+    return '$quantity акций $companyName по цене $price';
+  }
+
+  @override
+  String get orderEntryNotifBuyWord => 'Покупка';
+
+  @override
+  String get orderEntryNotifSellWord => 'Продажа';
+
+  @override
+  String orderEntryNotifOrderPlacedTitle(String orderType, String buyOrSell) {
+    return '$buyOrSell ($orderType): ордер выставлен';
+  }
+
+  @override
+  String orderEntryNotifPendingDetailBase(String quantity, String companyName) {
+    return '$quantity акций $companyName';
+  }
+
+  @override
+  String orderEntryNotifAtPrice(String price) {
+    return ' по цене $price';
+  }
+
+  @override
+  String get orderEntryNotifPendingSuffix => ' — в ожидании';
 }

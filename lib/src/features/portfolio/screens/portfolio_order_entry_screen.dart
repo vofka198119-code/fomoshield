@@ -400,6 +400,7 @@ class _PortfolioOrderEntryScreenState
     required double amount,
     double? limitPrice,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     final order = ref
         .read(ordersProvider.notifier)
         .placeOrder(
@@ -436,10 +437,14 @@ class _PortfolioOrderEntryScreenState
             symbol: widget.symbol,
             companyName: widget.companyName,
             logoUrl: widget.logo,
-            title: _isBuy ? 'You Bought' : 'You Sold',
-            detail:
-                '${shares.toStringAsFixed(4)} shares of $companyName '
-                'at ${formatUsd(_currentPrice)}',
+            title: _isBuy
+                ? l10n.orderEntryNotifYouBought
+                : l10n.orderEntryNotifYouSold,
+            detail: l10n.orderEntryNotifFilledDetail(
+              shares.toStringAsFixed(4),
+              companyName,
+              formatUsd(_currentPrice),
+            ),
             createdAt: DateTime.now(),
           ),
         );
@@ -456,10 +461,16 @@ class _PortfolioOrderEntryScreenState
             symbol: widget.symbol,
             companyName: widget.companyName,
             logoUrl: widget.logo,
-            title: '${orderType.label} ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
+            title: l10n.orderEntryNotifOrderPlacedTitle(
+              orderType.label,
+              _isBuy
+                  ? l10n.orderEntryNotifBuyWord
+                  : l10n.orderEntryNotifSellWord,
+            ),
             detail:
-                '${shares.toStringAsFixed(4)} shares of $companyName'
-                '${limitPrice != null ? ' at ${formatUsd(limitPrice)}' : ''} — Pending',
+                '${l10n.orderEntryNotifPendingDetailBase(shares.toStringAsFixed(4), companyName)}'
+                '${limitPrice != null ? l10n.orderEntryNotifAtPrice(formatUsd(limitPrice)) : ''}'
+                '${l10n.orderEntryNotifPendingSuffix}',
             createdAt: DateTime.now(),
           ),
         );

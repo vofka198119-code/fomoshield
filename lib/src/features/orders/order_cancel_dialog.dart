@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Order Cancel Confirmation — plain AlertDialog (proven safe in this app,
@@ -12,6 +13,7 @@ import '../../core/theme/theme_v2.dart';
 // ---------------------------------------------------------------------------
 
 Future<bool> confirmCancelOrder(BuildContext context) async {
+  final l10n = AppLocalizations.of(context)!;
   final result = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
@@ -21,7 +23,7 @@ Future<bool> confirmCancelOrder(BuildContext context) async {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Cancel Order?',
+            l10n.orderCancelDialogTitle,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -42,7 +44,7 @@ Future<bool> confirmCancelOrder(BuildContext context) async {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Are you sure you want to cancel this order?',
+            l10n.orderCancelDialogBody,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,
@@ -65,7 +67,7 @@ Future<bool> confirmCancelOrder(BuildContext context) async {
                     ),
                   ),
                   child: Text(
-                    'No',
+                    l10n.orderCancelDialogNo,
                     style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -84,7 +86,7 @@ Future<bool> confirmCancelOrder(BuildContext context) async {
                     ),
                   ),
                   child: Text(
-                    'Yes',
+                    l10n.orderCancelDialogYes,
                     style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                   ),
                 ),

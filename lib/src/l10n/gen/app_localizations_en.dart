@@ -5222,4 +5222,274 @@ class AppLocalizationsEn extends AppLocalizations {
   String stressTestOrderRowLimitPriceLine(String price) {
     return 'Limit Price $price';
   }
+
+  @override
+  String get monetizationModalTitle => 'Search limit reached';
+
+  @override
+  String get monetizationModalDescription =>
+      'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 15 more.';
+
+  @override
+  String get monetizationModalUpgradeButton => 'Upgrade to Premium';
+
+  @override
+  String get monetizationModalWatchAdButton => 'Watch Ad (+15 searches)';
+
+  @override
+  String get monetizationModalCounterResetAdmin =>
+      '🔧 Counter reset to 15 (admin)';
+
+  @override
+  String get monetizationModalResetCounterAdmin => 'Reset counter (admin)';
+
+  @override
+  String get monetizationModalSponsoredAd => 'Sponsored Ad';
+
+  @override
+  String get monetizationModalRewardText => 'Your reward: +15 free searches';
+
+  @override
+  String monetizationModalSecondsRemaining(int seconds) {
+    return '${seconds}s remaining';
+  }
+
+  @override
+  String get monetizationModalSkip => 'Skip';
+
+  @override
+  String get monetizationModalComingSoon =>
+      '🏗️ Premium subscription — coming soon!';
+
+  @override
+  String get monetizationModalRewardEarned => '✓ Earned 15 more searches!';
+
+  @override
+  String get premiumPromoOverlayBarrierLabel => 'Premium promo overlay';
+
+  @override
+  String get premiumPromoOverlayDefaultTitle => 'Premium feature';
+
+  @override
+  String get premiumPromoOverlayBadge => 'PREMIUM';
+
+  @override
+  String get premiumPromoOverlaySubtitle => 'Upgrade to unlock this and more';
+
+  @override
+  String get premiumPromoOverlayFeatureAdFree => 'Completely ad‑free';
+
+  @override
+  String premiumPromoOverlaySecondsShort(int seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String premiumPromoOverlayClosingIn(int seconds) {
+    return 'Closing in ${seconds}s…';
+  }
+
+  @override
+  String get premiumPromoOverlayClose => 'Close';
+
+  @override
+  String get disclaimerScreenTitle => 'Disclaimer';
+
+  @override
+  String get disclaimerScreenAccessRestricted => 'Access Restricted';
+
+  @override
+  String get disclaimerScreenAppWillClose => 'The app will now close';
+
+  @override
+  String get disclaimerScreenCloseAppButton => 'Close App';
+
+  @override
+  String get disclaimerScreenImportantNoticeTitle => 'Important Notice';
+
+  @override
+  String get disclaimerScreenImportantNoticeBody =>
+      'F.O.M.O. Shield is an educational tool designed to help investors understand market behavior and their own decision-making patterns. It does not provide financial advice, investment recommendations, or any form of financial advisory services.';
+
+  @override
+  String get disclaimerScreenFsScoresTitle => 'Independence of FS Scores';
+
+  @override
+  String get disclaimerScreenFsScoresBody =>
+      'FS Scores and all related analytical materials are the result of F.O.M.O. Shield\'s proprietary analysis based on mathematical models and publicly available data. We do not receive compensation from companies for inclusion in the ratings or for rating changes. FS Scores are not a recommendation to buy, sell, or hold any security.';
+
+  @override
+  String get disclaimerScreenDataSourcesTitle => 'Data Sources';
+
+  @override
+  String get disclaimerScreenDataSourcesBody =>
+      'Market data is provided by Finnhub and Wikipedia APIs. While we strive for accuracy, we cannot guarantee that all data is complete, accurate, or up-to-date. Past performance is not indicative of future results. Stress test scenarios are simulations based on mathematical models and historical patterns.';
+
+  @override
+  String get disclaimerScreenPrivacyTitle => 'Privacy';
+
+  @override
+  String get disclaimerScreenPrivacyBody =>
+      'We collect minimal data necessary for app functionality: your email address (for account creation) and the data you generate inside the app (portfolios, watchlist, simulations). We do not sell your data to third parties.';
+
+  @override
+  String get disclaimerScreenTermsUpdatesTitle => 'Terms Updates';
+
+  @override
+  String get disclaimerScreenTermsUpdatesBody =>
+      'We reserve the right to update this disclaimer, Terms of Service, and Privacy Policy. In case of changes, the app will notify you and require re-acceptance of the updated terms to continue.';
+
+  @override
+  String get disclaimerScreenAcceptPrefix =>
+      'I confirm that I am at least 18 years old and I fully accept this Disclaimer, the ';
+
+  @override
+  String get disclaimerScreenTermsOfServiceLink => 'Terms of Service';
+
+  @override
+  String get disclaimerScreenAcceptAndThe => ', and the ';
+
+  @override
+  String get disclaimerScreenPrivacyPolicyLink => 'Privacy Policy';
+
+  @override
+  String get disclaimerScreenAcceptButton => 'I Accept';
+
+  @override
+  String get accountRestoreScreenRestoreFailed =>
+      'Could not restore your account. Please try again.';
+
+  @override
+  String get accountRestoreScreenTitle => 'Account Scheduled for Deletion';
+
+  @override
+  String accountRestoreScreenDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You have $count days left to restore this account',
+      one: 'You have $count day left to restore this account',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String accountRestoreScreenDeletionWarningSuffix(String date) {
+    return ' — after $date it will be permanently erased, with no way to recover it';
+  }
+
+  @override
+  String get accountRestoreScreenAboutToErase =>
+      'This account is about to be permanently erased, with no way to recover it.';
+
+  @override
+  String get accountRestoreScreenRestoreButton => 'Restore Account';
+
+  @override
+  String get forgotPasswordScreenEnterEmail =>
+      'Please enter your email address';
+
+  @override
+  String forgotPasswordScreenWaitSeconds(int seconds) {
+    return 'Please wait $seconds seconds before requesting again.';
+  }
+
+  @override
+  String get forgotPasswordScreenTitle => 'Reset password';
+
+  @override
+  String get forgotPasswordScreenSubtitle =>
+      'Enter your email and we\'ll send you a link\nto reset your password.';
+
+  @override
+  String get forgotPasswordScreenCheckEmail => 'Check your email';
+
+  @override
+  String get forgotPasswordScreenSentMessage =>
+      'If this email is registered in our system, we\'ve sent a password reset link to it.';
+
+  @override
+  String get forgotPasswordScreenDevModeNote =>
+      'Dev mode: reset link is logged in the debug console.';
+
+  @override
+  String get forgotPasswordScreenSendButton => 'Send Reset Link';
+
+  @override
+  String get forgotPasswordScreenBackToSignIn => 'Back to Sign In';
+
+  @override
+  String get authGoogleNoIdToken => 'Google did not return an ID token.';
+
+  @override
+  String get watchlistFullScreenEmptyTitle => 'No companies yet';
+
+  @override
+  String get watchlistFullScreenEmptySubtitle =>
+      'Tap + to search and add companies';
+
+  @override
+  String get watchlistFullScreenSearchButton => 'Search companies';
+
+  @override
+  String orderRowTilePriceLabel(String orderType, String price) {
+    return '$orderType Price $price';
+  }
+
+  @override
+  String get orderCancelDialogTitle => 'Cancel Order?';
+
+  @override
+  String get orderCancelDialogBody =>
+      'Are you sure you want to cancel this order?';
+
+  @override
+  String get orderCancelDialogNo => 'No';
+
+  @override
+  String get orderCancelDialogYes => 'Yes';
+
+  @override
+  String orderAmountSectionApproxUsd(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get orderEntryNotifYouBought => 'You Bought';
+
+  @override
+  String get orderEntryNotifYouSold => 'You Sold';
+
+  @override
+  String orderEntryNotifFilledDetail(
+    String quantity,
+    String companyName,
+    String price,
+  ) {
+    return '$quantity shares of $companyName at $price';
+  }
+
+  @override
+  String get orderEntryNotifBuyWord => 'Buy';
+
+  @override
+  String get orderEntryNotifSellWord => 'Sell';
+
+  @override
+  String orderEntryNotifOrderPlacedTitle(String orderType, String buyOrSell) {
+    return '$orderType $buyOrSell Order Placed';
+  }
+
+  @override
+  String orderEntryNotifPendingDetailBase(String quantity, String companyName) {
+    return '$quantity shares of $companyName';
+  }
+
+  @override
+  String orderEntryNotifAtPrice(String price) {
+    return ' at $price';
+  }
+
+  @override
+  String get orderEntryNotifPendingSuffix => ' — Pending';
 }

@@ -6,6 +6,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../home_providers.dart';
 
@@ -34,6 +35,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
   @override
   Widget build(BuildContext context) {
     final watchlistSymbols = ref.watch(watchlistSymbolsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -41,7 +43,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'WATCHLIST',
+          l10n.watchlistTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -56,7 +58,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
         left: false,
         right: false,
         child: watchlistSymbols.isEmpty
-            ? _emptyState()
+            ? _emptyState(l10n)
             : SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                 child: Column(
@@ -72,7 +74,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                             child: Row(
                               children: [
                                 Text(
-                                  'WATCHLIST',
+                                  l10n.watchlistTitle,
                                   style: FomoShieldTheme.cardTitle(),
                                 ),
                                 const Spacer(),
@@ -112,7 +114,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
     );
   }
 
-  Widget _emptyState() {
+  Widget _emptyState(AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -124,7 +126,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'No companies yet',
+            l10n.watchlistFullScreenEmptyTitle,
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -133,7 +135,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Tap + to search and add companies',
+            l10n.watchlistFullScreenEmptySubtitle,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,
@@ -143,7 +145,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           ElevatedButton.icon(
             onPressed: _isNavigating ? null : _navigateToSearch,
             icon: const Icon(Icons.search_rounded, size: 18),
-            label: const Text('Search companies'),
+            label: Text(l10n.watchlistFullScreenSearchButton),
           ),
         ],
       ),
@@ -169,6 +171,7 @@ class _WatchlistRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final logoEntry = ref.watch(cachedLogoEntryProvider(symbol)).valueOrNull;
     final name = logoEntry?.companyName.isNotEmpty == true
         ? logoEntry!.companyName
@@ -227,7 +230,7 @@ class _WatchlistRow extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    sector?.label ?? symbol,
+                    sector?.localizedLabel(l10n) ?? symbol,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(

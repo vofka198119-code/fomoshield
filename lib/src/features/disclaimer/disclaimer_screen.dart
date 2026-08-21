@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 import 'disclaimer_providers.dart';
 
@@ -70,6 +71,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
   }
 
   Widget _buildContent({required bool isBlocked, String? reason}) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Header
@@ -84,7 +86,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Disclaimer',
+                l10n.disclaimerScreenTitle,
                 style: GoogleFonts.inter(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
@@ -109,7 +111,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    reason ?? 'Access Restricted',
+                    reason ?? l10n.disclaimerScreenAccessRestricted,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       fontSize: 16,
@@ -124,8 +126,10 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                     child: ElevatedButton(
                       onPressed: () =>
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('The app will now close'),
+                            SnackBar(
+                              content: Text(
+                                l10n.disclaimerScreenAppWillClose,
+                              ),
                               backgroundColor: ThemeV2.loss,
                             ),
                           ),
@@ -137,7 +141,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                         ),
                       ),
                       child: Text(
-                        'Close App',
+                        l10n.disclaimerScreenCloseAppButton,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -155,43 +159,28 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               children: [
                 _section(
-                  'Important Notice',
-                  'F.O.M.O. Shield is an educational tool designed to help investors understand '
-                      'market behavior and their own decision-making patterns. It does not provide '
-                      'financial advice, investment recommendations, or any form of financial '
-                      'advisory services.',
+                  l10n.disclaimerScreenImportantNoticeTitle,
+                  l10n.disclaimerScreenImportantNoticeBody,
                 ),
                 const SizedBox(height: 16),
                 _section(
-                  'Independence of FS Scores',
-                  'FS Scores and all related analytical materials are the result of F.O.M.O. Shield\'s '
-                      'proprietary analysis based on mathematical models and publicly available data. '
-                      'We do not receive compensation from companies for inclusion in the ratings or '
-                      'for rating changes. FS Scores are not a recommendation to buy, sell, or hold '
-                      'any security.',
+                  l10n.disclaimerScreenFsScoresTitle,
+                  l10n.disclaimerScreenFsScoresBody,
                 ),
                 const SizedBox(height: 16),
                 _section(
-                  'Data Sources',
-                  'Market data is provided by Finnhub and Wikipedia APIs. While we strive for '
-                      'accuracy, we cannot guarantee that all data is complete, accurate, or '
-                      'up-to-date. Past performance is not indicative of future results. Stress test '
-                      'scenarios are simulations based on mathematical models and historical patterns.',
+                  l10n.disclaimerScreenDataSourcesTitle,
+                  l10n.disclaimerScreenDataSourcesBody,
                 ),
                 const SizedBox(height: 16),
                 _section(
-                  'Privacy',
-                  'We collect minimal data necessary for app functionality: your email '
-                      'address (for account creation) and the data you generate inside the '
-                      'app (portfolios, watchlist, simulations). We do not sell your data '
-                      'to third parties.',
+                  l10n.disclaimerScreenPrivacyTitle,
+                  l10n.disclaimerScreenPrivacyBody,
                 ),
                 const SizedBox(height: 16),
                 _section(
-                  'Terms Updates',
-                  'We reserve the right to update this disclaimer, Terms of Service, and Privacy '
-                      'Policy. In case of changes, the app will notify you and require re-acceptance '
-                      'of the updated terms to continue.',
+                  l10n.disclaimerScreenTermsUpdatesTitle,
+                  l10n.disclaimerScreenTermsUpdatesBody,
                 ),
                 const SizedBox(height: 24),
               ],
@@ -242,10 +231,8 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                             height: 1.5,
                           ),
                           children: [
-                            const TextSpan(
-                              text:
-                                  'I confirm that I am at least 18 years old '
-                                  'and I fully accept this Disclaimer, the ',
+                            TextSpan(
+                              text: l10n.disclaimerScreenAcceptPrefix,
                             ),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.baseline,
@@ -263,7 +250,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                                     ),
                                   ),
                                   child: Text(
-                                    'Terms of Service',
+                                    l10n.disclaimerScreenTermsOfServiceLink,
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
                                       color: ThemeV2.primary,
@@ -273,7 +260,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                                 ),
                               ),
                             ),
-                            const TextSpan(text: ', and the '),
+                            TextSpan(text: l10n.disclaimerScreenAcceptAndThe),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
@@ -291,7 +278,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                                     ),
                                   ),
                                   child: Text(
-                                    'Privacy Policy',
+                                    l10n.disclaimerScreenPrivacyPolicyLink,
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
                                       color: ThemeV2.primary,
@@ -326,7 +313,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                       ),
                     ),
                     child: Text(
-                      'I Accept',
+                      l10n.disclaimerScreenAcceptButton,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

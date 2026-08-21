@@ -8796,6 +8796,448 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Limit Price {price}'**
   String stressTestOrderRowLimitPriceLine(String price);
+
+  /// No description provided for @monetizationModalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search limit reached'**
+  String get monetizationModalTitle;
+
+  /// No description provided for @monetizationModalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 15 more.'**
+  String get monetizationModalDescription;
+
+  /// No description provided for @monetizationModalUpgradeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get monetizationModalUpgradeButton;
+
+  /// No description provided for @monetizationModalWatchAdButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Ad (+15 searches)'**
+  String get monetizationModalWatchAdButton;
+
+  /// No description provided for @monetizationModalCounterResetAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'🔧 Counter reset to 15 (admin)'**
+  String get monetizationModalCounterResetAdmin;
+
+  /// No description provided for @monetizationModalResetCounterAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset counter (admin)'**
+  String get monetizationModalResetCounterAdmin;
+
+  /// No description provided for @monetizationModalSponsoredAd.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored Ad'**
+  String get monetizationModalSponsoredAd;
+
+  /// No description provided for @monetizationModalRewardText.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reward: +15 free searches'**
+  String get monetizationModalRewardText;
+
+  /// No description provided for @monetizationModalSecondsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s remaining'**
+  String monetizationModalSecondsRemaining(int seconds);
+
+  /// No description provided for @monetizationModalSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get monetizationModalSkip;
+
+  /// No description provided for @monetizationModalComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'🏗️ Premium subscription — coming soon!'**
+  String get monetizationModalComingSoon;
+
+  /// No description provided for @monetizationModalRewardEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ Earned 15 more searches!'**
+  String get monetizationModalRewardEarned;
+
+  /// No description provided for @premiumPromoOverlayBarrierLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium promo overlay'**
+  String get premiumPromoOverlayBarrierLabel;
+
+  /// No description provided for @premiumPromoOverlayDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium feature'**
+  String get premiumPromoOverlayDefaultTitle;
+
+  /// No description provided for @premiumPromoOverlayBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PREMIUM'**
+  String get premiumPromoOverlayBadge;
+
+  /// No description provided for @premiumPromoOverlaySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to unlock this and more'**
+  String get premiumPromoOverlaySubtitle;
+
+  /// No description provided for @premiumPromoOverlayFeatureAdFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Completely ad‑free'**
+  String get premiumPromoOverlayFeatureAdFree;
+
+  /// No description provided for @premiumPromoOverlaySecondsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String premiumPromoOverlaySecondsShort(int seconds);
+
+  /// No description provided for @premiumPromoOverlayClosingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Closing in {seconds}s…'**
+  String premiumPromoOverlayClosingIn(int seconds);
+
+  /// No description provided for @premiumPromoOverlayClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get premiumPromoOverlayClose;
+
+  /// No description provided for @disclaimerScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer'**
+  String get disclaimerScreenTitle;
+
+  /// No description provided for @disclaimerScreenAccessRestricted.
+  ///
+  /// In en, this message translates to:
+  /// **'Access Restricted'**
+  String get disclaimerScreenAccessRestricted;
+
+  /// No description provided for @disclaimerScreenAppWillClose.
+  ///
+  /// In en, this message translates to:
+  /// **'The app will now close'**
+  String get disclaimerScreenAppWillClose;
+
+  /// No description provided for @disclaimerScreenCloseAppButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Close App'**
+  String get disclaimerScreenCloseAppButton;
+
+  /// No description provided for @disclaimerScreenImportantNoticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Important Notice'**
+  String get disclaimerScreenImportantNoticeTitle;
+
+  /// No description provided for @disclaimerScreenImportantNoticeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'F.O.M.O. Shield is an educational tool designed to help investors understand market behavior and their own decision-making patterns. It does not provide financial advice, investment recommendations, or any form of financial advisory services.'**
+  String get disclaimerScreenImportantNoticeBody;
+
+  /// No description provided for @disclaimerScreenFsScoresTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Independence of FS Scores'**
+  String get disclaimerScreenFsScoresTitle;
+
+  /// No description provided for @disclaimerScreenFsScoresBody.
+  ///
+  /// In en, this message translates to:
+  /// **'FS Scores and all related analytical materials are the result of F.O.M.O. Shield\'s proprietary analysis based on mathematical models and publicly available data. We do not receive compensation from companies for inclusion in the ratings or for rating changes. FS Scores are not a recommendation to buy, sell, or hold any security.'**
+  String get disclaimerScreenFsScoresBody;
+
+  /// No description provided for @disclaimerScreenDataSourcesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Sources'**
+  String get disclaimerScreenDataSourcesTitle;
+
+  /// No description provided for @disclaimerScreenDataSourcesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Market data is provided by Finnhub and Wikipedia APIs. While we strive for accuracy, we cannot guarantee that all data is complete, accurate, or up-to-date. Past performance is not indicative of future results. Stress test scenarios are simulations based on mathematical models and historical patterns.'**
+  String get disclaimerScreenDataSourcesBody;
+
+  /// No description provided for @disclaimerScreenPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get disclaimerScreenPrivacyTitle;
+
+  /// No description provided for @disclaimerScreenPrivacyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We collect minimal data necessary for app functionality: your email address (for account creation) and the data you generate inside the app (portfolios, watchlist, simulations). We do not sell your data to third parties.'**
+  String get disclaimerScreenPrivacyBody;
+
+  /// No description provided for @disclaimerScreenTermsUpdatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms Updates'**
+  String get disclaimerScreenTermsUpdatesTitle;
+
+  /// No description provided for @disclaimerScreenTermsUpdatesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We reserve the right to update this disclaimer, Terms of Service, and Privacy Policy. In case of changes, the app will notify you and require re-acceptance of the updated terms to continue.'**
+  String get disclaimerScreenTermsUpdatesBody;
+
+  /// No description provided for @disclaimerScreenAcceptPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'I confirm that I am at least 18 years old and I fully accept this Disclaimer, the '**
+  String get disclaimerScreenAcceptPrefix;
+
+  /// No description provided for @disclaimerScreenTermsOfServiceLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get disclaimerScreenTermsOfServiceLink;
+
+  /// No description provided for @disclaimerScreenAcceptAndThe.
+  ///
+  /// In en, this message translates to:
+  /// **', and the '**
+  String get disclaimerScreenAcceptAndThe;
+
+  /// No description provided for @disclaimerScreenPrivacyPolicyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get disclaimerScreenPrivacyPolicyLink;
+
+  /// No description provided for @disclaimerScreenAcceptButton.
+  ///
+  /// In en, this message translates to:
+  /// **'I Accept'**
+  String get disclaimerScreenAcceptButton;
+
+  /// No description provided for @accountRestoreScreenRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not restore your account. Please try again.'**
+  String get accountRestoreScreenRestoreFailed;
+
+  /// No description provided for @accountRestoreScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Scheduled for Deletion'**
+  String get accountRestoreScreenTitle;
+
+  /// No description provided for @accountRestoreScreenDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{You have {count} day left to restore this account} other{You have {count} days left to restore this account}}'**
+  String accountRestoreScreenDaysLeft(int count);
+
+  /// No description provided for @accountRestoreScreenDeletionWarningSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **' — after {date} it will be permanently erased, with no way to recover it'**
+  String accountRestoreScreenDeletionWarningSuffix(String date);
+
+  /// No description provided for @accountRestoreScreenAboutToErase.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is about to be permanently erased, with no way to recover it.'**
+  String get accountRestoreScreenAboutToErase;
+
+  /// No description provided for @accountRestoreScreenRestoreButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Account'**
+  String get accountRestoreScreenRestoreButton;
+
+  /// No description provided for @forgotPasswordScreenEnterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email address'**
+  String get forgotPasswordScreenEnterEmail;
+
+  /// No description provided for @forgotPasswordScreenWaitSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait {seconds} seconds before requesting again.'**
+  String forgotPasswordScreenWaitSeconds(int seconds);
+
+  /// No description provided for @forgotPasswordScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get forgotPasswordScreenTitle;
+
+  /// No description provided for @forgotPasswordScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email and we\'ll send you a link\nto reset your password.'**
+  String get forgotPasswordScreenSubtitle;
+
+  /// No description provided for @forgotPasswordScreenCheckEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get forgotPasswordScreenCheckEmail;
+
+  /// No description provided for @forgotPasswordScreenSentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'If this email is registered in our system, we\'ve sent a password reset link to it.'**
+  String get forgotPasswordScreenSentMessage;
+
+  /// No description provided for @forgotPasswordScreenDevModeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Dev mode: reset link is logged in the debug console.'**
+  String get forgotPasswordScreenDevModeNote;
+
+  /// No description provided for @forgotPasswordScreenSendButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Reset Link'**
+  String get forgotPasswordScreenSendButton;
+
+  /// No description provided for @forgotPasswordScreenBackToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Sign In'**
+  String get forgotPasswordScreenBackToSignIn;
+
+  /// No description provided for @authGoogleNoIdToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Google did not return an ID token.'**
+  String get authGoogleNoIdToken;
+
+  /// No description provided for @watchlistFullScreenEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No companies yet'**
+  String get watchlistFullScreenEmptyTitle;
+
+  /// No description provided for @watchlistFullScreenEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to search and add companies'**
+  String get watchlistFullScreenEmptySubtitle;
+
+  /// No description provided for @watchlistFullScreenSearchButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Search companies'**
+  String get watchlistFullScreenSearchButton;
+
+  /// No description provided for @orderRowTilePriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{orderType} Price {price}'**
+  String orderRowTilePriceLabel(String orderType, String price);
+
+  /// No description provided for @orderCancelDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Order?'**
+  String get orderCancelDialogTitle;
+
+  /// No description provided for @orderCancelDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this order?'**
+  String get orderCancelDialogBody;
+
+  /// No description provided for @orderCancelDialogNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get orderCancelDialogNo;
+
+  /// No description provided for @orderCancelDialogYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get orderCancelDialogYes;
+
+  /// No description provided for @orderAmountSectionApproxUsd.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {amount}'**
+  String orderAmountSectionApproxUsd(String amount);
+
+  /// No description provided for @orderEntryNotifYouBought.
+  ///
+  /// In en, this message translates to:
+  /// **'You Bought'**
+  String get orderEntryNotifYouBought;
+
+  /// No description provided for @orderEntryNotifYouSold.
+  ///
+  /// In en, this message translates to:
+  /// **'You Sold'**
+  String get orderEntryNotifYouSold;
+
+  /// No description provided for @orderEntryNotifFilledDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} shares of {companyName} at {price}'**
+  String orderEntryNotifFilledDetail(
+    String quantity,
+    String companyName,
+    String price,
+  );
+
+  /// No description provided for @orderEntryNotifBuyWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get orderEntryNotifBuyWord;
+
+  /// No description provided for @orderEntryNotifSellWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell'**
+  String get orderEntryNotifSellWord;
+
+  /// No description provided for @orderEntryNotifOrderPlacedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{orderType} {buyOrSell} Order Placed'**
+  String orderEntryNotifOrderPlacedTitle(String orderType, String buyOrSell);
+
+  /// No description provided for @orderEntryNotifPendingDetailBase.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} shares of {companyName}'**
+  String orderEntryNotifPendingDetailBase(String quantity, String companyName);
+
+  /// No description provided for @orderEntryNotifAtPrice.
+  ///
+  /// In en, this message translates to:
+  /// **' at {price}'**
+  String orderEntryNotifAtPrice(String price);
+
+  /// No description provided for @orderEntryNotifPendingSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **' — Pending'**
+  String get orderEntryNotifPendingSuffix;
 }
 
 class _AppLocalizationsDelegate

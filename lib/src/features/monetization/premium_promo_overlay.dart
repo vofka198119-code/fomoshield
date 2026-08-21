@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scanco/src/core/theme/app_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Premium Promo Overlay — 5‑second simulated "ad" for free users
@@ -21,17 +22,18 @@ import 'package:scanco/src/core/theme/app_theme.dart';
 /// [onComplete] – optional callback fired after the timer finishes.
 Future<void> showPremiumPromoOverlay({
   required BuildContext context,
-  String title = 'Premium feature',
+  String? title,
   int durationSeconds = 5,
   VoidCallback? onComplete,
 }) {
+  final l10n = AppLocalizations.of(context)!;
   return showGeneralDialog(
     context: context,
     barrierDismissible: false,
     barrierColor: Colors.black87,
-    barrierLabel: 'Premium promo overlay',
+    barrierLabel: l10n.premiumPromoOverlayBarrierLabel,
     pageBuilder: (ctx, animation, secondaryAnimation) => _PremiumPromoOverlay(
-      title: title,
+      title: title ?? l10n.premiumPromoOverlayDefaultTitle,
       durationSeconds: durationSeconds,
       onComplete: () {
         // Pop the dialog first, then fire callback
@@ -102,6 +104,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
@@ -155,7 +158,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'PREMIUM',
+                        l10n.premiumPromoOverlayBadge,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
@@ -181,7 +184,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                 const SizedBox(height: 8),
 
                 Text(
-                  'Upgrade to unlock this and more',
+                  l10n.premiumPromoOverlaySubtitle,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     color: AppTheme.premiumGreen.withValues(alpha: 0.6),
@@ -191,21 +194,27 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                 const SizedBox(height: 28),
 
                 // ── Feature list ─────────────────────────────────
-                _featureRow(Icons.search_rounded, 'Unlimited daily searches'),
+                _featureRow(Icons.search_rounded, l10n.premiumBenefitSearches),
                 const SizedBox(height: 10),
                 _featureRow(
                   Icons.account_balance_rounded,
-                  'Up to 3 portfolios',
+                  l10n.premiumBenefitPortfolios,
                 ),
                 const SizedBox(height: 10),
                 _featureRow(
                   Icons.monetization_on_rounded,
-                  '\$50,000 starting capital',
+                  l10n.premiumBenefitCapital,
                 ),
                 const SizedBox(height: 10),
-                _featureRow(Icons.psychology_rounded, 'Up to 5 stress tests'),
+                _featureRow(
+                  Icons.psychology_rounded,
+                  l10n.premiumBenefitStressTests,
+                ),
                 const SizedBox(height: 10),
-                _featureRow(Icons.block_rounded, 'Completely ad‑free'),
+                _featureRow(
+                  Icons.block_rounded,
+                  l10n.premiumPromoOverlayFeatureAdFree,
+                ),
                 const SizedBox(height: 28),
 
                 // ── Countdown timer ──────────────────────────────
@@ -246,7 +255,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                           ),
                           // Seconds text
                           Text(
-                            '${remaining}s',
+                            l10n.premiumPromoOverlaySecondsShort(remaining),
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
@@ -267,7 +276,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                         widget.durationSeconds -
                         (_progress.value * widget.durationSeconds).toInt();
                     return Text(
-                      'Closing in ${sec}s…',
+                      l10n.premiumPromoOverlayClosingIn(sec),
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         color: AppTheme.textDim,
@@ -292,7 +301,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    child: const Text('Close'),
+                    child: Text(l10n.premiumPromoOverlayClose),
                   )
                 else
                   const SizedBox(height: 4),

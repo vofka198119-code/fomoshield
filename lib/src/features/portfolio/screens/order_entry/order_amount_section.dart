@@ -180,7 +180,9 @@ class OrderAmountSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '≈ ${formatUsd(displayAmount * currentPrice)}',
+                l10n.orderAmountSectionApproxUsd(
+                  formatUsd(displayAmount * currentPrice),
+                ),
                 textAlign: TextAlign.center,
                 style: interNums(
                   fontSize: 15,

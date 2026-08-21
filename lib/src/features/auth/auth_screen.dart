@@ -257,7 +257,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       final account = await GoogleSignIn.instance.authenticate();
       final idToken = account.authentication.idToken;
       if (idToken == null) {
-        throw const AuthException('Google did not return an ID token.');
+        throw AuthException(_l10n.authGoogleNoIdToken);
       }
 
       await SupabaseConfig.client.auth.signInWithIdToken(

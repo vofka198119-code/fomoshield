@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../disclaimer/disclaimer_providers.dart';
 import 'auth_providers.dart';
@@ -51,7 +52,7 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Could not restore your account. Please try again.',
+            AppLocalizations.of(context)!.accountRestoreScreenRestoreFailed,
             style: GoogleFonts.inter(fontSize: 13),
           ),
           backgroundColor: ThemeV2.loss,
@@ -68,6 +69,7 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final deleteAt = widget.deleteAt;
     final dateLabel = deleteAt != null
         ? DateFormat('MMMM d, yyyy').format(deleteAt.toLocal())
@@ -89,7 +91,7 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                'Account Scheduled for Deletion',
+                l10n.accountRestoreScreenTitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 22,
@@ -100,10 +102,9 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
               const SizedBox(height: 12),
               Text(
                 widget.daysRemaining > 0
-                    ? 'You have $_dayWord left to restore this account'
-                        '${dateLabel != null ? ' — after $dateLabel it will be permanently erased, with no way to recover it' : ''}.'
-                    : 'This account is about to be permanently erased, with '
-                          'no way to recover it.',
+                    ? '${l10n.accountRestoreScreenDaysLeft(widget.daysRemaining)}'
+                          '${dateLabel != null ? l10n.accountRestoreScreenDeletionWarningSuffix(dateLabel) : ''}.'
+                    : l10n.accountRestoreScreenAboutToErase,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 14,
@@ -133,7 +134,7 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
                           ),
                         )
                       : Text(
-                          'Restore Account',
+                          l10n.accountRestoreScreenRestoreButton,
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -145,7 +146,7 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
               TextButton(
                 onPressed: _busy ? null : _signOut,
                 child: Text(
-                  'Sign Out',
+                  l10n.profileSignOut,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     color: ThemeV2.textSecondary,
@@ -158,10 +159,5 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
         ),
       ),
     );
-  }
-
-  String get _dayWord {
-    final n = widget.daysRemaining;
-    return n == 1 ? '1 day' : '$n days';
   }
 }

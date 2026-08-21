@@ -1960,5 +1960,177 @@
         "type": "String"
       }
     }
-  }
+  },
+  "monetizationModalTitle": "Search limit reached",
+  "monetizationModalDescription": "You've used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 15 more.",
+  "monetizationModalUpgradeButton": "Upgrade to Premium",
+  "monetizationModalWatchAdButton": "Watch Ad (+15 searches)",
+  "monetizationModalCounterResetAdmin": "🔧 Counter reset to 15 (admin)",
+  "monetizationModalResetCounterAdmin": "Reset counter (admin)",
+  "monetizationModalSponsoredAd": "Sponsored Ad",
+  "monetizationModalRewardText": "Your reward: +15 free searches",
+  "monetizationModalSecondsRemaining": "{seconds}s remaining",
+  "@monetizationModalSecondsRemaining": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "monetizationModalSkip": "Skip",
+  "monetizationModalComingSoon": "🏗️ Premium subscription — coming soon!",
+  "monetizationModalRewardEarned": "✓ Earned 15 more searches!",
+  "premiumPromoOverlayBarrierLabel": "Premium promo overlay",
+  "premiumPromoOverlayDefaultTitle": "Premium feature",
+  "premiumPromoOverlayBadge": "PREMIUM",
+  "premiumPromoOverlaySubtitle": "Upgrade to unlock this and more",
+  "premiumPromoOverlayFeatureAdFree": "Completely ad‑free",
+  "premiumPromoOverlaySecondsShort": "{seconds}s",
+  "@premiumPromoOverlaySecondsShort": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumPromoOverlayClosingIn": "Closing in {seconds}s…",
+  "@premiumPromoOverlayClosingIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumPromoOverlayClose": "Close",
+  "disclaimerScreenTitle": "Disclaimer",
+  "disclaimerScreenAccessRestricted": "Access Restricted",
+  "disclaimerScreenAppWillClose": "The app will now close",
+  "disclaimerScreenCloseAppButton": "Close App",
+  "disclaimerScreenImportantNoticeTitle": "Important Notice",
+  "disclaimerScreenImportantNoticeBody": "F.O.M.O. Shield is an educational tool designed to help investors understand market behavior and their own decision-making patterns. It does not provide financial advice, investment recommendations, or any form of financial advisory services.",
+  "disclaimerScreenFsScoresTitle": "Independence of FS Scores",
+  "disclaimerScreenFsScoresBody": "FS Scores and all related analytical materials are the result of F.O.M.O. Shield's proprietary analysis based on mathematical models and publicly available data. We do not receive compensation from companies for inclusion in the ratings or for rating changes. FS Scores are not a recommendation to buy, sell, or hold any security.",
+  "disclaimerScreenDataSourcesTitle": "Data Sources",
+  "disclaimerScreenDataSourcesBody": "Market data is provided by Finnhub and Wikipedia APIs. While we strive for accuracy, we cannot guarantee that all data is complete, accurate, or up-to-date. Past performance is not indicative of future results. Stress test scenarios are simulations based on mathematical models and historical patterns.",
+  "disclaimerScreenPrivacyTitle": "Privacy",
+  "disclaimerScreenPrivacyBody": "We collect minimal data necessary for app functionality: your email address (for account creation) and the data you generate inside the app (portfolios, watchlist, simulations). We do not sell your data to third parties.",
+  "disclaimerScreenTermsUpdatesTitle": "Terms Updates",
+  "disclaimerScreenTermsUpdatesBody": "We reserve the right to update this disclaimer, Terms of Service, and Privacy Policy. In case of changes, the app will notify you and require re-acceptance of the updated terms to continue.",
+  "disclaimerScreenAcceptPrefix": "I confirm that I am at least 18 years old and I fully accept this Disclaimer, the ",
+  "disclaimerScreenTermsOfServiceLink": "Terms of Service",
+  "disclaimerScreenAcceptAndThe": ", and the ",
+  "disclaimerScreenPrivacyPolicyLink": "Privacy Policy",
+  "disclaimerScreenAcceptButton": "I Accept",
+  "accountRestoreScreenRestoreFailed": "Could not restore your account. Please try again.",
+  "accountRestoreScreenTitle": "Account Scheduled for Deletion",
+  "accountRestoreScreenDaysLeft": "{count, plural, one{You have {count} day left to restore this account} other{You have {count} days left to restore this account}}",
+  "@accountRestoreScreenDaysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "accountRestoreScreenDeletionWarningSuffix": " — after {date} it will be permanently erased, with no way to recover it",
+  "@accountRestoreScreenDeletionWarningSuffix": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "accountRestoreScreenAboutToErase": "This account is about to be permanently erased, with no way to recover it.",
+  "accountRestoreScreenRestoreButton": "Restore Account",
+  "forgotPasswordScreenEnterEmail": "Please enter your email address",
+  "forgotPasswordScreenWaitSeconds": "Please wait {seconds} seconds before requesting again.",
+  "@forgotPasswordScreenWaitSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "forgotPasswordScreenTitle": "Reset password",
+  "forgotPasswordScreenSubtitle": "Enter your email and we'll send you a link\nto reset your password.",
+  "forgotPasswordScreenCheckEmail": "Check your email",
+  "forgotPasswordScreenSentMessage": "If this email is registered in our system, we've sent a password reset link to it.",
+  "forgotPasswordScreenDevModeNote": "Dev mode: reset link is logged in the debug console.",
+  "forgotPasswordScreenSendButton": "Send Reset Link",
+  "forgotPasswordScreenBackToSignIn": "Back to Sign In",
+  "authGoogleNoIdToken": "Google did not return an ID token.",
+  "watchlistFullScreenEmptyTitle": "No companies yet",
+  "watchlistFullScreenEmptySubtitle": "Tap + to search and add companies",
+  "watchlistFullScreenSearchButton": "Search companies",
+  "orderRowTilePriceLabel": "{orderType} Price {price}",
+  "@orderRowTilePriceLabel": {
+    "placeholders": {
+      "orderType": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "orderCancelDialogTitle": "Cancel Order?",
+  "orderCancelDialogBody": "Are you sure you want to cancel this order?",
+  "orderCancelDialogNo": "No",
+  "orderCancelDialogYes": "Yes",
+  "orderAmountSectionApproxUsd": "≈ {amount}",
+  "@orderAmountSectionApproxUsd": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderEntryNotifYouBought": "You Bought",
+  "orderEntryNotifYouSold": "You Sold",
+  "orderEntryNotifFilledDetail": "{quantity} shares of {companyName} at {price}",
+  "@orderEntryNotifFilledDetail": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "companyName": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "orderEntryNotifBuyWord": "Buy",
+  "orderEntryNotifSellWord": "Sell",
+  "orderEntryNotifOrderPlacedTitle": "{orderType} {buyOrSell} Order Placed",
+  "@orderEntryNotifOrderPlacedTitle": {
+    "placeholders": {
+      "orderType": {
+        "type": "String"
+      },
+      "buyOrSell": {
+        "type": "String"
+      }
+    }
+  },
+  "orderEntryNotifPendingDetailBase": "{quantity} shares of {companyName}",
+  "@orderEntryNotifPendingDetailBase": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "companyName": {
+        "type": "String"
+      }
+    }
+  },
+  "orderEntryNotifAtPrice": " at {price}",
+  "@orderEntryNotifAtPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "orderEntryNotifPendingSuffix": " — Pending"
 }
