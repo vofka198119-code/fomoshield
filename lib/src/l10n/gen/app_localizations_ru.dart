@@ -4858,4 +4858,330 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get marketPhasesScreenMoreLink => 'Ещё';
+
+  @override
+  String get assetsScreenTitle => 'Активы';
+
+  @override
+  String get assetsScreenNoAssets => 'Нет активов';
+
+  @override
+  String get assetsScreenTotalValueLabel => 'ОБЩАЯ СТОИМОСТЬ';
+
+  @override
+  String get assetsScreenStartCashLabel => 'СТАРТОВЫЙ КЭШ';
+
+  @override
+  String get assetsScreenSortValue => 'Стоимость';
+
+  @override
+  String get assetsScreenSortMarketPrice => 'Рыночная цена';
+
+  @override
+  String get assetsScreenDevPhaseLabel => 'ФАЗА';
+
+  @override
+  String get assetsScreenDevTempLabel => 'ТЕМП';
+
+  @override
+  String get assetsScreenDevFatigueLabel => 'УСТАЛОСТЬ';
+
+  @override
+  String get assetsScreenDevSeedLabel => 'СИД';
+
+  @override
+  String get assetsScreenDevTickLabel => 'ТИК';
+
+  @override
+  String assetsScreenDevNewsLabel(String symbol) {
+    return 'НОВОСТИ $symbol';
+  }
+
+  @override
+  String assetsScreenDevHypeLabel(String sector) {
+    return 'ХАЙП $sector';
+  }
+
+  @override
+  String assetsScreenDevTimeLeftHm(int hours, int minutes) {
+    return '$hours ч $minutes мин осталось';
+  }
+
+  @override
+  String assetsScreenDevTimeLeftM(int minutes) {
+    return '$minutes мин осталось';
+  }
+
+  @override
+  String get assetsScreenDevTimeEnding => 'завершается';
+
+  @override
+  String get stockDetailAppBarTitle => 'КАРТОЧКА КОМПАНИИ';
+
+  @override
+  String whyTodayScreenAppBarTitle(String symbol) {
+    return 'ДИАГНОСТИКА $symbol';
+  }
+
+  @override
+  String get whyTodayScreenTodaysChangeTitle => 'ИЗМЕНЕНИЕ ЗА СЕГОДНЯ';
+
+  @override
+  String get whyTodayScreenDollarsLabel => 'ДОЛЛАРЫ';
+
+  @override
+  String get whyTodayScreenPercentLabel => 'ПРОЦЕНТ';
+
+  @override
+  String get whyTodayScreenThisTickTitle => 'ЭТОТ ТИК — РАЗБИВКА ФАКТОРОВ';
+
+  @override
+  String get whyTodayScreenWholePeriodTitle =>
+      'ВЕСЬ ПЕРИОД — РАЗБИВКА ФАКТОРОВ';
+
+  @override
+  String whyTodayScreenWholePeriodSubtitle(int tickCount) {
+    return 'С учётом веса движения цены каждого тика — $tickCount тиков с момента первой покупки.';
+  }
+
+  @override
+  String whyTodayScreenWholePeriodSubtitleRecentOnly(int tickCount) {
+    return 'С учётом веса движения цены каждого тика — $tickCount тиков с момента первой покупки (только недавние — кэш ещё не накоплен).';
+  }
+
+  @override
+  String get whyTodayScreenRawDriftTitle =>
+      'СЫРЫЕ ЗНАЧЕНИЯ ДРЕЙФА (ПОСЛЕДНИЙ ТИК)';
+
+  @override
+  String get whyTodayScreenRawDriftSubtitle =>
+      'Ненормализовано — до масштабирования 5 факторов выше в сумму 100%.';
+
+  @override
+  String get whyTodayScreenFactorMarketTrends => 'Рыночные тренды';
+
+  @override
+  String get whyTodayScreenFactorSector => 'Сектор';
+
+  @override
+  String get whyTodayScreenFactorNews => 'Новости';
+
+  @override
+  String get whyTodayScreenFactorSectorHype => 'Хайп сектора';
+
+  @override
+  String get whyTodayScreenFactorNoise => 'Шум';
+
+  @override
+  String get whyTodayScreenRawMarketDrift => 'Рыночный дрейф';
+
+  @override
+  String get whyTodayScreenRawSectorDrift => 'Секторный дрейф';
+
+  @override
+  String get whyTodayScreenRawHype => 'Хайп';
+
+  @override
+  String get whyTodayScreenNewsAndHypeTitle => 'НОВОСТИ И ХАЙП СЕКТОРА';
+
+  @override
+  String get whyTodayScreenMarketPhaseTitle => 'ФАЗА РЫНКА / ЭПОХИ';
+
+  @override
+  String whyTodayScreenNewsLiveLabel(String headline) {
+    return 'Новость — В ЭФИРЕ: $headline';
+  }
+
+  @override
+  String whyTodayScreenTargetDetail(String percent) {
+    return 'цель $percent%';
+  }
+
+  @override
+  String get whyTodayScreenSectorHypeLiveLabel => 'Хайп сектора — В ЭФИРЕ';
+
+  @override
+  String whyTodayScreenSectorTargetDetail(String percent) {
+    return 'цель сектора $percent%';
+  }
+
+  @override
+  String whyTodayScreenRemainingHm(int hours, int minutes) {
+    return '≈$hours ч $minutes мин осталось';
+  }
+
+  @override
+  String whyTodayScreenRemainingM(int minutes) {
+    return '≈$minutes мин осталось';
+  }
+
+  @override
+  String get whyTodayScreenWrappingUp => 'завершается';
+
+  @override
+  String whyTodayScreenNewsHistoryTitle(int count) {
+    return 'ИСТОРИЯ НОВОСТЕЙ ($count)';
+  }
+
+  @override
+  String get whyTodayScreenNoNewsEpisodes => 'Пока нет новостных эпизодов.';
+
+  @override
+  String whyTodayScreenSectorHypeHistoryTitle(int count) {
+    return 'ИСТОРИЯ ХАЙПА СЕКТОРА ($count)';
+  }
+
+  @override
+  String get whyTodayScreenNoHypeEpisodes => 'Пока нет эпизодов хайпа сектора.';
+
+  @override
+  String whyTodayScreenEpochSingle(int num) {
+    return 'Эпоха $num';
+  }
+
+  @override
+  String whyTodayScreenEpochRange(int start, int end) {
+    return 'Эпоха $start–$end';
+  }
+
+  @override
+  String whyTodayScreenEpochScenario(int num, String scenario) {
+    return 'Эпоха $num — $scenario';
+  }
+
+  @override
+  String get whyTodayScreenActiveLabel => 'активна';
+
+  @override
+  String get whyTodayScreenTicksTitle => 'Тики';
+
+  @override
+  String whyTodayScreenFactorMoved(String factor, int percent) {
+    return '$factor изменил на $percent%';
+  }
+
+  @override
+  String get whyTodayScreenEmptyStateMessage =>
+      'Пока нет данных по тикам для этой позиции.';
+
+  @override
+  String get stockLimitOrdersTitle => 'ЛИМИТНЫЕ ОРДЕРА';
+
+  @override
+  String stockLimitOrdersSeeAll(int count) {
+    return 'Показать все ордера ($count)';
+  }
+
+  @override
+  String stockLimitOrdersSheetTitle(String symbol) {
+    return 'Лимитные ордера $symbol';
+  }
+
+  @override
+  String get stockPositionCardTitle => 'ВАША ПОЗИЦИЯ';
+
+  @override
+  String get stockPositionCardAssetValueLabel => 'Стоимость актива';
+
+  @override
+  String get stockPositionCardSharesLabel => 'Акции';
+
+  @override
+  String get stockPositionCardUnrealizedPnlLabel => 'Нереализ. P&L';
+
+  @override
+  String get stockPositionCardAvgCostLabel => 'Средняя цена';
+
+  @override
+  String get stockSparklineChartTitle => 'ГРАФИК ЦЕНЫ';
+
+  @override
+  String get whyTodayCardTitle => 'ПОЧЕМУ СЕГОДНЯ';
+
+  @override
+  String get whyTodayCardButtonLabel => 'Почему сегодня?';
+
+  @override
+  String get whyTodayCardTodaysChangeLabel => 'ИЗМЕНЕНИЕ ЗА СЕГОДНЯ';
+
+  @override
+  String get whyTodayCardPercentChangeLabel => 'ИЗМЕНЕНИЕ В %';
+
+  @override
+  String get whyTodayCardFactorMarketTrends => 'Рыночные тренды';
+
+  @override
+  String get whyTodayCardFactorSector => 'Сектор';
+
+  @override
+  String get whyTodayCardFactorNews => 'Новости';
+
+  @override
+  String get whyTodayCardFactorSectorHype => 'Хайп сектора';
+
+  @override
+  String get whyTodayCardFactorNoise => 'Шум';
+
+  @override
+  String get whyTodayCardHintNoData =>
+      'Пока недостаточно данных по этой позиции — загляните после следующего тика цены, чтобы понять, что может её двигать.';
+
+  @override
+  String get whyTodayCardHintMarketBull =>
+      'Широкая сила рынка может поддерживать эту позицию вместе с общим трендом сегодня.';
+
+  @override
+  String get whyTodayCardHintMarketSideways =>
+      'Рынок в целом сейчас движется в боковике, что может удерживать эту позицию относительно ровной.';
+
+  @override
+  String get whyTodayCardHintMarketBear =>
+      'Более широкое снижение рынка может давить на эту позицию вместе с остальным рынком.';
+
+  @override
+  String get whyTodayCardHintMarketVolatility =>
+      'Резкие, разнонаправленные движения рынка могут быть причиной сегодняшних колебаний.';
+
+  @override
+  String get whyTodayCardHintMarketRecovery =>
+      'Рынок может стабилизироваться после недавнего шока — это может объяснять сегодняшнее движение.';
+
+  @override
+  String get whyTodayCardHintMarketBlackSwan =>
+      'Необычный резкий шок по всему рынку может двигать цену сегодня — стоит внимательно следить.';
+
+  @override
+  String get whyTodayCardHintMarketCrash =>
+      'Резкая распродажа по всему рынку может сильно давить на эту позицию прямо сейчас.';
+
+  @override
+  String get whyTodayCardHintSector =>
+      'Это движение может быть связано с тем, как торгуется сектор этой позиции относительно остального рынка.';
+
+  @override
+  String get whyTodayCardHintNews =>
+      'За сегодняшним движением может стоять новость по компании — например, отчёт о прибыли.';
+
+  @override
+  String get whyTodayCardHintHype =>
+      'Более широкая волна внимания ко всему сектору этой позиции может двигать цену сегодня.';
+
+  @override
+  String get whyTodayCardHintNoise =>
+      'Сегодняшнее движение выглядит как обычные повседневные колебания цены без одного явного драйвера.';
+
+  @override
+  String stressTestOrderRowBuyLine(String quantity) {
+    return 'Купить $quantity акций';
+  }
+
+  @override
+  String stressTestOrderRowSellLine(String quantity) {
+    return 'Продать $quantity акций';
+  }
+
+  @override
+  String stressTestOrderRowLimitPriceLine(String price) {
+    return 'Лимитная цена $price';
+  }
 }

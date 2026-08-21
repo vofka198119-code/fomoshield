@@ -8,6 +8,7 @@ import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../shared/utils/currency_format.dart';
 import '../../../../../shared/widgets/chart_line_glow_painter.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../market_clock/market_clock_dial.dart'
     show darkCardDecoration;
 import '../../../../stress_test/stress_test_engine.dart' show ChartDataPoint;
@@ -150,6 +151,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (!widget.ready || widget.points.length < 2) {
       return Container(
         height: 280,
@@ -177,7 +179,10 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+            child: Text(
+              l10n.stockSparklineChartTitle,
+              style: FomoShieldTheme.cardTitle(),
+            ),
           ),
           const SizedBox(height: 10),
           Padding(
@@ -239,6 +244,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   }
 
   Widget _buildChartArea() {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
 
     DateTime domainStart;
@@ -255,7 +261,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
       if (points.length < 2) {
         return Center(
           child: Text(
-            'Not enough data for this period',
+            l10n.stressTestChartNotEnoughDataForPeriod,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,
@@ -280,7 +286,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
       if (points.length < 2) {
         return Center(
           child: Text(
-            'Not enough data for this period',
+            l10n.stressTestChartNotEnoughDataForPeriod,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,

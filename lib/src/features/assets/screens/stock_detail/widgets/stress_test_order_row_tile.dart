@@ -8,6 +8,7 @@ import '../../../../orders/order_cancel_dialog.dart';
 import '../../../../stress_test/stress_test_pending_order.dart';
 import '../../../../stress_test/stress_test_pending_orders_provider.dart';
 import '../../../../stress_test/stress_test_naming.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Stress Test Order Row Tile — same olive-box visual as the real orders
@@ -24,6 +25,7 @@ class StressTestOrderRowTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final accentColor = order.isBuy ? ThemeV2.success : ThemeV2.loss;
     final companyName = resolveStressTestCompanyName(ref, order.symbol);
 
@@ -53,7 +55,13 @@ class StressTestOrderRowTile extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${order.isBuy ? 'Buy' : 'Sell'} ${_formatQuantity(order.quantity)} shares',
+                  order.isBuy
+                      ? l10n.stressTestOrderRowBuyLine(
+                          _formatQuantity(order.quantity),
+                        )
+                      : l10n.stressTestOrderRowSellLine(
+                          _formatQuantity(order.quantity),
+                        ),
                   style: interNums(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -70,7 +78,9 @@ class StressTestOrderRowTile extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Limit Price ${formatUsd(order.limitPrice)}',
+                  l10n.stressTestOrderRowLimitPriceLine(
+                    formatUsd(order.limitPrice),
+                  ),
                   style: interNums(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,

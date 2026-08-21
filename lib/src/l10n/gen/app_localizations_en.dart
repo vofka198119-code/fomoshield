@@ -4848,4 +4848,329 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketPhasesScreenMoreLink => 'More';
+
+  @override
+  String get assetsScreenTitle => 'Assets';
+
+  @override
+  String get assetsScreenNoAssets => 'No assets';
+
+  @override
+  String get assetsScreenTotalValueLabel => 'TOTAL VALUE';
+
+  @override
+  String get assetsScreenStartCashLabel => 'START CASH';
+
+  @override
+  String get assetsScreenSortValue => 'Value';
+
+  @override
+  String get assetsScreenSortMarketPrice => 'Market Price';
+
+  @override
+  String get assetsScreenDevPhaseLabel => 'PHASE';
+
+  @override
+  String get assetsScreenDevTempLabel => 'TEMP';
+
+  @override
+  String get assetsScreenDevFatigueLabel => 'FATIGUE';
+
+  @override
+  String get assetsScreenDevSeedLabel => 'SEED';
+
+  @override
+  String get assetsScreenDevTickLabel => 'TICK';
+
+  @override
+  String assetsScreenDevNewsLabel(String symbol) {
+    return 'NEWS $symbol';
+  }
+
+  @override
+  String assetsScreenDevHypeLabel(String sector) {
+    return 'HYPE $sector';
+  }
+
+  @override
+  String assetsScreenDevTimeLeftHm(int hours, int minutes) {
+    return '${hours}h${minutes}m left';
+  }
+
+  @override
+  String assetsScreenDevTimeLeftM(int minutes) {
+    return '${minutes}m left';
+  }
+
+  @override
+  String get assetsScreenDevTimeEnding => 'ending';
+
+  @override
+  String get stockDetailAppBarTitle => 'COMPANY CARD';
+
+  @override
+  String whyTodayScreenAppBarTitle(String symbol) {
+    return '$symbol DIAGNOSTICS';
+  }
+
+  @override
+  String get whyTodayScreenTodaysChangeTitle => 'TODAY\'S CHANGE';
+
+  @override
+  String get whyTodayScreenDollarsLabel => 'DOLLARS';
+
+  @override
+  String get whyTodayScreenPercentLabel => 'PERCENT';
+
+  @override
+  String get whyTodayScreenThisTickTitle => 'THIS TICK — FACTOR BREAKDOWN';
+
+  @override
+  String get whyTodayScreenWholePeriodTitle =>
+      'WHOLE PERIOD — FACTOR BREAKDOWN';
+
+  @override
+  String whyTodayScreenWholePeriodSubtitle(int tickCount) {
+    return 'Weighted by each tick\'s own price move — $tickCount ticks since first purchase.';
+  }
+
+  @override
+  String whyTodayScreenWholePeriodSubtitleRecentOnly(int tickCount) {
+    return 'Weighted by each tick\'s own price move — $tickCount ticks since first purchase (recent only — no cache yet).';
+  }
+
+  @override
+  String get whyTodayScreenRawDriftTitle => 'RAW DRIFT VALUES (LATEST TICK)';
+
+  @override
+  String get whyTodayScreenRawDriftSubtitle =>
+      'Unnormalized — before the 5 factors above are scaled to sum to 100%.';
+
+  @override
+  String get whyTodayScreenFactorMarketTrends => 'Market Trends';
+
+  @override
+  String get whyTodayScreenFactorSector => 'Sector';
+
+  @override
+  String get whyTodayScreenFactorNews => 'News';
+
+  @override
+  String get whyTodayScreenFactorSectorHype => 'Sector Hype';
+
+  @override
+  String get whyTodayScreenFactorNoise => 'Noise';
+
+  @override
+  String get whyTodayScreenRawMarketDrift => 'Market drift';
+
+  @override
+  String get whyTodayScreenRawSectorDrift => 'Sector drift';
+
+  @override
+  String get whyTodayScreenRawHype => 'Hype';
+
+  @override
+  String get whyTodayScreenNewsAndHypeTitle => 'NEWS & SECTOR HYPE';
+
+  @override
+  String get whyTodayScreenMarketPhaseTitle => 'MARKET PHASE / EPOCHS';
+
+  @override
+  String whyTodayScreenNewsLiveLabel(String headline) {
+    return 'News — LIVE: $headline';
+  }
+
+  @override
+  String whyTodayScreenTargetDetail(String percent) {
+    return '$percent% target';
+  }
+
+  @override
+  String get whyTodayScreenSectorHypeLiveLabel => 'Sector Hype — LIVE';
+
+  @override
+  String whyTodayScreenSectorTargetDetail(String percent) {
+    return '$percent% sector target';
+  }
+
+  @override
+  String whyTodayScreenRemainingHm(int hours, int minutes) {
+    return '≈${hours}h ${minutes}m left';
+  }
+
+  @override
+  String whyTodayScreenRemainingM(int minutes) {
+    return '≈${minutes}m left';
+  }
+
+  @override
+  String get whyTodayScreenWrappingUp => 'wrapping up';
+
+  @override
+  String whyTodayScreenNewsHistoryTitle(int count) {
+    return 'NEWS HISTORY ($count)';
+  }
+
+  @override
+  String get whyTodayScreenNoNewsEpisodes => 'No News episodes yet.';
+
+  @override
+  String whyTodayScreenSectorHypeHistoryTitle(int count) {
+    return 'SECTOR HYPE HISTORY ($count)';
+  }
+
+  @override
+  String get whyTodayScreenNoHypeEpisodes => 'No Sector Hype episodes yet.';
+
+  @override
+  String whyTodayScreenEpochSingle(int num) {
+    return 'Epoch $num';
+  }
+
+  @override
+  String whyTodayScreenEpochRange(int start, int end) {
+    return 'Epoch $start–$end';
+  }
+
+  @override
+  String whyTodayScreenEpochScenario(int num, String scenario) {
+    return 'Epoch $num — $scenario';
+  }
+
+  @override
+  String get whyTodayScreenActiveLabel => 'active';
+
+  @override
+  String get whyTodayScreenTicksTitle => 'Ticks';
+
+  @override
+  String whyTodayScreenFactorMoved(String factor, int percent) {
+    return '$factor moved by $percent%';
+  }
+
+  @override
+  String get whyTodayScreenEmptyStateMessage =>
+      'No tick data yet for this position.';
+
+  @override
+  String get stockLimitOrdersTitle => 'LIMIT ORDERS';
+
+  @override
+  String stockLimitOrdersSeeAll(int count) {
+    return 'See all $count orders';
+  }
+
+  @override
+  String stockLimitOrdersSheetTitle(String symbol) {
+    return '$symbol Limit Orders';
+  }
+
+  @override
+  String get stockPositionCardTitle => 'YOUR POSITION';
+
+  @override
+  String get stockPositionCardAssetValueLabel => 'Asset Value';
+
+  @override
+  String get stockPositionCardSharesLabel => 'Shares';
+
+  @override
+  String get stockPositionCardUnrealizedPnlLabel => 'Unrealized P&L';
+
+  @override
+  String get stockPositionCardAvgCostLabel => 'Avg Cost';
+
+  @override
+  String get stockSparklineChartTitle => 'PRICE CHART';
+
+  @override
+  String get whyTodayCardTitle => 'WHY TODAY';
+
+  @override
+  String get whyTodayCardButtonLabel => 'Why today?';
+
+  @override
+  String get whyTodayCardTodaysChangeLabel => 'TODAY\'S CHANGE';
+
+  @override
+  String get whyTodayCardPercentChangeLabel => 'PERCENT CHANGE';
+
+  @override
+  String get whyTodayCardFactorMarketTrends => 'Market Trends';
+
+  @override
+  String get whyTodayCardFactorSector => 'Sector';
+
+  @override
+  String get whyTodayCardFactorNews => 'News';
+
+  @override
+  String get whyTodayCardFactorSectorHype => 'Sector Hype';
+
+  @override
+  String get whyTodayCardFactorNoise => 'Noise';
+
+  @override
+  String get whyTodayCardHintNoData =>
+      'Not enough data yet for this position — check back after the next price tick for a read on what might be moving it.';
+
+  @override
+  String get whyTodayCardHintMarketBull =>
+      'Broad market strength may be lifting this position along with the wider trend today.';
+
+  @override
+  String get whyTodayCardHintMarketSideways =>
+      'The wider market looks range-bound right now, which could be keeping this position relatively flat.';
+
+  @override
+  String get whyTodayCardHintMarketBear =>
+      'A broader market pullback may be weighing on this position along with the rest of the market.';
+
+  @override
+  String get whyTodayCardHintMarketVolatility =>
+      'Choppy, directionless market conditions could be behind today\'s swings.';
+
+  @override
+  String get whyTodayCardHintMarketRecovery =>
+      'The market may be steadying after a recent shock, which could explain today\'s move.';
+
+  @override
+  String get whyTodayCardHintMarketBlackSwan =>
+      'An unusual, sharp market-wide shock may be driving today\'s move — worth watching closely.';
+
+  @override
+  String get whyTodayCardHintMarketCrash =>
+      'A steep market-wide selloff may be weighing heavily on this position right now.';
+
+  @override
+  String get whyTodayCardHintSector =>
+      'This move may be tied to how this position\'s sector is trading relative to the rest of the market.';
+
+  @override
+  String get whyTodayCardHintNews =>
+      'Company-specific news — possibly something like an earnings report — could be behind today\'s move.';
+
+  @override
+  String get whyTodayCardHintHype =>
+      'A broader wave of attention across this position\'s whole sector may be driving today\'s move.';
+
+  @override
+  String get whyTodayCardHintNoise =>
+      'Today\'s move looks like ordinary day-to-day price fluctuation, without one single clear driver.';
+
+  @override
+  String stressTestOrderRowBuyLine(String quantity) {
+    return 'Buy $quantity shares';
+  }
+
+  @override
+  String stressTestOrderRowSellLine(String quantity) {
+    return 'Sell $quantity shares';
+  }
+
+  @override
+  String stressTestOrderRowLimitPriceLine(String price) {
+    return 'Limit Price $price';
+  }
 }

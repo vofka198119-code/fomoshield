@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
@@ -239,9 +240,11 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     });
     final session = _session;
     if (session == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: Text('Session not found')),
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.stressTestSessionNotFound),
+        ),
       );
     }
 
@@ -364,6 +367,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: AppBar(
@@ -373,7 +377,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
         toolbarHeight: 64,
         centerTitle: true,
         title: Text(
-          'COMPANY CARD',
+          l10n.stockDetailAppBarTitle,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.inter(

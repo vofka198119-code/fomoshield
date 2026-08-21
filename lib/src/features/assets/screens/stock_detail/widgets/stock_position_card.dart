@@ -4,6 +4,7 @@ import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../core/theme/typography_helpers.dart';
 import '../../../../../shared/utils/currency_format.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../market_clock/market_clock_dial.dart'
     show darkCardDecoration;
 
@@ -30,6 +31,7 @@ class StockPositionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isUp = pnl >= 0;
     final pnlColor = isUp ? ThemeV2.success : ThemeV2.loss;
     final costBasis = shares * avgPrice;
@@ -43,22 +45,26 @@ class StockPositionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('YOUR POSITION', style: FomoShieldTheme.cardTitle(Colors.white)),
+          Text(
+            l10n.stockPositionCardTitle,
+            style: FomoShieldTheme.cardTitle(Colors.white),
+          ),
           const SizedBox(height: 10),
           Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
           const SizedBox(height: 12),
-          _row('Asset Value', formatUsd(positionValue)),
+          _row(l10n.stockPositionCardAssetValueLabel, formatUsd(positionValue)),
           const SizedBox(height: 8),
-          _row('Shares', shares.toStringAsFixed(4)),
+          _row(l10n.stockPositionCardSharesLabel, shares.toStringAsFixed(4)),
           const SizedBox(height: 8),
           _pnlRow(
+            l10n: l10n,
             pnl: pnl,
             pnlPercent: pnlPercent,
             isUp: isUp,
             pnlColor: pnlColor,
           ),
           const SizedBox(height: 8),
-          _row('Avg Cost', formatUsd(avgPrice)),
+          _row(l10n.stockPositionCardAvgCostLabel, formatUsd(avgPrice)),
         ],
       ),
     );
@@ -87,6 +93,7 @@ class StockPositionCard extends StatelessWidget {
   );
 
   Widget _pnlRow({
+    required AppLocalizations l10n,
     required double pnl,
     required double pnlPercent,
     required bool isUp,
@@ -95,7 +102,7 @@ class StockPositionCard extends StatelessWidget {
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Text(
-        'Unrealized P&L',
+        l10n.stockPositionCardUnrealizedPnlLabel,
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,

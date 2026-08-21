@@ -16,6 +16,7 @@ import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/utils/currency_format.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../widgets/asset_row_widget.dart';
 
 /// Asset list sort mode
@@ -74,6 +75,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = _session;
     if (session == null) {
@@ -82,7 +84,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: Text(
-            'Assets',
+            l10n.assetsScreenTitle,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -97,7 +99,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         ),
         body: Center(
           child: Text(
-            'Session not found',
+            l10n.stressTestSessionNotFound,
             style: GoogleFonts.inter(
               color: ThemeV2.textSecondary,
               fontSize: 14,
@@ -119,7 +121,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
-          'Assets',
+          l10n.assetsScreenTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -147,6 +149,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
 
             // ── Total Balance Header ─────────────────────────────
             _buildBalanceHeader(
+              l10n: l10n,
               totalValue: totalValue,
               unrealizedPnl: unrealizedPnl,
               pnlPercent: pnlPercent,
@@ -155,10 +158,10 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
             ),
 
             // ── Search Bar ───────────────────────────────────────
-            _buildSearchBar(),
+            _buildSearchBar(l10n),
 
             // ── Sort Toggle ──────────────────────────────────────
-            _buildSortToggle(),
+            _buildSortToggle(l10n),
 
             // ── Divider ──────────────────────────────────────────
             const Divider(height: 1, color: ThemeV2.divider),
@@ -168,7 +171,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
               child: holdings.isEmpty
                   ? Center(
                       child: Text(
-                        'No assets',
+                        l10n.assetsScreenNoAssets,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           color: ThemeV2.textSecondary,
@@ -201,6 +204,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
   /// Developer Trace Bar — видна только при enableDeveloperTrace == true.
   /// Отображает текущие метки MarketCycleManager в техническом стиле.
   Widget _buildDevTraceBar(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     final monoStyle = GoogleFonts.jetBrainsMono(
       fontSize: 11,
       fontWeight: FontWeight.w500,
@@ -216,7 +220,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         child: Row(
           children: [
             _devChip(
-              'PHASE',
+              l10n.assetsScreenDevPhaseLabel,
               session.devMarketPhase.isNotEmpty
                   ? session.devMarketPhase.toUpperCase()
                   : '—',
@@ -225,33 +229,33 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
             ),
             const SizedBox(width: 12),
             _devChip(
-              'TEMP',
+              l10n.assetsScreenDevTempLabel,
               '${session.devMarketTemperature.toStringAsFixed(1)}°',
               _tempColor(session.devMarketTemperature),
               monoStyle,
             ),
             const SizedBox(width: 12),
             _devChip(
-              'FATIGUE',
+              l10n.assetsScreenDevFatigueLabel,
               '${(session.devFatigue * 100).toStringAsFixed(0)}%',
               const Color(0xFFFFA726),
               monoStyle,
             ),
             const SizedBox(width: 12),
             _devChip(
-              'SEED',
+              l10n.assetsScreenDevSeedLabel,
               session.simulationSeed.toString(),
               const Color(0xFF66BB6A),
               monoStyle,
             ),
             const SizedBox(width: 12),
             _devChip(
-              'TICK',
+              l10n.assetsScreenDevTickLabel,
               '#${session.devCurrentTick}',
               const Color(0xFF42A5F5),
               monoStyle,
             ),
-            for (final chip in _activeEventChips(session)) ...[
+            for (final chip in _activeEventChips(session, l10n)) ...[
               const SizedBox(width: 12),
               chip,
             ],
@@ -266,7 +270,10 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
   /// Replaces the old `devNextEvent`/`devNextEventDays` fields, which were
   /// declared and displayed (bottom_metrics_bar.dart's "Next Event" column)
   /// but never actually assigned anywhere in the engine — always empty.
-  List<Widget> _activeEventChips(StressTestSession session) {
+  List<Widget> _activeEventChips(
+    StressTestSession session,
+    AppLocalizations l10n,
+  ) {
     final monoStyle = GoogleFonts.jetBrainsMono(
       fontSize: 11,
       fontWeight: FontWeight.w500,
@@ -278,9 +285,9 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     if (news != null) {
       chips.add(
         _devChip(
-          'NEWS ${news.symbol}',
+          l10n.assetsScreenDevNewsLabel(news.symbol),
           '${news.currentTick}/${news.rampDurationTicks} '
-              '(${_remainingLabel(news.currentTick, news.rampDurationTicks)})',
+              '(${_remainingLabel(news.currentTick, news.rampDurationTicks, l10n)})',
           news.isPositive ? const Color(0xFF66BB6A) : const Color(0xFFEF5350),
           monoStyle,
         ),
@@ -289,9 +296,9 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     for (final hype in session.activeHypeEvents) {
       chips.add(
         _devChip(
-          'HYPE ${hype.sector.label}',
+          l10n.assetsScreenDevHypeLabel(hype.sector.label),
           '${hype.currentTick}/${hype.rampDurationTicks} '
-              '(${_remainingLabel(hype.currentTick, hype.rampDurationTicks)})',
+              '(${_remainingLabel(hype.currentTick, hype.rampDurationTicks, l10n)})',
           hype.isPositive ? const Color(0xFF66BB6A) : const Color(0xFFEF5350),
           monoStyle,
         ),
@@ -300,7 +307,11 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     return chips;
   }
 
-  String _remainingLabel(int currentTick, int rampDurationTicks) {
+  String _remainingLabel(
+    int currentTick,
+    int rampDurationTicks,
+    AppLocalizations l10n,
+  ) {
     final ticksLeft = (rampDurationTicks - currentTick).clamp(
       0,
       rampDurationTicks,
@@ -308,9 +319,9 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     final secondsLeft = ticksLeft * tickIntervalSeconds;
     final hours = secondsLeft ~/ 3600;
     final minutes = (secondsLeft % 3600) ~/ 60;
-    if (hours > 0) return '${hours}h${minutes}m left';
-    if (minutes > 0) return '${minutes}m left';
-    return 'ending';
+    if (hours > 0) return l10n.assetsScreenDevTimeLeftHm(hours, minutes);
+    if (minutes > 0) return l10n.assetsScreenDevTimeLeftM(minutes);
+    return l10n.assetsScreenDevTimeEnding;
   }
 
   Widget _devChip(String label, String value, Color accent, TextStyle mono) {
@@ -346,6 +357,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     required double pnlPercent,
     required bool isPositive,
     required double startCash,
+    required AppLocalizations l10n,
   }) {
     return Container(
       width: double.infinity,
@@ -359,7 +371,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         children: [
           // TOTAL VALUE
           Text(
-            'TOTAL VALUE',
+            l10n.assetsScreenTotalValueLabel,
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -383,7 +395,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
           Row(
             children: [
               Text(
-                'UNREALIZED P&L',
+                l10n.portfolioUnrealizedPnl,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -408,7 +420,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
           Row(
             children: [
               Text(
-                'START CASH',
+                l10n.assetsScreenStartCashLabel,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -432,7 +444,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       decoration: BoxDecoration(
@@ -444,7 +456,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         onChanged: (v) => setState(() => _searchQuery = v.trim()),
         style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textPrimary),
         decoration: InputDecoration(
-          hintText: 'Search',
+          hintText: l10n.navSearch,
           hintStyle: GoogleFonts.inter(
             fontSize: 14,
             color: ThemeV2.textSecondary,
@@ -466,14 +478,14 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
     );
   }
 
-  Widget _buildSortToggle() {
+  Widget _buildSortToggle(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          _sortChip('Value', AssetSortMode.value),
+          _sortChip(l10n.assetsScreenSortValue, AssetSortMode.value),
           const SizedBox(width: 16),
-          _sortChip('Market Price', AssetSortMode.marketPrice),
+          _sortChip(l10n.assetsScreenSortMarketPrice, AssetSortMode.marketPrice),
         ],
       ),
     );

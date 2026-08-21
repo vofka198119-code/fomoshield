@@ -8190,6 +8190,534 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More'**
   String get marketPhasesScreenMoreLink;
+
+  /// No description provided for @assetsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets'**
+  String get assetsScreenTitle;
+
+  /// No description provided for @assetsScreenNoAssets.
+  ///
+  /// In en, this message translates to:
+  /// **'No assets'**
+  String get assetsScreenNoAssets;
+
+  /// No description provided for @assetsScreenTotalValueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL VALUE'**
+  String get assetsScreenTotalValueLabel;
+
+  /// No description provided for @assetsScreenStartCashLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'START CASH'**
+  String get assetsScreenStartCashLabel;
+
+  /// No description provided for @assetsScreenSortValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get assetsScreenSortValue;
+
+  /// No description provided for @assetsScreenSortMarketPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Price'**
+  String get assetsScreenSortMarketPrice;
+
+  /// No description provided for @assetsScreenDevPhaseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PHASE'**
+  String get assetsScreenDevPhaseLabel;
+
+  /// No description provided for @assetsScreenDevTempLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TEMP'**
+  String get assetsScreenDevTempLabel;
+
+  /// No description provided for @assetsScreenDevFatigueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'FATIGUE'**
+  String get assetsScreenDevFatigueLabel;
+
+  /// No description provided for @assetsScreenDevSeedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SEED'**
+  String get assetsScreenDevSeedLabel;
+
+  /// No description provided for @assetsScreenDevTickLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TICK'**
+  String get assetsScreenDevTickLabel;
+
+  /// No description provided for @assetsScreenDevNewsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NEWS {symbol}'**
+  String assetsScreenDevNewsLabel(String symbol);
+
+  /// No description provided for @assetsScreenDevHypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HYPE {sector}'**
+  String assetsScreenDevHypeLabel(String sector);
+
+  /// No description provided for @assetsScreenDevTimeLeftHm.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h{minutes}m left'**
+  String assetsScreenDevTimeLeftHm(int hours, int minutes);
+
+  /// No description provided for @assetsScreenDevTimeLeftM.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m left'**
+  String assetsScreenDevTimeLeftM(int minutes);
+
+  /// No description provided for @assetsScreenDevTimeEnding.
+  ///
+  /// In en, this message translates to:
+  /// **'ending'**
+  String get assetsScreenDevTimeEnding;
+
+  /// No description provided for @stockDetailAppBarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPANY CARD'**
+  String get stockDetailAppBarTitle;
+
+  /// No description provided for @whyTodayScreenAppBarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{symbol} DIAGNOSTICS'**
+  String whyTodayScreenAppBarTitle(String symbol);
+
+  /// No description provided for @whyTodayScreenTodaysChangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY\'S CHANGE'**
+  String get whyTodayScreenTodaysChangeTitle;
+
+  /// No description provided for @whyTodayScreenDollarsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'DOLLARS'**
+  String get whyTodayScreenDollarsLabel;
+
+  /// No description provided for @whyTodayScreenPercentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PERCENT'**
+  String get whyTodayScreenPercentLabel;
+
+  /// No description provided for @whyTodayScreenThisTickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'THIS TICK — FACTOR BREAKDOWN'**
+  String get whyTodayScreenThisTickTitle;
+
+  /// No description provided for @whyTodayScreenWholePeriodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WHOLE PERIOD — FACTOR BREAKDOWN'**
+  String get whyTodayScreenWholePeriodTitle;
+
+  /// No description provided for @whyTodayScreenWholePeriodSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weighted by each tick\'s own price move — {tickCount} ticks since first purchase.'**
+  String whyTodayScreenWholePeriodSubtitle(int tickCount);
+
+  /// No description provided for @whyTodayScreenWholePeriodSubtitleRecentOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weighted by each tick\'s own price move — {tickCount} ticks since first purchase (recent only — no cache yet).'**
+  String whyTodayScreenWholePeriodSubtitleRecentOnly(int tickCount);
+
+  /// No description provided for @whyTodayScreenRawDriftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'RAW DRIFT VALUES (LATEST TICK)'**
+  String get whyTodayScreenRawDriftTitle;
+
+  /// No description provided for @whyTodayScreenRawDriftSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unnormalized — before the 5 factors above are scaled to sum to 100%.'**
+  String get whyTodayScreenRawDriftSubtitle;
+
+  /// No description provided for @whyTodayScreenFactorMarketTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Trends'**
+  String get whyTodayScreenFactorMarketTrends;
+
+  /// No description provided for @whyTodayScreenFactorSector.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector'**
+  String get whyTodayScreenFactorSector;
+
+  /// No description provided for @whyTodayScreenFactorNews.
+  ///
+  /// In en, this message translates to:
+  /// **'News'**
+  String get whyTodayScreenFactorNews;
+
+  /// No description provided for @whyTodayScreenFactorSectorHype.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Hype'**
+  String get whyTodayScreenFactorSectorHype;
+
+  /// No description provided for @whyTodayScreenFactorNoise.
+  ///
+  /// In en, this message translates to:
+  /// **'Noise'**
+  String get whyTodayScreenFactorNoise;
+
+  /// No description provided for @whyTodayScreenRawMarketDrift.
+  ///
+  /// In en, this message translates to:
+  /// **'Market drift'**
+  String get whyTodayScreenRawMarketDrift;
+
+  /// No description provided for @whyTodayScreenRawSectorDrift.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector drift'**
+  String get whyTodayScreenRawSectorDrift;
+
+  /// No description provided for @whyTodayScreenRawHype.
+  ///
+  /// In en, this message translates to:
+  /// **'Hype'**
+  String get whyTodayScreenRawHype;
+
+  /// No description provided for @whyTodayScreenNewsAndHypeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NEWS & SECTOR HYPE'**
+  String get whyTodayScreenNewsAndHypeTitle;
+
+  /// No description provided for @whyTodayScreenMarketPhaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MARKET PHASE / EPOCHS'**
+  String get whyTodayScreenMarketPhaseTitle;
+
+  /// No description provided for @whyTodayScreenNewsLiveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'News — LIVE: {headline}'**
+  String whyTodayScreenNewsLiveLabel(String headline);
+
+  /// No description provided for @whyTodayScreenTargetDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% target'**
+  String whyTodayScreenTargetDetail(String percent);
+
+  /// No description provided for @whyTodayScreenSectorHypeLiveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Hype — LIVE'**
+  String get whyTodayScreenSectorHypeLiveLabel;
+
+  /// No description provided for @whyTodayScreenSectorTargetDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% sector target'**
+  String whyTodayScreenSectorTargetDetail(String percent);
+
+  /// No description provided for @whyTodayScreenRemainingHm.
+  ///
+  /// In en, this message translates to:
+  /// **'≈{hours}h {minutes}m left'**
+  String whyTodayScreenRemainingHm(int hours, int minutes);
+
+  /// No description provided for @whyTodayScreenRemainingM.
+  ///
+  /// In en, this message translates to:
+  /// **'≈{minutes}m left'**
+  String whyTodayScreenRemainingM(int minutes);
+
+  /// No description provided for @whyTodayScreenWrappingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'wrapping up'**
+  String get whyTodayScreenWrappingUp;
+
+  /// No description provided for @whyTodayScreenNewsHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NEWS HISTORY ({count})'**
+  String whyTodayScreenNewsHistoryTitle(int count);
+
+  /// No description provided for @whyTodayScreenNoNewsEpisodes.
+  ///
+  /// In en, this message translates to:
+  /// **'No News episodes yet.'**
+  String get whyTodayScreenNoNewsEpisodes;
+
+  /// No description provided for @whyTodayScreenSectorHypeHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SECTOR HYPE HISTORY ({count})'**
+  String whyTodayScreenSectorHypeHistoryTitle(int count);
+
+  /// No description provided for @whyTodayScreenNoHypeEpisodes.
+  ///
+  /// In en, this message translates to:
+  /// **'No Sector Hype episodes yet.'**
+  String get whyTodayScreenNoHypeEpisodes;
+
+  /// No description provided for @whyTodayScreenEpochSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'Epoch {num}'**
+  String whyTodayScreenEpochSingle(int num);
+
+  /// No description provided for @whyTodayScreenEpochRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Epoch {start}–{end}'**
+  String whyTodayScreenEpochRange(int start, int end);
+
+  /// No description provided for @whyTodayScreenEpochScenario.
+  ///
+  /// In en, this message translates to:
+  /// **'Epoch {num} — {scenario}'**
+  String whyTodayScreenEpochScenario(int num, String scenario);
+
+  /// No description provided for @whyTodayScreenActiveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'active'**
+  String get whyTodayScreenActiveLabel;
+
+  /// No description provided for @whyTodayScreenTicksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticks'**
+  String get whyTodayScreenTicksTitle;
+
+  /// No description provided for @whyTodayScreenFactorMoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{factor} moved by {percent}%'**
+  String whyTodayScreenFactorMoved(String factor, int percent);
+
+  /// No description provided for @whyTodayScreenEmptyStateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No tick data yet for this position.'**
+  String get whyTodayScreenEmptyStateMessage;
+
+  /// No description provided for @stockLimitOrdersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'LIMIT ORDERS'**
+  String get stockLimitOrdersTitle;
+
+  /// No description provided for @stockLimitOrdersSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all {count} orders'**
+  String stockLimitOrdersSeeAll(int count);
+
+  /// No description provided for @stockLimitOrdersSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{symbol} Limit Orders'**
+  String stockLimitOrdersSheetTitle(String symbol);
+
+  /// No description provided for @stockPositionCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR POSITION'**
+  String get stockPositionCardTitle;
+
+  /// No description provided for @stockPositionCardAssetValueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Value'**
+  String get stockPositionCardAssetValueLabel;
+
+  /// No description provided for @stockPositionCardSharesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares'**
+  String get stockPositionCardSharesLabel;
+
+  /// No description provided for @stockPositionCardUnrealizedPnlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrealized P&L'**
+  String get stockPositionCardUnrealizedPnlLabel;
+
+  /// No description provided for @stockPositionCardAvgCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg Cost'**
+  String get stockPositionCardAvgCostLabel;
+
+  /// No description provided for @stockSparklineChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PRICE CHART'**
+  String get stockSparklineChartTitle;
+
+  /// No description provided for @whyTodayCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WHY TODAY'**
+  String get whyTodayCardTitle;
+
+  /// No description provided for @whyTodayCardButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Why today?'**
+  String get whyTodayCardButtonLabel;
+
+  /// No description provided for @whyTodayCardTodaysChangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY\'S CHANGE'**
+  String get whyTodayCardTodaysChangeLabel;
+
+  /// No description provided for @whyTodayCardPercentChangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PERCENT CHANGE'**
+  String get whyTodayCardPercentChangeLabel;
+
+  /// No description provided for @whyTodayCardFactorMarketTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Trends'**
+  String get whyTodayCardFactorMarketTrends;
+
+  /// No description provided for @whyTodayCardFactorSector.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector'**
+  String get whyTodayCardFactorSector;
+
+  /// No description provided for @whyTodayCardFactorNews.
+  ///
+  /// In en, this message translates to:
+  /// **'News'**
+  String get whyTodayCardFactorNews;
+
+  /// No description provided for @whyTodayCardFactorSectorHype.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Hype'**
+  String get whyTodayCardFactorSectorHype;
+
+  /// No description provided for @whyTodayCardFactorNoise.
+  ///
+  /// In en, this message translates to:
+  /// **'Noise'**
+  String get whyTodayCardFactorNoise;
+
+  /// No description provided for @whyTodayCardHintNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data yet for this position — check back after the next price tick for a read on what might be moving it.'**
+  String get whyTodayCardHintNoData;
+
+  /// No description provided for @whyTodayCardHintMarketBull.
+  ///
+  /// In en, this message translates to:
+  /// **'Broad market strength may be lifting this position along with the wider trend today.'**
+  String get whyTodayCardHintMarketBull;
+
+  /// No description provided for @whyTodayCardHintMarketSideways.
+  ///
+  /// In en, this message translates to:
+  /// **'The wider market looks range-bound right now, which could be keeping this position relatively flat.'**
+  String get whyTodayCardHintMarketSideways;
+
+  /// No description provided for @whyTodayCardHintMarketBear.
+  ///
+  /// In en, this message translates to:
+  /// **'A broader market pullback may be weighing on this position along with the rest of the market.'**
+  String get whyTodayCardHintMarketBear;
+
+  /// No description provided for @whyTodayCardHintMarketVolatility.
+  ///
+  /// In en, this message translates to:
+  /// **'Choppy, directionless market conditions could be behind today\'s swings.'**
+  String get whyTodayCardHintMarketVolatility;
+
+  /// No description provided for @whyTodayCardHintMarketRecovery.
+  ///
+  /// In en, this message translates to:
+  /// **'The market may be steadying after a recent shock, which could explain today\'s move.'**
+  String get whyTodayCardHintMarketRecovery;
+
+  /// No description provided for @whyTodayCardHintMarketBlackSwan.
+  ///
+  /// In en, this message translates to:
+  /// **'An unusual, sharp market-wide shock may be driving today\'s move — worth watching closely.'**
+  String get whyTodayCardHintMarketBlackSwan;
+
+  /// No description provided for @whyTodayCardHintMarketCrash.
+  ///
+  /// In en, this message translates to:
+  /// **'A steep market-wide selloff may be weighing heavily on this position right now.'**
+  String get whyTodayCardHintMarketCrash;
+
+  /// No description provided for @whyTodayCardHintSector.
+  ///
+  /// In en, this message translates to:
+  /// **'This move may be tied to how this position\'s sector is trading relative to the rest of the market.'**
+  String get whyTodayCardHintSector;
+
+  /// No description provided for @whyTodayCardHintNews.
+  ///
+  /// In en, this message translates to:
+  /// **'Company-specific news — possibly something like an earnings report — could be behind today\'s move.'**
+  String get whyTodayCardHintNews;
+
+  /// No description provided for @whyTodayCardHintHype.
+  ///
+  /// In en, this message translates to:
+  /// **'A broader wave of attention across this position\'s whole sector may be driving today\'s move.'**
+  String get whyTodayCardHintHype;
+
+  /// No description provided for @whyTodayCardHintNoise.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s move looks like ordinary day-to-day price fluctuation, without one single clear driver.'**
+  String get whyTodayCardHintNoise;
+
+  /// No description provided for @stressTestOrderRowBuyLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {quantity} shares'**
+  String stressTestOrderRowBuyLine(String quantity);
+
+  /// No description provided for @stressTestOrderRowSellLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell {quantity} shares'**
+  String stressTestOrderRowSellLine(String quantity);
+
+  /// No description provided for @stressTestOrderRowLimitPriceLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Price {price}'**
+  String stressTestOrderRowLimitPriceLine(String price);
 }
 
 class _AppLocalizationsDelegate

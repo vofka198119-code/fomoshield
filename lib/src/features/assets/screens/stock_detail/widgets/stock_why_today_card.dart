@@ -10,6 +10,7 @@ import '../../../../market_clock/market_clock_dial.dart'
     show darkCardDecoration;
 import '../../../../stress_test/stress_test_models.dart' show TickExplanation;
 import '../../../../../shared/utils/currency_format.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Stress Test "Why Today" card — dark dialLight/dialDark family (matches
@@ -47,43 +48,19 @@ enum _WhyTodayHint {
   noise,
 }
 
-const Map<_WhyTodayHint, String> _hintCopy = {
-  _WhyTodayHint.noData:
-      'Not enough data yet for this position — check back after the next '
-      'price tick for a read on what might be moving it.',
-  _WhyTodayHint.marketBull:
-      'Broad market strength may be lifting this position along with the '
-      'wider trend today.',
-  _WhyTodayHint.marketSideways:
-      'The wider market looks range-bound right now, which could be '
-      'keeping this position relatively flat.',
-  _WhyTodayHint.marketBear:
-      'A broader market pullback may be weighing on this position along '
-      'with the rest of the market.',
-  _WhyTodayHint.marketVolatility:
-      'Choppy, directionless market conditions could be behind today\'s '
-      'swings.',
-  _WhyTodayHint.marketRecovery:
-      'The market may be steadying after a recent shock, which could '
-      'explain today\'s move.',
-  _WhyTodayHint.marketBlackSwan:
-      'An unusual, sharp market-wide shock may be driving today\'s move — '
-      'worth watching closely.',
-  _WhyTodayHint.marketCrash:
-      'A steep market-wide selloff may be weighing heavily on this '
-      'position right now.',
-  _WhyTodayHint.sector:
-      'This move may be tied to how this position\'s sector is trading '
-      'relative to the rest of the market.',
-  _WhyTodayHint.news:
-      'Company-specific news — possibly something like an earnings report '
-      '— could be behind today\'s move.',
-  _WhyTodayHint.hype:
-      'A broader wave of attention across this position\'s whole sector '
-      'may be driving today\'s move.',
-  _WhyTodayHint.noise:
-      'Today\'s move looks like ordinary day-to-day price fluctuation, '
-      'without one single clear driver.',
+Map<_WhyTodayHint, String> _hintCopyFor(AppLocalizations l10n) => {
+  _WhyTodayHint.noData: l10n.whyTodayCardHintNoData,
+  _WhyTodayHint.marketBull: l10n.whyTodayCardHintMarketBull,
+  _WhyTodayHint.marketSideways: l10n.whyTodayCardHintMarketSideways,
+  _WhyTodayHint.marketBear: l10n.whyTodayCardHintMarketBear,
+  _WhyTodayHint.marketVolatility: l10n.whyTodayCardHintMarketVolatility,
+  _WhyTodayHint.marketRecovery: l10n.whyTodayCardHintMarketRecovery,
+  _WhyTodayHint.marketBlackSwan: l10n.whyTodayCardHintMarketBlackSwan,
+  _WhyTodayHint.marketCrash: l10n.whyTodayCardHintMarketCrash,
+  _WhyTodayHint.sector: l10n.whyTodayCardHintSector,
+  _WhyTodayHint.news: l10n.whyTodayCardHintNews,
+  _WhyTodayHint.hype: l10n.whyTodayCardHintHype,
+  _WhyTodayHint.noise: l10n.whyTodayCardHintNoise,
 };
 
 class StockWhyTodayCard extends ConsumerWidget {
@@ -106,6 +83,7 @@ class StockWhyTodayCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isAdmin = ref.watch(isAdminProvider);
     final contributions = latestExplanation?.contributions;
     final marketPct = contributions?.marketPct ?? 0;
@@ -124,7 +102,10 @@ class StockWhyTodayCard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('WHY TODAY', style: FomoShieldTheme.cardTitle(Colors.white)),
+              Text(
+                l10n.whyTodayCardTitle,
+                style: FomoShieldTheme.cardTitle(Colors.white),
+              ),
               // Admin-only — this button (and the detail screen behind it,
               // with the raw per-tick factor breakdown) is an engine
               // debugging tool, not a real user-facing feature.
@@ -151,7 +132,7 @@ class StockWhyTodayCard extends ConsumerWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Why today?',
+                          l10n.whyTodayCardButtonLabel,
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -171,14 +152,14 @@ class StockWhyTodayCard extends ConsumerWidget {
             children: [
               Expanded(
                 child: _changeBox(
-                  label: "TODAY'S CHANGE",
+                  label: l10n.whyTodayCardTodaysChangeLabel,
                   value: formatUsdSigned(priceChange),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _changeBox(
-                  label: 'PERCENT CHANGE',
+                  label: l10n.whyTodayCardPercentChangeLabel,
                   value:
                       '${isPositive ? '+' : ''}${priceChangePercent.toStringAsFixed(2)}%',
                 ),
@@ -187,21 +168,37 @@ class StockWhyTodayCard extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           _factorBar(
-            'Market Trends',
+            l10n.whyTodayCardFactorMarketTrends,
             marketPct / 100,
             FomoShieldTheme.factorMarket,
           ),
           const SizedBox(height: 12),
-          _factorBar('Sector', sectorPct / 100, FomoShieldTheme.factorSector),
+          _factorBar(
+            l10n.whyTodayCardFactorSector,
+            sectorPct / 100,
+            FomoShieldTheme.factorSector,
+          ),
           const SizedBox(height: 12),
-          _factorBar('News', newsPct / 100, FomoShieldTheme.factorNews),
+          _factorBar(
+            l10n.whyTodayCardFactorNews,
+            newsPct / 100,
+            FomoShieldTheme.factorNews,
+          ),
           const SizedBox(height: 12),
-          _factorBar('Sector Hype', hypePct / 100, FomoShieldTheme.factorHype),
+          _factorBar(
+            l10n.whyTodayCardFactorSectorHype,
+            hypePct / 100,
+            FomoShieldTheme.factorHype,
+          ),
           const SizedBox(height: 12),
-          _factorBar('Noise', noisePct / 100, FomoShieldTheme.factorNoise),
+          _factorBar(
+            l10n.whyTodayCardFactorNoise,
+            noisePct / 100,
+            FomoShieldTheme.factorNoise,
+          ),
           const SizedBox(height: 16),
           Text(
-            _hintCopy[_resolveHint(
+            _hintCopyFor(l10n)[_resolveHint(
               contributions == null,
               marketPct,
               sectorPct,

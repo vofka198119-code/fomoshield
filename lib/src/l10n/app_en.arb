@@ -1652,5 +1652,269 @@
   "marketPeriodDetailFomoShieldTipLabel": "F.O.M.O. SHIELD TIP",
   "marketPhasesScreenTitle": "MARKET PHASES",
   "marketPhasesScreenNowBadge": "NOW",
-  "marketPhasesScreenMoreLink": "More"
+  "marketPhasesScreenMoreLink": "More",
+  "assetsScreenTitle": "Assets",
+  "assetsScreenNoAssets": "No assets",
+  "assetsScreenTotalValueLabel": "TOTAL VALUE",
+  "assetsScreenStartCashLabel": "START CASH",
+  "assetsScreenSortValue": "Value",
+  "assetsScreenSortMarketPrice": "Market Price",
+  "assetsScreenDevPhaseLabel": "PHASE",
+  "assetsScreenDevTempLabel": "TEMP",
+  "assetsScreenDevFatigueLabel": "FATIGUE",
+  "assetsScreenDevSeedLabel": "SEED",
+  "assetsScreenDevTickLabel": "TICK",
+  "assetsScreenDevNewsLabel": "NEWS {symbol}",
+  "@assetsScreenDevNewsLabel": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "assetsScreenDevHypeLabel": "HYPE {sector}",
+  "@assetsScreenDevHypeLabel": {
+    "placeholders": {
+      "sector": {
+        "type": "String"
+      }
+    }
+  },
+  "assetsScreenDevTimeLeftHm": "{hours}h{minutes}m left",
+  "@assetsScreenDevTimeLeftHm": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "assetsScreenDevTimeLeftM": "{minutes}m left",
+  "@assetsScreenDevTimeLeftM": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "assetsScreenDevTimeEnding": "ending",
+  "stockDetailAppBarTitle": "COMPANY CARD",
+  "whyTodayScreenAppBarTitle": "{symbol} DIAGNOSTICS",
+  "@whyTodayScreenAppBarTitle": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "whyTodayScreenTodaysChangeTitle": "TODAY'S CHANGE",
+  "whyTodayScreenDollarsLabel": "DOLLARS",
+  "whyTodayScreenPercentLabel": "PERCENT",
+  "whyTodayScreenThisTickTitle": "THIS TICK — FACTOR BREAKDOWN",
+  "whyTodayScreenWholePeriodTitle": "WHOLE PERIOD — FACTOR BREAKDOWN",
+  "whyTodayScreenWholePeriodSubtitle": "Weighted by each tick's own price move — {tickCount} ticks since first purchase.",
+  "@whyTodayScreenWholePeriodSubtitle": {
+    "placeholders": {
+      "tickCount": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenWholePeriodSubtitleRecentOnly": "Weighted by each tick's own price move — {tickCount} ticks since first purchase (recent only — no cache yet).",
+  "@whyTodayScreenWholePeriodSubtitleRecentOnly": {
+    "placeholders": {
+      "tickCount": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenRawDriftTitle": "RAW DRIFT VALUES (LATEST TICK)",
+  "whyTodayScreenRawDriftSubtitle": "Unnormalized — before the 5 factors above are scaled to sum to 100%.",
+  "whyTodayScreenFactorMarketTrends": "Market Trends",
+  "whyTodayScreenFactorSector": "Sector",
+  "whyTodayScreenFactorNews": "News",
+  "whyTodayScreenFactorSectorHype": "Sector Hype",
+  "whyTodayScreenFactorNoise": "Noise",
+  "whyTodayScreenRawMarketDrift": "Market drift",
+  "whyTodayScreenRawSectorDrift": "Sector drift",
+  "whyTodayScreenRawHype": "Hype",
+  "whyTodayScreenNewsAndHypeTitle": "NEWS & SECTOR HYPE",
+  "whyTodayScreenMarketPhaseTitle": "MARKET PHASE / EPOCHS",
+  "whyTodayScreenNewsLiveLabel": "News — LIVE: {headline}",
+  "@whyTodayScreenNewsLiveLabel": {
+    "placeholders": {
+      "headline": {
+        "type": "String"
+      }
+    }
+  },
+  "whyTodayScreenTargetDetail": "{percent}% target",
+  "@whyTodayScreenTargetDetail": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "whyTodayScreenSectorHypeLiveLabel": "Sector Hype — LIVE",
+  "whyTodayScreenSectorTargetDetail": "{percent}% sector target",
+  "@whyTodayScreenSectorTargetDetail": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "whyTodayScreenRemainingHm": "≈{hours}h {minutes}m left",
+  "@whyTodayScreenRemainingHm": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenRemainingM": "≈{minutes}m left",
+  "@whyTodayScreenRemainingM": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenWrappingUp": "wrapping up",
+  "whyTodayScreenNewsHistoryTitle": "NEWS HISTORY ({count})",
+  "@whyTodayScreenNewsHistoryTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenNoNewsEpisodes": "No News episodes yet.",
+  "whyTodayScreenSectorHypeHistoryTitle": "SECTOR HYPE HISTORY ({count})",
+  "@whyTodayScreenSectorHypeHistoryTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenNoHypeEpisodes": "No Sector Hype episodes yet.",
+  "whyTodayScreenEpochSingle": "Epoch {num}",
+  "@whyTodayScreenEpochSingle": {
+    "placeholders": {
+      "num": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenEpochRange": "Epoch {start}–{end}",
+  "@whyTodayScreenEpochRange": {
+    "placeholders": {
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenEpochScenario": "Epoch {num} — {scenario}",
+  "@whyTodayScreenEpochScenario": {
+    "placeholders": {
+      "num": {
+        "type": "int"
+      },
+      "scenario": {
+        "type": "String"
+      }
+    }
+  },
+  "whyTodayScreenActiveLabel": "active",
+  "whyTodayScreenTicksTitle": "Ticks",
+  "whyTodayScreenFactorMoved": "{factor} moved by {percent}%",
+  "@whyTodayScreenFactorMoved": {
+    "placeholders": {
+      "factor": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "whyTodayScreenEmptyStateMessage": "No tick data yet for this position.",
+  "stockLimitOrdersTitle": "LIMIT ORDERS",
+  "stockLimitOrdersSeeAll": "See all {count} orders",
+  "@stockLimitOrdersSeeAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stockLimitOrdersSheetTitle": "{symbol} Limit Orders",
+  "@stockLimitOrdersSheetTitle": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "stockPositionCardTitle": "YOUR POSITION",
+  "stockPositionCardAssetValueLabel": "Asset Value",
+  "stockPositionCardSharesLabel": "Shares",
+  "stockPositionCardUnrealizedPnlLabel": "Unrealized P&L",
+  "stockPositionCardAvgCostLabel": "Avg Cost",
+  "stockSparklineChartTitle": "PRICE CHART",
+  "whyTodayCardTitle": "WHY TODAY",
+  "whyTodayCardButtonLabel": "Why today?",
+  "whyTodayCardTodaysChangeLabel": "TODAY'S CHANGE",
+  "whyTodayCardPercentChangeLabel": "PERCENT CHANGE",
+  "whyTodayCardFactorMarketTrends": "Market Trends",
+  "whyTodayCardFactorSector": "Sector",
+  "whyTodayCardFactorNews": "News",
+  "whyTodayCardFactorSectorHype": "Sector Hype",
+  "whyTodayCardFactorNoise": "Noise",
+  "whyTodayCardHintNoData": "Not enough data yet for this position — check back after the next price tick for a read on what might be moving it.",
+  "whyTodayCardHintMarketBull": "Broad market strength may be lifting this position along with the wider trend today.",
+  "whyTodayCardHintMarketSideways": "The wider market looks range-bound right now, which could be keeping this position relatively flat.",
+  "whyTodayCardHintMarketBear": "A broader market pullback may be weighing on this position along with the rest of the market.",
+  "whyTodayCardHintMarketVolatility": "Choppy, directionless market conditions could be behind today's swings.",
+  "whyTodayCardHintMarketRecovery": "The market may be steadying after a recent shock, which could explain today's move.",
+  "whyTodayCardHintMarketBlackSwan": "An unusual, sharp market-wide shock may be driving today's move — worth watching closely.",
+  "whyTodayCardHintMarketCrash": "A steep market-wide selloff may be weighing heavily on this position right now.",
+  "whyTodayCardHintSector": "This move may be tied to how this position's sector is trading relative to the rest of the market.",
+  "whyTodayCardHintNews": "Company-specific news — possibly something like an earnings report — could be behind today's move.",
+  "whyTodayCardHintHype": "A broader wave of attention across this position's whole sector may be driving today's move.",
+  "whyTodayCardHintNoise": "Today's move looks like ordinary day-to-day price fluctuation, without one single clear driver.",
+  "stressTestOrderRowBuyLine": "Buy {quantity} shares",
+  "@stressTestOrderRowBuyLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "stressTestOrderRowSellLine": "Sell {quantity} shares",
+  "@stressTestOrderRowSellLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "stressTestOrderRowLimitPriceLine": "Limit Price {price}",
+  "@stressTestOrderRowLimitPriceLine": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  }
 }
