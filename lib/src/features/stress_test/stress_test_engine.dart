@@ -18,6 +18,7 @@ import '../../core/notifications/notification_providers.dart';
 import '../../core/overlay/app_notification_popup.dart';
 import '../../shared/services/user_data_service.dart';
 import '../../shared/services/finnhub_service.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/services/scoring_engine.dart';
 import 'psychology_engine.dart';
 import 'stress_test_models.dart';
@@ -1126,7 +1127,10 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   // ── Verdict Calculation ──────────────────────────────────────────
 
   /// Calculate the psychological verdict for a completed session.
-  PsychologicalVerdict calculateVerdict(String sessionId) {
+  PsychologicalVerdict calculateVerdict(
+    String sessionId, [
+    AppLocalizations? l10n,
+  ]) {
     final session = state.firstWhere(
       (s) => s.id == sessionId,
       orElse: () => StressTestSession(
@@ -1137,11 +1141,13 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     );
 
     if (session.id.isEmpty) {
-      return const PsychologicalVerdict(
+      return PsychologicalVerdict(
         primaryType: VerdictType.patientShield,
         fsScore: 0,
-        title: 'No Data',
-        description: 'Session data not found.',
+        title: l10n?.stressTestVerdictNoDataTitle ?? 'No Data',
+        description:
+            l10n?.stressTestVerdictNoDataDescription ??
+            'Session data not found.',
       );
     }
 
@@ -1171,65 +1177,79 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     // Priority 1: Panic (Fear)
     if (soldBottom >= 2 && pnl < 0) {
       primaryType = VerdictType.panic;
-      title = 'PANIC — Fear-Driven Investor';
+      title =
+          l10n?.stressTestVerdictPanicTitle ?? 'PANIC — Fear-Driven Investor';
       description =
+          l10n?.stressTestVerdictPanicDescription ??
           'You let fear dictate your actions, selling assets at the worst possible '
-          'moment and locking in losses. The data shows you sold at the bottom '
-          'at least twice while the market was in decline. '
-          'Emotional discipline is the cornerstone of successful investing. '
-          'Consider setting stop-loss limits and sticking to a predefined strategy '
-          'rather than reacting to short-term market noise.';
+              'moment and locking in losses. The data shows you sold at the bottom '
+              'at least twice while the market was in decline. '
+              'Emotional discipline is the cornerstone of successful investing. '
+              'Consider setting stop-loss limits and sticking to a predefined strategy '
+              'rather than reacting to short-term market noise.';
     }
     // Priority 2: FOMO (Greed)
     else if (boughtPeak >= 2) {
       primaryType = VerdictType.fomo;
-      title = 'FOMO — Momentum Chaser';
+      title = l10n?.stressTestVerdictFomoTitle ?? 'FOMO — Momentum Chaser';
       description =
+          l10n?.stressTestVerdictFomoDescription ??
           'You exhibit classic FOMO (Fear Of Missing Out) behavior, buying assets '
-          'near their peak prices. This pattern of chasing green candles often leads '
-          'to overpaying for assets. Successful investors buy when there is '
-          '"blood in the streets," not when euphoria takes over. '
-          'Try dollar-cost averaging instead of lump-sum buying at all-time highs.';
+              'near their peak prices. This pattern of chasing green candles often leads '
+              'to overpaying for assets. Successful investors buy when there is '
+              '"blood in the streets," not when euphoria takes over. '
+              'Try dollar-cost averaging instead of lump-sum buying at all-time highs.';
     }
     // Priority 3: Active Trader
     else if (totalTrades > 15) {
       primaryType = VerdictType.activeTrader;
-      title = 'ACTIVE TRADER — High-Frequency Risk';
+      title =
+          l10n?.stressTestVerdictActiveTraderTitle ??
+          'ACTIVE TRADER — High-Frequency Risk';
       description =
+          l10n?.stressTestVerdictActiveTraderDescription(totalTrades) ??
           'You executed over $totalTrades trades in this simulation. '
-          'While trading activity can be profitable, it also incurs significant '
-          'costs through commissions, slippage, and taxes. '
-          'More importantly, frequent trading often crosses the line from '
-          'methodical investing to dopamine-driven speculation. '
-          'Consider whether each trade has a clear thesis behind it.';
+              'While trading activity can be profitable, it also incurs significant '
+              'costs through commissions, slippage, and taxes. '
+              'More importantly, frequent trading often crosses the line from '
+              'methodical investing to dopamine-driven speculation. '
+              'Consider whether each trade has a clear thesis behind it.';
     }
     // Priority 4: Patient Shield (Ultimate Praise)
     else if (totalTrades <= 5 && pnl > 0 && soldBottom == 0) {
       primaryType = VerdictType.patientShield;
-      title = 'PATIENT SHIELD — Disciplined Investor';
+      title =
+          l10n?.stressTestVerdictPatientShieldTitle ??
+          'PATIENT SHIELD — Disciplined Investor';
       description =
+          l10n?.stressTestVerdictPatientShieldDescription ??
           'You demonstrated remarkable discipline by making few, well-timed trades, '
-          'holding through volatility, and avoiding panic selling. '
-          'This patient, long-term approach is the hallmark of legendary investors.';
+              'holding through volatility, and avoiding panic selling. '
+              'This patient, long-term approach is the hallmark of legendary investors.';
 
       if (catSurvived) {
         hasAbsoluteShieldBadge = true;
-        title = 'ABSOLUTE SHIELD — Master of Emotions';
+        title =
+            l10n?.stressTestVerdictAbsoluteShieldTitle ??
+            'ABSOLUTE SHIELD — Master of Emotions';
         description +=
-            '\n\nExceptional: You not only survived a Black Swan event — you bought '
-            'the dip and held steady. This is the rarest and most profitable '
-            'investing mindset. You have earned the ABSOLUTE SHIELD badge.';
+            '\n\n${l10n?.stressTestVerdictAbsoluteShieldExtra ?? 'Exceptional: You not only survived a Black Swan event — you bought '
+                    'the dip and held steady. This is the rarest and most profitable '
+                    'investing mindset. You have earned the ABSOLUTE SHIELD badge.'}';
       }
     }
     // Fallback: Balanced
     else {
       primaryType = VerdictType.patientShield;
-      title = 'BALANCED — Developing Investor';
+      title =
+          l10n?.stressTestVerdictBalancedTitle ??
+          'BALANCED — Developing Investor';
       description =
+          l10n?.stressTestVerdictBalancedDescription ??
           'Your trading patterns show a mix of behaviors. While you avoided '
-          'major emotional pitfalls, there is room for improvement in your '
-          'decision-making process. Focus on building a systematic approach '
-          'to investing that minimizes emotional reactions.';
+              'major emotional pitfalls, there is room for improvement in your '
+              'decision-making process. Focus on building a systematic approach '
+              'to investing that minimizes emotional reactions.';
     }
 
     return PsychologicalVerdict(

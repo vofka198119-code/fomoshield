@@ -398,17 +398,18 @@ class StressTestWidget extends ConsumerWidget {
     WidgetRef ref,
     StressTestSession session,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Retrieve psychological verdict
     PsychologicalVerdict? verdict;
     try {
       verdict = ref
           .read(stressTestProvider.notifier)
-          .calculateVerdict(session.id);
+          .calculateVerdict(session.id, l10n);
     } catch (_) {}
 
     final verdictTitle = verdict?.title ?? '—';
     final pnlColor = session.profitLoss >= 0 ? ThemeV2.success : ThemeV2.loss;
-    final l10n = AppLocalizations.of(context)!;
 
     return InkWell(
       key: ValueKey('st_completed_${session.id}'),

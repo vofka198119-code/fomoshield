@@ -4003,6 +4003,90 @@ abstract class AppLocalizations {
   /// **'Starting Cash'**
   String get verdictStartingCashLabel;
 
+  /// No description provided for @stressTestVerdictNoDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Data'**
+  String get stressTestVerdictNoDataTitle;
+
+  /// No description provided for @stressTestVerdictNoDataDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Session data not found.'**
+  String get stressTestVerdictNoDataDescription;
+
+  /// No description provided for @stressTestVerdictPanicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PANIC — Fear-Driven Investor'**
+  String get stressTestVerdictPanicTitle;
+
+  /// No description provided for @stressTestVerdictPanicDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You let fear dictate your actions, selling assets at the worst possible moment and locking in losses. The data shows you sold at the bottom at least twice while the market was in decline. Emotional discipline is the cornerstone of successful investing. Consider setting stop-loss limits and sticking to a predefined strategy rather than reacting to short-term market noise.'**
+  String get stressTestVerdictPanicDescription;
+
+  /// No description provided for @stressTestVerdictFomoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FOMO — Momentum Chaser'**
+  String get stressTestVerdictFomoTitle;
+
+  /// No description provided for @stressTestVerdictFomoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You exhibit classic FOMO (Fear Of Missing Out) behavior, buying assets near their peak prices. This pattern of chasing green candles often leads to overpaying for assets. Successful investors buy when there is \"blood in the streets,\" not when euphoria takes over. Try dollar-cost averaging instead of lump-sum buying at all-time highs.'**
+  String get stressTestVerdictFomoDescription;
+
+  /// No description provided for @stressTestVerdictActiveTraderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE TRADER — High-Frequency Risk'**
+  String get stressTestVerdictActiveTraderTitle;
+
+  /// No description provided for @stressTestVerdictActiveTraderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You executed over {totalTrades} trades in this simulation. While trading activity can be profitable, it also incurs significant costs through commissions, slippage, and taxes. More importantly, frequent trading often crosses the line from methodical investing to dopamine-driven speculation. Consider whether each trade has a clear thesis behind it.'**
+  String stressTestVerdictActiveTraderDescription(int totalTrades);
+
+  /// No description provided for @stressTestVerdictPatientShieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PATIENT SHIELD — Disciplined Investor'**
+  String get stressTestVerdictPatientShieldTitle;
+
+  /// No description provided for @stressTestVerdictPatientShieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You demonstrated remarkable discipline by making few, well-timed trades, holding through volatility, and avoiding panic selling. This patient, long-term approach is the hallmark of legendary investors.'**
+  String get stressTestVerdictPatientShieldDescription;
+
+  /// No description provided for @stressTestVerdictAbsoluteShieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ABSOLUTE SHIELD — Master of Emotions'**
+  String get stressTestVerdictAbsoluteShieldTitle;
+
+  /// No description provided for @stressTestVerdictAbsoluteShieldExtra.
+  ///
+  /// In en, this message translates to:
+  /// **'Exceptional: You not only survived a Black Swan event — you bought the dip and held steady. This is the rarest and most profitable investing mindset. You have earned the ABSOLUTE SHIELD badge.'**
+  String get stressTestVerdictAbsoluteShieldExtra;
+
+  /// No description provided for @stressTestVerdictBalancedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'BALANCED — Developing Investor'**
+  String get stressTestVerdictBalancedTitle;
+
+  /// No description provided for @stressTestVerdictBalancedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your trading patterns show a mix of behaviors. While you avoided major emotional pitfalls, there is room for improvement in your decision-making process. Focus on building a systematic approach to investing that minimizes emotional reactions.'**
+  String get stressTestVerdictBalancedDescription;
+
   /// No description provided for @commonRetry.
   ///
   /// In en, this message translates to:

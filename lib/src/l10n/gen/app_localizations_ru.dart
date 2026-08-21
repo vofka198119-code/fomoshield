@@ -2270,6 +2270,60 @@ class AppLocalizationsRu extends AppLocalizations {
   String get verdictStartingCashLabel => 'Начальные наличные';
 
   @override
+  String get stressTestVerdictNoDataTitle => 'Нет данных';
+
+  @override
+  String get stressTestVerdictNoDataDescription => 'Данные сессии не найдены.';
+
+  @override
+  String get stressTestVerdictPanicTitle =>
+      'ПАНИКА — Инвестор, ведомый страхом';
+
+  @override
+  String get stressTestVerdictPanicDescription =>
+      'Вы позволили страху диктовать свои действия, продавая активы в худший момент и фиксируя убытки. Данные показывают, что вы продавали на дне минимум дважды, пока рынок падал. Эмоциональная дисциплина — основа успешного инвестирования. Подумайте об использовании стоп-лоссов и о том, чтобы придерживаться заранее продуманной стратегии, а не реагировать на краткосрочный рыночный шум.';
+
+  @override
+  String get stressTestVerdictFomoTitle => 'FOMO — Охотник за импульсом';
+
+  @override
+  String get stressTestVerdictFomoDescription =>
+      'Вы демонстрируете классическое поведение FOMO (страх упустить возможность), покупая активы у самых пиков цены. Такая гонка за зелёными свечами часто приводит к переплате за активы. Успешные инвесторы покупают, когда «на улицах кровь», а не когда царит эйфория. Попробуйте усреднение стоимости вместо покупки на все деньги на исторических максимумах.';
+
+  @override
+  String get stressTestVerdictActiveTraderTitle =>
+      'АКТИВНЫЙ ТРЕЙДЕР — Риск высокой частоты';
+
+  @override
+  String stressTestVerdictActiveTraderDescription(int totalTrades) {
+    return 'Вы совершили более $totalTrades сделок за эту симуляцию. Хотя активная торговля может быть прибыльной, она также влечёт значительные издержки — комиссии, проскальзывание и налоги. Что важнее, частая торговля нередко переходит границу между методичным инвестированием и спекуляцией на дофамине. Задумайтесь, есть ли у каждой сделки чёткое обоснование.';
+  }
+
+  @override
+  String get stressTestVerdictPatientShieldTitle =>
+      'ТЕРПЕЛИВЫЙ ЩИТ — Дисциплинированный инвестор';
+
+  @override
+  String get stressTestVerdictPatientShieldDescription =>
+      'Вы продемонстрировали настоящую дисциплину: совершали мало точных сделок, держали позиции в волатильности и не поддавались панике. Такой терпеливый, долгосрочный подход — отличительная черта легендарных инвесторов.';
+
+  @override
+  String get stressTestVerdictAbsoluteShieldTitle =>
+      'АБСОЛЮТНЫЙ ЩИТ — Мастер эмоций';
+
+  @override
+  String get stressTestVerdictAbsoluteShieldExtra =>
+      'Исключительный результат: вы не просто пережили эффект «чёрного лебедя» — вы выкупили просадку и удержали позицию. Это самый редкий и самый прибыльный образ мышления в инвестировании. Вы заслужили значок АБСОЛЮТНЫЙ ЩИТ.';
+
+  @override
+  String get stressTestVerdictBalancedTitle =>
+      'СБАЛАНСИРОВАННЫЙ — Развивающийся инвестор';
+
+  @override
+  String get stressTestVerdictBalancedDescription =>
+      'Ваши торговые паттерны показывают смешанное поведение. Хотя вы избежали серьёзных эмоциональных ошибок, есть пространство для роста в процессе принятия решений. Сосредоточьтесь на выработке системного подхода к инвестированию, минимизирующего эмоциональные реакции.';
+
+  @override
   String get commonRetry => 'Повторить';
 
   @override

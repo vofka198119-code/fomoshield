@@ -2271,6 +2271,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verdictStartingCashLabel => 'Starting Cash';
 
   @override
+  String get stressTestVerdictNoDataTitle => 'No Data';
+
+  @override
+  String get stressTestVerdictNoDataDescription => 'Session data not found.';
+
+  @override
+  String get stressTestVerdictPanicTitle => 'PANIC — Fear-Driven Investor';
+
+  @override
+  String get stressTestVerdictPanicDescription =>
+      'You let fear dictate your actions, selling assets at the worst possible moment and locking in losses. The data shows you sold at the bottom at least twice while the market was in decline. Emotional discipline is the cornerstone of successful investing. Consider setting stop-loss limits and sticking to a predefined strategy rather than reacting to short-term market noise.';
+
+  @override
+  String get stressTestVerdictFomoTitle => 'FOMO — Momentum Chaser';
+
+  @override
+  String get stressTestVerdictFomoDescription =>
+      'You exhibit classic FOMO (Fear Of Missing Out) behavior, buying assets near their peak prices. This pattern of chasing green candles often leads to overpaying for assets. Successful investors buy when there is \"blood in the streets,\" not when euphoria takes over. Try dollar-cost averaging instead of lump-sum buying at all-time highs.';
+
+  @override
+  String get stressTestVerdictActiveTraderTitle =>
+      'ACTIVE TRADER — High-Frequency Risk';
+
+  @override
+  String stressTestVerdictActiveTraderDescription(int totalTrades) {
+    return 'You executed over $totalTrades trades in this simulation. While trading activity can be profitable, it also incurs significant costs through commissions, slippage, and taxes. More importantly, frequent trading often crosses the line from methodical investing to dopamine-driven speculation. Consider whether each trade has a clear thesis behind it.';
+  }
+
+  @override
+  String get stressTestVerdictPatientShieldTitle =>
+      'PATIENT SHIELD — Disciplined Investor';
+
+  @override
+  String get stressTestVerdictPatientShieldDescription =>
+      'You demonstrated remarkable discipline by making few, well-timed trades, holding through volatility, and avoiding panic selling. This patient, long-term approach is the hallmark of legendary investors.';
+
+  @override
+  String get stressTestVerdictAbsoluteShieldTitle =>
+      'ABSOLUTE SHIELD — Master of Emotions';
+
+  @override
+  String get stressTestVerdictAbsoluteShieldExtra =>
+      'Exceptional: You not only survived a Black Swan event — you bought the dip and held steady. This is the rarest and most profitable investing mindset. You have earned the ABSOLUTE SHIELD badge.';
+
+  @override
+  String get stressTestVerdictBalancedTitle => 'BALANCED — Developing Investor';
+
+  @override
+  String get stressTestVerdictBalancedDescription =>
+      'Your trading patterns show a mix of behaviors. While you avoided major emotional pitfalls, there is room for improvement in your decision-making process. Focus on building a systematic approach to investing that minimizes emotional reactions.';
+
+  @override
   String get commonRetry => 'Retry';
 
   @override
