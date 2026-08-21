@@ -890,6 +890,55 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tradeHistoryTitle => 'ИСТОРИЯ СДЕЛОК';
 
   @override
+  String get setGoalScreenTitleSet => 'УСТАНОВИТЬ ЦЕЛЬ';
+
+  @override
+  String get setGoalScreenTitleChange => 'ИЗМЕНИТЬ ЦЕЛЬ';
+
+  @override
+  String get setGoalScreenPrompt =>
+      'Какого общего размера портфеля вы хотите достичь?';
+
+  @override
+  String setGoalScreenSubtitle(String amount) {
+    return 'Это ваш целевой общий баланс, а не дополнительная прибыль сверху. Минимум $amount.';
+  }
+
+  @override
+  String get setGoalScreenSaveButton => 'Сохранить цель';
+
+  @override
+  String setGoalScreenMinimumTargetError(String amount) {
+    return 'Минимальная цель — $amount';
+  }
+
+  @override
+  String get setGoalScreenNotifTitleSet => 'Цель установлена';
+
+  @override
+  String get setGoalScreenNotifTitleUpdated => 'Цель обновлена';
+
+  @override
+  String setGoalScreenNotifDetailSet(String amount) {
+    return 'Цель установлена на $amount';
+  }
+
+  @override
+  String setGoalScreenNotifDetailUpdated(String amount, String signed) {
+    return 'Новая цель $amount ($signed)';
+  }
+
+  @override
+  String get portfolioTradeHistoryScreenPortfolioNotFound =>
+      'Портфель не найден';
+
+  @override
+  String get portfolioTradeHistoryScreenNoTradesYet => 'Сделок пока нет';
+
+  @override
+  String get portfolioWidgetsSettingsSheetTitle => 'Виджеты портфеля';
+
+  @override
   String get myLimitOrdersTitle => 'МОИ ЛИМИТНЫЕ ОРДЕРА';
 
   @override

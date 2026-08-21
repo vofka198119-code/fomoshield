@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/stagger_fade_in.dart';
 import '../../../shared/widgets/trade_history_tile.dart';
 import '../portfolio_providers.dart';
@@ -23,6 +24,7 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.watch(portfoliosProvider);
     Portfolio? portfolio;
     for (final p in portfolios) {
@@ -46,7 +48,7 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'TRADE HISTORY',
+          l10n.tradeHistoryTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -61,9 +63,11 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
         left: false,
         right: false,
         child: portfolio == null
-            ? const Center(child: Text('Portfolio not found'))
+            ? Center(
+                child: Text(l10n.portfolioTradeHistoryScreenPortfolioNotFound),
+              )
             : portfolio.transactions.isEmpty
-            ? const Center(child: Text('No trades yet'))
+            ? Center(child: Text(l10n.portfolioTradeHistoryScreenNoTradesYet))
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: Container(

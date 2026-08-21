@@ -887,6 +887,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tradeHistoryTitle => 'TRADE HISTORY';
 
   @override
+  String get setGoalScreenTitleSet => 'SET GOAL';
+
+  @override
+  String get setGoalScreenTitleChange => 'CHANGE GOAL';
+
+  @override
+  String get setGoalScreenPrompt =>
+      'What total portfolio value do you want to reach?';
+
+  @override
+  String setGoalScreenSubtitle(String amount) {
+    return 'This is your target total balance, not extra profit on top. Minimum $amount.';
+  }
+
+  @override
+  String get setGoalScreenSaveButton => 'Save Goal';
+
+  @override
+  String setGoalScreenMinimumTargetError(String amount) {
+    return 'Minimum target is $amount';
+  }
+
+  @override
+  String get setGoalScreenNotifTitleSet => 'Goal Set';
+
+  @override
+  String get setGoalScreenNotifTitleUpdated => 'Goal Updated';
+
+  @override
+  String setGoalScreenNotifDetailSet(String amount) {
+    return 'Target set to $amount';
+  }
+
+  @override
+  String setGoalScreenNotifDetailUpdated(String amount, String signed) {
+    return 'New target $amount ($signed)';
+  }
+
+  @override
+  String get portfolioTradeHistoryScreenPortfolioNotFound =>
+      'Portfolio not found';
+
+  @override
+  String get portfolioTradeHistoryScreenNoTradesYet => 'No trades yet';
+
+  @override
+  String get portfolioWidgetsSettingsSheetTitle => 'Portfolio Widgets';
+
+  @override
   String get myLimitOrdersTitle => 'MY LIMIT ORDERS';
 
   @override

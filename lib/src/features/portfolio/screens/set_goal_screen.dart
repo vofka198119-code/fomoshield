@@ -16,6 +16,7 @@ import '../../../core/models/app_notification.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/numeric_keypad.dart';
 import '../portfolio_providers.dart';
@@ -67,11 +68,16 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
   }
 
   void _save() {
+    final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_controller.text);
     final minGoal = _minGoal;
     if (amount == null || amount < minGoal) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Minimum target is ${formatUsd(minGoal)}')),
+        SnackBar(
+          content: Text(
+            l10n.setGoalScreenMinimumTargetError(formatUsd(minGoal)),
+          ),
+        ),
       );
       return;
     }
@@ -84,11 +90,15 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
         type: AppNotificationType.goalUpdated,
         portfolioKind: NotificationPortfolioKind.real,
         portfolioId: widget.portfolioId,
-        title: previous == null ? 'Goal Set' : 'Goal Updated',
+        title: previous == null
+            ? l10n.setGoalScreenNotifTitleSet
+            : l10n.setGoalScreenNotifTitleUpdated,
         detail: previous == null
-            ? 'Target set to ${formatUsd(amount)}'
-            : 'New target ${formatUsd(amount)} '
-                  '(${formatUsdSigned(amount - previous)})',
+            ? l10n.setGoalScreenNotifDetailSet(formatUsd(amount))
+            : l10n.setGoalScreenNotifDetailUpdated(
+                formatUsd(amount),
+                formatUsdSigned(amount - previous),
+              ),
         createdAt: DateTime.now(),
       ),
     );
@@ -102,13 +112,16 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final minGoal = _minGoal;
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
-          _isEditing ? 'CHANGE GOAL' : 'SET GOAL',
+          _isEditing
+              ? l10n.setGoalScreenTitleChange
+              : l10n.setGoalScreenTitleSet,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -134,7 +147,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'What total portfolio value do you want to reach?',
+                      l10n.setGoalScreenPrompt,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -143,8 +156,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'This is your target total balance, not extra profit on top. '
-                      'Minimum ${formatUsd(minGoal)}.',
+                      l10n.setGoalScreenSubtitle(formatUsd(minGoal)),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: ThemeV2.textSecondary,
@@ -216,7 +228,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
           elevation: 0,
         ),
         child: Text(
-          'Save Goal',
+          AppLocalizations.of(context)!.setGoalScreenSaveButton,
           style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),

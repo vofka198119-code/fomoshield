@@ -400,6 +400,50 @@
     }
   },
   "tradeHistoryTitle": "TRADE HISTORY",
+  "setGoalScreenTitleSet": "SET GOAL",
+  "setGoalScreenTitleChange": "CHANGE GOAL",
+  "setGoalScreenPrompt": "What total portfolio value do you want to reach?",
+  "setGoalScreenSubtitle": "This is your target total balance, not extra profit on top. Minimum {amount}.",
+  "@setGoalScreenSubtitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "setGoalScreenSaveButton": "Save Goal",
+  "setGoalScreenMinimumTargetError": "Minimum target is {amount}",
+  "@setGoalScreenMinimumTargetError": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "setGoalScreenNotifTitleSet": "Goal Set",
+  "setGoalScreenNotifTitleUpdated": "Goal Updated",
+  "setGoalScreenNotifDetailSet": "Target set to {amount}",
+  "@setGoalScreenNotifDetailSet": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "setGoalScreenNotifDetailUpdated": "New target {amount} ({signed})",
+  "@setGoalScreenNotifDetailUpdated": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "signed": {
+        "type": "String"
+      }
+    }
+  },
+  "portfolioTradeHistoryScreenPortfolioNotFound": "Portfolio not found",
+  "portfolioTradeHistoryScreenNoTradesYet": "No trades yet",
+  "portfolioWidgetsSettingsSheetTitle": "Portfolio Widgets",
   "myLimitOrdersTitle": "MY LIMIT ORDERS",
   "myLimitOrdersSheetTitle": "My Limit Orders",
   "myLimitOrdersEmpty": "You currently have no active orders",

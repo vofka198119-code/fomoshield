@@ -1681,6 +1681,84 @@ abstract class AppLocalizations {
   /// **'TRADE HISTORY'**
   String get tradeHistoryTitle;
 
+  /// No description provided for @setGoalScreenTitleSet.
+  ///
+  /// In en, this message translates to:
+  /// **'SET GOAL'**
+  String get setGoalScreenTitleSet;
+
+  /// No description provided for @setGoalScreenTitleChange.
+  ///
+  /// In en, this message translates to:
+  /// **'CHANGE GOAL'**
+  String get setGoalScreenTitleChange;
+
+  /// No description provided for @setGoalScreenPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'What total portfolio value do you want to reach?'**
+  String get setGoalScreenPrompt;
+
+  /// No description provided for @setGoalScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This is your target total balance, not extra profit on top. Minimum {amount}.'**
+  String setGoalScreenSubtitle(String amount);
+
+  /// No description provided for @setGoalScreenSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Goal'**
+  String get setGoalScreenSaveButton;
+
+  /// No description provided for @setGoalScreenMinimumTargetError.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum target is {amount}'**
+  String setGoalScreenMinimumTargetError(String amount);
+
+  /// No description provided for @setGoalScreenNotifTitleSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Set'**
+  String get setGoalScreenNotifTitleSet;
+
+  /// No description provided for @setGoalScreenNotifTitleUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Updated'**
+  String get setGoalScreenNotifTitleUpdated;
+
+  /// No description provided for @setGoalScreenNotifDetailSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Target set to {amount}'**
+  String setGoalScreenNotifDetailSet(String amount);
+
+  /// No description provided for @setGoalScreenNotifDetailUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'New target {amount} ({signed})'**
+  String setGoalScreenNotifDetailUpdated(String amount, String signed);
+
+  /// No description provided for @portfolioTradeHistoryScreenPortfolioNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio not found'**
+  String get portfolioTradeHistoryScreenPortfolioNotFound;
+
+  /// No description provided for @portfolioTradeHistoryScreenNoTradesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No trades yet'**
+  String get portfolioTradeHistoryScreenNoTradesYet;
+
+  /// No description provided for @portfolioWidgetsSettingsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio Widgets'**
+  String get portfolioWidgetsSettingsSheetTitle;
+
   /// No description provided for @myLimitOrdersTitle.
   ///
   /// In en, this message translates to:
