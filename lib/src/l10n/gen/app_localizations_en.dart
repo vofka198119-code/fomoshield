@@ -2323,6 +2323,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your trading patterns show a mix of behaviors. While you avoided major emotional pitfalls, there is room for improvement in your decision-making process. Focus on building a systematic approach to investing that minimizes emotional reactions.';
 
   @override
+  String get tradesEngineTestNotActive => 'Test not active';
+
+  @override
+  String get tradesEnginePriceNotAvailable => 'Price not available';
+
+  @override
+  String get tradesEngineInvalidAmount => 'Invalid amount';
+
+  @override
+  String get tradesEngineInsufficientCash => 'Insufficient cash';
+
+  @override
+  String get tradesEngineInsufficientShares => 'Insufficient shares';
+
+  @override
   String get commonRetry => 'Retry';
 
   @override

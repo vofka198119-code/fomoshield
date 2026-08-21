@@ -259,6 +259,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           _isBuy,
           shares,
           useShares: true,
+          l10n: AppLocalizations.of(context)!,
         );
 
     if (!result.success) {

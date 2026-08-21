@@ -206,22 +206,32 @@ extension TradesEngine on StressTestNotifier {
     double amountOrShares, {
     bool useShares = false,
     bool isEtf = false,
+    AppLocalizations? l10n,
   }) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) {
-      return TradeResult(success: false, reason: 'Session not found');
+      return TradeResult(
+        success: false,
+        reason: l10n?.stressTestSessionNotFound ?? 'Session not found',
+      );
     }
 
     final session = state[idx];
     if (session.status != StressTestStatus.active) {
-      return TradeResult(success: false, reason: 'Test not active');
+      return TradeResult(
+        success: false,
+        reason: l10n?.tradesEngineTestNotActive ?? 'Test not active',
+      );
     }
 
     // Virtual market is always open — no market-hour trading restrictions.
 
     final currentPrice = session.currentPrices[symbol] ?? 0;
     if (currentPrice <= 0) {
-      return TradeResult(success: false, reason: 'Price not available');
+      return TradeResult(
+        success: false,
+        reason: l10n?.tradesEnginePriceNotAvailable ?? 'Price not available',
+      );
     }
 
     // Check ad counter for free users
@@ -241,12 +251,18 @@ extension TradesEngine on StressTestNotifier {
     }
 
     if (shares <= 0 || cost <= 0) {
-      return TradeResult(success: false, reason: 'Invalid amount');
+      return TradeResult(
+        success: false,
+        reason: l10n?.tradesEngineInvalidAmount ?? 'Invalid amount',
+      );
     }
 
     if (isBuy) {
       if (cost > session.cash) {
-        return TradeResult(success: false, reason: 'Insufficient cash');
+        return TradeResult(
+          success: false,
+          reason: l10n?.tradesEngineInsufficientCash ?? 'Insufficient cash',
+        );
       }
     } else {
       final heldShares = session.holdings
@@ -266,7 +282,11 @@ extension TradesEngine on StressTestNotifier {
         if (shares <= heldShares + 0.000001) {
           shares = heldShares;
         } else {
-          return TradeResult(success: false, reason: 'Insufficient shares');
+          return TradeResult(
+            success: false,
+            reason:
+                l10n?.tradesEngineInsufficientShares ?? 'Insufficient shares',
+          );
         }
       }
     }

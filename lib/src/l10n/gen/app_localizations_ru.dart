@@ -2324,6 +2324,21 @@ class AppLocalizationsRu extends AppLocalizations {
       'Ваши торговые паттерны показывают смешанное поведение. Хотя вы избежали серьёзных эмоциональных ошибок, есть пространство для роста в процессе принятия решений. Сосредоточьтесь на выработке системного подхода к инвестированию, минимизирующего эмоциональные реакции.';
 
   @override
+  String get tradesEngineTestNotActive => 'Тест не активен';
+
+  @override
+  String get tradesEnginePriceNotAvailable => 'Цена недоступна';
+
+  @override
+  String get tradesEngineInvalidAmount => 'Некорректная сумма';
+
+  @override
+  String get tradesEngineInsufficientCash => 'Недостаточно наличных';
+
+  @override
+  String get tradesEngineInsufficientShares => 'Недостаточно акций';
+
+  @override
   String get commonRetry => 'Повторить';
 
   @override

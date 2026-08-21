@@ -186,6 +186,7 @@ class _StressTestSearchSheetState
         true,
         _amount,
         isEtf: _selectedIsEtf,
+        l10n: AppLocalizations.of(context)!,
       );
       success = result.success;
       if (success) {

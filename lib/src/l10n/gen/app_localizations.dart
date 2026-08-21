@@ -4087,6 +4087,36 @@ abstract class AppLocalizations {
   /// **'Your trading patterns show a mix of behaviors. While you avoided major emotional pitfalls, there is room for improvement in your decision-making process. Focus on building a systematic approach to investing that minimizes emotional reactions.'**
   String get stressTestVerdictBalancedDescription;
 
+  /// No description provided for @tradesEngineTestNotActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Test not active'**
+  String get tradesEngineTestNotActive;
+
+  /// No description provided for @tradesEnginePriceNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Price not available'**
+  String get tradesEnginePriceNotAvailable;
+
+  /// No description provided for @tradesEngineInvalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid amount'**
+  String get tradesEngineInvalidAmount;
+
+  /// No description provided for @tradesEngineInsufficientCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient cash'**
+  String get tradesEngineInsufficientCash;
+
+  /// No description provided for @tradesEngineInsufficientShares.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient shares'**
+  String get tradesEngineInsufficientShares;
+
   /// No description provided for @commonRetry.
   ///
   /// In en, this message translates to:
