@@ -2582,4 +2582,1674 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get companyDetailDisclaimerBody =>
       'This application operates strictly as an educational simulator designed to help users learn how to analyze and understand business fundamentals. Evaluation scores and analytics are derived from public corporate financial filings, as well as academic frameworks from leading universities and established financial literacy textbooks.\n\nDisplayed market prices and metrics may be delayed, estimated, or differ from live exchange prices. Content within this app does not constitute a solicitation, recommendation, or offer to buy or sell any financial security. All trading decisions are made solely and independently by the user. The developers do not provide financial services and bear no liability for any potential lost profits, financial losses, or loss of real-world capital.\n\nContinued use of this application constitutes your full acknowledgment and acceptance of this disclaimer, including the release of developers from any liability. Failure to read this disclaimer does not exempt the user from compliance nor provide grounds for any claims, disputes, or legal actions.';
+
+  @override
+  String get metricInfoPeTitle => 'P/E';
+
+  @override
+  String get metricInfoPeSubtitle => 'Price-to-Earnings Ratio';
+
+  @override
+  String get metricInfoPeSection1Header => 'What is P/E?';
+
+  @override
+  String get metricInfoPeSection1Body =>
+      'The Price-to-Earnings Ratio (P/E) compares a company\'s stock price to the amount of profit it earns.\n\nIn simple terms: P/E shows how much investors are willing to pay today for every \$1 of the company\'s annual earnings. It is one of the most widely used valuation metrics in the stock market.';
+
+  @override
+  String get metricInfoPeSection2Header => 'How is it calculated?';
+
+  @override
+  String get metricInfoPeSection2Body =>
+      'Formula\nP/E = Share Price ÷ Earnings Per Share (EPS)\n\nExample\nShare Price = \$100\nEarnings Per Share = \$5\nP/E = 100 ÷ 5 = 20\n\nThis means investors are currently paying \$20 for every \$1 of annual profit.';
+
+  @override
+  String get metricInfoPeSection3Header => 'What does it tell you?';
+
+  @override
+  String get metricInfoPeSection3Body =>
+      'P/E helps answer one important question: \"Is this company expensive or cheap compared to its earnings?\"\n\nGenerally:\n• Lower P/E = lower valuation\n• Higher P/E = higher valuation\n\nHowever, a low P/E is not automatically good, and a high P/E is not automatically bad. Context always matters.';
+
+  @override
+  String get metricInfoPeSection4Header => 'What is considered a good P/E?';
+
+  @override
+  String get metricInfoPeSection4Body =>
+      'There is no perfect number, because every industry is different.\n\nBelow 10 — Often considered very cheap. Possible reasons: market pessimism, declining business, temporary problems, or a hidden opportunity. Requires careful research.\n\n10–20 — Often considered a reasonable valuation for mature companies. Common among stable businesses such as consumer goods, banks, and industrial companies.\n\n20–30 — Investors expect future earnings growth, a strong competitive position, and a reliable business model. The company is becoming more expensive.\n\nAbove 30 — The market expects significant future growth. Common among technology companies, fast-growing businesses, and innovative industries. These companies can perform very well — but they also carry higher expectations.';
+
+  @override
+  String get metricInfoPeSection5Header =>
+      'Why can a high P/E be completely normal?';
+
+  @override
+  String get metricInfoPeSection5Body =>
+      'Imagine two companies.\n\nCompany A — Profit grows 2% per year, P/E = 12\nCompany B — Profit grows 35% per year, P/E = 40\n\nAt first glance, Company B looks very expensive. But if its profits continue growing rapidly, today\'s high valuation may become reasonable over time. Investors are paying not only for today\'s earnings — but also for tomorrow\'s potential.';
+
+  @override
+  String get metricInfoPeSection6Header => 'Why can a low P/E be dangerous?';
+
+  @override
+  String get metricInfoPeSection6Body =>
+      'A low P/E may indicate that investors expect problems. Possible reasons include: falling sales, declining profits, large debt, loss of market share, legal issues, or poor management.\n\nSometimes the market is simply reacting to risks that are not immediately obvious. This is known as a Value Trap — a stock that appears cheap but continues to perform poorly.';
+
+  @override
+  String get metricInfoPeSection7Header => 'What if the P/E is negative?';
+
+  @override
+  String get metricInfoPeSection7Body =>
+      'A negative P/E means the company reported a loss instead of a profit. This does not necessarily mean the company is failing.\n\nPossible reasons include: heavy investment in future growth, building new factories, expanding into new markets, acquiring another company, a temporary economic downturn, or one-time accounting expenses.\n\nMany successful companies have experienced periods of negative earnings before returning to profitability.';
+
+  @override
+  String get metricInfoPeSection8Header => 'What is \"Hype\"?';
+
+  @override
+  String get metricInfoPeSection8Body =>
+      'Sometimes investors become extremely optimistic about a company. The stock price rises much faster than the company\'s actual earnings, so the P/E ratio becomes very high.\n\nThis often happens when investors expect revolutionary technology, Artificial Intelligence growth, new breakthrough products, or massive future expansion. A high P/E driven by excitement is often called market hype.\n\nIf the company fails to meet those high expectations, the stock price can fall sharply — even if the business remains healthy.';
+
+  @override
+  String get metricInfoPeSection9Header => 'Common mistakes beginners make';
+
+  @override
+  String get metricInfoPeSection9Body =>
+      '• Buying only because the P/E is low.\n• Avoiding every company with a high P/E.\n• Comparing companies from completely different industries.\n• Ignoring profit growth.\n• Ignoring debt levels.\n• Making investment decisions based on a single metric.';
+
+  @override
+  String get metricInfoPeSection10Header => 'P/E has limitations';
+
+  @override
+  String get metricInfoPeSection10Body =>
+      'P/E works best for companies that consistently earn profits. It is less useful for startups, companies with temporary losses, businesses with highly cyclical earnings, or firms experiencing major restructuring.\n\nFor these companies, investors often rely on additional valuation metrics.';
+
+  @override
+  String get metricInfoPeSection11Header => 'Best used together with';
+
+  @override
+  String get metricInfoPeSection11Body =>
+      'P/E should never be viewed alone. Combine it with: Revenue Growth, Net Margin, Operating Margin, ROE, Debt Levels, Free Cash Flow, and Dividend Yield.\n\nLooking at several metrics together provides a much clearer picture of a company\'s financial health.';
+
+  @override
+  String get metricInfoPeSection12Header => 'Real-world analogy';
+
+  @override
+  String get metricInfoPeSection12Body =>
+      'Imagine two apartment buildings.\n\nBuilding A — Price: \$500,000, Annual rental income: \$50,000\nBuilding B — Price: \$1,000,000, Annual rental income: \$50,000\n\nBuilding A appears much cheaper. But if Building B is located in the center of a rapidly growing city where rental income is expected to double in a few years, the higher price may be justified.\n\nStocks work in a similar way.';
+
+  @override
+  String get metricInfoPeSection13Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoPeSection13Body =>
+      'P/E measures how much investors are paying for each dollar of a company\'s earnings. It is an excellent starting point for evaluating a stock — but it should never be used as the only factor when making an investment decision.';
+
+  @override
+  String get metricInfoDividendYieldTitle => 'Dividend Yield';
+
+  @override
+  String get metricInfoDividendYieldSubtitle =>
+      'Annual Dividend Income vs. Share Price';
+
+  @override
+  String get metricInfoDividendYieldSection1Header => 'What is Dividend Yield?';
+
+  @override
+  String get metricInfoDividendYieldSection1Body =>
+      'Dividend Yield shows how much cash a company pays its shareholders each year relative to the current stock price.\n\nIn simple terms: Dividend Yield tells you how much annual income you receive from dividends for every \$100 invested in the stock. It is one of the most important metrics for income investors.';
+
+  @override
+  String get metricInfoDividendYieldSection2Header => 'How is it calculated?';
+
+  @override
+  String get metricInfoDividendYieldSection2Body =>
+      'Formula\nDividend Yield = Annual Dividend per Share ÷ Share Price × 100%\n\nExample\nAnnual Dividend = \$2.40\nShare Price = \$100\nDividend Yield = 2.4%\n\nThis means that for every \$100 invested, you receive approximately \$2.40 per year in dividends (before taxes).';
+
+  @override
+  String get metricInfoDividendYieldSection3Header => 'What does it tell you?';
+
+  @override
+  String get metricInfoDividendYieldSection3Body =>
+      'Dividend Yield measures the income potential of a stock.\n\nGenerally:\n• Higher Yield = Higher dividend income\n• Lower Yield = Lower dividend income\n\nHowever, a higher dividend yield is not always better.';
+
+  @override
+  String get metricInfoDividendYieldSection4Header =>
+      'What is considered a good Dividend Yield?';
+
+  @override
+  String get metricInfoDividendYieldSection4Body =>
+      'There is no universal \"best\" number.\n\n0% — The company pays no dividend. Common for growth companies, startups, and many technology companies. Instead of paying shareholders, these businesses reinvest profits to grow faster.\n\n1%–2% — A relatively small dividend. Often seen in companies focused on long-term growth while still rewarding shareholders.\n\n2%–4% — Generally considered a healthy and sustainable range. Many high-quality companies fall into this category.\n\n4%–6% — A relatively high dividend. Can be attractive, but investors should check whether the company can continue paying it.\n\nAbove 6% — Requires extra attention. Sometimes the dividend is genuinely generous. Sometimes the stock price has fallen sharply, making the yield appear unusually high. This can be a warning sign rather than a bargain.';
+
+  @override
+  String get metricInfoDividendYieldSection5Header =>
+      'Why isn\'t a high Dividend Yield always good?';
+
+  @override
+  String get metricInfoDividendYieldSection5Body =>
+      'Dividend Yield increases whenever dividends increase, or the stock price falls.\n\nImagine this example.\n\nYesterday — Price = \$100, Dividend = \$4, Yield = 4%\nToday — Price falls to \$50, Dividend stays \$4, Yield becomes 8%\n\nThe dividend hasn\'t improved. The stock simply became much cheaper. Investors may be worried about the company\'s future.';
+
+  @override
+  String get metricInfoDividendYieldSection6Header =>
+      'Can a company have a 0% Dividend Yield and still be excellent?';
+
+  @override
+  String get metricInfoDividendYieldSection6Body =>
+      'Absolutely. Many successful companies choose not to pay dividends. Instead, they use their profits to: develop new products, expand internationally, build new factories, acquire competitors, or invest in research and innovation.\n\nIf those investments generate higher future profits, shareholders may benefit through rising stock prices instead of dividend payments.';
+
+  @override
+  String get metricInfoDividendYieldSection7Header =>
+      'Can Dividend Yield decrease?';
+
+  @override
+  String get metricInfoDividendYieldSection7Body =>
+      'Yes. Reasons include: the stock price rises faster than dividends, the company reduces its dividend, or the company temporarily suspends dividend payments.\n\nA lower yield does not automatically indicate a weaker company.';
+
+  @override
+  String get metricInfoDividendYieldSection8Header =>
+      'Can Dividend Yield increase?';
+
+  @override
+  String get metricInfoDividendYieldSection8Body =>
+      'Yes. Possible reasons: the company raises its dividend, the stock price declines, or both occur simultaneously.\n\nThis is why investors should always determine why the yield changed.';
+
+  @override
+  String get metricInfoDividendYieldSection9Header => 'What is a Dividend Cut?';
+
+  @override
+  String get metricInfoDividendYieldSection9Body =>
+      'A Dividend Cut occurs when a company reduces the amount of money it pays shareholders. Companies may cut dividends because they need cash for: paying debt, surviving an economic downturn, funding major investments, or protecting the business during difficult periods.\n\nA dividend cut is not always a sign of failure. Sometimes it is a responsible financial decision that strengthens the company over the long term.';
+
+  @override
+  String get metricInfoDividendYieldSection10Header =>
+      'Why do some companies never pay dividends?';
+
+  @override
+  String get metricInfoDividendYieldSection10Body =>
+      'Many growth companies believe that every dollar earned can generate even greater returns if reinvested into the business. For example: expanding into new markets, hiring more employees, developing new technology, or increasing production capacity.\n\nIn these cases, investors expect capital appreciation instead of dividend income.';
+
+  @override
+  String get metricInfoDividendYieldSection11Header =>
+      'Common mistakes beginners make';
+
+  @override
+  String get metricInfoDividendYieldSection11Body =>
+      '• Buying the stock with the highest Dividend Yield.\n• Assuming dividends are guaranteed forever.\n• Ignoring the company\'s earnings and cash flow.\n• Comparing dividend yields across completely different industries.\n• Focusing only on income while ignoring business quality.';
+
+  @override
+  String get metricInfoDividendYieldSection12Header =>
+      'Best used together with';
+
+  @override
+  String get metricInfoDividendYieldSection12Body =>
+      'Dividend Yield becomes much more meaningful when combined with: Dividend Payout Ratio, Earnings Growth, Free Cash Flow, P/E Ratio, Net Margin, and Debt Levels.\n\nThese metrics help determine whether the dividend is sustainable.';
+
+  @override
+  String get metricInfoDividendYieldSection13Header => 'Real-world analogy';
+
+  @override
+  String get metricInfoDividendYieldSection13Body =>
+      'Imagine buying a rental apartment.\n\nApartment A costs \$200,000 and generates \$6,000 per year in rent. Rental Yield = 3%\n\nApartment B costs \$200,000 and generates \$12,000 per year. Rental Yield = 6%\n\nApartment B looks much more attractive. But if the building requires expensive repairs or tenants are leaving, the higher rental yield may come with higher risk.\n\nDividend investing works much the same way.';
+
+  @override
+  String get metricInfoDividendYieldSection14Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoDividendYieldSection14Body =>
+      'Dividend Yield measures the annual dividend income you receive relative to the current stock price. A higher yield can be attractive, but the quality and sustainability of those dividends are far more important than the percentage itself.';
+
+  @override
+  String get metricInfoNetMarginTitle => 'Net Margin';
+
+  @override
+  String get metricInfoNetMarginSubtitle => 'Profit Kept After All Expenses';
+
+  @override
+  String get metricInfoNetMarginSection1Header => 'What is Net Margin?';
+
+  @override
+  String get metricInfoNetMarginSection1Body =>
+      'Net Margin measures how much profit a company keeps after paying all of its expenses. These expenses include: cost of products, employee salaries, rent, taxes, interest on debt, operating expenses, and all other business costs.\n\nIn simple terms: Net Margin shows how much money the company actually keeps from every dollar of sales. It is often considered one of the best indicators of a company\'s overall profitability.';
+
+  @override
+  String get metricInfoNetMarginSection2Header => 'How is it calculated?';
+
+  @override
+  String get metricInfoNetMarginSection2Body =>
+      'Formula\nNet Margin = Net Income ÷ Revenue × 100%\n\nExample\nRevenue = \$100 million\nNet Income = \$20 million\nNet Margin = 20%\n\nThis means the company keeps \$20 in profit for every \$100 of sales.';
+
+  @override
+  String get metricInfoNetMarginSection3Header => 'What does it tell you?';
+
+  @override
+  String get metricInfoNetMarginSection3Body =>
+      'Net Margin measures how efficiently a company converts revenue into actual profit.\n\nGenerally:\n• Higher Margin = More profitable business\n• Lower Margin = Less profitable business\n\nCompanies with strong Net Margins usually have: efficient operations, strong pricing power, good cost control, and healthy business models.';
+
+  @override
+  String get metricInfoNetMarginSection4Header =>
+      'What is considered a good Net Margin?';
+
+  @override
+  String get metricInfoNetMarginSection4Body =>
+      'There is no universal standard because industries are very different.\n\nBelow 5% — Usually considered a low profit margin. Common in businesses with intense competition or thin margins, e.g. grocery stores, airlines, retail chains.\n\n5%–10% — Healthy for many traditional businesses.\n\n10%–20% — Very good profitability. Many successful companies consistently operate in this range.\n\nAbove 20% — Excellent profitability. Often found in companies with strong brands, software businesses, luxury products, or high-value technology.\n\nAbove 30% — Exceptional. Usually indicates an outstanding business model or a company with significant competitive advantages.';
+
+  @override
+  String get metricInfoNetMarginSection5Header =>
+      'Why is a high Net Margin important?';
+
+  @override
+  String get metricInfoNetMarginSection5Body =>
+      'A company with a high Net Margin has more flexibility. It can: invest in growth, increase dividends, buy back shares, survive difficult economic periods, or continue investing during recessions.\n\nHigher profitability often means a stronger and more resilient business.';
+
+  @override
+  String get metricInfoNetMarginSection6Header =>
+      'Why isn\'t a low Net Margin always bad?';
+
+  @override
+  String get metricInfoNetMarginSection6Body =>
+      'Some industries naturally operate with low margins. For example, a supermarket may earn only 2% Net Margin but sell billions of dollars of products every year. Small profits on enormous sales can still produce substantial earnings.\n\nThis is why Net Margin should always be compared with companies in the same industry.';
+
+  @override
+  String get metricInfoNetMarginSection7Header => 'Can Net Margin be negative?';
+
+  @override
+  String get metricInfoNetMarginSection7Body =>
+      'Yes. A negative Net Margin means the company lost money during the reporting period. However, this does not automatically mean the business is failing.\n\nPossible reasons include: heavy investments, economic recession, one-time legal expenses, factory construction, acquisitions, temporary restructuring, or currency losses.\n\nMany successful companies have experienced temporary negative margins before returning to profitability.';
+
+  @override
+  String get metricInfoNetMarginSection8Header =>
+      'What causes Net Margin to improve?';
+
+  @override
+  String get metricInfoNetMarginSection8Body =>
+      'Net Margin usually increases when a company: sells more products, raises prices, reduces costs, improves efficiency, pays less interest, or lowers operating expenses.\n\nConsistently improving margins often indicate excellent management.';
+
+  @override
+  String get metricInfoNetMarginSection9Header =>
+      'What causes Net Margin to decline?';
+
+  @override
+  String get metricInfoNetMarginSection9Body =>
+      'Profit margins may shrink because of: rising production costs, higher wages, inflation, increased competition, falling sales, higher interest rates, or unexpected expenses.\n\nA temporary decline is normal. A long-term downward trend deserves closer attention.';
+
+  @override
+  String get metricInfoNetMarginSection10Header =>
+      'Why is comparing industries important?';
+
+  @override
+  String get metricInfoNetMarginSection10Body =>
+      'Different industries have completely different business models. For example, a supermarket may have a 2% Net Margin and still be an excellent business, while a software company with a 2% Net Margin would likely have serious profitability issues.\n\nAlways compare companies with their direct competitors.';
+
+  @override
+  String get metricInfoNetMarginSection11Header =>
+      'Common mistakes beginners make';
+
+  @override
+  String get metricInfoNetMarginSection11Body =>
+      '• Assuming every company should have the same Net Margin.\n• Comparing technology companies with retailers.\n• Ignoring long-term trends.\n• Looking at only one year\'s results.\n• Ignoring why margins changed.';
+
+  @override
+  String get metricInfoNetMarginSection12Header => 'Best used together with';
+
+  @override
+  String get metricInfoNetMarginSection12Body =>
+      'Net Margin becomes even more useful when combined with: Gross Margin, Operating Margin, ROE, Revenue Growth, Free Cash Flow, P/E Ratio, and Debt Levels.\n\nTogether, these metrics provide a much more complete picture of a company\'s financial health.';
+
+  @override
+  String get metricInfoNetMarginSection13Header => 'Real-world analogy';
+
+  @override
+  String get metricInfoNetMarginSection13Body =>
+      'Imagine two restaurants.\n\nRestaurant A earns \$1,000,000 in annual sales but keeps only \$20,000 in profit. Net Margin = 2%\n\nRestaurant B earns the same \$1,000,000 but keeps \$200,000. Net Margin = 20%\n\nBoth restaurants generate the same revenue, but Restaurant B is far more efficient and profitable. That\'s exactly what Net Margin helps investors understand.';
+
+  @override
+  String get metricInfoNetMarginSection14Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoNetMarginSection14Body =>
+      'Net Margin measures how much profit a company keeps after paying all expenses. Higher margins generally indicate a stronger, more efficient, and more financially healthy business, but comparisons should always be made within the same industry.';
+
+  @override
+  String get metricInfoOperatingMarginTitle => 'Operating Margin';
+
+  @override
+  String get metricInfoOperatingMarginSubtitle =>
+      'Core Business Profit Before Interest and Taxes';
+
+  @override
+  String get metricInfoOperatingMarginSection1Header =>
+      'What is Operating Margin?';
+
+  @override
+  String get metricInfoOperatingMarginSection1Body =>
+      'Operating Margin measures how much profit a company earns from its core business operations before paying interest on debt and taxes. Unlike Net Margin, Operating Margin focuses only on how efficiently the business itself is run.\n\nIn simple terms: Operating Margin shows how much money the company keeps from every dollar of sales before financing costs and taxes. Many professional investors consider this one of the best measures of management efficiency.';
+
+  @override
+  String get metricInfoOperatingMarginSection2Header => 'How is it calculated?';
+
+  @override
+  String get metricInfoOperatingMarginSection2Body =>
+      'Formula\nOperating Margin = Operating Income ÷ Revenue × 100%\n\nExample\nRevenue = \$100 million\nOperating Income = \$25 million\nOperating Margin = 25%\n\nThis means that after paying for all operating expenses, the company keeps \$25 for every \$100 of sales, before interest and taxes.';
+
+  @override
+  String get metricInfoOperatingMarginSection3Header =>
+      'What does it tell you?';
+
+  @override
+  String get metricInfoOperatingMarginSection3Body =>
+      'Operating Margin measures how profitable the company\'s core business really is. It answers questions like: is management controlling costs? Is the business efficient? Can the company generate healthy profits from its everyday operations?\n\nA strong Operating Margin usually indicates a well-managed company.';
+
+  @override
+  String get metricInfoOperatingMarginSection4Header =>
+      'What is Operating Income?';
+
+  @override
+  String get metricInfoOperatingMarginSection4Body =>
+      'Operating Income is the profit remaining after paying for: cost of goods sold (COGS), employee salaries, rent, marketing, research & development, administrative expenses, and other operating costs.\n\nIt does not include: interest payments, income taxes, or one-time extraordinary gains or losses.\n\nThis makes Operating Margin a cleaner measure of business performance.';
+
+  @override
+  String get metricInfoOperatingMarginSection5Header =>
+      'What is considered a good Operating Margin?';
+
+  @override
+  String get metricInfoOperatingMarginSection5Body =>
+      'Different industries have different standards.\n\nBelow 5% — Generally considered low. Common in businesses with intense competition.\n\n5%–10% — Healthy for many traditional companies.\n\n10%–20% — Strong operating performance. Many successful businesses consistently achieve margins in this range.\n\nAbove 20% — Excellent. Often indicates strong pricing power, efficient management, or competitive advantages.\n\nAbove 30% — Outstanding. Usually found in software companies, luxury brands, or businesses with exceptionally efficient operations.';
+
+  @override
+  String get metricInfoOperatingMarginSection6Header =>
+      'Why is Operating Margin important?';
+
+  @override
+  String get metricInfoOperatingMarginSection6Body =>
+      'Unlike Net Margin, Operating Margin removes factors that management doesn\'t fully control, such as tax rates, interest expenses, and debt structure. This allows investors to evaluate the quality of the company\'s actual business operations.\n\nTwo companies may have different Net Margins simply because one has more debt. Operating Margin helps remove that distortion.';
+
+  @override
+  String get metricInfoOperatingMarginSection7Header =>
+      'Why can Operating Margin be low?';
+
+  @override
+  String get metricInfoOperatingMarginSection7Body =>
+      'A lower Operating Margin does not automatically mean a weak company. Possible reasons include: heavy investment in growth, launching new products, expanding into new markets, higher marketing spending, rising labor costs, or temporary inflation.\n\nSometimes these investments lead to much stronger profits in the future.';
+
+  @override
+  String get metricInfoOperatingMarginSection8Header =>
+      'Can Operating Margin be negative?';
+
+  @override
+  String get metricInfoOperatingMarginSection8Body =>
+      'Yes. A negative Operating Margin means the company\'s core business is currently losing money before even paying interest or taxes.\n\nPossible reasons include: weak sales, high production costs, poor cost control, major expansion, economic downturn, or temporary restructuring.\n\nA single negative quarter is not necessarily alarming. However, consistently negative Operating Margins deserve careful investigation.';
+
+  @override
+  String get metricInfoOperatingMarginSection9Header =>
+      'Why do investors like stable Operating Margins?';
+
+  @override
+  String get metricInfoOperatingMarginSection9Body =>
+      'A company with stable or improving Operating Margins often demonstrates: strong management, consistent pricing power, good cost control, and sustainable competitive advantages.\n\nLong-term stability is often more valuable than one exceptionally high result.';
+
+  @override
+  String get metricInfoOperatingMarginSection10Header =>
+      'Why should you compare companies in the same industry?';
+
+  @override
+  String get metricInfoOperatingMarginSection10Body =>
+      'Operating Margins vary dramatically between industries. For example, a supermarket may operate with a 4% Operating Margin and still be an excellent business, while a software company with a 4% Operating Margin would likely have serious profitability issues.\n\nIndustry comparisons are essential.';
+
+  @override
+  String get metricInfoOperatingMarginSection11Header =>
+      'Common mistakes beginners make';
+
+  @override
+  String get metricInfoOperatingMarginSection11Body =>
+      '• Confusing Operating Margin with Net Margin.\n• Comparing companies from different industries.\n• Ignoring long-term trends.\n• Assuming one unusually high year represents normal performance.\n• Looking only at one financial metric.';
+
+  @override
+  String get metricInfoOperatingMarginSection12Header =>
+      'Best used together with';
+
+  @override
+  String get metricInfoOperatingMarginSection12Body =>
+      'Operating Margin becomes much more powerful when analyzed alongside: Gross Margin, Net Margin, Revenue Growth, ROE, Free Cash Flow, Debt Levels, and P/E Ratio.\n\nTogether, these metrics provide a comprehensive view of business quality.';
+
+  @override
+  String get metricInfoOperatingMarginSection13Header => 'Real-world analogy';
+
+  @override
+  String get metricInfoOperatingMarginSection13Body =>
+      'Imagine two delivery companies. Both generate \$100 million in revenue.\n\nCompany A spends \$85 million operating its business. Operating Margin = 15%\n\nCompany B spends only \$70 million. Operating Margin = 30%\n\nEven before paying taxes or interest, Company B is running a much more efficient business. That efficiency often leads to stronger long-term performance.';
+
+  @override
+  String get metricInfoOperatingMarginSection14Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoOperatingMarginSection14Body =>
+      'Operating Margin measures how profitable a company\'s core business is before interest and taxes. A higher Operating Margin generally indicates better operational efficiency, stronger cost control, and a healthier underlying business model.';
+
+  @override
+  String get metricInfoGrossMarginTitle => 'Gross Margin';
+
+  @override
+  String get metricInfoGrossMarginSubtitle =>
+      'Profit After Direct Production Costs';
+
+  @override
+  String get metricInfoGrossMarginSection1Header => 'What is Gross Margin?';
+
+  @override
+  String get metricInfoGrossMarginSection1Body =>
+      'Gross Margin measures how much money a company keeps after paying only the direct costs of producing its products or services. These direct costs are known as Cost of Goods Sold (COGS).\n\nIn simple terms: Gross Margin shows how profitable a company\'s products are before paying for salaries, marketing, rent, taxes, interest, and other operating expenses. It is one of the first indicators of a company\'s pricing power and production efficiency.';
+
+  @override
+  String get metricInfoGrossMarginSection2Header => 'How is it calculated?';
+
+  @override
+  String get metricInfoGrossMarginSection2Body =>
+      'Formula\nGross Margin = (Revenue − Cost of Goods Sold) ÷ Revenue × 100%\n\nExample\nRevenue = \$100 million\nCost of Goods Sold = \$60 million\nGross Profit = \$40 million\nGross Margin = 40%\n\nThis means the company keeps \$40 from every \$100 of sales before paying any operating expenses.';
+
+  @override
+  String get metricInfoGrossMarginSection3Header =>
+      'What is Cost of Goods Sold (COGS)?';
+
+  @override
+  String get metricInfoGrossMarginSection3Body =>
+      'COGS includes the direct costs required to produce a product or provide a service. Examples include: raw materials, manufacturing costs, factory labor, packaging, shipping to warehouses, and production equipment directly used to make products.\n\nCOGS does not include: office salaries, advertising, research & development, taxes, interest payments, or administrative expenses.';
+
+  @override
+  String get metricInfoGrossMarginSection4Header => 'What does it tell you?';
+
+  @override
+  String get metricInfoGrossMarginSection4Body =>
+      'Gross Margin answers one simple question: \"How profitable is the product itself?\"\n\nA high Gross Margin usually means the company can produce its products at a relatively low cost compared to the selling price.';
+
+  @override
+  String get metricInfoGrossMarginSection5Header =>
+      'What is considered a good Gross Margin?';
+
+  @override
+  String get metricInfoGrossMarginSection5Body =>
+      'The answer depends on the industry.\n\nBelow 20% — Typically found in industries with intense price competition, e.g. grocery stores, food wholesalers, fuel distributors.\n\n20%–40% — Healthy for many traditional manufacturers.\n\n40%–60% — Strong profitability. Common among companies with valuable brands or premium products.\n\nAbove 60% — Excellent. Frequently seen in software companies, luxury brands, pharmaceutical companies, and technology businesses.\n\nAbove 80% — Exceptional. Usually indicates that the product costs very little to produce while customers are willing to pay a premium price.';
+
+  @override
+  String get metricInfoGrossMarginSection6Header =>
+      'Why is a high Gross Margin important?';
+
+  @override
+  String get metricInfoGrossMarginSection6Body =>
+      'A company with a high Gross Margin has more money available to pay for: marketing, employee salaries, research & development, expansion, debt payments, or dividends.\n\nHigh Gross Margins give businesses greater flexibility during difficult economic periods.';
+
+  @override
+  String get metricInfoGrossMarginSection7Header =>
+      'Why isn\'t a low Gross Margin always bad?';
+
+  @override
+  String get metricInfoGrossMarginSection7Body =>
+      'Some industries naturally have low Gross Margins. For example, a supermarket may earn only 15% Gross Margin, but because it sells millions of products every day, it can still generate significant profits.\n\nBusiness models matter. Always compare companies within the same industry.';
+
+  @override
+  String get metricInfoGrossMarginSection8Header =>
+      'Can Gross Margin decrease?';
+
+  @override
+  String get metricInfoGrossMarginSection8Body =>
+      'Yes. Common reasons include: rising material costs, higher wages, increased shipping costs, inflation, discounts offered to customers, stronger competition, or supply chain disruptions.\n\nA declining Gross Margin often signals that production is becoming more expensive or pricing power is weakening.';
+
+  @override
+  String get metricInfoGrossMarginSection9Header =>
+      'Can Gross Margin increase?';
+
+  @override
+  String get metricInfoGrossMarginSection9Body =>
+      'Absolutely. Possible reasons include: higher product prices, lower production costs, better supplier contracts, improved manufacturing efficiency, selling more premium products, or economies of scale.\n\nImproving Gross Margins often indicate a strengthening business.';
+
+  @override
+  String get metricInfoGrossMarginSection10Header =>
+      'Why do investors monitor Gross Margin trends?';
+
+  @override
+  String get metricInfoGrossMarginSection10Body =>
+      'A single year\'s Gross Margin tells only part of the story. What\'s more important is whether the margin is increasing, stable, or declining.\n\nA company with steadily improving Gross Margins is often becoming more competitive and more efficient.';
+
+  @override
+  String get metricInfoGrossMarginSection11Header =>
+      'Common mistakes beginners make';
+
+  @override
+  String get metricInfoGrossMarginSection11Body =>
+      '• Thinking Gross Margin equals overall profit.\n• Comparing completely different industries.\n• Ignoring changes over time.\n• Looking only at one year\'s results.\n• Forgetting that operating expenses still need to be paid.';
+
+  @override
+  String get metricInfoGrossMarginSection12Header =>
+      'How is Gross Margin different from Operating Margin and Net Margin?';
+
+  @override
+  String get metricInfoGrossMarginSection12Body =>
+      'Think of profitability as three stages.\n\nGross Margin — How profitable is the product itself?\n\nOperating Margin — How profitable is the entire business operation?\n\nNet Margin — How much profit remains after absolutely everything has been paid?\n\nThese three margins together tell the complete story of a company\'s profitability.';
+
+  @override
+  String get metricInfoGrossMarginSection13Header => 'Best used together with';
+
+  @override
+  String get metricInfoGrossMarginSection13Body =>
+      'Gross Margin becomes much more valuable when combined with: Operating Margin, Net Margin, Revenue Growth, ROE, Free Cash Flow, and P/E Ratio.\n\nTogether they help investors understand where a company\'s profits are being earned — and where they are being spent.';
+
+  @override
+  String get metricInfoGrossMarginSection14Header => 'Real-world analogy';
+
+  @override
+  String get metricInfoGrossMarginSection14Body =>
+      'Imagine a bakery sells a cake for \$100. The ingredients cost \$35.\n\nGross Profit = \$65\nGross Margin = 65%\n\nHowever, the bakery still has to pay: employee wages, rent, electricity, advertising, and taxes. Only after paying those expenses does the business know its true profit.\n\nGross Margin simply measures how profitable the cake itself is before all those additional costs.';
+
+  @override
+  String get metricInfoGrossMarginSection15Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoGrossMarginSection15Body =>
+      'Gross Margin measures how much money a company keeps after paying the direct costs of producing its products or services. A higher Gross Margin generally indicates stronger pricing power, better production efficiency, and greater financial flexibility — but it should always be compared with companies in the same industry.';
+
+  @override
+  String get metricInfoRoeTitle => 'ROE';
+
+  @override
+  String get metricInfoRoeSubtitle => 'Return on Equity';
+
+  @override
+  String get metricInfoRoeSection1Header => 'What is ROE?';
+
+  @override
+  String get metricInfoRoeSection1Body =>
+      'Return on Equity (ROE) measures how efficiently a company generates profit using the money invested by its shareholders.\n\nIn simple terms: ROE shows how much profit the company earns for every \$1 of shareholders\' equity. It is one of the most important indicators of management efficiency and business quality.';
+
+  @override
+  String get metricInfoRoeSection2Header => 'How is it calculated?';
+
+  @override
+  String get metricInfoRoeSection2Body =>
+      'Formula\nROE = Net Income ÷ Shareholders\' Equity × 100%\n\nExample\nNet Income = \$20 million\nShareholders\' Equity = \$100 million\nROE = 20%\n\nThis means the company generated 20 cents of profit for every \$1 invested by shareholders.';
+
+  @override
+  String get metricInfoRoeSection3Header => 'What is Shareholders\' Equity?';
+
+  @override
+  String get metricInfoRoeSection3Body =>
+      'Shareholders\' Equity represents the value that belongs to the company\'s owners after all debts have been paid. It is calculated as:\n\nAssets − Liabilities = Shareholders\' Equity\n\nThink of it as the company\'s net worth. If the business sold all of its assets and paid every debt, whatever remained would belong to the shareholders.';
+
+  @override
+  String get metricInfoRoeSection4Header => 'What does ROE tell you?';
+
+  @override
+  String get metricInfoRoeSection4Body =>
+      'ROE measures how effectively management uses shareholders\' money. A higher ROE generally means the company is producing more profit without requiring large amounts of additional investment.\n\nCompanies with consistently high ROE often have: strong business models, efficient management, competitive advantages, and high profitability.';
+
+  @override
+  String get metricInfoRoeSection5Header => 'What is considered a good ROE?';
+
+  @override
+  String get metricInfoRoeSection5Body =>
+      'The answer depends on the industry, but general guidelines are:\n\nBelow 5% — Usually considered weak. The company is generating relatively little profit from shareholders\' capital.\n\n5%–10% — Acceptable. Common among slower-growing or highly competitive businesses.\n\n10%–15% — Healthy. Many established companies operate in this range.\n\n15%–20% — Very strong. Often indicates a high-quality business.\n\nAbove 20% — Excellent. Companies that consistently maintain ROE above 20% often have durable competitive advantages.\n\nAbove 30% — Exceptional, but requires closer examination. Sometimes a very high ROE reflects an outstanding business. Other times, it may simply result from very high debt.';
+
+  @override
+  String get metricInfoRoeSection6Header => 'Why can a high ROE be misleading?';
+
+  @override
+  String get metricInfoRoeSection6Body =>
+      'A company can increase ROE in two very different ways.\n\nGood reason — It becomes more profitable.\n\nRisky reason — It borrows large amounts of money.\n\nWhen debt increases, Shareholders\' Equity becomes smaller relative to total assets. A smaller equity base can make ROE appear much higher — even if the business itself has not improved.\n\nFor this reason, ROE should always be analyzed together with Debt Levels.';
+
+  @override
+  String get metricInfoRoeSection7Header =>
+      'Can a low ROE still be acceptable?';
+
+  @override
+  String get metricInfoRoeSection7Body =>
+      'Yes. Young companies often invest heavily in: new factories, research, expansion, or new products. These investments increase Shareholders\' Equity before they begin generating significant profits.\n\nAs a result, ROE may remain low for several years while the business is still growing.';
+
+  @override
+  String get metricInfoRoeSection8Header => 'Can ROE be negative?';
+
+  @override
+  String get metricInfoRoeSection8Body =>
+      'Yes. A negative ROE means the company reported a net loss. However, this does not automatically mean the company is failing.\n\nPossible reasons include: temporary recession, major investments, one-time accounting losses, acquisitions, restructuring, or extraordinary expenses.\n\nThe important question is whether profitability is expected to recover.';
+
+  @override
+  String get metricInfoRoeSection9Header => 'Why do investors like stable ROE?';
+
+  @override
+  String get metricInfoRoeSection9Body =>
+      'One excellent year means very little. A company that consistently generates ROE around 18–21% over many years demonstrates stable management and a durable business model.\n\nConsistency is often more valuable than occasional spikes.';
+
+  @override
+  String get metricInfoRoeSection10Header => 'Common mistakes beginners make';
+
+  @override
+  String get metricInfoRoeSection10Body =>
+      '• Looking only at one year\'s ROE.\n• Ignoring debt.\n• Comparing unrelated industries.\n• Assuming every high ROE is a sign of quality.\n• Ignoring long-term trends.';
+
+  @override
+  String get metricInfoRoeSection11Header => 'Best used together with';
+
+  @override
+  String get metricInfoRoeSection11Body =>
+      'ROE becomes much more powerful when combined with: Debt to Equity, Net Margin, Operating Margin, Gross Margin, Free Cash Flow, Revenue Growth, and P/E Ratio.\n\nThese metrics help determine whether high profitability is sustainable.';
+
+  @override
+  String get metricInfoRoeSection12Header => 'Real-world analogy';
+
+  @override
+  String get metricInfoRoeSection12Body =>
+      'Imagine two business owners. Both invested \$100,000 into their companies.\n\nOwner A earns \$8,000 per year. ROE = 8%\n\nOwner B earns \$25,000. ROE = 25%\n\nOwner B is using the same amount of invested capital much more efficiently. That is exactly what ROE measures.';
+
+  @override
+  String get metricInfoRoeSection13Header =>
+      'Why long-term investors watch ROE closely';
+
+  @override
+  String get metricInfoRoeSection13Body =>
+      'Many successful long-term investors favor companies that consistently generate high ROE over many years.\n\nWhy? Because consistently high ROE may indicate: strong management, durable competitive advantages, efficient use of capital, and a business capable of generating long-term value for shareholders.\n\nThat said, high ROE should always be checked against reasonable debt levels — see below.';
+
+  @override
+  String get metricInfoRoeSection14Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoRoeSection14Body =>
+      'ROE measures how efficiently a company turns shareholders\' money into profit. A consistently high ROE often signals a high-quality business, but investors should always check whether that performance is driven by genuine profitability or excessive debt.';
+
+  @override
+  String get metricInfoValuationTitle => 'Valuation';
+
+  @override
+  String get metricInfoValuationSubtitle =>
+      'How Fairly the Market Is Pricing the Company';
+
+  @override
+  String get metricInfoValuationSection1Header => 'What is Valuation?';
+
+  @override
+  String get metricInfoValuationSection1Body =>
+      'Valuation measures how fairly the market is pricing a company based on its financial performance and compared to other companies in the same industry.\n\nIn simple terms: it helps you understand whether investors may be paying too much—or too little—for the company\'s stock.\n\nHowever, an expensive stock is not always a bad investment, and a cheap stock is not always a good one.';
+
+  @override
+  String get metricInfoValuationSection2Header => 'Why is Valuation important?';
+
+  @override
+  String get metricInfoValuationSection2Body =>
+      'When investors buy a stock, they are buying more than the company\'s current business—they are also buying expectations for its future.\n\nSometimes expectations become overly optimistic, causing the stock price to rise much faster than the company\'s actual performance.\n\nAt other times, the market becomes overly pessimistic, allowing high-quality companies to trade below what many investors believe is their fair value.\n\nValuation helps investors judge whether the current price appears reasonable.';
+
+  @override
+  String get metricInfoValuationSection3Header =>
+      'What does a high score mean?';
+
+  @override
+  String get metricInfoValuationSection3Body =>
+      'A high Valuation score suggests that the company\'s current market price appears reasonable relative to its financial performance and compared with similar companies.\n\nIt does not guarantee that the stock will rise, but it generally indicates a lower risk of overpaying.';
+
+  @override
+  String get metricInfoValuationSection4Header => 'What does a low score mean?';
+
+  @override
+  String get metricInfoValuationSection4Body =>
+      'A low Valuation score may indicate that investors are paying a premium for the company\'s shares.\n\nThis increases the risk that future expectations are already reflected in the stock price.\n\nIf the company fails to meet those expectations, the stock may decline—even if the business itself remains healthy.';
+
+  @override
+  String get metricInfoValuationSection5Header =>
+      'Why isn\'t a low score always bad?';
+
+  @override
+  String get metricInfoValuationSection5Body =>
+      'Some companies trade at premium valuations for many years because they have:\n\n• Strong competitive advantages\n• Rapid earnings growth\n• Market leadership\n• Innovative products\n• High investor confidence\n\nIn these cases, a higher valuation may be fully justified.';
+
+  @override
+  String get metricInfoValuationSection6Header =>
+      'Why isn\'t a high score always a guarantee?';
+
+  @override
+  String get metricInfoValuationSection6Body =>
+      'Even if a company appears attractively valued, there is no guarantee that its stock price will increase.\n\nSometimes the market is already aware of risks that are not yet fully reflected in financial reports.\n\nThat is why Valuation should always be considered alongside financial strength, profitability, and future growth potential.';
+
+  @override
+  String get metricInfoValuationSection7Header =>
+      'What should investors pay attention to?';
+
+  @override
+  String get metricInfoValuationSection7Body =>
+      'Valuation helps estimate the risk of overpaying, but it does not measure the overall quality of a business.\n\nA company should always be evaluated using multiple financial indicators rather than relying on valuation alone.';
+
+  @override
+  String get metricInfoValuationSection8Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoValuationSection8Body =>
+      'Valuation helps determine whether a company\'s current market price appears fair relative to its financial performance. It is a valuable tool for identifying the risk of overpaying, but it should never be used as the only factor when evaluating an investment.';
+
+  @override
+  String get metricInfoFinancialHealthTitle => 'Financial Health';
+
+  @override
+  String get metricInfoFinancialHealthSubtitle =>
+      'Stability and Ability to Manage Debt';
+
+  @override
+  String get metricInfoFinancialHealthSection1Header =>
+      'What is Financial Health?';
+
+  @override
+  String get metricInfoFinancialHealthSection1Body =>
+      'Financial Health evaluates a company\'s overall financial stability and its ability to manage debt and long-term obligations.\n\nIn simple terms: it helps determine whether a company has a strong financial foundation or may face increased financial risk in the future.\n\nA financially healthy company is generally better prepared to navigate economic downturns, invest in future growth, and adapt to changing market conditions.';
+
+  @override
+  String get metricInfoFinancialHealthSection2Header =>
+      'Why is Financial Health important?';
+
+  @override
+  String get metricInfoFinancialHealthSection2Body =>
+      'Every business needs money to operate and grow.\n\nSome companies rely mostly on their own resources, while others depend heavily on borrowed money.\n\nDebt is not necessarily bad—it can help a business expand, build new facilities, or acquire competitors. However, excessive debt can become a serious burden, especially during periods of slower growth or higher interest rates.\n\nFinancial Health helps investors understand how resilient a company may be under different economic conditions.';
+
+  @override
+  String get metricInfoFinancialHealthSection3Header =>
+      'What does a high score mean?';
+
+  @override
+  String get metricInfoFinancialHealthSection3Body =>
+      'A high Financial Health score suggests that the company appears financially stable and is managing its obligations responsibly.\n\nCompanies with strong financial health are generally in a better position to:\n\n• Invest in future growth\n• Handle unexpected challenges\n• Continue operations during economic downturns\n• Maintain financial flexibility\n\nWhile no company is completely risk-free, a stronger financial position often provides greater long-term stability.';
+
+  @override
+  String get metricInfoFinancialHealthSection4Header =>
+      'What does a low score mean?';
+
+  @override
+  String get metricInfoFinancialHealthSection4Body =>
+      'A low Financial Health score may indicate that the company is carrying a higher level of financial risk.\n\nThis could reduce its flexibility and make it more vulnerable during difficult economic periods.\n\nCompanies with weaker financial health may face challenges such as:\n\n• Higher borrowing costs\n• Reduced ability to invest\n• Greater pressure during recessions\n• Increased sensitivity to rising interest rates\n\nA lower score does not necessarily mean the company is in trouble, but it deserves closer attention.';
+
+  @override
+  String get metricInfoFinancialHealthSection5Header =>
+      'Why isn\'t a low score always bad?';
+
+  @override
+  String get metricInfoFinancialHealthSection5Body =>
+      'Some industries naturally rely on higher levels of debt.\n\nFor example:\n\n• Utilities\n• Telecommunications\n• Real estate\n• Infrastructure companies\n\nThese businesses often generate stable cash flows that allow them to manage larger debt levels safely.\n\nAs a result, financial health should always be considered within the context of the company\'s industry and business model.';
+
+  @override
+  String get metricInfoFinancialHealthSection6Header =>
+      'Why isn\'t a high score always a guarantee?';
+
+  @override
+  String get metricInfoFinancialHealthSection6Body =>
+      'Even financially strong companies can face unexpected challenges.\n\nMarket disruptions, changing consumer demand, poor management decisions, or global economic events can affect any business.\n\nFinancial Health reduces risk—it does not eliminate it.';
+
+  @override
+  String get metricInfoFinancialHealthSection7Header =>
+      'What should investors pay attention to?';
+
+  @override
+  String get metricInfoFinancialHealthSection7Body =>
+      'Financial Health reflects a company\'s ability to remain stable over time, but it is only one part of the overall picture.\n\nA company should also be evaluated based on its profitability, valuation, growth potential, and operational efficiency.\n\nLooking at all these factors together provides a much more balanced assessment.';
+
+  @override
+  String get metricInfoFinancialHealthSection8Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoFinancialHealthSection8Body =>
+      'Financial Health measures the overall financial strength and stability of a company. Businesses with stronger financial foundations are generally better equipped to manage uncertainty, support future growth, and withstand economic challenges, but no single indicator should be used in isolation.';
+
+  @override
+  String get metricInfoGrowthPotentialTitle => 'Growth Potential';
+
+  @override
+  String get metricInfoGrowthPotentialSubtitle =>
+      'How Consistently the Business Has Expanded';
+
+  @override
+  String get metricInfoGrowthPotentialSection1Header =>
+      'What is Growth Potential?';
+
+  @override
+  String get metricInfoGrowthPotentialSection1Body =>
+      'Growth Potential evaluates how consistently a company has expanded its business over time by increasing its revenue and earnings.\n\nIn simple terms: it helps determine whether a company is growing, standing still, or gradually losing momentum.\n\nGrowing companies often have more opportunities to increase their value over the long term, although growth is never guaranteed.';
+
+  @override
+  String get metricInfoGrowthPotentialSection2Header =>
+      'Why is Growth Potential important?';
+
+  @override
+  String get metricInfoGrowthPotentialSection2Body =>
+      'A successful company should not only be profitable today—it should also have the ability to grow in the future.\n\nBusiness growth may come from:\n\n• Selling more products\n• Expanding into new markets\n• Launching new services\n• Increasing market share\n• Improving operational performance\n\nConsistent growth often reflects strong demand, effective management, and a healthy business strategy.';
+
+  @override
+  String get metricInfoGrowthPotentialSection3Header =>
+      'What does a high score mean?';
+
+  @override
+  String get metricInfoGrowthPotentialSection3Body =>
+      'A high Growth Potential score suggests that the company has demonstrated strong and consistent business growth over time.\n\nCompanies with higher growth potential are often better positioned to:\n\n• Increase future earnings\n• Expand their operations\n• Strengthen their competitive position\n• Create long-term value for shareholders\n\nConsistent growth is generally viewed as a positive sign of business quality.';
+
+  @override
+  String get metricInfoGrowthPotentialSection4Header =>
+      'What does a low score mean?';
+
+  @override
+  String get metricInfoGrowthPotentialSection4Body =>
+      'A low Growth Potential score may indicate that business expansion has slowed or become inconsistent.\n\nPossible reasons include:\n\n• Slower customer demand\n• Increased competition\n• Market saturation\n• Economic challenges\n• Company-specific issues\n\nA lower score does not necessarily mean the business is weak, but it may suggest fewer growth opportunities in the near future.';
+
+  @override
+  String get metricInfoGrowthPotentialSection5Header =>
+      'Why isn\'t a low score always bad?';
+
+  @override
+  String get metricInfoGrowthPotentialSection5Body =>
+      'Not every successful company needs to grow rapidly.\n\nMany mature businesses focus on:\n\n• Stable earnings\n• Reliable dividends\n• Strong cash flow\n• Long-term consistency\n\nThese companies may deliver attractive long-term returns even without rapid expansion.';
+
+  @override
+  String get metricInfoGrowthPotentialSection6Header =>
+      'Why isn\'t a high score always a guarantee?';
+
+  @override
+  String get metricInfoGrowthPotentialSection6Body =>
+      'Rapid growth often comes with higher expectations.\n\nIf future growth slows, investors may react negatively, even if the company continues to perform well.\n\nGrowth can also become more difficult as companies become larger and more established.\n\nFor this reason, sustainable growth is generally more valuable than short periods of exceptional performance.';
+
+  @override
+  String get metricInfoGrowthPotentialSection7Header =>
+      'What should investors pay attention to?';
+
+  @override
+  String get metricInfoGrowthPotentialSection7Body =>
+      'Growth should always be evaluated together with profitability and financial stability.\n\nA company that grows rapidly while consistently generating healthy profits is often in a stronger position than one that grows quickly but struggles financially.\n\nLong-term consistency is usually more important than short-term acceleration.';
+
+  @override
+  String get metricInfoGrowthPotentialSection8Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoGrowthPotentialSection8Body =>
+      'Growth Potential measures how consistently a company has expanded its business over time. Strong and sustainable growth can create long-term opportunities, but it should always be considered alongside profitability, financial health, and overall business quality.';
+
+  @override
+  String get metricInfoEfficiencyTitle => 'Efficiency';
+
+  @override
+  String get metricInfoEfficiencySubtitle =>
+      'How Effectively Revenue Becomes Profit';
+
+  @override
+  String get metricInfoEfficiencySection1Header => 'What is Profitability?';
+
+  @override
+  String get metricInfoEfficiencySection1Body =>
+      'Profitability measures how effectively a company turns its revenue into profit.\n\nIn simple terms: it helps determine whether a company is making money efficiently—or simply generating a lot of sales with little profit.\n\nA profitable company is generally better positioned to invest in growth, reward shareholders, and navigate challenging economic conditions.';
+
+  @override
+  String get metricInfoEfficiencySection2Header =>
+      'Why is Profitability important?';
+
+  @override
+  String get metricInfoEfficiencySection2Body =>
+      'Revenue alone does not tell the full story.\n\nA company may generate billions of dollars in sales but keep only a small portion as profit.\n\nAnother company may generate lower revenue but operate much more efficiently, producing stronger and more consistent earnings.\n\nProfitability helps investors understand the quality of a company\'s business model.';
+
+  @override
+  String get metricInfoEfficiencySection3Header =>
+      'What does a high score mean?';
+
+  @override
+  String get metricInfoEfficiencySection3Body =>
+      'A high Profitability score suggests that the company consistently converts a meaningful portion of its revenue into profit.\n\nCompanies with strong profitability are often better positioned to:\n\n• Invest in future growth\n• Expand their operations\n• Pay dividends\n• Repurchase shares\n• Build financial reserves\n• Withstand economic downturns\n\nConsistently profitable businesses often demonstrate efficient management and strong competitive advantages.';
+
+  @override
+  String get metricInfoEfficiencySection4Header =>
+      'What does a low score mean?';
+
+  @override
+  String get metricInfoEfficiencySection4Body =>
+      'A low Profitability score may indicate that the company is struggling to generate healthy profits.\n\nPossible reasons include:\n\n• Rising operating costs\n• Intense competition\n• Weak pricing power\n• Declining demand\n• Poor cost management\n• Temporary business challenges\n\nLower profitability may reduce a company\'s ability to grow or respond to unexpected financial pressures.';
+
+  @override
+  String get metricInfoEfficiencySection5Header =>
+      'Why isn\'t a low score always bad?';
+
+  @override
+  String get metricInfoEfficiencySection5Body =>
+      'Some businesses naturally operate with lower profit margins.\n\nExamples include:\n\n• Supermarkets\n• Airlines\n• Wholesale distributors\n• Large retail chains\n\nThese industries often rely on very high sales volumes rather than large profits on each sale.\n\nA lower profitability score should always be evaluated within the context of the company\'s industry.';
+
+  @override
+  String get metricInfoEfficiencySection6Header =>
+      'Why isn\'t a high score always a guarantee?';
+
+  @override
+  String get metricInfoEfficiencySection6Body =>
+      'Strong profitability today does not guarantee strong profitability tomorrow.\n\nChanging market conditions, increased competition, higher costs, or economic slowdowns can all reduce future earnings.\n\nInvestors should look for companies that have demonstrated consistent profitability over many years, rather than relying on a single strong reporting period.';
+
+  @override
+  String get metricInfoEfficiencySection7Header =>
+      'What should investors pay attention to?';
+
+  @override
+  String get metricInfoEfficiencySection7Body =>
+      'Profitability is one of the strongest indicators of business quality, but it should never be viewed in isolation.\n\nA complete evaluation should also consider:\n\n• Financial Health\n• Growth Potential\n• Valuation\n• Operational Efficiency\n\nLooking at these factors together provides a much clearer understanding of a company\'s long-term prospects.';
+
+  @override
+  String get metricInfoEfficiencySection8Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoEfficiencySection8Body =>
+      'Profitability measures how efficiently a company converts revenue into profit. Businesses with strong and consistent profitability are often better equipped to grow, invest, and withstand economic challenges, but profitability should always be evaluated alongside other aspects of financial performance.';
+
+  @override
+  String get metricInfoHistoricalTrendTitle => 'Historical Trend';
+
+  @override
+  String get metricInfoHistoricalTrendSubtitle =>
+      'How the Market Has Rewarded the Company Over Time';
+
+  @override
+  String get metricInfoHistoricalTrendSection1Header =>
+      'What is Market Confidence?';
+
+  @override
+  String get metricInfoHistoricalTrendSection1Body =>
+      'Market Confidence reflects how investors currently perceive a company based on its overall performance, stability, and future prospects.\n\nIn simple terms: it helps determine whether the market has confidence in the company\'s future or is becoming more cautious.\n\nInvestor confidence can strongly influence a stock\'s price, especially over the short and medium term.';
+
+  @override
+  String get metricInfoHistoricalTrendSection2Header =>
+      'Why is Market Confidence important?';
+
+  @override
+  String get metricInfoHistoricalTrendSection2Body =>
+      'The stock market is driven by both facts and expectations.\n\nA company may report excellent financial results, but if investors expect even better performance, the stock price can still fall.\n\nLikewise, a company with average results may see its stock rise if investors believe its future is improving.\n\nMarket Confidence helps investors understand how the market is currently viewing the business.';
+
+  @override
+  String get metricInfoHistoricalTrendSection3Header =>
+      'What does a high score mean?';
+
+  @override
+  String get metricInfoHistoricalTrendSection3Body =>
+      'A high Market Confidence score suggests that investors generally have a positive view of the company\'s future.\n\nCompanies with strong market confidence often benefit from:\n\n• Positive investor sentiment\n• Stable long-term expectations\n• Strong reputation\n• Confidence in management\n• Optimism about future growth\n\nHigher confidence can make it easier for a company to raise capital and attract long-term investors.';
+
+  @override
+  String get metricInfoHistoricalTrendSection4Header =>
+      'What does a low score mean?';
+
+  @override
+  String get metricInfoHistoricalTrendSection4Body =>
+      'A low Market Confidence score may indicate that investors are becoming more cautious.\n\nPossible reasons include:\n\n• Slowing business growth\n• Weak financial results\n• Increased competition\n• Industry uncertainty\n• Economic concerns\n• Company-specific challenges\n\nLower confidence does not necessarily mean the company is performing poorly, but it often signals increased uncertainty.';
+
+  @override
+  String get metricInfoHistoricalTrendSection5Header =>
+      'Why isn\'t a low score always bad?';
+
+  @override
+  String get metricInfoHistoricalTrendSection5Body =>
+      'Investor sentiment can change quickly.\n\nSometimes the market reacts emotionally to short-term news, temporary setbacks, or broader economic conditions.\n\nStrong companies occasionally experience periods of lower confidence before recovering as business conditions improve.\n\nFor long-term investors, temporary pessimism may even create attractive opportunities.';
+
+  @override
+  String get metricInfoHistoricalTrendSection6Header =>
+      'Why isn\'t a high score always a guarantee?';
+
+  @override
+  String get metricInfoHistoricalTrendSection6Body =>
+      'High investor confidence can sometimes become excessive.\n\nWhen expectations become unrealistically optimistic, stock prices may rise much faster than the underlying business.\n\nIf future results fail to meet those expectations, investor confidence can decline rapidly, leading to increased price volatility.\n\nConfidence should always be supported by strong business fundamentals.';
+
+  @override
+  String get metricInfoHistoricalTrendSection7Header =>
+      'What should investors pay attention to?';
+
+  @override
+  String get metricInfoHistoricalTrendSection7Body =>
+      'Market Confidence reflects how investors currently feel about a company, but market sentiment can change much faster than the business itself.\n\nFor a balanced investment decision, Market Confidence should always be considered together with:\n\n• Valuation\n• Financial Health\n• Growth Potential\n• Profitability\n• Operational Efficiency\n\nStrong companies are built on solid fundamentals—not on market optimism alone.';
+
+  @override
+  String get metricInfoHistoricalTrendSection8Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoHistoricalTrendSection8Body =>
+      'Market Confidence reflects how investors currently view a company\'s future. Positive sentiment can support stock performance, while declining confidence may increase uncertainty. However, investor sentiment should always be evaluated alongside the company\'s underlying financial strength and long-term business quality.';
+
+  @override
+  String get metricInfoCapitalReturnTitle => 'Shareholder Returns';
+
+  @override
+  String get metricInfoCapitalReturnSubtitle => 'Dividends and Share Buybacks';
+
+  @override
+  String get metricInfoCapitalReturnSection1Header =>
+      'What are Shareholder Returns?';
+
+  @override
+  String get metricInfoCapitalReturnSection1Body =>
+      'Shareholder Returns evaluate how a company rewards its shareholders by returning value through dividends and share buybacks.\n\nIn simple terms: it helps determine how effectively a company shares its financial success with investors.\n\nSome companies reward shareholders by paying regular dividends, while others choose to repurchase their own shares. Many successful businesses use both approaches.';
+
+  @override
+  String get metricInfoCapitalReturnSection2Header =>
+      'Why are Shareholder Returns important?';
+
+  @override
+  String get metricInfoCapitalReturnSection2Body =>
+      'When a company generates profits, management must decide how to use that money.\n\nCommon options include:\n\n• Investing in future growth\n• Reducing debt\n• Building cash reserves\n• Paying dividends\n• Repurchasing company shares\n\nReturning capital to shareholders can demonstrate financial strength and confidence in the company\'s future.';
+
+  @override
+  String get metricInfoCapitalReturnSection3Header =>
+      'What does a high score mean?';
+
+  @override
+  String get metricInfoCapitalReturnSection3Body =>
+      'A high Shareholder Returns score suggests that the company has a consistent and shareholder-friendly approach to returning value.\n\nThis may include:\n\n• Reliable dividend payments\n• Sustainable dividend growth\n• Thoughtful share repurchase programs\n• A balanced capital allocation strategy\n\nCompanies with strong shareholder return policies often focus on creating long-term value rather than short-term results.';
+
+  @override
+  String get metricInfoCapitalReturnSection4Header =>
+      'What does a low score mean?';
+
+  @override
+  String get metricInfoCapitalReturnSection4Body =>
+      'A low Shareholder Returns score does not necessarily indicate poor business quality.\n\nPossible reasons include:\n\n• Reinvesting profits into future growth\n• Expanding operations\n• Developing new products\n• Acquiring other businesses\n• Strengthening the balance sheet\n\nMany successful companies choose to reinvest their earnings instead of returning cash directly to shareholders.';
+
+  @override
+  String get metricInfoCapitalReturnSection5Header =>
+      'Why isn\'t a low score always bad?';
+
+  @override
+  String get metricInfoCapitalReturnSection5Body =>
+      'Fast-growing companies often generate better long-term returns by investing in their own business rather than paying dividends or buying back shares.\n\nIf those investments produce higher future earnings, shareholders may benefit through long-term stock price appreciation instead of immediate cash distributions.\n\nGrowth-focused companies frequently follow this strategy during their expansion years.';
+
+  @override
+  String get metricInfoCapitalReturnSection6Header =>
+      'Why isn\'t a high score always a guarantee?';
+
+  @override
+  String get metricInfoCapitalReturnSection6Body =>
+      'Returning cash to shareholders is generally positive—but only when it is financially sustainable.\n\nFor example:\n\n• A company may pay an unusually high dividend that cannot be maintained.\n• A business may repurchase shares while taking on excessive debt.\n\nCapital returned to shareholders should never weaken the company\'s long-term financial stability.\n\nHealthy shareholder returns should be supported by strong earnings, cash flow, and a solid financial position.';
+
+  @override
+  String get metricInfoCapitalReturnSection7Header =>
+      'What should investors pay attention to?';
+
+  @override
+  String get metricInfoCapitalReturnSection7Body =>
+      'Shareholder Returns should be viewed as part of the company\'s overall capital allocation strategy.\n\nA company that balances:\n\n• Business investment\n• Financial stability\n• Sustainable dividends\n• Responsible share buybacks\n\nis often creating greater long-term value for its shareholders.\n\nThere is no single \"best\" approach. The right strategy depends on the company\'s stage of growth, industry, and long-term objectives.';
+
+  @override
+  String get metricInfoCapitalReturnSection8Header => 'Key Takeaway';
+
+  @override
+  String get metricInfoCapitalReturnSection8Body =>
+      'Shareholder Returns measure how a company rewards investors through dividends and share buybacks. Strong shareholder returns often reflect disciplined financial management, but they should always be supported by healthy earnings, sustainable cash flow, and a solid financial foundation.';
+
+  @override
+  String get metricInfoFsScoreLegalTitle => 'Legal Disclaimer';
+
+  @override
+  String get metricInfoFsScoreLegalSubtitle =>
+      'Financial Scoring & Market Data';
+
+  @override
+  String get metricInfoFsScoreLegalSection1Body =>
+      'The financial evaluation metrics (including FS Score) displayed in this application are calculated automatically using mathematical algorithms applied to publicly accessible market data and corporate financial disclosures (such as 10-K, 10-Q SEC filings).\n\nThese scores are strictly analytical outputs intended for educational and market research simulation. They do not constitute investment advice, financial recommendations, credit ratings, or endorsements of any security or entity.\n\nNeither the app nor its developers warrant the accuracy, completeness, or timeliness of the underlying data or calculated metrics. Users assume full responsibility for any trading or investment decisions made independently outside of this educational simulator.';
+
+  @override
+  String get metricInfoPortfolioHealthTitle => 'Portfolio Health';
+
+  @override
+  String get metricInfoPortfolioHealthSubtitle =>
+      'Overall Portfolio Quality Assessment';
+
+  @override
+  String get metricInfoPortfolioHealthSection1Body =>
+      'Portfolio Health provides an overall assessment of your portfolio\'s structure and investment quality. Instead of reviewing many separate statistics, this widget combines several important indicators into a single summary that helps you understand whether your portfolio follows healthy investing principles.\n\nA strong portfolio is not determined only by profit or loss. Even a portfolio that is currently making money can contain hidden weaknesses, such as too much money invested in one company or too many investments concentrated in a single industry. These risks may not be obvious during a rising market, but they can become much more noticeable when market conditions change.\n\nThe Portfolio Health widget analyzes different aspects of your portfolio, including diversification, concentration, sector balance, and overall stability. Each indicator contributes to the final picture and helps identify areas that may need improvement.\n\nA higher score generally means your investments are spread more effectively, reducing unnecessary risk and making your portfolio more resilient to unexpected market events. A lower score does not necessarily mean your portfolio is bad, but it may suggest that some adjustments could improve its balance and reduce exposure to avoidable risks.\n\nThis widget is designed to help investors focus on building a healthier portfolio over time rather than reacting to short-term market movements.';
+
+  @override
+  String get metricInfoAssetAllocationPctTitle => 'Asset Allocation %';
+
+  @override
+  String get metricInfoAssetAllocationPctSubtitle =>
+      'How Your Capital Is Distributed';
+
+  @override
+  String get metricInfoAssetAllocationPctSection1Body =>
+      'Asset Allocation shows exactly how your investment capital is distributed among the individual companies you own.\n\nEvery percentage displayed represents the portion of your total portfolio invested in a specific company. As stock prices change over time, these percentages also change automatically. A company that performs very well may gradually become a much larger part of your portfolio, even if you never purchase additional shares.\n\nMonitoring asset allocation is important because excessive concentration can increase risk. If one company represents a large percentage of your investments, the success or failure of that single business will have a much greater influence on your overall portfolio.\n\nA balanced allocation helps reduce dependence on any individual company. While there is no perfect distribution that fits every investor, avoiding extremely large positions can help create a more stable investment portfolio over the long term.\n\nThis widget allows you to quickly identify your largest holdings, monitor how your portfolio evolves, and decide whether your allocation still matches your investment goals.';
+
+  @override
+  String get metricInfoDiversificationIndicatorTitle =>
+      'Diversification Indicator';
+
+  @override
+  String get metricInfoDiversificationIndicatorSubtitle =>
+      'Sector Balance Across Your Holdings';
+
+  @override
+  String get metricInfoDiversificationIndicatorSection1Body =>
+      'Diversification Indicator measures how your investments are distributed across different sectors of the economy.\n\nEvery company belongs to a particular industry or business sector, such as Technology, Healthcare, Financial Services, Consumer Goods, Energy, Industrials, Utilities, or Real Estate. Different sectors often perform differently depending on economic conditions, interest rates, consumer demand, or global events.\n\nIf most of your money is invested in only one sector, your portfolio becomes more vulnerable to problems affecting that industry. For example, a decline in technology companies may have a significant impact if your portfolio consists mainly of technology stocks.\n\nA portfolio spread across multiple sectors can reduce this type of risk because different industries may perform differently during the same period. While one sector struggles, another may remain stable or continue growing.\n\nThis widget helps you understand which sectors make up your portfolio, identify areas that may be overrepresented, and discover sectors that are currently missing. Building sector diversification gradually can improve the overall balance of your investments without requiring you to own a very large number of companies.';
+
+  @override
+  String get metricInfoDiversificationProgressTitle =>
+      'Diversification Progress';
+
+  @override
+  String get metricInfoDiversificationProgressSubtitle =>
+      'Building a Broader Portfolio Over Time';
+
+  @override
+  String get metricInfoDiversificationProgressSection1Body =>
+      'Diversification Progress tracks how your portfolio grows by measuring the number of different companies you own.\n\nFor many long-term investors, diversification is built gradually over months or even years. Every new investment has the potential to increase the variety of businesses represented in the portfolio and reduce dependence on any single company.\n\nOwning only a few companies means that each investment has a greater influence on your portfolio\'s performance. As the number of holdings increases, the impact of one company\'s poor performance usually becomes smaller, creating a more balanced investment structure.\n\nHowever, diversification is not simply about buying as many companies as possible. A portfolio with many businesses from the same industry may still be poorly diversified. True diversification combines both the number of companies and the variety of sectors they represent.\n\nThis widget allows you to monitor your progress toward building a broader portfolio. Watching this number grow over time can encourage disciplined investing and remind you that diversification is a gradual process rather than something achieved in a single day.\n\nAs your portfolio expands, this widget provides a simple visual indication of how far you have progressed on your long-term diversification journey.';
+
+  @override
+  String get metricInfoPsychologyDisciplineTitle => 'Discipline';
+
+  @override
+  String get metricInfoPsychologyDisciplineSubtitle =>
+      'Buying With a Plan, Not With Emotion';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection1Header =>
+      'What Is Investment Discipline?';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection1Body =>
+      'Investment discipline is the ability to make decisions based on a strategy rather than emotions.\n\nThe market constantly creates situations that test investors:\n\nWhen prices rise quickly — excitement appears and the fear of missing out begins.\n\nWhen markets fall — fear appears and investors often hesitate or panic.\n\nMany investment mistakes do not happen because people lack investing knowledge.\n\nThey happen because emotions push investors to change their decisions at the worst possible moments.\n\nDiscipline helps investors stay committed to their strategy regardless of what is happening around them.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection2Header => 'A Simple Example';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection2Body =>
+      'Imagine two investors.\n\nThey both have the same amount of money and access to the same information.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection3Header => 'Investor A';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection3Body =>
+      'The market is rising quickly.\n\nThe news is full of stories about one popular company.\n\nEveryone is talking about its future potential.\n\nThe investor buys because they are afraid of missing the opportunity.\n\nA few months later, the market changes.\n\nThe stock price falls.\n\nThe investor sells because fear takes over.\n\nTheir decisions are controlled by emotions.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection4Header => 'Investor B';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection4Body =>
+      'Before buying, they ask important questions:\n\nWhy am I buying this company?\nHas the real value of the business changed?\nDoes this purchase fit my investment strategy?\n\nWhen the market rises, they don\'t buy simply because everyone is excited.\n\nWhen the market falls, they look for opportunities.\n\nTheir decisions are based on a process, not market emotions.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection5Header =>
+      'What Does This Widget Track?';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection5Body =>
+      'This widget analyzes your buying history and evaluates how closely your actions follow the principles of disciplined investing.\n\nIt does not only look at the outcome of your investments.\n\nIt looks at the conditions and environment in which your decisions were made.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection6Header =>
+      'Buying During Market Fear';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection6Body =>
+      'Buying during:\n\nmarket declines;\nfinancial crises;\nperiods of extreme uncertainty;\n\ncan demonstrate the ability to act when many investors are afraid.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection7Header =>
+      'Buying During Market Excitement';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection7Body =>
+      'Buying during:\n\nmarket hype;\nrapid price increases;\nmassive attention around a specific theme;\n\ncan indicate an emotional decision and the desire to avoid missing out.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection8Header =>
+      'Risk Control During Opportunities';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection8Body =>
+      'Even a good investment idea requires good execution.\n\nA strong investor does not only recognize opportunities.\n\nThey also manage position sizes and maintain flexibility.\n\nFor example, buying during a market decline while keeping a cash reserve shows a more controlled and thoughtful approach.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection9Header =>
+      'What Does This Widget Teach?';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection9Body =>
+      'This widget teaches one of the most important skills of a long-term investor:\n\nManaging not only your portfolio, but also your own behavior.\n\nBecause the market cannot be controlled.\n\nYou cannot control:\n\nnews;\nthe economy;\nprice movements;\nthe emotions of other investors.\n\nBut you can control:\n\nyour decisions;\nyour strategy;\nyour reaction to events.';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection10Header => 'The Main Idea';
+
+  @override
+  String get metricInfoPsychologyDisciplineSection10Body =>
+      'A successful investor is not someone who never makes mistakes.\n\nEveryone makes mistakes.\n\nA successful investor is someone who can continue making rational decisions even when the market creates maximum pressure.\n\nYour strategy shows what you buy.\n\nYour discipline shows why you buy it.';
+
+  @override
+  String get metricInfoPsychologyPanicTitle => 'Panic';
+
+  @override
+  String get metricInfoPsychologyPanicSubtitle =>
+      'Selling Calmly, Not Selling Scared';
+
+  @override
+  String get metricInfoPsychologyPanicSection1Header =>
+      'What Is Panic in Investing?';
+
+  @override
+  String get metricInfoPsychologyPanicSection1Body =>
+      'Panic in investing is not simply feeling fear.\n\nFear is a natural reaction when money is involved.\n\nEvery investor experiences uncertainty when prices fall.\n\nThe problem begins when fear starts controlling decisions.\n\nA falling stock price does not automatically mean a bad investment.\n\nSometimes a declining price means:\n\nthe entire market is under pressure;\ninvestors are temporarily afraid;\na good company is becoming cheaper.\n\nBut during stressful periods, many investors make decisions based on emotions instead of analysis.\n\nThey sell because the situation feels uncomfortable.\n\nThey sell because they want to stop the pain.\n\nThey sell because they believe the decline will continue forever.\n\nThis is one of the most common mistakes in investing.';
+
+  @override
+  String get metricInfoPsychologyPanicSection2Header => 'A Simple Example';
+
+  @override
+  String get metricInfoPsychologyPanicSection2Body =>
+      'Imagine an investor buys shares of a strong company.\n\nThe business is growing.\n\nThe financial results are healthy.\n\nThe long-term idea remains unchanged.\n\nBut then the market enters a difficult period.\n\nThe stock price falls:\n\n-20%.\n\nThen:\n\n-35%.\n\nNegative headlines appear everywhere.\n\nMany investors become afraid.';
+
+  @override
+  String get metricInfoPsychologyPanicSection3Header => 'Investor A';
+
+  @override
+  String get metricInfoPsychologyPanicSection3Body =>
+      'The falling price creates stress.\n\nThey think:\n\n\"I cannot handle this loss anymore.\"\n\nThey sell near the worst moment.\n\nA few months later, the market begins recovering.\n\nThe problem was not only the price decline.\n\nThe problem was making a decision at the moment when emotions were strongest.';
+
+  @override
+  String get metricInfoPsychologyPanicSection4Header => 'Investor B';
+
+  @override
+  String get metricInfoPsychologyPanicSection4Body =>
+      'They review the original investment idea.\n\nThey ask:\n\nDid the company become weaker?\nDid the business model change?\nIs this a temporary market reaction?\n\nIf the investment reason is still valid, they remain patient.\n\nThey understand that volatility is part of investing.';
+
+  @override
+  String get metricInfoPsychologyPanicSection5Header =>
+      'What Does This Widget Track?';
+
+  @override
+  String get metricInfoPsychologyPanicSection5Body =>
+      'This widget analyzes your selling behavior and evaluates how you react during difficult market situations.\n\nIt does not judge every losing sale as a mistake.\n\nSelling at a loss can sometimes be the correct decision.\n\nA smart investor may sell because:\n\nthe business fundamentals changed;\nthe original investment idea is no longer valid;\na better opportunity appeared.\n\nThe important question is:\n\nWhy did you sell?';
+
+  @override
+  String get metricInfoPsychologyPanicSection6Header => 'Selling During Fear';
+
+  @override
+  String get metricInfoPsychologyPanicSection6Body =>
+      'The system looks at whether sales happened during periods of extreme market pressure.\n\nSelling close to major declines can indicate an emotional reaction, especially if the investment later recovers.';
+
+  @override
+  String get metricInfoPsychologyPanicSection7Header =>
+      'Ability to Accept Volatility';
+
+  @override
+  String get metricInfoPsychologyPanicSection7Body =>
+      'Successful investors understand that price movement is normal.\n\nStrong companies can experience temporary declines.\n\nThis widget helps measure whether you can separate temporary market noise from real problems with an investment.';
+
+  @override
+  String get metricInfoPsychologyPanicSection8Header =>
+      'Surviving Extreme Market Events';
+
+  @override
+  String get metricInfoPsychologyPanicSection8Body =>
+      'The strongest test of an investor often comes during crises.\n\nMarket crashes create:\n\nuncertainty;\nfear;\npressure to act.\n\nInvestors who can survive these periods without emotional decisions demonstrate one of the most valuable skills in investing:\n\npatience.';
+
+  @override
+  String get metricInfoPsychologyPanicSection9Header =>
+      'What Does This Widget Teach?';
+
+  @override
+  String get metricInfoPsychologyPanicSection9Body =>
+      'This widget teaches that investing is not only about choosing the right assets.\n\nIt is also about controlling your reactions when things do not go according to plan.\n\nYou cannot control:\n\nmarket crashes;\nnegative news;\ntemporary price declines.\n\nBut you can control:\n\nyour decisions;\nyour preparation;\nyour response to uncertainty.';
+
+  @override
+  String get metricInfoPsychologyPanicSection10Header => 'The Main Idea';
+
+  @override
+  String get metricInfoPsychologyPanicSection10Body =>
+      'A great investor is not someone who never experiences fear.\n\nEveryone feels fear.\n\nThe difference is what happens next.\n\nSome investors allow fear to make decisions for them.\n\nOthers use patience, analysis, and a clear strategy.\n\nYour portfolio shows what you own.\n\nYour Discipline shows how you buy.\n\nYour Panic score shows how you behave when the market tests you.';
+
+  @override
+  String get metricInfoPsychologyPatienceTitle => 'Patience';
+
+  @override
+  String get metricInfoPsychologyPatienceSubtitle =>
+      'Letting Positions Play Out';
+
+  @override
+  String get metricInfoPsychologyPatienceSection1Header =>
+      'What Is Investment Patience?';
+
+  @override
+  String get metricInfoPsychologyPatienceSection1Body =>
+      'Investment patience is the ability to stay focused on a long-term plan without making unnecessary decisions because of short-term market movements.\n\nMany investors believe that successful investing is about finding the perfect moment to buy or sell.\n\nBut in reality, one of the biggest advantages an investor has is time.\n\nThe market constantly creates situations that test patience:\n\nprices move up and down;\nunexpected news appears;\nother investors become excited or afraid;\ngood companies sometimes experience difficult periods.\n\nDuring these moments, investors often feel pressure to act.\n\nThey want to change something.\n\nThey want to fix the situation.\n\nBut sometimes the best decision is not making a decision at all.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection2Header => 'A Simple Example';
+
+  @override
+  String get metricInfoPsychologyPatienceSection2Body =>
+      'Imagine two investors who bought shares of the same strong company.\n\nThe business continues growing.\n\nThe financial results remain healthy.\n\nBut the market enters a difficult period and the stock price declines.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection3Header => 'Investor A';
+
+  @override
+  String get metricInfoPsychologyPatienceSection3Body =>
+      'The falling price creates stress.\n\nThey think:\n\n\"Maybe I made a mistake. I should do something.\"\n\nThey sell because the situation feels uncomfortable.\n\nLater, the company recovers.\n\nThe problem was not the temporary decline.\n\nThe problem was not allowing the original investment idea enough time.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection4Header => 'Investor B';
+
+  @override
+  String get metricInfoPsychologyPatienceSection4Body =>
+      'They review the situation.\n\nThey ask:\n\nDid the business become weaker?\nHas the original reason for investing changed?\nIs this a company problem or only market fear?\n\nIf the investment idea remains valid, they stay patient.\n\nThey understand that short-term volatility is a normal part of long-term investing.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection5Header =>
+      'What Does This Widget Track?';
+
+  @override
+  String get metricInfoPsychologyPatienceSection5Body =>
+      'This widget analyzes your investing behavior and measures your ability to remain patient during different market situations.\n\nIt does not simply measure how long you hold an investment.\n\nHolding a bad company for many years is not patience.\n\nTrue patience means:\n\nGiving good decisions enough time to work while staying ready to react when the facts truly change.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection6Header =>
+      'Ability to Avoid Unnecessary Actions';
+
+  @override
+  String get metricInfoPsychologyPatienceSection6Body =>
+      'The market creates constant movement.\n\nEvery price change can create an emotional reaction.\n\nThis widget evaluates whether your decisions are based on:\n\nnew information;\nchanges in business quality;\na clear investment reason;\nor simply on temporary market pressure.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection7Header =>
+      'Ability to Stay Calm During Crisis';
+
+  @override
+  String get metricInfoPsychologyPatienceSection7Body =>
+      'The strongest test of patience appears during extreme events.\n\nMarket crashes create:\n\nfear;\nuncertainty;\npressure to sell.\n\nMany investors make their biggest mistakes during these moments because they focus only on the current situation.\n\nA patient investor understands that difficult periods are part of investing.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection8Header =>
+      'Taking Profit Without Greed';
+
+  @override
+  String get metricInfoPsychologyPatienceSection8Body =>
+      'Patience is not only about holding.\n\nIt is also about knowing when enough is enough.\n\nA disciplined investor can accept a successful result without waiting forever for a perfect exit.\n\nMarkets rarely provide perfect timing.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection9Header =>
+      'What Does This Widget Teach?';
+
+  @override
+  String get metricInfoPsychologyPatienceSection9Body =>
+      'This widget teaches one of the most important lessons in investing:\n\nTime is one of the greatest advantages an investor can have.\n\nYou cannot control:\n\ndaily price movements;\nmarket emotions;\neconomic events.\n\nBut you can control:\n\nyour reactions;\nyour decision process;\nyour ability to stay focused.';
+
+  @override
+  String get metricInfoPsychologyPatienceSection10Header => 'The Main Idea';
+
+  @override
+  String get metricInfoPsychologyPatienceSection10Body =>
+      'Patience does not mean ignoring problems.\n\nIt does not mean holding every investment forever.\n\nIt means understanding the difference between temporary market noise and real changes that require action.\n\nThe best investors are not those who make the most decisions.\n\nThey are those who make the right decisions and give them enough time to work.\n\nYour Discipline shows how you enter the market.\n\nYour Panic score shows how you react under pressure.\n\nYour Patience score shows whether you can let time become your advantage.';
+
+  @override
+  String get metricInfoPsychologyStrategyTitle => 'Strategy';
+
+  @override
+  String get metricInfoPsychologyStrategySubtitle =>
+      'How Your Portfolio Is Built';
+
+  @override
+  String get metricInfoPsychologyStrategySection1Header =>
+      'What Is an Investment Strategy?';
+
+  @override
+  String get metricInfoPsychologyStrategySection1Body =>
+      'An investment strategy is not just a list of companies you own.\n\nIt is a system of rules that guides your decisions.\n\nA strong strategy answers questions like:\n\nWhat am I buying?\nWhy am I buying it?\nHow do I manage risk?\nWhat will I do during a market decline?\nHow will I react when new opportunities appear?';
+
+  @override
+  String get metricInfoPsychologyStrategySection2Header => 'A Simple Example';
+
+  @override
+  String get metricInfoPsychologyStrategySection2Body =>
+      'Two investors can own the same stocks.\n\nBut their strategies can be completely different.';
+
+  @override
+  String get metricInfoPsychologyStrategySection3Header => 'Investor A';
+
+  @override
+  String get metricInfoPsychologyStrategySection3Body =>
+      'Buys companies because their prices are rising.\n\nFollows every headline.\n\nBuys after strong price increases because of fear of missing out.\n\nSells during market declines because of panic.\n\nThey own investments, but they don\'t have a system.';
+
+  @override
+  String get metricInfoPsychologyStrategySection4Header => 'Investor B';
+
+  @override
+  String get metricInfoPsychologyStrategySection4Body =>
+      'Buys strong businesses.\n\nManages position sizes.\n\nKeeps a cash reserve.\n\nUses ETFs for additional diversification.\n\nHas a plan for different market situations.\n\nThey don\'t simply own stocks.\n\nThey have a strategy.';
+
+  @override
+  String get metricInfoPsychologyStrategySection5Header =>
+      'What Does This Widget Track?';
+
+  @override
+  String get metricInfoPsychologyStrategySection5Body =>
+      'This widget analyzes whether your investing approach follows the principles of long-term portfolio management.\n\nIt evaluates:';
+
+  @override
+  String get metricInfoPsychologyStrategySection6Header =>
+      'Quality of Your Investments';
+
+  @override
+  String get metricInfoPsychologyStrategySection6Body =>
+      'Are you investing in strong businesses with sustainable models?\n\nOr are you taking excessive risks hoping for quick returns?';
+
+  @override
+  String get metricInfoPsychologyStrategySection7Header =>
+      'Balance Between Growth and Protection';
+
+  @override
+  String get metricInfoPsychologyStrategySection7Body =>
+      'A portfolio should not only perform well during good markets.\n\nIt should also have the ability to survive difficult periods.';
+
+  @override
+  String get metricInfoPsychologyStrategySection8Header =>
+      'Preparation for Opportunities';
+
+  @override
+  String get metricInfoPsychologyStrategySection8Body =>
+      'Investors without a plan often make emotional decisions.\n\nInvestors with a strategy understand:\n\nwhen to wait;\nwhen to invest;\nwhen to review their decisions.';
+
+  @override
+  String get metricInfoPsychologyStrategySection9Header => 'The Main Idea';
+
+  @override
+  String get metricInfoPsychologyStrategySection9Body =>
+      'Successful investing is not about finding one perfect stock.\n\nIt is about building a system that helps you make reasonable decisions again and again.\n\nYou cannot control the market.\n\nBut you can control your actions.';
+
+  @override
+  String get metricInfoInvestorScoreTitle => 'Psychology & Strategy Scores';
+
+  @override
+  String get metricInfoInvestorScoreSubtitle =>
+      'Two Sides of Your Investment Behavior';
+
+  @override
+  String get metricInfoInvestorScoreSection1Header =>
+      'What Do These Widgets Show?';
+
+  @override
+  String get metricInfoInvestorScoreSection1Body =>
+      'Your investment behavior is evaluated as two separate scores, not one blended number.\n\nThey do not measure:\n\nhow much money you made;\nhow fast your portfolio grew;\nwhether you will make a profit in the future.\n\nInstead, each answers its own question:\n\n\"Psychology Score\" — how closely does your behavior during the test match the habits of a disciplined investor?\n\n\"Strategy Score\" — how well is your portfolio actually built, independent of how you behaved while building it?';
+
+  @override
+  String get metricInfoInvestorScoreSection2Header =>
+      'Why Two Scores Instead of One?';
+
+  @override
+  String get metricInfoInvestorScoreSection2Body =>
+      'A trader can behave perfectly — no panic selling, no chasing headlines, plenty of patience — while still holding a badly built portfolio: everything in one stock, no cash reserve, no ETFs. The opposite is also possible: a well-diversified portfolio assembled through impulsive, emotional trades.\n\nBlending both into a single number let one side hide problems on the other. Keeping them separate means each score tells you something you can actually act on.';
+
+  @override
+  String get metricInfoInvestorScoreSection3Header =>
+      '🧠 PSYCHOLOGY SCORE — Discipline, Panic, Patience';
+
+  @override
+  String get metricInfoInvestorScoreSection3Body =>
+      'How you behaved during the test: whether you followed a plan, how you reacted to market drops, and whether you gave your decisions time to play out.';
+
+  @override
+  String get metricInfoInvestorScoreSection4Header =>
+      '📊 STRATEGY SCORE — Concentration, ETF Exposure, Cash Buffer, Sector Balance, Diversification, Safety Marker';
+
+  @override
+  String get metricInfoInvestorScoreSection4Body =>
+      'How your portfolio is actually built, right now — independent of the decisions that got it there.';
+
+  @override
+  String get metricInfoInvestorScoreSection5Header =>
+      '🧩 Diversification — How Your Portfolio Is Built';
+
+  @override
+  String get metricInfoInvestorScoreSection5Body =>
+      'This indicator evaluates:\n\nhow your investments are distributed;\nwhether your portfolio depends too heavily on one company or idea;\nhow well your portfolio is protected from a single mistake.\n\nA strong investor understands:\n\nOwning one great company can be a good decision.\n\nBut building an entire portfolio around one idea creates unnecessary risk.';
+
+  @override
+  String get metricInfoInvestorScoreSection6Header =>
+      '🧩 Strategy — How You Manage Your Portfolio';
+
+  @override
+  String get metricInfoInvestorScoreSection6Body =>
+      'This indicator evaluates:\n\nasset balance;\nETF exposure;\ncash reserves;\nrisk management.\n\nA strong strategy helps prevent situations like:\n\n\"I bought everything I liked, and now I don\'t know what to do next.\"\n\nA portfolio is not only about what you own.\n\nIt is also about how you prepare for different market situations.';
+
+  @override
+  String get metricInfoInvestorScoreSection7Header =>
+      '🧩 Discipline — How You Make Investment Decisions';
+
+  @override
+  String get metricInfoInvestorScoreSection7Body =>
+      'This indicator analyzes:\n\nwhether you buy during fear or excitement;\nwhether you follow your strategy;\nwhether your decisions are based on logic or emotions.\n\nOne of the most common investor mistakes is:\n\nBuying when everyone already feels confident.\n\nDiscipline helps investors search for opportunities instead of simply following the crowd.';
+
+  @override
+  String get metricInfoInvestorScoreSection8Header =>
+      '🧩 Panic — How You React During Market Declines';
+
+  @override
+  String get metricInfoInvestorScoreSection8Body =>
+      'This indicator shows:\n\nwhether you sell under pressure;\nhow you handle market downturns;\nwhether you can separate temporary declines from real problems.\n\nMarket declines are unavoidable.\n\nThe important question is not:\n\n\"Will the market fall?\"\n\nThe important question is:\n\n\"How will I react when it does?\"';
+
+  @override
+  String get metricInfoInvestorScoreSection9Header =>
+      '🧩 Patience — Whether You Can Let Time Work';
+
+  @override
+  String get metricInfoInvestorScoreSection9Body =>
+      'This indicator evaluates:\n\nyour ability to wait;\nwhether you avoid unnecessary decisions;\nwhether you can stay focused during difficult periods.\n\nSometimes the best investment decision is not making a decision.\n\nPatience allows good ideas enough time to develop.';
+
+  @override
+  String get metricInfoInvestorScoreSection10Header =>
+      'How Should You Understand Your Scores?';
+
+  @override
+  String get metricInfoInvestorScoreSection10Body =>
+      'The same 5 tiers apply to both scores independently — a 75 Psychology Score and a 75 Strategy Score mean the same thing about each side of your investing, they just don\'t have to match each other.\n\n🔴 0–20 — Beginner Investor\nYour investment process is currently strongly influenced by emotions and short-term reactions. The main goal is not finding perfect investments — the first step is building strong investment habits.\n\n🟠 21–40 — Developing Investor\nYou understand many basic investment concepts, but market situations may still influence some decisions. The next step: create clear rules and learn to follow them consistently.\n\n🟡 41–60 — Balanced Investor\nYou have built a solid foundation. You understand the importance of strategy and risk management. However, some market situations may still create pressure.\n\n🟢 61–80 — Disciplined Investor\nYour behavior shows strong investment habits. You are able to control emotions, evaluate risks, and make more thoughtful decisions.\n\n⭐ 81–100 — Experienced Investor Mindset\nYour actions demonstrate a high level of investment maturity. You understand the importance of long-term thinking, the power of discipline, and the need for risk control. However, a high score does not mean perfection — markets can always surprise investors. The greatest advantage is the ability to continue making rational decisions in changing conditions.';
+
+  @override
+  String get metricInfoInvestorScoreSection11Header =>
+      'The Main Purpose of This Widget';
+
+  @override
+  String get metricInfoInvestorScoreSection11Body =>
+      'These scores are not designed to tell you:\n\n\"You are a good investor.\"\n\nor\n\n\"You are a bad investor.\"\n\nTheir purpose is to show:\n\n\"Which investment habits are helping you, and which ones may limit your long-term progress.\"\n\nEvery investor can improve both scores.\n\nNot by trying to predict every market movement.\n\nBut by improving their own decision-making process.';
+
+  @override
+  String get metricInfoInvestorScoreSection12Header => 'Final Thought';
+
+  @override
+  String get metricInfoInvestorScoreSection12Body =>
+      'The market cannot be controlled.\n\nYou cannot control:\n\nnews;\nprices;\neconomic cycles.\n\nBut you can control:\n\nyour strategy;\nyour decisions;\nyour discipline.\n\nYour portfolio shows what you own.\n\nYour Psychology Score shows how you\'re deciding. Your Strategy Score shows what you\'re building. Together, they show what kind of investor you are becoming.';
+
+  @override
+  String get metricInfoPsychologyDiversificationTitle => 'Diversification';
+
+  @override
+  String get metricInfoPsychologyDiversificationSubtitle =>
+      'Spreading Risk Across Your Portfolio';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection1Header =>
+      'What Is Diversification?';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection1Body =>
+      'Diversification is a way to reduce portfolio risk by spreading your investments across different assets.\n\nIn simple words:\n\nDon\'t put all your eggs in one basket.\n\nIf one basket falls, you lose everything.\n\nBut if you have several baskets, a problem with one of them does not destroy the entire result.\n\nIn investing, this means:\n\nowning different companies;\ninvesting across different industries;\navoiding dependence on one single stock.';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection2Header =>
+      'A Simple Example';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection2Body =>
+      'Imagine an investor has \$15,000.\n\nScenario 1:\n\nThey invest everything into one company.\n\nIf that company performs well, the results can be excellent.\n\nBut if the business faces problems, the entire portfolio suffers together with it.\n\nOne disappointing report.\n\nOne management mistake.\n\nOne unexpected crisis.\n\nThe full impact falls on a single investment.\n\nScenario 2:\n\nThe same \$15,000 is distributed across different companies:\n\ntechnology;\nhealthcare;\nconsumer goods;\nfinancial services;\nindustrial companies.\n\nNow, problems in one industry do not necessarily damage the entire portfolio.\n\nSome companies may struggle while others continue to perform well.';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection3Header =>
+      'But Diversification Is Not Simply Buying Many Stocks';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection3Body =>
+      'Many beginner investors think:\n\n\"I own 20 companies, so my portfolio is safe.\"\n\nBut this is not always true.\n\nYou can own 20 different companies and still have a highly concentrated portfolio.\n\nFor example:\n\n20 companies from the artificial intelligence sector.\n\nTechnically, you own many businesses.\n\nBut if the AI industry experiences a major decline, your entire portfolio may fall at the same time.\n\nTrue diversification is not about quantity.\n\nIt is about balance.';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection4Header =>
+      'What Does This Widget Track?';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection4Body =>
+      'This widget analyzes how well your portfolio is distributed.\n\nIt looks at several important elements:';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection5Header =>
+      'Number of Companies';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection5Body =>
+      'Too few companies can make your portfolio dependent on only a few decisions.\n\nBut too many companies can turn your portfolio into a collection of random assets that become difficult to monitor.';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection6Header =>
+      'Sector Distribution';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection6Body =>
+      'Different industries react differently to economic conditions.\n\nWhen one sector experiences pressure, another may remain stronger.\n\nThat is why it is important not only to ask:\n\n\"How many companies do I own?\"\n\nBut also:\n\n\"What types of businesses and industries do these companies represent?\"';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection7Header =>
+      'Individual Position Concentration';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection7Body =>
+      'Even a strong portfolio can become risky if one company represents too much of your capital.\n\nYour favorite company may be an excellent business.\n\nBut even great companies can face unexpected challenges.';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection8Header =>
+      'The Main Idea';
+
+  @override
+  String get metricInfoPsychologyDiversificationSection8Body =>
+      'Good diversification does not mean buying everything.\n\nIt means creating a portfolio where one mistake, one company, or one industry cannot destroy your entire investment journey.\n\nThe goal of diversification is not to remove all risk.\n\nThat is impossible.\n\nThe goal is to make risk manageable.';
+
+  @override
+  String get metricInfoGuardianVerdictTitle => 'GUARDIAN\'S VERDICT';
+
+  @override
+  String get metricInfoGuardianVerdictSubtitle =>
+      'Congratulations — you have completed your portfolio stress test.';
+
+  @override
+  String get metricInfoGuardianVerdictSection1Header => 'Stress Test Complete';
+
+  @override
+  String get metricInfoGuardianVerdictSection1Body =>
+      'During the simulation, you experienced different market periods and scenarios based on patterns observed throughout real market history. Events that can unfold over months or even years in the real world were accelerated in the simulation, allowing you to experience their effects in a much shorter period of time.\n\nYou saw how your portfolio could behave under very different conditions:\n\n📈 Market growth\n➖ Sideways markets and uncertainty\n📉 Market declines\n🔄 Recovery after a downturn\n🚀 Market hype\n🎲 Speculative movements\n⚠️ Crisis scenarios\n🦢 Rare extreme events and Black Swan scenarios\n\nEach of these market phases has its own characteristics.\n\nHype is not simply a rising price.\n\nSpeculation is not the same as long-term investing.\n\nA market decline does not automatically mean that a business is becoming weaker.\n\nAnd strong price growth does not automatically mean that an asset has become a better investment.\n\nDuring the test, you have already seen these patterns in action. Some of them you may have recognized immediately. Others may have passed unnoticed. That is why one test may not be enough.\n\nTry running different stress tests again. Change your portfolio and observe how your decisions and portfolio behavior change under different market conditions.\n\nOver time, you may become better at recognizing different market phases and understanding why the same action can have a very different meaning depending on the situation.';
+
+  @override
+  String get metricInfoGuardianVerdictSection2Header =>
+      'One Important Thing to Remember';
+
+  @override
+  String get metricInfoGuardianVerdictSection2Body =>
+      'Neither in the real world nor in our simulator can anyone know with certainty which direction the market will take tomorrow.\n\nNo one can reliably predict: when a period of growth will end; when a decline will begin; how deep a decline will become; when recovery will start; which sector will become the next leader; which unexpected event will change market sentiment.\n\nThat is why this test is not designed to teach you how to predict the market. It is designed to teach you something more useful: how to understand possible market scenarios and observe your own behavior when they occur.';
+
+  @override
+  String get metricInfoGuardianVerdictSection3Header => 'Train, Don\'t Predict';
+
+  @override
+  String get metricInfoGuardianVerdictSection3Body =>
+      'Use the simulator as a training environment. Run different scenarios. Observe your decisions. Watch what happens to your portfolio as market conditions change.\n\nMost importantly, learn to recognize the classic mistakes investors have been studying for decades: chasing hype, FOMO, poor diversification, excessive concentration, panic selling, having no cash reserve, constantly trying to time the market, and making decisions based on emotions.\n\nAnd there is an important distinction: this is about investing, not trading. A trader and a long-term investor may look at the same market, but their goals, time horizons, and approaches to risk can be very different. Our simulator is not designed to teach you to constantly buy and sell. It is designed to help you understand long-term investment behavior and develop better decision-making habits.';
+
+  @override
+  String get metricInfoGuardianVerdictSection4Header =>
+      'Now, Let\'s Look at Your Results';
+
+  @override
+  String get metricInfoGuardianVerdictSection4Body =>
+      'Below, you will find a detailed analysis of your actions and your portfolio throughout the simulation. Each indicator is based on your actual decisions and the events that occurred during the test.\n\nThe system analyzes: which assets you selected; how diversified your portfolio was; when you bought; when you sold; how you behaved during market declines; how frequently you changed your positions; whether you demonstrated patience; how you managed risk and your cash reserve; how closely your behavior matched the principles of disciplined long-term investing.\n\nYour actions are processed through an objective algorithmic analysis that produces individual behavioral indicators and an overall investor profile.\n\nThis is not about simply telling you \"You did this right.\" or \"You did this wrong.\" Instead, the system shows: what happened, why it matters, and which investment skill you may want to develop further.\n\nYour result should therefore not be treated as a final judgment. It is not a prediction of your future financial results, and it is not a measure of you as a person. It is a snapshot of your behavior within this particular simulation.\n\nAnd if you don\'t like your result — that\'s actually a good thing. Because here, you have an opportunity that is much harder to get in real life: make mistakes in the simulator, study your decisions, try again, and gradually learn to recognize and avoid classic investment mistakes before they become real-world problems.';
 }

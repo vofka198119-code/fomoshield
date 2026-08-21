@@ -164,7 +164,8 @@ class AppRouter {
         name: 'metricInfo',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          final content = metricInfoRegistry[id];
+          final l10n = AppLocalizations.of(context)!;
+          final content = metricInfoRegistryFor(l10n)[id];
           return NoTransitionPage(
             child: content == null
                 ? const SizedBox()
