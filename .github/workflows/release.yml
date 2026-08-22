@@ -253,32 +253,117 @@ jobs:
           name: macos
           path: ScanCo-macos.zip
 
-  # ── Create release + auto-create lightweight tag ──────────────────────────
+  # ── Release ────────────────────────────────────────────────────────────────
+  # One release per tag. `if: !cancelled()` means a failed build never blocks
+  # the release: each platform attaches its asset on success, or appends a
+  # failure note to the release body. All steps run sequentially in one job,
+  # so there is no race updating the same release.
   release:
     name: Release
-    needs: [version, build-android, build-windows, build-ios, build-linux]
+    if: ${{ !cancelled() }}
+    needs: [version, build-android, build-windows, build-ios, build-linux, build-macos]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v7
-        with: { name: android }
-
-      - uses: actions/download-artifact@v7
-        with: { name: windows }
-
-      - uses: actions/download-artifact@v7
-        with: { name: iphone }
-
-      - uses: actions/download-artifact@v7
-        with: { name: linux }
-
-      - uses: softprops/action-gh-release@v3
+      - name: Ensure release exists
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.version.outputs.tag }}
           name: ${{ needs.version.outputs.tag }}
           prerelease: ${{ needs.version.outputs.prerelease }}
-          files: |
-            ScanCo.apk
-            ScanCo-windows.zip
-            ScanCo.ipa
-            ScanCo-linux.tar.gz
-          generate_release_notes: true
+          update_release: true
+          body: ScanCo build — per-platform results are attached / appended below.
+
+      # ── Android ──
+      - uses: actions/download-artifact@v7
+        if: ${{ needs.build-android.result == 'success' }}
+        with: { name: android }
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-android.result == 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          overwrite: true
+          files: ScanCo.apk
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-android.result != 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          append_body: true
+          body: "❌ **Android** — result: `${{ needs.build-android.result }}` (see run log)."
+
+      # ── Windows ──
+      - uses: actions/download-artifact@v7
+        if: ${{ needs.build-windows.result == 'success' }}
+        with: { name: windows }
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-windows.result == 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          overwrite: true
+          files: ScanCo-windows.zip
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-windows.result != 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          append_body: true
+          body: "❌ **Windows** — result: `${{ needs.build-windows.result }}` (see run log)."
+
+      # ── iPhone ──
+      - uses: actions/download-artifact@v7
+        if: ${{ needs.build-ios.result == 'success' }}
+        with: { name: iphone }
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-ios.result == 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          overwrite: true
+          files: ScanCo.ipa
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-ios.result != 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          append_body: true
+          body: "❌ **iPhone** — result: `${{ needs.build-ios.result }}` (see run log)."
+
+      # ── Linux ──
+      - uses: actions/download-artifact@v7
+        if: ${{ needs.build-linux.result == 'success' }}
+        with: { name: linux }
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-linux.result == 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          overwrite: true
+          files: ScanCo-linux.tar.gz
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-linux.result != 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          append_body: true
+          body: "❌ **Linux** — result: `${{ needs.build-linux.result }}` (see run log)."
+
+      # ── macOS ──
+      - uses: actions/download-artifact@v7
+        if: ${{ needs.build-macos.result == 'success' }}
+        with: { name: macos }
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-macos.result == 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          overwrite: true
+          files: ScanCo-macos.zip
+      - uses: softprops/action-gh-release@v3
+        if: ${{ needs.build-macos.result != 'success' }}
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          update_release: true
+          append_body: true
+          body: "❌ **macOS** — result: `${{ needs.build-macos.result }}` (see run log)."
