@@ -159,6 +159,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileSignOut => 'Sign Out';
 
   @override
+  String get updateChecking => 'Checking for updates...';
+
+  @override
+  String get updateUpToDate => "You're on the latest version";
+
+  @override
+  String get updateNewVersionAvailable => 'New Version Available';
+
+  @override
+  String updateYouHavePrevious(String version) =>
+      'v$version (you have a previous version)';
+
+  @override
+  String get updateDownloadAndInstall => 'Download & Install';
+
+  @override
+  String get updateMaybeLater => 'Maybe Later';
+
+  @override
+  String updateDownloading(String version) => 'Downloading v$version...';
+
+  @override
+  String get updateCancel => 'Cancel';
+
+  @override
+  String get updateReadyToInstall => 'Ready to Install';
+
+  @override
+  String get updateInstall => 'Install';
+
+  @override
+  String get updateViewOnGithub => 'View on GitHub';
+
+  @override
+  String get updateInstallFailed =>
+      'Couldn\'t install. Enable "Install unknown apps" for ScanCo in system settings and try again.';
+
+  @override
   String get profileDeleteAccount => 'Delete Account';
 
   @override

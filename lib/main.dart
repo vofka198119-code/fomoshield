@@ -175,10 +175,16 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
     // Auto-update: show dialog after 5 seconds — it starts in CHECKING
     // state (spinner) and calls the GitHub Releases API internally.
     // Non-blocking — user can dismiss at any time.
+    //
+    // `context` here belongs to the app shell, which sits ABOVE the Navigator
+    // inside MaterialApp.router — showDialog on it would throw "No Navigator
+    // found" (which is why the dialog never appeared on cold start). Use the
+    // router's root navigator instead.
     Future.delayed(const Duration(seconds: 5), () {
-      if (mounted) {
+      final navContext = AppRouter.rootNavigatorKey.currentContext;
+      if (navContext != null) {
         showDialog(
-          context: context,
+          context: navContext,
           barrierDismissible: true,
           builder: (_) => const UpdateDialog(),
         );

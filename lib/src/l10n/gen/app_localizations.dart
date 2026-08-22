@@ -374,6 +374,78 @@ abstract class AppLocalizations {
   /// **'Sign Out'**
   String get profileSignOut;
 
+  /// No description provided for @updateChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for updates...'**
+  String get updateChecking;
+
+  /// No description provided for @updateUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'You're on the latest version'**
+  String get updateUpToDate;
+
+  /// No description provided for @updateNewVersionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'New Version Available'**
+  String get updateNewVersionAvailable;
+
+  /// No description provided for @updateYouHavePrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'v{version} (you have a previous version)'**
+  String updateYouHavePrevious(String version);
+
+  /// No description provided for @updateDownloadAndInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Download & Install'**
+  String get updateDownloadAndInstall;
+
+  /// No description provided for @updateMaybeLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get updateMaybeLater;
+
+  /// No description provided for @updateDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading v{version}...'**
+  String updateDownloading(String version);
+
+  /// No description provided for @updateCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get updateCancel;
+
+  /// No description provided for @updateReadyToInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to Install'**
+  String get updateReadyToInstall;
+
+  /// No description provided for @updateInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get updateInstall;
+
+  /// No description provided for @updateViewOnGithub.
+  ///
+  /// In en, this message translates to:
+  /// **'View on GitHub'**
+  String get updateViewOnGithub;
+
+  /// No description provided for @updateInstallFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn't install. Enable "Install unknown apps" for ScanCo in system settings and try again.'**
+  String get updateInstallFailed;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:

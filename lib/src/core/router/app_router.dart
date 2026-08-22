@@ -79,6 +79,11 @@ class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
   static final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
+  /// The root Navigator (inside MaterialApp.router / GoRouter). Use this to
+  /// show dialogs from contexts that sit ABOVE the navigator (e.g. the app
+  /// shell) — showDialog on those contexts throws "No Navigator found".
+  static GlobalKey<NavigatorState> get rootNavigatorKey => _rootNavigatorKey;
+
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',

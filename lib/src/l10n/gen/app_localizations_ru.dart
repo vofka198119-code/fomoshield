@@ -158,6 +158,44 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileSignOut => 'Выйти';
 
   @override
+  String get updateChecking => 'Проверяем обновления...';
+
+  @override
+  String get updateUpToDate => 'У вас последняя версия';
+
+  @override
+  String get updateNewVersionAvailable => 'Доступна новая версия';
+
+  @override
+  String updateYouHavePrevious(String version) =>
+      'v$version (у вас предыдущая версия)';
+
+  @override
+  String get updateDownloadAndInstall => 'Скачать и установить';
+
+  @override
+  String get updateMaybeLater => 'Может, позже';
+
+  @override
+  String updateDownloading(String version) => 'Загружаем v$version...';
+
+  @override
+  String get updateCancel => 'Отмена';
+
+  @override
+  String get updateReadyToInstall => 'Готово к установке';
+
+  @override
+  String get updateInstall => 'Установить';
+
+  @override
+  String get updateViewOnGithub => 'Открыть на GitHub';
+
+  @override
+  String get updateInstallFailed =>
+      'Не удалось установить. Включите «Установка из неизвестных источников» для ScanCo в настройках и попробуйте снова.';
+
+  @override
   String get profileDeleteAccount => 'Удалить аккаунт';
 
   @override

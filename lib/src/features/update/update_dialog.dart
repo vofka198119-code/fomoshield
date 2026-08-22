@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/models/update_info.dart';
 import '../../core/services/update_service.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 /// Internal states for the update dialog lifecycle.
 enum _DialogState { checking, upToDate, info, downloading, ready }
@@ -36,6 +37,8 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   double _progress = 0;
   CancelToken? _cancelToken;
   File? _downloadedFile;
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
   @override
   void initState() {
@@ -116,7 +119,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         ),
         const SizedBox(height: 16),
         Text(
-          'Checking for updates...',
+          _l10n.updateChecking,
           style: TextStyle(
             fontSize: 15,
             color: const Color(0xFF1B365D),
@@ -137,7 +140,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         const Icon(Icons.check_circle, color: Color(0xFF4A5D23), size: 48),
         const SizedBox(height: 12),
         Text(
-          "You're on the latest version",
+          _l10n.updateUpToDate,
           style: TextStyle(
             fontSize: 15,
             color: const Color(0xFF1B365D),
@@ -160,7 +163,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'New Version Available',
+          _l10n.updateNewVersionAvailable,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -170,7 +173,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         ),
         const SizedBox(height: 8),
         Text(
-          'v${info.latestVersion} (you have a previous version)',
+          _l10n.updateYouHavePrevious(info.latestVersion),
           style: TextStyle(
             fontSize: 14,
             color: const Color(0xFF4A5D23),
@@ -205,7 +208,9 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
               ),
             ),
             child: Text(
-              isAndroid ? 'Download & Install' : 'View on GitHub',
+              isAndroid
+                  ? _l10n.updateDownloadAndInstall
+                  : _l10n.updateViewOnGithub,
               style: const TextStyle(fontFamily: 'Inter'),
             ),
           ),
@@ -216,7 +221,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
           child: TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              'Maybe Later',
+              _l10n.updateMaybeLater,
               style: TextStyle(
                 color: const Color(0xFF6B6B6B),
                 fontFamily: _fontFamily,
@@ -236,7 +241,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Downloading v${_updateInfo!.latestVersion}...',
+          _l10n.updateDownloading(_updateInfo!.latestVersion),
           style: TextStyle(
             fontSize: 15,
             color: const Color(0xFF1B365D),
@@ -266,7 +271,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         TextButton(
           onPressed: _cancelDownload,
           child: Text(
-            'Cancel',
+            _l10n.updateCancel,
             style: TextStyle(
               color: const Color(0xFF6B6B6B),
               fontFamily: _fontFamily,
@@ -287,7 +292,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         const Icon(Icons.check_circle, color: Color(0xFF4A5D23), size: 48),
         const SizedBox(height: 12),
         Text(
-          'Ready to Install',
+          _l10n.updateReadyToInstall,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -306,7 +311,10 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Install', style: TextStyle(fontFamily: 'Inter')),
+            child: Text(
+              _l10n.updateInstall,
+              style: const TextStyle(fontFamily: 'Inter'),
+            ),
           ),
         ),
       ],
@@ -353,13 +361,22 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         type: 'application/vnd.android.package-archive',
       );
       if (result.type != ResultType.done) {
-        debugPrint('[UpdateDialog] Install result: ${result.type} — ${result.message}');
+        debugPrint(
+            '[UpdateDialog] Install result: ${result.type} — ${result.message}');
+        // Most often this means the system's "Install unknown apps"
+        // permission isn't granted for ScanCo (Android 8+). Tell the user
+        // what to do instead of failing silently.
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(_l10n.updateInstallFailed)),
+          );
+        }
       }
     } catch (e) {
       debugPrint('[UpdateDialog] Install failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Installation failed. Please try again.')),
+          SnackBar(content: Text(_l10n.updateInstallFailed)),
         );
       }
     }
