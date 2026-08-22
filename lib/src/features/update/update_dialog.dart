@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,6 +14,9 @@ import '../../l10n/gen/app_localizations.dart';
 
 /// Internal states for the update dialog lifecycle.
 enum _DialogState { checking, upToDate, info, downloading, ready }
+
+/// Android install channel (PackageInstaller Session API) — see MainActivity.kt.
+const _installerChannel = MethodChannel('scanco/installer');
 
 /// A 5-state auto-update dialog.
 ///
@@ -367,9 +372,13 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     final file = _downloadedFile;
     if (file == null) return;
 
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await _installApkAndroid(file.path);
+      return;
+    }
+
+    // Fallback (non-Android): open via the system file handler.
     try {
-      // open_filex uses FileProvider internally on Android 7+,
-      // generating the required content:// URI automatically.
       final result = await OpenFilex.open(
         file.path,
         type: 'application/vnd.android.package-archive',
@@ -377,9 +386,6 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
       if (result.type != ResultType.done) {
         debugPrint(
             '[UpdateDialog] Install result: ${result.type} — ${result.message}');
-        // Most often this means the system's "Install unknown apps"
-        // permission isn't granted for ScanCo (Android 8+). Tell the user
-        // what to do instead of failing silently.
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(_l10n.updateInstallFailed)),
@@ -388,6 +394,46 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
       }
     } catch (e) {
       debugPrint('[UpdateDialog] Install failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_l10n.updateInstallFailed)),
+        );
+      }
+    }
+  }
+
+  /// Installs via the Android `PackageInstaller` Session API (see
+  /// `MainActivity.kt`, channel `scanco/installer`) — far more reliable than
+  /// handing the APK to the system via `open_filex`, and it lets us detect when
+  /// "Install unknown apps" isn't granted so we can take the user straight to
+  /// ScanCo's own toggle.
+  Future<void> _installApkAndroid(String path) async {
+    try {
+      final res = await _installerChannel
+          .invokeMethod<String>('installApk', {'path': path});
+      if (!mounted) return;
+
+      if (res == 'started') {
+        // The system PackageInstaller takes over — close the dialog.
+        Navigator.of(context).pop();
+      } else if (res == 'permission_missing') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_l10n.updateInstallFailed),
+            action: SnackBarAction(
+              label: _l10n.updateOpenSettings,
+              onPressed: () =>
+                  _installerChannel.invokeMethod<void>('openInstallSettings'),
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_l10n.updateInstallFailed)),
+        );
+      }
+    } on PlatformException catch (e) {
+      debugPrint('[UpdateDialog] Install failed: ${e.message}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(_l10n.updateInstallFailed)),

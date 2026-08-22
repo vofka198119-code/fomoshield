@@ -446,6 +446,12 @@ abstract class AppLocalizations {
   /// **'Couldn't install. Enable "Install unknown apps" for ScanCo in system settings and try again.'**
   String get updateInstallFailed;
 
+  /// No description provided for @updateOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get updateOpenSettings;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:

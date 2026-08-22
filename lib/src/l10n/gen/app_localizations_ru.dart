@@ -196,6 +196,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось установить. Включите «Установка из неизвестных источников» для ScanCo в настройках и попробуйте снова.';
 
   @override
+  String get updateOpenSettings => 'Открыть настройки';
+
+  @override
   String get profileDeleteAccount => 'Удалить аккаунт';
 
   @override

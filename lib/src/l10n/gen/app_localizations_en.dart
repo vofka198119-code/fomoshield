@@ -197,6 +197,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t install. Enable "Install unknown apps" for ScanCo in system settings and try again.';
 
   @override
+  String get updateOpenSettings => 'Open settings';
+
+  @override
   String get profileDeleteAccount => 'Delete Account';
 
   @override
