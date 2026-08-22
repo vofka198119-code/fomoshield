@@ -17,6 +17,7 @@ import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../psychology_engine.dart' show diversificationScoreForCount;
 import '../stress_test_models.dart';
 import '../stress_test_naming.dart';
@@ -41,6 +42,7 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final holdings = session.holdings;
     // Cost basis (shares × avgCost — money actually invested), NOT current
     // market value. A market swing on ANY holding would otherwise shift
@@ -97,7 +99,10 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('PORTFOLIO HEALTH', style: FomoShieldTheme.cardTitle()),
+                  Text(
+                    l10n.portfolioHealthWidgetTitle,
+                    style: FomoShieldTheme.cardTitle(),
+                  ),
                   GestureDetector(
                     onTap: () => context.push('/metric-info/portfolio-health'),
                     child: Container(
@@ -190,6 +195,7 @@ class _HealthGaugeCluster extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final overall =
         (diversification + concentration + sectorBalance + stability) / 4;
     final overallColor = _colorForScore(overall);
@@ -209,7 +215,7 @@ class _HealthGaugeCluster extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topLeft,
                 child: _CornerGauge(
-                  label: 'Diversification',
+                  label: l10n.portfolioHealthWidgetDiversification,
                   score: diversification,
                   diameter: _miniDiameter,
                   startAngle: _startAngleNW,
@@ -227,7 +233,7 @@ class _HealthGaugeCluster extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topRight,
                 child: _CornerGauge(
-                  label: 'Concentration',
+                  label: l10n.portfolioHealthWidgetConcentration,
                   score: concentration,
                   diameter: _miniDiameter,
                   startAngle: _startAngleNE,
@@ -245,7 +251,7 @@ class _HealthGaugeCluster extends StatelessWidget {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: _CornerGauge(
-                  label: 'Sector Balance',
+                  label: l10n.portfolioHealthWidgetSectorBalance,
                   score: sectorBalance,
                   diameter: _miniDiameter,
                   startAngle: _startAngleSW,
@@ -263,7 +269,7 @@ class _HealthGaugeCluster extends StatelessWidget {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: _CornerGauge(
-                  label: 'Stability',
+                  label: l10n.portfolioHealthWidgetStability,
                   score: stability,
                   diameter: _miniDiameter,
                   startAngle: _startAngleSE,

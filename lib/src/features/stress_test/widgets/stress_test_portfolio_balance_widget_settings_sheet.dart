@@ -96,7 +96,7 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Widget Settings',
+                    l10n.homeWidgetSettingsTitle,
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -118,7 +118,7 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                       });
                     },
                     child: Text(
-                      'Reset',
+                      l10n.homeReset,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

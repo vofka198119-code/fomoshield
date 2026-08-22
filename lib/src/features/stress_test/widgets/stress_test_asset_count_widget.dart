@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
 import '../stress_test_models.dart';
@@ -55,6 +56,7 @@ class StressTestAssetCountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final count = session.holdings.length;
     final color = _colorForCount(count.toDouble());
 
@@ -71,7 +73,7 @@ class StressTestAssetCountCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'DIVERSIFICATION PROGRESS',
+                    l10n.assetCountWidgetTitle,
                     style: FomoShieldTheme.cardTitle(Colors.white),
                   ),
                   GestureDetector(
@@ -123,7 +125,7 @@ class StressTestAssetCountCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'ASSETS',
+                            l10n.assetCountWidgetAssetsLabel,
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,

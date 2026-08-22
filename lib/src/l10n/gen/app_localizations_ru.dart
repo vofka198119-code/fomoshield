@@ -5656,4 +5656,196 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get orderEntryNotifPendingSuffix => ' — в ожидании';
+
+  @override
+  String get verdictDisclaimerTitle => 'Дисклеймер';
+
+  @override
+  String get verdictDisclaimerBody =>
+      'Обратите внимание: результаты стресс-теста, оценки, выводы и текстовые комментарии, которые предоставляет это приложение, предназначены исключительно для образовательных и информационных целей.\n\nВсе вердикты формируются автоматически на основе анализа ваших решений в смоделированных рыночных сценариях, вдохновлённых историческими рыночными событиями и общепринятыми принципами долгосрочного инвестирования. Несмотря на все усилия сделать симуляции максимально реалистичными, они не могут учесть абсолютно все факторы, влияющие на реальные финансовые рынки.\n\nПрошлые рыночные события и историческая доходность не гарантируют, что похожие условия или результаты повторятся в будущем. Поведение реального рынка может существенно отличаться от сценариев, представленных в этом приложении. Любое сходство между симуляциями и реальными рыночными событиями следует рассматривать исключительно как образовательный пример, а не как прогноз.\n\nЭто приложение не предоставляет инвестиционных, финансовых, юридических или налоговых консультаций и не должно расцениваться как рекомендация покупать, продавать или держать какую-либо ценную бумагу, актив или финансовый инструмент.\n\nВсе инвестиционные решения пользователь принимает самостоятельно и несёт за них полную ответственность. Разработчики этого приложения не несут ответственности за какие-либо финансовые потери, упущенную выгоду, результаты инвестирования, а также за любой прямой, косвенный, случайный или последующий ущерб, возникший в результате использования приложения, его содержимого или решений, принятых на основе предоставленной информации.\n\nОсновная цель этого приложения — помочь пользователям лучше разобраться в основах инвестирования, диверсификации портфеля, управлении рисками, принципах долгосрочного инвестирования и психологических аспектах принятия инвестиционных решений. Весь контент предоставляется исключительно в образовательных целях и не может служить заменой профессиональной финансовой консультации или руководством для принятия реальных инвестиционных решений.';
+
+  @override
+  String get portfolioBalanceScreenTitle => 'БАЛАНС ПОРТФЕЛЯ';
+
+  @override
+  String get portfolioBalanceScreenDisclaimerTitle =>
+      'Образовательный дисклеймер';
+
+  @override
+  String get portfolioBalanceScreenDisclaimerBody =>
+      'Это приложение создано, чтобы помочь пользователям разобраться в инвестировании и управлении портфелем. Все оценки, показатели, симуляции и образовательные материалы предоставляются исключительно в информационных целях и не должны расцениваться как финансовая консультация или инвестиционная рекомендация.\n\nПриложение не указывает вам, что покупать, продавать или держать. Его задача — объяснять инвестиционные понятия, визуализировать характеристики портфеля и поддерживать обучение с помощью образовательных инструментов.\n\nИнвестирование связано с риском, и стоимость инвестиций может как расти, так и падать. Прошлые результаты и результаты симуляций не гарантируют будущей доходности. Всегда проводите собственное исследование и при необходимости обращайтесь за консультацией к лицензированному финансовому специалисту, прежде чем принимать инвестиционные решения.\n\nИспользуя это приложение, вы подтверждаете, что все инвестиционные решения остаются исключительно на вашей ответственности.';
+
+  @override
+  String get portfolioBalanceScreenAssetAllocationTitle =>
+      'РАСПРЕДЕЛЕНИЕ АКТИВОВ, %';
+
+  @override
+  String get portfolioHealthWidgetTitle => 'ЗДОРОВЬЕ ПОРТФЕЛЯ';
+
+  @override
+  String get portfolioHealthWidgetDiversification => 'Диверсификация';
+
+  @override
+  String get portfolioHealthWidgetConcentration => 'Концентрация';
+
+  @override
+  String get portfolioHealthWidgetSectorBalance => 'Секторальный баланс';
+
+  @override
+  String get portfolioHealthWidgetStability => 'Стабильность';
+
+  @override
+  String get verdictStrategyCardTitle => 'СТРАТЕГИЯ';
+
+  @override
+  String get verdictStrategyCardConcentration => 'Концентрация';
+
+  @override
+  String get verdictStrategyCardEtfExposure => 'Доля ETF';
+
+  @override
+  String get verdictStrategyCardCashBuffer => 'Денежный буфер';
+
+  @override
+  String get verdictDiversificationCardTitle => 'ДИВЕРСИФИКАЦИЯ';
+
+  @override
+  String get verdictDiversificationCardSectorDiversification =>
+      'Диверсификация по секторам';
+
+  @override
+  String get verdictDiversificationCardSafetyMarker => 'Маркер безопасности';
+
+  @override
+  String get verdictDiversificationCardSectorBalance => 'Секторальный баланс';
+
+  @override
+  String get psychologyStrategyWidgetTitle => 'СТРАТЕГИЯ';
+
+  @override
+  String get psychologyStrategyWidgetConcentration => 'Концентрация';
+
+  @override
+  String get psychologyStrategyWidgetEtfExposure => 'Доля ETF';
+
+  @override
+  String get psychologyStrategyWidgetCashBuffer => 'Денежный буфер';
+
+  @override
+  String get psychologyDiversificationWidgetTitle => 'ДИВЕРСИФИКАЦИЯ';
+
+  @override
+  String get psychologyDiversificationWidgetSectorBalance =>
+      'Секторальный баланс';
+
+  @override
+  String get psychologyDiversificationWidgetSectorDiversification =>
+      'Диверсификация по секторам';
+
+  @override
+  String get psychologyDiversificationWidgetSafetyMarker =>
+      'Маркер безопасности';
+
+  @override
+  String get psychologyPatienceWidgetTitle => 'ТЕРПЕНИЕ';
+
+  @override
+  String get psychologyPatienceWidgetLabel => 'Терпение';
+
+  @override
+  String get psychologyPanicWidgetTitle => 'ПАНИКА';
+
+  @override
+  String get psychologyPanicWidgetLabel => 'Паника';
+
+  @override
+  String get psychologyDisciplineWidgetTitle => 'ДИСЦИПЛИНА';
+
+  @override
+  String get psychologyDisciplineWidgetLabel => 'Дисциплина';
+
+  @override
+  String get psychologyMeterScreenStrategyScore => 'ОЦЕНКА СТРАТЕГИИ';
+
+  @override
+  String get psychologyMeterScreenPsychologyScore => 'ОЦЕНКА ПСИХОЛОГИИ';
+
+  @override
+  String get psychologyMeterScreenSessionStats => 'СТАТИСТИКА СЕССИИ';
+
+  @override
+  String get verdictMarkerRowGood => 'Хорошо';
+
+  @override
+  String get verdictMarkerRowFair => 'Средне';
+
+  @override
+  String get verdictMarkerRowNeedsWork => 'Требует внимания';
+
+  @override
+  String get stressTestTradeHistoryScreenSessionNotFound => 'Сессия не найдена';
+
+  @override
+  String get stressTestTradeHistoryScreenNoTradesYet => 'Сделок пока нет';
+
+  @override
+  String get assetCountWidgetTitle => 'ПРОГРЕСС ДИВЕРСИФИКАЦИИ';
+
+  @override
+  String get assetCountWidgetAssetsLabel => 'АКТИВЫ';
+
+  @override
+  String get verdictMarkerDetailDiscipline => 'Дисциплина';
+
+  @override
+  String get verdictMarkerDetailPanic => 'Паника';
+
+  @override
+  String get verdictMarkerDetailPatience => 'Терпение';
+
+  @override
+  String get verdictMarkerDetailSectorDiversification =>
+      'Диверсификация по секторам';
+
+  @override
+  String get verdictMarkerDetailSafetyMarker => 'Маркер безопасности';
+
+  @override
+  String get verdictMarkerDetailSectorBalance => 'Секторальный баланс';
+
+  @override
+  String get verdictMarkerDetailConcentration => 'Концентрация';
+
+  @override
+  String get verdictMarkerDetailEtfExposure => 'Доля ETF';
+
+  @override
+  String get verdictMarkerDetailCashBuffer => 'Денежный буфер';
+
+  @override
+  String get verdictMarkerDetailFallbackTitle => 'Вердикт';
+
+  @override
+  String get verdictScreenStrategyScoreLabel => 'ОЦЕНКА СТРАТЕГИИ';
+
+  @override
+  String get verdictScreenPsychologyScoreLabel => 'ОЦЕНКА ПСИХОЛОГИИ';
+
+  @override
+  String get verdictScreenDisciplineTitle => 'ДИСЦИПЛИНА';
+
+  @override
+  String get verdictScreenDisciplineLabel => 'Дисциплина';
+
+  @override
+  String get verdictScreenPanicTitle => 'ПАНИКА';
+
+  @override
+  String get verdictScreenPanicLabel => 'Паника';
+
+  @override
+  String get verdictScreenPatienceTitle => 'ТЕРПЕНИЕ';
+
+  @override
+  String get verdictScreenPatienceLabel => 'Терпение';
 }

@@ -29,25 +29,49 @@ import 'widgets/verdict/verdict_tier.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
 
 class _MarkerInfo {
-  final String label;
   final double Function(VerdictArchiveEntry) score;
-  const _MarkerInfo(this.label, this.score);
+  const _MarkerInfo(this.score);
 }
 
 const Map<String, _MarkerInfo> _markers = {
-  'discipline': _MarkerInfo('Discipline', _disciplineScore),
-  'panic': _MarkerInfo('Panic', _panicScore),
-  'patience': _MarkerInfo('Patience', _patienceScore),
-  'sector-diversification': _MarkerInfo(
-    'Sector Diversification',
-    _sectorDiversificationScore,
-  ),
-  'safety-marker': _MarkerInfo('Safety Marker', _safetyMarkerScore),
-  'sector-balance': _MarkerInfo('Sector Balance', _sectorBalanceScore),
-  'concentration': _MarkerInfo('Concentration', _concentrationScore),
-  'etf-exposure': _MarkerInfo('ETF Exposure', _etfExposureScore),
-  'cash-buffer': _MarkerInfo('Cash Buffer', _cashBufferScore),
+  'discipline': _MarkerInfo(_disciplineScore),
+  'panic': _MarkerInfo(_panicScore),
+  'patience': _MarkerInfo(_patienceScore),
+  'sector-diversification': _MarkerInfo(_sectorDiversificationScore),
+  'safety-marker': _MarkerInfo(_safetyMarkerScore),
+  'sector-balance': _MarkerInfo(_sectorBalanceScore),
+  'concentration': _MarkerInfo(_concentrationScore),
+  'etf-exposure': _MarkerInfo(_etfExposureScore),
+  'cash-buffer': _MarkerInfo(_cashBufferScore),
 };
+
+// Localized label lookup — kept separate from the const `_markers` map
+// above since a `const` initializer can't call AppLocalizations (needs a
+// BuildContext). Callers always have `l10n` in scope (from build()).
+String _labelForMarker(AppLocalizations l10n, String markerId) {
+  switch (markerId) {
+    case 'discipline':
+      return l10n.verdictMarkerDetailDiscipline;
+    case 'panic':
+      return l10n.verdictMarkerDetailPanic;
+    case 'patience':
+      return l10n.verdictMarkerDetailPatience;
+    case 'sector-diversification':
+      return l10n.verdictMarkerDetailSectorDiversification;
+    case 'safety-marker':
+      return l10n.verdictMarkerDetailSafetyMarker;
+    case 'sector-balance':
+      return l10n.verdictMarkerDetailSectorBalance;
+    case 'concentration':
+      return l10n.verdictMarkerDetailConcentration;
+    case 'etf-exposure':
+      return l10n.verdictMarkerDetailEtfExposure;
+    case 'cash-buffer':
+      return l10n.verdictMarkerDetailCashBuffer;
+    default:
+      return l10n.verdictMarkerDetailFallbackTitle;
+  }
+}
 
 double _disciplineScore(VerdictArchiveEntry e) => e.discipline;
 double _panicScore(VerdictArchiveEntry e) => e.panicResistance;
@@ -122,6 +146,9 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
       orElse: () => null,
     );
     final marker = _markers[markerId];
+    final markerLabel = marker == null
+        ? l10n.verdictMarkerDetailFallbackTitle
+        : _labelForMarker(l10n, markerId);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -137,7 +164,7 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          (marker?.label ?? 'Verdict').toUpperCase(),
+          markerLabel.toUpperCase(),
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -156,7 +183,7 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: _MarkerDetailBody(
-                  label: marker.label,
+                  label: markerLabel,
                   score: marker.score(entry),
                   tier: _tierFor(l10n, markerId, entry),
                 ),

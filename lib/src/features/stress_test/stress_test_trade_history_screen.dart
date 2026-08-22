@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import '../../shared/widgets/trade_history_tile.dart';
 import 'stress_test_engine.dart';
@@ -22,6 +23,7 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = ref.watch(stressTestSessionProvider(sessionId));
 
@@ -39,7 +41,7 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'TRADE HISTORY',
+          l10n.tradeHistoryTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -54,9 +56,13 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
         left: false,
         right: false,
         child: session == null
-            ? const Center(child: Text('Session not found'))
+            ? Center(
+                child: Text(l10n.stressTestTradeHistoryScreenSessionNotFound),
+              )
             : session.trades.isEmpty
-            ? const Center(child: Text('No trades yet'))
+            ? Center(
+                child: Text(l10n.stressTestTradeHistoryScreenNoTradesYet),
+              )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: Container(

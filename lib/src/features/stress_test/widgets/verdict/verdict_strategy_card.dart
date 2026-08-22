@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'verdict_marker_row.dart';
 
@@ -40,20 +41,21 @@ class VerdictStrategyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final rows = [
       _StrategyRow(
         markerId: 'concentration',
-        label: 'Concentration',
+        label: l10n.verdictStrategyCardConcentration,
         score: concentrationScore,
       ),
       _StrategyRow(
         markerId: 'etf-exposure',
-        label: 'ETF Exposure',
+        label: l10n.verdictStrategyCardEtfExposure,
         score: etfExposureScore,
       ),
       _StrategyRow(
         markerId: 'cash-buffer',
-        label: 'Cash Buffer',
+        label: l10n.verdictStrategyCardCashBuffer,
         score: cashBufferScore,
       ),
     ];
@@ -71,7 +73,7 @@ class VerdictStrategyCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'STRATEGY',
+                  l10n.verdictStrategyCardTitle,
                   style: FomoShieldTheme.cardTitle(Colors.white),
                 ),
                 GestureDetector(

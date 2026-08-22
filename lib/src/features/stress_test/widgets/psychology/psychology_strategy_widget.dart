@@ -11,6 +11,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import '../../psychology_engine.dart';
 import '../../stress_test_models.dart';
 import '../allocation_bar_row.dart';
@@ -25,19 +26,20 @@ class PsychologyStrategyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scores = computeStrategySubScores(
       holdings: session.holdings,
       cash: session.cash,
     );
 
     return PsychologyMarkerCard(
-      title: 'STRATEGY',
+      title: l10n.psychologyStrategyWidgetTitle,
       infoId: 'psychology-strategy',
       child: Column(
         children: [
-          _bar('Concentration', scores.concentration),
-          _bar('ETF Exposure', scores.etf),
-          _bar('Cash Buffer', scores.cashBuffer),
+          _bar(l10n.psychologyStrategyWidgetConcentration, scores.concentration),
+          _bar(l10n.psychologyStrategyWidgetEtfExposure, scores.etf),
+          _bar(l10n.psychologyStrategyWidgetCashBuffer, scores.cashBuffer),
         ],
       ),
     );

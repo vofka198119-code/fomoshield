@@ -5,6 +5,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import '../allocation_bar_row.dart';
 import 'psychology_marker_card.dart';
 
@@ -17,12 +18,13 @@ class PsychologyPanicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final percent = (panicResistance * 100).clamp(0.0, 100.0);
     return PsychologyMarkerCard(
-      title: 'PANIC',
+      title: l10n.psychologyPanicWidgetTitle,
       infoId: 'psychology-panic',
       child: AllocationBarRow(
-        name: 'Panic',
+        name: l10n.psychologyPanicWidgetLabel,
         percent: percent,
         warning: percent < _warningThreshold,
         decimals: 0,

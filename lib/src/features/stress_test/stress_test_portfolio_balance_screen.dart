@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import '../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'stress_test_engine.dart';
@@ -31,6 +32,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = ref.watch(stressTestSessionProvider(sessionId));
     final widgetConfigs = ref.watch(
@@ -52,7 +54,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'PORTFOLIO BALANCE',
+          l10n.portfolioBalanceScreenTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -89,7 +91,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
                       size: 20,
                     ),
                     label: Text(
-                      'Add widgets',
+                      l10n.homeAddWidgets,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -113,7 +115,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
                 ),
 
                 // ── Educational disclaimer ───────────────────────
-                _educationalDisclaimer(),
+                _educationalDisclaimer(l10n),
               ],
             ],
           ),
@@ -161,13 +163,13 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
 
   // Same centered title+body shape as order_config_section.dart's
   // Simulated Trading disclaimer ("Company Card style").
-  Widget _educationalDisclaimer() {
+  Widget _educationalDisclaimer(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
         children: [
           Text(
-            'Educational Disclaimer',
+            l10n.portfolioBalanceScreenDisclaimerTitle,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 10,
@@ -177,22 +179,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'This application is intended to help users learn about '
-            'investing and portfolio management. All scores, indicators, '
-            'simulations, and educational content are provided for '
-            'informational purposes only and should not be interpreted as '
-            'financial advice or investment recommendations.\n\n'
-            'The app does not tell you what to buy, sell, or hold. Its '
-            'purpose is to explain investment concepts, visualize '
-            'portfolio characteristics, and support learning through '
-            'educational tools.\n\n'
-            'Investing involves risk, and the value of investments can '
-            'rise or fall. Past performance and simulated results are not '
-            'guarantees of future performance. Always perform your own '
-            'research and, when appropriate, seek advice from a licensed '
-            'financial professional before making investment decisions.\n\n'
-            'By using this application, you acknowledge that all '
-            'investment decisions remain your sole responsibility.',
+            l10n.portfolioBalanceScreenDisclaimerBody,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,
@@ -218,6 +205,7 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final holdings = session.holdings;
     final invested = <({String symbol, double value})>[];
     double totalInvested = 0;
@@ -243,7 +231,7 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'ASSET ALLOCATION %',
+                    l10n.portfolioBalanceScreenAssetAllocationTitle,
                     style: FomoShieldTheme.cardTitle(Colors.white),
                   ),
                   GestureDetector(

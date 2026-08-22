@@ -5639,4 +5639,192 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orderEntryNotifPendingSuffix => ' — Pending';
+
+  @override
+  String get verdictDisclaimerTitle => 'Disclaimer';
+
+  @override
+  String get verdictDisclaimerBody =>
+      'Please note: the stress test results, scores, insights, and written feedback provided by this application are intended for educational and informational purposes only.\n\nAll verdicts are generated automatically by analyzing your decisions within simulated market scenarios inspired by historical market events and generally accepted long-term investing principles. While every effort has been made to create realistic simulations, they cannot account for every factor that may influence real financial markets.\n\nPast market events and historical performance do not guarantee that similar conditions or outcomes will occur in the future. Real-world market behavior may differ significantly from the scenarios presented in this application. Any similarities between the simulations and actual market events should be viewed solely as educational examples and not as predictions or forecasts.\n\nThis application does not provide investment, financial, legal, or tax advice and should not be interpreted as a recommendation to buy, sell, or hold any security, asset, or financial instrument.\n\nAll investment decisions are made solely by the user and remain the user\'s sole responsibility. The developers of this application accept no liability for any financial losses, lost profits, investment outcomes, or any direct, indirect, incidental, or consequential damages resulting from the use of this application, its content, or decisions made based on the information provided.\n\nThe primary purpose of this application is to help users better understand the fundamentals of investing, portfolio diversification, risk management, long-term investing principles, and the psychological aspects of investment decision-making. All content is provided exclusively for educational purposes and should not be considered a substitute for professional financial advice or a guide for making real-world investment decisions.';
+
+  @override
+  String get portfolioBalanceScreenTitle => 'PORTFOLIO BALANCE';
+
+  @override
+  String get portfolioBalanceScreenDisclaimerTitle => 'Educational Disclaimer';
+
+  @override
+  String get portfolioBalanceScreenDisclaimerBody =>
+      'This application is intended to help users learn about investing and portfolio management. All scores, indicators, simulations, and educational content are provided for informational purposes only and should not be interpreted as financial advice or investment recommendations.\n\nThe app does not tell you what to buy, sell, or hold. Its purpose is to explain investment concepts, visualize portfolio characteristics, and support learning through educational tools.\n\nInvesting involves risk, and the value of investments can rise or fall. Past performance and simulated results are not guarantees of future performance. Always perform your own research and, when appropriate, seek advice from a licensed financial professional before making investment decisions.\n\nBy using this application, you acknowledge that all investment decisions remain your sole responsibility.';
+
+  @override
+  String get portfolioBalanceScreenAssetAllocationTitle => 'ASSET ALLOCATION %';
+
+  @override
+  String get portfolioHealthWidgetTitle => 'PORTFOLIO HEALTH';
+
+  @override
+  String get portfolioHealthWidgetDiversification => 'Diversification';
+
+  @override
+  String get portfolioHealthWidgetConcentration => 'Concentration';
+
+  @override
+  String get portfolioHealthWidgetSectorBalance => 'Sector Balance';
+
+  @override
+  String get portfolioHealthWidgetStability => 'Stability';
+
+  @override
+  String get verdictStrategyCardTitle => 'STRATEGY';
+
+  @override
+  String get verdictStrategyCardConcentration => 'Concentration';
+
+  @override
+  String get verdictStrategyCardEtfExposure => 'ETF Exposure';
+
+  @override
+  String get verdictStrategyCardCashBuffer => 'Cash Buffer';
+
+  @override
+  String get verdictDiversificationCardTitle => 'DIVERSIFICATION';
+
+  @override
+  String get verdictDiversificationCardSectorDiversification =>
+      'Sector Diversification';
+
+  @override
+  String get verdictDiversificationCardSafetyMarker => 'Safety Marker';
+
+  @override
+  String get verdictDiversificationCardSectorBalance => 'Sector Balance';
+
+  @override
+  String get psychologyStrategyWidgetTitle => 'STRATEGY';
+
+  @override
+  String get psychologyStrategyWidgetConcentration => 'Concentration';
+
+  @override
+  String get psychologyStrategyWidgetEtfExposure => 'ETF Exposure';
+
+  @override
+  String get psychologyStrategyWidgetCashBuffer => 'Cash Buffer';
+
+  @override
+  String get psychologyDiversificationWidgetTitle => 'DIVERSIFICATION';
+
+  @override
+  String get psychologyDiversificationWidgetSectorBalance => 'Sector Balance';
+
+  @override
+  String get psychologyDiversificationWidgetSectorDiversification =>
+      'Sector Diversification';
+
+  @override
+  String get psychologyDiversificationWidgetSafetyMarker => 'Safety Marker';
+
+  @override
+  String get psychologyPatienceWidgetTitle => 'PATIENCE';
+
+  @override
+  String get psychologyPatienceWidgetLabel => 'Patience';
+
+  @override
+  String get psychologyPanicWidgetTitle => 'PANIC';
+
+  @override
+  String get psychologyPanicWidgetLabel => 'Panic';
+
+  @override
+  String get psychologyDisciplineWidgetTitle => 'DISCIPLINE';
+
+  @override
+  String get psychologyDisciplineWidgetLabel => 'Discipline';
+
+  @override
+  String get psychologyMeterScreenStrategyScore => 'STRATEGY SCORE';
+
+  @override
+  String get psychologyMeterScreenPsychologyScore => 'PSYCHOLOGY SCORE';
+
+  @override
+  String get psychologyMeterScreenSessionStats => 'SESSION STATS';
+
+  @override
+  String get verdictMarkerRowGood => 'Good';
+
+  @override
+  String get verdictMarkerRowFair => 'Fair';
+
+  @override
+  String get verdictMarkerRowNeedsWork => 'Needs Work';
+
+  @override
+  String get stressTestTradeHistoryScreenSessionNotFound => 'Session not found';
+
+  @override
+  String get stressTestTradeHistoryScreenNoTradesYet => 'No trades yet';
+
+  @override
+  String get assetCountWidgetTitle => 'DIVERSIFICATION PROGRESS';
+
+  @override
+  String get assetCountWidgetAssetsLabel => 'ASSETS';
+
+  @override
+  String get verdictMarkerDetailDiscipline => 'Discipline';
+
+  @override
+  String get verdictMarkerDetailPanic => 'Panic';
+
+  @override
+  String get verdictMarkerDetailPatience => 'Patience';
+
+  @override
+  String get verdictMarkerDetailSectorDiversification =>
+      'Sector Diversification';
+
+  @override
+  String get verdictMarkerDetailSafetyMarker => 'Safety Marker';
+
+  @override
+  String get verdictMarkerDetailSectorBalance => 'Sector Balance';
+
+  @override
+  String get verdictMarkerDetailConcentration => 'Concentration';
+
+  @override
+  String get verdictMarkerDetailEtfExposure => 'ETF Exposure';
+
+  @override
+  String get verdictMarkerDetailCashBuffer => 'Cash Buffer';
+
+  @override
+  String get verdictMarkerDetailFallbackTitle => 'Verdict';
+
+  @override
+  String get verdictScreenStrategyScoreLabel => 'STRATEGY SCORE';
+
+  @override
+  String get verdictScreenPsychologyScoreLabel => 'PSYCHOLOGY SCORE';
+
+  @override
+  String get verdictScreenDisciplineTitle => 'DISCIPLINE';
+
+  @override
+  String get verdictScreenDisciplineLabel => 'Discipline';
+
+  @override
+  String get verdictScreenPanicTitle => 'PANIC';
+
+  @override
+  String get verdictScreenPanicLabel => 'Panic';
+
+  @override
+  String get verdictScreenPatienceTitle => 'PATIENCE';
+
+  @override
+  String get verdictScreenPatienceLabel => 'Patience';
 }

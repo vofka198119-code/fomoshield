@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 
 class VerdictMarkerRow extends StatelessWidget {
@@ -34,14 +35,15 @@ class VerdictMarkerRow extends StatelessWidget {
     return ThemeV2.loss;
   }
 
-  String get _statusWord {
-    if (score >= 0.7) return 'Good';
-    if (score >= 0.4) return 'Fair';
-    return 'Needs Work';
+  String _statusWord(AppLocalizations l10n) {
+    if (score >= 0.7) return l10n.verdictMarkerRowGood;
+    if (score >= 0.4) return l10n.verdictMarkerRowFair;
+    return l10n.verdictMarkerRowNeedsWork;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = _color;
 
     return Container(
@@ -87,7 +89,7 @@ class VerdictMarkerRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _statusWord,
+                  _statusWord(l10n),
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
