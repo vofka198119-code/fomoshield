@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
@@ -30,6 +31,23 @@ bool isEtfSecurityType(String? type) {
 class FinnhubService {
   final Dio _backendDio;
   final Map<String, _CacheEntry> _cache = {};
+
+  // ---------------------------------------------------------------------------
+  // Concurrency limiting + in-flight de-dup
+  // ---------------------------------------------------------------------------
+  // A screen that renders N rows at once (S&P 500 list, Portfolio/Stress
+  // Test holdings) used to fire N independent backend calls the instant it
+  // mounted — easily blowing past the backend's own 120-req/60s client
+  // rate limit in under a second and leaving every row stuck on its letter-
+  // avatar fallback. [_limiter] caps how many of THIS client's requests are
+  // actually in flight to the backend at once; the rest queue instead of
+  // firing immediately. [_inFlight] additionally collapses concurrent
+  // requests for the exact same cache key (e.g. Logo and Sector both
+  // fetching AAPL's profile in the same frame) into a single network call
+  // that both callers await.
+  final _limiter = _ConcurrencyLimiter(maxConcurrent: 4);
+  final Map<String, Future<Map<String, dynamic>>> _inFlight = {};
+  final Map<String, Future<List<dynamic>>> _inFlightRaw = {};
 
   FinnhubService()
     : _backendDio = Dio(
@@ -85,8 +103,30 @@ class FinnhubService {
     final cached = _getCached(cacheKey);
     if (cached != null) return cached.data as Map<String, dynamic>;
 
+    // Someone else already asked for this exact key this instant (e.g. Logo
+    // and Sector both cache-missing the same ticker's profile in the same
+    // frame) — await their in-flight request instead of firing a duplicate.
+    final pending = _inFlight[cacheKey];
+    if (pending != null) return pending;
+
+    final future = _fetchFromBackend(path, params, cacheKey);
+    _inFlight[cacheKey] = future;
     try {
-      final response = await _backendDio.get(path, queryParameters: params);
+      return await future;
+    } finally {
+      _inFlight.remove(cacheKey);
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchFromBackend(
+    String path,
+    Map<String, dynamic>? params,
+    String cacheKey,
+  ) async {
+    try {
+      final response = await _limiter.run(
+        () => _backendDio.get(path, queryParameters: params),
+      );
       if (response.data is! Map) {
         throw Exception(
           'Backend $path: unexpected response type ${response.data.runtimeType}',
@@ -122,7 +162,26 @@ class FinnhubService {
     final cached = _getCachedRaw(cacheKey);
     if (cached != null) return cached;
 
-    final response = await _backendDio.get(path, queryParameters: params);
+    final pending = _inFlightRaw[cacheKey];
+    if (pending != null) return pending;
+
+    final future = _fetchRawFromBackend(path, params, cacheKey);
+    _inFlightRaw[cacheKey] = future;
+    try {
+      return await future;
+    } finally {
+      _inFlightRaw.remove(cacheKey);
+    }
+  }
+
+  Future<List<dynamic>> _fetchRawFromBackend(
+    String path,
+    Map<String, dynamic>? params,
+    String cacheKey,
+  ) async {
+    final response = await _limiter.run(
+      () => _backendDio.get(path, queryParameters: params),
+    );
     if (response.data is List) {
       final data = List<dynamic>.from(response.data);
       _setCacheRaw(cacheKey, data);
@@ -475,4 +534,35 @@ class _CacheEntry {
   final dynamic data;
   final DateTime time;
   _CacheEntry(this.data, this.time);
+}
+
+/// Simple FIFO concurrency gate — at most [maxConcurrent] calls to [run]
+/// are ever mid-flight at once; anything past that queues until a slot
+/// frees up. Mirrors, on the client side, what the backend's own
+/// per-client rate limit already enforces server-side — without this, a
+/// screen rendering N rows at once fired all N requests in the same
+/// frame instead of trickling them out.
+class _ConcurrencyLimiter {
+  final int maxConcurrent;
+  int _active = 0;
+  final List<Completer<void>> _queue = [];
+
+  _ConcurrencyLimiter({required this.maxConcurrent});
+
+  Future<T> run<T>(Future<T> Function() task) async {
+    if (_active >= maxConcurrent) {
+      final waiter = Completer<void>();
+      _queue.add(waiter);
+      await waiter.future;
+    }
+    _active++;
+    try {
+      return await task();
+    } finally {
+      _active--;
+      if (_queue.isNotEmpty) {
+        _queue.removeAt(0).complete();
+      }
+    }
+  }
 }

@@ -1459,6 +1459,12 @@ abstract class AppLocalizations {
   /// **'TOP S&P 500'**
   String get searchTopSp500;
 
+  /// No description provided for @searchOtherSector.
+  ///
+  /// In en, this message translates to:
+  /// **'OTHER'**
+  String get searchOtherSector;
+
   /// No description provided for @searchRecentlyViewed.
   ///
   /// In en, this message translates to:
@@ -1740,6 +1746,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New target {amount} ({signed})'**
   String setGoalScreenNotifDetailUpdated(String amount, String signed);
+
+  /// No description provided for @verdictAccessLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Renew Premium to view again'**
+  String get verdictAccessLockedTitle;
+
+  /// No description provided for @verdictAccessLockedDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already used your one free look at this verdict after Premium expired. Renew Premium to view it again.'**
+  String get verdictAccessLockedDetail;
+
+  /// No description provided for @fundingModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you want to fund this test?'**
+  String get fundingModeTitle;
+
+  /// No description provided for @fundingModeLumpSumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All at once'**
+  String get fundingModeLumpSumTitle;
+
+  /// No description provided for @fundingModeLumpSumDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with the full \$15,000 right away.'**
+  String get fundingModeLumpSumDetail;
+
+  /// No description provided for @fundingModeDcaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly deposits'**
+  String get fundingModeDcaTitle;
+
+  /// No description provided for @fundingModeDcaDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with \$2,500, then simulate adding \$200 every week.'**
+  String get fundingModeDcaDetail;
+
+  /// No description provided for @weeklyPayoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Deposit'**
+  String get weeklyPayoutTitle;
+
+  /// No description provided for @weeklyPayoutDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} added to your portfolio — tap to view.'**
+  String weeklyPayoutDetail(String amount);
+
+  /// No description provided for @weeklyPayoutPausedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Deposit Paused'**
+  String get weeklyPayoutPausedTitle;
+
+  /// No description provided for @weeklyPayoutPausedDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Your premium subscription lapsed, so the weekly deposit is on hold — renew to resume it.'**
+  String get weeklyPayoutPausedDetail;
+
+  /// No description provided for @subscriptionUpgradedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Premium'**
+  String get subscriptionUpgradedTitle;
+
+  /// No description provided for @subscriptionUpgradedDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is now Premium — enjoy the extra perks.'**
+  String get subscriptionUpgradedDetail;
+
+  /// No description provided for @subscriptionDowngradedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Expired'**
+  String get subscriptionDowngradedTitle;
+
+  /// No description provided for @subscriptionDowngradedDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Premium subscription has ended — you\'re back on the Free plan.'**
+  String get subscriptionDowngradedDetail;
 
   /// No description provided for @portfolioTradeHistoryScreenPortfolioNotFound.
   ///
@@ -4098,6 +4194,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Price not available'**
   String get tradesEnginePriceNotAvailable;
+
+  /// No description provided for @tradesEngineSlotFrozen.
+  ///
+  /// In en, this message translates to:
+  /// **'This test is frozen — renew Premium to buy or sell here again.'**
+  String get tradesEngineSlotFrozen;
 
   /// No description provided for @tradesEngineInvalidAmount.
   ///

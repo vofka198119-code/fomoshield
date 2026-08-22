@@ -22,6 +22,7 @@ import '../../shared/guardian/guardian_engine.dart';
 import '../../shared/guardian/guardian_providers.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
+import 'stress_test_dca_provider.dart';
 
 // Market Clock ring's gold accent — used for every "PREMIUM" tag on this
 // screen.
@@ -42,6 +43,12 @@ class StressTestSetupScreen extends ConsumerStatefulWidget {
 class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   TestDuration _selectedDuration = TestDuration.week1;
   int _customDurationDays = 5; // Only used when _selectedDuration == custom
+  // Set right after the custom-duration picker's Apply, before the risk
+  // disclaimer — see _showCustomDurationPicker. Only meaningful while
+  // _selectedDuration == custom; reset whenever the user picks a
+  // different duration so a stale DCA choice can't leak into a lump-sum
+  // week1/month1/3-months test.
+  bool _useDcaFunding = false;
 
   StressTestSession? get _session =>
       ref.read(stressTestProvider.notifier).getSession(widget.sessionId);
@@ -96,6 +103,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       return;
     }
 
+    // Custom-duration funding choice (lump sum vs DCA) was already made
+    // right after the custom-duration picker's Apply — see
+    // _showCustomDurationPicker — well before this disclaimer step.
+    final useDca = _selectedDuration == TestDuration.custom && _useDcaFunding;
+
     final notifier = ref.read(stressTestProvider.notifier);
     // Apply selected duration before starting
     notifier.setSessionDuration(
@@ -104,7 +116,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       customDurationDays: _selectedDuration == TestDuration.custom
           ? _customDurationDays
           : null,
+      overrideCash: useDca ? dcaStartingCash : null,
     );
+    if (useDca) {
+      await markStressTestDcaFunded(ref, widget.sessionId);
+    }
     notifier.startTest(widget.sessionId);
 
     // Record test start for Guardian intelligence
@@ -403,7 +419,12 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               } else if (isCustomRow) {
                 _showCustomDurationPicker();
               } else {
-                setState(() => _selectedDuration = d);
+                setState(() {
+                  _selectedDuration = d;
+                  // A DCA choice only ever applies to Custom — picking
+                  // any other duration must not carry it forward.
+                  _useDcaFunding = false;
+                });
               }
             },
             child: Container(
@@ -616,7 +637,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 left: 24,
                 right: 24,
                 top: 24,
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+                // viewInsets.bottom covers the keyboard; padding.bottom
+                // covers the 3-button Android nav bar (0 on gesture-nav
+                // devices) — without it the Apply/Cancel row sat right
+                // under the system buttons on 3-button devices.
+                bottom:
+                    MediaQuery.of(ctx).viewInsets.bottom +
+                    MediaQuery.of(ctx).padding.bottom +
+                    24,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -767,12 +795,32 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         child: SizedBox(
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               setState(() {
                                 _selectedDuration = TestDuration.custom;
                                 _customDurationDays = tempDays;
                               });
                               Navigator.of(ctx).pop();
+                              // Funding choice right here, before the risk
+                              // disclaimer — see _startTest's doc comment.
+                              // Uses the State's own `context` (this
+                              // method's, not the closed sheet's `ctx`),
+                              // which is still valid — the setup screen
+                              // underneath stays mounted.
+                              final choice = await showModalBottomSheet<bool>(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: ThemeV2.surface,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20),
+                                  ),
+                                ),
+                                builder: (_) => const _FundingModeSheet(),
+                              );
+                              if (choice != null && mounted) {
+                                setState(() => _useDcaFunding = choice);
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFD4AF37),
@@ -1186,6 +1234,121 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Funding Mode Sheet — Custom-duration only: lump sum vs weekly DCA.
+// ---------------------------------------------------------------------------
+// Bottom sheet, same chrome as _showCustomDurationPicker's sheet (handle,
+// rounded top corners, ThemeV2.surface) rather than a centered Dialog —
+// matches this screen's own convention for a mid-flow choice. Pops true
+// for DCA, false for lump sum, null if dismissed (caller treats null the
+// same as Cancel — see _startTest).
+// ---------------------------------------------------------------------------
+
+class _FundingModeSheet extends StatelessWidget {
+  const _FundingModeSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom +
+            24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Handle
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            l10n.fundingModeTitle,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: ThemeV2.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 20),
+          _fundingOption(
+            context,
+            title: l10n.fundingModeLumpSumTitle,
+            detail: l10n.fundingModeLumpSumDetail,
+            onTap: () => Navigator.of(context).pop(false),
+          ),
+          const SizedBox(height: 12),
+          _fundingOption(
+            context,
+            title: l10n.fundingModeDcaTitle,
+            detail: l10n.fundingModeDcaDetail,
+            onTap: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _fundingOption(
+    BuildContext context, {
+    required String title,
+    required String detail,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFD4AF37).withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFFD4AF37),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              detail,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: ThemeV2.textSecondary,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

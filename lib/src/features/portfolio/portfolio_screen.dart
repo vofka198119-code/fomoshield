@@ -7,14 +7,10 @@ import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/router/navigation_history_provider.dart';
 import '../../core/supabase/supabase_providers.dart';
-import '../market_clock/market_clock_dial.dart'
-    show dialBrassLight, darkCardDecoration;
-import '../monetization/monetization_modal.dart';
-import '../monetization/premium_promo_overlay.dart';
 import 'portfolio_providers.dart';
 import 'portfolio_limits_provider.dart';
+import 'weekly_payout_provider.dart';
 import '../orders/pending_orders_checker.dart';
-import 'portfolio_ad_provider.dart';
 import 'portfolio_widget_order_provider.dart';
 import 'widgets/portfolio_balance_widget.dart';
 import 'widgets/portfolio_cash_widget.dart';
@@ -28,7 +24,6 @@ import '../../shared/widgets/stagger_fade_in.dart';
 import 'widgets/my_limit_orders_widget.dart';
 
 part 'widgets/portfolio_body.dart';
-part 'widgets/portfolio_selector.dart';
 part 'widgets/portfolio_widgets_settings_sheet.dart';
 
 class PortfolioScreen extends ConsumerStatefulWidget {
@@ -147,7 +142,8 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
 
   Widget _emptyState(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final startingCapital = startingCapitalForIndex(0);
+    final tier = ref.watch(subscriptionTierProvider);
+    final startingCapital = startingCapitalForTier(tier);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -445,7 +441,9 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
                   .read(portfoliosProvider.notifier)
                   .addPortfolio(
                     controller.text.trim(),
-                    startingBalance: startingCapitalForIndex(currentCount),
+                    startingBalance: startingCapitalForTier(
+                      ref.read(subscriptionTierProvider),
+                    ),
                   );
               Navigator.pop(ctx);
             }

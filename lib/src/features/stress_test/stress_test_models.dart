@@ -1428,6 +1428,16 @@ class VerdictArchiveEntry {
   /// field existed.
   final Map<String, double> unrealizedPnlBySymbol;
 
+  /// True if this session was slot #2/#3 (a premium-only "extra" slot,
+  /// see stress_test_engine.dart's isStressTestSlotFrozen) at the moment
+  /// it completed — snapshotted here because slot position can no longer
+  /// be computed once the live session is wiped from state on archival.
+  /// Drives the "one free look after Premium lapses" verdict gate — see
+  /// stress_test_verdict_access_provider.dart. Absent (false) for
+  /// verdicts archived before this field existed, which just means no
+  /// gate applies to them (same as slot #1 today).
+  final bool wasPremiumSlot;
+
   const VerdictArchiveEntry({
     required this.sessionId,
     required this.durationLabel,
@@ -1452,6 +1462,7 @@ class VerdictArchiveEntry {
     this.safetyMarkerHasData = false,
     this.scenarioCounts = const {},
     this.unrealizedPnlBySymbol = const {},
+    this.wasPremiumSlot = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -1478,6 +1489,7 @@ class VerdictArchiveEntry {
     'safetyMarkerHasData': safetyMarkerHasData,
     'scenarioCounts': scenarioCounts,
     'unrealizedPnlBySymbol': unrealizedPnlBySymbol,
+    'wasPremiumSlot': wasPremiumSlot,
   };
 
   factory VerdictArchiveEntry.fromJson(
@@ -1533,6 +1545,7 @@ class VerdictArchiveEntry {
           (k, v) => MapEntry(k, (v as num).toDouble()),
         ) ??
         const {},
+    wasPremiumSlot: json['wasPremiumSlot'] as bool? ?? false,
   );
 }
 

@@ -19,11 +19,9 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/numeric_keypad.dart';
+import '../../../core/supabase/supabase_providers.dart';
+import '../portfolio_limits_provider.dart';
 import '../portfolio_providers.dart';
-
-// Fallback only — normally the min goal is the portfolio's own
-// startingBalance ($15k for the first portfolio, $50k for the 2nd/3rd).
-const double _fallbackMinGoal = 15000;
 
 class SetGoalScreen extends ConsumerStatefulWidget {
   final String portfolioId;
@@ -62,9 +60,10 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
   double get _minGoal {
     final portfolios = ref.read(portfoliosProvider);
     final portfolio = portfolios.where((p) => p.id == widget.portfolioId);
-    return portfolio.isEmpty
-        ? _fallbackMinGoal
-        : portfolio.first.startingBalance;
+    if (portfolio.isNotEmpty) return portfolio.first.startingBalance;
+    // Fallback only — portfolio not found is an edge case that shouldn't
+    // happen in practice; falls back to this tier's own starting capital.
+    return startingCapitalForTier(ref.read(subscriptionTierProvider));
   }
 
   void _save() {

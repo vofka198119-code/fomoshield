@@ -98,12 +98,21 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                             endIndent: 16,
                             color: Colors.black.withValues(alpha: 0.06),
                           ),
-                          for (int i = 0; i < watchlistSymbols.length; i++)
-                            _WatchlistRow(
+                          // Lazy-built (shrinkWrap over the outer scroll
+                          // view still only builds rows near the viewport,
+                          // same as ListView.separated elsewhere) — a large
+                          // watchlist no longer fires every row's logo/name
+                          // fetch in one frame just because it's on screen.
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: watchlistSymbols.length,
+                            itemBuilder: (context, i) => _WatchlistRow(
                               key: ValueKey(watchlistSymbols[i]),
                               symbol: watchlistSymbols[i],
                               showDivider: i < watchlistSymbols.length - 1,
                             ),
+                          ),
                         ],
                       ),
                     ),
@@ -155,8 +164,8 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
 
 // ---------------------------------------------------------------------------
 // Watchlist Row — logo, name + sector, no live price (see cachedLogoEntryProvider
-// doc comment: no Finnhub call ever happens from this row — price only shows
-// once the user taps through to Company Detail).
+// doc comment: no Finnhub call ever happens from this row, by design — price
+// only shows once the user taps through to Company Detail).
 // ---------------------------------------------------------------------------
 
 class _WatchlistRow extends ConsumerWidget {

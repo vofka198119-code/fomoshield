@@ -18,6 +18,7 @@ import '../../../core/cache/sector_providers.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
+import '../../../core/supabase/supabase_providers.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/guardian/guardian_engine.dart';
 import '../../../shared/guardian/guardian_providers.dart';
@@ -189,6 +190,19 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       return;
     }
 
+    // Frozen slot (#2/#3, lapsed Premium) — block both market AND limit
+    // orders here, before either path below fires.
+    if (isStressTestSlotFrozen(
+      ref.read(stressTestProvider),
+      widget.sessionId,
+      ref.read(subscriptionTierProvider),
+    )) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.tradesEngineSlotFrozen)));
+      return;
+    }
+
     double? limitPrice;
     if (_selectedOrderType == _OrderType.limit) {
       limitPrice = double.tryParse(_limitPriceController.text);
@@ -260,6 +274,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           shares,
           useShares: true,
           l10n: AppLocalizations.of(context)!,
+          tier: ref.read(subscriptionTierProvider),
         );
 
     if (!result.success) {

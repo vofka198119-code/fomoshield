@@ -335,6 +335,7 @@
   "searchErrorRateLimited": "API limit reached. Please try again later.",
   "searchErrorGeneric": "Couldn't load results. Try again.",
   "searchTopSp500": "TOP S&P 500",
+  "searchOtherSector": "OTHER",
   "searchRecentlyViewed": "RECENTLY VIEWED",
   "searchTopCompaniesBuilding": "Top companies list is still being built on the server.",
   "searchTopCompaniesLoadError": "Couldn't load top companies. Pull to retry shortly.",
@@ -441,6 +442,28 @@
       }
     }
   },
+  "verdictAccessLockedTitle": "Renew Premium to view again",
+  "verdictAccessLockedDetail": "You've already used your one free look at this verdict after Premium expired. Renew Premium to view it again.",
+  "fundingModeTitle": "How do you want to fund this test?",
+  "fundingModeLumpSumTitle": "All at once",
+  "fundingModeLumpSumDetail": "Start with the full $15,000 right away.",
+  "fundingModeDcaTitle": "Weekly deposits",
+  "fundingModeDcaDetail": "Start with $2,500, then simulate adding $200 every week.",
+  "weeklyPayoutTitle": "Weekly Deposit",
+  "weeklyPayoutDetail": "{amount} added to your portfolio — tap to view.",
+  "@weeklyPayoutDetail": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "weeklyPayoutPausedTitle": "Weekly Deposit Paused",
+  "weeklyPayoutPausedDetail": "Your premium subscription lapsed, so the weekly deposit is on hold — renew to resume it.",
+  "subscriptionUpgradedTitle": "Welcome to Premium",
+  "subscriptionUpgradedDetail": "Your account is now Premium — enjoy the extra perks.",
+  "subscriptionDowngradedTitle": "Premium Expired",
+  "subscriptionDowngradedDetail": "Your Premium subscription has ended — you're back on the Free plan.",
   "portfolioTradeHistoryScreenPortfolioNotFound": "Portfolio not found",
   "portfolioTradeHistoryScreenNoTradesYet": "No trades yet",
   "portfolioWidgetsSettingsSheetTitle": "Portfolio Widgets",
@@ -911,6 +934,7 @@
   "stressTestVerdictBalancedDescription": "Your trading patterns show a mix of behaviors. While you avoided major emotional pitfalls, there is room for improvement in your decision-making process. Focus on building a systematic approach to investing that minimizes emotional reactions.",
   "tradesEngineTestNotActive": "Test not active",
   "tradesEnginePriceNotAvailable": "Price not available",
+  "tradesEngineSlotFrozen": "This test is frozen — renew Premium to buy or sell here again.",
   "tradesEngineInvalidAmount": "Invalid amount",
   "tradesEngineInsufficientCash": "Insufficient cash",
   "tradesEngineInsufficientShares": "Insufficient shares",

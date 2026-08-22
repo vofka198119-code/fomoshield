@@ -35,6 +35,7 @@ import '../../shared/widgets/psychology_meter.dart';
 import '../../shared/widgets/market_timeline.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
+import 'stress_test_dca_provider.dart';
 import 'widgets/market_value_chart.dart';
 import 'stress_test_widget_order_provider.dart';
 import 'widgets/stress_test_allocation_chart.dart';
@@ -83,24 +84,44 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         ref.read(stressTestProvider.notifier).refreshPrices(widget.sessionId);
       }
     });
-    // Check open counter for ad (every 6th opening for free users past 1st test)
+    // Check open counter for ad (every 6th opening for free users past 1st
+    // test) — a frozen (#2/#3) slot uses its own separate counter instead,
+    // at the same cadence, so viewing a frozen test doesn't also burn
+    // through the general "opened any test" counter.
     Future.microtask(() {
       if (!mounted) return;
       final tier = ref.read(subscriptionTierProvider);
-      if (tier == SubscriptionTier.free) {
-        final showAd = ref
-            .read(stressTestProvider.notifier)
-            .checkAndIncrementOpenCounter();
-        if (showAd) {
-          showPremiumPromoOverlay(
-            context: context,
-            title: AppLocalizations.of(context)!.stressTestAccessTitle,
-            durationSeconds: 5,
-            onComplete: () {
-              if (context.mounted) showMonetizationModal(context, ref);
-            },
-          );
-        }
+      if (tier != SubscriptionTier.free) return;
+      final notifier = ref.read(stressTestProvider.notifier);
+      final isFrozen = isStressTestSlotFrozen(
+        ref.read(stressTestProvider),
+        widget.sessionId,
+        tier,
+      );
+      final showAd = isFrozen
+          ? notifier.checkAndIncrementFrozenViewCounter()
+          : notifier.checkAndIncrementOpenCounter();
+      if (showAd) {
+        showPremiumPromoOverlay(
+          context: context,
+          title: AppLocalizations.of(context)!.stressTestAccessTitle,
+          durationSeconds: 5,
+          onComplete: () {
+            if (context.mounted) showMonetizationModal(context, ref);
+          },
+        );
+      }
+    });
+    // DCA weekly catch-up — independent of the free-tier-only ad check
+    // above (checkStressTestDcaPayout itself gates on premium/admin, so a
+    // free-tier viewer here is simply a no-op, matching the freeze logic).
+    Future.microtask(() {
+      if (!mounted) return;
+      final session = ref
+          .read(stressTestProvider.notifier)
+          .getSession(widget.sessionId);
+      if (session != null) {
+        checkStressTestDcaPayout(ref, session, AppLocalizations.of(context)!);
       }
     });
     _timer = Timer.periodic(const Duration(seconds: 20), (_) {

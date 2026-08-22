@@ -22,6 +22,8 @@ import '../market_clock/market_clock_dial.dart'
 import '../../shared/widgets/stagger_fade_in.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
+import 'stress_test_verdict_access_provider.dart';
+import '../monetization/monetization_modal.dart';
 import 'psychology_engine.dart' show computeStrategicScore;
 import 'widgets/verdict_trade_breakdown_widget.dart';
 import 'widgets/verdict/verdict_marker_row.dart';
@@ -59,6 +61,72 @@ class VerdictScreen extends ConsumerWidget {
         ),
         body: Center(
           child: Text(l10n.verdictNotAvailable),
+        ),
+      );
+    }
+
+    final access = ref.watch(verdictAccessProvider(sessionId));
+    if (access.isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: CircularProgressIndicator(color: ThemeV2.primary),
+        ),
+      );
+    }
+    final locked = access.valueOrNull == false;
+    if (locked) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          title: Text(
+            l10n.verdictTitle,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: ThemeV2.primary,
+            ),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.lock_rounded,
+                  size: 48,
+                  color: ThemeV2.textSecondary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.verdictAccessLockedTitle,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: ThemeV2.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.verdictAccessLockedDetail,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: ThemeV2.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => showMonetizationModal(context, ref),
+                  child: Text(l10n.verdictAccessLockedTitle),
+                ),
+              ],
+            ),
+          ),
         ),
       );
     }

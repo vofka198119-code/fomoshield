@@ -24,8 +24,6 @@ import 'widgets/company_widgets_settings_sheet.dart';
 import 'widgets/company_bottom_bar.dart';
 import 'widgets/company_ad_overlay.dart';
 import '../search/recently_viewed_provider.dart';
-import '../portfolio/portfolio_limits_provider.dart'
-    show firstPortfolioStartingCapital;
 
 // ---------------------------------------------------------------------------
 // Screen
@@ -313,6 +311,9 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
   void _openOrderEntry(String type) {
     final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.read(portfoliosProvider);
+    final tier = ref.read(subscriptionTierProvider);
+    final isPremiumTier =
+        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
     if (portfolios.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.companyDetailNoPortfolios)),
@@ -385,7 +386,10 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                 child: PortfolioOptionTile(
                   name: p.name,
                   cash: p.cash,
-                  isPremium: p.startingBalance > firstPortfolioStartingCapital,
+                  // Every portfolio is on the same (single-slot) plan now —
+                  // "premium" here just reflects the user's own tier, not a
+                  // per-portfolio distinction like the old $15k/$50k tiers.
+                  isPremium: isPremiumTier,
                   onTap: () {
                     Navigator.pop(ctx);
                     context.push(

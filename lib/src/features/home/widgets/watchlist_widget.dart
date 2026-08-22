@@ -49,7 +49,8 @@ class WatchlistWidget extends ConsumerWidget {
 
 // ---------------------------------------------------------------------------
 // Watchlist Tile — Compact version (no accordion), no live price (see
-// cachedLogoEntryProvider doc comment: no Finnhub call ever from this tile).
+// cachedLogoEntryProvider doc comment: no Finnhub call ever from this tile,
+// by design).
 // ---------------------------------------------------------------------------
 
 class _WatchlistTile extends ConsumerWidget {

@@ -25,6 +25,15 @@ import '../../../l10n/gen/app_localizations.dart';
 
 const _lanePreviewCount = 6;
 
+// The "TOP S&P 500" lane's own "see all" used to hand company_list_sheet
+// all ~500 ranked constituents at once — opening it fired a burst of
+// concurrent profile/logo fetches for every row scrolled into view,
+// hitting the backend's per-client rate limit within a second on a cold
+// cache. Real users don't need all 500 in one flat list anyway — the
+// per-sector lanes below already cover the full roster, dosed out lane by
+// lane instead of in one 500-row dump.
+const _topSp500Limit = 30;
+
 // Lanes cascade in over a ~2s total window (matches roughly how long it
 // takes to scroll to the bottom) instead of a flat per-lane delay that
 // would keep growing with the sector count — see StaggerFadeIn's
@@ -85,9 +94,20 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
         }
 
         final bySector = <GicsSector, List<TopCompanyEntry>>{};
+        // Companies resolveGicsSector can't place in any of the 11 GICS
+        // sectors (mid/small-cap names outside CompanyTagMapper's curated
+        // table — ~236 of the 502 real S&P 500 constituents, spot-checked
+        // 2026-08-22) used to just vanish from every lane instead of
+        // showing up in the sector they'd normally belong to — real stocks
+        // here, not ETFs/crypto (the other null case), so "unclassified"
+        // beats "invisible". Collected into its own OTHER lane below.
+        final unclassified = <TopCompanyEntry>[];
         for (final c in companies) {
           final sector = resolveGicsSector(c.symbol);
-          if (sector == null) continue;
+          if (sector == null) {
+            unclassified.add(c);
+            continue;
+          }
           bySector.putIfAbsent(sector, () => []).add(c);
         }
 
@@ -102,7 +122,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
             onSeeAll: () => showCompanyListSheet(
               context,
               l10n.searchTopSp500,
-              companies,
+              companies.take(_topSp500Limit).toList(),
               onTapSymbol: widget.onTapSymbol,
             ),
           ),
@@ -120,6 +140,17 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                   onTapSymbol: widget.onTapSymbol,
                 ),
               ),
+          if (unclassified.isNotEmpty)
+            BrowseLane(
+              title: l10n.searchOtherSector,
+              items: _cards(unclassified.take(_lanePreviewCount).toList()),
+              onSeeAll: () => showCompanyListSheet(
+                context,
+                l10n.searchOtherSector,
+                unclassified,
+                onTapSymbol: widget.onTapSymbol,
+              ),
+            ),
           if (recentlyViewed.isNotEmpty)
             BrowseLane(
               title: l10n.searchRecentlyViewed,

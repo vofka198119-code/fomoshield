@@ -762,6 +762,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchTopSp500 => 'TOP S&P 500';
 
   @override
+  String get searchOtherSector => 'OTHER';
+
+  @override
   String get searchRecentlyViewed => 'RECENTLY VIEWED';
 
   @override
@@ -924,6 +927,59 @@ class AppLocalizationsEn extends AppLocalizations {
   String setGoalScreenNotifDetailUpdated(String amount, String signed) {
     return 'New target $amount ($signed)';
   }
+
+  @override
+  String get verdictAccessLockedTitle => 'Renew Premium to view again';
+
+  @override
+  String get verdictAccessLockedDetail =>
+      'You\'ve already used your one free look at this verdict after Premium expired. Renew Premium to view it again.';
+
+  @override
+  String get fundingModeTitle => 'How do you want to fund this test?';
+
+  @override
+  String get fundingModeLumpSumTitle => 'All at once';
+
+  @override
+  String get fundingModeLumpSumDetail =>
+      'Start with the full \$15,000 right away.';
+
+  @override
+  String get fundingModeDcaTitle => 'Weekly deposits';
+
+  @override
+  String get fundingModeDcaDetail =>
+      'Start with \$2,500, then simulate adding \$200 every week.';
+
+  @override
+  String get weeklyPayoutTitle => 'Weekly Deposit';
+
+  @override
+  String weeklyPayoutDetail(String amount) {
+    return '$amount added to your portfolio — tap to view.';
+  }
+
+  @override
+  String get weeklyPayoutPausedTitle => 'Weekly Deposit Paused';
+
+  @override
+  String get weeklyPayoutPausedDetail =>
+      'Your premium subscription lapsed, so the weekly deposit is on hold — renew to resume it.';
+
+  @override
+  String get subscriptionUpgradedTitle => 'Welcome to Premium';
+
+  @override
+  String get subscriptionUpgradedDetail =>
+      'Your account is now Premium — enjoy the extra perks.';
+
+  @override
+  String get subscriptionDowngradedTitle => 'Premium Expired';
+
+  @override
+  String get subscriptionDowngradedDetail =>
+      'Your Premium subscription has ended — you\'re back on the Free plan.';
 
   @override
   String get portfolioTradeHistoryScreenPortfolioNotFound =>
@@ -2327,6 +2383,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tradesEnginePriceNotAvailable => 'Price not available';
+
+  @override
+  String get tradesEngineSlotFrozen =>
+      'This test is frozen — renew Premium to buy or sell here again.';
 
   @override
   String get tradesEngineInvalidAmount => 'Invalid amount';

@@ -764,6 +764,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get searchTopSp500 => 'ТОП S&P 500';
 
   @override
+  String get searchOtherSector => 'ПРОЧИЕ';
+
+  @override
   String get searchRecentlyViewed => 'НЕДАВНО ПРОСМОТРЕННЫЕ';
 
   @override
@@ -927,6 +930,60 @@ class AppLocalizationsRu extends AppLocalizations {
   String setGoalScreenNotifDetailUpdated(String amount, String signed) {
     return 'Новая цель $amount ($signed)';
   }
+
+  @override
+  String get verdictAccessLockedTitle =>
+      'Продлите Premium, чтобы посмотреть снова';
+
+  @override
+  String get verdictAccessLockedDetail =>
+      'Вы уже использовали единственный бесплатный просмотр этого вердикта после истечения Premium. Продлите подписку, чтобы посмотреть его снова.';
+
+  @override
+  String get fundingModeTitle => 'Как профинансировать этот тест?';
+
+  @override
+  String get fundingModeLumpSumTitle => 'Всё сразу';
+
+  @override
+  String get fundingModeLumpSumDetail =>
+      'Начать сразу с полной суммой \$15,000.';
+
+  @override
+  String get fundingModeDcaTitle => 'Еженедельные пополнения';
+
+  @override
+  String get fundingModeDcaDetail =>
+      'Начать с \$2,500, затем имитация пополнения на \$200 каждую неделю.';
+
+  @override
+  String get weeklyPayoutTitle => 'Еженедельное пополнение';
+
+  @override
+  String weeklyPayoutDetail(String amount) {
+    return '$amount зачислено на ваш портфель — нажмите, чтобы посмотреть.';
+  }
+
+  @override
+  String get weeklyPayoutPausedTitle => 'Пополнение приостановлено';
+
+  @override
+  String get weeklyPayoutPausedDetail =>
+      'Подписка Premium истекла, еженедельное пополнение приостановлено — продлите подписку, чтобы возобновить.';
+
+  @override
+  String get subscriptionUpgradedTitle => 'Добро пожаловать в Premium';
+
+  @override
+  String get subscriptionUpgradedDetail =>
+      'Ваш аккаунт теперь Premium — пользуйтесь дополнительными возможностями.';
+
+  @override
+  String get subscriptionDowngradedTitle => 'Premium истёк';
+
+  @override
+  String get subscriptionDowngradedDetail =>
+      'Ваша подписка Premium закончилась — вы вернулись на тариф Free.';
 
   @override
   String get portfolioTradeHistoryScreenPortfolioNotFound =>
@@ -2328,6 +2385,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tradesEnginePriceNotAvailable => 'Цена недоступна';
+
+  @override
+  String get tradesEngineSlotFrozen =>
+      'Этот тест заморожен — продлите Premium, чтобы снова покупать и продавать здесь.';
 
   @override
   String get tradesEngineInvalidAmount => 'Некорректная сумма';

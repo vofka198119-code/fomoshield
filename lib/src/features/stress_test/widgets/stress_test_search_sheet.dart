@@ -18,6 +18,7 @@ import '../../../shared/widgets/simulated_trading_disclaimer.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/notifications/notification_providers.dart';
+import '../../../core/supabase/supabase_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../stress_test_engine.dart';
 import '../stress_test_models.dart';
@@ -168,6 +169,21 @@ class _StressTestSearchSheetState
     final engine = ref.read(stressTestProvider.notifier);
     final session = engine.getSession(widget.sessionId);
     final isSetup = session?.status == StressTestStatus.setup;
+    final tier = ref.read(subscriptionTierProvider);
+
+    if (isStressTestSlotFrozen(
+      ref.read(stressTestProvider),
+      widget.sessionId,
+      tier,
+    )) {
+      setState(
+        () => _errorMessage = AppLocalizations.of(
+          context,
+        )!.tradesEngineSlotFrozen,
+      );
+      setState(() => _isLoading = false);
+      return;
+    }
 
     bool success;
     if (isSetup) {
@@ -177,6 +193,7 @@ class _StressTestSearchSheetState
         _amount,
         _selectedPrice,
         isEtf: _selectedIsEtf,
+        tier: tier,
       );
     } else {
       // Active phase — use executeTrade
@@ -187,6 +204,7 @@ class _StressTestSearchSheetState
         _amount,
         isEtf: _selectedIsEtf,
         l10n: AppLocalizations.of(context)!,
+        tier: tier,
       );
       success = result.success;
       if (success) {

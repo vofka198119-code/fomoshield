@@ -69,6 +69,12 @@ class Portfolio {
   List<Transaction> transactions;
   DateTime createdAt;
   double? goalAmount;
+  // When the weekly +$180 premium payout stream last credited this
+  // portfolio. Null until the user's first premium check-in — see
+  // weekly_payout_provider.dart. Not reset on a tier downgrade, so a
+  // returning premium user resumes accruing from where they left off
+  // rather than losing the whole history.
+  DateTime? lastWeeklyPayoutAt;
 
   Portfolio({
     required this.id,
@@ -77,6 +83,7 @@ class Portfolio {
     List<Transaction>? transactions,
     DateTime? createdAt,
     this.goalAmount,
+    this.lastWeeklyPayoutAt,
   }) : startingBalance = startingBalance ?? AppConstants.defaultStartingBalance,
        transactions = transactions ?? [],
        createdAt = createdAt ?? DateTime.now();
@@ -140,6 +147,7 @@ class Portfolio {
     'transactions': transactions.map((t) => t.toJson()).toList(),
     'createdAt': createdAt.toIso8601String(),
     'goalAmount': goalAmount,
+    'lastWeeklyPayoutAt': lastWeeklyPayoutAt?.toIso8601String(),
   };
 
   factory Portfolio.fromJson(Map<String, dynamic> json) => Portfolio(
@@ -157,6 +165,9 @@ class Portfolio {
         ? DateTime.parse(json['createdAt'] as String)
         : DateTime.now(),
     goalAmount: (json['goalAmount'] as num?)?.toDouble(),
+    lastWeeklyPayoutAt: json['lastWeeklyPayoutAt'] != null
+        ? DateTime.tryParse(json['lastWeeklyPayoutAt'] as String)
+        : null,
   );
 }
 
@@ -167,12 +178,23 @@ class Portfolio {
 class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
   final UserDataService _supabaseService;
   String? _userId;
+  // Starting capital for the auto-created default portfolio — resolved from
+  // the caller's subscription tier at construction time (see
+  // portfoliosProvider below). Not re-applied to an already-existing
+  // portfolio if the tier changes later; only affects a portfolio created
+  // fresh by this instance's _load().
+  final double _startingCapital;
   // Guards against _load()'s async SharedPreferences read finishing AFTER
   // loadFromSupabase() and clobbering the just-synced server data with an
   // empty/stale local cache (or worse, creating a spurious default portfolio).
   bool _loadedFromSupabase = false;
 
-  PortfolioNotifier(this._supabaseService, {this._userId}) : super([]) {
+  PortfolioNotifier(
+    this._supabaseService, {
+    this._userId,
+    required double startingCapital,
+  }) : _startingCapital = startingCapital,
+       super([]) {
     _load();
   }
 
@@ -186,9 +208,16 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
   void loadFromSupabase(List<Portfolio> portfolios) {
     if (portfolios.isEmpty) return;
     _loadedFromSupabase = true;
-    state = portfolios;
+    // Same migration as _load() below — a Supabase-synced account from
+    // before "one portfolio for everyone" can still hand back several.
+    state = portfolios.length > 1 ? [_oldestOf(portfolios)] : portfolios;
     _saveLocal(); // Cache locally
+    if (portfolios.length > 1) _syncToSupabase();
   }
+
+  Portfolio _oldestOf(List<Portfolio> portfolios) =>
+      ([...portfolios]..sort((a, b) => a.createdAt.compareTo(b.createdAt)))
+          .first;
 
   String get _storageKey =>
       _userId != null ? 'portfolios_$_userId' : 'portfolios';
@@ -208,10 +237,19 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
         Portfolio(
           id: 'default_${DateTime.now().millisecondsSinceEpoch}',
           name: 'Portfolio',
-          startingBalance: firstPortfolioStartingCapital,
+          startingBalance: _startingCapital,
         ),
       ];
       await _saveLocal();
+    } else if (state.length > 1) {
+      // Migration: an install from before "one portfolio for everyone"
+      // may still have several saved locally. Keep only the oldest (was
+      // always the free-tier "base" portfolio under the old 1/3-slot
+      // system) and persist the trim so the extras don't keep reappearing
+      // on every load.
+      state = [_oldestOf(state)];
+      await _saveLocal();
+      _syncToSupabase();
     }
   }
 
@@ -288,6 +326,42 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
     _saveLocal();
     _syncToSupabase();
   }
+
+  /// Credits the weekly premium payout — bumps startingBalance directly
+  /// (not a Transaction; this is capital added, not a trade) and advances
+  /// the portfolio's own payout clock to [creditedThrough]. See
+  /// weekly_payout_provider.dart for the caller that computes [amount] and
+  /// [creditedThrough] from elapsed weeks.
+  void creditWeeklyPayout(
+    String portfolioId,
+    double amount,
+    DateTime creditedThrough,
+  ) {
+    state = state.map((p) {
+      if (p.id == portfolioId) {
+        p.startingBalance += amount;
+        p.lastWeeklyPayoutAt = creditedThrough;
+      }
+      return p;
+    }).toList();
+    _saveLocal();
+    _syncToSupabase();
+  }
+
+  /// Starts (or restarts) a portfolio's payout clock without crediting
+  /// anything — called the first time a portfolio is seen as premium, so
+  /// there's no retroactive credit for time before the user ever had
+  /// premium (or before this feature existed).
+  void startWeeklyPayoutClock(String portfolioId, DateTime at) {
+    state = state.map((p) {
+      if (p.id == portfolioId) {
+        p.lastWeeklyPayoutAt = at;
+      }
+      return p;
+    }).toList();
+    _saveLocal();
+    _syncToSupabase();
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -298,7 +372,12 @@ final portfoliosProvider =
     StateNotifierProvider<PortfolioNotifier, List<Portfolio>>((ref) {
       final service = ref.read(userDataServiceProvider);
       final user = ref.watch(currentUserProvider);
-      return PortfolioNotifier(service, userId: user?.id);
+      final tier = ref.watch(subscriptionTierProvider);
+      return PortfolioNotifier(
+        service,
+        userId: user?.id,
+        startingCapital: startingCapitalForTier(tier),
+      );
     });
 
 final activePortfolioIdProvider = StateProvider<String?>((ref) => null);

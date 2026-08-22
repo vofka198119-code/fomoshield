@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../models/app_notification.dart';
 import '../notifications/notification_providers.dart';
+import '../theme/theme_v2.dart';
 import 'app_overlay_host.dart';
 import '../../shared/widgets/company_logo.dart';
 
@@ -64,6 +65,37 @@ IconData _iconFor(AppNotificationType type) {
       return Icons.bolt_rounded;
     case AppNotificationType.goalUpdated:
       return Icons.track_changes_rounded;
+    case AppNotificationType.weeklyPayout:
+      return Icons.savings_rounded;
+    case AppNotificationType.weeklyPayoutPaused:
+      return Icons.pause_circle_rounded;
+    case AppNotificationType.subscriptionStatusChanged:
+      return Icons.workspace_premium_rounded;
+  }
+}
+
+/// Buy/sell get their title colored green/red — a tester bought the same
+/// asset twice because the plain-black title next to a small icon didn't
+/// read as clear confirmation that the trade actually went through. Shared
+/// by the transient popup here AND the bell-icon history list
+/// (notifications_screen.dart), so a trade reads the same color in both
+/// places. Everything else keeps the caller's own neutral [fallback].
+Color notificationTitleColor(AppNotificationType type, {required Color fallback}) {
+  switch (type) {
+    case AppNotificationType.buy:
+      return ThemeV2.success;
+    case AppNotificationType.sell:
+      return ThemeV2.loss;
+    case AppNotificationType.limitOrderPlaced:
+    case AppNotificationType.limitOrderFilled:
+    case AppNotificationType.news:
+    case AppNotificationType.stressTestCompleted:
+    case AppNotificationType.priceSwing:
+    case AppNotificationType.goalUpdated:
+    case AppNotificationType.weeklyPayout:
+    case AppNotificationType.weeklyPayoutPaused:
+    case AppNotificationType.subscriptionStatusChanged:
+      return fallback;
   }
 }
 
@@ -203,7 +235,10 @@ class _AppNotificationPopupState extends State<_AppNotificationPopup>
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                        color: notificationTitleColor(
+                          n.type,
+                          fallback: Colors.black,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 2),

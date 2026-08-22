@@ -6,6 +6,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
+import '../../core/overlay/app_notification_popup.dart';
 import '../../shared/widgets/company_logo.dart';
 
 // ---------------------------------------------------------------------------
@@ -30,6 +31,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (n.type == AppNotificationType.stressTestCompleted &&
         n.portfolioId != null) {
       context.go('/stress-test/${n.portfolioId}/verdict');
+      return;
+    }
+    if (n.type == AppNotificationType.weeklyPayout) {
+      if (n.portfolioKind == NotificationPortfolioKind.stressTest &&
+          n.portfolioId != null) {
+        context.go('/stress-test/${n.portfolioId}');
+      } else {
+        context.go('/portfolio');
+      }
       return;
     }
     setState(() {
@@ -154,6 +164,12 @@ class _NotificationRow extends StatelessWidget {
         return Icons.bolt_rounded;
       case AppNotificationType.goalUpdated:
         return Icons.track_changes_rounded;
+      case AppNotificationType.weeklyPayout:
+        return Icons.savings_rounded;
+      case AppNotificationType.weeklyPayoutPaused:
+        return Icons.pause_circle_rounded;
+      case AppNotificationType.subscriptionStatusChanged:
+        return Icons.workspace_premium_rounded;
     }
   }
 
@@ -202,7 +218,10 @@ class _NotificationRow extends StatelessWidget {
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: ThemeV2.textPrimary,
+                                color: notificationTitleColor(
+                                  notification.type,
+                                  fallback: ThemeV2.textPrimary,
+                                ),
                               ),
                             ),
                           ),

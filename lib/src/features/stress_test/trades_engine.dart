@@ -26,6 +26,7 @@ extension TradesEngine on StressTestNotifier {
     double amount,
     double price, {
     bool isEtf = false,
+    SubscriptionTier? tier,
   }) async {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) return false;
@@ -33,6 +34,9 @@ extension TradesEngine on StressTestNotifier {
     final session = state[idx];
     if (session.status != StressTestStatus.setup) return false;
     if (amount > session.cash) return false;
+    if (tier != null && isStressTestSlotFrozen(state, sessionId, tier)) {
+      return false;
+    }
 
     // High-precision double: full IEEE 754, NEVER round to int
     final shares = amount / price;
@@ -127,12 +131,13 @@ extension TradesEngine on StressTestNotifier {
   }
 
   /// Remove an asset during setup phase.
-  void removeAssetSetup(String sessionId, String symbol) {
+  void removeAssetSetup(String sessionId, String symbol, {SubscriptionTier? tier}) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) return;
 
     final session = state[idx];
     if (session.status != StressTestStatus.setup) return;
+    if (tier != null && isStressTestSlotFrozen(state, sessionId, tier)) return;
 
     final holding = session.holdings.firstWhere(
       (h) => h.symbol == symbol,
@@ -207,6 +212,7 @@ extension TradesEngine on StressTestNotifier {
     bool useShares = false,
     bool isEtf = false,
     AppLocalizations? l10n,
+    SubscriptionTier? tier,
   }) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) {
@@ -221,6 +227,17 @@ extension TradesEngine on StressTestNotifier {
       return TradeResult(
         success: false,
         reason: l10n?.tradesEngineTestNotActive ?? 'Test not active',
+      );
+    }
+
+    // Slot #2/#3 frozen — trading blocked once the tier drops back to
+    // free, until Premium is renewed. Caller passes tier == null to skip
+    // this check (e.g. system-driven fills where it's already been
+    // checked upstream); pass the real tier for anything user-initiated.
+    if (tier != null && isStressTestSlotFrozen(state, sessionId, tier)) {
+      return TradeResult(
+        success: false,
+        reason: l10n?.tradesEngineSlotFrozen ?? 'This test is frozen.',
       );
     }
 

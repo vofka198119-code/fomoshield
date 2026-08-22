@@ -36,15 +36,20 @@ part 'stress_test_why_diagnostics.dart';
 // Constants
 // ---------------------------------------------------------------------------
 
-const double _freeStartingCash = 5000;
+const double _freeStartingCash = 7000;
 const double _premiumStartingCash = 15000;
-// Concurrent active slots — free: 1 ad-free + 1 ad-gated (stubbed as a
-// "Go Premium" nudge until ad integration exists). No lifetime cap on
-// total tests ever created — completing/deleting a test frees its slot.
-const int _freeMaxSessions = 2;
-const int _premiumMaxSessions = 5;
+// Concurrent active slots. No lifetime cap on total tests ever created —
+// completing/deleting a test frees its slot.
+const int _freeMaxSessions = 1;
+const int _premiumMaxSessions = 3;
 const int _adEveryNTrades = 5; // show ad after every N trades for free users
 const int _adEveryNOpen = 6; // show ad on every Nth opening
+
+// Custom-duration test funding options (premium-only, same gate as Custom
+// itself) — see stress_test_dca_provider.dart. Lump sum uses the regular
+// _premiumStartingCash ($15k) above; DCA starts lower and drips weekly.
+const double dcaStartingCash = 2500;
+const double dcaWeeklyAmount = 200;
 
 /// Wall-clock seconds per simulation tick.
 const int _tickSeconds = 20;
@@ -112,6 +117,11 @@ String _testCounterKey(String? uid) =>
     uid != null ? 'stress_test_total_$uid' : 'stress_test_total';
 String _openCounterKey(String? uid) =>
     uid != null ? 'stress_test_open_$uid' : 'stress_test_open';
+// Separate from _openCounterKey — counts views of a FROZEN (#2/#3, lapsed
+// Premium) slot specifically, at its own cadence, rather than sharing the
+// general "opened any test" counter above.
+String _frozenViewCounterKey(String? uid) =>
+    uid != null ? 'stress_test_frozen_view_$uid' : 'stress_test_frozen_view';
 String _archiveKey(String? uid) => uid != null
     ? 'stress_test_verdicts_history_$uid'
     : 'stress_test_verdicts_history';
@@ -135,6 +145,35 @@ final stressTestStartingCashProvider = Provider<double>((ref) {
       : _freeStartingCash;
 });
 
+/// Slot position (0-based, by creation order) of [sessionId] among ALL of
+/// this user's sessions ever created — not just active ones, so a slot's
+/// identity survives its own completion/deletion. Slot 0 ("test #1", the
+/// base slot) is always tradeable; slots 1+ ("#2"/"#3") only exist for
+/// premium/admin and freeze the instant the tier drops back to free — see
+/// [isStressTestSlotFrozen].
+int stressTestSlotIndex(List<StressTestSession> allSessions, String sessionId) {
+  final ordered = [...allSessions]
+    ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  return ordered.indexWhere((s) => s.id == sessionId);
+}
+
+/// True if [sessionId] is a "beyond free tier" slot (#2/#3) and the
+/// current tier is free — trading is blocked, but the session and its
+/// past trades/verdict stay readable (see stress_test_screen.dart /
+/// verdict screens, which never call this — only the trade entry points
+/// do).
+bool isStressTestSlotFrozen(
+  List<StressTestSession> allSessions,
+  String sessionId,
+  SubscriptionTier tier,
+) {
+  if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) {
+    return false;
+  }
+  final slot = stressTestSlotIndex(allSessions, sessionId);
+  return slot > 0;
+}
+
 // ---------------------------------------------------------------------------
 // Stress Test Notifier — manages all sessions and simulation
 // ---------------------------------------------------------------------------
@@ -145,6 +184,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   int _adCounter = 0;
   int _testCounter = 0; // total sessions created (across all time)
   int _openCounter = 0; // times the stress test screen has been opened
+  int _frozenViewCounter = 0; // times a frozen (#2/#3) slot has been viewed
   List<VerdictArchiveEntry> _verdictArchive = [];
 
   final UserDataService? _supabaseService;
@@ -252,6 +292,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   String get _adKey => _adCounterKey(_userId);
   String get _testKey => _testCounterKey(_userId);
   String get _openKey => _openCounterKey(_userId);
+  String get _frozenViewKey => _frozenViewCounterKey(_userId);
   String get _archiveStorageKey => _archiveKey(_userId);
 
   /// ── Task 1.7: Load active sessions from ephemeral cache ──────
@@ -295,6 +336,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _adCounter = prefs.getInt(_adKey) ?? 0;
     _testCounter = prefs.getInt(_testKey) ?? 0;
     _openCounter = prefs.getInt(_openKey) ?? 0;
+    _frozenViewCounter = prefs.getInt(_frozenViewKey) ?? 0;
     if (ranCatchUp) {
       // Guarantee anything catch-up completed (session removal + archive
       // entry) is actually persisted before _load() resolves, instead of
@@ -317,6 +359,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     await prefs.setInt(_adKey, _adCounter);
     await prefs.setInt(_testKey, _testCounter);
     await prefs.setInt(_openKey, _openCounter);
+    await prefs.setInt(_frozenViewKey, _frozenViewCounter);
     // ── Isolated: verdict history (never mixed with active data) ─
     await _saveArchive(prefs);
   }
@@ -627,6 +670,33 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _save();
   }
 
+  /// Same shape as [checkAndIncrementOpenCounter] (every Nth time, no
+  /// first-session grace period — a frozen slot only exists for a user who
+  /// already had Premium, so there's no "brand new user" case to spare
+  /// here) but its own independent counter, for viewing a frozen (#2/#3)
+  /// slot specifically.
+  bool checkAndIncrementFrozenViewCounter() {
+    _frozenViewCounter++;
+    _save();
+    return _frozenViewCounter % _adEveryNOpen == 0;
+  }
+
+  /// Credits the weekly DCA payout (Custom-duration test funding option —
+  /// see stress_test_dca_provider.dart) directly into cash. Not a Trade —
+  /// mirrors Portfolio's creditWeeklyPayout. Safe in-place mutation: `cash`
+  /// is a plain mutable field on StressTestSession, so unlike a buy/sell
+  /// this doesn't need to reconstruct the whole session object (which
+  /// would risk silently dropping any field this method doesn't know
+  /// about — the reason DCA's own funding-mode/last-payout state lives in
+  /// its own separate store instead of on StressTestSession at all).
+  void creditDcaPayout(String sessionId, double amount) {
+    state = state.map((s) {
+      if (s.id == sessionId) s.cash += amount;
+      return s;
+    }).toList();
+    _save();
+  }
+
   /// ── Task 1.7: Delete a session — wipes heavy ephemeral payload ──
   /// Removes the session from `state`, then `_save()` rewrites
   /// `active_stress_test_sessions` without this session's data,
@@ -747,17 +817,26 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
   // ── Set Duration (Setup Phase) ──────────────────────────────────
 
-  /// Update the duration of a session during setup phase.
+  /// Update the duration of a session during setup phase. [overrideCash],
+  /// when given, replaces BOTH startingCash and cash — used by the Custom
+  /// duration's DCA funding choice (see stress_test_dca_provider.dart) to
+  /// drop the session from its default lump-sum cash down to the $2,500
+  /// DCA starting amount. startingCash is final on StressTestSession, so
+  /// this is the one controlled reconstruction point for that change
+  /// (before the test starts — no trades/scoring have touched it yet).
   void setSessionDuration(
     String sessionId,
     TestDuration duration, {
     int? customDurationDays,
+    double? overrideCash,
   }) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) return;
 
     final session = state[idx];
     if (session.status != StressTestStatus.setup) return;
+    final cash = overrideCash ?? session.cash;
+    final startingCash = overrideCash ?? session.startingCash;
 
     state = [
       for (int i = 0; i < state.length; i++)
@@ -765,8 +844,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           StressTestSession(
             id: session.id,
             duration: duration,
-            startingCash: session.startingCash,
-            cash: session.cash,
+            startingCash: startingCash,
+            cash: cash,
             holdings: session.holdings,
             trades: session.trades,
             status: session.status,
@@ -1045,6 +1124,11 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       safetyMarkerHasData: finalSafetyMarker.hasData,
       scenarioCounts: scenarioCounts,
       unrealizedPnlBySymbol: unrealizedPnlBySymbol,
+      // Computed from `state` (still holds this session — it's removed
+      // right after this block) rather than tier, since slot POSITION is
+      // structural and independent of whether the user is premium right
+      // now — the verdict gate below decides based on tier separately.
+      wasPremiumSlot: stressTestSlotIndex(state, session.id) > 0,
     );
     // ── Task 1.7: FIFO Verdict History ──────────────────────────
     // Oldest record at index 0, newest appended at the end.

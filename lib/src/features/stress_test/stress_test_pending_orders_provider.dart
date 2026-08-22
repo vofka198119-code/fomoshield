@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../core/overlay/app_notification_popup.dart';
+import '../../core/supabase/supabase_providers.dart';
 import '../../shared/utils/currency_format.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
@@ -134,6 +135,7 @@ class StressTestPendingOrdersNotifier
               order.isBuy,
               order.quantity,
               useShares: true,
+              tier: _ref.read(subscriptionTierProvider),
             );
         if (result.success) {
           final idx = state.indexWhere((o) => o.id == order.id);
