@@ -15,6 +15,8 @@ import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
 import '../../features/search/search_screen.dart';
+import '../../features/search/top_companies_provider.dart';
+import '../../features/search/widgets/company_list_screen.dart';
 import '../../features/portfolio/portfolio_screen.dart';
 import '../../features/portfolio/screens/portfolio_order_entry_screen.dart';
 import '../../features/portfolio/screens/set_goal_screen.dart';
@@ -194,6 +196,23 @@ class AppRouter {
         path: '/search',
         name: 'search',
         builder: (context, state) => const SearchScreen(),
+      ),
+
+      // Search browse lane "see all" — a real pushed route instead of a
+      // modal sheet, see company_list_screen.dart's doc comment for why.
+      // extra is a Map: {title, companies, onTapSymbol, suppressSector?}.
+      GoRoute(
+        path: '/search/company-list',
+        name: 'search-company-list',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return CompanyListScreen(
+            title: extra['title'] as String,
+            companies: extra['companies'] as List<TopCompanyEntry>,
+            onTapSymbol: extra['onTapSymbol'] as void Function(String),
+            suppressSector: extra['suppressSector'] as bool? ?? false,
+          );
+        },
       ),
 
       // Market Clock — standalone (outside shell)

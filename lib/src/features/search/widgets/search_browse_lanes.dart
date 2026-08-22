@@ -1,15 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/cache/logo_dao.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/widgets/stagger_fade_in.dart';
 import '../recently_viewed_provider.dart';
 import '../top_companies_provider.dart';
 import 'browse_lane.dart';
-import 'company_list_sheet.dart';
 import 'company_mini_card.dart';
 import '../../../l10n/gen/app_localizations.dart';
+
+// ---------------------------------------------------------------------------
+// Persisted sector overrides — a purely local read (LogoDao is
+// SharedPreferences, zero network — logo/name/sector now share one cache
+// entry, see logo_repository.dart's doc comment) of every sector any
+// screen in the app has EVER live-resolved for this device (Company
+// Detail's badge, a Stress Test buy, ...). resolveGicsSector()'s own
+// static table (CompanyTagMapper) misses ~236/502 real S&P 500 names, but
+// a name the user has actually opened on Company Detail often already has
+// a real, live-resolved sector sitting in this same persistent cache —
+// Company Detail's price_header.dart reads it via its in-memory mirror
+// (_liveCache), which is why a ticker can show a clear sector there while
+// still landing in this screen's "Other" lane: _liveCache is a plain
+// in-memory Map, not a Riverpod provider, so writing to it never triggers
+// a rebuild here. Reading the same data through this FutureProvider (which
+// Riverpod does track) is what lets a company move out of "Other" once
+// it's actually known, instead of the label just being hidden in place.
+// autoDispose so this re-reads fresh every time Search is (re-)entered —
+// Search is a real pushed/popped route (not kept alive in a bottom-nav
+// IndexedStack), so a plain FutureProvider would cache its first read for
+// the rest of the app's life and never pick up a sector resolved by a
+// later Company Detail visit.
+final _persistedSectorOverridesProvider =
+    FutureProvider.autoDispose<Map<String, GicsSector>>((ref) async {
+  final all = await LogoDao().getAllEntries();
+  final result = <String, GicsSector>{};
+  for (final entry in all.values) {
+    final sectorName = entry.gicsSector;
+    if (sectorName == null || sectorName.isEmpty) continue;
+    for (final s in GicsSector.values) {
+      if (s.name == sectorName) {
+        result[entry.ticker] = s;
+        break;
+      }
+    }
+  }
+  return result;
+});
 
 // ---------------------------------------------------------------------------
 // Browse Lanes — shown on the empty-query state. "TOP S&P 500" + per-sector
@@ -18,7 +57,8 @@ import '../../../l10n/gen/app_localizations.dart';
 // ranked S&P 500, not just a top-47 slice), grouped client-side by real GICS
 // sector via resolveGicsSector(). Each lane previews 4 companies — no live
 // price anywhere here (see CompanyMiniCard) — with a chevron that opens the
-// full list via [showCompanyListSheet]. Recently Viewed is separately real —
+// full list by pushing '/search/company-list' (see [_openList]). Recently
+// Viewed is separately real —
 // see recently_viewed_provider and company_detail_screen.dart's ref.listen
 // that records each view.
 // ---------------------------------------------------------------------------
@@ -58,6 +98,8 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
     final l10n = AppLocalizations.of(context)!;
     final recentlyViewed = ref.watch(recentlyViewedProvider);
     final topCompanies = ref.watch(topCompaniesProvider);
+    final persistedOverrides =
+        ref.watch(_persistedSectorOverridesProvider).valueOrNull ?? const {};
 
     return topCompanies.when(
       loading: () => const Center(
@@ -103,7 +145,22 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
         // beats "invisible". Collected into its own OTHER lane below.
         final unclassified = <TopCompanyEntry>[];
         for (final c in companies) {
-          final sector = resolveGicsSector(c.symbol);
+          // companyName matters here: without it, this call resolves purely
+          // by ticker — company_list_sheet.dart's own row (used to render
+          // every lane's "see all", including this one) resolves ticker
+          // AND name, so a company that failed the ticker-only check here
+          // could still show a real sector label once rendered as a row,
+          // reading as a stray real sector inside "Other". Passing the same
+          // name this call gets keeps the bucket decision and the row's
+          // own label in agreement.
+          //
+          // persistedOverrides is checked FIRST — any ticker some other
+          // screen has already live-resolved (Company Detail, a Stress
+          // Test buy) belongs in its real sector, not "Other", even though
+          // resolveGicsSector's own static table alone still misses it.
+          final sector =
+              persistedOverrides[c.symbol.toUpperCase()] ??
+              resolveGicsSector(c.symbol, companyName: c.name);
           if (sector == null) {
             unclassified.add(c);
             continue;
@@ -119,11 +176,10 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           BrowseLane(
             title: l10n.searchTopSp500,
             items: _cards(companies.take(_lanePreviewCount).toList()),
-            onSeeAll: () => showCompanyListSheet(
+            onSeeAll: () => _openList(
               context,
               l10n.searchTopSp500,
               companies.take(_topSp500Limit).toList(),
-              onTapSymbol: widget.onTapSymbol,
             ),
           ),
           for (final sector in GicsSector.values)
@@ -133,22 +189,21 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                 items: _cards(
                   bySector[sector]!.take(_lanePreviewCount).toList(),
                 ),
-                onSeeAll: () => showCompanyListSheet(
+                onSeeAll: () => _openList(
                   context,
                   sector.localizedLabel(l10n).toUpperCase(),
                   bySector[sector]!,
-                  onTapSymbol: widget.onTapSymbol,
                 ),
               ),
           if (unclassified.isNotEmpty)
             BrowseLane(
               title: l10n.searchOtherSector,
               items: _cards(unclassified.take(_lanePreviewCount).toList()),
-              onSeeAll: () => showCompanyListSheet(
+              onSeeAll: () => _openList(
                 context,
                 l10n.searchOtherSector,
                 unclassified,
-                onTapSymbol: widget.onTapSymbol,
+                suppressSector: true,
               ),
             ),
           if (recentlyViewed.isNotEmpty)
@@ -167,7 +222,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                     .toList(),
               ),
               onSeeAll: recentlyViewed.length > _lanePreviewCount
-                  ? () => showCompanyListSheet(
+                  ? () => _openList(
                       context,
                       l10n.searchRecentlyViewed,
                       recentlyViewed
@@ -179,7 +234,6 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                             ),
                           )
                           .toList(),
-                      onTapSymbol: widget.onTapSymbol,
                     )
                   : null,
             ),
@@ -197,6 +251,23 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
             child: lanes[i],
           ),
         );
+      },
+    );
+  }
+
+  void _openList(
+    BuildContext context,
+    String title,
+    List<TopCompanyEntry> companies, {
+    bool suppressSector = false,
+  }) {
+    context.push(
+      '/search/company-list',
+      extra: {
+        'title': title,
+        'companies': companies,
+        'onTapSymbol': widget.onTapSymbol,
+        'suppressSector': suppressSector,
       },
     );
   }

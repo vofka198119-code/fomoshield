@@ -1,15 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/gics_sector_mapper.dart';
-import '../../shared/services/finnhub_service.dart';
-import 'sector_dao.dart';
+import 'logo_dao.dart';
+import 'logo_providers.dart';
 import 'sector_repository.dart';
 
 // ---------------------------------------------------------------------------
 // SectorRepository Provider
 // ---------------------------------------------------------------------------
+// Shares the same LogoRepository instance logo_providers.dart already
+// wires up (which in turn shares finnhubServiceProvider) — sector
+// resolution now reads/writes through the same LogoDao entry logo
+// resolution does, see sector_repository.dart's doc comment.
 
 final sectorRepositoryProvider = Provider<SectorRepository>((ref) {
-  return SectorRepository(dao: SectorDao(), api: ref.read(finnhubServiceProvider));
+  return SectorRepository(
+    dao: LogoDao(),
+    logoRepo: ref.read(logoRepositoryProvider),
+  );
 });
 
 // ---------------------------------------------------------------------------
