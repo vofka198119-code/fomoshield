@@ -458,6 +458,12 @@ abstract class AppLocalizations {
   /// **'Update from Store'**
   String get updateFromStore;
 
+  /// No description provided for @updateRestarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Restarting to apply the update…'**
+  String get updateRestarting;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:

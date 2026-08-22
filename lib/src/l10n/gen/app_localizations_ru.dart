@@ -202,6 +202,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get updateFromStore => 'Обновить в магазине';
 
   @override
+  String get updateRestarting => 'Перезапуск для применения обновления…';
+
+  @override
   String get profileDeleteAccount => 'Удалить аккаунт';
 
   @override

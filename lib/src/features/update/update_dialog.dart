@@ -1,14 +1,18 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/models/update_info.dart';
+import '../../core/services/desktop_updater.dart';
 import '../../core/services/update_service.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 /// Internal states for the update dialog lifecycle.
-enum _DialogState { checking, upToDate, info }
+enum _DialogState { checking, upToDate, info, downloading, restarting }
 
 /// Numeric App Store ID — set once the app is published to the App Store.
 const String _appStoreId = ''; // TODO(publish): fill in after App Store submission
@@ -40,6 +44,8 @@ class UpdateDialog extends ConsumerStatefulWidget {
 class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   _DialogState _state = _DialogState.checking;
   UpdateInfo? _updateInfo;
+  double _progress = 0;
+  CancelToken? _cancelToken;
 
   AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
@@ -108,6 +114,8 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         _DialogState.checking => _buildChecking(),
         _DialogState.upToDate => _buildUpToDate(),
         _DialogState.info => _buildInfo(),
+        _DialogState.downloading => _buildDownloading(),
+        _DialogState.restarting => _buildRestarting(),
       },
     );
   }
@@ -161,10 +169,91 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     );
   }
 
+  // ── DOWNLOADING ─────────────────────────────────────────────────────────
+
+  Widget _buildDownloading() {
+    return Column(
+      key: const ValueKey('downloading'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          _l10n.updateDownloading(_updateInfo!.latestVersion),
+          style: TextStyle(
+            fontSize: 15,
+            color: const Color(0xFF1B365D),
+            fontFamily: _fontFamily,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: LinearProgressIndicator(
+            value: _progress,
+            minHeight: 6,
+            backgroundColor: const Color(0xFFE5DFD3),
+            valueColor: const AlwaysStoppedAnimation(Color(0xFF3F7CFF)),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${(_progress * 100).toStringAsFixed(0)}%',
+          style: TextStyle(
+            fontSize: 13,
+            color: const Color(0xFF6B6B6B),
+            fontFamily: _fontFamily,
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: _cancelDownload,
+          child: Text(
+            _l10n.updateCancel,
+            style: TextStyle(
+              color: const Color(0xFF6B6B6B),
+              fontFamily: _fontFamily,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── RESTARTING ──────────────────────────────────────────────────────────
+
+  Widget _buildRestarting() {
+    return Column(
+      key: const ValueKey('restarting'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(
+          width: 36,
+          height: 36,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.5,
+            valueColor: AlwaysStoppedAnimation(Color(0xFF1B365D)),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          _l10n.updateRestarting,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 15,
+            color: const Color(0xFF1B365D),
+            fontFamily: _fontFamily,
+          ),
+        ),
+      ],
+    );
+  }
+
   // ── INFO ────────────────────────────────────────────────────────────────
 
   Widget _buildInfo() {
     final info = _updateInfo!;
+    final isDesktop = defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.linux ||
+        defaultTargetPlatform == TargetPlatform.macOS;
 
     return Column(
       key: const ValueKey('info'),
@@ -209,7 +298,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-            onPressed: _openStore,
+            onPressed: isDesktop ? _startDesktopUpdate : _openStore,
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFF1B365D),
               shape: RoundedRectangleBorder(
@@ -217,7 +306,9 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
               ),
             ),
             child: Text(
-              _l10n.updateFromStore,
+              isDesktop
+                  ? _l10n.updateDownloadAndInstall
+                  : _l10n.updateFromStore,
               style: const TextStyle(fontFamily: 'Inter'),
             ),
           ),
@@ -255,9 +346,51 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
 
   // ── Actions ─────────────────────────────────────────────────────────────
 
+  /// Desktop self-update: download the platform package, then apply & relaunch
+  /// via [DesktopUpdater] and exit so the new version takes over.
+  Future<void> _startDesktopUpdate() async {
+    final info = _updateInfo;
+    final url = info?.downloadUrl;
+    if (url == null) return;
+
+    setState(() {
+      _state = _DialogState.downloading;
+      _progress = 0;
+    });
+    _cancelToken = CancelToken();
+    try {
+      final service = ref.read(updateServiceProvider);
+      final file = await service.downloadPackage(
+        url,
+        (p) {
+          if (mounted) setState(() => _progress = p);
+        },
+        cancelToken: _cancelToken,
+      );
+      if (!mounted) return;
+
+      setState(() => _state = _DialogState.restarting);
+      await DesktopUpdater.applyAndRelaunch(file);
+
+      // Give the detached helper a moment to start, then exit so it can
+      // replace the running files and launch the new version.
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      exit(0);
+    } on DioException catch (_) {
+      if (mounted) setState(() => _state = _DialogState.info);
+    } catch (e) {
+      debugPrint('[UpdateDialog] Desktop update failed: $e');
+      if (mounted) setState(() => _state = _DialogState.info);
+    }
+  }
+
+  void _cancelDownload() {
+    _cancelToken?.cancel();
+    if (mounted) setState(() => _state = _DialogState.info);
+  }
+
   /// Android + iOS can only ship updates through their own app stores — the
-  /// "Update" button forwards there instead of self-installing. Desktop builds
-  /// (no store) fall back to the public GitHub release page.
+  /// "Update" button forwards there instead of self-installing.
   void _openStore() {
     if (defaultTargetPlatform == TargetPlatform.android) {
       _launchAndClose(

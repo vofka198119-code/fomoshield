@@ -89,29 +89,31 @@ class UpdateService {
 
         if (_isNewer(tagName, currentVersion, currentBuild, installedLabel)) {
           final assets = data['assets'] as List<dynamic>? ?? [];
-          final platform = Platform.isAndroid
-              ? TargetPlatform.android
-              : TargetPlatform.iOS;
+          final platform = _currentPlatform();
 
+          // Which asset this platform downloads — null for store-only (iOS).
+          final assetSuffix = _assetSuffix(platform);
           String? downloadUrl;
-          int? apkSize;
+          int? packageSize;
 
-          if (Platform.isAndroid) {
-            final apk = assets.cast<Map<String, dynamic>>().firstWhere(
-                  (a) => (a['name'] as String).endsWith('.apk'),
+          if (assetSuffix != null) {
+            final asset = assets.cast<Map<String, dynamic>>().firstWhere(
+                  (a) => (a['name'] as String)
+                      .toLowerCase()
+                      .endsWith(assetSuffix),
                   orElse: () => <String, dynamic>{},
                 );
-            downloadUrl = apk['browser_download_url'] as String?;
-            apkSize = apk['size'] as int?;
+            downloadUrl = asset['browser_download_url'] as String?;
+            packageSize = asset['size'] as int?;
+            // Release has no binary for our platform — skip it.
+            if (downloadUrl == null) continue;
           }
-
-          if (Platform.isAndroid && downloadUrl == null) continue;
 
           return UpdateInfo(
             latestVersion: tagName,
             downloadUrl: downloadUrl,
             releaseNotes: data['body'] as String?,
-            apkSize: apkSize,
+            apkSize: packageSize,
             platform: platform,
           );
         }
@@ -121,6 +123,36 @@ class UpdateService {
     } catch (e) {
       debugPrint('[UpdateService] checkForUpdate failed: $e');
       return null;
+    }
+  }
+
+  /// The platform we're running on, including desktop.
+  TargetPlatform _currentPlatform() {
+    if (Platform.isAndroid) return TargetPlatform.android;
+    if (Platform.isIOS) return TargetPlatform.iOS;
+    if (Platform.isWindows) return TargetPlatform.windows;
+    if (Platform.isLinux) return TargetPlatform.linux;
+    if (Platform.isMacOS) return TargetPlatform.macOS;
+    return TargetPlatform.fuchsia;
+  }
+
+  /// The release-asset suffix this platform downloads, or null for store-only
+  /// platforms (iOS). The public repo names assets `ScanCo.{ext}`:
+  /// `.apk` (Android), `.zip` (Windows), `.tar.gz` (Linux), `.dmg` (macOS).
+  String? _assetSuffix(TargetPlatform platform) {
+    switch (platform) {
+      case TargetPlatform.android:
+        return '.apk';
+      case TargetPlatform.windows:
+        return '.zip';
+      case TargetPlatform.linux:
+        return '.tar.gz';
+      case TargetPlatform.macOS:
+        return '.dmg';
+      case TargetPlatform.iOS:
+        return null; // store-based
+      default:
+        return null;
     }
   }
 
@@ -140,6 +172,41 @@ class UpdateService {
     }
 
     final filePath = '${apkDir.path}/update.apk';
+
+    await _dio.download(
+      url,
+      filePath,
+      cancelToken: cancelToken,
+      onReceiveProgress: (received, total) {
+        if (total > 0) onProgress(received / total);
+      },
+    );
+
+    return File(filePath);
+  }
+
+  /// Downloads a release package (zip / tar.gz / dmg / apk) to a temp dir.
+  /// Works on every platform — Android uses external cache, desktop uses the
+  /// system temp dir (getExternalCacheDirectories throws on desktop).
+  ///
+  /// [onProgress] receives values 0.0 → 1.0.
+  /// [cancelToken] allows the user to cancel mid-download.
+  Future<File> downloadPackage(
+    String url,
+    void Function(double) onProgress, {
+    CancelToken? cancelToken,
+  }) async {
+    final Directory dir;
+    if (Platform.isAndroid) {
+      final cache = await getExternalCacheDirectories();
+      dir = Directory('${cache!.first.path}/apk');
+    } else {
+      dir = await getTemporaryDirectory();
+    }
+    if (!await dir.exists()) await dir.create(recursive: true);
+
+    final filename = url.split('/').last;
+    final filePath = '${dir.path}/$filename';
 
     await _dio.download(
       url,
