@@ -3,8 +3,8 @@ name: Release
 # ═══════════════════════════════════════════════════════════════════════════════
 # FULLY AUTOMATED — developer just `git push`, no other steps needed.
 #
-# push to main  →  auto-tag v1.0.0-dev.{run_number}  →  build APK+IPA  →  release
-# push tag v*   →  stable release v1.0.1              →  build APK+IPA  →  release
+# push to main  →  auto-tag v1.0.0-dev.{run_number}  →  build all platforms →  release
+# push tag v*   →  stable release v1.0.1              →  build all platforms →  release
 #
 # Tester reopens the app → auto-update dialog → download & install.
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -120,14 +120,137 @@ jobs:
           name: ipa
           path: build/ios/iphoneos/app-release.ipa
 
+  # ── Windows desktop ───────────────────────────────────────────────────────
+  build-windows:
+    name: Windows
+    needs: [version]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      # Scaffold the windows/ folder (not committed yet) so the build works.
+      - name: Scaffold Windows platform
+        run: flutter create --platforms=windows --org com.scanco --project-name scanco .
+
+      - run: flutter pub get
+
+      - name: Setup .env
+        run: |
+          echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}" > .env
+          echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
+          echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
+
+      - run: flutter build windows --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+
+      - name: Package Windows app
+        shell: pwsh
+        run: Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "scanco-windows.zip" -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: scanco-windows.zip
+
+  # ── Linux desktop ─────────────────────────────────────────────────────────
+  build-linux:
+    name: Linux
+    needs: [version]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Install Linux build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev liblzma-dev
+
+      # Scaffold the linux/ folder (not committed yet) so the build works.
+      - name: Scaffold Linux platform
+        run: flutter create --platforms=linux --org com.scanco --project-name scanco .
+
+      - run: flutter pub get
+
+      - name: Setup .env
+        run: |
+          echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}" > .env
+          echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
+          echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
+
+      - run: flutter build linux --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+
+      - name: Package Linux app
+        run: tar -czf scanco-linux.tar.gz -C build/linux/x64/release/bundle .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: scanco-linux.tar.gz
+
+  # ── macOS desktop ─────────────────────────────────────────────────────────
+  build-macos:
+    name: macOS
+    needs: [version]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      # Scaffold the macos/ folder (not committed yet) so the build works.
+      - name: Scaffold macOS platform
+        run: flutter create --platforms=macos --org com.scanco --project-name scanco .
+
+      - run: flutter pub get
+
+      - name: Setup .env
+        run: |
+          echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}" > .env
+          echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
+          echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
+
+      - run: flutter build macos --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+
+      - name: Package macOS app
+        run: ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/Runner.app scanco-macos.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: scanco-macos.zip
+
   # ── Create release + auto-create lightweight tag ──────────────────────────
   release:
     name: Release
-    needs: [version, build-android]
+    needs: [version, build-android, build-windows, build-linux, build-macos]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
         with: { name: apk }
+
+      - uses: actions/download-artifact@v4
+        with: { name: windows }
+
+      - uses: actions/download-artifact@v4
+        with: { name: linux }
+
+      - uses: actions/download-artifact@v4
+        with: { name: macos }
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -136,4 +259,7 @@ jobs:
           prerelease: ${{ needs.version.outputs.prerelease }}
           files: |
             app-release.apk
+            scanco-windows.zip
+            scanco-linux.tar.gz
+            scanco-macos.zip
           generate_release_notes: true
