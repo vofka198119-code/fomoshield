@@ -4941,6 +4941,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'FOMO Shield Status';
 
   @override
+  String get portfolioBalanceWidgetDisplayNamePortfolioHealth =>
+      'Portfolio Health';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameAssetAllocation =>
+      'Asset Allocation %';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameDiversificationIndicator =>
+      'Diversification Indicator';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameDiversificationProgress =>
+      'Diversification Progress';
+
+  @override
   String get marketPhaseWidgetTitle => 'MARKET PHASE';
 
   @override

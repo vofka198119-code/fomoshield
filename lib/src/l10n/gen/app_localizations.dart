@@ -8317,6 +8317,30 @@ abstract class AppLocalizations {
   /// **'FOMO Shield Status'**
   String get marketClockWidgetDisplayNameTimingIndicator;
 
+  /// No description provided for @portfolioBalanceWidgetDisplayNamePortfolioHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio Health'**
+  String get portfolioBalanceWidgetDisplayNamePortfolioHealth;
+
+  /// No description provided for @portfolioBalanceWidgetDisplayNameAssetAllocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Allocation %'**
+  String get portfolioBalanceWidgetDisplayNameAssetAllocation;
+
+  /// No description provided for @portfolioBalanceWidgetDisplayNameDiversificationIndicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Diversification Indicator'**
+  String get portfolioBalanceWidgetDisplayNameDiversificationIndicator;
+
+  /// No description provided for @portfolioBalanceWidgetDisplayNameDiversificationProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Diversification Progress'**
+  String get portfolioBalanceWidgetDisplayNameDiversificationProgress;
+
   /// No description provided for @marketPhaseWidgetTitle.
   ///
   /// In en, this message translates to:

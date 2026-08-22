@@ -9,6 +9,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 /// Configuration for a reorderable widget on the Portfolio Balance screen.
 class PortfolioBalanceWidgetConfig {
@@ -17,16 +18,16 @@ class PortfolioBalanceWidgetConfig {
 
   const PortfolioBalanceWidgetConfig({required this.id, required this.visible});
 
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (id) {
       case 'portfolio_health':
-        return 'Portfolio Health';
+        return l10n.portfolioBalanceWidgetDisplayNamePortfolioHealth;
       case 'asset_allocation':
-        return 'Asset Allocation %';
+        return l10n.portfolioBalanceWidgetDisplayNameAssetAllocation;
       case 'diversification_indicator':
-        return 'Diversification Indicator';
+        return l10n.portfolioBalanceWidgetDisplayNameDiversificationIndicator;
       case 'diversification_progress':
-        return 'Diversification Progress';
+        return l10n.portfolioBalanceWidgetDisplayNameDiversificationProgress;
       default:
         return id;
     }

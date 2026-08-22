@@ -4954,6 +4954,22 @@ class AppLocalizationsRu extends AppLocalizations {
       'Статус FOMO Shield';
 
   @override
+  String get portfolioBalanceWidgetDisplayNamePortfolioHealth =>
+      'Здоровье портфеля';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameAssetAllocation =>
+      'Распределение активов, %';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameDiversificationIndicator =>
+      'Индикатор диверсификации';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameDiversificationProgress =>
+      'Прогресс диверсификации';
+
+  @override
   String get marketPhaseWidgetTitle => 'ФАЗА РЫНКА';
 
   @override

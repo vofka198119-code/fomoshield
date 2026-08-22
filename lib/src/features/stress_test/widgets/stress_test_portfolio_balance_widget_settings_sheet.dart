@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../stress_test_portfolio_balance_widget_order_provider.dart';
 
 class StressTestPortfolioBalanceWidgetSettingsSheet extends StatefulWidget {
@@ -67,6 +68,7 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -182,7 +184,7 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                       ],
                     ),
                     title: Text(
-                      config.displayName,
+                      config.displayName(l10n),
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
