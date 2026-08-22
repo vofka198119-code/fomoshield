@@ -216,7 +216,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateOpenFailed =>
-      'Downloaded — open the file from your Downloads folder.';
+      'Couldn\'t open the file — use "Download in browser" below.';
+
+  @override
+  String get updateDownloadInBrowser => 'Download in browser';
 
   @override
   String get updateDirectly => 'Update directly';

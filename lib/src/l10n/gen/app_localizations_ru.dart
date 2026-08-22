@@ -215,7 +215,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get updateOpenFailed =>
-      'Скачано — откройте файл в папке «Загрузки».';
+      'Не удалось открыть файл — используйте «Скачать в браузере» ниже.';
+
+  @override
+  String get updateDownloadInBrowser => 'Скачать в браузере';
 
   @override
   String get updateDirectly => 'Обновить напрямую';

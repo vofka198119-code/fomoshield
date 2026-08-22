@@ -289,9 +289,9 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         SizedBox(
           width: double.infinity,
           child: TextButton(
-            onPressed: _showInFolder,
+            onPressed: _offerBrowserDownload,
             child: Text(
-              _l10n.updateShowInFolder,
+              _l10n.updateDownloadInBrowser,
               style: TextStyle(
                 color: const Color(0xFF6B6B6B),
                 fontFamily: _fontFamily,
@@ -503,51 +503,56 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   }
 
   /// Open the downloaded file with the OS default handler (desktop) or the
-  /// system installer (Android APK). Falls back to revealing the file.
+  /// system installer (Android APK). If opening fails, tell the user and keep
+  /// the dialog open — "Download in browser" below is the robust alternative.
   Future<void> _openNow() async {
     final file = _downloadedFile;
     if (file == null) return;
 
-    if (Platform.isWindows) {
-      await Process.start('explorer.exe', [file.path]);
-    } else if (Platform.isMacOS) {
-      await Process.start('open', [file.path]);
-    } else if (Platform.isLinux) {
-      await Process.start('xdg-open', [file.path]);
-    } else {
-      // Android / iOS — use the system handler (APK → package installer).
-      final result = await OpenFilex.open(
-        file.path,
-        type: Platform.isAndroid
-            ? 'application/vnd.android.package-archive'
-            : null,
-      );
-      if (result.type != ResultType.done && mounted) {
-        _showInFolder();
-        return;
+    try {
+      if (Platform.isWindows) {
+        await Process.start('explorer.exe', [file.path]);
+      } else if (Platform.isMacOS) {
+        await Process.start('open', [file.path]);
+      } else if (Platform.isLinux) {
+        await Process.start('xdg-open', [file.path]);
+      } else {
+        // Android / iOS — use the system handler (APK → package installer).
+        final result = await OpenFilex.open(
+          file.path,
+          type: Platform.isAndroid
+              ? 'application/vnd.android.package-archive'
+              : null,
+        );
+        if (result.type != ResultType.done) {
+          _notifyOpenFailed();
+          return;
+        }
       }
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      debugPrint('[UpdateDialog] Open failed: $e');
+      _notifyOpenFailed();
     }
-    if (mounted) Navigator.of(context).pop();
   }
 
-  /// Reveal the downloaded file in the OS file manager (or a hint on mobile).
-  void _showInFolder() {
-    final file = _downloadedFile;
-    if (file == null) return;
-    if (Platform.isWindows) {
-      Process.start('explorer.exe', ['/select,"${file.path}"']);
-    } else if (Platform.isMacOS) {
-      Process.start('open', ['-R', file.path]);
-    } else if (Platform.isLinux) {
-      Process.start('xdg-open', [file.parent.path]);
-    } else {
-      // Android / iOS — no folder reveal; tell the user where it went.
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_l10n.updateOpenFailed)),
-        );
-      }
+  void _notifyOpenFailed() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_l10n.updateOpenFailed)),
+    );
+  }
+
+  /// Robust alternative: open the browser to the direct binary URL so the OS
+  /// handles the download natively (it lands in the real Downloads folder).
+  void _offerBrowserDownload() {
+    final info = _updateInfo;
+    final url = info?.downloadUrl;
+    if (url == null) {
+      _openReleasePage();
+      return;
     }
+    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     if (mounted) Navigator.of(context).pop();
   }
 

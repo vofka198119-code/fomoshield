@@ -485,8 +485,14 @@ abstract class AppLocalizations {
   /// No description provided for @updateOpenFailed.
   ///
   /// In en, this message translates to:
-  /// **'Downloaded — open the file from your Downloads folder.'**
+  /// **'Couldn't open the file — use "Download in browser" below.'**
   String get updateOpenFailed;
+
+  /// No description provided for @updateDownloadInBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Download in browser'**
+  String get updateDownloadInBrowser;
 
   /// No description provided for @updateDirectly.
   ///
