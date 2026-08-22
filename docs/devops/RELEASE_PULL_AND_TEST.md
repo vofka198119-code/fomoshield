@@ -153,18 +153,36 @@ timeout 12 ./scanco 2>&1 | head -40   # app живёт и логирует → e
 
 ## 6. Тестирование APK на Windows
 
-APK **не запускается на Windows**. Варианты:
+APK **не запускается напрямую в Windows** — нужен Android-рантайм. Самый быстрый
+вариант — **BlueStacks** (уже установлен) с adb:
 
-- **Эмулятор (Android Studio):** Tools → Device Manager → Create Device → запустить
-  AVD, затем:
-  ```powershell
-  adb install -r C:\fomoshield\.bin\<run-id>\android\ScanCo.apk
-  adb shell monkey -p com.scanco.scanco 1
-  ```
-- **Физическое устройство:** включить USB-отладку → `adb install -r ...`.
+```powershell
+# adb от BlueStacks (в PATH его нет)
+$adb = "C:\Program Files\BlueStacks_nxt\HD-Adb.exe"
 
-> Application ID уточнить: `com.scanco.*` (см. `android/app/build.gradle.kts`,
-> `applicationId`).
+# Подключиться к BlueStacks (порт по умолчанию) и проверить устройства
+& $adb connect 127.0.0.1:5555
+& $adb devices            # 127.0.0.1:5555  device  (+ возможно emulator-5554)
+
+# Установить APK (applicationId = com.scanco.scanco)
+& $adb -s 127.0.0.1:5555 install -r C:\fomoshield\.bin\<run-id>\android\ScanCo.apk
+
+# Запустить приложение
+& $adb -s 127.0.0.1:5555 shell monkey -p com.scanco.scanco -c android.intent.category.LAUNCHER 1
+
+# Скриншот, чтобы увидеть UI
+& $adb -s 127.0.0.1:5555 exec-out screencap -p > C:\fomoshield\bs_screenshot.png
+
+# Логи приложения (flutter / UpdateService / ошибки)
+& $adb -s 127.0.0.1:5555 logcat -d -s flutter | Select-String -Pattern 'UpdateService|Error'
+```
+
+Альтернативы: эмулятор **Android Studio** (AVD) или физическое устройство по USB —
+та же команда `adb install -r ...` (тогда `adb` из `platform-tools`, добавить в PATH).
+
+> Проверено: BlueStacks + HD-Adb установили и запустили `com.scanco.scanco`
+> (сборка из `.bin/<run-id>/android/ScanCo.apk`) — UI рендерится, `.env` грузится,
+> авто-обновление можно гонять прямо в BlueStacks.
 
 ---
 
@@ -185,20 +203,57 @@ APK **не запускается на Windows**. Варианты:
 
 ## 8. Тестирование на macOS
 
-- Скачать `ScanCo.dmg` → открыть → перетащить **ScanCo** в Applications → запустить.
-- Сборка **без подписи (unsigned)**: Gatekeeper предупредит
-  *«app cannot be opened because the developer cannot be verified»* →
-  `ПКМ → Open → Open`, или:
-  ```bash
-  xattr -dr com.apple.quarantine /Applications/ScanCo.app
-  ```
-- Если нужно проверить сам `.app` без DMG: распаковать `ScanCo.dmg`,
-  запустить `ScanCo.app` напрямую.
-- Лог FileLogger появится рядом с `.app` (внутри bundle, `logs/app.log`).
+Бандл собирается как **`scanco.app`** (project-name `scanco`; отображаемое имя —
+ScanCo). Сборка **без подписи (unsigned)** — Gatekeeper будет предупреждать.
+
+**Установка из DMG:**
+```bash
+hdiutil attach ScanCo.dmg                          # смонтировать
+cp -R /Volumes/ScanCo/scanco.app /Applications/    # скопировать в Applications
+hdiutil detach /Volumes/ScanCo                     # размонтировать
+```
+
+**Запуск:**
+```bash
+open /Applications/scanco.app                      # как двойной клик
+# Или напрямую бинарник (виден stdout/FileLogger в терминале):
+/Applications/scanco.app/Contents/MacOS/scanco
+```
+
+**Gatekeeper (unsigned):** разово снять quarantine, либо `ПКМ → Open → Open`:
+```bash
+xattr -dr com.apple.quarantine /Applications/scanco.app
+```
+
+**Проверка, что живое / закрыть (по аналогии с Windows):**
+```bash
+pgrep -x scanco        # PID если запущено
+pkill -x scanco        # закрыть
+```
+
+**Лог FileLogger** — пишется рядом с бинарником, т.е. внутри бандла:
+```bash
+tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
+```
 
 ---
 
-## 9. Известные проблемы (на момент проверки run #25)
+## 9. Проверка авто-обновления
+
+- На Android обновление работает в приложении: примерно через **5 сек** после
+  запуска (и по кнопке **⟳** на Профиле) приложение проверяет GitHub Releases,
+  показывает «New Version Available» → скачивает APK в приложении (с прогрессом)
+  → отдаёт **системному установщику Android** (нужно подтверждение пользователя).
+- APK должен быть **подписан тем же ключом**, что установленная сборка (иначе
+  signature mismatch). Android 8+ может один раз спросить «Install unknown apps».
+- Версия на Профиле: **`v1.0.0 (24) ⟳`** — version (build); build = CI run number
+  (из `--dart-define=APP_BUILD`), не статичный номер из pubspec.
+- Updater **build-aware**: не предлагает `dev.N`, если установлена та же N.
+- На iOS/desktop приложение установить не может — открывает страницу релиза GitHub.
+
+---
+
+## 10. Известные проблемы (на момент проверки run #25)
 
 - **Desktop GoogleSignIn:** `GoogleSignIn.initialize()` в `_SplashScreenState.initState`
   (`lib/src/features/splash/splash_screen.dart`) бросает `UnimplementedError` на
