@@ -77,10 +77,14 @@ class LanguagePickerScreen extends ConsumerWidget {
                       option: options[i],
                       selected: options[i].locale?.languageCode ==
                           current?.languageCode,
-                      onTap: () =>
-                          ref.read(languageProvider.notifier).setLanguage(
-                                options[i].locale,
-                              ),
+                      onTap: () {
+                        ref
+                            .read(languageProvider.notifier)
+                            .setLanguage(options[i].locale);
+                        // Apply + return to the Profile immediately — no
+                        // manual back-tap needed.
+                        context.pop();
+                      },
                     ),
                   ],
                 ],
