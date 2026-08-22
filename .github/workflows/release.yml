@@ -87,9 +87,8 @@ jobs:
           name: android
           path: ScanCo.apk
 
-  # ── iOS IPA (skipped — unsigned, requires Apple Developer account) ─────────
+  # ── iOS (iPhone) build — unsigned IPA ─────────────────────────────────────
   build-ios:
-    if: false
     name: iPhone
     needs: [version]
     runs-on: macos-latest
@@ -116,12 +115,12 @@ jobs:
           cd build/ios/iphoneos
           mkdir -p Payload
           cp -r Runner.app Payload/
-          zip -r app-release.ipa Payload
+          zip -r ScanCo.ipa Payload
 
       - uses: actions/upload-artifact@v7
         with:
           name: iphone
-          path: build/ios/iphoneos/app-release.ipa
+          path: build/ios/iphoneos/ScanCo.ipa
 
   # ── Windows desktop ───────────────────────────────────────────────────────
   build-windows:
@@ -186,7 +185,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.x'
-          channel: 'stable'
+          channel: 'beta'
           cache: true
 
       - name: Install Linux build deps
@@ -232,7 +231,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.x'
-          channel: 'stable'
+          channel: 'beta'
           cache: true
 
       # Scaffold the macos/ folder (not committed yet) so the build works.
@@ -261,7 +260,7 @@ jobs:
   # ── Create release + auto-create lightweight tag ──────────────────────────
   release:
     name: Release
-    needs: [version, build-android, build-windows]
+    needs: [version, build-android, build-windows, build-ios]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
@@ -269,6 +268,9 @@ jobs:
 
       - uses: actions/download-artifact@v7
         with: { name: windows }
+
+      - uses: actions/download-artifact@v7
+        with: { name: iphone }
 
       - uses: softprops/action-gh-release@v3
         with:
@@ -278,4 +280,5 @@ jobs:
           files: |
             ScanCo.apk
             ScanCo-windows.zip
+            ScanCo.ipa
           generate_release_notes: true
