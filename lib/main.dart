@@ -21,32 +21,46 @@ import 'src/l10n/gen/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Edge-to-edge with a fully transparent system nav bar — no solid plate
-  // behind the 3-button/gesture bar, regardless of the device's system
-  // light/dark setting (the app itself is always light-themed).
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ),
-  );
+  // Mobile-only startup that has no meaning/implementation on desktop or web:
+  // edge-to-edge system UI, Firebase (only Android has FirebaseOptions here),
+  // and Crashlytics (no Windows/Linux support). Guarding it prevents a crash
+  // before runApp() — which previously left the Windows window blank.
+  final isMobile = !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (isMobile) {
+    // Edge-to-edge with a fully transparent system nav bar — no solid plate
+    // behind the 3-button/gesture bar, regardless of the device's system
+    // light/dark setting (the app itself is always light-themed).
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
+  }
 
-  // Only report real crashes from release builds — debug-time hot-reload
-  // exceptions and dev-machine noise would otherwise flood Crashlytics.
-  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-    !kDebugMode,
-  );
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // Only report real crashes from release builds — debug-time hot-reload
+    // exceptions and dev-machine noise would otherwise flood Crashlytics.
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      !kDebugMode,
+    );
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
 
   // Load .env — optional so the app doesn't crash if the file is missing
   await dotenv.load(fileName: '.env', isOptional: true);
