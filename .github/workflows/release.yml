@@ -85,6 +85,15 @@ jobs:
 
       - run: flutter pub get
 
+      # pubspec bundles `.env` as an asset — without the file the test's
+      # asset bundle fails to build ("No file or variants found for asset:
+      # .env"). Mirror the build jobs' Setup .env step.
+      - name: Setup .env
+        run: |
+          echo "FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}" > .env
+          echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
+          echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
+
       - name: Auto-update routine tests
         run: flutter test test/services/update_service_test.dart test/services/desktop_updater_test.dart
 
