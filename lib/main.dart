@@ -169,27 +169,24 @@ class ScanCoApp extends ConsumerStatefulWidget {
 }
 
 class _ScanCoAppState extends ConsumerState<ScanCoApp> {
+  bool _updateDialogShown = false;
+
   @override
   void initState() {
     super.initState();
-    // Auto-update: show dialog after 5 seconds — it starts in CHECKING
-    // state (spinner) and calls the GitHub Releases API internally.
-    // Non-blocking — user can dismiss at any time.
+    // Auto-update: wait for the splash → first-screen hand-off before
+    // showing the dialog. Showing it during the splash let the splash's
+    // `context.go(...)` to /auth or /home dismiss it ~1-2s later — the
+    // "prompt closes and jumps to the main UI" the user saw. Now it appears
+    // over the settled first screen and is modal (barrierDismissible: false):
+    // when an update is available the app PAUSES at the prompt until the
+    // user taps "Maybe later" or "Install" — no auto-forward to the UI.
     //
     // `context` here belongs to the app shell, which sits ABOVE the Navigator
     // inside MaterialApp.router — showDialog on it would throw "No Navigator
     // found" (which is why the dialog never appeared on cold start). Use the
     // router's root navigator instead.
-    Future.delayed(const Duration(seconds: 5), () {
-      final navContext = AppRouter.rootNavigatorKey.currentContext;
-      if (navContext != null) {
-        showDialog(
-          context: navContext,
-          barrierDismissible: true,
-          builder: (_) => const UpdateDialog(silentWhenUpToDate: true),
-        );
-      }
-    });
+    AppRouter.router.routerDelegate.addListener(_maybeShowUpdateDialog);
 
     // Delayed so this doesn't compete with everything else the first
     // frame already loads (widget order providers, home widgets, sector
@@ -197,6 +194,35 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
     Future.delayed(const Duration(seconds: 8), () {
       if (mounted) checkPendingOrders(ref);
     });
+  }
+
+  /// Fires once the router has handed off from the splash ('/') to a real
+  /// screen — then shows the modal auto-update dialog (one shot).
+  void _maybeShowUpdateDialog() {
+    if (_updateDialogShown) return;
+    final path =
+        AppRouter.router.routerDelegate.currentConfiguration.uri.path;
+    if (path.isEmpty || path == '/') return; // still on the splash
+
+    _updateDialogShown = true;
+    AppRouter.router.routerDelegate.removeListener(_maybeShowUpdateDialog);
+
+    final navContext = AppRouter.rootNavigatorKey.currentContext;
+    if (navContext == null) return;
+    showDialog(
+      context: navContext,
+      // Non-dismissible: when an update is available the prompt stays until
+      // the user explicitly taps "Maybe later" / "Install". When there's no
+      // update, silentWhenUpToDate pops it immediately anyway.
+      barrierDismissible: false,
+      builder: (_) => const UpdateDialog(silentWhenUpToDate: true),
+    );
+  }
+
+  @override
+  void dispose() {
+    AppRouter.router.routerDelegate.removeListener(_maybeShowUpdateDialog);
+    super.dispose();
   }
 
   @override
