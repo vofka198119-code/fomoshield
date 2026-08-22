@@ -1,16 +1,20 @@
 # Miscellaneous
 *.class
-*.log
+*.log*
 *.pyc
 *.swp
 .DS_Store
 .atom/
+.bin/
 .build/
 .buildlog/
 .history
 .svn/
 .swiftpm/
 migrate_working_dir/
+
+# Local CI analysis logs (gh run view --log)
+.github/.logs/
 
 # IntelliJ related
 *.iml

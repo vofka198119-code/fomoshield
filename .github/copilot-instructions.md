@@ -103,6 +103,7 @@ final isPremium = tier == SubscriptionTier.premium || tier == SubscriptionTier.a
 | Файл | Назначение |
 |------|-----------|
 | `docs/FOMO_SHIELD_DESIGN_BIBLE.md` | **Главное ТЗ** — 12 частей дизайн-системы |
+| `docs/devops/RELEASE_PULL_AND_TEST.md` | **CI/CD — как качать релизы и тестировать** (gh CLI, `.bin/{run-id}/{platform}/`, WSL2, APK/IPA/macOS) |
 | `lib/main.dart` | Точка входа |
 | `lib/src/` | Исходный код (фичи, виджеты, провайдеры) |
 | `lib/src/features/` | Экраны: stress_test, portfolio, assets, orders, etc. |
@@ -113,6 +114,18 @@ final isPremium = tier == SubscriptionTier.premium || tier == SubscriptionTier.a
 - **Routing**: GoRouter
 - **Хранилище**: SharedPreferences + Supabase
 - **Дизайн-система**: Editoral Heritage (#F5F2EB bg, #1B365D accent, #4A5D23 stressAccent)
+
+---
+
+## 🚀 CI/CD и DevOps
+
+- Релизный пайплайн: `.github/workflows/release.yml` (сборка Android/Windows/Linux/macOS/iPhone →
+  единый GitHub Release с ассетами `ScanCo.{ext}`).
+- **Как качать релизы и тестировать билды на Windows/WSL2/Android/macOS** — см.
+  `docs/devops/RELEASE_PULL_AND_TEST.md`.
+- Правило скачивания: **executables** в `.bin/{run-id}/{platform}/` (не архивы);
+  при новом pull — удалять старые `.bin/{run-id}/`.
+- Логи запусков локально: `.github/.logs/run-<id>.log` (не коммитить).
 
 ---
 
