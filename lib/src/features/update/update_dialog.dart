@@ -25,7 +25,12 @@ enum _DialogState { checking, upToDate, info, downloading, ready }
 /// - Card radius 24px, no countdown timers, no pressure language
 /// - Dismissible at CHECKING and INFO states
 class UpdateDialog extends ConsumerStatefulWidget {
-  const UpdateDialog({super.key});
+  /// When true (the auto-check on app open), the dialog closes silently if
+  /// the user is already on the latest version — no "You're on the latest"
+  /// notification. The manual Profile ⟳ button keeps that feedback.
+  const UpdateDialog({super.key, this.silentWhenUpToDate = false});
+
+  final bool silentWhenUpToDate;
 
   @override
   ConsumerState<UpdateDialog> createState() => _UpdateDialogState();
@@ -59,11 +64,20 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
           _state = _DialogState.info;
         });
       } else {
+        // Up to date: auto-check closes silently, manual check shows feedback.
+        if (widget.silentWhenUpToDate) {
+          Navigator.of(context).pop();
+          return;
+        }
         setState(() => _state = _DialogState.upToDate);
         _autoDismiss();
       }
     } catch (_) {
       if (!mounted) return;
+      if (widget.silentWhenUpToDate) {
+        Navigator.of(context).pop();
+        return;
+      }
       setState(() => _state = _DialogState.upToDate);
       _autoDismiss();
     }

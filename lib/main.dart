@@ -186,7 +186,7 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
         showDialog(
           context: navContext,
           barrierDismissible: true,
-          builder: (_) => const UpdateDialog(),
+          builder: (_) => const UpdateDialog(silentWhenUpToDate: true),
         );
       }
     });

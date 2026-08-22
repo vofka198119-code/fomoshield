@@ -19,9 +19,12 @@ permissions:
   contents: write
 
 jobs:
-  # ── Auto-version: reads pubspec.yaml, sets tag name ────────────────────────
-  version:
-    name: Version
+  # ── Bump version: read pubspec, compute the release tag ────────────────────
+  # Reads the version from pubspec.yaml and computes the release tag:
+  #   branch push → v{version}-dev.{run_number} (pre-release)
+  #   tag push   → the pushed tag itself (stable release)
+  bump-version:
+    name: Bump version
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.set.outputs.tag }}
@@ -45,7 +48,7 @@ jobs:
   # ── Android APK (ubuntu, cached Flutter SDK) ────────────────────────────────
   build-android:
     name: Android
-    needs: [version]
+    needs: [bump-version]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -90,7 +93,7 @@ jobs:
   # ── iOS (iPhone) build — unsigned IPA ─────────────────────────────────────
   build-ios:
     name: iPhone
-    needs: [version]
+    needs: [bump-version]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
@@ -125,7 +128,7 @@ jobs:
   # ── Windows desktop ───────────────────────────────────────────────────────
   build-windows:
     name: Windows
-    needs: [version]
+    needs: [bump-version]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
@@ -173,7 +176,7 @@ jobs:
   # ── Linux desktop ─────────────────────────────────────────────────────────
   build-linux:
     name: Linux
-    needs: [version]
+    needs: [bump-version]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -215,7 +218,7 @@ jobs:
   # ── macOS desktop ─────────────────────────────────────────────────────────
   build-macos:
     name: macOS
-    needs: [version]
+    needs: [bump-version]
     runs-on: macos-latest
     # Flutter beta 3.48 fixed the desktop-AOT snapshotter bug that crashed
     # 3.47.x macOS release builds ("Class with illegal cid"). macOS is now a
@@ -264,7 +267,7 @@ jobs:
   publish:
     name: Publish release
     if: ${{ !cancelled() }}
-    needs: [version, build-android, build-windows, build-ios, build-linux, build-macos]
+    needs: [bump-version, build-android, build-windows, build-ios, build-linux, build-macos]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
@@ -287,9 +290,9 @@ jobs:
         with:
           repository: vofka198119-code/fomoshield-releases
           token: ${{ secrets.RELEASE_PUBLISH_TOKEN }}
-          tag_name: ${{ needs.version.outputs.tag }}
-          name: ${{ needs.version.outputs.tag }}
-          prerelease: ${{ needs.version.outputs.prerelease }}
+          tag_name: ${{ needs.bump-version.outputs.tag }}
+          name: ${{ needs.bump-version.outputs.tag }}
+          prerelease: ${{ needs.bump-version.outputs.prerelease }}
           files: |
             ScanCo.apk
             ScanCo.zip
