@@ -396,6 +396,7 @@
   "commonFailedToLoad": "Failed to load",
   "commonOther": "Other",
   "commonLess": "Less",
+  "commonMore": "More",
   "commonMoreCount": "More ({count})",
   "@commonMoreCount": {
     "placeholders": {
@@ -1739,6 +1740,118 @@
   "marketClockWidgetDisplayNameNyTime": "New York Time",
   "marketClockWidgetDisplayNameMarketPhase": "Market Phase",
   "marketClockWidgetDisplayNameTimingIndicator": "FOMO Shield Status",
+  "portfolioBalanceWidgetDisplayNamePortfolioHealth": "Portfolio Health",
+  "portfolioBalanceWidgetDisplayNameAssetAllocation": "Asset Allocation %",
+  "portfolioBalanceWidgetDisplayNameDiversificationIndicator": "Diversification Indicator",
+  "portfolioBalanceWidgetDisplayNameDiversificationProgress": "Diversification Progress",
+  "marketTimelineTitle": "EPOCHS",
+  "marketTimelineEpochCount": "{current} of {total} epochs",
+  "@marketTimelineEpochCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "marketTimelineEpochLabel": "Ep. {number} · {description}",
+  "@marketTimelineEpochLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "marketTimelineDescBull": "Broad market growth",
+  "marketTimelineDescSideways": "Calm, range-bound",
+  "marketTimelineDescBear": "Gradual decline",
+  "marketTimelineDescVolatility": "Sharp swings, no trend",
+  "marketTimelineDescBlackSwan": "Everything crashes",
+  "marketTimelineDescCrash": "Heavy sector-wide drop",
+  "marketTimelineDescRecovery": "Post-crisis rebound",
+  "marketTimelineDescHype": "Target sector spike",
+  "marketTimelineDescSpeculation": "Multi-directional volatility",
+  "psychologyAuditTimesOnce": "once",
+  "psychologyAuditTimesCount": "{n} times",
+  "@psychologyAuditTimesCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "psychologyAuditRightDiversifying": "Great job on diversifying! You bought assets from different sectors, which protects your cash.",
+  "psychologyAuditRightPatience": "Excellent patience. You aren't panic-selling during drops and you're letting profits grow smoothly.",
+  "psychologyAuditRightDiscipline": "Strong discipline. You're sticking to your plan and not chasing every market move.",
+  "psychologyAuditRightNerve": "Solid nerve. You're holding steady during market turbulence instead of panic-selling.",
+  "psychologyAuditRightSectorSpread": "You're spread across {count} sectors. Good diversification reduces your risk if one industry struggles.",
+  "@psychologyAuditRightSectorSpread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "psychologyAuditRightCashBuffer": "You're keeping {pct}% in cash. This gives you flexibility to buy when opportunities appear.",
+  "@psychologyAuditRightCashBuffer": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "psychologyAuditMistakeFomoBuying": "You are buying during market Hype/Euphoria! You are chasing green candles due to FOMO.",
+  "psychologyAuditMistakePanicSelling": "You are selling assets at a loss as soon as the market bleeds a little bit.",
+  "psychologyAuditMistakeLackDiversification": "Your portfolio lacks diversification. Putting too much into one asset increases your risk dramatically.",
+  "psychologyAuditMistakeOvertrading": "You're trading too frequently. Every trade costs you — slow down and think twice before acting.",
+  "psychologyAuditMistakeBoughtAtPeak": "You bought at a peak {times}. This is classic FOMO — buying when everyone else is excited.",
+  "@psychologyAuditMistakeBoughtAtPeak": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "psychologyAuditMistakeSoldAtBottom": "You sold at the bottom {times}. Panic selling locks in losses that might have recovered.",
+  "@psychologyAuditMistakeSoldAtBottom": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "psychologyAuditRiskConcentration": "High Concentration Risk! If your top asset drops, your entire portfolio goes down with it.",
+  "psychologyAuditRiskNoSafetyNet": "No Safety Net! You went 100% all-in. If a Black Swan hits right now, you won't have cash to buy the dip.",
+  "psychologyAuditRiskSingleSector": "You're only in 1 sector. A single industry downturn could wipe out your gains.",
+  "psychologyAuditRiskOvertrading": "Overtrading alert! You're making {rate} trades/day. High frequency = high stress + more mistakes.",
+  "@psychologyAuditRiskOvertrading": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "psychologyAuditRiskRealizedLosses": "Your realized losses are adding up. Consider smaller position sizes until you find your rhythm.",
+  "psychologyAuditFreshTitle": "Your stress test has just begun!",
+  "psychologyAuditFreshTip": "Make your first moves wisely: diversify across 3+ sectors and keep some cash in reserve to build your Strategy score.",
+  "psychologyAuditTitle": "Live Action Audit",
+  "psychologyAuditSubtitle": "Psychology Score: {score}/100",
+  "@psychologyAuditSubtitle": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "psychologyAuditSectionRights": "🟢 What you are doing right",
+  "psychologyAuditSectionMistakes": "🔴 Where you are slipping up",
+  "psychologyAuditSectionRisks": "⚠️ Active Risks",
+  "psychologyAuditAllClearTip": "You're doing fine so far. Keep observing the market and make thoughtful decisions — don't rush.",
   "marketPhaseWidgetTitle": "MARKET PHASE",
   "marketPhaseWidgetDetailsTooltip": "Details",
   "marketClockFomoShieldStatusTitle": "FOMO SHIELD STATUS",
@@ -2203,5 +2316,66 @@
       }
     }
   },
-  "orderEntryNotifPendingSuffix": " — Pending"
+  "orderEntryNotifPendingSuffix": " — Pending",
+  "verdictDisclaimerTitle": "Disclaimer",
+  "verdictDisclaimerBody": "Please note: the stress test results, scores, insights, and written feedback provided by this application are intended for educational and informational purposes only.\n\nAll verdicts are generated automatically by analyzing your decisions within simulated market scenarios inspired by historical market events and generally accepted long-term investing principles. While every effort has been made to create realistic simulations, they cannot account for every factor that may influence real financial markets.\n\nPast market events and historical performance do not guarantee that similar conditions or outcomes will occur in the future. Real-world market behavior may differ significantly from the scenarios presented in this application. Any similarities between the simulations and actual market events should be viewed solely as educational examples and not as predictions or forecasts.\n\nThis application does not provide investment, financial, legal, or tax advice and should not be interpreted as a recommendation to buy, sell, or hold any security, asset, or financial instrument.\n\nAll investment decisions are made solely by the user and remain the user's sole responsibility. The developers of this application accept no liability for any financial losses, lost profits, investment outcomes, or any direct, indirect, incidental, or consequential damages resulting from the use of this application, its content, or decisions made based on the information provided.\n\nThe primary purpose of this application is to help users better understand the fundamentals of investing, portfolio diversification, risk management, long-term investing principles, and the psychological aspects of investment decision-making. All content is provided exclusively for educational purposes and should not be considered a substitute for professional financial advice or a guide for making real-world investment decisions.",
+  "portfolioBalanceScreenTitle": "PORTFOLIO BALANCE",
+  "portfolioBalanceScreenDisclaimerTitle": "Educational Disclaimer",
+  "portfolioBalanceScreenDisclaimerBody": "This application is intended to help users learn about investing and portfolio management. All scores, indicators, simulations, and educational content are provided for informational purposes only and should not be interpreted as financial advice or investment recommendations.\n\nThe app does not tell you what to buy, sell, or hold. Its purpose is to explain investment concepts, visualize portfolio characteristics, and support learning through educational tools.\n\nInvesting involves risk, and the value of investments can rise or fall. Past performance and simulated results are not guarantees of future performance. Always perform your own research and, when appropriate, seek advice from a licensed financial professional before making investment decisions.\n\nBy using this application, you acknowledge that all investment decisions remain your sole responsibility.",
+  "portfolioBalanceScreenAssetAllocationTitle": "ASSET ALLOCATION %",
+  "portfolioHealthWidgetTitle": "PORTFOLIO HEALTH",
+  "portfolioHealthWidgetDiversification": "Diversification",
+  "portfolioHealthWidgetConcentration": "Concentration",
+  "portfolioHealthWidgetSectorBalance": "Sector Balance",
+  "portfolioHealthWidgetStability": "Stability",
+  "verdictStrategyCardTitle": "STRATEGY",
+  "verdictStrategyCardConcentration": "Concentration",
+  "verdictStrategyCardEtfExposure": "ETF Exposure",
+  "verdictStrategyCardCashBuffer": "Cash Buffer",
+  "verdictDiversificationCardTitle": "DIVERSIFICATION",
+  "verdictDiversificationCardSectorDiversification": "Sector Diversification",
+  "verdictDiversificationCardSafetyMarker": "Safety Marker",
+  "verdictDiversificationCardSectorBalance": "Sector Balance",
+  "psychologyStrategyWidgetTitle": "STRATEGY",
+  "psychologyStrategyWidgetConcentration": "Concentration",
+  "psychologyStrategyWidgetEtfExposure": "ETF Exposure",
+  "psychologyStrategyWidgetCashBuffer": "Cash Buffer",
+  "psychologyDiversificationWidgetTitle": "DIVERSIFICATION",
+  "psychologyDiversificationWidgetSectorBalance": "Sector Balance",
+  "psychologyDiversificationWidgetSectorDiversification": "Sector Diversification",
+  "psychologyDiversificationWidgetSafetyMarker": "Safety Marker",
+  "psychologyPatienceWidgetTitle": "PATIENCE",
+  "psychologyPatienceWidgetLabel": "Patience",
+  "psychologyPanicWidgetTitle": "PANIC",
+  "psychologyPanicWidgetLabel": "Panic",
+  "psychologyDisciplineWidgetTitle": "DISCIPLINE",
+  "psychologyDisciplineWidgetLabel": "Discipline",
+  "psychologyMeterScreenStrategyScore": "STRATEGY SCORE",
+  "psychologyMeterScreenPsychologyScore": "PSYCHOLOGY SCORE",
+  "psychologyMeterScreenSessionStats": "SESSION STATS",
+  "verdictMarkerRowGood": "Good",
+  "verdictMarkerRowFair": "Fair",
+  "verdictMarkerRowNeedsWork": "Needs Work",
+  "stressTestTradeHistoryScreenSessionNotFound": "Session not found",
+  "stressTestTradeHistoryScreenNoTradesYet": "No trades yet",
+  "assetCountWidgetTitle": "DIVERSIFICATION PROGRESS",
+  "assetCountWidgetAssetsLabel": "ASSETS",
+  "verdictMarkerDetailDiscipline": "Discipline",
+  "verdictMarkerDetailPanic": "Panic",
+  "verdictMarkerDetailPatience": "Patience",
+  "verdictMarkerDetailSectorDiversification": "Sector Diversification",
+  "verdictMarkerDetailSafetyMarker": "Safety Marker",
+  "verdictMarkerDetailSectorBalance": "Sector Balance",
+  "verdictMarkerDetailConcentration": "Concentration",
+  "verdictMarkerDetailEtfExposure": "ETF Exposure",
+  "verdictMarkerDetailCashBuffer": "Cash Buffer",
+  "verdictMarkerDetailFallbackTitle": "Verdict",
+  "verdictScreenStrategyScoreLabel": "STRATEGY SCORE",
+  "verdictScreenPsychologyScoreLabel": "PSYCHOLOGY SCORE",
+  "verdictScreenDisciplineTitle": "DISCIPLINE",
+  "verdictScreenDisciplineLabel": "Discipline",
+  "verdictScreenPanicTitle": "PANIC",
+  "verdictScreenPanicLabel": "Panic",
+  "verdictScreenPatienceTitle": "PATIENCE",
+  "verdictScreenPatienceLabel": "Patience"
 }

@@ -20,8 +20,6 @@ import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../../shared/guardian/guardian_engine.dart';
-import '../../../shared/guardian/guardian_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../stress_test/stress_test_models.dart';
@@ -292,12 +290,6 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       // any holding bought here.
       ref.read(sectorRepositoryProvider).loadSector(widget.symbol);
     }
-
-    ref.read(guardianEngineProvider).whenData((engine) {
-      engine.recordAction(
-        _isBuy ? UserAction.boughtAsset : UserAction.soldAsset,
-      );
-    });
 
     pushAppNotification(
       ref.read(notificationsProvider.notifier),

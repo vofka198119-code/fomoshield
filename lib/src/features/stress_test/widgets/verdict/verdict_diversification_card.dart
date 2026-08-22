@@ -16,6 +16,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'verdict_marker_row.dart';
 
@@ -46,20 +47,21 @@ class VerdictDiversificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final rows = [
       _DiversificationRow(
         markerId: 'sector-diversification',
-        label: 'Sector Diversification',
+        label: l10n.verdictDiversificationCardSectorDiversification,
         score: sectorDiversificationScore,
       ),
       _DiversificationRow(
         markerId: 'safety-marker',
-        label: 'Safety Marker',
+        label: l10n.verdictDiversificationCardSafetyMarker,
         score: safetyMarkerScore,
       ),
       _DiversificationRow(
         markerId: 'sector-balance',
-        label: 'Sector Balance',
+        label: l10n.verdictDiversificationCardSectorBalance,
         score: sectorBalanceScore,
       ),
     ];
@@ -77,7 +79,7 @@ class VerdictDiversificationCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'DIVERSIFICATION',
+                  l10n.verdictDiversificationCardTitle,
                   style: FomoShieldTheme.cardTitle(Colors.white),
                 ),
                 GestureDetector(

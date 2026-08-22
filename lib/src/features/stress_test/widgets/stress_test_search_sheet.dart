@@ -219,7 +219,7 @@ class _StressTestSearchSheetState
             portfolioLabel: label == null ? null : 'Stress Test — $label',
             symbol: _selectedSymbol,
             companyName: _selectedDescription,
-            title: 'You Bought',
+            title: AppLocalizations.of(context)!.orderEntryNotifYouBought,
             detail:
                 '${(_amount / _selectedPrice).toStringAsFixed(4)} shares of '
                 '$_selectedDescription at ${formatUsd(_selectedPrice)}',

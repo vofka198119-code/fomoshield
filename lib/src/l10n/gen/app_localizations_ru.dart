@@ -918,6 +918,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonLess => 'Свернуть';
 
   @override
+  String get commonMore => 'Ещё';
+
+  @override
   String commonMoreCount(int count) {
     return 'Ещё ($count)';
   }
@@ -5017,6 +5020,171 @@ class AppLocalizationsRu extends AppLocalizations {
       'Статус FOMO Shield';
 
   @override
+  String get portfolioBalanceWidgetDisplayNamePortfolioHealth =>
+      'Здоровье портфеля';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameAssetAllocation =>
+      'Распределение активов, %';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameDiversificationIndicator =>
+      'Индикатор диверсификации';
+
+  @override
+  String get portfolioBalanceWidgetDisplayNameDiversificationProgress =>
+      'Прогресс диверсификации';
+
+  @override
+  String get marketTimelineTitle => 'ЭПОХИ';
+
+  @override
+  String marketTimelineEpochCount(int current, int total) {
+    return 'Эпоха $current из $total';
+  }
+
+  @override
+  String marketTimelineEpochLabel(int number, String description) {
+    return 'Эп. $number · $description';
+  }
+
+  @override
+  String get marketTimelineDescBull => 'Широкий рост рынка';
+
+  @override
+  String get marketTimelineDescSideways => 'Спокойный, боковой тренд';
+
+  @override
+  String get marketTimelineDescBear => 'Постепенное снижение';
+
+  @override
+  String get marketTimelineDescVolatility => 'Резкие колебания без тренда';
+
+  @override
+  String get marketTimelineDescBlackSwan => 'Обвал по всем направлениям';
+
+  @override
+  String get marketTimelineDescCrash => 'Резкое падение в секторе';
+
+  @override
+  String get marketTimelineDescRecovery => 'Восстановление после кризиса';
+
+  @override
+  String get marketTimelineDescHype => 'Всплеск в целевом секторе';
+
+  @override
+  String get marketTimelineDescSpeculation => 'Разнонаправленная волатильность';
+
+  @override
+  String get psychologyAuditTimesOnce => 'один раз';
+
+  @override
+  String psychologyAuditTimesCount(int n) {
+    return '$n раз';
+  }
+
+  @override
+  String get psychologyAuditRightDiversifying =>
+      'Отличная работа с диверсификацией! Вы покупали активы из разных секторов — это защищает ваш капитал.';
+
+  @override
+  String get psychologyAuditRightPatience =>
+      'Отличное терпение. Вы не продаёте в панике на просадках и даёте прибыли спокойно расти.';
+
+  @override
+  String get psychologyAuditRightDiscipline =>
+      'Хорошая дисциплина. Вы следуете своему плану и не гонитесь за каждым движением рынка.';
+
+  @override
+  String get psychologyAuditRightNerve =>
+      'Крепкие нервы. Вы держитесь стабильно во время рыночной турбулентности вместо панических продаж.';
+
+  @override
+  String psychologyAuditRightSectorSpread(int count) {
+    return 'Вы распределены по $count секторам. Хорошая диверсификация снижает риск, если пострадает одна отрасль.';
+  }
+
+  @override
+  String psychologyAuditRightCashBuffer(int pct) {
+    return 'Вы держите $pct% в кэше. Это даёт гибкость для покупок, когда появляются возможности.';
+  }
+
+  @override
+  String get psychologyAuditMistakeFomoBuying =>
+      'Вы покупаете во время рыночного хайпа/эйфории! Вы гонитесь за зелёными свечами из-за FOMO.';
+
+  @override
+  String get psychologyAuditMistakePanicSelling =>
+      'Вы продаёте активы в убыток при малейшей просадке рынка.';
+
+  @override
+  String get psychologyAuditMistakeLackDiversification =>
+      'Вашему портфелю не хватает диверсификации. Слишком большая доля в одном активе резко увеличивает риск.';
+
+  @override
+  String get psychologyAuditMistakeOvertrading =>
+      'Вы торгуете слишком часто. Каждая сделка обходится вам — притормозите и дважды подумайте перед действием.';
+
+  @override
+  String psychologyAuditMistakeBoughtAtPeak(String times) {
+    return 'Вы покупали на пике $times. Это классический FOMO — покупка, когда все вокруг в эйфории.';
+  }
+
+  @override
+  String psychologyAuditMistakeSoldAtBottom(String times) {
+    return 'Вы продавали на дне $times. Панические продажи фиксируют убытки, которые могли бы восстановиться.';
+  }
+
+  @override
+  String get psychologyAuditRiskConcentration =>
+      'Высокий риск концентрации! Если ваш крупнейший актив упадёт, весь портфель пойдёт вниз вместе с ним.';
+
+  @override
+  String get psychologyAuditRiskNoSafetyNet =>
+      'Нет подушки безопасности! Вы вложили 100% средств. Если сейчас случится «чёрный лебедь», у вас не будет кэша, чтобы выкупить просадку.';
+
+  @override
+  String get psychologyAuditRiskSingleSector =>
+      'Вы только в 1 секторе. Спад в одной отрасли может свести на нет всю вашу прибыль.';
+
+  @override
+  String psychologyAuditRiskOvertrading(String rate) {
+    return 'Тревога по перегрузке сделками! Вы совершаете $rate сделок в день. Высокая частота = больше стресса и ошибок.';
+  }
+
+  @override
+  String get psychologyAuditRiskRealizedLosses =>
+      'Ваши зафиксированные убытки накапливаются. Рассмотрите меньшие размеры позиций, пока не найдёте свой ритм.';
+
+  @override
+  String get psychologyAuditFreshTitle => 'Ваш стресс-тест только начался!';
+
+  @override
+  String get psychologyAuditFreshTip =>
+      'Делайте первые шаги обдуманно: диверсифицируйтесь по 3+ секторам и держите немного кэша в резерве, чтобы улучшить показатель Стратегии.';
+
+  @override
+  String get psychologyAuditTitle => 'Аудит действий в реальном времени';
+
+  @override
+  String psychologyAuditSubtitle(int score) {
+    return 'Психологический показатель: $score/100';
+  }
+
+  @override
+  String get psychologyAuditSectionRights => '🟢 Что вы делаете правильно';
+
+  @override
+  String get psychologyAuditSectionMistakes => '🔴 В чём вы допускаете ошибки';
+
+  @override
+  String get psychologyAuditSectionRisks => '⚠️ Активные риски';
+
+  @override
+  String get psychologyAuditAllClearTip =>
+      'Пока всё в порядке. Продолжайте наблюдать за рынком и принимать взвешенные решения — не торопитесь.';
+
+  @override
   String get marketPhaseWidgetTitle => 'ФАЗА РЫНКА';
 
   @override
@@ -5703,4 +5871,196 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get orderEntryNotifPendingSuffix => ' — в ожидании';
+
+  @override
+  String get verdictDisclaimerTitle => 'Дисклеймер';
+
+  @override
+  String get verdictDisclaimerBody =>
+      'Обратите внимание: результаты стресс-теста, оценки, выводы и текстовые комментарии, которые предоставляет это приложение, предназначены исключительно для образовательных и информационных целей.\n\nВсе вердикты формируются автоматически на основе анализа ваших решений в смоделированных рыночных сценариях, вдохновлённых историческими рыночными событиями и общепринятыми принципами долгосрочного инвестирования. Несмотря на все усилия сделать симуляции максимально реалистичными, они не могут учесть абсолютно все факторы, влияющие на реальные финансовые рынки.\n\nПрошлые рыночные события и историческая доходность не гарантируют, что похожие условия или результаты повторятся в будущем. Поведение реального рынка может существенно отличаться от сценариев, представленных в этом приложении. Любое сходство между симуляциями и реальными рыночными событиями следует рассматривать исключительно как образовательный пример, а не как прогноз.\n\nЭто приложение не предоставляет инвестиционных, финансовых, юридических или налоговых консультаций и не должно расцениваться как рекомендация покупать, продавать или держать какую-либо ценную бумагу, актив или финансовый инструмент.\n\nВсе инвестиционные решения пользователь принимает самостоятельно и несёт за них полную ответственность. Разработчики этого приложения не несут ответственности за какие-либо финансовые потери, упущенную выгоду, результаты инвестирования, а также за любой прямой, косвенный, случайный или последующий ущерб, возникший в результате использования приложения, его содержимого или решений, принятых на основе предоставленной информации.\n\nОсновная цель этого приложения — помочь пользователям лучше разобраться в основах инвестирования, диверсификации портфеля, управлении рисками, принципах долгосрочного инвестирования и психологических аспектах принятия инвестиционных решений. Весь контент предоставляется исключительно в образовательных целях и не может служить заменой профессиональной финансовой консультации или руководством для принятия реальных инвестиционных решений.';
+
+  @override
+  String get portfolioBalanceScreenTitle => 'БАЛАНС ПОРТФЕЛЯ';
+
+  @override
+  String get portfolioBalanceScreenDisclaimerTitle =>
+      'Образовательный дисклеймер';
+
+  @override
+  String get portfolioBalanceScreenDisclaimerBody =>
+      'Это приложение создано, чтобы помочь пользователям разобраться в инвестировании и управлении портфелем. Все оценки, показатели, симуляции и образовательные материалы предоставляются исключительно в информационных целях и не должны расцениваться как финансовая консультация или инвестиционная рекомендация.\n\nПриложение не указывает вам, что покупать, продавать или держать. Его задача — объяснять инвестиционные понятия, визуализировать характеристики портфеля и поддерживать обучение с помощью образовательных инструментов.\n\nИнвестирование связано с риском, и стоимость инвестиций может как расти, так и падать. Прошлые результаты и результаты симуляций не гарантируют будущей доходности. Всегда проводите собственное исследование и при необходимости обращайтесь за консультацией к лицензированному финансовому специалисту, прежде чем принимать инвестиционные решения.\n\nИспользуя это приложение, вы подтверждаете, что все инвестиционные решения остаются исключительно на вашей ответственности.';
+
+  @override
+  String get portfolioBalanceScreenAssetAllocationTitle =>
+      'РАСПРЕДЕЛЕНИЕ АКТИВОВ, %';
+
+  @override
+  String get portfolioHealthWidgetTitle => 'ЗДОРОВЬЕ ПОРТФЕЛЯ';
+
+  @override
+  String get portfolioHealthWidgetDiversification => 'Диверсификация';
+
+  @override
+  String get portfolioHealthWidgetConcentration => 'Концентрация';
+
+  @override
+  String get portfolioHealthWidgetSectorBalance => 'Секторальный баланс';
+
+  @override
+  String get portfolioHealthWidgetStability => 'Стабильность';
+
+  @override
+  String get verdictStrategyCardTitle => 'СТРАТЕГИЯ';
+
+  @override
+  String get verdictStrategyCardConcentration => 'Концентрация';
+
+  @override
+  String get verdictStrategyCardEtfExposure => 'Доля ETF';
+
+  @override
+  String get verdictStrategyCardCashBuffer => 'Денежный буфер';
+
+  @override
+  String get verdictDiversificationCardTitle => 'ДИВЕРСИФИКАЦИЯ';
+
+  @override
+  String get verdictDiversificationCardSectorDiversification =>
+      'Диверсификация по секторам';
+
+  @override
+  String get verdictDiversificationCardSafetyMarker => 'Маркер безопасности';
+
+  @override
+  String get verdictDiversificationCardSectorBalance => 'Секторальный баланс';
+
+  @override
+  String get psychologyStrategyWidgetTitle => 'СТРАТЕГИЯ';
+
+  @override
+  String get psychologyStrategyWidgetConcentration => 'Концентрация';
+
+  @override
+  String get psychologyStrategyWidgetEtfExposure => 'Доля ETF';
+
+  @override
+  String get psychologyStrategyWidgetCashBuffer => 'Денежный буфер';
+
+  @override
+  String get psychologyDiversificationWidgetTitle => 'ДИВЕРСИФИКАЦИЯ';
+
+  @override
+  String get psychologyDiversificationWidgetSectorBalance =>
+      'Секторальный баланс';
+
+  @override
+  String get psychologyDiversificationWidgetSectorDiversification =>
+      'Диверсификация по секторам';
+
+  @override
+  String get psychologyDiversificationWidgetSafetyMarker =>
+      'Маркер безопасности';
+
+  @override
+  String get psychologyPatienceWidgetTitle => 'ТЕРПЕНИЕ';
+
+  @override
+  String get psychologyPatienceWidgetLabel => 'Терпение';
+
+  @override
+  String get psychologyPanicWidgetTitle => 'ПАНИКА';
+
+  @override
+  String get psychologyPanicWidgetLabel => 'Паника';
+
+  @override
+  String get psychologyDisciplineWidgetTitle => 'ДИСЦИПЛИНА';
+
+  @override
+  String get psychologyDisciplineWidgetLabel => 'Дисциплина';
+
+  @override
+  String get psychologyMeterScreenStrategyScore => 'ОЦЕНКА СТРАТЕГИИ';
+
+  @override
+  String get psychologyMeterScreenPsychologyScore => 'ОЦЕНКА ПСИХОЛОГИИ';
+
+  @override
+  String get psychologyMeterScreenSessionStats => 'СТАТИСТИКА СЕССИИ';
+
+  @override
+  String get verdictMarkerRowGood => 'Хорошо';
+
+  @override
+  String get verdictMarkerRowFair => 'Средне';
+
+  @override
+  String get verdictMarkerRowNeedsWork => 'Требует внимания';
+
+  @override
+  String get stressTestTradeHistoryScreenSessionNotFound => 'Сессия не найдена';
+
+  @override
+  String get stressTestTradeHistoryScreenNoTradesYet => 'Сделок пока нет';
+
+  @override
+  String get assetCountWidgetTitle => 'ПРОГРЕСС ДИВЕРСИФИКАЦИИ';
+
+  @override
+  String get assetCountWidgetAssetsLabel => 'АКТИВЫ';
+
+  @override
+  String get verdictMarkerDetailDiscipline => 'Дисциплина';
+
+  @override
+  String get verdictMarkerDetailPanic => 'Паника';
+
+  @override
+  String get verdictMarkerDetailPatience => 'Терпение';
+
+  @override
+  String get verdictMarkerDetailSectorDiversification =>
+      'Диверсификация по секторам';
+
+  @override
+  String get verdictMarkerDetailSafetyMarker => 'Маркер безопасности';
+
+  @override
+  String get verdictMarkerDetailSectorBalance => 'Секторальный баланс';
+
+  @override
+  String get verdictMarkerDetailConcentration => 'Концентрация';
+
+  @override
+  String get verdictMarkerDetailEtfExposure => 'Доля ETF';
+
+  @override
+  String get verdictMarkerDetailCashBuffer => 'Денежный буфер';
+
+  @override
+  String get verdictMarkerDetailFallbackTitle => 'Вердикт';
+
+  @override
+  String get verdictScreenStrategyScoreLabel => 'ОЦЕНКА СТРАТЕГИИ';
+
+  @override
+  String get verdictScreenPsychologyScoreLabel => 'ОЦЕНКА ПСИХОЛОГИИ';
+
+  @override
+  String get verdictScreenDisciplineTitle => 'ДИСЦИПЛИНА';
+
+  @override
+  String get verdictScreenDisciplineLabel => 'Дисциплина';
+
+  @override
+  String get verdictScreenPanicTitle => 'ПАНИКА';
+
+  @override
+  String get verdictScreenPanicLabel => 'Паника';
+
+  @override
+  String get verdictScreenPatienceTitle => 'ТЕРПЕНИЕ';
+
+  @override
+  String get verdictScreenPatienceLabel => 'Терпение';
 }

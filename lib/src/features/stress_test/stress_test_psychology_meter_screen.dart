@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/psychology_meter.dart';
 import 'stress_test_engine.dart';
 import 'widgets/psychology/psychology_discipline_widget.dart';
@@ -28,6 +29,7 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = ref.watch(stressTestSessionProvider(sessionId));
     final data = session == null
@@ -48,7 +50,7 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'PSYCHOLOGY METER',
+          l10n.stressTestPsychologyMeterTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -70,7 +72,7 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
                   children: [
                     _FsScoreGaugeCard(
                       score: data.strategicScore,
-                      label: 'STRATEGY SCORE',
+                      label: l10n.psychologyMeterScreenStrategyScore,
                     ),
                     const SizedBox(height: 16),
                     PsychologyStrategyCard(session: session),
@@ -79,7 +81,7 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
                     const SizedBox(height: 24),
                     _FsScoreGaugeCard(
                       score: data.psychologicalScore,
-                      label: 'PSYCHOLOGY SCORE',
+                      label: l10n.psychologyMeterScreenPsychologyScore,
                     ),
                     const SizedBox(height: 16),
                     PsychologyDisciplineCard(
@@ -174,6 +176,7 @@ class _PsychologyMeterDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       decoration: FomoShieldTheme.cardDecoration,
@@ -183,7 +186,10 @@ class _PsychologyMeterDetailCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text('SESSION STATS', style: FomoShieldTheme.cardTitle()),
+            child: Text(
+              l10n.psychologyMeterScreenSessionStats,
+              style: FomoShieldTheme.cardTitle(),
+            ),
           ),
           Divider(
             height: 1,

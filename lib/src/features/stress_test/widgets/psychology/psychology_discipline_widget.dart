@@ -5,6 +5,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import '../allocation_bar_row.dart';
 import 'psychology_marker_card.dart';
 
@@ -20,12 +21,13 @@ class PsychologyDisciplineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final percent = (discipline * 100).clamp(0.0, 100.0);
     return PsychologyMarkerCard(
-      title: 'DISCIPLINE',
+      title: l10n.psychologyDisciplineWidgetTitle,
       infoId: 'psychology-discipline',
       child: AllocationBarRow(
-        name: 'Discipline',
+        name: l10n.psychologyDisciplineWidgetLabel,
         percent: percent,
         warning: percent < _warningThreshold,
         decimals: 0,

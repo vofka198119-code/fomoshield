@@ -15,6 +15,8 @@ import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
 import '../../features/search/search_screen.dart';
+import '../../features/search/top_companies_provider.dart';
+import '../../features/search/widgets/company_list_screen.dart';
 import '../../features/portfolio/portfolio_screen.dart';
 import '../../features/portfolio/screens/portfolio_order_entry_screen.dart';
 import '../../features/portfolio/screens/set_goal_screen.dart';
@@ -199,6 +201,33 @@ class AppRouter {
         path: '/search',
         name: 'search',
         builder: (context, state) => const SearchScreen(),
+      ),
+
+      // Search browse lane "see all" — a real pushed route instead of a
+      // modal sheet, see company_list_screen.dart's doc comment for why.
+      // extra is a Map: {title, companies, onTapSymbol, suppressSector?}.
+      GoRoute(
+        path: '/search/company-list',
+        name: 'search-company-list',
+        // `extra` carries a raw List<TopCompanyEntry> and even a closure
+        // (onTapSymbol) — neither survives Android restoring the nav stack
+        // from just the URL after the process was killed in the
+        // background (or a hot reload replaying routes), which lands here
+        // with state.extra == null instead of never re-entering this
+        // route at all. A hard `as Map` cast crashed the whole app on
+        // that path (confirmed on-device 2026-08-22); redirect to plain
+        // Search instead since the original list can't be reconstructed.
+        redirect: (context, state) =>
+            state.extra is Map<String, dynamic> ? null : '/search',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return CompanyListScreen(
+            title: extra['title'] as String,
+            companies: extra['companies'] as List<TopCompanyEntry>,
+            onTapSymbol: extra['onTapSymbol'] as void Function(String),
+            suppressSector: extra['suppressSector'] as bool? ?? false,
+          );
+        },
       ),
 
       // Market Clock — standalone (outside shell)

@@ -12,6 +12,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import '../../psychology_engine.dart';
 import '../../stress_test_models.dart';
 import '../allocation_bar_row.dart';
@@ -26,6 +27,7 @@ class PsychologyDiversificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scores = computeStrategySubScores(
       holdings: session.holdings,
       cash: session.cash,
@@ -33,13 +35,22 @@ class PsychologyDiversificationCard extends StatelessWidget {
     final safety = safetyMarkerFor(session.holdings);
 
     return PsychologyMarkerCard(
-      title: 'DIVERSIFICATION',
+      title: l10n.psychologyDiversificationWidgetTitle,
       infoId: 'psychology-diversification',
       child: Column(
         children: [
-          _bar('Sector Balance', scores.sector * 100),
-          _bar('Sector Diversification', scores.diversification * 100),
-          _bar('Safety Marker', safety.score * 100),
+          _bar(
+            l10n.psychologyDiversificationWidgetSectorBalance,
+            scores.sector * 100,
+          ),
+          _bar(
+            l10n.psychologyDiversificationWidgetSectorDiversification,
+            scores.diversification * 100,
+          ),
+          _bar(
+            l10n.psychologyDiversificationWidgetSafetyMarker,
+            safety.score * 100,
+          ),
         ],
       ),
     );

@@ -189,7 +189,7 @@ class VerdictScreen extends ConsumerWidget {
                             ) *
                             100)
                         .round(),
-                    'STRATEGY SCORE',
+                    l10n.verdictScreenStrategyScoreLabel,
                   ),
                 ),
               ),
@@ -237,7 +237,7 @@ class VerdictScreen extends ConsumerWidget {
                                 .clamp(0.0, 1.0) *
                             100)
                         .round(),
-                    'PSYCHOLOGY SCORE',
+                    l10n.verdictScreenPsychologyScoreLabel,
                   ),
                 ),
               ),
@@ -251,8 +251,8 @@ class VerdictScreen extends ConsumerWidget {
                   child: VerdictSingleMarkerCard(
                     sessionId: sessionId,
                     markerId: 'discipline',
-                    title: 'DISCIPLINE',
-                    label: 'Discipline',
+                    title: l10n.verdictScreenDisciplineTitle,
+                    label: l10n.verdictScreenDisciplineLabel,
                     score: entry.discipline,
                   ),
                 ),
@@ -265,8 +265,8 @@ class VerdictScreen extends ConsumerWidget {
                   child: VerdictSingleMarkerCard(
                     sessionId: sessionId,
                     markerId: 'panic',
-                    title: 'PANIC',
-                    label: 'Panic',
+                    title: l10n.verdictScreenPanicTitle,
+                    label: l10n.verdictScreenPanicLabel,
                     score: entry.panicResistance,
                   ),
                 ),
@@ -279,8 +279,8 @@ class VerdictScreen extends ConsumerWidget {
                   child: VerdictSingleMarkerCard(
                     sessionId: sessionId,
                     markerId: 'patience',
-                    title: 'PATIENCE',
-                    label: 'Patience',
+                    title: l10n.verdictScreenPatienceTitle,
+                    label: l10n.verdictScreenPatienceLabel,
                     score: entry.patience,
                   ),
                 ),

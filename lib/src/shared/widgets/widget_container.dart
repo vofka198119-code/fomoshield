@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'card_frame.dart';
 
 // ---------------------------------------------------------------------------
@@ -17,7 +18,10 @@ class WidgetContainer extends StatelessWidget {
   // promised navigation and did nothing, which read as a stray artifact.
   final VoidCallback? onTap;
   final List<Widget> children;
-  final String footerText;
+  // Null falls back to the localized "More" (see build()) — most callers
+  // don't need a custom footer label, only portfolio_trade_history_widget
+  // overrides it with a count.
+  final String? footerText;
   final bool showFooter;
   final String? emptyText;
   // Optional header-right action (e.g. a "+" add button), shown before the
@@ -29,7 +33,7 @@ class WidgetContainer extends StatelessWidget {
     required this.title,
     this.onTap,
     this.children = const [],
-    this.footerText = 'More',
+    this.footerText,
     this.showFooter = true,
     this.emptyText,
     this.trailing,
@@ -37,7 +41,9 @@ class WidgetContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasTap = onTap != null;
+    final resolvedFooterText = footerText ?? l10n.commonMore;
     return CardFrame(
       showTopBar: false,
       padding: EdgeInsets.zero,
@@ -120,7 +126,7 @@ class WidgetContainer extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Center(
                     child: Text(
-                      footerText,
+                      resolvedFooterText,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

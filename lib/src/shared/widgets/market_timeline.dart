@@ -14,6 +14,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 /// Compact vertical timeline of market epochs.
 ///
@@ -57,6 +58,7 @@ class _MarketTimelineState extends State<MarketTimeline> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (widget.epochs.isEmpty) return const SizedBox.shrink();
 
     final currentIdx =
@@ -92,10 +94,13 @@ class _MarketTimelineState extends State<MarketTimeline> {
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
           child: Row(
             children: [
-              Text('EPOCHS', style: FomoShieldTheme.cardTitle()),
+              Text(l10n.marketTimelineTitle, style: FomoShieldTheme.cardTitle()),
               const Spacer(),
               Text(
-                '${currentIdx + 1} of ${widget.epochs.length} epochs',
+                l10n.marketTimelineEpochCount(
+                  currentIdx + 1,
+                  widget.epochs.length,
+                ),
                 style: interNums(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -146,8 +151,10 @@ class _MarketTimelineState extends State<MarketTimeline> {
               child: Center(
                 child: Text(
                   _expanded
-                      ? 'Less'
-                      : 'More (${widget.epochs.length - widget.initialLimit})',
+                      ? l10n.commonLess
+                      : l10n.commonMoreCount(
+                          widget.epochs.length - widget.initialLimit,
+                        ),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -190,23 +197,24 @@ class _TimelineRow extends StatelessWidget {
 
   String get _phaseLabel => epoch.scenario.name.toUpperCase();
 
-  String get _description {
+  String _descriptionFor(AppLocalizations l10n) {
     // Short single-line description, e.g. "Broad growth" for bull
     return switch (epoch.scenario) {
-      MarketScenario.bull => 'Broad market growth',
-      MarketScenario.sideways => 'Calm, range-bound',
-      MarketScenario.bear => 'Gradual decline',
-      MarketScenario.volatility => 'Sharp swings, no trend',
-      MarketScenario.blackSwan => 'Everything crashes',
-      MarketScenario.crash => 'Heavy sector-wide drop',
-      MarketScenario.recovery => 'Post-crisis rebound',
-      MarketScenario.hype => 'Target sector spike',
-      MarketScenario.speculation => 'Multi-directional volatility',
+      MarketScenario.bull => l10n.marketTimelineDescBull,
+      MarketScenario.sideways => l10n.marketTimelineDescSideways,
+      MarketScenario.bear => l10n.marketTimelineDescBear,
+      MarketScenario.volatility => l10n.marketTimelineDescVolatility,
+      MarketScenario.blackSwan => l10n.marketTimelineDescBlackSwan,
+      MarketScenario.crash => l10n.marketTimelineDescCrash,
+      MarketScenario.recovery => l10n.marketTimelineDescRecovery,
+      MarketScenario.hype => l10n.marketTimelineDescHype,
+      MarketScenario.speculation => l10n.marketTimelineDescSpeculation,
     };
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final dotSize = isCurrent ? 14.0 : 10.0;
     final dotColor = _phaseColor;
     final opacity = isCurrent
@@ -301,7 +309,7 @@ class _TimelineRow extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'NOW',
+                            l10n.marketPhasesScreenNowBadge,
                             style: GoogleFonts.inter(
                               fontSize: 9,
                               fontWeight: FontWeight.w800,
@@ -315,7 +323,10 @@ class _TimelineRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 1),
                   Text(
-                    'Ep. $epochNumber · $_description',
+                    l10n.marketTimelineEpochLabel(
+                      epochNumber,
+                      _descriptionFor(l10n),
+                    ),
                     style: interNums(
                       fontSize: 11,
                       fontWeight: FontWeight.w400,

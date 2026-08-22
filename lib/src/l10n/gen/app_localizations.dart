@@ -1741,6 +1741,12 @@ abstract class AppLocalizations {
   /// **'Less'**
   String get commonLess;
 
+  /// No description provided for @commonMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get commonMore;
+
   /// No description provided for @commonMoreCount.
   ///
   /// In en, this message translates to:
@@ -8437,6 +8443,264 @@ abstract class AppLocalizations {
   /// **'FOMO Shield Status'**
   String get marketClockWidgetDisplayNameTimingIndicator;
 
+  /// No description provided for @portfolioBalanceWidgetDisplayNamePortfolioHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio Health'**
+  String get portfolioBalanceWidgetDisplayNamePortfolioHealth;
+
+  /// No description provided for @portfolioBalanceWidgetDisplayNameAssetAllocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Allocation %'**
+  String get portfolioBalanceWidgetDisplayNameAssetAllocation;
+
+  /// No description provided for @portfolioBalanceWidgetDisplayNameDiversificationIndicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Diversification Indicator'**
+  String get portfolioBalanceWidgetDisplayNameDiversificationIndicator;
+
+  /// No description provided for @portfolioBalanceWidgetDisplayNameDiversificationProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Diversification Progress'**
+  String get portfolioBalanceWidgetDisplayNameDiversificationProgress;
+
+  /// No description provided for @marketTimelineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EPOCHS'**
+  String get marketTimelineTitle;
+
+  /// No description provided for @marketTimelineEpochCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {total} epochs'**
+  String marketTimelineEpochCount(int current, int total);
+
+  /// No description provided for @marketTimelineEpochLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ep. {number} · {description}'**
+  String marketTimelineEpochLabel(int number, String description);
+
+  /// No description provided for @marketTimelineDescBull.
+  ///
+  /// In en, this message translates to:
+  /// **'Broad market growth'**
+  String get marketTimelineDescBull;
+
+  /// No description provided for @marketTimelineDescSideways.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm, range-bound'**
+  String get marketTimelineDescSideways;
+
+  /// No description provided for @marketTimelineDescBear.
+  ///
+  /// In en, this message translates to:
+  /// **'Gradual decline'**
+  String get marketTimelineDescBear;
+
+  /// No description provided for @marketTimelineDescVolatility.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharp swings, no trend'**
+  String get marketTimelineDescVolatility;
+
+  /// No description provided for @marketTimelineDescBlackSwan.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything crashes'**
+  String get marketTimelineDescBlackSwan;
+
+  /// No description provided for @marketTimelineDescCrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy sector-wide drop'**
+  String get marketTimelineDescCrash;
+
+  /// No description provided for @marketTimelineDescRecovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-crisis rebound'**
+  String get marketTimelineDescRecovery;
+
+  /// No description provided for @marketTimelineDescHype.
+  ///
+  /// In en, this message translates to:
+  /// **'Target sector spike'**
+  String get marketTimelineDescHype;
+
+  /// No description provided for @marketTimelineDescSpeculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-directional volatility'**
+  String get marketTimelineDescSpeculation;
+
+  /// No description provided for @psychologyAuditTimesOnce.
+  ///
+  /// In en, this message translates to:
+  /// **'once'**
+  String get psychologyAuditTimesOnce;
+
+  /// No description provided for @psychologyAuditTimesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} times'**
+  String psychologyAuditTimesCount(int n);
+
+  /// No description provided for @psychologyAuditRightDiversifying.
+  ///
+  /// In en, this message translates to:
+  /// **'Great job on diversifying! You bought assets from different sectors, which protects your cash.'**
+  String get psychologyAuditRightDiversifying;
+
+  /// No description provided for @psychologyAuditRightPatience.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent patience. You aren\'t panic-selling during drops and you\'re letting profits grow smoothly.'**
+  String get psychologyAuditRightPatience;
+
+  /// No description provided for @psychologyAuditRightDiscipline.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong discipline. You\'re sticking to your plan and not chasing every market move.'**
+  String get psychologyAuditRightDiscipline;
+
+  /// No description provided for @psychologyAuditRightNerve.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid nerve. You\'re holding steady during market turbulence instead of panic-selling.'**
+  String get psychologyAuditRightNerve;
+
+  /// No description provided for @psychologyAuditRightSectorSpread.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re spread across {count} sectors. Good diversification reduces your risk if one industry struggles.'**
+  String psychologyAuditRightSectorSpread(int count);
+
+  /// No description provided for @psychologyAuditRightCashBuffer.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re keeping {pct}% in cash. This gives you flexibility to buy when opportunities appear.'**
+  String psychologyAuditRightCashBuffer(int pct);
+
+  /// No description provided for @psychologyAuditMistakeFomoBuying.
+  ///
+  /// In en, this message translates to:
+  /// **'You are buying during market Hype/Euphoria! You are chasing green candles due to FOMO.'**
+  String get psychologyAuditMistakeFomoBuying;
+
+  /// No description provided for @psychologyAuditMistakePanicSelling.
+  ///
+  /// In en, this message translates to:
+  /// **'You are selling assets at a loss as soon as the market bleeds a little bit.'**
+  String get psychologyAuditMistakePanicSelling;
+
+  /// No description provided for @psychologyAuditMistakeLackDiversification.
+  ///
+  /// In en, this message translates to:
+  /// **'Your portfolio lacks diversification. Putting too much into one asset increases your risk dramatically.'**
+  String get psychologyAuditMistakeLackDiversification;
+
+  /// No description provided for @psychologyAuditMistakeOvertrading.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re trading too frequently. Every trade costs you — slow down and think twice before acting.'**
+  String get psychologyAuditMistakeOvertrading;
+
+  /// No description provided for @psychologyAuditMistakeBoughtAtPeak.
+  ///
+  /// In en, this message translates to:
+  /// **'You bought at a peak {times}. This is classic FOMO — buying when everyone else is excited.'**
+  String psychologyAuditMistakeBoughtAtPeak(String times);
+
+  /// No description provided for @psychologyAuditMistakeSoldAtBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'You sold at the bottom {times}. Panic selling locks in losses that might have recovered.'**
+  String psychologyAuditMistakeSoldAtBottom(String times);
+
+  /// No description provided for @psychologyAuditRiskConcentration.
+  ///
+  /// In en, this message translates to:
+  /// **'High Concentration Risk! If your top asset drops, your entire portfolio goes down with it.'**
+  String get psychologyAuditRiskConcentration;
+
+  /// No description provided for @psychologyAuditRiskNoSafetyNet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Safety Net! You went 100% all-in. If a Black Swan hits right now, you won\'t have cash to buy the dip.'**
+  String get psychologyAuditRiskNoSafetyNet;
+
+  /// No description provided for @psychologyAuditRiskSingleSector.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re only in 1 sector. A single industry downturn could wipe out your gains.'**
+  String get psychologyAuditRiskSingleSector;
+
+  /// No description provided for @psychologyAuditRiskOvertrading.
+  ///
+  /// In en, this message translates to:
+  /// **'Overtrading alert! You\'re making {rate} trades/day. High frequency = high stress + more mistakes.'**
+  String psychologyAuditRiskOvertrading(String rate);
+
+  /// No description provided for @psychologyAuditRiskRealizedLosses.
+  ///
+  /// In en, this message translates to:
+  /// **'Your realized losses are adding up. Consider smaller position sizes until you find your rhythm.'**
+  String get psychologyAuditRiskRealizedLosses;
+
+  /// No description provided for @psychologyAuditFreshTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your stress test has just begun!'**
+  String get psychologyAuditFreshTitle;
+
+  /// No description provided for @psychologyAuditFreshTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Make your first moves wisely: diversify across 3+ sectors and keep some cash in reserve to build your Strategy score.'**
+  String get psychologyAuditFreshTip;
+
+  /// No description provided for @psychologyAuditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Action Audit'**
+  String get psychologyAuditTitle;
+
+  /// No description provided for @psychologyAuditSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Psychology Score: {score}/100'**
+  String psychologyAuditSubtitle(int score);
+
+  /// No description provided for @psychologyAuditSectionRights.
+  ///
+  /// In en, this message translates to:
+  /// **'🟢 What you are doing right'**
+  String get psychologyAuditSectionRights;
+
+  /// No description provided for @psychologyAuditSectionMistakes.
+  ///
+  /// In en, this message translates to:
+  /// **'🔴 Where you are slipping up'**
+  String get psychologyAuditSectionMistakes;
+
+  /// No description provided for @psychologyAuditSectionRisks.
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ Active Risks'**
+  String get psychologyAuditSectionRisks;
+
+  /// No description provided for @psychologyAuditAllClearTip.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re doing fine so far. Keep observing the market and make thoughtful decisions — don\'t rush.'**
+  String get psychologyAuditAllClearTip;
+
   /// No description provided for @marketPhaseWidgetTitle.
   ///
   /// In en, this message translates to:
@@ -9580,6 +9844,372 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **' — Pending'**
   String get orderEntryNotifPendingSuffix;
+
+  /// No description provided for @verdictDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer'**
+  String get verdictDisclaimerTitle;
+
+  /// No description provided for @verdictDisclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please note: the stress test results, scores, insights, and written feedback provided by this application are intended for educational and informational purposes only.\n\nAll verdicts are generated automatically by analyzing your decisions within simulated market scenarios inspired by historical market events and generally accepted long-term investing principles. While every effort has been made to create realistic simulations, they cannot account for every factor that may influence real financial markets.\n\nPast market events and historical performance do not guarantee that similar conditions or outcomes will occur in the future. Real-world market behavior may differ significantly from the scenarios presented in this application. Any similarities between the simulations and actual market events should be viewed solely as educational examples and not as predictions or forecasts.\n\nThis application does not provide investment, financial, legal, or tax advice and should not be interpreted as a recommendation to buy, sell, or hold any security, asset, or financial instrument.\n\nAll investment decisions are made solely by the user and remain the user\'s sole responsibility. The developers of this application accept no liability for any financial losses, lost profits, investment outcomes, or any direct, indirect, incidental, or consequential damages resulting from the use of this application, its content, or decisions made based on the information provided.\n\nThe primary purpose of this application is to help users better understand the fundamentals of investing, portfolio diversification, risk management, long-term investing principles, and the psychological aspects of investment decision-making. All content is provided exclusively for educational purposes and should not be considered a substitute for professional financial advice or a guide for making real-world investment decisions.'**
+  String get verdictDisclaimerBody;
+
+  /// No description provided for @portfolioBalanceScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PORTFOLIO BALANCE'**
+  String get portfolioBalanceScreenTitle;
+
+  /// No description provided for @portfolioBalanceScreenDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Educational Disclaimer'**
+  String get portfolioBalanceScreenDisclaimerTitle;
+
+  /// No description provided for @portfolioBalanceScreenDisclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This application is intended to help users learn about investing and portfolio management. All scores, indicators, simulations, and educational content are provided for informational purposes only and should not be interpreted as financial advice or investment recommendations.\n\nThe app does not tell you what to buy, sell, or hold. Its purpose is to explain investment concepts, visualize portfolio characteristics, and support learning through educational tools.\n\nInvesting involves risk, and the value of investments can rise or fall. Past performance and simulated results are not guarantees of future performance. Always perform your own research and, when appropriate, seek advice from a licensed financial professional before making investment decisions.\n\nBy using this application, you acknowledge that all investment decisions remain your sole responsibility.'**
+  String get portfolioBalanceScreenDisclaimerBody;
+
+  /// No description provided for @portfolioBalanceScreenAssetAllocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ASSET ALLOCATION %'**
+  String get portfolioBalanceScreenAssetAllocationTitle;
+
+  /// No description provided for @portfolioHealthWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PORTFOLIO HEALTH'**
+  String get portfolioHealthWidgetTitle;
+
+  /// No description provided for @portfolioHealthWidgetDiversification.
+  ///
+  /// In en, this message translates to:
+  /// **'Diversification'**
+  String get portfolioHealthWidgetDiversification;
+
+  /// No description provided for @portfolioHealthWidgetConcentration.
+  ///
+  /// In en, this message translates to:
+  /// **'Concentration'**
+  String get portfolioHealthWidgetConcentration;
+
+  /// No description provided for @portfolioHealthWidgetSectorBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Balance'**
+  String get portfolioHealthWidgetSectorBalance;
+
+  /// No description provided for @portfolioHealthWidgetStability.
+  ///
+  /// In en, this message translates to:
+  /// **'Stability'**
+  String get portfolioHealthWidgetStability;
+
+  /// No description provided for @verdictStrategyCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'STRATEGY'**
+  String get verdictStrategyCardTitle;
+
+  /// No description provided for @verdictStrategyCardConcentration.
+  ///
+  /// In en, this message translates to:
+  /// **'Concentration'**
+  String get verdictStrategyCardConcentration;
+
+  /// No description provided for @verdictStrategyCardEtfExposure.
+  ///
+  /// In en, this message translates to:
+  /// **'ETF Exposure'**
+  String get verdictStrategyCardEtfExposure;
+
+  /// No description provided for @verdictStrategyCardCashBuffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Buffer'**
+  String get verdictStrategyCardCashBuffer;
+
+  /// No description provided for @verdictDiversificationCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DIVERSIFICATION'**
+  String get verdictDiversificationCardTitle;
+
+  /// No description provided for @verdictDiversificationCardSectorDiversification.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Diversification'**
+  String get verdictDiversificationCardSectorDiversification;
+
+  /// No description provided for @verdictDiversificationCardSafetyMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Marker'**
+  String get verdictDiversificationCardSafetyMarker;
+
+  /// No description provided for @verdictDiversificationCardSectorBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Balance'**
+  String get verdictDiversificationCardSectorBalance;
+
+  /// No description provided for @psychologyStrategyWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'STRATEGY'**
+  String get psychologyStrategyWidgetTitle;
+
+  /// No description provided for @psychologyStrategyWidgetConcentration.
+  ///
+  /// In en, this message translates to:
+  /// **'Concentration'**
+  String get psychologyStrategyWidgetConcentration;
+
+  /// No description provided for @psychologyStrategyWidgetEtfExposure.
+  ///
+  /// In en, this message translates to:
+  /// **'ETF Exposure'**
+  String get psychologyStrategyWidgetEtfExposure;
+
+  /// No description provided for @psychologyStrategyWidgetCashBuffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Buffer'**
+  String get psychologyStrategyWidgetCashBuffer;
+
+  /// No description provided for @psychologyDiversificationWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DIVERSIFICATION'**
+  String get psychologyDiversificationWidgetTitle;
+
+  /// No description provided for @psychologyDiversificationWidgetSectorBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Balance'**
+  String get psychologyDiversificationWidgetSectorBalance;
+
+  /// No description provided for @psychologyDiversificationWidgetSectorDiversification.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Diversification'**
+  String get psychologyDiversificationWidgetSectorDiversification;
+
+  /// No description provided for @psychologyDiversificationWidgetSafetyMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Marker'**
+  String get psychologyDiversificationWidgetSafetyMarker;
+
+  /// No description provided for @psychologyPatienceWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PATIENCE'**
+  String get psychologyPatienceWidgetTitle;
+
+  /// No description provided for @psychologyPatienceWidgetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Patience'**
+  String get psychologyPatienceWidgetLabel;
+
+  /// No description provided for @psychologyPanicWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PANIC'**
+  String get psychologyPanicWidgetTitle;
+
+  /// No description provided for @psychologyPanicWidgetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Panic'**
+  String get psychologyPanicWidgetLabel;
+
+  /// No description provided for @psychologyDisciplineWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DISCIPLINE'**
+  String get psychologyDisciplineWidgetTitle;
+
+  /// No description provided for @psychologyDisciplineWidgetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Discipline'**
+  String get psychologyDisciplineWidgetLabel;
+
+  /// No description provided for @psychologyMeterScreenStrategyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'STRATEGY SCORE'**
+  String get psychologyMeterScreenStrategyScore;
+
+  /// No description provided for @psychologyMeterScreenPsychologyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'PSYCHOLOGY SCORE'**
+  String get psychologyMeterScreenPsychologyScore;
+
+  /// No description provided for @psychologyMeterScreenSessionStats.
+  ///
+  /// In en, this message translates to:
+  /// **'SESSION STATS'**
+  String get psychologyMeterScreenSessionStats;
+
+  /// No description provided for @verdictMarkerRowGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get verdictMarkerRowGood;
+
+  /// No description provided for @verdictMarkerRowFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get verdictMarkerRowFair;
+
+  /// No description provided for @verdictMarkerRowNeedsWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs Work'**
+  String get verdictMarkerRowNeedsWork;
+
+  /// No description provided for @stressTestTradeHistoryScreenSessionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Session not found'**
+  String get stressTestTradeHistoryScreenSessionNotFound;
+
+  /// No description provided for @stressTestTradeHistoryScreenNoTradesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No trades yet'**
+  String get stressTestTradeHistoryScreenNoTradesYet;
+
+  /// No description provided for @assetCountWidgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DIVERSIFICATION PROGRESS'**
+  String get assetCountWidgetTitle;
+
+  /// No description provided for @assetCountWidgetAssetsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ASSETS'**
+  String get assetCountWidgetAssetsLabel;
+
+  /// No description provided for @verdictMarkerDetailDiscipline.
+  ///
+  /// In en, this message translates to:
+  /// **'Discipline'**
+  String get verdictMarkerDetailDiscipline;
+
+  /// No description provided for @verdictMarkerDetailPanic.
+  ///
+  /// In en, this message translates to:
+  /// **'Panic'**
+  String get verdictMarkerDetailPanic;
+
+  /// No description provided for @verdictMarkerDetailPatience.
+  ///
+  /// In en, this message translates to:
+  /// **'Patience'**
+  String get verdictMarkerDetailPatience;
+
+  /// No description provided for @verdictMarkerDetailSectorDiversification.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Diversification'**
+  String get verdictMarkerDetailSectorDiversification;
+
+  /// No description provided for @verdictMarkerDetailSafetyMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Marker'**
+  String get verdictMarkerDetailSafetyMarker;
+
+  /// No description provided for @verdictMarkerDetailSectorBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector Balance'**
+  String get verdictMarkerDetailSectorBalance;
+
+  /// No description provided for @verdictMarkerDetailConcentration.
+  ///
+  /// In en, this message translates to:
+  /// **'Concentration'**
+  String get verdictMarkerDetailConcentration;
+
+  /// No description provided for @verdictMarkerDetailEtfExposure.
+  ///
+  /// In en, this message translates to:
+  /// **'ETF Exposure'**
+  String get verdictMarkerDetailEtfExposure;
+
+  /// No description provided for @verdictMarkerDetailCashBuffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Buffer'**
+  String get verdictMarkerDetailCashBuffer;
+
+  /// No description provided for @verdictMarkerDetailFallbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verdict'**
+  String get verdictMarkerDetailFallbackTitle;
+
+  /// No description provided for @verdictScreenStrategyScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'STRATEGY SCORE'**
+  String get verdictScreenStrategyScoreLabel;
+
+  /// No description provided for @verdictScreenPsychologyScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PSYCHOLOGY SCORE'**
+  String get verdictScreenPsychologyScoreLabel;
+
+  /// No description provided for @verdictScreenDisciplineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DISCIPLINE'**
+  String get verdictScreenDisciplineTitle;
+
+  /// No description provided for @verdictScreenDisciplineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Discipline'**
+  String get verdictScreenDisciplineLabel;
+
+  /// No description provided for @verdictScreenPanicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PANIC'**
+  String get verdictScreenPanicTitle;
+
+  /// No description provided for @verdictScreenPanicLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Panic'**
+  String get verdictScreenPanicLabel;
+
+  /// No description provided for @verdictScreenPatienceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PATIENCE'**
+  String get verdictScreenPatienceTitle;
+
+  /// No description provided for @verdictScreenPatienceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Patience'**
+  String get verdictScreenPatienceLabel;
 }
 
 class _AppLocalizationsDelegate

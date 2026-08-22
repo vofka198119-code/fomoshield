@@ -1,17 +1,25 @@
 import 'package:flutter/foundation.dart';
 import '../models/company.dart';
 import '../models/logo_cache_entry.dart';
+import '../services/gics_sector_mapper.dart';
 import '../../shared/services/finnhub_service.dart';
 import 'logo_dao.dart';
 
 // ---------------------------------------------------------------------------
-// LogoRepository — управление загрузкой и кэшированием логотипов
+// LogoRepository — управление загрузкой и кэшированием логотипов И сектора
 // ---------------------------------------------------------------------------
 // Логика:
 //   1. Проверить LogoDao (постоянное хранилище)
 //   2. Если есть — вернуть URL
 //   3. Если нет — запросить profile Finnhub, извлечь домен,
 //      сформировать Clearbit URL, сохранить в LogoDao, вернуть
+//
+// Логотип и сектор раньше были двумя отдельными постоянными кэшами
+// (LogoDao + SectorDao), каждый со своим собственным запросом к тому же
+// самому /profile/:symbol — объединено 2026-08-22: одна и та же
+// профильная загрузка теперь сразу заполняет оба поля в LogoCacheEntry.
+// SectorRepository (sector_repository.dart) теперь тонкая обёртка,
+// читающая/дозаписывающая через этот же кэш и этот же метод.
 // ---------------------------------------------------------------------------
 
 class LogoRepository {
@@ -34,14 +42,22 @@ class LogoRepository {
   /// Загружает логотип, если его нет в кэше.
   /// Возвращает URL логотипа (из кэша или свежезагруженный).
   Future<String?> loadLogo(Company company) async {
-    // 1. Проверить кэш — но если companyName в кэше равен самому тикеру,
-    // это след старого бага loadLogoSymbol() (см. ниже): запись считается
-    // непригодной и перезагружается, чтобы самоисправиться при следующем
-    // обращении вместо того чтобы хранить тикер вместо имени вечно.
+    // 1. Проверить кэш — но перезапросить профиль заново, если:
+    //    (a) companyName в кэше равен самому тикеру — след старого бага
+    //        loadLogoSymbol() (см. ниже), запись непригодна; или
+    //    (b) сектор ещё ни разу не резолвился (gicsSector == null) — эта
+    //        запись могла быть создана ДО объединения логотипа и сектора
+    //        в один кэш, либо только что созданной SectorRepository-путём
+    //        ниже. Один лишний повторный фетч на тикер самоисправляет
+    //        такую запись раз и навсегда, вместо того чтобы sector
+    //        оставался незаполненным до следующего случайного триггера.
     final cached = await _dao.getLogo(company.ticker);
     final cachedNameUseless = cached != null &&
         cached.companyName.toUpperCase() == company.ticker.toUpperCase();
-    if (cached != null && !cachedNameUseless) return cached.logoUrl;
+    final cachedSectorMissing = cached != null && cached.gicsSector == null;
+    if (cached != null && !cachedNameUseless && !cachedSectorMissing) {
+      return cached.logoUrl;
+    }
 
     // 2. Если нет в кэше (или имя непригодно) — загрузить profile и сохранить
     try {
@@ -82,6 +98,18 @@ class LogoRepository {
         return null;
       }
 
+      // Same response, same trip — map Finnhub's raw industry string to a
+      // GICS sector via the SAME bridge SectorRepository used to fetch
+      // for separately. Stored as '' (not left null) when Finnhub gave an
+      // industry that finnhubIndustryToGics doesn't cover, or gave none
+      // at all — a real "checked, no sector" result, distinct from "never
+      // checked" (null), so this ticker isn't re-fetched forever chasing
+      // a sector that was never going to resolve.
+      final rawIndustry = profile['finnhubIndustry'] as String?;
+      final mappedSector = rawIndustry != null
+          ? finnhubIndustryToGics[rawIndustry]
+          : null;
+
       // Сохранить в постоянный кэш. profileName приоритетнее company.name —
       // last-known-good real name бьёт слабый/ticker-only фоллбэк, с которым
       // Company мог быть создан вызывающей стороной (см. loadLogoSymbol).
@@ -93,6 +121,8 @@ class LogoRepository {
         domain: domain,
         logoUrl: logoUrl,
         createdAt: DateTime.now(),
+        gicsSector: mappedSector?.name ?? '',
+        finnhubIndustry: rawIndustry ?? '',
       );
       await _dao.saveLogo(entry);
 
@@ -111,4 +141,70 @@ class LogoRepository {
 
   /// Проверяет, есть ли логотип в кэше.
   Future<bool> hasLogo(String ticker) async => _dao.hasLogo(ticker);
+
+  /// Записывает логотип+сектор из уже загруженного profile-ответа —
+  /// для вызывающих сторон, у которых profile и так уже под рукой
+  /// (Company Detail: тот же самый /profile/:symbol, что и её price
+  /// header, без второго похода в сеть). Раньше Company Detail писал в
+  /// LogoDao напрямую (company_detail_provider.dart's старый
+  /// cacheCompanyLogo) — та запись не заполняла gicsSector вообще
+  /// (сектор в ней навсегда оставался "не проверялся"), и, что хуже,
+  /// ничего не инвалидировало quickLogoProvider/quickGicsSectorProvider —
+  /// поэтому Search-виджет с этим же тикером продолжал показывать
+  /// буквенный аватар даже после того, как Company Detail уже реально
+  /// подтянул и лого, и сектор. Объединено в один путь записи 2026-08-22.
+  Future<void> cacheFromProfile(
+    String ticker,
+    Map<String, dynamic> profile,
+  ) async {
+    final key = ticker.trim().toUpperCase();
+    final existing = await _dao.getLogo(key);
+    final nameUseless =
+        existing != null && existing.companyName.toUpperCase() == key;
+    final sectorMissing = existing != null && existing.gicsSector == null;
+    if (existing != null && !nameUseless && !sectorMissing) {
+      return; // уже полная запись, писать нечего
+    }
+
+    final weburl = profile['weburl'] as String?;
+    final finnhubLogo = profile['logo'] as String?;
+    final profileName = profile['name'] as String?;
+
+    String? domain;
+    if (weburl != null && weburl.isNotEmpty) {
+      try {
+        final uri = Uri.parse(weburl);
+        domain = uri.host;
+        if (domain.startsWith('www.')) domain = domain.substring(4);
+      } catch (_) {}
+    }
+
+    final tickerLogoUrl = key.isNotEmpty
+        ? 'https://financialmodelingprep.com/image-stock/$key.png'
+        : null;
+    final logoUrl =
+        finnhubLogo ??
+        (domain != null ? 'https://logo.clearbit.com/$domain' : null) ??
+        tickerLogoUrl;
+    if (logoUrl == null || logoUrl.isEmpty) return;
+
+    final rawIndustry = profile['finnhubIndustry'] as String?;
+    final mappedSector = rawIndustry != null
+        ? finnhubIndustryToGics[rawIndustry]
+        : null;
+
+    await _dao.saveLogo(
+      LogoCacheEntry(
+        ticker: key,
+        companyName: (profileName != null && profileName.isNotEmpty)
+            ? profileName
+            : key,
+        domain: domain,
+        logoUrl: logoUrl,
+        createdAt: DateTime.now(),
+        gicsSector: mappedSector?.name ?? '',
+        finnhubIndustry: rawIndustry ?? '',
+      ),
+    );
+  }
 }

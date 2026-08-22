@@ -535,12 +535,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     children: [
                       SvgPicture.string(_googleLogoSvg, width: 20, height: 20),
                       const SizedBox(width: 12),
-                      Text(
-                        l10n.authContinueWithGoogle,
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                      Flexible(
+                        child: Text(
+                          l10n.authContinueWithGoogle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                     ],

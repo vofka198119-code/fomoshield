@@ -56,4 +56,26 @@ class LogoDao {
     final entry = await getLogo(ticker);
     return entry != null;
   }
+
+  /// Возвращает ВСЕ закэшированные записи — используется для прогрева
+  /// синхронного in-memory кэша сектора движка при старте приложения
+  /// (см. SectorRepository.hydrateLiveCache).
+  Future<Map<String, LogoCacheEntry>> getAllEntries() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonMap = prefs.getString(_storageKey);
+    if (jsonMap == null) return {};
+
+    try {
+      final map = Map<String, dynamic>.from(json.decode(jsonMap) as Map);
+      return map.map(
+        (key, value) => MapEntry(
+          key,
+          LogoCacheEntry.fromJson(Map<String, dynamic>.from(value as Map)),
+        ),
+      );
+    } catch (e) {
+      debugPrint('❌ LogoDao.getAllEntries error: $e');
+      return {};
+    }
+  }
 }

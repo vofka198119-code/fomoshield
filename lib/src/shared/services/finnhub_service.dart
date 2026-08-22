@@ -45,7 +45,41 @@ class FinnhubService {
   // requests for the exact same cache key (e.g. Logo and Sector both
   // fetching AAPL's profile in the same frame) into a single network call
   // that both callers await.
-  final _limiter = _ConcurrencyLimiter(maxConcurrent: 4);
+  //
+  // maxConcurrent was 4 — safe against the 120-req/60s budget (even 3-4
+  // screens bursting at once on cold app open stays well under it), but
+  // visibly wrong on its own: a single list's ~10-15 visible rows only
+  // ever had 4 in flight together, so icons/sectors populated in
+  // conspicuous waves ("slideshow" — confirmed 2026-08-22 on-device,
+  // present even after capping the S&P 500 list to 30, because visible
+  // row count — not list length — is what drove it; ListView.builder was
+  // already lazy). Raised to 8: still a shared, app-wide gate (this
+  // instance is a singleton — see finnhubServiceProvider below — so it
+  // still caps a multi-screen pile-up the same as before), just wide
+  // enough that one screen's own rows resolve in ~2 waves instead of ~4.
+  final _limiter = _ConcurrencyLimiter(maxConcurrent: 8);
+  // Concurrency alone caps how many requests are in flight AT ONCE, not
+  // how many go out over TIME — browsing 3 different cold Search lanes
+  // back to back (each its own burst of ~10-15 never-cached tickers)
+  // still summed past Finnhub's real upstream 60-req/min budget within a
+  // couple of minutes, confirmed live 2026-08-22 (backend log: "[upstream
+  // error] Failed to fetch ... 429 ... x-ratelimit-limit: 60" — that's
+  // Finnhub's own limit, shared across every device and the server's own
+  // warm-up cron, not this app's 120/60s client-facing one). [_rateLimiter]
+  // caps this client's own sustained rate.
+  //
+  // 30/60s (tried 2026-08-22) was a serious over-correction: it averages
+  // one request every 2s, so a single cold sector lane with 40-50 never-
+  // cached tickers took 1.5-2 minutes to populate — read as "just hangs".
+  // The real bottleneck that day turned out to be the BACKEND's own
+  // profileCache (60-day TTL, but in-memory node-cache — wiped on every
+  // pm2 restart/deploy, and the server had restarted 47x in ~5h during
+  // that session's own debugging), not this client bursting — so a tight
+  // client limit was punishing the wrong layer. 55/60s stays just under
+  // Finnhub's real 60/min ceiling (still leaves a sliver of headroom for
+  // the server's own warm-up cron + any other device) while letting one
+  // normal lane-sized burst clear almost immediately.
+  final _rateLimiter = _RateLimiter(maxPerWindow: 55, window: const Duration(seconds: 60));
   final Map<String, Future<Map<String, dynamic>>> _inFlight = {};
   final Map<String, Future<List<dynamic>>> _inFlightRaw = {};
 
@@ -124,8 +158,8 @@ class FinnhubService {
     String cacheKey,
   ) async {
     try {
-      final response = await _limiter.run(
-        () => _backendDio.get(path, queryParameters: params),
+      final response = await _rateLimiter.run(
+        () => _limiter.run(() => _backendDio.get(path, queryParameters: params)),
       );
       if (response.data is! Map) {
         throw Exception(
@@ -179,8 +213,8 @@ class FinnhubService {
     Map<String, dynamic>? params,
     String cacheKey,
   ) async {
-    final response = await _limiter.run(
-      () => _backendDio.get(path, queryParameters: params),
+    final response = await _rateLimiter.run(
+      () => _limiter.run(() => _backendDio.get(path, queryParameters: params)),
     );
     if (response.data is List) {
       final data = List<dynamic>.from(response.data);
@@ -563,6 +597,49 @@ class _ConcurrencyLimiter {
       if (_queue.isNotEmpty) {
         _queue.removeAt(0).complete();
       }
+    }
+  }
+}
+
+/// Sliding-window rate gate — at most [maxPerWindow] calls to [run] START
+/// within any rolling [window]; anything past that waits until the oldest
+/// call in the window ages out. Unlike [_ConcurrencyLimiter] (which only
+/// bounds how many are mid-flight AT ONCE), this bounds sustained
+/// throughput OVER TIME — needed because Finnhub's own upstream limit (60
+/// req/min, shared across every device using the app AND the server's own
+/// warm-up cron) is a rate, not a concurrency cap: three quick, mostly
+/// non-overlapping bursts from opening 3 different cold Search lanes back
+/// to back can still sum past it even with a tight concurrency gate.
+/// Confirmed live 2026-08-22 via the backend's own error log.
+class _RateLimiter {
+  final int maxPerWindow;
+  final Duration window;
+  final List<DateTime> _timestamps = [];
+  // Serializes the "wait for a slot, then reserve it" decision itself —
+  // without this, N concurrent callers could all observe room for one
+  // more slot and all proceed together, defeating the limit.
+  Future<void> _chain = Future.value();
+
+  _RateLimiter({required this.maxPerWindow, required this.window});
+
+  Future<T> run<T>(Future<T> Function() task) {
+    final reserved = _chain.then((_) => _waitForSlot());
+    _chain = reserved;
+    return reserved.then((_) => task());
+  }
+
+  Future<void> _waitForSlot() async {
+    while (true) {
+      final now = DateTime.now();
+      _timestamps.removeWhere((t) => now.difference(t) >= window);
+      if (_timestamps.length < maxPerWindow) {
+        _timestamps.add(now);
+        return;
+      }
+      final waitFor = window - now.difference(_timestamps.first);
+      await Future.delayed(
+        waitFor > Duration.zero ? waitFor : const Duration(milliseconds: 50),
+      );
     }
   }
 }
