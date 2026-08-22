@@ -37,6 +37,15 @@ class MainActivity : FlutterActivity() {
     // ── APK install channel (PackageInstaller Session API) ──────────────────
     // Robust Android self-update: installs the downloaded APK via the system
     // PackageInstaller — no FileProvider, no open_filex, no browser redirects.
+    private fun canRequestPackageInstalls(): Boolean {
+        // PackageManager.canRequestPackageInstalls() requires API 26 (Oreo).
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            packageManager.canRequestPackageInstalls()
+        } else {
+            true // Pre-O: installing from any source is allowed by default.
+        }
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "scanco/installer")
@@ -75,24 +84,28 @@ class MainActivity : FlutterActivity() {
             params.setAppPackageName(packageName)
             val sessionId = packageManager.packageInstaller.createSession(params)
             val session = packageManager.packageInstaller.openSession(sessionId)
-            try {
-                val out: OutputStream = session.openWrite("ScanCo", 0, file.length())
-                FileInputStream(file).use { input ->
-                    val buffer = ByteArray(128 * 1024)
-                    var read: Int
-                    while (input.read(buffer).also { read = it } != -1) {
-                        out.write(buffer, 0, read)
-                    }
-                }
-                out.close()
-            } finally {
-                session.close()
-            }
             val intent = Intent("com.scanco.scanco.INSTALL_RESULT")
             val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             val sender = PendingIntent.getBroadcast(this, 0, intent, flags).intentSender
-            packageManager.packageInstaller.commit(sessionId, sender)
-            result.success("started")
+            try {
+                val out: OutputStream = session.openWrite("ScanCo", 0, file.length())
+                try {
+                    FileInputStream(file).use { input ->
+                        val buffer = ByteArray(128 * 1024)
+                        var read: Int
+                        while (input.read(buffer).also { read = it } != -1) {
+                            out.write(buffer, 0, read)
+                        }
+                    }
+                } finally {
+                    out.close()
+                }
+                // Session.commit(IntentSender) launches the system install UI.
+                session.commit(sender)
+                result.success("started")
+            } finally {
+                session.close()
+            }
         } catch (e: Exception) {
             result.error("install_failed", e.message ?: "Install failed", null)
         }
