@@ -139,6 +139,10 @@ class UpdateService {
   /// The release-asset suffix this platform downloads, or null for store-only
   /// platforms (iOS). The public repo names assets `ScanCo.{ext}`:
   /// `.apk` (Android), `.zip` (Windows), `.tar.gz` (Linux), `.dmg` (macOS).
+  /// The release-asset suffix for [platform], null for store-only (iOS).
+  @visibleForTesting
+  String? assetSuffix(TargetPlatform platform) => _assetSuffix(platform);
+
   String? _assetSuffix(TargetPlatform platform) {
     switch (platform) {
       case TargetPlatform.android:

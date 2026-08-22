@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scanco/src/core/services/update_service.dart';
 
@@ -109,6 +110,19 @@ void main() {
 
     test('stable same-base still not newer', () {
       expect(service.isNewer('1.0.0', '1.0.0', 24, 'dev'), isFalse);
+    });
+  });
+
+  group('assetSuffix — per-platform release asset', () {
+    test('maps every download platform to its asset', () {
+      expect(service.assetSuffix(TargetPlatform.android), '.apk');
+      expect(service.assetSuffix(TargetPlatform.windows), '.zip');
+      expect(service.assetSuffix(TargetPlatform.linux), '.tar.gz');
+      expect(service.assetSuffix(TargetPlatform.macOS), '.dmg');
+    });
+
+    test('iOS (store-based) has no asset', () {
+      expect(service.assetSuffix(TargetPlatform.iOS), isNull);
     });
   });
 }

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 /// Applies a downloaded release package on desktop and relaunches the new
 /// version. The current app process exits afterwards so the new files can
 /// replace it.
@@ -44,19 +46,7 @@ class DesktopUpdater {
     ]);
 
     final scriptPath = '$stagingPath\\apply_update.ps1';
-    File(scriptPath).writeAsStringSync(r'''
-param([string]$AppDir, [string]$Staging, [string]$NewExe)
-$deadline = (Get-Date).AddMinutes(5)
-while ((Get-Date) -lt $deadline) {
-  if (-not (Get-Process -Name 'scanco' -ErrorAction SilentlyContinue)) { break }
-  Start-Sleep -Milliseconds 200
-}
-try {
-  Copy-Item -Path "$Staging\app\*" -Destination $AppDir -Recurse -Force
-} catch { }
-Remove-Item -Path $Staging -Recurse -Force -ErrorAction SilentlyContinue
-Start-Process -FilePath $NewExe -WorkingDirectory $AppDir
-''');
+    File(scriptPath).writeAsStringSync(windowsScript());
 
     await Process.start('powershell.exe', [
       '-NoProfile',
@@ -84,14 +74,7 @@ Start-Process -FilePath $NewExe -WorkingDirectory $AppDir
     await Process.run('tar', ['-xzf', package.path, '-C', appStaging]);
 
     final scriptPath = '$stagingPath/apply_update.sh';
-    File(scriptPath).writeAsStringSync('''
-#!/bin/sh
-OLD_PID="\$1"; APP_DIR="\$2"; STAGING="\$3"; NEW_EXE="\$4"
-while kill -0 "\$OLD_PID" 2>/dev/null; do sleep 0.2; done
-cp -R "\$STAGING/app/." "\$APP_DIR/"
-rm -rf "\$STAGING"
-nohup "\$NEW_EXE" >/dev/null 2>&1 &
-''');
+    File(scriptPath).writeAsStringSync(linuxScript());
 
     await Process.start('/bin/sh', [
       scriptPath,
@@ -114,7 +97,45 @@ nohup "\$NEW_EXE" >/dev/null 2>&1 &
 
     final staging = await Directory.systemTemp.createTemp('scanco_upd');
     final scriptPath = '${staging.path}/apply_update.sh';
-    File(scriptPath).writeAsStringSync('''
+    File(scriptPath).writeAsStringSync(macosScript());
+
+    await Process.start('/bin/sh', [
+      scriptPath,
+      '$pid',
+      package.path,
+      installDir,
+    ]);
+  }
+
+  // ── Helper script templates (exposed for tests) ─────────────────────────
+
+  @visibleForTesting
+  static String windowsScript() => r'''
+param([string]$AppDir, [string]$Staging, [string]$NewExe)
+$deadline = (Get-Date).AddMinutes(5)
+while ((Get-Date) -lt $deadline) {
+  if (-not (Get-Process -Name 'scanco' -ErrorAction SilentlyContinue)) { break }
+  Start-Sleep -Milliseconds 200
+}
+try {
+  Copy-Item -Path "$Staging\app\*" -Destination $AppDir -Recurse -Force
+} catch { }
+Remove-Item -Path $Staging -Recurse -Force -ErrorAction SilentlyContinue
+Start-Process -FilePath $NewExe -WorkingDirectory $AppDir
+''';
+
+  @visibleForTesting
+  static String linuxScript() => '''
+#!/bin/sh
+OLD_PID="\$1"; APP_DIR="\$2"; STAGING="\$3"; NEW_EXE="\$4"
+while kill -0 "\$OLD_PID" 2>/dev/null; do sleep 0.2; done
+cp -R "\$STAGING/app/." "\$APP_DIR/"
+rm -rf "\$STAGING"
+nohup "\$NEW_EXE" >/dev/null 2>&1 &
+''';
+
+  @visibleForTesting
+  static String macosScript() => '''
 #!/bin/sh
 OLD_PID="\$1"; DMG="\$2"; INSTALL_DIR="\$3"; MOUNT="/Volumes/ScanCo"
 while kill -0 "\$OLD_PID" 2>/dev/null; do sleep 0.2; done
@@ -124,13 +145,5 @@ cp -R "\$MOUNT/scanco.app" "\$INSTALL_DIR/"
 hdiutil detach "\$MOUNT" -quiet
 rm -f "\$DMG"
 open "\$INSTALL_DIR/scanco.app"
-''');
-
-    await Process.start('/bin/sh', [
-      scriptPath,
-      '$pid',
-      package.path,
-      installDir,
-    ]);
-  }
+''';
 }
