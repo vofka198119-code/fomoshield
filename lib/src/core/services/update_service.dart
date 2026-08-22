@@ -70,6 +70,9 @@ class UpdateService {
                 : packageInfo.buildNumber,
           ) ??
           0;
+      // Branch label of the installed build (APP_LABEL), used to honor
+      // precedence: stable > main > dev > other. Empty on old/local builds.
+      final installedLabel = kAppLabelOverride;
 
       // Use /releases (not /releases/latest) to include pre-releases.
       final response = await _dio.get('/repos/$_repo/releases', queryParameters: {
@@ -84,7 +87,7 @@ class UpdateService {
         final tagName =
             (data['tag_name'] as String).replaceFirst(RegExp(r'^v'), '');
 
-        if (_isNewer(tagName, currentVersion, currentBuild)) {
+        if (_isNewer(tagName, currentVersion, currentBuild, installedLabel)) {
           final assets = data['assets'] as List<dynamic>? ?? [];
           final platform = Platform.isAndroid
               ? TargetPlatform.android
@@ -152,26 +155,35 @@ class UpdateService {
 
   // ─── Private ─────────────────────────────────────────────────────────────
 
-  /// Build-aware semver comparison.
+  /// Build-aware semver comparison with branch-label precedence.
   ///
   /// Returns true if [latest] is newer than the installed build identified by
-  /// [current] (version) and [currentBuild] (build/run number).
+  /// [current] (version) and [currentBuild] (build/run number). [installedLabel]
+  /// is the branch label the installed build was built from (`APP_LABEL`); when
+  /// provided, branch precedence is honored for same-base pre-releases:
+  ///   stable > main > dev > other branch > numeric (0)
+  /// so a `main` build supersedes a `dev` build even if its run number is lower,
+  /// and a `dev` build never supersedes a `main` build. Older builds without a
+  /// label (or [installedLabel] == '') keep the build-number-only comparison.
   ///
-  /// Releases are tagged `v{major.minor.patch}-dev.{run_number}` where the run
-  /// number is the CI build number (injected as `APP_BUILD` at build time), so
-  /// dev pre-releases are compared by that number — same build = no update.
+  /// Releases are tagged `v{major.minor.patch}-{label}.{run_number}` where the
+  /// run number is the CI build number (injected as `APP_BUILD` at build time),
+  /// so pre-releases are compared by that number — same build = no update.
   ///
-  /// Examples (currentBuild = 24):
-  ///   isNewer("1.0.0-dev.25", "1.0.0", 24) → true   (25 > 24)
-  ///   isNewer("1.0.0-dev.24", "1.0.0", 24) → false  (same build)
-  ///   isNewer("1.0.0-dev.10", "1.0.0", 24) → false  (older build)
-  ///   isNewer("1.0.1", "1.0.0", 24)        → true   (higher base semver)
-  ///   isNewer("1.0.0", "1.0.0", 24)        → false  (stable, same base)
+  /// Examples (currentBuild = 24, installedLabel = "dev"):
+  ///   isNewer("1.0.0-dev.25", "1.0.0", 24, "dev") → true   (25 > 24)
+  ///   isNewer("1.0.0-dev.24", "1.0.0", 24, "dev") → false  (same build)
+  ///   isNewer("1.0.0-main.30", "1.0.0", 24, "dev") → true   (main > dev)
+  ///   isNewer("1.0.0-dev.40", "1.0.0", 24, "main") → false  (dev < main)
+  ///   isNewer("1.0.1", "1.0.0", 24, "dev")        → true   (higher base)
+  ///   isNewer("1.0.0", "1.0.0", 24, "dev")        → false  (stable, same base)
   @visibleForTesting
-  bool isNewer(String latest, String current, int currentBuild) =>
-      _isNewer(latest, current, currentBuild);
+  bool isNewer(String latest, String current, int currentBuild,
+          [String installedLabel = '']) =>
+      _isNewer(latest, current, currentBuild, installedLabel);
 
-  bool _isNewer(String latest, String current, int currentBuild) {
+  bool _isNewer(String latest, String current, int currentBuild,
+      [String installedLabel = '']) {
     // Normalize: strip leading 'v' and split base from pre-release suffix.
     final l = latest.startsWith('v') ? latest.substring(1) : latest;
     final c = current.startsWith('v') ? current.substring(1) : current;
@@ -192,19 +204,41 @@ class UpdateService {
       if (lNum[i] < cNum[i]) return false;
     }
 
-    // Same base version — compare pre-release build numbers.
+    // Same base version — inspect the pre-release suffix, e.g. "dev.35".
     final lSuffix = l.contains('-') ? l.split('-').last : '';
-    if (lSuffix.isNotEmpty) {
-      // Dev/pre-release: newer only if its run number exceeds the installed
-      // build number. Same or older run → already up to date.
-      final lBuild = int.tryParse(
-            RegExp(r'\d+').firstMatch(lSuffix)?.group(0) ?? '',
-          ) ??
-          0;
-      return lBuild > currentBuild;
+    if (lSuffix.isEmpty) {
+      // Latest is stable with the same base version → not newer.
+      return false;
     }
 
-    // Latest is stable with the same base version → not newer.
-    return false;
+    // Split "<label>.<run>": label may be "main", "dev", "feature-x", etc.
+    final m = RegExp(r'^(.*)\.(\d+)$').firstMatch(lSuffix);
+    final lBuild = int.tryParse(m?.group(2) ?? '') ?? 0;
+    final lLabel = (m?.group(1) ?? lSuffix).toLowerCase();
+
+    // Branch precedence — only when the installed app knows its own label.
+    // Older builds (no APP_LABEL) keep the build-number-only comparison.
+    if (installedLabel.isNotEmpty) {
+      final lRank = _labelRank(lLabel);
+      final iRank = _labelRank(installedLabel);
+      if (lRank > iRank) return true;
+      if (lRank < iRank) return false;
+    }
+
+    // Same branch/rank → newer only if its run number exceeds the installed
+    // build number. Same or older run → already up to date.
+    return lBuild > currentBuild;
+  }
+
+  /// Pre-release label precedence. Higher = more important.
+  ///
+  ///   stable (4) > main/master (3) > dev/develop (2) > other-alnum (1) > numeric (0)
+  int _labelRank(String label) {
+    final l = label.toLowerCase();
+    if (l.isEmpty || l == 'stable') return 4;
+    if (l == 'main' || l == 'master') return 3;
+    if (l == 'dev' || l == 'develop') return 2;
+    if (RegExp(r'^\d+$').hasMatch(l)) return 0;
+    return 1;
   }
 }

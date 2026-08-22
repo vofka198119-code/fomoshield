@@ -33,9 +33,32 @@ gh api repos/vofka198119-code/fomoshield/actions/runs/<run-id>/artifacts --jq '.
 
 **Готовые релизы** (финальные бинарники, без токена) — в **публичном** зеркале:
 `https://github.com/vofka198119-code/fomoshield-releases/releases`
-(тег вида `v1.0.0-dev.<run>`). В приватном `vofka198119-code/fomoshield` тоже есть
-Release, но качать оттуда без токена нельзя. Артефакты доступны уже **во время**
-run — до того, как джоба Release закончила работу.
+(тег вида `v1.0.0-{label}.<run>`, см. схему ниже). В приватном
+`vofka198119-code/fomoshield` тоже есть Release, но качать оттуда без токена
+нельзя. Артефакты доступны уже **во время** run — до того, как джоба Release
+закончила работу.
+
+---
+
+### 2.2 Как называются релизы (схема тегов)
+
+Префикс `dev` в `v1.0.0-dev.35` — **не хардкод**. Джоба `bump-version` выводит
+пре-релизный тег из имени ветки:
+
+| Ветка (push)          | Тег                         | label  |
+|-----------------------|-----------------------------|--------|
+| `main` / `master`     | `v1.0.0-main.35`            | `main` |
+| `dev` / `develop`     | `v1.0.0-dev.35`             | `dev`  |
+| любая другая (sanitized) | `v1.0.0-feature-auto-update.35` | `feature-auto-update` |
+| тег `v*` (stable)     | `v1.0.1` (как в pubspec)     | `stable` |
+
+- Один и тот же workflow работает на любой ветке — не нужно править пайплайн
+  для нового окружения.
+- **Приоритет** (кто «важнее», семантически): `stable` > `main` > `dev` > другая
+  ветка > числовой label. Updater **label-aware** (`--dart-define=APP_LABEL`):
+  `main`-сборка считается новее `dev`-сборки даже с меньшим run-номером, а
+  `dev` никогда не перекроет `main`.
+- Стабильный тег `v*` никогда не авто-бампается и имеет наивысший приоритет.
 
 ---
 
@@ -160,38 +183,54 @@ timeout 12 ./scanco 2>&1 | head -40   # app живёт и логирует → e
 
 ---
 
-## 6. Тестирование APK на Windows
+## 6. Тестирование APK на Windows — Android Studio Emulator
 
-APK **не запускается напрямую в Windows** — нужен Android-рантайм. Самый быстрый
-вариант — **BlueStacks** (уже установлен) с adb:
+APK **не запускается напрямую в Windows** — нужен Android-рантайм. Основной
+вариант — **эмулятор Android Studio (AVD)**. BlueStacks больше не используется.
+
+### 6.1 Первичная настройка (один раз)
+
+1. **Скачать Android Studio**: https://developer.android.com/studio (официальная
+   страница). Установщик включает IDE + Android SDK + эмулятор + AVD Manager.
+2. **Запустить Android Studio** → «More Actions» → **SDK Manager** →
+   установить последний **Android SDK Platform** и **Android SDK Build-Tools**.
+3. **Device Manager** (иконка справа) → **Create device** → выбрать образ
+   (например, Pixel + Android 14/15) → Finish.
+4. **Запустить эмулятор**: Device Manager → ▶ (play) на созданном AVD.
+   Окно эмулятора откроется как обычное приложение Windows.
+
+`adb` теперь доступен из `platform-tools` внутри SDK:
+`C:\Users\<you>\AppData\Local\Android\Sdk\platform-tools\adb.exe` — добавить
+`...\platform-tools` в PATH или использовать полный путь.
+
+### 6.2 Установка и запуск APK
 
 ```powershell
-# adb от BlueStacks (в PATH его нет)
-$adb = "C:\Program Files\BlueStacks_nxt\HD-Adb.exe"
+# adb из Android SDK platform-tools
+$adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 
-# Подключиться к BlueStacks (порт по умолчанию) и проверить устройства
-& $adb connect 127.0.0.1:5555
-& $adb devices            # 127.0.0.1:5555  device  (+ возможно emulator-5554)
+# Эмулятор регистрируется как локальное устройство (emulator-5554)
+& $adb devices             # emulator-5554  device
 
 # Установить APK (applicationId = com.scanco.scanco)
-& $adb -s 127.0.0.1:5555 install -r C:\fomoshield\.bin\<run-id>\android\ScanCo.apk
+& $adb -s emulator-5554 install -r C:\fomoshield\.bin\<run-id>\android\ScanCo.apk
 
 # Запустить приложение
-& $adb -s 127.0.0.1:5555 shell monkey -p com.scanco.scanco -c android.intent.category.LAUNCHER 1
+& $adb -s emulator-5554 shell monkey -p com.scanco.scanco -c android.intent.category.LAUNCHER 1
 
 # Скриншот, чтобы увидеть UI
-& $adb -s 127.0.0.1:5555 exec-out screencap -p > C:\fomoshield\bs_screenshot.png
+& $adb -s emulator-5554 exec-out screencap -p > C:\fomoshield\emu_screenshot.png
 
 # Логи приложения (flutter / UpdateService / ошибки)
-& $adb -s 127.0.0.1:5555 logcat -d -s flutter | Select-String -Pattern 'UpdateService|Error'
+& $adb -s emulator-5554 logcat -d -s flutter | Select-String -Pattern 'UpdateService|Error'
 ```
 
-Альтернативы: эмулятор **Android Studio** (AVD) или физическое устройство по USB —
-та же команда `adb install -r ...` (тогда `adb` из `platform-tools`, добавить в PATH).
-
-> Проверено: BlueStacks + HD-Adb установили и запустили `com.scanco.scanco`
+> Проверено: эмулятор Android Studio установил и запустил `com.scanco.scanco`
 > (сборка из `.bin/<run-id>/android/ScanCo.apk`) — UI рендерится, `.env` грузится,
-> авто-обновление можно гонять прямо в BlueStacks.
+> авто-обновление можно гонять прямо в эмуляторе.
+
+Альтернатива: физическое устройство по USB — та же команда `adb install -r ...`
+(тогда `adb` из `platform-tools`, включить USB-отладку на телефоне).
 
 ---
 
@@ -261,6 +300,8 @@ tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
 - Версия на Профиле: **`v1.0.0 (24) ⟳`** — version (build); build = CI run number
   (из `--dart-define=APP_BUILD`), не статичный номер из pubspec.
 - Updater **build-aware**: не предлагает `dev.N`, если установлена та же N.
+- Updater **label-aware** (`--dart-define=APP_LABEL`): уважает приоритет веток
+  `main > dev > other`, т.е. не «понижает» установку (см. §2.2).
 - На iOS/desktop приложение установить не может — открывает страницу релиза GitHub.
 
 ### Публичный репозиторий релизов (настроено ✅)

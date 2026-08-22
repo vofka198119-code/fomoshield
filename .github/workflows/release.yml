@@ -3,8 +3,10 @@ name: Release
 # ═══════════════════════════════════════════════════════════════════════════════
 # FULLY AUTOMATED — developer just `git push`, no other steps needed.
 #
-# push to main  →  auto-tag v1.0.0-dev.{run_number}  →  build all platforms →  release
-# push tag v*   →  stable release v1.0.1              →  build all platforms →  release
+# push any branch → pre-release v1.0.0-{label}.{run_number} (label = source branch)
+#                  main/master → -main. · dev/develop → -dev. · other → sanitized branch
+#                  precedence: stable tag > main > dev > other branch > numeric (0)
+# push tag v*     → stable release v1.0.1 (top precedence, never auto-bumped)
 #
 # Tester reopens the app → auto-update dialog → download & install.
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -20,14 +22,18 @@ permissions:
 
 jobs:
   # ── Bump version: read pubspec, compute the release tag ────────────────────
-  # Reads the version from pubspec.yaml and computes the release tag:
-  #   branch push → v{version}-dev.{run_number} (pre-release)
-  #   tag push   → the pushed tag itself (stable release)
+  # Reads the version from pubspec.yaml and computes the release tag. The
+  # pre-release label is derived from the source BRANCH, not hardcoded, so the
+  # same workflow works on any branch without producing fake "dev" releases:
+  #   branch push → v{version}-{label}.{run_number}  (pre-release)
+  #   tag push    → the pushed tag itself             (stable release)
+  # Precedence (semver pre-release identifiers): stable > main > dev > other > 0
   bump-version:
     name: Bump version
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.set.outputs.tag }}
+      label: ${{ steps.set.outputs.label }}
       prerelease: ${{ steps.set.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v5
@@ -38,10 +44,22 @@ jobs:
           SEMVER="${VER%%+*}"
 
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            # Explicit tag push → stable release (top precedence).
             echo "tag=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+            echo "label=stable" >> $GITHUB_OUTPUT
             echo "prerelease=false" >> $GITHUB_OUTPUT
           else
-            echo "tag=v${SEMVER}-dev.$GITHUB_RUN_NUMBER" >> $GITHUB_OUTPUT
+            # Branch push → pre-release; label comes from the branch name so
+            # main/master → "main", dev/develop → "dev", others → sanitized.
+            BRANCH="${GITHUB_REF_NAME}"
+            case "$BRANCH" in
+              main|master) LABEL="main" ;;
+              dev|develop) LABEL="dev" ;;
+              *)           LABEL="$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]\+/-/g; s/^-//; s/-$//')" ;;
+            esac
+            [[ -z "$LABEL" ]] && LABEL="dev"
+            echo "tag=v${SEMVER}-${LABEL}.$GITHUB_RUN_NUMBER" >> $GITHUB_OUTPUT
+            echo "label=$LABEL" >> $GITHUB_OUTPUT
             echo "prerelease=true" >> $GITHUB_OUTPUT
           fi
 
@@ -80,7 +98,7 @@ jobs:
             echo "storeFile=upload-keystore.p12"
           } > android/key.properties
 
-      - run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=APP_BUILD=${{ github.run_number }}
+      - run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=APP_BUILD=${{ github.run_number }} --dart-define=APP_LABEL=${{ needs.bump-version.outputs.label }}
 
       - name: Rename APK to ScanCo.apk
         run: cp build/app/outputs/flutter-apk/app-release.apk ScanCo.apk
@@ -112,7 +130,7 @@ jobs:
           echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
-      - run: flutter build ios --release --no-codesign --dart-define=APP_BUILD=${{ github.run_number }}
+      - run: flutter build ios --release --no-codesign --dart-define=APP_BUILD=${{ github.run_number }} --dart-define=APP_LABEL=${{ needs.bump-version.outputs.label }}
 
       - run: |
           cd build/ios/iphoneos
@@ -162,7 +180,7 @@ jobs:
           echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
-      - run: flutter build windows --release --dart-define=APP_BUILD=${{ github.run_number }}
+      - run: flutter build windows --release --dart-define=APP_BUILD=${{ github.run_number }} --dart-define=APP_LABEL=${{ needs.bump-version.outputs.label }}
 
       - name: Package Windows app
         shell: pwsh
@@ -205,7 +223,7 @@ jobs:
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
       - run: flutter clean
-      - run: flutter build linux --release --dart-define=APP_BUILD=${{ github.run_number }}
+      - run: flutter build linux --release --dart-define=APP_BUILD=${{ github.run_number }} --dart-define=APP_LABEL=${{ needs.bump-version.outputs.label }}
 
       - name: Package Linux app
         run: tar -czf ScanCo.tar.gz -C build/linux/x64/release/bundle .
@@ -245,7 +263,7 @@ jobs:
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
       - run: flutter clean
-      - run: flutter build macos --release --dart-define=APP_BUILD=${{ github.run_number }}
+      - run: flutter build macos --release --dart-define=APP_BUILD=${{ github.run_number }} --dart-define=APP_LABEL=${{ needs.bump-version.outputs.label }}
 
       - name: Package macOS app (DMG)
         run: hdiutil create -volname ScanCo -srcfolder build/macos/Build/Products/Release/scanco.app -ov -format UDZO ScanCo.dmg

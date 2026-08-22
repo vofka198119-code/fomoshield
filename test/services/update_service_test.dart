@@ -60,4 +60,55 @@ void main() {
       expect(service.isNewer('1.0.0-dev.1', '1.0.0', 0), isTrue);
     });
   });
+
+  group('isNewer — branch-label precedence (installed on dev)', () {
+    test('higher run on same dev label → true', () {
+      expect(service.isNewer('1.0.0-dev.25', '1.0.0', 24, 'dev'), isTrue);
+    });
+
+    test('same run on same dev label → false', () {
+      expect(service.isNewer('1.0.0-dev.24', '1.0.0', 24, 'dev'), isFalse);
+    });
+
+    test('main label beats dev even with lower run → true', () {
+      expect(service.isNewer('1.0.0-main.10', '1.0.0', 24, 'dev'), isTrue);
+    });
+
+    test('dev label never supersedes main → false', () {
+      expect(service.isNewer('1.0.0-dev.40', '1.0.0', 24, 'main'), isFalse);
+    });
+
+    test('other branch label loses to dev → false', () {
+      expect(service.isNewer('1.0.0-feature-x.30', '1.0.0', 24, 'dev'), isFalse);
+    });
+
+    test('main beats other branch → true', () {
+      expect(service.isNewer('1.0.0-main.5', '1.0.0', 24, 'feature-x'), isTrue);
+    });
+
+    test('numeric-only label ranks lowest → false vs dev', () {
+      expect(service.isNewer('1.0.0-35.99', '1.0.0', 24, 'dev'), isFalse);
+    });
+  });
+
+  group('isNewer — same-label run comparison', () {
+    test('same label, higher run → true', () {
+      expect(service.isNewer('1.0.0-main.40', '1.0.0', 30, 'main'), isTrue);
+    });
+
+    test('same label, lower run → false', () {
+      expect(service.isNewer('1.0.0-main.5', '1.0.0', 30, 'main'), isFalse);
+    });
+  });
+
+  group('isNewer — no installed label (older builds, build-only)', () {
+    test('build-number-only comparison still applies', () {
+      expect(service.isNewer('1.0.0-main.5', '1.0.0', 24), isFalse);
+      expect(service.isNewer('1.0.0-dev.25', '1.0.0', 24, ''), isTrue);
+    });
+
+    test('stable same-base still not newer', () {
+      expect(service.isNewer('1.0.0', '1.0.0', 24, 'dev'), isFalse);
+    });
+  });
 }
