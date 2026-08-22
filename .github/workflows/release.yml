@@ -44,7 +44,7 @@ jobs:
 
   # ── Android APK (ubuntu, cached Flutter SDK) ────────────────────────────────
   build-android:
-    name: APK
+    name: Android
     needs: [version]
     runs-on: ubuntu-latest
     steps:
@@ -79,15 +79,18 @@ jobs:
 
       - run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
+      - name: Rename APK to ScanCo.apk
+        run: cp build/app/outputs/flutter-apk/app-release.apk ScanCo.apk
+
       - uses: actions/upload-artifact@v7
         with:
-          name: apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: android
+          path: ScanCo.apk
 
   # ── iOS IPA (skipped — unsigned, requires Apple Developer account) ─────────
   build-ios:
     if: false
-    name: IPA
+    name: iPhone
     needs: [version]
     runs-on: macos-latest
     steps:
@@ -117,7 +120,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: ipa
+          name: iphone
           path: build/ios/iphoneos/app-release.ipa
 
   # ── Windows desktop ───────────────────────────────────────────────────────
@@ -161,12 +164,12 @@ jobs:
 
       - name: Package Windows app
         shell: pwsh
-        run: Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "scanco-windows.zip" -Force
+        run: Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "ScanCo-windows.zip" -Force
 
       - uses: actions/upload-artifact@v7
         with:
           name: windows
-          path: scanco-windows.zip
+          path: ScanCo-windows.zip
 
   # ── Linux desktop ─────────────────────────────────────────────────────────
   build-linux:
@@ -202,12 +205,12 @@ jobs:
       - run: flutter build linux --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
       - name: Package Linux app
-        run: tar -czf scanco-linux.tar.gz -C build/linux/x64/release/bundle .
+        run: tar -czf ScanCo-linux.tar.gz -C build/linux/x64/release/bundle .
 
       - uses: actions/upload-artifact@v7
         with:
           name: linux
-          path: scanco-linux.tar.gz
+          path: ScanCo-linux.tar.gz
 
   # ── macOS desktop ─────────────────────────────────────────────────────────
   build-macos:
@@ -243,12 +246,12 @@ jobs:
       - run: flutter build macos --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
       - name: Package macOS app
-        run: ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/Runner.app scanco-macos.zip
+        run: ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/Runner.app ScanCo-macos.zip
 
       - uses: actions/upload-artifact@v7
         with:
           name: macos
-          path: scanco-macos.zip
+          path: ScanCo-macos.zip
 
   # ── Create release + auto-create lightweight tag ──────────────────────────
   release:
@@ -257,7 +260,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
-        with: { name: apk }
+        with: { name: android }
 
       - uses: actions/download-artifact@v7
         with: { name: windows }
@@ -271,7 +274,7 @@ jobs:
           name: ${{ needs.version.outputs.tag }}
           prerelease: ${{ needs.version.outputs.prerelease }}
           files: |
-            app-release.apk
-            scanco-windows.zip
-            scanco-linux.tar.gz
+            ScanCo.apk
+            ScanCo-windows.zip
+            ScanCo-linux.tar.gz
           generate_release_notes: true
