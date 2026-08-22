@@ -452,6 +452,12 @@ abstract class AppLocalizations {
   /// **'Open settings'**
   String get updateOpenSettings;
 
+  /// No description provided for @updateFromStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Update from Store'**
+  String get updateFromStore;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:

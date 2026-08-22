@@ -200,6 +200,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateOpenSettings => 'Open settings';
 
   @override
+  String get updateFromStore => 'Update from Store';
+
+  @override
   String get profileDeleteAccount => 'Delete Account';
 
   @override

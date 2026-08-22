@@ -199,6 +199,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get updateOpenSettings => 'Открыть настройки';
 
   @override
+  String get updateFromStore => 'Обновить в магазине';
+
+  @override
   String get profileDeleteAccount => 'Удалить аккаунт';
 
   @override

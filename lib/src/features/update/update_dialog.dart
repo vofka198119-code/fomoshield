@@ -1,11 +1,6 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/models/update_info.dart';
@@ -13,17 +8,18 @@ import '../../core/services/update_service.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 /// Internal states for the update dialog lifecycle.
-enum _DialogState { checking, upToDate, info, downloading, ready }
+enum _DialogState { checking, upToDate, info }
 
-/// Android install channel (PackageInstaller Session API) — see MainActivity.kt.
-const _installerChannel = MethodChannel('scanco/installer');
+/// Numeric App Store ID — set once the app is published to the App Store.
+const String _appStoreId = ''; // TODO(publish): fill in after App Store submission
 
-/// A 5-state auto-update dialog.
+/// A 3-state auto-update dialog.
 ///
 /// Opens in [CHECKING] with a spinner, calls the GitHub Releases API,
 /// then transitions to [UP_TO_DATE] (auto-dismiss) or [INFO] (new version).
-/// On Android, continues through [DOWNLOADING] → [READY] → system installer.
-/// On iOS, redirects to the GitHub release page in Safari.
+/// Android & iOS can only ship updates through their own app stores, so the
+/// [INFO] "Update" button opens the Play Store / App Store (desktop falls
+/// back to the GitHub release page). No in-app download or install.
 ///
 /// Follows FOMO Shield Design Bible:
 /// - Editorial Heritage palette (#F6F1E7, #1B365D, #4A5D23, #3F7CFF)
@@ -44,9 +40,6 @@ class UpdateDialog extends ConsumerStatefulWidget {
 class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   _DialogState _state = _DialogState.checking;
   UpdateInfo? _updateInfo;
-  double _progress = 0;
-  CancelToken? _cancelToken;
-  File? _downloadedFile;
 
   AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
@@ -115,8 +108,6 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         _DialogState.checking => _buildChecking(),
         _DialogState.upToDate => _buildUpToDate(),
         _DialogState.info => _buildInfo(),
-        _DialogState.downloading => _buildDownloading(),
-        _DialogState.ready => _buildReady(),
       },
     );
   }
@@ -174,7 +165,6 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
 
   Widget _buildInfo() {
     final info = _updateInfo!;
-    final isAndroid = info.isAndroidUpdate;
 
     return Column(
       key: const ValueKey('info'),
@@ -219,7 +209,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-            onPressed: isAndroid ? _startDownload : _openReleasePage,
+            onPressed: _openStore,
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFF1B365D),
               shape: RoundedRectangleBorder(
@@ -227,14 +217,25 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
               ),
             ),
             child: Text(
-              isAndroid
-                  ? _l10n.updateDownloadAndInstall
-                  : _l10n.updateViewOnGithub,
+              _l10n.updateFromStore,
               style: const TextStyle(fontFamily: 'Inter'),
             ),
           ),
         ),
         const SizedBox(height: 4),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: _openReleasePage,
+            child: Text(
+              _l10n.updateViewOnGithub,
+              style: TextStyle(
+                color: const Color(0xFF6B6B6B),
+                fontFamily: _fontFamily,
+              ),
+            ),
+          ),
+        ),
         SizedBox(
           width: double.infinity,
           child: TextButton(
@@ -252,194 +253,30 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     );
   }
 
-  // ── DOWNLOADING ─────────────────────────────────────────────────────────
-
-  Widget _buildDownloading() {
-    return Column(
-      key: const ValueKey('downloading'),
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          _l10n.updateDownloading(_updateInfo!.latestVersion),
-          style: TextStyle(
-            fontSize: 15,
-            color: const Color(0xFF1B365D),
-            fontFamily: _fontFamily,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: LinearProgressIndicator(
-            value: _progress,
-            minHeight: 6,
-            backgroundColor: const Color(0xFFE5DFD3),
-            valueColor: const AlwaysStoppedAnimation(Color(0xFF3F7CFF)),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '${(_progress * 100).toStringAsFixed(0)}%',
-          style: TextStyle(
-            fontSize: 13,
-            color: const Color(0xFF6B6B6B),
-            fontFamily: _fontFamily,
-          ),
-        ),
-        const SizedBox(height: 12),
-        TextButton(
-          onPressed: _cancelDownload,
-          child: Text(
-            _l10n.updateCancel,
-            style: TextStyle(
-              color: const Color(0xFF6B6B6B),
-              fontFamily: _fontFamily,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ── READY ───────────────────────────────────────────────────────────────
-
-  Widget _buildReady() {
-    return Column(
-      key: const ValueKey('ready'),
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.check_circle, color: Color(0xFF4A5D23), size: 48),
-        const SizedBox(height: 12),
-        Text(
-          _l10n.updateReadyToInstall,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF1B365D),
-            fontFamily: _fontFamily,
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: _installApk,
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF4A5D23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              _l10n.updateInstall,
-              style: const TextStyle(fontFamily: 'Inter'),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   // ── Actions ─────────────────────────────────────────────────────────────
 
-  Future<void> _startDownload() async {
-    setState(() {
-      _state = _DialogState.downloading;
-      _progress = 0;
-    });
-    _cancelToken = CancelToken();
-    try {
-      final service = ref.read(updateServiceProvider);
-      _downloadedFile = await service.downloadApk(
-        _updateInfo!.downloadUrl!,
-        (p) {
-          if (mounted) setState(() => _progress = p);
-        },
-        cancelToken: _cancelToken,
-      );
-      if (mounted) setState(() => _state = _DialogState.ready);
-    } on DioException catch (_) {
-      if (mounted) setState(() => _state = _DialogState.info);
-    }
-  }
-
-  void _cancelDownload() {
-    _cancelToken?.cancel();
-    if (mounted) setState(() => _state = _DialogState.info);
-  }
-
-  Future<void> _installApk() async {
-    final file = _downloadedFile;
-    if (file == null) return;
-
+  /// Android + iOS can only ship updates through their own app stores — the
+  /// "Update" button forwards there instead of self-installing. Desktop builds
+  /// (no store) fall back to the public GitHub release page.
+  void _openStore() {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      await _installApkAndroid(file.path);
+      _launchAndClose(
+        'https://play.google.com/store/apps/details?id=com.scanco.scanco',
+      );
       return;
     }
-
-    // Fallback (non-Android): open via the system file handler.
-    try {
-      final result = await OpenFilex.open(
-        file.path,
-        type: 'application/vnd.android.package-archive',
-      );
-      if (result.type != ResultType.done) {
-        debugPrint(
-            '[UpdateDialog] Install result: ${result.type} — ${result.message}');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_l10n.updateInstallFailed)),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('[UpdateDialog] Install failed: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_l10n.updateInstallFailed)),
-        );
-      }
+    if (defaultTargetPlatform == TargetPlatform.iOS && _appStoreId.isNotEmpty) {
+      _launchAndClose('https://apps.apple.com/app/id$_appStoreId');
+      return;
     }
+    // Desktop, or iOS not yet published — the GitHub release page is the
+    // current dev distribution path.
+    _openReleasePage();
   }
 
-  /// Installs via the Android `PackageInstaller` Session API (see
-  /// `MainActivity.kt`, channel `scanco/installer`) — far more reliable than
-  /// handing the APK to the system via `open_filex`, and it lets us detect when
-  /// "Install unknown apps" isn't granted so we can take the user straight to
-  /// ScanCo's own toggle.
-  Future<void> _installApkAndroid(String path) async {
-    try {
-      final res = await _installerChannel
-          .invokeMethod<String>('installApk', {'path': path});
-      if (!mounted) return;
-
-      if (res == 'started') {
-        // The system PackageInstaller takes over — close the dialog.
-        Navigator.of(context).pop();
-      } else if (res == 'permission_missing') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_l10n.updateInstallFailed),
-            action: SnackBarAction(
-              label: _l10n.updateOpenSettings,
-              onPressed: () =>
-                  _installerChannel.invokeMethod<void>('openInstallSettings'),
-            ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_l10n.updateInstallFailed)),
-        );
-      }
-    } on PlatformException catch (e) {
-      debugPrint('[UpdateDialog] Install failed: ${e.message}');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_l10n.updateInstallFailed)),
-        );
-      }
-    }
+  void _launchAndClose(String url) {
+    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    if (mounted) Navigator.of(context).pop();
   }
 
   void _openReleasePage() {
