@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,6 +18,9 @@ enum _DialogState { checking, upToDate, info, downloading, ready, restarting }
 
 /// Numeric App Store ID — set once the app is published to the App Store.
 const String _appStoreId = ''; // TODO(publish): fill in after App Store submission
+
+/// Android install channel (PackageInstaller Session API) — see MainActivity.kt.
+const _installerChannel = MethodChannel('scanco/installer');
 
 /// An auto-update dialog.
 ///
@@ -502,9 +506,10 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     }
   }
 
-  /// Open the downloaded file with the OS default handler (desktop) or the
-  /// system installer (Android APK). If opening fails, tell the user and keep
-  /// the dialog open — "Download in browser" below is the robust alternative.
+  /// Open the downloaded file with the OS default handler (desktop), the
+  /// system installer via PackageInstaller (Android APK), or the system
+  /// handler (iOS). If opening fails, tell the user and keep the dialog open —
+  /// "Download in browser" below is the robust alternative.
   Future<void> _openNow() async {
     final file = _downloadedFile;
     if (file == null) return;
@@ -516,14 +521,13 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         await Process.start('open', [file.path]);
       } else if (Platform.isLinux) {
         await Process.start('xdg-open', [file.path]);
+      } else if (defaultTargetPlatform == TargetPlatform.android) {
+        // Install via PackageInstaller — robust, no FileProvider/browser.
+        await _installApkAndroid(file.path);
+        return;
       } else {
-        // Android / iOS — use the system handler (APK → package installer).
-        final result = await OpenFilex.open(
-          file.path,
-          type: Platform.isAndroid
-              ? 'application/vnd.android.package-archive'
-              : null,
-        );
+        // iOS — system handler (no in-app install possible).
+        final result = await OpenFilex.open(file.path);
         if (result.type != ResultType.done) {
           _notifyOpenFailed();
           return;
@@ -532,6 +536,37 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       debugPrint('[UpdateDialog] Open failed: $e');
+      _notifyOpenFailed();
+    }
+  }
+
+  /// Installs via the Android PackageInstaller Session API (see
+  /// `MainActivity.kt`, channel `scanco/installer`) — the reliable path.
+  Future<void> _installApkAndroid(String path) async {
+    try {
+      final res = await _installerChannel
+          .invokeMethod<String>('installApk', {'path': path});
+      if (!mounted) return;
+
+      if (res == 'started') {
+        // The system installer takes over — close the dialog.
+        Navigator.of(context).pop();
+      } else if (res == 'permission_missing') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_l10n.updateInstallFailed),
+            action: SnackBarAction(
+              label: _l10n.updateOpenSettings,
+              onPressed: () =>
+                  _installerChannel.invokeMethod<void>('openInstallSettings'),
+            ),
+          ),
+        );
+      } else {
+        _notifyOpenFailed();
+      }
+    } on PlatformException catch (e) {
+      debugPrint('[UpdateDialog] Install failed: ${e.message}');
       _notifyOpenFailed();
     }
   }

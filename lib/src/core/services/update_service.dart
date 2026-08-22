@@ -212,7 +212,15 @@ class UpdateService {
     }
     if (!await dir.exists()) await dir.create(recursive: true);
 
-    final filename = url.split('/').last;
+    // Name the local file with the release tag (e.g. ScanCo-v1.0.0-...59.apk)
+    // so Android treats each update as a fresh file and it's identifiable.
+    final parts = url.split('/');
+    final original = parts.last; // e.g. ScanCo.apk
+    final tag = parts.length >= 2 ? parts[parts.length - 2] : '';
+    final dot = original.lastIndexOf('.');
+    final stem = dot > 0 ? original.substring(0, dot) : original;
+    final ext = dot > 0 ? original.substring(dot) : '';
+    final filename = tag.isNotEmpty ? '$stem-$tag$ext' : original;
     final filePath = '${dir.path}/$filename';
 
     await _dio.download(
