@@ -67,7 +67,8 @@ jobs:
   # ── Unit tests: auto-update routine (desktop) ────────────────────────────
   # Runs the update-routine tests (isNewer/assetSuffix + DesktopUpdater script
   # templates) on Linux AND Windows so both desktop code paths are exercised.
-  # Build jobs depend on this — a failing update test blocks the release.
+  # Builds run in PARALLEL with these; the release (publish) depends on them —
+  # a failing test cancels the in-flight builds and blocks the release.
   test:
     name: Tests (updater)
     strategy:
@@ -98,10 +99,24 @@ jobs:
       - name: Auto-update routine tests
         run: flutter test test/services/update_service_test.dart test/services/desktop_updater_test.dart
 
+  # If the matrix tests failed, stop the in-flight builds — no point burning
+  # runner minutes on artifacts that will never be released. The run is already
+  # marked failed, and `publish` is skipped because it needs `test`.
+  cancel-on-test-failure:
+    name: Cancel builds (tests failed)
+    if: ${{ failure() }}
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel in-flight jobs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run cancel ${{ github.run_id }}
+
   # ── Android APK (ubuntu, cached Flutter SDK) ────────────────────────────────
   build-android:
     name: Android
-    needs: [bump-version, test]
+    needs: [bump-version]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -152,7 +167,7 @@ jobs:
   # ── iOS (iPhone) build — unsigned IPA ─────────────────────────────────────
   build-ios:
     name: iPhone
-    needs: [bump-version, test]
+    needs: [bump-version]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
@@ -192,7 +207,7 @@ jobs:
   # ── Windows desktop ───────────────────────────────────────────────────────
   build-windows:
     name: Windows
-    needs: [bump-version, test]
+    needs: [bump-version]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
@@ -250,7 +265,7 @@ jobs:
   # ── Linux desktop ─────────────────────────────────────────────────────────
   build-linux:
     name: Linux
-    needs: [bump-version, test]
+    needs: [bump-version]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -297,7 +312,7 @@ jobs:
   # ── macOS desktop ─────────────────────────────────────────────────────────
   build-macos:
     name: macOS
-    needs: [bump-version, test]
+    needs: [bump-version]
     runs-on: macos-latest
     # Flutter beta 3.48 fixed the desktop-AOT snapshotter bug that crashed
     # 3.47.x macOS release builds ("Class with illegal cid"). macOS is now a
@@ -352,7 +367,7 @@ jobs:
   publish:
     name: Publish release
     if: ${{ !cancelled() }}
-    needs: [bump-version, build-android, build-windows, build-ios, build-linux, build-macos]
+    needs: [bump-version, test, build-android, build-windows, build-ios, build-linux, build-macos]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
