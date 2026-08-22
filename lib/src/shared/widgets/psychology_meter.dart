@@ -780,125 +780,85 @@ class _SubIndexRow extends StatelessWidget {
 /// Opens the live audit Bottom Sheet with a jargon-free analysis
 /// of the user's current actions, split into three sections.
 void _showAuditSheet(BuildContext context, PsychologyMeterData data) {
+  final l10n = AppLocalizations.of(context)!;
   final rights = <String>[];
   final mistakes = <String>[];
   final risks = <String>[];
 
+  String timesLabel(int n) =>
+      n == 1 ? l10n.psychologyAuditTimesOnce : l10n.psychologyAuditTimesCount(n);
+
   // ── 🟢 What you are doing right ──────────────────────────────────
   if (data.strategyAdherence > 0.6) {
-    rights.add(
-      'Great job on diversifying! You bought assets from different sectors, '
-      'which protects your cash.',
-    );
+    rights.add(l10n.psychologyAuditRightDiversifying);
   }
   if (data.patience > 0.6) {
-    rights.add(
-      'Excellent patience. You aren\'t panic-selling during drops '
-      'and you\'re letting profits grow smoothly.',
-    );
+    rights.add(l10n.psychologyAuditRightPatience);
   }
   if (data.discipline > 0.6) {
-    rights.add(
-      'Strong discipline. You\'re sticking to your plan '
-      'and not chasing every market move.',
-    );
+    rights.add(l10n.psychologyAuditRightDiscipline);
   }
   if (data.panicResistance > 0.6) {
-    rights.add(
-      'Solid nerve. You\'re holding steady during market turbulence '
-      'instead of panic-selling.',
-    );
+    rights.add(l10n.psychologyAuditRightNerve);
   }
   if (data.sectorCount >= 3) {
-    rights.add(
-      'You\'re spread across ${data.sectorCount} sectors. '
-      'Good diversification reduces your risk if one industry struggles.',
-    );
+    rights.add(l10n.psychologyAuditRightSectorSpread(data.sectorCount));
   }
   if (data.cashBufferPct >= 15) {
     rights.add(
-      'You\'re keeping ${data.cashBufferPct.round()}% in cash. '
-      'This gives you flexibility to buy when opportunities appear.',
+      l10n.psychologyAuditRightCashBuffer(data.cashBufferPct.round()),
     );
   }
 
   // ── 🔴 Where you are messing up ─────────────────────────────────
   if (data.discipline < 0.4 && data.discipline > 0.0) {
-    mistakes.add(
-      'You are buying during market Hype/Euphoria! '
-      'You are chasing green candles due to FOMO.',
-    );
+    mistakes.add(l10n.psychologyAuditMistakeFomoBuying);
   }
   if (data.panicResistance < 0.4 && data.panicResistance > 0.0) {
-    mistakes.add(
-      'You are selling assets at a loss as soon as '
-      'the market bleeds a little bit.',
-    );
+    mistakes.add(l10n.psychologyAuditMistakePanicSelling);
   }
   if (data.strategyAdherence < 0.4 &&
       data.strategyAdherence > 0.0 &&
       data.sectorCount < 3) {
-    mistakes.add(
-      'Your portfolio lacks diversification. '
-      'Putting too much into one asset increases your risk dramatically.',
-    );
+    mistakes.add(l10n.psychologyAuditMistakeLackDiversification);
   }
   if (data.patience < 0.4 && data.patience > 0.0) {
-    mistakes.add(
-      'You\'re trading too frequently. Every trade costs you — '
-      'slow down and think twice before acting.',
-    );
+    mistakes.add(l10n.psychologyAuditMistakeOvertrading);
   }
   if (data.boughtAtPeakCount > 0) {
-    final times = data.boughtAtPeakCount == 1
-        ? 'once'
-        : '${data.boughtAtPeakCount} times';
     mistakes.add(
-      'You bought at a peak $times. '
-      'This is classic FOMO — buying when everyone else is excited.',
+      l10n.psychologyAuditMistakeBoughtAtPeak(
+        timesLabel(data.boughtAtPeakCount),
+      ),
     );
   }
   if (data.soldAtBottomCount > 0) {
-    final times = data.soldAtBottomCount == 1
-        ? 'once'
-        : '${data.soldAtBottomCount} times';
     mistakes.add(
-      'You sold at the bottom $times. '
-      'Panic selling locks in losses that might have recovered.',
+      l10n.psychologyAuditMistakeSoldAtBottom(
+        timesLabel(data.soldAtBottomCount),
+      ),
     );
   }
 
   // ── ⚠️ Current Risks ────────────────────────────────────────────
   if (data.maxConcentrationPct > 40) {
-    risks.add(
-      'High Concentration Risk! '
-      'If your top asset drops, your entire portfolio goes down with it.',
-    );
+    risks.add(l10n.psychologyAuditRiskConcentration);
   }
   if (data.cashBufferPct < 5 && data.totalTrades > 0) {
-    risks.add(
-      'No Safety Net! You went 100% all-in. '
-      'If a Black Swan hits right now, you won\'t have cash to buy the dip.',
-    );
+    risks.add(l10n.psychologyAuditRiskNoSafetyNet);
   }
   if (data.sectorCount == 1) {
-    risks.add(
-      'You\'re only in 1 sector. '
-      'A single industry downturn could wipe out your gains.',
-    );
+    risks.add(l10n.psychologyAuditRiskSingleSector);
   }
   if (data.tradesPerDay > 3) {
     risks.add(
-      'Overtrading alert! You\'re making '
-      '${data.tradesPerDay.toStringAsFixed(1)} trades/day. '
-      'High frequency = high stress + more mistakes.',
+      l10n.psychologyAuditRiskOvertrading(
+        data.tradesPerDay.toStringAsFixed(1),
+      ),
     );
   }
   if (data.realizedPnl < -500) {
-    risks.add(
-      'Your realized losses are adding up. '
-      'Consider smaller position sizes until you find your rhythm.',
-    );
+    risks.add(l10n.psychologyAuditRiskRealizedLosses);
   }
 
   // ── Fallback: all metrics at 0.0 (fresh session) ────────────────
@@ -943,6 +903,7 @@ class _AuditSheetContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomPad = MediaQuery.of(context).padding.bottom;
     return DraggableScrollableSheet(
       initialChildSize: 0.75,
@@ -972,27 +933,23 @@ class _AuditSheetContent extends StatelessWidget {
               _buildHeader(
                 icon: Icons.auto_awesome,
                 iconColor: FomoShieldTheme.sideways,
-                title: 'Your stress test has just begun!',
+                title: l10n.psychologyAuditFreshTitle,
               ),
               const SizedBox(height: 16),
-              _buildTip(
-                'Make your first moves wisely: diversify across '
-                '3+ sectors and keep some cash in reserve to build '
-                'your Strategy score.',
-              ),
+              _buildTip(l10n.psychologyAuditFreshTip),
             ] else ...[
               _buildHeader(
                 icon: Icons.psychology_outlined,
                 iconColor: _fsScoreColor(fsScore),
-                title: 'Live Action Audit',
-                subtitle: 'Psychology Score: ${fsScore.round()}/100',
+                title: l10n.psychologyAuditTitle,
+                subtitle: l10n.psychologyAuditSubtitle(fsScore.round()),
               ),
               const SizedBox(height: 20),
 
               // ── 🟢 What you are doing right ────────────────────
               if (rights.isNotEmpty) ...[
                 _sectionTitle(
-                  '🟢 What you are doing right',
+                  l10n.psychologyAuditSectionRights,
                   FomoShieldTheme.positive,
                 ),
                 const SizedBox(height: 8),
@@ -1008,7 +965,7 @@ class _AuditSheetContent extends StatelessWidget {
               // ── 🔴 Where you are messing up ────────────────────
               if (mistakes.isNotEmpty) ...[
                 _sectionTitle(
-                  '🔴 Where you are slipping up',
+                  l10n.psychologyAuditSectionMistakes,
                   FomoShieldTheme.negative,
                 ),
                 const SizedBox(height: 8),
@@ -1023,7 +980,10 @@ class _AuditSheetContent extends StatelessWidget {
 
               // ── ⚠️ Current Risks ──────────────────────────────
               if (risks.isNotEmpty) ...[
-                _sectionTitle('⚠️ Active Risks', FomoShieldTheme.sideways),
+                _sectionTitle(
+                  l10n.psychologyAuditSectionRisks,
+                  FomoShieldTheme.sideways,
+                ),
                 const SizedBox(height: 8),
                 ...risks.map(
                   (r) => _sectionItem(
@@ -1035,10 +995,7 @@ class _AuditSheetContent extends StatelessWidget {
 
               // ── All clear ──────────────────────────────────────
               if (rights.isEmpty && mistakes.isEmpty && risks.isEmpty)
-                _buildTip(
-                  'You\'re doing fine so far. Keep observing the market '
-                  'and make thoughtful decisions — don\'t rush.',
-                ),
+                _buildTip(l10n.psychologyAuditAllClearTip),
             ],
           ],
         );

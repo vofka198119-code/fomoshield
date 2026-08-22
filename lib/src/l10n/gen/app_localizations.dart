@@ -1621,6 +1621,12 @@ abstract class AppLocalizations {
   /// **'Less'**
   String get commonLess;
 
+  /// No description provided for @commonMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get commonMore;
+
   /// No description provided for @commonMoreCount.
   ///
   /// In en, this message translates to:
@@ -8340,6 +8346,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Diversification Progress'**
   String get portfolioBalanceWidgetDisplayNameDiversificationProgress;
+
+  /// No description provided for @marketTimelineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EPOCHS'**
+  String get marketTimelineTitle;
+
+  /// No description provided for @marketTimelineEpochCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {total} epochs'**
+  String marketTimelineEpochCount(int current, int total);
+
+  /// No description provided for @marketTimelineEpochLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ep. {number} · {description}'**
+  String marketTimelineEpochLabel(int number, String description);
+
+  /// No description provided for @marketTimelineDescBull.
+  ///
+  /// In en, this message translates to:
+  /// **'Broad market growth'**
+  String get marketTimelineDescBull;
+
+  /// No description provided for @marketTimelineDescSideways.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm, range-bound'**
+  String get marketTimelineDescSideways;
+
+  /// No description provided for @marketTimelineDescBear.
+  ///
+  /// In en, this message translates to:
+  /// **'Gradual decline'**
+  String get marketTimelineDescBear;
+
+  /// No description provided for @marketTimelineDescVolatility.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharp swings, no trend'**
+  String get marketTimelineDescVolatility;
+
+  /// No description provided for @marketTimelineDescBlackSwan.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything crashes'**
+  String get marketTimelineDescBlackSwan;
+
+  /// No description provided for @marketTimelineDescCrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy sector-wide drop'**
+  String get marketTimelineDescCrash;
+
+  /// No description provided for @marketTimelineDescRecovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-crisis rebound'**
+  String get marketTimelineDescRecovery;
+
+  /// No description provided for @marketTimelineDescHype.
+  ///
+  /// In en, this message translates to:
+  /// **'Target sector spike'**
+  String get marketTimelineDescHype;
+
+  /// No description provided for @marketTimelineDescSpeculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-directional volatility'**
+  String get marketTimelineDescSpeculation;
+
+  /// No description provided for @psychologyAuditTimesOnce.
+  ///
+  /// In en, this message translates to:
+  /// **'once'**
+  String get psychologyAuditTimesOnce;
+
+  /// No description provided for @psychologyAuditTimesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} times'**
+  String psychologyAuditTimesCount(int n);
+
+  /// No description provided for @psychologyAuditRightDiversifying.
+  ///
+  /// In en, this message translates to:
+  /// **'Great job on diversifying! You bought assets from different sectors, which protects your cash.'**
+  String get psychologyAuditRightDiversifying;
+
+  /// No description provided for @psychologyAuditRightPatience.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent patience. You aren\'t panic-selling during drops and you\'re letting profits grow smoothly.'**
+  String get psychologyAuditRightPatience;
+
+  /// No description provided for @psychologyAuditRightDiscipline.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong discipline. You\'re sticking to your plan and not chasing every market move.'**
+  String get psychologyAuditRightDiscipline;
+
+  /// No description provided for @psychologyAuditRightNerve.
+  ///
+  /// In en, this message translates to:
+  /// **'Solid nerve. You\'re holding steady during market turbulence instead of panic-selling.'**
+  String get psychologyAuditRightNerve;
+
+  /// No description provided for @psychologyAuditRightSectorSpread.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re spread across {count} sectors. Good diversification reduces your risk if one industry struggles.'**
+  String psychologyAuditRightSectorSpread(int count);
+
+  /// No description provided for @psychologyAuditRightCashBuffer.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re keeping {pct}% in cash. This gives you flexibility to buy when opportunities appear.'**
+  String psychologyAuditRightCashBuffer(int pct);
+
+  /// No description provided for @psychologyAuditMistakeFomoBuying.
+  ///
+  /// In en, this message translates to:
+  /// **'You are buying during market Hype/Euphoria! You are chasing green candles due to FOMO.'**
+  String get psychologyAuditMistakeFomoBuying;
+
+  /// No description provided for @psychologyAuditMistakePanicSelling.
+  ///
+  /// In en, this message translates to:
+  /// **'You are selling assets at a loss as soon as the market bleeds a little bit.'**
+  String get psychologyAuditMistakePanicSelling;
+
+  /// No description provided for @psychologyAuditMistakeLackDiversification.
+  ///
+  /// In en, this message translates to:
+  /// **'Your portfolio lacks diversification. Putting too much into one asset increases your risk dramatically.'**
+  String get psychologyAuditMistakeLackDiversification;
+
+  /// No description provided for @psychologyAuditMistakeOvertrading.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re trading too frequently. Every trade costs you — slow down and think twice before acting.'**
+  String get psychologyAuditMistakeOvertrading;
+
+  /// No description provided for @psychologyAuditMistakeBoughtAtPeak.
+  ///
+  /// In en, this message translates to:
+  /// **'You bought at a peak {times}. This is classic FOMO — buying when everyone else is excited.'**
+  String psychologyAuditMistakeBoughtAtPeak(String times);
+
+  /// No description provided for @psychologyAuditMistakeSoldAtBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'You sold at the bottom {times}. Panic selling locks in losses that might have recovered.'**
+  String psychologyAuditMistakeSoldAtBottom(String times);
+
+  /// No description provided for @psychologyAuditRiskConcentration.
+  ///
+  /// In en, this message translates to:
+  /// **'High Concentration Risk! If your top asset drops, your entire portfolio goes down with it.'**
+  String get psychologyAuditRiskConcentration;
+
+  /// No description provided for @psychologyAuditRiskNoSafetyNet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Safety Net! You went 100% all-in. If a Black Swan hits right now, you won\'t have cash to buy the dip.'**
+  String get psychologyAuditRiskNoSafetyNet;
+
+  /// No description provided for @psychologyAuditRiskSingleSector.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re only in 1 sector. A single industry downturn could wipe out your gains.'**
+  String get psychologyAuditRiskSingleSector;
+
+  /// No description provided for @psychologyAuditRiskOvertrading.
+  ///
+  /// In en, this message translates to:
+  /// **'Overtrading alert! You\'re making {rate} trades/day. High frequency = high stress + more mistakes.'**
+  String psychologyAuditRiskOvertrading(String rate);
+
+  /// No description provided for @psychologyAuditRiskRealizedLosses.
+  ///
+  /// In en, this message translates to:
+  /// **'Your realized losses are adding up. Consider smaller position sizes until you find your rhythm.'**
+  String get psychologyAuditRiskRealizedLosses;
+
+  /// No description provided for @psychologyAuditFreshTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your stress test has just begun!'**
+  String get psychologyAuditFreshTitle;
+
+  /// No description provided for @psychologyAuditFreshTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Make your first moves wisely: diversify across 3+ sectors and keep some cash in reserve to build your Strategy score.'**
+  String get psychologyAuditFreshTip;
+
+  /// No description provided for @psychologyAuditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Action Audit'**
+  String get psychologyAuditTitle;
+
+  /// No description provided for @psychologyAuditSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Psychology Score: {score}/100'**
+  String psychologyAuditSubtitle(int score);
+
+  /// No description provided for @psychologyAuditSectionRights.
+  ///
+  /// In en, this message translates to:
+  /// **'🟢 What you are doing right'**
+  String get psychologyAuditSectionRights;
+
+  /// No description provided for @psychologyAuditSectionMistakes.
+  ///
+  /// In en, this message translates to:
+  /// **'🔴 Where you are slipping up'**
+  String get psychologyAuditSectionMistakes;
+
+  /// No description provided for @psychologyAuditSectionRisks.
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ Active Risks'**
+  String get psychologyAuditSectionRisks;
+
+  /// No description provided for @psychologyAuditAllClearTip.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re doing fine so far. Keep observing the market and make thoughtful decisions — don\'t rush.'**
+  String get psychologyAuditAllClearTip;
 
   /// No description provided for @marketPhaseWidgetTitle.
   ///

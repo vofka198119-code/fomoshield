@@ -855,6 +855,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonLess => 'Свернуть';
 
   @override
+  String get commonMore => 'Ещё';
+
+  @override
   String commonMoreCount(int count) {
     return 'Ещё ($count)';
   }
@@ -4968,6 +4971,155 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get portfolioBalanceWidgetDisplayNameDiversificationProgress =>
       'Прогресс диверсификации';
+
+  @override
+  String get marketTimelineTitle => 'ЭПОХИ';
+
+  @override
+  String marketTimelineEpochCount(int current, int total) {
+    return 'Эпоха $current из $total';
+  }
+
+  @override
+  String marketTimelineEpochLabel(int number, String description) {
+    return 'Эп. $number · $description';
+  }
+
+  @override
+  String get marketTimelineDescBull => 'Широкий рост рынка';
+
+  @override
+  String get marketTimelineDescSideways => 'Спокойный, боковой тренд';
+
+  @override
+  String get marketTimelineDescBear => 'Постепенное снижение';
+
+  @override
+  String get marketTimelineDescVolatility => 'Резкие колебания без тренда';
+
+  @override
+  String get marketTimelineDescBlackSwan => 'Обвал по всем направлениям';
+
+  @override
+  String get marketTimelineDescCrash => 'Резкое падение в секторе';
+
+  @override
+  String get marketTimelineDescRecovery => 'Восстановление после кризиса';
+
+  @override
+  String get marketTimelineDescHype => 'Всплеск в целевом секторе';
+
+  @override
+  String get marketTimelineDescSpeculation => 'Разнонаправленная волатильность';
+
+  @override
+  String get psychologyAuditTimesOnce => 'один раз';
+
+  @override
+  String psychologyAuditTimesCount(int n) {
+    return '$n раз';
+  }
+
+  @override
+  String get psychologyAuditRightDiversifying =>
+      'Отличная работа с диверсификацией! Вы покупали активы из разных секторов — это защищает ваш капитал.';
+
+  @override
+  String get psychologyAuditRightPatience =>
+      'Отличное терпение. Вы не продаёте в панике на просадках и даёте прибыли спокойно расти.';
+
+  @override
+  String get psychologyAuditRightDiscipline =>
+      'Хорошая дисциплина. Вы следуете своему плану и не гонитесь за каждым движением рынка.';
+
+  @override
+  String get psychologyAuditRightNerve =>
+      'Крепкие нервы. Вы держитесь стабильно во время рыночной турбулентности вместо панических продаж.';
+
+  @override
+  String psychologyAuditRightSectorSpread(int count) {
+    return 'Вы распределены по $count секторам. Хорошая диверсификация снижает риск, если пострадает одна отрасль.';
+  }
+
+  @override
+  String psychologyAuditRightCashBuffer(int pct) {
+    return 'Вы держите $pct% в кэше. Это даёт гибкость для покупок, когда появляются возможности.';
+  }
+
+  @override
+  String get psychologyAuditMistakeFomoBuying =>
+      'Вы покупаете во время рыночного хайпа/эйфории! Вы гонитесь за зелёными свечами из-за FOMO.';
+
+  @override
+  String get psychologyAuditMistakePanicSelling =>
+      'Вы продаёте активы в убыток при малейшей просадке рынка.';
+
+  @override
+  String get psychologyAuditMistakeLackDiversification =>
+      'Вашему портфелю не хватает диверсификации. Слишком большая доля в одном активе резко увеличивает риск.';
+
+  @override
+  String get psychologyAuditMistakeOvertrading =>
+      'Вы торгуете слишком часто. Каждая сделка обходится вам — притормозите и дважды подумайте перед действием.';
+
+  @override
+  String psychologyAuditMistakeBoughtAtPeak(String times) {
+    return 'Вы покупали на пике $times. Это классический FOMO — покупка, когда все вокруг в эйфории.';
+  }
+
+  @override
+  String psychologyAuditMistakeSoldAtBottom(String times) {
+    return 'Вы продавали на дне $times. Панические продажи фиксируют убытки, которые могли бы восстановиться.';
+  }
+
+  @override
+  String get psychologyAuditRiskConcentration =>
+      'Высокий риск концентрации! Если ваш крупнейший актив упадёт, весь портфель пойдёт вниз вместе с ним.';
+
+  @override
+  String get psychologyAuditRiskNoSafetyNet =>
+      'Нет подушки безопасности! Вы вложили 100% средств. Если сейчас случится «чёрный лебедь», у вас не будет кэша, чтобы выкупить просадку.';
+
+  @override
+  String get psychologyAuditRiskSingleSector =>
+      'Вы только в 1 секторе. Спад в одной отрасли может свести на нет всю вашу прибыль.';
+
+  @override
+  String psychologyAuditRiskOvertrading(String rate) {
+    return 'Тревога по перегрузке сделками! Вы совершаете $rate сделок в день. Высокая частота = больше стресса и ошибок.';
+  }
+
+  @override
+  String get psychologyAuditRiskRealizedLosses =>
+      'Ваши зафиксированные убытки накапливаются. Рассмотрите меньшие размеры позиций, пока не найдёте свой ритм.';
+
+  @override
+  String get psychologyAuditFreshTitle => 'Ваш стресс-тест только начался!';
+
+  @override
+  String get psychologyAuditFreshTip =>
+      'Делайте первые шаги обдуманно: диверсифицируйтесь по 3+ секторам и держите немного кэша в резерве, чтобы улучшить показатель Стратегии.';
+
+  @override
+  String get psychologyAuditTitle => 'Аудит действий в реальном времени';
+
+  @override
+  String psychologyAuditSubtitle(int score) {
+    return 'Психологический показатель: $score/100';
+  }
+
+  @override
+  String get psychologyAuditSectionRights => '🟢 Что вы делаете правильно';
+
+  @override
+  String get psychologyAuditSectionMistakes => '🔴 В чём вы допускаете ошибки';
+
+  @override
+  String get psychologyAuditSectionRisks => '⚠️ Активные риски';
+
+  @override
+  String get psychologyAuditAllClearTip =>
+      'Пока всё в порядке. Продолжайте наблюдать за рынком и принимать взвешенные решения — не торопитесь.';
 
   @override
   String get marketPhaseWidgetTitle => 'ФАЗА РЫНКА';

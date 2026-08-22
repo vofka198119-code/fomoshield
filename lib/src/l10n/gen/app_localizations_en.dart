@@ -853,6 +853,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonLess => 'Less';
 
   @override
+  String get commonMore => 'More';
+
+  @override
   String commonMoreCount(int count) {
     return 'More ($count)';
   }
@@ -4955,6 +4958,155 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get portfolioBalanceWidgetDisplayNameDiversificationProgress =>
       'Diversification Progress';
+
+  @override
+  String get marketTimelineTitle => 'EPOCHS';
+
+  @override
+  String marketTimelineEpochCount(int current, int total) {
+    return '$current of $total epochs';
+  }
+
+  @override
+  String marketTimelineEpochLabel(int number, String description) {
+    return 'Ep. $number · $description';
+  }
+
+  @override
+  String get marketTimelineDescBull => 'Broad market growth';
+
+  @override
+  String get marketTimelineDescSideways => 'Calm, range-bound';
+
+  @override
+  String get marketTimelineDescBear => 'Gradual decline';
+
+  @override
+  String get marketTimelineDescVolatility => 'Sharp swings, no trend';
+
+  @override
+  String get marketTimelineDescBlackSwan => 'Everything crashes';
+
+  @override
+  String get marketTimelineDescCrash => 'Heavy sector-wide drop';
+
+  @override
+  String get marketTimelineDescRecovery => 'Post-crisis rebound';
+
+  @override
+  String get marketTimelineDescHype => 'Target sector spike';
+
+  @override
+  String get marketTimelineDescSpeculation => 'Multi-directional volatility';
+
+  @override
+  String get psychologyAuditTimesOnce => 'once';
+
+  @override
+  String psychologyAuditTimesCount(int n) {
+    return '$n times';
+  }
+
+  @override
+  String get psychologyAuditRightDiversifying =>
+      'Great job on diversifying! You bought assets from different sectors, which protects your cash.';
+
+  @override
+  String get psychologyAuditRightPatience =>
+      'Excellent patience. You aren\'t panic-selling during drops and you\'re letting profits grow smoothly.';
+
+  @override
+  String get psychologyAuditRightDiscipline =>
+      'Strong discipline. You\'re sticking to your plan and not chasing every market move.';
+
+  @override
+  String get psychologyAuditRightNerve =>
+      'Solid nerve. You\'re holding steady during market turbulence instead of panic-selling.';
+
+  @override
+  String psychologyAuditRightSectorSpread(int count) {
+    return 'You\'re spread across $count sectors. Good diversification reduces your risk if one industry struggles.';
+  }
+
+  @override
+  String psychologyAuditRightCashBuffer(int pct) {
+    return 'You\'re keeping $pct% in cash. This gives you flexibility to buy when opportunities appear.';
+  }
+
+  @override
+  String get psychologyAuditMistakeFomoBuying =>
+      'You are buying during market Hype/Euphoria! You are chasing green candles due to FOMO.';
+
+  @override
+  String get psychologyAuditMistakePanicSelling =>
+      'You are selling assets at a loss as soon as the market bleeds a little bit.';
+
+  @override
+  String get psychologyAuditMistakeLackDiversification =>
+      'Your portfolio lacks diversification. Putting too much into one asset increases your risk dramatically.';
+
+  @override
+  String get psychologyAuditMistakeOvertrading =>
+      'You\'re trading too frequently. Every trade costs you — slow down and think twice before acting.';
+
+  @override
+  String psychologyAuditMistakeBoughtAtPeak(String times) {
+    return 'You bought at a peak $times. This is classic FOMO — buying when everyone else is excited.';
+  }
+
+  @override
+  String psychologyAuditMistakeSoldAtBottom(String times) {
+    return 'You sold at the bottom $times. Panic selling locks in losses that might have recovered.';
+  }
+
+  @override
+  String get psychologyAuditRiskConcentration =>
+      'High Concentration Risk! If your top asset drops, your entire portfolio goes down with it.';
+
+  @override
+  String get psychologyAuditRiskNoSafetyNet =>
+      'No Safety Net! You went 100% all-in. If a Black Swan hits right now, you won\'t have cash to buy the dip.';
+
+  @override
+  String get psychologyAuditRiskSingleSector =>
+      'You\'re only in 1 sector. A single industry downturn could wipe out your gains.';
+
+  @override
+  String psychologyAuditRiskOvertrading(String rate) {
+    return 'Overtrading alert! You\'re making $rate trades/day. High frequency = high stress + more mistakes.';
+  }
+
+  @override
+  String get psychologyAuditRiskRealizedLosses =>
+      'Your realized losses are adding up. Consider smaller position sizes until you find your rhythm.';
+
+  @override
+  String get psychologyAuditFreshTitle => 'Your stress test has just begun!';
+
+  @override
+  String get psychologyAuditFreshTip =>
+      'Make your first moves wisely: diversify across 3+ sectors and keep some cash in reserve to build your Strategy score.';
+
+  @override
+  String get psychologyAuditTitle => 'Live Action Audit';
+
+  @override
+  String psychologyAuditSubtitle(int score) {
+    return 'Psychology Score: $score/100';
+  }
+
+  @override
+  String get psychologyAuditSectionRights => '🟢 What you are doing right';
+
+  @override
+  String get psychologyAuditSectionMistakes => '🔴 Where you are slipping up';
+
+  @override
+  String get psychologyAuditSectionRisks => '⚠️ Active Risks';
+
+  @override
+  String get psychologyAuditAllClearTip =>
+      'You\'re doing fine so far. Keep observing the market and make thoughtful decisions — don\'t rush.';
 
   @override
   String get marketPhaseWidgetTitle => 'MARKET PHASE';

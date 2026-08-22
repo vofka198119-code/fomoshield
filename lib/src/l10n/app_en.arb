@@ -376,6 +376,7 @@
   "commonFailedToLoad": "Failed to load",
   "commonOther": "Other",
   "commonLess": "Less",
+  "commonMore": "More",
   "commonMoreCount": "More ({count})",
   "@commonMoreCount": {
     "placeholders": {
@@ -1723,6 +1724,114 @@
   "portfolioBalanceWidgetDisplayNameAssetAllocation": "Asset Allocation %",
   "portfolioBalanceWidgetDisplayNameDiversificationIndicator": "Diversification Indicator",
   "portfolioBalanceWidgetDisplayNameDiversificationProgress": "Diversification Progress",
+  "marketTimelineTitle": "EPOCHS",
+  "marketTimelineEpochCount": "{current} of {total} epochs",
+  "@marketTimelineEpochCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "marketTimelineEpochLabel": "Ep. {number} · {description}",
+  "@marketTimelineEpochLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "marketTimelineDescBull": "Broad market growth",
+  "marketTimelineDescSideways": "Calm, range-bound",
+  "marketTimelineDescBear": "Gradual decline",
+  "marketTimelineDescVolatility": "Sharp swings, no trend",
+  "marketTimelineDescBlackSwan": "Everything crashes",
+  "marketTimelineDescCrash": "Heavy sector-wide drop",
+  "marketTimelineDescRecovery": "Post-crisis rebound",
+  "marketTimelineDescHype": "Target sector spike",
+  "marketTimelineDescSpeculation": "Multi-directional volatility",
+  "psychologyAuditTimesOnce": "once",
+  "psychologyAuditTimesCount": "{n} times",
+  "@psychologyAuditTimesCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "psychologyAuditRightDiversifying": "Great job on diversifying! You bought assets from different sectors, which protects your cash.",
+  "psychologyAuditRightPatience": "Excellent patience. You aren't panic-selling during drops and you're letting profits grow smoothly.",
+  "psychologyAuditRightDiscipline": "Strong discipline. You're sticking to your plan and not chasing every market move.",
+  "psychologyAuditRightNerve": "Solid nerve. You're holding steady during market turbulence instead of panic-selling.",
+  "psychologyAuditRightSectorSpread": "You're spread across {count} sectors. Good diversification reduces your risk if one industry struggles.",
+  "@psychologyAuditRightSectorSpread": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "psychologyAuditRightCashBuffer": "You're keeping {pct}% in cash. This gives you flexibility to buy when opportunities appear.",
+  "@psychologyAuditRightCashBuffer": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "psychologyAuditMistakeFomoBuying": "You are buying during market Hype/Euphoria! You are chasing green candles due to FOMO.",
+  "psychologyAuditMistakePanicSelling": "You are selling assets at a loss as soon as the market bleeds a little bit.",
+  "psychologyAuditMistakeLackDiversification": "Your portfolio lacks diversification. Putting too much into one asset increases your risk dramatically.",
+  "psychologyAuditMistakeOvertrading": "You're trading too frequently. Every trade costs you — slow down and think twice before acting.",
+  "psychologyAuditMistakeBoughtAtPeak": "You bought at a peak {times}. This is classic FOMO — buying when everyone else is excited.",
+  "@psychologyAuditMistakeBoughtAtPeak": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "psychologyAuditMistakeSoldAtBottom": "You sold at the bottom {times}. Panic selling locks in losses that might have recovered.",
+  "@psychologyAuditMistakeSoldAtBottom": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "psychologyAuditRiskConcentration": "High Concentration Risk! If your top asset drops, your entire portfolio goes down with it.",
+  "psychologyAuditRiskNoSafetyNet": "No Safety Net! You went 100% all-in. If a Black Swan hits right now, you won't have cash to buy the dip.",
+  "psychologyAuditRiskSingleSector": "You're only in 1 sector. A single industry downturn could wipe out your gains.",
+  "psychologyAuditRiskOvertrading": "Overtrading alert! You're making {rate} trades/day. High frequency = high stress + more mistakes.",
+  "@psychologyAuditRiskOvertrading": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "psychologyAuditRiskRealizedLosses": "Your realized losses are adding up. Consider smaller position sizes until you find your rhythm.",
+  "psychologyAuditFreshTitle": "Your stress test has just begun!",
+  "psychologyAuditFreshTip": "Make your first moves wisely: diversify across 3+ sectors and keep some cash in reserve to build your Strategy score.",
+  "psychologyAuditTitle": "Live Action Audit",
+  "psychologyAuditSubtitle": "Psychology Score: {score}/100",
+  "@psychologyAuditSubtitle": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "psychologyAuditSectionRights": "🟢 What you are doing right",
+  "psychologyAuditSectionMistakes": "🔴 Where you are slipping up",
+  "psychologyAuditSectionRisks": "⚠️ Active Risks",
+  "psychologyAuditAllClearTip": "You're doing fine so far. Keep observing the market and make thoughtful decisions — don't rush.",
   "marketPhaseWidgetTitle": "MARKET PHASE",
   "marketPhaseWidgetDetailsTooltip": "Details",
   "marketClockFomoShieldStatusTitle": "FOMO SHIELD STATUS",
