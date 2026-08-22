@@ -122,7 +122,8 @@ final isPremium = tier == SubscriptionTier.premium || tier == SubscriptionTier.a
 - Релизный пайплайн: `.github/workflows/release.yml` (сборка Android/Windows/Linux/macOS/iPhone →
   единый GitHub Release с ассетами `ScanCo.{ext}`).
 - **Публичный репозиторий релизов** `vofka198119-code/fomoshield-releases` — зеркало
-  бинарников: джоба `publish-public` заливает туда `ScanCo.*` после сборки. Приложение
+  бинарников: джоба `publish` (единственный релизный шаг) заливает туда `ScanCo.*`
+  после сборки. Приложение
   читает обновления именно оттуда (**без токена в бинарнике**; приватный исходник не
   раскрывается). Секрет `RELEASE_PUBLISH_TOKEN` (fine-grained PAT, Contents: write на
   публичный репо) живёт только в CI.

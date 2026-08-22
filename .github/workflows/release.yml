@@ -252,133 +252,35 @@ jobs:
           name: macos
           path: ScanCo.dmg
 
-  # ── Release ────────────────────────────────────────────────────────────────
-  # One release per tag. `if: !cancelled()` means a failed build never blocks
-  # the release: each platform attaches its asset on success, or appends a
-  # failure note to the release body. All steps run sequentially in one job,
-  # so there is no race updating the same release.
-  release:
-    name: Release
+  # ── Publish release (single job) ─────────────────────────────────────────
+  # Creates ONE release on the PUBLIC releases repo with all ScanCo.* assets.
+  # The app's auto-update reads releases from here (public → no token in app);
+  # the private repo keeps no release — this is the single release step.
+  # `if: !cancelled()` lets a failed platform still publish the working ones
+  # (downloads are gated; missing files are skipped by gh-release).
+  # Requires repo SECRET RELEASE_PUBLISH_TOKEN = fine-grained PAT
+  # (Contents: write) on the public repo only — CI-only, never shipped.
+  # If the public repo is named differently, change `repository:` below.
+  publish:
+    name: Publish release
     if: ${{ !cancelled() }}
     needs: [version, build-android, build-windows, build-ios, build-linux, build-macos]
     runs-on: ubuntu-latest
     steps:
-      - name: Ensure release exists
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          name: ${{ needs.version.outputs.tag }}
-          prerelease: ${{ needs.version.outputs.prerelease }}
-          body: ScanCo build — per-platform results are attached / appended below.
-
-      # ── Android ──
       - uses: actions/download-artifact@v7
         if: ${{ needs.build-android.result == 'success' }}
         with: { name: android }
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-android.result == 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          overwrite_files: true
-          files: ScanCo.apk
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-android.result != 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          append_body: true
-          body: "❌ **Android** — result: `${{ needs.build-android.result }}` (see run log)."
-
-      # ── Windows ──
       - uses: actions/download-artifact@v7
         if: ${{ needs.build-windows.result == 'success' }}
         with: { name: windows }
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-windows.result == 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          overwrite_files: true
-          files: ScanCo.zip
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-windows.result != 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          append_body: true
-          body: "❌ **Windows** — result: `${{ needs.build-windows.result }}` (see run log)."
-
-      # ── iPhone ──
       - uses: actions/download-artifact@v7
         if: ${{ needs.build-ios.result == 'success' }}
         with: { name: iphone }
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-ios.result == 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          overwrite_files: true
-          files: ScanCo.ipa
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-ios.result != 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          append_body: true
-          body: "❌ **iPhone** — result: `${{ needs.build-ios.result }}` (see run log)."
-
-      # ── Linux ──
       - uses: actions/download-artifact@v7
         if: ${{ needs.build-linux.result == 'success' }}
         with: { name: linux }
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-linux.result == 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          overwrite_files: true
-          files: ScanCo.tar.gz
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-linux.result != 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          append_body: true
-          body: "❌ **Linux** — result: `${{ needs.build-linux.result }}` (see run log)."
-
-      # ── macOS ──
       - uses: actions/download-artifact@v7
         if: ${{ needs.build-macos.result == 'success' }}
-        with: { name: macos }
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-macos.result == 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          overwrite_files: true
-          files: ScanCo.dmg
-      - uses: softprops/action-gh-release@v3
-        if: ${{ needs.build-macos.result != 'success' }}
-        with:
-          tag_name: ${{ needs.version.outputs.tag }}
-          append_body: true
-          body: "❌ **macOS** — result: `${{ needs.build-macos.result }}` (see run log)."
-
-  # ── Mirror ScanCo.* binaries to the PUBLIC releases repo ──────────────────
-  # The app's auto-update reads releases from here (public → no token in app).
-  # Setup (once, in the repo settings):
-  #   - create a PUBLIC repo, e.g. vofka198119-code/fomoshield-releases
-  #     (make at least one commit, e.g. README, so it has a default branch)
-  #   - add repo SECRET  RELEASE_PUBLISH_TOKEN = fine-grained PAT
-  #     (Contents: write) on that public repo ONLY — used by CI, never shipped
-  #   - if the repo is named differently, change the `repository:` line below
-  publish-public:
-    name: Publish to public releases repo
-    if: ${{ !cancelled() && needs.release.result == 'success' }}
-    needs: [version, build-android, build-windows, build-ios, build-linux, build-macos, release]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v7
-        with: { name: android }
-      - uses: actions/download-artifact@v7
-        with: { name: windows }
-      - uses: actions/download-artifact@v7
-        with: { name: iphone }
-      - uses: actions/download-artifact@v7
-        with: { name: linux }
-      - uses: actions/download-artifact@v7
         with: { name: macos }
 
       - uses: softprops/action-gh-release@v3
@@ -395,3 +297,4 @@ jobs:
             ScanCo.tar.gz
             ScanCo.dmg
           overwrite_files: true
+

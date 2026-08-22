@@ -265,14 +265,15 @@ tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
 
 ### Публичный репозиторий релизов (настроено ✅)
 
-- Публичное зеркало: `vofka198119-code/fomoshield-releases` — джоба `publish-public`
-  после сборки заливает `ScanCo.*` с тем же тегом; приложение качает их анонимно.
+- Публичное зеркало: `vofka198119-code/fomoshield-releases` — джоба `publish`
+  (единственный релизный шаг) после сборки заливает `ScanCo.*` с тем же тегом;
+  приложение качает их анонимно.
 - README-коммит и секрет `RELEASE_PUBLISH_TOKEN` (fine-grained PAT, Contents: write
   на публичный репо) уже настроены. Пошаговая настройка (если нужно повторить):
   `docs/devops/vofka_secret_setup.md`.
 - Если название репозитория изменится — поправить `_repo` в
   `lib/src/core/services/update_service.dart` и строку `repository:` в джобе
-  `publish-public`.
+  `publish`.
 
 ---
 

@@ -22,7 +22,7 @@ final updateServiceProvider = Provider<UpdateService>((ref) {
 /// updater works for anyone, and the private source repo is never exposed.
 ///
 /// The public repo is a CI mirror: `.github/workflows/release.yml` publishes
-/// the ScanCo.* binaries there (job `publish-public`).
+/// the ScanCo.* binaries there (job `publish`).
 class UpdateService {
   static const _baseUrl = 'https://api.github.com';
 
