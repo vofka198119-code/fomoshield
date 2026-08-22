@@ -4,6 +4,22 @@ All notable changes to this project are documented here.
 
 ---
 
+## [Unreleased]
+
+### Auto-update pipeline & desktop self-update
+- Release pipeline now derives pre-release labels from the **source branch**
+  (`main`/`dev`/other) with precedence `stable > main > dev > other > numeric`;
+  updater is label-aware and never downgrades.
+- **Desktop self-update** (Windows/Linux/macOS): check → download → install →
+  relaunch via a detached helper script (`DesktopUpdater`). Mobile "Update"
+  forwards to the app store; a direct APK/IPA download is also offered.
+- CI runs the auto-update routine tests on Linux + Windows before building.
+- Update dialog: shows after the splash hand-off as a modal gate (pauses until
+  the user acts), is silent when already on the latest build, and offers
+  "Update from Store / Update directly / Maybe later".
+
+---
+
 ## [1.1.0] — 2026-06-27
 
 ### Added
