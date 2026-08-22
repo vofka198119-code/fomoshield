@@ -3,7 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../core/theme/typography_helpers.dart';
-import '../../../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../../../shared/utils/currency_format.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
+import '../../../../market_clock/market_clock_dial.dart'
+    show darkCardDecoration;
 
 // ---------------------------------------------------------------------------
 // Stress Test "Your Position" card — visual match for real Portfolio's
@@ -28,6 +31,7 @@ class StockPositionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isUp = pnl >= 0;
     final pnlColor = isUp ? ThemeV2.success : ThemeV2.loss;
     final costBasis = shares * avgPrice;
@@ -37,28 +41,30 @@ class StockPositionCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: FomoShieldTheme.cardRadius,
-      ),
+      decoration: darkCardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('YOUR POSITION', style: FomoShieldTheme.cardTitle(Colors.white)),
+          Text(
+            l10n.stockPositionCardTitle,
+            style: FomoShieldTheme.cardTitle(Colors.white),
+          ),
           const SizedBox(height: 10),
           Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
           const SizedBox(height: 12),
-          _row('Asset Value', '\$${positionValue.toStringAsFixed(2)}'),
+          _row(l10n.stockPositionCardAssetValueLabel, formatUsd(positionValue)),
           const SizedBox(height: 8),
-          _row('Shares', shares.toStringAsFixed(4)),
+          _row(l10n.stockPositionCardSharesLabel, shares.toStringAsFixed(4)),
           const SizedBox(height: 8),
-          _pnlRow(pnl: pnl, pnlPercent: pnlPercent, isUp: isUp, pnlColor: pnlColor),
+          _pnlRow(
+            l10n: l10n,
+            pnl: pnl,
+            pnlPercent: pnlPercent,
+            isUp: isUp,
+            pnlColor: pnlColor,
+          ),
           const SizedBox(height: 8),
-          _row('Avg Cost', '\$${avgPrice.toStringAsFixed(2)}'),
+          _row(l10n.stockPositionCardAvgCostLabel, formatUsd(avgPrice)),
         ],
       ),
     );
@@ -77,12 +83,17 @@ class StockPositionCard extends StatelessWidget {
       ),
       Text(
         value,
-        style: interNums(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+        style: interNums(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
       ),
     ],
   );
 
   Widget _pnlRow({
+    required AppLocalizations l10n,
     required double pnl,
     required double pnlPercent,
     required bool isUp,
@@ -91,7 +102,7 @@ class StockPositionCard extends StatelessWidget {
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Text(
-        'Unrealized P&L',
+        l10n.stockPositionCardUnrealizedPnlLabel,
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,
@@ -108,8 +119,12 @@ class StockPositionCard extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            '${isUp ? '+' : ''}${pnl.toStringAsFixed(2)} (${pnlPercent.toStringAsFixed(2)}%)',
-            style: interNums(fontSize: 14, fontWeight: FontWeight.w600, color: pnlColor),
+            '${formatUsdSigned(pnl)} (${pnlPercent.toStringAsFixed(2)}%)',
+            style: interNums(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: pnlColor,
+            ),
           ),
         ],
       ),

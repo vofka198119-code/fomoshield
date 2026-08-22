@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
@@ -30,6 +31,23 @@ bool isEtfSecurityType(String? type) {
 class FinnhubService {
   final Dio _backendDio;
   final Map<String, _CacheEntry> _cache = {};
+
+  // ---------------------------------------------------------------------------
+  // Concurrency limiting + in-flight de-dup
+  // ---------------------------------------------------------------------------
+  // A screen that renders N rows at once (S&P 500 list, Portfolio/Stress
+  // Test holdings) used to fire N independent backend calls the instant it
+  // mounted — easily blowing past the backend's own 120-req/60s client
+  // rate limit in under a second and leaving every row stuck on its letter-
+  // avatar fallback. [_limiter] caps how many of THIS client's requests are
+  // actually in flight to the backend at once; the rest queue instead of
+  // firing immediately. [_inFlight] additionally collapses concurrent
+  // requests for the exact same cache key (e.g. Logo and Sector both
+  // fetching AAPL's profile in the same frame) into a single network call
+  // that both callers await.
+  final _limiter = _ConcurrencyLimiter(maxConcurrent: 4);
+  final Map<String, Future<Map<String, dynamic>>> _inFlight = {};
+  final Map<String, Future<List<dynamic>>> _inFlightRaw = {};
 
   FinnhubService()
     : _backendDio = Dio(
@@ -85,8 +103,30 @@ class FinnhubService {
     final cached = _getCached(cacheKey);
     if (cached != null) return cached.data as Map<String, dynamic>;
 
+    // Someone else already asked for this exact key this instant (e.g. Logo
+    // and Sector both cache-missing the same ticker's profile in the same
+    // frame) — await their in-flight request instead of firing a duplicate.
+    final pending = _inFlight[cacheKey];
+    if (pending != null) return pending;
+
+    final future = _fetchFromBackend(path, params, cacheKey);
+    _inFlight[cacheKey] = future;
     try {
-      final response = await _backendDio.get(path, queryParameters: params);
+      return await future;
+    } finally {
+      _inFlight.remove(cacheKey);
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchFromBackend(
+    String path,
+    Map<String, dynamic>? params,
+    String cacheKey,
+  ) async {
+    try {
+      final response = await _limiter.run(
+        () => _backendDio.get(path, queryParameters: params),
+      );
       if (response.data is! Map) {
         throw Exception(
           'Backend $path: unexpected response type ${response.data.runtimeType}',
@@ -122,7 +162,26 @@ class FinnhubService {
     final cached = _getCachedRaw(cacheKey);
     if (cached != null) return cached;
 
-    final response = await _backendDio.get(path, queryParameters: params);
+    final pending = _inFlightRaw[cacheKey];
+    if (pending != null) return pending;
+
+    final future = _fetchRawFromBackend(path, params, cacheKey);
+    _inFlightRaw[cacheKey] = future;
+    try {
+      return await future;
+    } finally {
+      _inFlightRaw.remove(cacheKey);
+    }
+  }
+
+  Future<List<dynamic>> _fetchRawFromBackend(
+    String path,
+    Map<String, dynamic>? params,
+    String cacheKey,
+  ) async {
+    final response = await _limiter.run(
+      () => _backendDio.get(path, queryParameters: params),
+    );
     if (response.data is List) {
       final data = List<dynamic>.from(response.data);
       _setCacheRaw(cacheKey, data);
@@ -176,35 +235,35 @@ class FinnhubService {
 
   /// Exchanges to explicitly exclude (e.g. Warsaw, Mexico, etc.)
   static const _excludedSuffixes = {
-    '.WA',  // Warsaw
-    '.MX',  // Mexico
-    '.BC',  // Colombia
-    '.LM',  // Chile
-    '.IS',  // Israel
-    '.TA',  // Tel Aviv
-    '.SS',  // Shanghai
-    '.SZ',  // Shenzhen
-    '.HK',  // Hong Kong
-    '.TW',  // Taiwan
-    '.KS',  // Korea
-    '.KQ',  // KOSDAQ
-    '.T',   // Tokyo
-    '.F',   // Frankfurt (we keep .DE for Xetra)
-    '.BE',  // Berlin
-    '.MU',  // Munich
-    '.HA',  // Hanover
-    '.SG',  // Singapore
-    '.OL',  // Oslo
-    '.ST',  // Stockholm
-    '.CO',  // Copenhagen
-    '.HE',  // Helsinki
-    '.VI',  // Vienna
-    '.AT',  // Athens
-    '.IR',  // Irish
-    '.LS',  // Lisbon
-    '.PA',  // Euronext Paris
-    '.AS',  // Euronext Amsterdam
-    '.BR',  // Euronext Brussels
+    '.WA', // Warsaw
+    '.MX', // Mexico
+    '.BC', // Colombia
+    '.LM', // Chile
+    '.IS', // Israel
+    '.TA', // Tel Aviv
+    '.SS', // Shanghai
+    '.SZ', // Shenzhen
+    '.HK', // Hong Kong
+    '.TW', // Taiwan
+    '.KS', // Korea
+    '.KQ', // KOSDAQ
+    '.T', // Tokyo
+    '.F', // Frankfurt (we keep .DE for Xetra)
+    '.BE', // Berlin
+    '.MU', // Munich
+    '.HA', // Hanover
+    '.SG', // Singapore
+    '.OL', // Oslo
+    '.ST', // Stockholm
+    '.CO', // Copenhagen
+    '.HE', // Helsinki
+    '.VI', // Vienna
+    '.AT', // Athens
+    '.IR', // Irish
+    '.LS', // Lisbon
+    '.PA', // Euronext Paris
+    '.AS', // Euronext Amsterdam
+    '.BR', // Euronext Brussels
   };
 
   Future<List<Map<String, dynamic>>> search(String query) async {
@@ -329,9 +388,7 @@ class FinnhubService {
       final c = (q['c'] as num?)?.toDouble() ?? 0;
       final dp = (q['dp'] as num?)?.toDouble() ?? 0;
       final pc = (q['pc'] as num?)?.toDouble() ?? 0;
-      debugPrint(
-        '📊 quote($symbol): c=$c dp=$dp pc=$pc',
-      );
+      debugPrint('📊 quote($symbol): c=$c dp=$dp pc=$pc');
       return {'c': c, 'dp': dp, 'pc': pc};
     } catch (e) {
       debugPrint('❌ previousTradingDayQuote error for $symbol: $e');
@@ -403,6 +460,62 @@ class FinnhubService {
     '/candles/$symbol',
     params: {'resolution': resolution, 'from': from, 'to': to},
   );
+
+  /// Current Disclaimer/Privacy Policy/Terms version numbers, uncached —
+  /// this is a compliance check, a stale answer defeats its purpose.
+  Future<Map<String, dynamic>> documentVersions() async {
+    final response = await _backendDio.get('/config/versions');
+    return Map<String, dynamic>.from(response.data as Map);
+  }
+
+  /// Permanently deletes the signed-in user's account and all their data,
+  /// immediately, with no recovery. Kept for potential admin/manual use —
+  /// the app's own Delete Account button calls [scheduleAccountDeletion]
+  /// instead, which gives a 14-day recovery window.
+  Future<void> deleteAccount() async {
+    await _backendDio.delete('/account');
+  }
+
+  /// Marks the signed-in account for deletion — the account keeps working
+  /// normally (still signs in, all data intact) unless/until it's hard-
+  /// deleted by the server's daily sweep after the recovery window closes.
+  /// See [restoreAccount] and [accountDeletionStatus].
+  Future<void> scheduleAccountDeletion() async {
+    await _backendDio.post('/account/schedule-deletion');
+  }
+
+  /// Cancels a pending deletion for the signed-in account.
+  Future<void> restoreAccount() async {
+    await _backendDio.post('/account/restore');
+  }
+
+  /// Whether the signed-in account is currently pending deletion, and how
+  /// many days are left to restore it. Checked right after sign-in/session
+  /// resume to decide whether to show the full-block Restore Account
+  /// screen instead of the app.
+  Future<AccountDeletionStatus> accountDeletionStatus() async {
+    final response = await _backendDio.get('/account/status');
+    final data = Map<String, dynamic>.from(response.data as Map);
+    return AccountDeletionStatus(
+      pendingDeletion: data['pendingDeletion'] as bool? ?? false,
+      daysRemaining: (data['daysRemaining'] as num?)?.toInt() ?? 0,
+      deleteAt: data['deleteAt'] != null
+          ? DateTime.tryParse(data['deleteAt'] as String)
+          : null,
+    );
+  }
+}
+
+class AccountDeletionStatus {
+  final bool pendingDeletion;
+  final int daysRemaining;
+  final DateTime? deleteAt;
+
+  const AccountDeletionStatus({
+    required this.pendingDeletion,
+    required this.daysRemaining,
+    this.deleteAt,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -413,10 +526,43 @@ class FinnhubService {
 // directly wherever `ref` is available.
 // ---------------------------------------------------------------------------
 
-final finnhubServiceProvider = Provider<FinnhubService>((ref) => FinnhubService());
+final finnhubServiceProvider = Provider<FinnhubService>(
+  (ref) => FinnhubService(),
+);
 
 class _CacheEntry {
   final dynamic data;
   final DateTime time;
   _CacheEntry(this.data, this.time);
+}
+
+/// Simple FIFO concurrency gate — at most [maxConcurrent] calls to [run]
+/// are ever mid-flight at once; anything past that queues until a slot
+/// frees up. Mirrors, on the client side, what the backend's own
+/// per-client rate limit already enforces server-side — without this, a
+/// screen rendering N rows at once fired all N requests in the same
+/// frame instead of trickling them out.
+class _ConcurrencyLimiter {
+  final int maxConcurrent;
+  int _active = 0;
+  final List<Completer<void>> _queue = [];
+
+  _ConcurrencyLimiter({required this.maxConcurrent});
+
+  Future<T> run<T>(Future<T> Function() task) async {
+    if (_active >= maxConcurrent) {
+      final waiter = Completer<void>();
+      _queue.add(waiter);
+      await waiter.future;
+    }
+    _active++;
+    try {
+      return await task();
+    } finally {
+      _active--;
+      if (_queue.isNotEmpty) {
+        _queue.removeAt(0).complete();
+      }
+    }
+  }
 }

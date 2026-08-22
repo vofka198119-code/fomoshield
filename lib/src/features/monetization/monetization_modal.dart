@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../search/search_counter_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -36,6 +37,7 @@ class _MonetizationSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isAdmin = ref.watch(isAdminProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -76,7 +78,7 @@ class _MonetizationSheet extends ConsumerWidget {
 
           // Title
           Text(
-            'Search limit reached',
+            l10n.monetizationModalTitle,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -87,7 +89,7 @@ class _MonetizationSheet extends ConsumerWidget {
 
           // Description
           Text(
-            'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 15 more.',
+            l10n.monetizationModalDescription,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 14,
@@ -107,7 +109,7 @@ class _MonetizationSheet extends ConsumerWidget {
               },
               icon: const Icon(Icons.workspace_premium_rounded, size: 20),
               label: Text(
-                'Upgrade to Premium',
+                l10n.monetizationModalUpgradeButton,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
@@ -136,7 +138,7 @@ class _MonetizationSheet extends ConsumerWidget {
               },
               icon: const Icon(Icons.play_circle_rounded, size: 20),
               label: Text(
-                'Watch Ad (+15 searches)',
+                l10n.monetizationModalWatchAdButton,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
@@ -163,15 +165,15 @@ class _MonetizationSheet extends ConsumerWidget {
                   Navigator.pop(context);
                   ref.read(searchCounterProvider.notifier).resetToFree();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('🔧 Counter reset to 15 (admin)'),
+                    SnackBar(
+                      content: Text(l10n.monetizationModalCounterResetAdmin),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
                 },
                 icon: const Icon(Icons.admin_panel_settings_rounded, size: 18),
                 label: Text(
-                  'Reset counter (admin)',
+                  l10n.monetizationModalResetCounterAdmin,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     color: AppTheme.textDim,
@@ -249,12 +251,13 @@ class _AdOverlayState extends State<_AdOverlay>
   void _grantRewardAndClose() {
     widget.ref.read(searchCounterProvider.notifier).addSearches(15);
     if (mounted) {
+      final l10n = AppLocalizations.of(context)!;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✓ Earned 15 more searches!'),
+        SnackBar(
+          content: Text(l10n.monetizationModalRewardEarned),
           behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -268,6 +271,7 @@ class _AdOverlayState extends State<_AdOverlay>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
@@ -290,7 +294,7 @@ class _AdOverlayState extends State<_AdOverlay>
               const SizedBox(height: 24),
 
               Text(
-                'Sponsored Ad',
+                l10n.monetizationModalSponsoredAd,
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -300,7 +304,7 @@ class _AdOverlayState extends State<_AdOverlay>
               const SizedBox(height: 8),
 
               Text(
-                'Your reward: +15 free searches',
+                l10n.monetizationModalRewardText,
                 style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
               ),
               const SizedBox(height: 24),
@@ -329,7 +333,7 @@ class _AdOverlayState extends State<_AdOverlay>
                 builder: (context, child) {
                   final remaining = 3 - (_progress.value * 3).toInt();
                   return Text(
-                    '${remaining}s remaining',
+                    l10n.monetizationModalSecondsRemaining(remaining),
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: AppTheme.textDim,
@@ -352,7 +356,7 @@ class _AdOverlayState extends State<_AdOverlay>
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  child: const Text('Skip'),
+                  child: Text(l10n.monetizationModalSkip),
                 )
               else
                 const SizedBox(height: 4),
@@ -369,11 +373,12 @@ class _AdOverlayState extends State<_AdOverlay>
 // ===========================================================================
 
 void _showComingSoonSnack(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text('🏗️ Premium subscription — coming soon!'),
+    SnackBar(
+      content: Text(l10n.monetizationModalComingSoon),
       behavior: SnackBarBehavior.floating,
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     ),
   );
 }

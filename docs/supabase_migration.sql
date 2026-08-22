@@ -283,3 +283,70 @@ DROP TRIGGER IF EXISTS on_auth_user_created_confirm ON auth.users;
 
 ALTER TABLE public.user_data
 ADD COLUMN IF NOT EXISTS stress_test_verdicts JSONB NOT NULL DEFAULT '[]'::jsonb;
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 008
+-- Table: users (TRIGGER)
+-- Description: Closes a real privilege-escalation hole found in the
+--              2026-08-15 pre-release audit — the `users_update_own` RLS
+--              policy (Migration 001) authorizes a signed-in user to
+--              UPDATE their whole own row, with no column-level
+--              restriction. Since subscription_tier/subscription_expires_at
+--              (Migration 003) live on that same row, any authenticated
+--              user could PATCH their own row directly via Supabase's
+--              REST API (their own JWT + the publicly-embedded anon key
+--              are both meant to be public) and grant themselves
+--              `subscription_tier: 'premium'` for free — completely
+--              bypassing the app and the admin-only grant path
+--              (scripts/set-premium.js). This was live/exploitable
+--              immediately, even before any real payment flow exists.
+--
+-- Fix: a BEFORE UPDATE trigger that silently reverts
+-- subscription_tier/subscription_expires_at to their previous value
+-- whenever the request does NOT come from the service_role (i.e. any
+-- normal user-authenticated request). scripts/set-premium.js already
+-- uses the service_role key, so the admin grant path is unaffected.
+-- Every other column a user legitimately self-updates (email,
+-- is_setup_complete, disclaimer_accepted_version, ...) is untouched —
+-- this only locks the two subscription columns.
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION public.protect_subscription_columns()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = ''
+AS $$
+BEGIN
+    IF auth.role() <> 'service_role' THEN
+        NEW.subscription_tier := OLD.subscription_tier;
+        NEW.subscription_expires_at := OLD.subscription_expires_at;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER protect_subscription_columns_trigger
+    BEFORE UPDATE ON public.users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.protect_subscription_columns();
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 009
+-- Table: users (COLUMN)
+-- Description: 14-day soft-delete for account deletion (2026-08-16). The
+--              "Delete Account" button previously called
+--              supabaseAdmin.auth.admin.deleteUser() directly — immediate,
+--              permanent, no recovery. Now it only sets this timestamp;
+--              the account keeps existing untouched. A daily sweep on the
+--              backend (see scanco-backend's src/services/accountCleanup.js)
+--              hard-deletes any account whose deletion_requested_at is more
+--              than 14 days old. Signing back in while this is set routes
+--              the user to a full-block "Restore Account" screen instead of
+--              the app (see app_router.dart's session guard) — restoring
+--              just clears this column back to NULL.
+-- =============================================================================
+
+ALTER TABLE public.users
+ADD COLUMN IF NOT EXISTS deletion_requested_at TIMESTAMPTZ NULL DEFAULT NULL;

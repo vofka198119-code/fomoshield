@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
+import '../../../l10n/gen/app_localizations.dart';
 
 // ===========================================================================
 // Sticky Bottom Bar: BUY / SELL
@@ -23,6 +24,7 @@ class CompanyBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.only(
         top: 8,
@@ -53,12 +55,7 @@ class CompanyBottomBar extends StatelessWidget {
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(18),
                     child: Ink(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [dialLight, dialDark],
-                        ),
+                      decoration: darkCardDecoration(
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: InkWell(
@@ -66,7 +63,7 @@ class CompanyBottomBar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(18),
                         child: Center(
                           child: Text(
-                            'BUY',
+                            l10n.tradeBuy,
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -93,8 +90,10 @@ class CompanyBottomBar extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onSell,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Color.alphaBlend(ThemeV2.primaryBg, Colors.white),
+                      backgroundColor: Color.alphaBlend(
+                        ThemeV2.primaryBg,
+                        Colors.white,
+                      ),
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
@@ -102,7 +101,7 @@ class CompanyBottomBar extends StatelessWidget {
                       elevation: 0,
                     ),
                     child: Text(
-                      'SELL',
+                      l10n.tradeSell,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

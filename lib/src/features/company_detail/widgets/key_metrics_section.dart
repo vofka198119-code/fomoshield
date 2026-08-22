@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import 'metric_info_data.dart';
 
 // ===========================================================================
@@ -17,6 +18,7 @@ class KeyMetricsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final m = metrics['metric'] as Map<String, dynamic>? ?? {};
     if (m.isEmpty) return const SizedBox.shrink();
 
@@ -29,26 +31,35 @@ class KeyMetricsSection extends StatelessWidget {
     final opMargin = _doubleOrNull(m['operatingMarginTTM']);
     final grossMargin = _doubleOrNull(m['grossMarginTTM']);
     final roe = _doubleOrNull(m['roeTTM']);
+    final na = l10n.commonNotAvailable;
 
-    final items = <(String, String)>[
-      ('P/E', pe != null ? pe.toStringAsFixed(1) : 'N/A'),
+    // Tuple is (metricInfoData.dart's stable English lookup key, localized
+    // display label, formatted value) — the lookup key must stay the fixed
+    // English string since metricInfoIdByLabel's keys aren't translated.
+    final items = <(String, String, String)>[
+      ('P/E', l10n.companyDetailMetricPe, pe != null ? pe.toStringAsFixed(1) : na),
       (
         'Dividend Yield',
-        divYield != null ? '${divYield.toStringAsFixed(2)}%' : 'N/A',
+        l10n.companyDetailMetricDividendYield,
+        divYield != null ? '${divYield.toStringAsFixed(2)}%' : na,
       ),
       (
         'Net Margin',
-        netMargin != null ? '${netMargin.toStringAsFixed(1)}%' : 'N/A',
+        l10n.companyDetailMetricNetMargin,
+        netMargin != null ? '${netMargin.toStringAsFixed(1)}%' : na,
       ),
       (
         'Operating Margin',
-        opMargin != null ? '${opMargin.toStringAsFixed(1)}%' : 'N/A',
+        l10n.companyDetailMetricOperatingMargin,
+        opMargin != null ? '${opMargin.toStringAsFixed(1)}%' : na,
       ),
       (
         'Gross Margin',
-        grossMargin != null ? '${grossMargin.toStringAsFixed(1)}%' : 'N/A',
+        l10n.companyDetailMetricGrossMargin,
+        grossMargin != null ? '${grossMargin.toStringAsFixed(1)}%' : na,
       ),
-      if (roe != null) ('ROE', '${roe.toStringAsFixed(1)}%'),
+      if (roe != null)
+        ('ROE', l10n.companyDetailMetricRoe, '${roe.toStringAsFixed(1)}%'),
     ];
 
     return Padding(
@@ -59,13 +70,13 @@ class KeyMetricsSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('KEY METRICS', style: FomoShieldTheme.cardTitle()),
+            Text(l10n.companyDetailKeyMetricsTitle, style: FomoShieldTheme.cardTitle()),
             const SizedBox(height: 10),
             Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
             const SizedBox(height: 12),
             for (int i = 0; i < items.length; i++) ...[
               if (i > 0) const SizedBox(height: 8),
-              _row(context, items[i].$1, items[i].$2),
+              _row(context, items[i].$1, items[i].$2, items[i].$3),
             ],
           ],
         ),
@@ -80,8 +91,13 @@ class KeyMetricsSection extends StatelessWidget {
   // for readable label+number pairs; value uses interNums() (tabular
   // figures) rather than plain GoogleFonts.inter like every other number
   // in the app.
-  Widget _row(BuildContext context, String label, String value) {
-    final infoId = metricInfoIdByLabel[label];
+  Widget _row(
+    BuildContext context,
+    String metricKey,
+    String label,
+    String value,
+  ) {
+    final infoId = metricInfoIdByLabel[metricKey];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

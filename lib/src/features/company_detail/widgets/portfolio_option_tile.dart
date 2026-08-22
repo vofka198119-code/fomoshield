@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
+import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
+import '../../market_clock/market_clock_dial.dart'
+    show dialBrassLight, darkCardDecoration;
 
 // ===========================================================================
 // Select Portfolio — option row for the multi-portfolio Buy/Sell sheet
 // ===========================================================================
-
-// Same brand dark-green gradient + gold accent used for the play-button
-// badge and PREMIUM tags on Home's stress test widget.
-const List<Color> _walletGradient = [dialLight, dialDark];
 
 class PortfolioOptionTile extends StatelessWidget {
   final String name;
@@ -27,6 +26,7 @@ class PortfolioOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -41,12 +41,7 @@ class PortfolioOptionTile extends StatelessWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: _walletGradient,
-                ),
+              decoration: darkCardDecoration(
                 borderRadius: BorderRadius.circular(10),
               ),
               alignment: Alignment.center,
@@ -76,13 +71,13 @@ class PortfolioOptionTile extends StatelessWidget {
                       ),
                       if (isPremium) ...[
                         const SizedBox(width: 6),
-                        _premiumBadge(),
+                        _premiumBadge(l10n),
                       ],
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '\$${cash.toStringAsFixed(2)} available',
+                    l10n.companyDetailCashAvailable(formatUsd(cash)),
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: ThemeV2.textSecondary,
@@ -91,39 +86,26 @@ class PortfolioOptionTile extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: ThemeV2.textSecondary,
-            ),
+            Icon(Icons.chevron_right_rounded, color: ThemeV2.textSecondary),
           ],
         ),
       ),
     );
   }
 
-  Widget _premiumBadge() {
+  Widget _premiumBadge(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: _walletGradient,
-        ),
-        borderRadius: BorderRadius.circular(5),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
-        'PREMIUM',
+        l10n.profilePremiumBadge,
         style: GoogleFonts.inter(
           fontSize: 8,
           fontWeight: FontWeight.w800,
           color: dialBrassLight,
           letterSpacing: 1.0,
           shadows: [
-            Shadow(
-              color: dialBrassLight.withValues(alpha: 0.5),
-              blurRadius: 6,
-            ),
+            Shadow(color: dialBrassLight.withValues(alpha: 0.5), blurRadius: 6),
           ],
         ),
       ),

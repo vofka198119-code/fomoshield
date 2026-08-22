@@ -3,30 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/router/navigation_history_provider.dart';
 import '../../core/supabase/supabase_providers.dart';
-import '../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
-import '../monetization/monetization_modal.dart';
-import '../monetization/premium_promo_overlay.dart';
 import 'portfolio_providers.dart';
 import 'portfolio_limits_provider.dart';
+import 'weekly_payout_provider.dart';
 import '../orders/pending_orders_checker.dart';
-import 'portfolio_ad_provider.dart';
 import 'portfolio_widget_order_provider.dart';
 import 'widgets/portfolio_balance_widget.dart';
 import 'widgets/portfolio_cash_widget.dart';
 import 'widgets/target_widget.dart';
 import 'widgets/portfolio_holdings_widget.dart';
 import 'widgets/portfolio_trade_history_widget.dart';
+import '../../shared/utils/currency_format.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import 'widgets/my_limit_orders_widget.dart';
 
 part 'widgets/portfolio_body.dart';
-part 'widgets/portfolio_selector.dart';
 part 'widgets/portfolio_widgets_settings_sheet.dart';
 
 class PortfolioScreen extends ConsumerStatefulWidget {
@@ -39,6 +36,7 @@ class PortfolioScreen extends ConsumerStatefulWidget {
 class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.watch(portfoliosProvider);
     final activeId = ref.watch(activePortfolioIdProvider);
     final effectiveId =
@@ -51,11 +49,10 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.primary),
-          onPressed: () =>
-              context.go(ref.read(previousTabRouteProvider)),
+          onPressed: () => context.go(ref.read(previousTabRouteProvider)),
         ),
         title: Text(
-          'PORTFOLIO',
+          l10n.portfolioWidgetTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -91,9 +88,9 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                     color: ThemeV2.primary,
                     size: 20,
                   ),
-                  title: const Text(
-                    'Rename Portfolio',
-                    style: TextStyle(color: ThemeV2.primary),
+                  title: Text(
+                    l10n.portfolioRenameMenu,
+                    style: const TextStyle(color: ThemeV2.primary),
                   ),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
@@ -107,9 +104,9 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                     color: ThemeV2.warning,
                     size: 20,
                   ),
-                  title: const Text(
-                    'Reset Portfolio',
-                    style: TextStyle(color: ThemeV2.warning),
+                  title: Text(
+                    l10n.portfolioResetMenu,
+                    style: const TextStyle(color: ThemeV2.warning),
                   ),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
@@ -123,9 +120,9 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                     color: ThemeV2.loss,
                     size: 20,
                   ),
-                  title: const Text(
-                    'Delete Portfolio',
-                    style: TextStyle(color: ThemeV2.loss),
+                  title: Text(
+                    l10n.portfolioDeleteMenu,
+                    style: const TextStyle(color: ThemeV2.loss),
                   ),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
@@ -144,7 +141,9 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
   }
 
   Widget _emptyState(BuildContext context) {
-    final startingCapital = startingCapitalForIndex(0);
+    final l10n = AppLocalizations.of(context)!;
+    final tier = ref.watch(subscriptionTierProvider);
+    final startingCapital = startingCapitalForTier(tier);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -158,7 +157,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No portfolios yet',
+              l10n.portfolioNoPortfoliosYet,
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -167,15 +166,18 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Create your first virtual portfolio\nwith \$${NumberFormat('#,##0', 'en_US').format(startingCapital)} starting balance',
+              l10n.portfolioCreateFirstMsg(formatUsd(startingCapital)),
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: ThemeV2.textSecondary,
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => _showCreatePortfolioDialog(context, ref),
               icon: const Icon(Icons.add_rounded),
-              label: Text('Create Portfolio'),
+              label: Text(l10n.portfolioCreateButton),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ThemeV2.primary,
                 foregroundColor: Colors.white,
@@ -196,13 +198,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     String portfolioId,
     String currentName,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: currentName);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ThemeV2.surface,
         title: Text(
-          'Rename Portfolio',
+          l10n.portfolioRenameMenu,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -213,8 +216,11 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: 'e.g. Tech Growth',
-            hintStyle: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 14),
+            hintText: l10n.portfolioNameHint,
+            hintStyle: GoogleFonts.inter(
+              color: ThemeV2.textSecondary,
+              fontSize: 14,
+            ),
             filled: true,
             fillColor: ThemeV2.surfaceDark,
             border: OutlineInputBorder(
@@ -228,7 +234,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Cancel',
+              l10n.profileCancel,
               style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
@@ -243,7 +249,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               }
             },
             child: Text(
-              'Save',
+              l10n.portfolioSave,
               style: GoogleFonts.inter(
                 color: ThemeV2.primary,
                 fontWeight: FontWeight.w600,
@@ -256,12 +262,13 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
   }
 
   void _showResetPortfolioDialog(BuildContext context, String portfolioId) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ThemeV2.surface,
         title: Text(
-          'Reset Portfolio?',
+          l10n.portfolioResetDialogTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -269,14 +276,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           ),
         ),
         content: Text(
-          'All holdings and history will be cleared.\nBalance will be restored to its original amount.',
+          l10n.portfolioResetDialogBody,
           style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Cancel',
+              l10n.profileCancel,
               style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
@@ -286,7 +293,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               Navigator.pop(ctx);
             },
             child: Text(
-              'Reset',
+              l10n.homeReset,
               style: GoogleFonts.inter(
                 color: ThemeV2.warning,
                 fontWeight: FontWeight.w600,
@@ -303,11 +310,12 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     String portfolioId,
     List<Portfolio> ps,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     if (ps.length <= 1) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Cannot delete the last portfolio. Create a new one first.',
+            l10n.portfolioCannotDeleteLast,
             style: GoogleFonts.inter(fontSize: 13),
           ),
           backgroundColor: ThemeV2.loss,
@@ -321,7 +329,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: ThemeV2.surface,
         title: Text(
-          'Delete Portfolio?',
+          l10n.portfolioDeleteDialogTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -329,14 +337,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           ),
         ),
         content: Text(
-          'All holdings and history will be lost.',
+          l10n.portfolioDeleteDialogBody,
           style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Cancel',
+              l10n.profileCancel,
               style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
@@ -351,7 +359,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               Navigator.pop(ctx);
             },
             child: Text(
-              'Delete',
+              l10n.profileDelete,
               style: GoogleFonts.inter(
                 color: ThemeV2.loss,
                 fontWeight: FontWeight.w600,
@@ -368,13 +376,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
 // button and _PortfolioSelector's premium-slot tap (portfolio_selector.dart)
 // can open it without one needing an instance of the other's State class.
 void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
+  final l10n = AppLocalizations.of(context)!;
   final controller = TextEditingController();
   showDialog(
     context: context,
     builder: (ctx) => AlertDialog(
       backgroundColor: ThemeV2.surface,
       title: Text(
-        'New Portfolio',
+        l10n.portfolioNewDialogTitle,
         style: GoogleFonts.inter(
           fontSize: 18,
           fontWeight: FontWeight.w700,
@@ -385,8 +394,11 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
         controller: controller,
         autofocus: true,
         decoration: InputDecoration(
-          hintText: 'e.g. Tech Growth',
-          hintStyle: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 14),
+          hintText: l10n.portfolioNameHint,
+          hintStyle: GoogleFonts.inter(
+            color: ThemeV2.textSecondary,
+            fontSize: 14,
+          ),
           filled: true,
           fillColor: ThemeV2.surfaceDark,
           border: OutlineInputBorder(
@@ -400,7 +412,7 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
         TextButton(
           onPressed: () => Navigator.pop(ctx),
           child: Text(
-            'Cancel',
+            l10n.profileCancel,
             style: GoogleFonts.inter(color: ThemeV2.textSecondary),
           ),
         ),
@@ -415,8 +427,8 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
                   SnackBar(
                     content: Text(
                       maxP == 1
-                          ? 'FREE limit: 1 portfolio. Upgrade to Premium (3).'
-                          : 'Max $maxP portfolios reached.',
+                          ? l10n.portfolioFreeLimitOne
+                          : l10n.portfolioMaxReached(maxP),
                       style: GoogleFonts.inter(fontSize: 13),
                     ),
                     backgroundColor: ThemeV2.primary,
@@ -429,13 +441,15 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
                   .read(portfoliosProvider.notifier)
                   .addPortfolio(
                     controller.text.trim(),
-                    startingBalance: startingCapitalForIndex(currentCount),
+                    startingBalance: startingCapitalForTier(
+                      ref.read(subscriptionTierProvider),
+                    ),
                   );
               Navigator.pop(ctx);
             }
           },
           child: Text(
-            'Create',
+            l10n.portfolioCreate,
             style: GoogleFonts.inter(
               color: ThemeV2.primary,
               fontWeight: FontWeight.w600,
@@ -446,4 +460,3 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
     ),
   );
 }
-

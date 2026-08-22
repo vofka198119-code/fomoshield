@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:scanco/src/core/theme/app_theme.dart';
 import 'package:scanco/src/core/supabase/supabase_providers.dart';
+import 'package:scanco/src/l10n/gen/app_localizations.dart';
 import 'package:scanco/src/shared/services/user_data_service.dart';
 import 'package:scanco/src/shared/widgets/widget_container.dart';
 import 'package:scanco/src/features/home/widgets/watchlist_widget.dart';
@@ -17,10 +19,19 @@ import 'package:scanco/src/features/home/widgets/watchlist_widget.dart';
 
 /// Wraps a widget in [MaterialApp] with the app's dark theme + [Scaffold]
 /// (Scaffold provides the Material ancestor required by InkWell inside
-/// WidgetContainer).
+/// WidgetContainer). Delegates/supportedLocales mirror main.dart's
+/// MaterialApp.router — without them AppLocalizations.of(context) returns
+/// null and any widget calling the `!` on it (e.g. WatchlistWidget) throws.
 Widget _wrapWithTheme(Widget child) {
   return MaterialApp(
     theme: AppTheme.lightTheme,
+    supportedLocales: const [Locale('en'), Locale('ru')],
+    localizationsDelegates: const [
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
     home: Scaffold(body: child),
   );
 }

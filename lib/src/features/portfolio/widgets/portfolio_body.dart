@@ -26,7 +26,17 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
       if (mounted) {
         ref.invalidate(portfolioPerformanceProvider(widget.portfolioId));
         checkPendingOrders(ref);
+        checkWeeklyPayout(ref, AppLocalizations.of(context)!);
       }
+    });
+    // Also check once right away — deferred to a microtask (not called
+    // directly here) because AppLocalizations.of(context) depends on an
+    // InheritedWidget, which Flutter forbids reading before initState()
+    // itself has returned (see project memory: this exact call crashed
+    // Market Clock's home card the same way when it was placed directly
+    // in initState instead of deferred).
+    Future.microtask(() {
+      if (mounted) checkWeeklyPayout(ref, AppLocalizations.of(context)!);
     });
   }
 
@@ -58,18 +68,11 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
 
   @override
   Widget build(BuildContext context) {
-    final portfolios = ref.watch(portfoliosProvider);
     final performanceAsync = ref.watch(
       portfolioPerformanceProvider(widget.portfolioId),
     );
     final widgetConfigs = ref.watch(portfolioWidgetsProvider);
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
-    final activeIndex = portfolios.indexWhere(
-      (p) => p.id == widget.portfolioId,
-    );
-    final showBannerAd = ref.watch(
-      isPortfolioBannerAdSupportedProvider(activeIndex),
-    );
 
     return RefreshIndicator(
       color: ThemeV2.primary,
@@ -84,11 +87,6 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _PortfolioSelector(
-              portfolios: portfolios,
-              activeId: widget.portfolioId,
-            ),
-            const SizedBox(height: 16),
             // Render visible widgets in order
             ...performanceAsync.when(
               loading: () => [
@@ -105,7 +103,10 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                 for (int i = 0; i < visibleWidgets.length; i++)
                   StaggerFadeIn(
                     index: i,
-                    child: _buildWidget(visibleWidgets[i].id, performance: perf),
+                    child: _buildWidget(
+                      visibleWidgets[i].id,
+                      performance: perf,
+                    ),
                   ),
               ],
             ),
@@ -120,7 +121,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   size: 20,
                 ),
                 label: Text(
-                  'Add widgets',
+                  AppLocalizations.of(context)!.homeAddWidgets,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -134,51 +135,13 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(
-                      color: ThemeV2.primary,
-                      width: 0.5,
-                    ),
+                    side: const BorderSide(color: ThemeV2.primary, width: 0.5),
                   ),
                 ),
               ),
             ),
-            // Banner ad for 2nd/3rd portfolio (free tier)
-            if (showBannerAd) ...[
-              const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: ThemeV2.surfaceDark,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black12, width: 0.5),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.ad_units_rounded,
-                      size: 14,
-                      color: ThemeV2.textSecondary.withValues(alpha: 0.6),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Sponsored Content',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: ThemeV2.textSecondary.withValues(alpha: 0.6),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
             const DisclaimerFooter(),
-            const SizedBox(height: 100),
+            SizedBox(height: shellBottomClearance(context)),
           ],
         ),
       ),

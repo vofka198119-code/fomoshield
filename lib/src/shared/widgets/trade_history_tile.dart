@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
+import '../utils/currency_format.dart';
 import 'company_logo.dart';
 
 /// Shared trade-history row: ringed logo, asset name, BUY/SELL badge.
@@ -78,8 +80,10 @@ class TradeHistoryTile extends StatelessWidget {
                             logoUrl: url,
                             radius: 17,
                           ),
-                          error: (_, _) => CompanyLogo(ticker: symbol, radius: 17),
-                          loading: () => CompanyLogo(ticker: symbol, radius: 17),
+                          error: (_, _) =>
+                              CompanyLogo(ticker: symbol, radius: 17),
+                          loading: () =>
+                              CompanyLogo(ticker: symbol, radius: 17),
                         ),
                       ),
                     ),
@@ -119,7 +123,7 @@ class TradeHistoryTile extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '\$${_fmtValue(totalValue)}',
+                    formatUsd(totalValue),
                     style: interNums(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -137,7 +141,9 @@ class TradeHistoryTile extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      isBuy ? 'BUY' : 'SELL',
+                      isBuy
+                          ? AppLocalizations.of(context)!.tradeBuy
+                          : AppLocalizations.of(context)!.tradeSell,
                       style: GoogleFonts.inter(
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
@@ -152,14 +158,5 @@ class TradeHistoryTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _fmtValue(double v) {
-    final parts = v.toStringAsFixed(2).split('.');
-    final whole = parts[0].replaceAllMapped(
-      RegExp(r'\B(?=(\d{3})+(?!\d))'),
-      (m) => ',',
-    );
-    return '$whole.${parts[1]}';
   }
 }

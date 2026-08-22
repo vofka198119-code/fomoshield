@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/stagger_fade_in.dart';
 import '../../../shared/widgets/trade_history_tile.dart';
 import '../portfolio_providers.dart';
@@ -23,6 +24,7 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.watch(portfoliosProvider);
     Portfolio? portfolio;
     for (final p in portfolios) {
@@ -46,7 +48,7 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'TRADE HISTORY',
+          l10n.tradeHistoryTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -55,46 +57,63 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: portfolio == null
-          ? const Center(child: Text('Portfolio not found'))
-          : portfolio.transactions.isEmpty
-          ? const Center(child: Text('No trades yet'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Container(
-                decoration: FomoShieldTheme.cardDecoration,
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  children: [
-                    for (int i = 0; i < portfolio.transactions.length; i++)
-                      Builder(
-                        builder: (context) {
-                          final tx = portfolio!.transactions[
-                              portfolio.transactions.length - 1 - i];
-                          return StaggerFadeIn(
-                            index: i,
-                            child: TradeHistoryTile(
-                              symbol: tx.symbol,
-                              companyName:
-                                  ref
-                                      .watch(resolvedCompanyNameProvider(tx.symbol))
-                                      .valueOrNull ??
-                                  tx.symbol,
-                              isBuy: tx.type == TransactionType.buy,
-                              totalValue: tx.shares * tx.price,
-                              showDivider: i != portfolio.transactions.length - 1,
-                              onTap: () => context.push(
-                                '/portfolio/$portfolioId/trade-detail',
-                                extra: tx,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: portfolio == null
+            ? Center(
+                child: Text(l10n.portfolioTradeHistoryScreenPortfolioNotFound),
+              )
+            : portfolio.transactions.isEmpty
+            ? Center(child: Text(l10n.portfolioTradeHistoryScreenNoTradesYet))
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Container(
+                  decoration: FomoShieldTheme.cardDecoration,
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    children: [
+                      for (int i = 0; i < portfolio.transactions.length; i++)
+                        Builder(
+                          builder: (context) {
+                            final tx =
+                                portfolio!.transactions[portfolio
+                                        .transactions
+                                        .length -
+                                    1 -
+                                    i];
+                            return StaggerFadeIn(
+                              index: i,
+                              child: TradeHistoryTile(
+                                symbol: tx.symbol,
+                                companyName:
+                                    ref
+                                        .watch(
+                                          resolvedCompanyNameProvider(
+                                            tx.symbol,
+                                          ),
+                                        )
+                                        .valueOrNull ??
+                                    tx.symbol,
+                                isBuy: tx.type == TransactionType.buy,
+                                totalValue: tx.shares * tx.price,
+                                showDivider:
+                                    i != portfolio.transactions.length - 1,
+                                onTap: () => context.push(
+                                  '/portfolio/$portfolioId/trade-detail',
+                                  extra: tx,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                  ],
+                            );
+                          },
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 }

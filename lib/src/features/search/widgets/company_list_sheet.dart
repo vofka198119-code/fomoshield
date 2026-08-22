@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../core/cache/sector_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/widgets/company_logo.dart';
@@ -20,21 +20,31 @@ import '../top_companies_provider.dart';
 Future<void> showCompanyListSheet(
   BuildContext context,
   String title,
-  List<TopCompanyEntry> companies,
-) {
+  List<TopCompanyEntry> companies, {
+  required void Function(String symbol) onTapSymbol,
+}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _CompanyListSheet(title: title, companies: companies),
+    builder: (_) => _CompanyListSheet(
+      title: title,
+      companies: companies,
+      onTapSymbol: onTapSymbol,
+    ),
   );
 }
 
 class _CompanyListSheet extends StatelessWidget {
   final String title;
   final List<TopCompanyEntry> companies;
+  final void Function(String symbol) onTapSymbol;
 
-  const _CompanyListSheet({required this.title, required this.companies});
+  const _CompanyListSheet({
+    required this.title,
+    required this.companies,
+    required this.onTapSymbol,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +101,15 @@ class _CompanyListSheet extends StatelessWidget {
                   controller: scrollController,
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   itemCount: companies.length,
-                  separatorBuilder: (_, _) =>
-                      const Divider(height: 1, indent: 68, color: Color(0x0F000000)),
-                  itemBuilder: (context, i) => _CompanyRow(entry: companies[i]),
+                  separatorBuilder: (_, _) => const Divider(
+                    height: 1,
+                    indent: 68,
+                    color: Color(0x0F000000),
+                  ),
+                  itemBuilder: (context, i) => _CompanyRow(
+                    entry: companies[i],
+                    onTapSymbol: onTapSymbol,
+                  ),
                 ),
               ),
             ],
@@ -106,18 +122,23 @@ class _CompanyListSheet extends StatelessWidget {
 
 class _CompanyRow extends ConsumerWidget {
   final TopCompanyEntry entry;
+  final void Function(String symbol) onTapSymbol;
 
-  const _CompanyRow({required this.entry});
+  const _CompanyRow({required this.entry, required this.onTapSymbol});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logoEntry = ref.watch(cachedLogoEntryProvider(entry.symbol)).valueOrNull;
-    final sector = resolveGicsSector(entry.symbol, companyName: entry.name);
+    final logoUrl = ref.watch(cachedLogoProvider(entry.symbol)).valueOrNull;
+    final liveSector = ref
+        .watch(cachedGicsSectorProvider(entry.symbol))
+        .valueOrNull;
+    final sector =
+        liveSector ?? resolveGicsSector(entry.symbol, companyName: entry.name);
 
     return ListTile(
       onTap: () {
         Navigator.of(context).pop();
-        context.push('/company/${entry.symbol}');
+        onTapSymbol(entry.symbol);
       },
       leading: Container(
         padding: const EdgeInsets.all(2),
@@ -125,12 +146,7 @@ class _CompanyRow extends ConsumerWidget {
           shape: BoxShape.circle,
           border: Border.all(color: ThemeV2.primary, width: 1.5),
         ),
-        child: CompanyLogo(
-          ticker: entry.symbol,
-          logoUrl: logoEntry?.logoUrl,
-          domain: logoEntry?.domain,
-          radius: 18,
-        ),
+        child: CompanyLogo(ticker: entry.symbol, logoUrl: logoUrl, radius: 18),
       ),
       title: Text(
         entry.name,

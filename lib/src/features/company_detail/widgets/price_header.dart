@@ -4,23 +4,26 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark, dialBrassLight;
+import '../../market_clock/market_clock_dial.dart'
+    show dialBrassLight, darkCardDecoration;
 import '../../market_clock/market_clock_engine.dart'
-    show MarketPhase, nowInNewYork, resolveMarketClockState;
+    show MarketPhase, nowInNewYork, resolveMarketPhase;
 
 // ===========================================================================
 // Market session label — reuses Market Clock's real Eastern-time engine
-// (nowInNewYork/resolveMarketClockState, DST-aware) instead of the phone's
+// (nowInNewYork/resolveMarketPhase, DST-aware) instead of the phone's
 // local clock, so this always agrees with the actual NYSE session.
 // ===========================================================================
 
-String _phaseLabel(MarketPhase p) => switch (p) {
-      MarketPhase.preMarket => 'PRE-MARKET',
-      MarketPhase.marketOpen => 'MARKET OPEN',
-      MarketPhase.afterHours => 'POST-MARKET',
-      MarketPhase.closed => 'MARKET CLOSED',
-    };
+String _phaseLabel(AppLocalizations l10n, MarketPhase p) => switch (p) {
+  MarketPhase.preMarket => l10n.companyDetailPhasePreMarket,
+  MarketPhase.marketOpen => l10n.companyDetailPhaseMarketOpen,
+  MarketPhase.afterHours => l10n.companyDetailPhasePostMarket,
+  MarketPhase.closed => l10n.companyDetailPhaseMarketClosed,
+};
 
 // ===========================================================================
 // Price Header — brand dark-green hero card (logo/name/price/change always
@@ -73,6 +76,7 @@ class PriceHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
     // Home Portfolio widget's cell fills are a 10%-alpha tint meant for a
     // light card background — flattened against white here so it still
@@ -96,14 +100,7 @@ class PriceHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Container(
             padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [dialLight, dialDark],
-              ),
-              borderRadius: FomoShieldTheme.cardRadius,
-            ),
+            decoration: darkCardDecoration(),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -155,7 +152,7 @@ class PriceHeader extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            sector.label,
+                            sector.localizedLabel(AppLocalizations.of(context)!),
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -187,7 +184,7 @@ class PriceHeader extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _priceCell(),
+                      _priceCell(l10n),
                       const SizedBox(height: 10),
                       // Change — fill/colors unchanged for now (still the
                       // olive/success/loss tint used elsewhere), just
@@ -209,7 +206,7 @@ class PriceHeader extends StatelessWidget {
                             const SizedBox(width: 3),
                             Flexible(
                               child: Text(
-                                '${isUp ? '+' : ''}${change.toStringAsFixed(2)}\$ (${isUp ? '+' : ''}${changePercent.toStringAsFixed(2)}%)',
+                                '${formatUsdSigned(change)} (${isUp ? '+' : ''}${changePercent.toStringAsFixed(2)}%)',
                                 style: interNums(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -238,7 +235,7 @@ class PriceHeader extends StatelessWidget {
                               border: Border.all(color: ThemeV2.divider),
                             ),
                           )
-                        : _fsScoreCell(fsScore!),
+                        : _fsScoreCell(l10n, fsScore!),
                   ),
                 ],
               ],
@@ -257,24 +254,17 @@ class PriceHeader extends StatelessWidget {
 
   // Green-gradient card duplicating FinancialScoreWidget's circular gauge,
   // so the score is visible right at the top without scrolling down.
-  Widget _fsScoreCell(int score) {
+  Widget _fsScoreCell(AppLocalizations l10n, int score) {
     final color = _gaugeColor(score);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
           Text(
-            'FS SCORE',
+            l10n.companyDetailFsScoreLabel,
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
@@ -289,32 +279,35 @@ class PriceHeader extends StatelessWidget {
                 widthFactor: 0.9,
                 heightFactor: 0.9,
                 child: AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: ThemeV2.surface,
-                    border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.1),
-                        blurRadius: 20,
-                        spreadRadius: 3,
+                  aspectRatio: 1,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: ThemeV2.surface,
+                      border: Border.all(
+                        color: color.withValues(alpha: 0.3),
+                        width: 3,
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      '$score',
-                      style: GoogleFonts.inter(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: color,
-                        letterSpacing: -1,
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          spreadRadius: 3,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$score',
+                        style: GoogleFonts.inter(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          color: color,
+                          letterSpacing: -1,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 ),
               ),
             ),
@@ -324,7 +317,7 @@ class PriceHeader extends StatelessWidget {
     );
   }
 
-  Widget _priceCell() {
+  Widget _priceCell(AppLocalizations l10n) {
     String sessionLabel = '';
     bool isOpen = false;
     if (showSessionLabel) {
@@ -332,31 +325,25 @@ class PriceHeader extends StatelessWidget {
         sessionLabel = phaseLabel!;
         isOpen = phaseGlow;
       } else {
-        final phase = resolveMarketClockState(nowInNewYork()).phase;
-        sessionLabel = _phaseLabel(phase);
+        final phase = resolveMarketPhase(nowInNewYork());
+        sessionLabel = _phaseLabel(l10n, phase);
         isOpen = phase == MarketPhase.marketOpen;
       }
     }
-    final sessionColor = phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
+    final sessionColor =
+        phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Text(
-                'PRICE',
+                l10n.companyDetailPriceLabel,
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -393,36 +380,25 @@ class PriceHeader extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.attach_money_rounded,
-                  size: 26,
-                  color: sessionColor,
-                  shadows: isOpen
-                      ? [
-                          Shadow(
-                            color: dialBrassLight.withValues(alpha: 0.5),
-                            blurRadius: 6,
-                          ),
-                        ]
-                      : null,
-                ),
+                Icon(Icons.attach_money_rounded, size: 26, color: sessionColor),
                 Text(
                   price.toStringAsFixed(2),
-                  style: interNums(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                    color: sessionColor,
-                    height: 1,
-                  ).copyWith(
-                    shadows: isOpen
-                        ? [
-                            Shadow(
-                              color: dialBrassLight.withValues(alpha: 0.5),
-                              blurRadius: 6,
-                            ),
-                          ]
-                        : null,
-                  ),
+                  style:
+                      interNums(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                        color: sessionColor,
+                        height: 1,
+                      ).copyWith(
+                        shadows: isOpen
+                            ? [
+                                Shadow(
+                                  color: dialBrassLight.withValues(alpha: 0.5),
+                                  blurRadius: 6,
+                                ),
+                              ]
+                            : null,
+                      ),
                 ),
               ],
             ),
@@ -462,7 +438,11 @@ class PriceHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: child),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: child,
+          ),
         ],
       ),
     );

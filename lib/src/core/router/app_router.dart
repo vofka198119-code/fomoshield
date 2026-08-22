@@ -1,4 +1,4 @@
-import 'dart:ui' show ImageFilter;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,10 +6,14 @@ import 'package:go_router/go_router.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/auth/auth_screen.dart';
 import '../../features/auth/forgot_password_screen.dart';
+import '../supabase/supabase_client.dart';
 
+import '../../features/auth/account_restore_screen.dart';
+import '../../shared/services/finnhub_service.dart' show AccountDeletionStatus;
 import '../../features/disclaimer/disclaimer_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
+import '../../features/notifications/notifications_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/portfolio/portfolio_screen.dart';
 import '../../features/portfolio/screens/portfolio_order_entry_screen.dart';
@@ -18,6 +22,8 @@ import '../../features/market_clock/market_clock_screen.dart';
 import '../../features/market_clock/market_period_detail_screen.dart';
 import '../../features/market_clock/market_clock_risk_detail_screen.dart';
 import '../../features/market_clock/market_phases_screen.dart';
+import '../../features/profile/language_picker_screen.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
 import '../../features/company_detail/widgets/metric_info_screen.dart';
@@ -26,14 +32,14 @@ import '../../features/stress_test/stress_test_setup_screen.dart';
 import '../../features/stress_test/stress_test_screen.dart';
 import '../../features/stress_test/verdict_screen.dart';
 import '../../features/stress_test/verdict_marker_detail_screen.dart';
-import '../../features/stress_test/stress_test_analytics_screen.dart';
 import '../../features/stress_test/stress_test_hub_screen.dart';
 import '../../features/stress_test/stress_test_portfolio_balance_screen.dart';
 import '../../features/stress_test/stress_test_psychology_meter_screen.dart';
 import '../../features/stress_test/stress_test_trade_history_screen.dart';
 import '../../features/stress_test/stress_test_trade_detail_screen.dart';
 import '../../features/stress_test/verdict_trade_breakdown_detail_screen.dart';
-import '../../features/stress_test/stress_test_models.dart' show StressTestTrade;
+import '../../features/stress_test/stress_test_models.dart'
+    show StressTestTrade;
 import '../../features/portfolio/screens/portfolio_trade_history_screen.dart';
 import '../../features/portfolio/screens/portfolio_trade_detail_screen.dart';
 import '../../features/portfolio/portfolio_providers.dart' show Transaction;
@@ -44,6 +50,29 @@ import '../../features/assets/screens/order_entry_screen.dart';
 import '../theme/theme_v2.dart';
 import 'navigation_history_provider.dart';
 
+/// Bridges a Stream (Supabase's auth-state stream) into a [Listenable] so
+/// GoRouter re-evaluates its `redirect` callback whenever auth state
+/// changes — not just at initial navigation. Standard go_router pattern.
+class _GoRouterRefreshStream extends ChangeNotifier {
+  _GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+// Routes that manage their own auth/session logic — never redirected away
+// from by the session guard below (Splash resolves the real destination
+// itself; Auth/forgot-password/disclaimer are the destinations).
+const _authExemptPaths = {'/', '/auth', '/forgot-password', '/disclaimer'};
+
 class AppRouter {
   AppRouter._();
 
@@ -53,6 +82,18 @@ class AppRouter {
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
+    refreshListenable: _GoRouterRefreshStream(
+      SupabaseConfig.client.auth.onAuthStateChange,
+    ),
+    // Session guard only — if a live Supabase session gets revoked/expires
+    // while the app is already open (not just at cold start, which Splash
+    // already handles), send the user back to /auth instead of leaving
+    // them stranded on a screen that assumes they're signed in.
+    redirect: (context, state) {
+      if (_authExemptPaths.contains(state.matchedLocation)) return null;
+      final hasSession = SupabaseConfig.client.auth.currentSession != null;
+      return hasSession ? null : '/auth';
+    },
     routes: [
       // Auth flow (full screen, no shell)
       GoRoute(
@@ -79,6 +120,26 @@ class AppRouter {
         builder: (context, state) => const DisclaimerScreen(),
       ),
 
+      GoRoute(
+        path: '/language',
+        name: 'language',
+        builder: (context, state) => const LanguagePickerScreen(),
+      ),
+
+      // Account Restore — full-block gate for a pending-deletion account,
+      // see resolvePostAuthRoute() in auth_providers.dart.
+      GoRoute(
+        path: '/account-restore',
+        name: 'accountRestore',
+        builder: (context, state) {
+          final status = state.extra as AccountDeletionStatus?;
+          return AccountRestoreScreen(
+            daysRemaining: status?.daysRemaining ?? 0,
+            deleteAt: status?.deleteAt,
+          );
+        },
+      ),
+
       // Company detail (full screen, no shell)
       GoRoute(
         path: '/company/:symbol',
@@ -103,7 +164,8 @@ class AppRouter {
         name: 'metricInfo',
         pageBuilder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          final content = metricInfoRegistry[id];
+          final l10n = AppLocalizations.of(context)!;
+          final content = metricInfoRegistryFor(l10n)[id];
           return NoTransitionPage(
             child: content == null
                 ? const SizedBox()
@@ -117,6 +179,13 @@ class AppRouter {
         path: '/watchlist',
         name: 'watchlist',
         builder: (context, state) => const WatchlistFullScreen(),
+      ),
+
+      // Notifications — bell icon on Home
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        builder: (context, state) => const NotificationsScreen(),
       ),
 
       // Search — standalone full screen (outside ShellRoute to avoid
@@ -190,14 +259,6 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: '/stress-test/:id/analytics',
-        name: 'stressTestAnalytics',
-        builder: (context, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return StressTestAnalyticsScreen(sessionId: id);
-        },
-      ),
-      GoRoute(
         path: '/stress-test/:id/portfolio-balance',
         name: 'stressTestPortfolioBalance',
         builder: (context, state) {
@@ -256,10 +317,7 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           final symbol = state.pathParameters['symbol'] ?? '';
-          return StockDetailScreen(
-            sessionId: id,
-            symbol: symbol.toUpperCase(),
-          );
+          return StockDetailScreen(sessionId: id, symbol: symbol.toUpperCase());
         },
       ),
       GoRoute(
@@ -268,10 +326,7 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           final symbol = state.pathParameters['symbol'] ?? '';
-          return WhyTodayScreen(
-            sessionId: id,
-            symbol: symbol.toUpperCase(),
-          );
+          return WhyTodayScreen(sessionId: id, symbol: symbol.toUpperCase());
         },
       ),
       GoRoute(
@@ -393,62 +448,63 @@ class _AppShell extends ConsumerWidget {
       body: child,
       bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            decoration: BoxDecoration(
-              color: ThemeV2.surface.withValues(alpha: 0.75),
-              border: Border(
-                top: BorderSide(
-                  color: Colors.black.withValues(alpha: 0.06),
-                ),
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: ThemeV2.surface,
+            border: Border(
+              top: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
             ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: BottomNavigationBar(
-                  currentIndex: _currentIndex(context),
-                  onTap: (index) {
-                    ref.read(previousTabRouteProvider.notifier).state =
-                        GoRouterState.of(context).uri.toString();
-                    switch (index) {
-                      case 0:
-                        context.go('/home');
-                      case 1:
-                        context.push('/search');
-                      case 2:
-                        context.go('/portfolio');
-                      case 3:
-                        _onStressTestTap(context, ref);
-                      case 4:
-                        context.go('/profile');
-                    }
-                  },
-                  items: const [
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.shield_rounded),
-                      label: 'Home',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.search_rounded),
-                      label: 'Search',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.account_balance_rounded),
-                      label: 'Portfolio',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.psychology_rounded),
-                      label: 'Stress Test',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.person_rounded),
-                      label: 'Profile',
-                    ),
-                  ],
-                ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: BottomNavigationBar(
+                // Cyrillic glyphs run visibly wider than Latin at the same
+                // character count — "Стресс-тест" was clipping to
+                // "Стресс-т…" at the default 12/14px label sizes. Shrunk
+                // a couple px so every language's longest label fits.
+                selectedFontSize: 12,
+                unselectedFontSize: 10,
+                currentIndex: _currentIndex(context),
+                onTap: (index) {
+                  ref.read(previousTabRouteProvider.notifier).state =
+                      GoRouterState.of(context).uri.toString();
+                  switch (index) {
+                    case 0:
+                      context.go('/home');
+                    case 1:
+                      context.push('/search');
+                    case 2:
+                      context.go('/portfolio');
+                    case 3:
+                      _onStressTestTap(context, ref);
+                    case 4:
+                      context.go('/profile');
+                  }
+                },
+                items: [
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.shield_rounded),
+                    label: AppLocalizations.of(context)!.navHome,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.search_rounded),
+                    label: AppLocalizations.of(context)!.navSearch,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.account_balance_rounded),
+                    label: AppLocalizations.of(context)!.navPortfolio,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.psychology_rounded),
+                    label: AppLocalizations.of(context)!.navStressTest,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.person_rounded),
+                    label: AppLocalizations.of(context)!.navProfile,
+                  ),
+                ],
               ),
             ),
           ),
@@ -457,4 +513,3 @@ class _AppShell extends ConsumerWidget {
     );
   }
 }
-

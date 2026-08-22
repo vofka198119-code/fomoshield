@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../shared/widgets/simulated_trading_disclaimer.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 import 'limit_price_input.dart';
 
 // ---------------------------------------------------------------------------
@@ -37,6 +38,7 @@ class OrderConfigSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         if (isLimit)
@@ -48,7 +50,7 @@ class OrderConfigSection extends StatelessWidget {
           ),
         _infoBox(),
         if (extendedHours != null && onExtendedHoursChanged != null)
-          _extendedHoursToggle(extendedHours!, onExtendedHoursChanged!),
+          _extendedHoursToggle(l10n, extendedHours!, onExtendedHoursChanged!),
         const SimulatedTradingDisclaimer(),
       ],
     );
@@ -63,12 +65,20 @@ class OrderConfigSection extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline_rounded, color: ThemeV2.textSecondary, size: 16),
+          const Icon(
+            Icons.info_outline_rounded,
+            color: ThemeV2.textSecondary,
+            size: 16,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               infoText,
-              style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary, height: 1.5),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: ThemeV2.textSecondary,
+                height: 1.5,
+              ),
             ),
           ),
         ],
@@ -76,7 +86,11 @@ class OrderConfigSection extends StatelessWidget {
     );
   }
 
-  Widget _extendedHoursToggle(bool extendedHours, ValueChanged<bool> onChanged) {
+  Widget _extendedHoursToggle(
+    AppLocalizations l10n,
+    bool extendedHours,
+    ValueChanged<bool> onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Container(
@@ -84,14 +98,18 @@ class OrderConfigSection extends StatelessWidget {
         decoration: FomoShieldTheme.cardDecoration,
         child: Row(
           children: [
-            const Icon(Icons.access_time_rounded, color: ThemeV2.textSecondary, size: 20),
+            const Icon(
+              Icons.access_time_rounded,
+              color: ThemeV2.textSecondary,
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Extended Hours',
+                    l10n.orderEntryExtendedHoursTitle,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -99,8 +117,11 @@ class OrderConfigSection extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Off: trade only while the real market is open',
-                    style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+                    l10n.orderEntryExtendedHoursSubtitle,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: ThemeV2.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -115,5 +136,4 @@ class OrderConfigSection extends StatelessWidget {
       ),
     );
   }
-
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Market Clock Widget Order Provider (SharedPreferences-backed)
@@ -25,14 +26,14 @@ class MarketClockWidgetConfig {
 
   const MarketClockWidgetConfig({required this.id, required this.visible});
 
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (id) {
       case 'ny_time':
-        return 'New York Time';
+        return l10n.marketClockWidgetDisplayNameNyTime;
       case 'market_phase':
-        return 'Market Phase';
+        return l10n.marketClockWidgetDisplayNameMarketPhase;
       case 'timing_indicator':
-        return 'FOMO Shield Status';
+        return l10n.marketClockWidgetDisplayNameTimingIndicator;
       default:
         return id;
     }
@@ -64,8 +65,9 @@ class MarketClockWidgetsNotifier
     // any saved ids that have since been retired.
     if (savedOrder != null) {
       final savedSet = Set<String>.from(savedOrder);
-      final missing =
-          marketClockDefaultOrder.where((id) => !savedSet.contains(id));
+      final missing = marketClockDefaultOrder.where(
+        (id) => !savedSet.contains(id),
+      );
       order = [
         ...savedOrder.where((id) => marketClockDefaultOrder.contains(id)),
         ...missing,
@@ -94,8 +96,7 @@ class MarketClockWidgetsNotifier
 
   Future<void> _save() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-        _prefsOrderKey, state.map((c) => c.id).toList());
+    await prefs.setStringList(_prefsOrderKey, state.map((c) => c.id).toList());
     await prefs.setString(
       _prefsVisibilityKey,
       state.map((c) => '${c.id}:${c.visible}').join(','),
@@ -136,7 +137,8 @@ class MarketClockWidgetsNotifier
   }
 }
 
-final marketClockWidgetsProvider = StateNotifierProvider<
-    MarketClockWidgetsNotifier, List<MarketClockWidgetConfig>>(
-  (ref) => MarketClockWidgetsNotifier(),
-);
+final marketClockWidgetsProvider =
+    StateNotifierProvider<
+      MarketClockWidgetsNotifier,
+      List<MarketClockWidgetConfig>
+    >((ref) => MarketClockWidgetsNotifier());

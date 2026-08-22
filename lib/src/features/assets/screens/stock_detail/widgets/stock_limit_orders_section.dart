@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../stress_test/stress_test_pending_orders_provider.dart';
 import 'stress_test_order_row_tile.dart';
 
@@ -28,6 +29,7 @@ class StockLimitOrdersSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final orders = ref
         .watch(stressTestSessionPendingOrdersProvider(sessionId))
         .where((o) => o.symbol == symbol)
@@ -44,7 +46,7 @@ class StockLimitOrdersSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('LIMIT ORDERS', style: FomoShieldTheme.cardTitle()),
+          Text(l10n.stockLimitOrdersTitle, style: FomoShieldTheme.cardTitle()),
           const Divider(height: 20, color: Color(0x0F000000)),
           for (final order in shown) StressTestOrderRowTile(order: order),
           if (orders.length > _inlineLimit)
@@ -54,7 +56,7 @@ class StockLimitOrdersSection extends ConsumerWidget {
                 child: TextButton(
                   onPressed: () => _showAllSheet(context),
                   child: Text(
-                    'See all ${orders.length} orders',
+                    l10n.stockLimitOrdersSeeAll(orders.length),
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -72,6 +74,7 @@ class StockLimitOrdersSection extends ConsumerWidget {
   }
 
   void _showAllSheet(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: ThemeV2.surface,
@@ -98,7 +101,7 @@ class StockLimitOrdersSection extends ConsumerWidget {
                 ),
               ),
               Text(
-                '$symbol Limit Orders',
+                l10n.stockLimitOrdersSheetTitle(symbol),
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -113,7 +116,9 @@ class StockLimitOrdersSection extends ConsumerWidget {
                     // was built from) so a fill mid-session updates/removes
                     // a row here instead of leaving a stale pending entry.
                     final liveOrders = ref
-                        .watch(stressTestSessionPendingOrdersProvider(sessionId))
+                        .watch(
+                          stressTestSessionPendingOrdersProvider(sessionId),
+                        )
                         .where((o) => o.symbol == symbol)
                         .toList();
                     return ListView.builder(

@@ -21,8 +21,9 @@ const List<String> _defaultPortfolioWidgetOrder = [
 
 String _orderPrefsKey(String? uid) =>
     uid != null ? 'portfolio_widget_order_$uid' : 'portfolio_widget_order';
-String _visibilityPrefsKey(String? uid) =>
-    uid != null ? 'portfolio_widget_visibility_$uid' : 'portfolio_widget_visibility';
+String _visibilityPrefsKey(String? uid) => uid != null
+    ? 'portfolio_widget_visibility_$uid'
+    : 'portfolio_widget_visibility';
 
 /// Model representing a portfolio widget's configuration.
 class PortfolioWidgetConfig {
@@ -65,7 +66,8 @@ class PortfolioWidgetConfig {
 // StateNotifier
 // ---------------------------------------------------------------------------
 
-class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>> {
+class PortfolioWidgetsNotifier
+    extends StateNotifier<List<PortfolioWidgetConfig>> {
   String? _userId;
 
   PortfolioWidgetsNotifier({this._userId}) : super([]) {
@@ -110,7 +112,9 @@ class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>
     // Merge: append any default widgets missing from saved order
     if (savedOrder != null) {
       final savedSet = Set<String>.from(savedOrder);
-      final missing = _defaultPortfolioWidgetOrder.where((id) => !savedSet.contains(id));
+      final missing = _defaultPortfolioWidgetOrder.where(
+        (id) => !savedSet.contains(id),
+      );
       if (missing.isNotEmpty) {
         order = [...savedOrder, ...missing];
       }
@@ -141,7 +145,9 @@ class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>
   Future<void> _saveLocal() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-        _orderPrefsKey(_userId), state.map((c) => c.id).toList());
+      _orderPrefsKey(_userId),
+      state.map((c) => c.id).toList(),
+    );
     await prefs.setString(
       _visibilityPrefsKey(_userId),
       state.map((c) => '${c.id}:${c.visible}').join(','),
@@ -166,7 +172,8 @@ class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>
   Future<void> toggleVisibility(String id) async {
     if (id == _pinnedFirstId) return;
     state = state.map((c) {
-      if (c.id == id) return PortfolioWidgetConfig(id: c.id, visible: !c.visible);
+      if (c.id == id)
+        return PortfolioWidgetConfig(id: c.id, visible: !c.visible);
       return c;
     }).toList();
     await _saveLocal();
@@ -183,7 +190,10 @@ class PortfolioWidgetsNotifier extends StateNotifier<List<PortfolioWidgetConfig>
 // ---------------------------------------------------------------------------
 
 final portfolioWidgetsProvider =
-    StateNotifierProvider<PortfolioWidgetsNotifier, List<PortfolioWidgetConfig>>((ref) {
-  final user = ref.watch(currentUserProvider);
-  return PortfolioWidgetsNotifier(userId: user?.id);
-});
+    StateNotifierProvider<
+      PortfolioWidgetsNotifier,
+      List<PortfolioWidgetConfig>
+    >((ref) {
+      final user = ref.watch(currentUserProvider);
+      return PortfolioWidgetsNotifier(userId: user?.id);
+    });

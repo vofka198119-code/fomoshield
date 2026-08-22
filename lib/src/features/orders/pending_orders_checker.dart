@@ -34,7 +34,9 @@ Future<void> checkPendingOrders(WidgetRef ref) async {
 
   if (prices.isEmpty) return;
 
-  ref.read(ordersProvider.notifier).processPendingOrders(
+  ref
+      .read(ordersProvider.notifier)
+      .processPendingOrders(
         currentPrices: prices,
         session: currentMarketSession(),
       );

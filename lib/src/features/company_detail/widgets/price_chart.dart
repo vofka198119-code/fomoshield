@@ -7,8 +7,10 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../shared/services/finnhub_service.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../l10n/gen/app_localizations.dart';
+import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../../portfolio/portfolio_providers.dart';
 import '../company_detail_provider.dart'
     show chartHoverPriceProvider, chartPeriodChangeProvider;
@@ -159,7 +161,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
       final status = data['s'] as String? ?? '';
       if (status == 'no_data') {
         setState(() {
-          _error = 'No price data available';
+          _error = AppLocalizations.of(context)!.companyDetailNoPriceDataAvailable;
           _isLoading = false;
         });
         return;
@@ -185,7 +187,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Failed to load chart';
+          _error = AppLocalizations.of(context)!.companyDetailChartLoadError;
           _isLoading = false;
         });
       }
@@ -216,6 +218,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final avgCost = _avgCost();
 
     return Container(
@@ -230,7 +233,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+            child: Text(l10n.stressTestPriceChartTitle, style: FomoShieldTheme.cardTitle()),
           ),
           const SizedBox(height: 10),
           Padding(
@@ -279,14 +282,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 6),
               decoration: isSelected
-                  ? BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [dialLight, dialDark],
-                      ),
-                      borderRadius: BorderRadius.circular(6),
-                    )
+                  ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
                   : null,
               child: Text(
                 period.label,
@@ -343,7 +339,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     if (closes.length < 2) {
       return Center(
         child: Text(
-          'Not enough data',
+          AppLocalizations.of(context)!.companyDetailChartNotEnoughData,
           style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
         ),
       );
@@ -553,7 +549,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
           top: 0,
           right: 3,
           child: Text(
-            '\$${maxPrice.toStringAsFixed(2)}',
+            formatUsd(maxPrice),
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -565,7 +561,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
           bottom: 0,
           right: 3,
           child: Text(
-            '\$${minPrice.toStringAsFixed(2)}',
+            formatUsd(minPrice),
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -578,7 +574,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             top: (avgLineTop - 14).clamp(0.0, 220.0 - 14),
             right: 3,
             child: Text(
-              '\$${avgCost.toStringAsFixed(2)}',
+              formatUsd(avgCost),
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,

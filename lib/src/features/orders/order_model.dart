@@ -114,50 +114,50 @@ class Order {
   // -----------------------------------------------------------------------
 
   Map<String, dynamic> toJson() => {
-        'orderId': orderId,
-        'userId': userId,
-        'portfolioId': portfolioId,
-        'assetSymbol': assetSymbol,
-        'companyName': companyName,
-        'side': side.name,
-        'type': type.name,
-        'quantity': quantity,
-        'createdPrice': createdPrice,
-        'limitPrice': limitPrice,
-        'stopPrice': stopPrice,
-        'status': status.name,
-        'filledQuantity': filledQuantity,
-        'filledPrice': filledPrice,
-        'filledAt': filledAt?.toIso8601String(),
-        'createdAt': createdAt.toIso8601String(),
-        'session': session.name,
-      };
+    'orderId': orderId,
+    'userId': userId,
+    'portfolioId': portfolioId,
+    'assetSymbol': assetSymbol,
+    'companyName': companyName,
+    'side': side.name,
+    'type': type.name,
+    'quantity': quantity,
+    'createdPrice': createdPrice,
+    'limitPrice': limitPrice,
+    'stopPrice': stopPrice,
+    'status': status.name,
+    'filledQuantity': filledQuantity,
+    'filledPrice': filledPrice,
+    'filledAt': filledAt?.toIso8601String(),
+    'createdAt': createdAt.toIso8601String(),
+    'session': session.name,
+  };
 
   factory Order.fromJson(Map<String, dynamic> json) => Order(
-        orderId: json['orderId'] as String,
-        userId: json['userId'] as String?,
-        portfolioId: json['portfolioId'] as String,
-        assetSymbol: json['assetSymbol'] as String,
-        companyName: json['companyName'] as String?,
-        side: OrderSide.values.firstWhere((e) => e.name == json['side']),
-        type: OrderType.values.firstWhere((e) => e.name == json['type']),
-        quantity: (json['quantity'] as num).toDouble(),
-        createdPrice: (json['createdPrice'] as num).toDouble(),
-        limitPrice: (json['limitPrice'] as num?)?.toDouble(),
-        stopPrice: (json['stopPrice'] as num?)?.toDouble(),
-        status: OrderStatus.values.firstWhere((e) => e.name == json['status']),
-        filledQuantity: (json['filledQuantity'] as num?)?.toDouble() ?? 0,
-        filledPrice: (json['filledPrice'] as num?)?.toDouble(),
-        filledAt: json['filledAt'] != null
-            ? DateTime.parse(json['filledAt'] as String)
-            : null,
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'] as String)
-            : DateTime.now(),
-        session: json['session'] != null
-            ? MarketSession.values.firstWhere((e) => e.name == json['session'])
-            : MarketSession.regular,
-      );
+    orderId: json['orderId'] as String,
+    userId: json['userId'] as String?,
+    portfolioId: json['portfolioId'] as String,
+    assetSymbol: json['assetSymbol'] as String,
+    companyName: json['companyName'] as String?,
+    side: OrderSide.values.firstWhere((e) => e.name == json['side']),
+    type: OrderType.values.firstWhere((e) => e.name == json['type']),
+    quantity: (json['quantity'] as num).toDouble(),
+    createdPrice: (json['createdPrice'] as num).toDouble(),
+    limitPrice: (json['limitPrice'] as num?)?.toDouble(),
+    stopPrice: (json['stopPrice'] as num?)?.toDouble(),
+    status: OrderStatus.values.firstWhere((e) => e.name == json['status']),
+    filledQuantity: (json['filledQuantity'] as num?)?.toDouble() ?? 0,
+    filledPrice: (json['filledPrice'] as num?)?.toDouble(),
+    filledAt: json['filledAt'] != null
+        ? DateTime.parse(json['filledAt'] as String)
+        : null,
+    createdAt: json['createdAt'] != null
+        ? DateTime.parse(json['createdAt'] as String)
+        : DateTime.now(),
+    session: json['session'] != null
+        ? MarketSession.values.firstWhere((e) => e.name == json['session'])
+        : MarketSession.regular,
+  );
 
   Order copyWith({
     OrderStatus? status,
@@ -165,26 +165,25 @@ class Order {
     double? filledPrice,
     DateTime? filledAt,
     MarketSession? session,
-  }) =>
-      Order(
-        orderId: orderId,
-        userId: userId,
-        portfolioId: portfolioId,
-        assetSymbol: assetSymbol,
-        companyName: companyName,
-        side: side,
-        type: type,
-        quantity: quantity,
-        createdPrice: createdPrice,
-        limitPrice: limitPrice,
-        stopPrice: stopPrice,
-        status: status ?? this.status,
-        filledQuantity: filledQuantity ?? this.filledQuantity,
-        filledPrice: filledPrice ?? this.filledPrice,
-        filledAt: filledAt ?? this.filledAt,
-        createdAt: createdAt,
-        session: session ?? this.session,
-      );
+  }) => Order(
+    orderId: orderId,
+    userId: userId,
+    portfolioId: portfolioId,
+    assetSymbol: assetSymbol,
+    companyName: companyName,
+    side: side,
+    type: type,
+    quantity: quantity,
+    createdPrice: createdPrice,
+    limitPrice: limitPrice,
+    stopPrice: stopPrice,
+    status: status ?? this.status,
+    filledQuantity: filledQuantity ?? this.filledQuantity,
+    filledPrice: filledPrice ?? this.filledPrice,
+    filledAt: filledAt ?? this.filledAt,
+    createdAt: createdAt,
+    session: session ?? this.session,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -196,8 +195,8 @@ class Order {
 /// about weekends/holidays/early closes — all things a naive hour/minute
 /// check here used to get wrong.
 MarketSession currentMarketSession() {
-  final state = market_clock.resolveMarketClockState(market_clock.nowInNewYork());
-  switch (state.phase) {
+  final phase = market_clock.resolveMarketPhase(market_clock.nowInNewYork());
+  switch (phase) {
     case market_clock.MarketPhase.preMarket:
       return MarketSession.preMarket;
     case market_clock.MarketPhase.marketOpen:

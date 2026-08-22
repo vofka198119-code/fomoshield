@@ -77,7 +77,15 @@ double _varianceDragCompensation(double annualVolatility) =>
 /// below: MarketScenario.speculation has mapped to [sideways] since Block 5
 /// and nothing ever reached the old [speculation] row through
 /// [_toMacroRegime].
-enum _MacroRegime { sideways, volatility, bull, bear, crash, blackSwan, recovery }
+enum _MacroRegime {
+  sideways,
+  volatility,
+  bull,
+  bear,
+  crash,
+  blackSwan,
+  recovery,
+}
 
 /// Maps a [MarketScenario] to its [_MacroRegime] for matrix lookup.
 /// ── Block 5: hype/speculation are no longer global regimes ────

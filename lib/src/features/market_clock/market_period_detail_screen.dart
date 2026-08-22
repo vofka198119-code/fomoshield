@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../stress_test/stress_test_hub_screen.dart';
 import 'market_clock_engine.dart';
 
@@ -10,7 +11,8 @@ class MarketPeriodDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final window = findWindowById(windowId);
+    final l10n = AppLocalizations.of(context)!;
+    final window = findWindowById(l10n, windowId);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -18,7 +20,8 @@ class MarketPeriodDetailScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          window?.shortHeadline.toUpperCase() ?? 'PERIOD',
+          window?.shortHeadline.toUpperCase() ??
+              l10n.marketPeriodDetailFallbackTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -27,62 +30,81 @@ class MarketPeriodDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: window == null
-          ? const SizedBox()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(window.emoji, style: const TextStyle(fontSize: 28)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          window.fullTitle,
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: ThemeV2.textPrimary,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: window == null
+            ? const SizedBox()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          window.emoji,
+                          style: const TextStyle(fontSize: 28),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            window.fullTitle,
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: ThemeV2.textPrimary,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      window.timeRangeLabel,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: ThemeV2.primary,
                       ),
+                    ),
+                    const SizedBox(height: 20),
+                    _Section(
+                      label: l10n.marketPeriodDetailWhatsHappeningLabel,
+                      body: window.whatHappens,
+                    ),
+                    _Section(
+                      label: l10n.marketPeriodDetailWhyDoesItMatterLabel,
+                      body: window.whyItMatters,
+                    ),
+                    if (window.dangerForBeginner != null)
+                      _Section(
+                        label: l10n.marketPeriodDetailWhatCanGoWrongLabel,
+                        body: window.dangerForBeginner!,
+                      ),
+                    _Section(
+                      label: l10n.marketPeriodDetailWhatShouldBeginnersDoLabel,
+                      body: window.whatToDo,
+                      isLast:
+                          window.stressTestPromoTitle == null &&
+                          window.fomoShieldTip == null,
+                    ),
+                    if (window.stressTestPromoTitle != null &&
+                        window.stressTestPromoBody != null) ...[
+                      _StressTestPromo(
+                        title: window.stressTestPromoTitle!,
+                        body: window.stressTestPromoBody!,
+                      ),
+                      const SizedBox(height: 18),
                     ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    window.timeRangeLabel,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeV2.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  _Section(label: 'What\'s Happening?', body: window.whatHappens),
-                  _Section(label: 'Why Does It Matter?', body: window.whyItMatters),
-                  if (window.dangerForBeginner != null)
-                    _Section(label: 'What Can Go Wrong?', body: window.dangerForBeginner!),
-                  _Section(
-                    label: 'What Should Beginners Do?',
-                    body: window.whatToDo,
-                    isLast: window.stressTestPromoTitle == null &&
-                        window.fomoShieldTip == null,
-                  ),
-                  if (window.stressTestPromoTitle != null &&
-                      window.stressTestPromoBody != null) ...[
-                    _StressTestPromo(
-                      title: window.stressTestPromoTitle!,
-                      body: window.stressTestPromoBody!,
-                    ),
-                    const SizedBox(height: 18),
+                    if (window.fomoShieldTip != null)
+                      _TipCallout(body: window.fomoShieldTip!),
                   ],
-                  if (window.fomoShieldTip != null)
-                    _TipCallout(body: window.fomoShieldTip!),
-                ],
+                ),
               ),
-            ),
+      ),
     );
   }
 }
@@ -91,7 +113,11 @@ class _Section extends StatelessWidget {
   final String label;
   final String body;
   final bool isLast;
-  const _Section({required this.label, required this.body, this.isLast = false});
+  const _Section({
+    required this.label,
+    required this.body,
+    this.isLast = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +138,11 @@ class _Section extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             body,
-            style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textPrimary, height: 1.5),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textPrimary,
+              height: 1.5,
+            ),
           ),
         ],
       ),
@@ -130,6 +160,7 @@ class _StressTestPromo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -160,7 +191,11 @@ class _StressTestPromo extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             body,
-            style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary, height: 1.5),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textSecondary,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 14),
           SizedBox(
@@ -178,8 +213,11 @@ class _StressTestPromo extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Open Stress Test',
-                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
+                l10n.marketPeriodDetailOpenStressTestButton,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
@@ -198,6 +236,7 @@ class _TipCallout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -214,7 +253,7 @@ class _TipCallout extends StatelessWidget {
               const Text('💡', style: TextStyle(fontSize: 16)),
               const SizedBox(width: 8),
               Text(
-                'F.O.M.O. SHIELD TIP',
+                l10n.marketPeriodDetailFomoShieldTipLabel,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -227,7 +266,11 @@ class _TipCallout extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             body,
-            style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textPrimary, height: 1.5),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textPrimary,
+              height: 1.5,
+            ),
           ),
         ],
       ),

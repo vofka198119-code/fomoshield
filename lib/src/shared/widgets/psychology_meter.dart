@@ -14,14 +14,19 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
-import 'package:intl/intl.dart' hide TextDirection;
 import '../../features/stress_test/stress_test_models.dart';
 import '../../features/stress_test/psychology_engine.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
+import '../utils/currency_format.dart';
 
 /// Data for the Psychology Meter.
 class PsychologyMeterData {
-  final double fsScore; // 0-100 composite
+  final double fsScore; // 0-100, now equal to psychologicalScore — kept
+  // as the field name every existing ring/label reads, see
+  // psychologicalScore's doc for why the underlying formula changed.
+  final double psychologicalScore; // 0-100, Discipline/Panic/Patience only
+  final double strategicScore; // 0-100, portfolio-construction signals only
   final double panicResistance; // 0.0-1.0
   final double discipline; // 0.0-1.0
   final double patience; // 0.0-1.0
@@ -52,6 +57,8 @@ class PsychologyMeterData {
 
   const PsychologyMeterData({
     required this.fsScore,
+    required this.psychologicalScore,
+    required this.strategicScore,
     required this.panicResistance,
     required this.discipline,
     required this.patience,
@@ -74,8 +81,16 @@ class PsychologyMeterData {
   });
 
   factory PsychologyMeterData.fromProfile(TraderPsychologyProfile profile) {
+    final psychScore = (profile.psychologicalScore() * 100)
+        .round()
+        .clamp(0, 100)
+        .toDouble();
     return PsychologyMeterData(
-      fsScore: (profile.compositeScore(0) * 100).round().clamp(0, 100).toDouble(),
+      fsScore: psychScore,
+      psychologicalScore: psychScore,
+      // No holdings available in this factory (profile-only, unused by any
+      // current call site) — strategyAdherence is the closest approximation.
+      strategicScore: (profile.strategyAdherence * 100).clamp(0, 100),
       panicResistance: profile.panicResistance,
       discipline: profile.discipline,
       patience: profile.patience,
@@ -112,12 +127,32 @@ class PsychologyMeterData {
     }
 
     final safetyMarker = safetyMarkerFor(session.holdings).score;
+    final strategySubScores = computeStrategySubScores(
+      holdings: session.holdings,
+      cash: session.cash,
+    );
+    final psychScore = (profile.psychologicalScore() * 100)
+        .round()
+        .clamp(0, 100)
+        .toDouble();
+    final stratScore =
+        (computeStrategicScore(
+                  diversification: strategySubScores.diversification,
+                  sector: strategySubScores.sector,
+                  concentration: strategySubScores.concentration,
+                  etf: strategySubScores.etf,
+                  cashBuffer: strategySubScores.cashBuffer,
+                  safetyMarker: safetyMarker,
+                ) *
+                100)
+            .round()
+            .clamp(0, 100)
+            .toDouble();
 
     return PsychologyMeterData(
-      fsScore: (profile.compositeScore(safetyMarker) * 100)
-          .round()
-          .clamp(0, 100)
-          .toDouble(),
+      fsScore: psychScore,
+      psychologicalScore: psychScore,
+      strategicScore: stratScore,
       panicResistance: profile.panicResistance,
       discipline: profile.discipline,
       patience: profile.patience,
@@ -183,7 +218,10 @@ class PsychologyMeter extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text('PSYCHOLOGY METER', style: FomoShieldTheme.cardTitle()),
+                  Text(
+                    AppLocalizations.of(context)!.stressTestPsychologyMeterTitle,
+                    style: FomoShieldTheme.cardTitle(),
+                  ),
                   const SizedBox(width: 6),
                   GestureDetector(
                     onTap: () => context.push('/metric-info/investor-score'),
@@ -253,27 +291,26 @@ class PsychologyAnalyticsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nf = NumberFormat('#,##0.00', 'en_US');
-
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _statRow('Total Trades', '${data.totalTrades}'),
-        _statRow('Trades Buy', '${data.buyTrades}'),
-        _statRow('Trades Sell', '${data.sellTrades}'),
-        _statRow('Holdings', '${data.holdingCount}'),
+        _statRow(l10n.stressTestAnalyticsTotalTrades, '${data.totalTrades}'),
+        _statRow(l10n.stressTestAnalyticsTradesBuy, '${data.buyTrades}'),
+        _statRow(l10n.stressTestAnalyticsTradesSell, '${data.sellTrades}'),
+        _statRow(l10n.stressTestWidgetHoldings, '${data.holdingCount}'),
         _statRow('ETF', '${data.etfCount}'),
-        _statRow('Epochs', '${data.epochsPassed}'),
+        _statRow(l10n.stressTestWidgetEpochs, '${data.epochsPassed}'),
         _statRow(
-          'Unrealized P&L',
-          '\$${nf.format(data.unrealizedPnl)}',
+          l10n.stressTestAnalyticsUnrealizedPnl,
+          formatUsdSigned(data.unrealizedPnl),
           valueColor: data.unrealizedPnl >= 0
               ? FomoShieldTheme.positive
               : FomoShieldTheme.negative,
         ),
         _statRow(
-          'Realized P&L',
-          '\$${nf.format(data.realizedPnl)}',
+          l10n.stressTestAnalyticsRealizedPnl,
+          formatUsdSigned(data.realizedPnl),
           valueColor: data.realizedPnl >= 0
               ? FomoShieldTheme.positive
               : FomoShieldTheme.negative,
@@ -323,25 +360,25 @@ class _PsychologyMeterBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ring shows the average of the two 2026-08-16-split scores — this
+    // compact card is a quick glance, not the place for a per-signal
+    // breakdown (that's what the Psychology Meter detail screen's own
+    // Strategy Score / Psychology Score circles + Discipline/Panic/
+    // Patience/Strategy/Diversification cards are for).
+    final avgScore = (data.psychologicalScore + data.strategicScore) / 2;
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
-        FsScoreRing(score: data.fsScore),
+        FsScoreRing(score: avgScore),
         const SizedBox(height: 20),
         _SubIndexRow(
-          label: 'Panic',
-          value: data.panicResistance,
+          label: l10n.stressTestStrategyScore,
+          value: data.strategicScore / 100,
         ),
         _SubIndexRow(
-          label: 'Discipline',
-          value: data.discipline,
-        ),
-        _SubIndexRow(
-          label: 'Patience',
-          value: data.patience,
-        ),
-        _SubIndexRow(
-          label: 'Strategy',
-          value: data.strategyAdherence,
+          label: l10n.stressTestPsychologyScore,
+          value: data.psychologicalScore / 100,
           isLast: true,
         ),
       ],
@@ -385,9 +422,7 @@ class FsScoreRing extends StatelessWidget {
         final sideBottomExtent = radius * _sideSin + _outerPad;
         final centerY = topExtent + 8;
         final height =
-            centerY +
-            math.max(sideBottomExtent, _pillTopGap + _pillHeight) +
-            8;
+            centerY + math.max(sideBottomExtent, _pillTopGap + _pillHeight) + 8;
         final center = Offset(width / 2, centerY);
 
         return SizedBox(
@@ -434,7 +469,7 @@ class FsScoreRing extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'SCORE',
+                          AppLocalizations.of(context)!.stressTestScoreLabel,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
                             fontSize: 10,
@@ -675,7 +710,7 @@ class _SubIndexRow extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 76,
+            width: 112,
             child: Text(
               label,
               maxLines: 1,
@@ -950,7 +985,7 @@ class _AuditSheetContent extends StatelessWidget {
                 icon: Icons.psychology_outlined,
                 iconColor: _fsScoreColor(fsScore),
                 title: 'Live Action Audit',
-                subtitle: 'FS Score: ${fsScore.round()}/100',
+                subtitle: 'Psychology Score: ${fsScore.round()}/100',
               ),
               const SizedBox(height: 20),
 
@@ -1133,4 +1168,3 @@ class _AuditSheetContent extends StatelessWidget {
 void showPsychologyAudit(BuildContext context, PsychologyMeterData data) {
   _showAuditSheet(context, data);
 }
-

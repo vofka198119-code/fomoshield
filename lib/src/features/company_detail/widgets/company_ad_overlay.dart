@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 // ===========================================================================
 // Simulated 3‑second ad overlay for company detail watch‑to‑continue flow
@@ -45,6 +46,7 @@ class _CompanyAdOverlayState extends State<CompanyAdOverlay>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
@@ -65,7 +67,7 @@ class _CompanyAdOverlayState extends State<CompanyAdOverlay>
               ),
               const SizedBox(height: 24),
               Text(
-                'Sponsored Ad',
+                l10n.companyDetailAdTitle,
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -74,8 +76,11 @@ class _CompanyAdOverlayState extends State<CompanyAdOverlay>
               ),
               const SizedBox(height: 8),
               Text(
-                'Continuing in a moment…',
-                style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+                l10n.companyDetailAdContinuing,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: ThemeV2.textSecondary,
+                ),
               ),
               const SizedBox(height: 24),
               AnimatedBuilder(

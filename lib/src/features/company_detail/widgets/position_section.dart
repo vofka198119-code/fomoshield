@@ -4,8 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 import '../../portfolio/portfolio_providers.dart';
 
 // ===========================================================================
@@ -63,6 +65,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.watch(portfoliosProvider);
 
     // Cost basis is pure transaction math (no live price involved), so this
@@ -94,18 +97,14 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
-          borderRadius: FomoShieldTheme.cardRadius,
-        ),
+        decoration: darkCardDecoration(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('MY INVESTMENTS', style: FomoShieldTheme.cardTitle(Colors.white)),
+            Text(
+              l10n.companyDetailPositionTitle,
+              style: FomoShieldTheme.cardTitle(Colors.white),
+            ),
             const SizedBox(height: 10),
             Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
             if (positions.length > 1) ...[
@@ -124,7 +123,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
                       ),
                     ),
                   ),
-                  if (safeIndex > 0) _premiumBadge(),
+                  if (safeIndex > 0) _premiumBadge(l10n),
                 ],
               ),
             ],
@@ -142,7 +141,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
                   child: IndexedStack(
                     index: 0,
                     children: [
-                      for (final pos in positions) _positionBlock(pos),
+                      for (final pos in positions) _positionBlock(l10n, pos),
                     ],
                   ),
                 ),
@@ -153,7 +152,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
                     onPageChanged: (i) => setState(() => _index = i),
                     itemBuilder: (context, i) => Align(
                       alignment: Alignment.topCenter,
-                      child: _positionBlock(positions[i]),
+                      child: _positionBlock(l10n, positions[i]),
                     ),
                   ),
                 ),
@@ -173,7 +172,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
     );
   }
 
-  Widget _positionBlock(_PortfolioPosition pos) {
+  Widget _positionBlock(AppLocalizations l10n, _PortfolioPosition pos) {
     final pnl = pos.totalValue - pos.totalCost;
     final pnlPercent = pos.totalCost > 0 ? (pnl / pos.totalCost) * 100 : 0.0;
     final isUp = pnl >= 0;
@@ -182,13 +181,29 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _row('Asset Value', pos.hasPosition ? '\$${pos.totalValue.toStringAsFixed(2)}' : '—'),
+        _row(
+          l10n.companyDetailAssetValueLabel,
+          pos.hasPosition ? formatUsd(pos.totalValue) : '—',
+        ),
         const SizedBox(height: 8),
-        _row('Shares', pos.hasPosition ? pos.shares.toStringAsFixed(4) : '—'),
+        _row(
+          l10n.companyDetailSharesLabel,
+          pos.hasPosition ? pos.shares.toStringAsFixed(4) : '—',
+        ),
         const SizedBox(height: 8),
-        _pnlRow(pos, pnl: pnl, pnlPercent: pnlPercent, isUp: isUp, pnlColor: pnlColor),
+        _pnlRow(
+          l10n,
+          pos,
+          pnl: pnl,
+          pnlPercent: pnlPercent,
+          isUp: isUp,
+          pnlColor: pnlColor,
+        ),
         const SizedBox(height: 8),
-        _row('Avg Cost', pos.hasPosition ? '\$${pos.avgCost.toStringAsFixed(2)}' : '—'),
+        _row(
+          l10n.companyDetailAvgCostLabel,
+          pos.hasPosition ? formatUsd(pos.avgCost) : '—',
+        ),
       ],
     );
   }
@@ -221,6 +236,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
   );
 
   Widget _pnlRow(
+    AppLocalizations l10n,
     _PortfolioPosition pos, {
     required double pnl,
     required double pnlPercent,
@@ -230,7 +246,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Text(
-        'Unrealized P&L',
+        l10n.stressTestAnalyticsUnrealizedPnl,
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,
@@ -257,7 +273,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             ),
             const SizedBox(width: 4),
             Text(
-              '${isUp ? '+' : ''}${pnl.toStringAsFixed(2)} (${pnlPercent.toStringAsFixed(2)}%)',
+              '${formatUsdSigned(pnl)} (${pnlPercent.toStringAsFixed(2)}%)',
               style: interNums(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -273,18 +289,21 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
   // gold outline instead of its usual dark-green fill — a filled chip in
   // the same dialLight/dialDark gradient would disappear into this card's
   // own background.
-  Widget _premiumBadge() {
+  Widget _premiumBadge(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         border: Border.all(color: dialBrassLight, width: 1),
         borderRadius: BorderRadius.circular(6),
         boxShadow: [
-          BoxShadow(color: dialBrassLight.withValues(alpha: 0.35), blurRadius: 4),
+          BoxShadow(
+            color: dialBrassLight.withValues(alpha: 0.35),
+            blurRadius: 4,
+          ),
         ],
       ),
       child: Text(
-        'PREMIUM',
+        l10n.profilePremiumBadge,
         style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w800,
@@ -312,7 +331,9 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             width: isActive ? 16 : 6,
             height: 6,
             decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.3),
+              color: isActive
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(3),
             ),
           ),

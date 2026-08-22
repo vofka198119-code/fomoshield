@@ -1,17 +1,52 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'firebase_options.dart';
 import 'src/core/cache/sector_providers.dart';
+import 'src/core/localization/language_provider.dart';
+import 'src/core/overlay/app_overlay_host.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
 import 'src/features/orders/pending_orders_checker.dart';
 import 'src/features/update/update_dialog.dart';
+import 'src/l10n/gen/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Edge-to-edge with a fully transparent system nav bar — no solid plate
+  // behind the 3-button/gesture bar, regardless of the device's system
+  // light/dark setting (the app itself is always light-themed).
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Only report real crashes from release builds — debug-time hot-reload
+  // exceptions and dev-machine noise would otherwise flood Crashlytics.
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+    !kDebugMode,
+  );
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
 
   // Load .env — optional so the app doesn't crash if the file is missing
   await dotenv.load(fileName: '.env', isOptional: true);
@@ -32,11 +67,14 @@ void main() async {
     publishableKey: SupabaseConfig.anonKey,
   );
 
-  // Must be called exactly once, before any other GoogleSignIn method.
-  await GoogleSignIn.instance.initialize(
-    clientId: SupabaseConfig.googleIosClientId,
-    serverClientId: SupabaseConfig.googleWebClientId,
-  );
+  // GoogleSignIn.instance.initialize() moved off this blocking path
+  // (2026-08-14) — it isn't needed until the user actually taps "Continue
+  // with Google" on the Auth screen, and typically takes noticeably longer
+  // than the other steps here (Play Services round-trip), so leaving it
+  // here was adding real time to the black screen between tapping the app
+  // icon and Flutter's first frame. Kicked off instead from SplashScreen's
+  // own bootstrap, in parallel with its 7s minimum display timer — see
+  // splash_screen.dart's initGoogleSignIn().
 
   // Hydrate the stress-test engine's synchronous GICS-sector cache from
   // disk before the UI (and any resumed simulation ticks) can run — see
@@ -47,10 +85,7 @@ void main() async {
   await container.read(sectorRepositoryProvider).hydrateLiveCache();
 
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const ScanCoApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const ScanCoApp()),
   );
 }
 
@@ -88,10 +123,21 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
 
   @override
   Widget build(BuildContext context) {
+    final languageOverride = ref.watch(languageProvider);
     return MaterialApp.router(
       title: 'F.O.M.O. Shield',
       debugShowCheckedModeBanner: false,
       theme: ThemeV2.lightTheme,
+      // null follows the device's system locale; a non-null value is the
+      // user's explicit Profile → Language override (language_provider.dart).
+      locale: languageOverride,
+      supportedLocales: const [Locale('en'), Locale('ru')],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: AppRouter.router,
       builder: (context, child) {
         return Container(
@@ -104,7 +150,7 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
                   scaffoldBackgroundColor: Colors.transparent,
                   canvasColor: Colors.transparent,
                 ),
-                child: child ?? const SizedBox.shrink(),
+                child: AppOverlayHost(child: child ?? const SizedBox.shrink()),
               ),
             ),
           ),

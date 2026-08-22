@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../shared/services/finnhub_service.dart';
 
 // ---------------------------------------------------------------------------
 // Document Versions Model
@@ -28,11 +29,11 @@ class DocumentVersions {
   }
 
   Map<String, dynamic> toJson() => {
-        'disclaimer_version': disclaimerVersion,
-        'privacy_policy_version': privacyPolicyVersion,
-        'terms_version': termsVersion,
-        'updated_at': updatedAt,
-      };
+    'disclaimer_version': disclaimerVersion,
+    'privacy_policy_version': privacyPolicyVersion,
+    'terms_version': termsVersion,
+    'updated_at': updatedAt,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -40,17 +41,20 @@ class DocumentVersions {
 // ---------------------------------------------------------------------------
 
 final remoteVersionsProvider = FutureProvider<DocumentVersions>((ref) async {
-  // Simulate network delay
-  await Future.delayed(const Duration(milliseconds: 500));
-
-  // In production, replace with actual HTTP call to your backend
-  // e.g. final response = await dio.get('https://api.fomoshield.com/config/versions');
-  return const DocumentVersions(
-    disclaimerVersion: '1.0',
-    privacyPolicyVersion: '1.0',
-    termsVersion: '1.0',
-    updatedAt: '2026-06-21',
-  );
+  try {
+    final data = await FinnhubService().documentVersions();
+    return DocumentVersions.fromJson(data);
+  } catch (_) {
+    // Backend unreachable — degrade to "nothing changed" rather than
+    // blocking the splash/disclaimer flow on a network hiccup. A real
+    // version bump will still be picked up on the next successful check.
+    return const DocumentVersions(
+      disclaimerVersion: '1.0',
+      privacyPolicyVersion: '1.0',
+      termsVersion: '1.0',
+      updatedAt: '2026-08-15',
+    );
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -83,8 +87,14 @@ class AcceptedVersionsNotifier extends StateNotifier<DocumentVersions?> {
 
   Future<void> accept(DocumentVersions versions) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('${_prefix}disclaimer_version', versions.disclaimerVersion);
-    await prefs.setString('${_prefix}privacy_policy_version', versions.privacyPolicyVersion);
+    await prefs.setString(
+      '${_prefix}disclaimer_version',
+      versions.disclaimerVersion,
+    );
+    await prefs.setString(
+      '${_prefix}privacy_policy_version',
+      versions.privacyPolicyVersion,
+    );
     await prefs.setString('${_prefix}terms_version', versions.termsVersion);
     await prefs.setString('${_prefix}updated_at', versions.updatedAt);
     state = versions;
@@ -102,8 +112,8 @@ class AcceptedVersionsNotifier extends StateNotifier<DocumentVersions?> {
 
 final acceptedVersionsProvider =
     StateNotifierProvider<AcceptedVersionsNotifier, DocumentVersions?>((ref) {
-  return AcceptedVersionsNotifier();
-});
+      return AcceptedVersionsNotifier();
+    });
 
 // ---------------------------------------------------------------------------
 // Versions Match Check (for disclaimer screen — uses StateNotifier)

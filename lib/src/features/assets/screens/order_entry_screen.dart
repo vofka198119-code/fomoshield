@@ -15,9 +15,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/cache/sector_providers.dart';
+import '../../../core/models/app_notification.dart';
+import '../../../core/notifications/notification_providers.dart';
+import '../../../core/overlay/app_notification_popup.dart';
+import '../../../core/supabase/supabase_providers.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/guardian/guardian_engine.dart';
 import '../../../shared/guardian/guardian_providers.dart';
+import '../../../shared/utils/currency_format.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_pending_orders_provider.dart';
@@ -26,9 +32,9 @@ import '../../portfolio/screens/order_entry/order_amount_section.dart';
 import '../../portfolio/screens/order_entry/order_config_section.dart';
 import '../../portfolio/screens/order_entry/order_bottom_button.dart';
 import '../../portfolio/screens/order_entry/amount_keypad.dart';
-import '../../portfolio/screens/order_entry/trade_confirmation_toast.dart';
 
 enum _OrderType { market, limit }
+
 enum _ActiveKeypad { none, amount, limitPrice }
 
 class OrderEntryScreen extends ConsumerStatefulWidget {
@@ -77,6 +83,11 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     return ref.read(stressTestProvider.notifier).getSession(widget.sessionId);
   }
 
+  String? _stressTestLabel() {
+    final duration = _session?.duration.displayName;
+    return duration == null ? null : 'Stress Test — $duration';
+  }
+
   StressTestHolding? _findHolding(StressTestSession session) {
     try {
       return session.holdings.firstWhere((h) => h.symbol == widget.symbol);
@@ -112,14 +123,12 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         widget.price;
   }
 
-  String get _infoText {
+  String _infoText(AppLocalizations l10n) {
     switch (_selectedOrderType) {
       case _OrderType.market:
-        return 'Market orders execute at the best available simulated price. '
-            'Execution is guaranteed, but the final price may differ from expectations.';
+        return l10n.stressTestOrderInfoMarket;
       case _OrderType.limit:
-        return 'Limit orders execute only once the simulated price reaches your '
-            'chosen price or better. Execution is not guaranteed.';
+        return l10n.stressTestOrderInfoLimit;
     }
   }
 
@@ -153,11 +162,12 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
   }
 
   void _submitOrder() {
+    final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter an amount')));
+      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryEnterAmount)));
       return;
     }
 
@@ -176,7 +186,20 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     if (shares <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Invalid quantity')));
+      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryInvalidQuantity)));
+      return;
+    }
+
+    // Frozen slot (#2/#3, lapsed Premium) — block both market AND limit
+    // orders here, before either path below fires.
+    if (isStressTestSlotFrozen(
+      ref.read(stressTestProvider),
+      widget.sessionId,
+      ref.read(subscriptionTierProvider),
+    )) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.tradesEngineSlotFrozen)));
       return;
     }
 
@@ -185,7 +208,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       limitPrice = double.tryParse(_limitPriceController.text);
       if (limitPrice == null || limitPrice <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enter a valid limit price')),
+          SnackBar(content: Text(l10n.orderEntryEnterValidLimitPrice)),
         );
         return;
       }
@@ -200,8 +223,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Not enough available cash — \$${_availableCash.toStringAsFixed(2)} '
-              'free (some is reserved for pending orders)',
+              l10n.orderEntryNotEnoughCash(formatUsd(_availableCash)),
             ),
           ),
         );
@@ -211,7 +233,9 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
 
     if (_selectedOrderType == _OrderType.limit) {
       final confirmedLimitPrice = limitPrice!;
-      ref.read(stressTestPendingOrdersProvider.notifier).placeLimitOrder(
+      ref
+          .read(stressTestPendingOrdersProvider.notifier)
+          .placeLimitOrder(
             sessionId: widget.sessionId,
             symbol: widget.symbol,
             isBuy: _isBuy,
@@ -219,15 +243,25 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
             limitPrice: confirmedLimitPrice,
           );
 
-      showTradeConfirmationToast(
-        context,
-        title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
-        subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-            'at \$${confirmedLimitPrice.toStringAsFixed(2)} — Pending',
-        icon: Icons.schedule_rounded,
-        accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
+      pushAppNotification(
+        ref.read(notificationsProvider.notifier),
+        AppNotification(
+          id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+          type: AppNotificationType.limitOrderPlaced,
+          portfolioKind: NotificationPortfolioKind.stressTest,
+          portfolioId: widget.sessionId,
+          portfolioLabel: _stressTestLabel(),
+          symbol: widget.symbol,
+          companyName: widget.companyName,
+          logoUrl: widget.logo,
+          title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
+          detail:
+              '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
+              'at ${formatUsd(confirmedLimitPrice)} — Pending',
+          createdAt: DateTime.now(),
+        ),
       );
-      Navigator.of(context).pop();
+      _resetForm();
       return;
     }
 
@@ -239,6 +273,8 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           _isBuy,
           shares,
           useShares: true,
+          l10n: AppLocalizations.of(context)!,
+          tier: ref.read(subscriptionTierProvider),
         );
 
     if (!result.success) {
@@ -263,25 +299,51 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       );
     });
 
-    showTradeConfirmationToast(
-      context,
-      title: _isBuy ? 'You Bought' : 'You Sold',
-      subtitle: '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-          'at \$${_currentPrice.toStringAsFixed(2)}',
-      icon: Icons.check_circle_rounded,
-      accentColor: _isBuy ? ThemeV2.success : ThemeV2.loss,
+    pushAppNotification(
+      ref.read(notificationsProvider.notifier),
+      AppNotification(
+        id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+        type: _isBuy ? AppNotificationType.buy : AppNotificationType.sell,
+        portfolioKind: NotificationPortfolioKind.stressTest,
+        portfolioId: widget.sessionId,
+        portfolioLabel: _stressTestLabel(),
+        symbol: widget.symbol,
+        companyName: widget.companyName,
+        logoUrl: widget.logo,
+        title: _isBuy ? 'You Bought' : 'You Sold',
+        detail:
+            '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
+            'at ${formatUsd(_currentPrice)}',
+        createdAt: DateTime.now(),
+      ),
     );
-    Navigator.of(context).pop();
+    _resetForm();
+  }
+
+  // After a successful order we now stay on this Buy/Sell card (see
+  // _submitOrder) instead of popping back to Company Detail — popping
+  // used to race the notification popup's entrance animation and made it
+  // look like the popup was glitching onto the card underneath.
+  void _resetForm() {
+    setState(() {
+      _amountController.clear();
+      _sliderValue = 0;
+      _activeKeypad = _ActiveKeypad.none;
+      if (_selectedOrderType == _OrderType.limit) {
+        _limitPriceController.text = _currentPrice.toStringAsFixed(2);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = _session;
     if (session == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: Text('Session not found')),
+        body: Center(child: Text(l10n.stressTestSessionNotFound)),
       );
     }
 
@@ -332,7 +394,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                         _limitPriceController.clear();
                         _activeKeypad = _ActiveKeypad.limitPrice;
                       }),
-                      infoText: _infoText,
+                      infoText: _infoText(l10n),
                       // No Extended Hours — simulated market is always open.
                     ),
                   ],

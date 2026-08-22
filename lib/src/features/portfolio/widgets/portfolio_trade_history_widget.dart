@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/trade_history_tile.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../portfolio_providers.dart';
 
 // ---------------------------------------------------------------------------
@@ -35,10 +36,11 @@ class PortfolioTradeHistoryWidget extends ConsumerWidget {
     final displayTx = allTx.take(5).toList();
     final hasMore = allTx.length > 5;
 
+    final l10n = AppLocalizations.of(context)!;
     return WidgetContainer(
-      title: 'TRADE HISTORY',
+      title: l10n.tradeHistoryTitle,
       showFooter: hasMore,
-      footerText: 'More (${allTx.length - 5})',
+      footerText: l10n.commonMoreCount(allTx.length - 5),
       onTap: hasMore
           ? () => context.push('/portfolio/$portfolioId/trade-history')
           : null,
@@ -47,7 +49,9 @@ class PortfolioTradeHistoryWidget extends ConsumerWidget {
             (tx) => TradeHistoryTile(
               symbol: tx.symbol,
               companyName:
-                  ref.watch(resolvedCompanyNameProvider(tx.symbol)).valueOrNull ??
+                  ref
+                      .watch(resolvedCompanyNameProvider(tx.symbol))
+                      .valueOrNull ??
                   tx.symbol,
               isBuy: tx.type == TransactionType.buy,
               totalValue: tx.shares * tx.price,

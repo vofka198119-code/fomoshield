@@ -8,7 +8,6 @@
 //   Card 4 – Corporate events (ex-div dates, dividends, popup)
 //   Card 5 – Trade history (last 10, reversed)
 //   Timer card at bottom
-//   Analytics card → navigates to full analytics screen
 //   Disclaimer footer
 // ---------------------------------------------------------------------------
 
@@ -22,7 +21,9 @@ import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/company_logo.dart';
+import '../../shared/utils/currency_format.dart';
 
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/widgets/donut_ring_painter.dart';
@@ -34,6 +35,7 @@ import '../../shared/widgets/psychology_meter.dart';
 import '../../shared/widgets/market_timeline.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
+import 'stress_test_dca_provider.dart';
 import 'widgets/market_value_chart.dart';
 import 'stress_test_widget_order_provider.dart';
 import 'widgets/stress_test_allocation_chart.dart';
@@ -82,24 +84,44 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         ref.read(stressTestProvider.notifier).refreshPrices(widget.sessionId);
       }
     });
-    // Check open counter for ad (every 6th opening for free users past 1st test)
+    // Check open counter for ad (every 6th opening for free users past 1st
+    // test) — a frozen (#2/#3) slot uses its own separate counter instead,
+    // at the same cadence, so viewing a frozen test doesn't also burn
+    // through the general "opened any test" counter.
     Future.microtask(() {
       if (!mounted) return;
       final tier = ref.read(subscriptionTierProvider);
-      if (tier == SubscriptionTier.free) {
-        final showAd = ref
-            .read(stressTestProvider.notifier)
-            .checkAndIncrementOpenCounter();
-        if (showAd) {
-          showPremiumPromoOverlay(
-            context: context,
-            title: 'Stress test access',
-            durationSeconds: 5,
-            onComplete: () {
-              if (context.mounted) showMonetizationModal(context, ref);
-            },
-          );
-        }
+      if (tier != SubscriptionTier.free) return;
+      final notifier = ref.read(stressTestProvider.notifier);
+      final isFrozen = isStressTestSlotFrozen(
+        ref.read(stressTestProvider),
+        widget.sessionId,
+        tier,
+      );
+      final showAd = isFrozen
+          ? notifier.checkAndIncrementFrozenViewCounter()
+          : notifier.checkAndIncrementOpenCounter();
+      if (showAd) {
+        showPremiumPromoOverlay(
+          context: context,
+          title: AppLocalizations.of(context)!.stressTestAccessTitle,
+          durationSeconds: 5,
+          onComplete: () {
+            if (context.mounted) showMonetizationModal(context, ref);
+          },
+        );
+      }
+    });
+    // DCA weekly catch-up — independent of the free-tier-only ad check
+    // above (checkStressTestDcaPayout itself gates on premium/admin, so a
+    // free-tier viewer here is simply a no-op, matching the freeze logic).
+    Future.microtask(() {
+      if (!mounted) return;
+      final session = ref
+          .read(stressTestProvider.notifier)
+          .getSession(widget.sessionId);
+      if (session != null) {
+        checkStressTestDcaPayout(ref, session, AppLocalizations.of(context)!);
       }
     });
     _timer = Timer.periodic(const Duration(seconds: 20), (_) {
@@ -180,6 +202,35 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
   }
 
+  /// Full-width tap-through bar styled like a search field — duplicates
+  /// the Holdings widget's "+" mechanic (same _openAddAssetSheet target),
+  /// just more discoverable for first-time users than the small icon.
+  Widget _buildQuickAddSearchBar() {
+    final l10n = AppLocalizations.of(context)!;
+    return GestureDetector(
+      onTap: _openAddAssetSheet,
+      child: Container(
+        width: double.infinity,
+        decoration: FomoShieldTheme.cardDecoration,
+        clipBehavior: Clip.antiAlias,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        child: Row(
+          children: [
+            Icon(Icons.search_rounded, color: ThemeV2.textSecondary, size: 20),
+            const SizedBox(width: 10),
+            Text(
+              l10n.stressTestSearchStocksHint,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showVerdict() {
     _showDisclaimerModal().then((accepted) {
       if (accepted == true && mounted) {
@@ -236,6 +287,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       },
     );
     final session = ref.watch(stressTestSessionProvider(widget.sessionId));
+    final l10n = AppLocalizations.of(context)!;
     if (session == null) {
       return Scaffold(
         backgroundColor: Colors.transparent,
@@ -244,7 +296,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           toolbarHeight: 64,
           centerTitle: true,
           title: Text(
-            'STRESS TEST PORTFOLIO',
+            l10n.stressTestPortfolioTitle,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -253,7 +305,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             ),
           ),
         ),
-        body: const Center(child: Text('Session not found')),
+        body: Center(child: Text(l10n.stressTestSessionNotFound)),
       );
     }
 
@@ -267,7 +319,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         toolbarHeight: 64,
         centerTitle: true,
         title: Text(
-          'STRESS TEST PORTFOLIO',
+          l10n.stressTestPortfolioTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -285,19 +337,26 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         ),
         actions: [],
       ),
-      body: isCompleted
-          ? _buildCompletedView(session)
-          : isActive
-          ? (session.holdings.isEmpty && session.trades.isEmpty
-                ? _buildActiveEmptyView()
-                : _buildActiveView(session))
-          : _buildSetupView(session),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: isCompleted
+            ? _buildCompletedView(session)
+            : isActive
+            ? (session.holdings.isEmpty && session.trades.isEmpty
+                  ? _buildActiveEmptyView()
+                  : _buildActiveView(session))
+            : _buildSetupView(session),
+      ),
     );
   }
 
   // ── Setup View ───────────────────────────────────────────────────
 
   Widget _buildSetupView(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -309,7 +368,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Test not started yet',
+            l10n.stressTestNotStartedYet,
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -318,7 +377,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Go back to setup and start the test',
+            l10n.stressTestGoBackToSetup,
             style: GoogleFonts.inter(
               fontSize: 14,
               color: ThemeV2.textSecondary,
@@ -328,7 +387,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ElevatedButton(
             onPressed: () =>
                 context.push('/stress-test/${widget.sessionId}/setup'),
-            child: const Text('Go to Setup'),
+            child: Text(l10n.stressTestGoToSetup),
           ),
         ],
       ),
@@ -338,6 +397,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // ── Startup Empty View — shown when no trades have been made yet ──
 
   Widget _buildActiveEmptyView() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -362,7 +422,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Start Building Your Portfolio',
+              l10n.stressTestStartBuildingPortfolio,
               style: GoogleFonts.inter(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -372,7 +432,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Tap the + button to search stocks\nand add your first position.',
+              l10n.stressTestTapToAddFirstPosition,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -410,106 +470,129 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   }
 
   Widget _buildActiveView(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     final isExpired = _isExpired(session);
     final widgetConfigs = ref.watch(
       stressTestWidgetOrderProvider(widget.sessionId),
     );
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
 
-    return RefreshIndicator(
-      color: ThemeV2.primary,
-      backgroundColor: ThemeV2.surface,
-      onRefresh: () async {
-        ref.read(stressTestProvider.notifier).refreshPrices(widget.sessionId);
-        ref.read(stressTestRefreshProvider.notifier).state++;
-        await Future.delayed(const Duration(milliseconds: 500));
-      },
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Verdict / Exit button ──────────────────────────
-            // Always at top when applicable, not reorderable.
-            if (isExpired)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _showVerdict,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeV2.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+    return Column(
+      children: [
+        // ── Quick-add search bar — pinned under the AppBar (not part of
+        // the scrollable body) so it stays reachable while swiping through
+        // widgets below. Duplicates the Holdings widget's "+" mechanic
+        // (_openAddAssetSheet) as a full-width, always visible tap target
+        // so first-time users don't have to spot the small "+" inside the
+        // Holdings card header. ──
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          child: _buildQuickAddSearchBar(),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            color: ThemeV2.primary,
+            backgroundColor: ThemeV2.surface,
+            onRefresh: () async {
+              ref
+                  .read(stressTestProvider.notifier)
+                  .refreshPrices(widget.sessionId);
+              ref.read(stressTestRefreshProvider.notifier).state++;
+              await Future.delayed(const Duration(milliseconds: 500));
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Verdict / Exit button ──────────────────────────
+                  // Always at top when applicable, not reorderable.
+                  if (isExpired)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _showVerdict,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ThemeV2.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.stressTestGetVerdict,
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (isExpired) const SizedBox(height: 12),
+
+                  // ── Widgets (reorderable via gear icon; Portfolio Balance
+                  // pinned first, Timer pinned last — see
+                  // stress_test_widget_order_provider.dart) ──
+                  for (final cfg in visibleWidgets) ...[
+                    _buildWidgetById(cfg.id, session),
+                    const SizedBox(height: 12),
+                  ],
+
+                  const SizedBox(height: 4),
+
+                  // ── Add widgets button ───────────────────────────
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: _showWidgetSettingsSheet,
+                      icon: const Icon(
+                        Icons.add_rounded,
+                        color: ThemeV2.primary,
+                        size: 20,
+                      ),
+                      label: Text(
+                        l10n.homeAddWidgets,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: ThemeV2.primary,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: const BorderSide(
+                            color: ThemeV2.primary,
+                            width: 0.5,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  child: Text(
-                    'GET PSYCHOLOGIST VERDICT',
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 14,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
-              ),
-            if (isExpired) const SizedBox(height: 12),
+                  const SizedBox(height: 16),
 
-            // ── Widgets (reorderable via gear icon; Portfolio Balance
-            // pinned first, Timer pinned last — see
-            // stress_test_widget_order_provider.dart) ──
-            for (final cfg in visibleWidgets) ...[
-              _buildWidgetById(cfg.id, session),
-              const SizedBox(height: 12),
-            ],
-
-            const SizedBox(height: 4),
-
-            // ── Add widgets button ───────────────────────────
-            Center(
-              child: TextButton.icon(
-                onPressed: _showWidgetSettingsSheet,
-                icon: const Icon(
-                  Icons.add_rounded,
-                  color: ThemeV2.primary,
-                  size: 20,
-                ),
-                label: Text(
-                  'Add widgets',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.primary,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: ThemeV2.primary, width: 0.5),
-                  ),
-                ),
+                  // ── Disclaimer (always at bottom) ────────────────
+                  const DisclaimerFooter(),
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-
-            // ── Disclaimer (always at bottom) ────────────────
-            const DisclaimerFooter(),
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
   /// Dispatch method — builds a widget by its config id.
   /// Returns [SizedBox.shrink] if the widget's conditions aren't met.
   Widget _buildWidgetById(String id, StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     switch (id) {
       case 'allocation_chart':
         return StressTestAllocationChart(session: session);
@@ -555,7 +638,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         final allTrades = session.trades.reversed.toList();
         final displayTrades = allTrades.take(5).toList();
         return _buildSectionCard(
-          title: 'TRADE HISTORY',
+          title: l10n.tradeHistoryTitle,
           noInnerPadding: true,
           child: Column(
             children: [
@@ -594,7 +677,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        'More (${allTrades.length - 5})',
+                        l10n.commonMoreCount(allTrades.length - 5),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -694,20 +777,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
   }
 
-  /// Full number format with commas and fixed 2 decimals — e.g. $15,000.00
-  String _fmtFull(double v) {
-    final parts = v.toStringAsFixed(2).split('.');
-    final intStr = parts[0];
-    final buf = StringBuffer();
-    for (int i = 0; i < intStr.length; i++) {
-      if (i > 0 && (intStr.length - i) % 3 == 0) buf.write(',');
-      buf.write(intStr[i]);
-    }
-    buf.write('.');
-    buf.write(parts[1]);
-    return buf.toString();
-  }
-
   /// Reactive wrapper for _buildMyAssets — watches the provider
   /// and rebuilds when holdings change.
   Widget _buildMyAssetsSection() {
@@ -727,6 +796,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // Always wrapped in _buildSectionCard with a (+) add button in header.
 
   Widget _buildMyAssets(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     final holdings = session.holdings;
 
     // Sort same as allocation chart — by value descending
@@ -755,7 +825,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     final displayList = _showAllAssets ? sorted : sorted.take(10).toList();
 
     return _buildSectionCard(
-      title: 'HOLDINGS',
+      title: l10n.holdingsTitle,
       trailing: addButton,
       noInnerPadding: true,
       child: holdings.isEmpty
@@ -766,8 +836,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   children: [
                     Text(
                       session.trades.isEmpty
-                          ? 'No assets yet'
-                          : 'No active positions',
+                          ? l10n.stressTestNoAssetsYet
+                          : l10n.stressTestNoActivePositions,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -777,8 +847,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     const SizedBox(height: 4),
                     Text(
                       session.trades.isEmpty
-                          ? 'Tap + to search and add your first asset'
-                          : 'Tap (+) to buy assets',
+                          ? l10n.stressTestTapToAddFirstAsset
+                          : l10n.stressTestTapToBuyAssets,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: ThemeV2.textSecondary,
@@ -901,7 +971,9 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      '${h.shares.toStringAsFixed(2)} shares',
+                                      l10n.sharesCount(
+                                        h.shares.toStringAsFixed(2),
+                                      ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.inter(
@@ -921,7 +993,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                   FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      '\$${_fmtPosition(positionValue)}',
+                                      formatUsd(positionValue),
                                       style: interNums(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
@@ -933,7 +1005,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                                   FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      '${isPositive ? '+' : ''}\$${pnl.toStringAsFixed(2)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
+                                      '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
                                       style: interNums(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -967,8 +1039,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                       child: Center(
                         child: Text(
                           _showAllAssets
-                              ? 'Less'
-                              : 'More (${sorted.length - 10})',
+                              ? l10n.commonLess
+                              : l10n.commonMoreCount(sorted.length - 10),
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -983,16 +1055,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     );
   }
 
-  String _companyName(String symbol) => resolveStressTestCompanyName(ref, symbol);
-
-  String _fmtPosition(double v) {
-    return _fmtFull(v);
-  }
+  String _companyName(String symbol) =>
+      resolveStressTestCompanyName(ref, symbol);
 
   // ── Timer Bar — real-time countdown (ticks every second) ──────
 
   Widget _buildTimerBar(StressTestSession session) {
     if (session.startedAt == null) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
 
     final now = DateTime.now();
     final total = _getTestDuration(session);
@@ -1007,31 +1077,39 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     Color timerColor;
 
     if (isExpiredTimer) {
-      label = 'Test Complete';
-      timeText = '0d 00h 00m 00s';
+      label = l10n.stressTestTestComplete;
+      timeText = l10n.stressTestCountdown('0', '00', '00', '00');
       timerColor = ThemeV2.loss;
     } else if (isCountdown && remaining != null) {
-      label = 'Time Remaining';
+      label = l10n.stressTestTimeRemaining;
       timerColor = ThemeV2.textPrimary;
       final d = remaining.inDays;
       final h = remaining.inHours % 24;
       final m = remaining.inMinutes % 60;
       final s = remaining.inSeconds % 60;
-      timeText =
-          '${d}d ${h.toString().padLeft(2, '0')}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
+      timeText = l10n.stressTestCountdown(
+        '$d',
+        h.toString().padLeft(2, '0'),
+        m.toString().padLeft(2, '0'),
+        s.toString().padLeft(2, '0'),
+      );
       if (remaining.inDays < 1) timerColor = ThemeV2.warning;
       if (remaining.inHours < 1) timerColor = ThemeV2.loss;
     } else {
       // Infinite with no expiry — show elapsed
-      label = 'Elapsed Time';
+      label = l10n.stressTestElapsedTime;
       timerColor = ThemeV2.textPrimary;
       final elapsed = now.difference(session.startedAt!);
       final d = elapsed.inDays;
       final h = elapsed.inHours % 24;
       final m = elapsed.inMinutes % 60;
       final s = elapsed.inSeconds % 60;
-      timeText =
-          '${d}d ${h.toString().padLeft(2, '0')}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
+      timeText = l10n.stressTestCountdown(
+        '$d',
+        h.toString().padLeft(2, '0'),
+        m.toString().padLeft(2, '0'),
+        s.toString().padLeft(2, '0'),
+      );
     }
 
     // Infinite ("until bored") past its 14-day minimum: the countdown is
@@ -1104,7 +1182,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   session.epochHistory.isNotEmpty &&
                   session.startedAt != null)
                 Text(
-                  'Epoch #${session.epochHistory.length}',
+                  l10n.stressTestEpochNumber(session.epochHistory.length),
                   style: interNums(
                     fontSize: 11,
                     color: ThemeV2.textSecondary,
@@ -1128,7 +1206,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   ),
                 ),
                 child: Text(
-                  'FINISH TEST',
+                  l10n.stressTestFinishTestButton,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
@@ -1146,13 +1224,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // ── Finish Test (Infinite mode manual completion) ──────────────────
 
   void _confirmFinishInfiniteTest(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ThemeV2.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Finish Test?',
+          '${l10n.stressTestFinishTest}?',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -1160,14 +1239,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
         ),
         content: Text(
-          "End this test now and get your verdict? This can't be undone.",
+          l10n.stressTestFinishTestConfirm,
           style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Cancel',
+              l10n.profileCancel,
               style: GoogleFonts.inter(color: ThemeV2.textSecondary),
             ),
           ),
@@ -1182,7 +1261,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
               }
             },
             child: Text(
-              'Finish Test',
+              l10n.stressTestFinishTest,
               style: GoogleFonts.inter(
                 color: ThemeV2.primary,
                 fontWeight: FontWeight.w600,
@@ -1197,6 +1276,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   // ── Completed View ─────────────────────────────────────────────
 
   Widget _buildCompletedView(StressTestSession session) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -1230,7 +1310,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'FINAL BALANCE',
+                        l10n.stressTestFinalBalance,
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -1240,7 +1320,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '\$${session.totalValue.toStringAsFixed(2)}',
+                        formatUsd(session.totalValue),
                         style: interNums(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -1284,7 +1364,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 ),
               ),
               child: Text(
-                'VIEW PSYCHOLOGIST VERDICT',
+                l10n.stressTestViewVerdict,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w800,
                   fontSize: 14,
@@ -1366,6 +1446,7 @@ class _StressTestWidgetSettingsSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -1393,7 +1474,7 @@ class _StressTestWidgetSettingsSheetState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Widget Settings',
+                    l10n.homeWidgetSettingsTitle,
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -1416,7 +1497,7 @@ class _StressTestWidgetSettingsSheetState
                       });
                     },
                     child: Text(
-                      'Reset',
+                      l10n.homeReset,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -1484,7 +1565,7 @@ class _StressTestWidgetSettingsSheetState
                       ],
                     ),
                     title: Text(
-                      config.displayName,
+                      config.displayName(l10n),
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -1556,6 +1637,7 @@ class _DisclaimerModal extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     bool accepted = false;
+    final l10n = AppLocalizations.of(context)!;
 
     return StatefulBuilder(
       builder: (context, setState) => Padding(
@@ -1577,7 +1659,7 @@ class _DisclaimerModal extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'INVESTMENT DISCLAIMER\n& LIMITATION OF LIABILITY',
+              l10n.stressTestInvestmentDisclaimerTitle,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
@@ -1587,16 +1669,7 @@ class _DisclaimerModal extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'This verdict is generated automatically by a mathematical model based '
-              'solely on your simulated historical behavior within this closed testing '
-              'environment. It is provided for educational and illustrative purposes '
-              'only and does NOT constitute personalized investment, legal, or financial '
-              'advice. Past performance within this simulator does not guarantee, predict, '
-              'or reflect real-world market outcomes. Final financial decisions, asset '
-              'purchases, or trading activities in real life carry substantial risk and '
-              'are made solely at your own discretion and responsibility. The creators of '
-              'F.O.M.O. Shield accept no liability for financial losses incurred in '
-              'real-world trading.',
+              l10n.stressTestInvestmentDisclaimerBody,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 color: ThemeV2.textSecondary,
@@ -1618,7 +1691,7 @@ class _DisclaimerModal extends ConsumerWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'I Understand & Accept',
+                      l10n.stressTestIUnderstandAccept,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

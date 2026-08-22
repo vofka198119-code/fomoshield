@@ -6,6 +6,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../home_providers.dart';
 
@@ -34,6 +35,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
   @override
   Widget build(BuildContext context) {
     final watchlistSymbols = ref.watch(watchlistSymbolsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -41,7 +43,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'WATCHLIST',
+          l10n.watchlistTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -50,64 +52,78 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           ),
         ),
       ),
-      body: watchlistSymbols.isEmpty
-          ? _emptyState()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-              child: Column(
-                children: [
-                  Container(
-                    decoration: FomoShieldTheme.cardDecoration,
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(22, 14, 22, 14),
-                          child: Row(
-                            children: [
-                              Text(
-                                'WATCHLIST',
-                                style: FomoShieldTheme.cardTitle(),
-                              ),
-                              const Spacer(),
-                              InkWell(
-                                onTap: _isNavigating
-                                    ? null
-                                    : _navigateToSearch,
-                                borderRadius: BorderRadius.circular(20),
-                                child: const Icon(
-                                  Icons.add_rounded,
-                                  color: ThemeV2.primary,
-                                  size: 22,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: watchlistSymbols.isEmpty
+            ? _emptyState(l10n)
+            : SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: FomoShieldTheme.cardDecoration,
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+                            child: Row(
+                              children: [
+                                Text(
+                                  l10n.watchlistTitle,
+                                  style: FomoShieldTheme.cardTitle(),
                                 ),
-                              ),
-                            ],
+                                const Spacer(),
+                                InkWell(
+                                  onTap: _isNavigating
+                                      ? null
+                                      : _navigateToSearch,
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: const Icon(
+                                    Icons.add_rounded,
+                                    color: ThemeV2.primary,
+                                    size: 22,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Divider(
-                          height: 1,
-                          indent: 16,
-                          endIndent: 16,
-                          color: Colors.black.withValues(alpha: 0.06),
-                        ),
-                        for (int i = 0; i < watchlistSymbols.length; i++)
-                          _WatchlistRow(
-                            key: ValueKey(watchlistSymbols[i]),
-                            symbol: watchlistSymbols[i],
-                            showDivider: i < watchlistSymbols.length - 1,
+                          Divider(
+                            height: 1,
+                            indent: 16,
+                            endIndent: 16,
+                            color: Colors.black.withValues(alpha: 0.06),
                           ),
-                      ],
+                          // Lazy-built (shrinkWrap over the outer scroll
+                          // view still only builds rows near the viewport,
+                          // same as ListView.separated elsewhere) — a large
+                          // watchlist no longer fires every row's logo/name
+                          // fetch in one frame just because it's on screen.
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: watchlistSymbols.length,
+                            itemBuilder: (context, i) => _WatchlistRow(
+                              key: ValueKey(watchlistSymbols[i]),
+                              symbol: watchlistSymbols[i],
+                              showDivider: i < watchlistSymbols.length - 1,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 
-  Widget _emptyState() {
+  Widget _emptyState(AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -119,7 +135,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'No companies yet',
+            l10n.watchlistFullScreenEmptyTitle,
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -128,7 +144,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Tap + to search and add companies',
+            l10n.watchlistFullScreenEmptySubtitle,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,
@@ -138,7 +154,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           ElevatedButton.icon(
             onPressed: _isNavigating ? null : _navigateToSearch,
             icon: const Icon(Icons.search_rounded, size: 18),
-            label: const Text('Search companies'),
+            label: Text(l10n.watchlistFullScreenSearchButton),
           ),
         ],
       ),
@@ -148,8 +164,8 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
 
 // ---------------------------------------------------------------------------
 // Watchlist Row — logo, name + sector, no live price (see cachedLogoEntryProvider
-// doc comment: no Finnhub call ever happens from this row — price only shows
-// once the user taps through to Company Detail).
+// doc comment: no Finnhub call ever happens from this row, by design — price
+// only shows once the user taps through to Company Detail).
 // ---------------------------------------------------------------------------
 
 class _WatchlistRow extends ConsumerWidget {
@@ -164,11 +180,15 @@ class _WatchlistRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final logoEntry = ref.watch(cachedLogoEntryProvider(symbol)).valueOrNull;
     final name = logoEntry?.companyName.isNotEmpty == true
         ? logoEntry!.companyName
         : symbol;
-    final sector = resolveGicsSector(symbol, companyName: logoEntry?.companyName);
+    final sector = resolveGicsSector(
+      symbol,
+      companyName: logoEntry?.companyName,
+    );
 
     return GestureDetector(
       onTap: () => context.push('/company/$symbol'),
@@ -219,7 +239,7 @@ class _WatchlistRow extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    sector?.label ?? symbol,
+                    sector?.localizedLabel(l10n) ?? symbol,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(

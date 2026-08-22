@@ -91,10 +91,13 @@ class AllocationBarRow extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           SizedBox(
-            width: 42,
+            width: 50,
             child: Text(
               '${percent.toStringAsFixed(decimals)}$suffix',
               textAlign: TextAlign.right,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.visible,
               style: interNums(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,

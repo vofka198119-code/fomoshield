@@ -26,6 +26,7 @@ extension TradesEngine on StressTestNotifier {
     double amount,
     double price, {
     bool isEtf = false,
+    SubscriptionTier? tier,
   }) async {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) return false;
@@ -33,6 +34,9 @@ extension TradesEngine on StressTestNotifier {
     final session = state[idx];
     if (session.status != StressTestStatus.setup) return false;
     if (amount > session.cash) return false;
+    if (tier != null && isStressTestSlotFrozen(state, sessionId, tier)) {
+      return false;
+    }
 
     // High-precision double: full IEEE 754, NEVER round to int
     final shares = amount / price;
@@ -127,12 +131,13 @@ extension TradesEngine on StressTestNotifier {
   }
 
   /// Remove an asset during setup phase.
-  void removeAssetSetup(String sessionId, String symbol) {
+  void removeAssetSetup(String sessionId, String symbol, {SubscriptionTier? tier}) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) return;
 
     final session = state[idx];
     if (session.status != StressTestStatus.setup) return;
+    if (tier != null && isStressTestSlotFrozen(state, sessionId, tier)) return;
 
     final holding = session.holdings.firstWhere(
       (h) => h.symbol == symbol,
@@ -179,8 +184,8 @@ extension TradesEngine on StressTestNotifier {
             activeHypeEvents: session.activeHypeEvents,
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: Map.from(session.priceHistory)..remove(symbol),
-            priceHistoryTimestamps:
-                Map.from(session.priceHistoryTimestamps)..remove(symbol),
+            priceHistoryTimestamps: Map.from(session.priceHistoryTimestamps)
+              ..remove(symbol),
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -206,22 +211,44 @@ extension TradesEngine on StressTestNotifier {
     double amountOrShares, {
     bool useShares = false,
     bool isEtf = false,
+    AppLocalizations? l10n,
+    SubscriptionTier? tier,
   }) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) {
-      return TradeResult(success: false, reason: 'Session not found');
+      return TradeResult(
+        success: false,
+        reason: l10n?.stressTestSessionNotFound ?? 'Session not found',
+      );
     }
 
     final session = state[idx];
     if (session.status != StressTestStatus.active) {
-      return TradeResult(success: false, reason: 'Test not active');
+      return TradeResult(
+        success: false,
+        reason: l10n?.tradesEngineTestNotActive ?? 'Test not active',
+      );
+    }
+
+    // Slot #2/#3 frozen — trading blocked once the tier drops back to
+    // free, until Premium is renewed. Caller passes tier == null to skip
+    // this check (e.g. system-driven fills where it's already been
+    // checked upstream); pass the real tier for anything user-initiated.
+    if (tier != null && isStressTestSlotFrozen(state, sessionId, tier)) {
+      return TradeResult(
+        success: false,
+        reason: l10n?.tradesEngineSlotFrozen ?? 'This test is frozen.',
+      );
     }
 
     // Virtual market is always open — no market-hour trading restrictions.
 
     final currentPrice = session.currentPrices[symbol] ?? 0;
     if (currentPrice <= 0) {
-      return TradeResult(success: false, reason: 'Price not available');
+      return TradeResult(
+        success: false,
+        reason: l10n?.tradesEnginePriceNotAvailable ?? 'Price not available',
+      );
     }
 
     // Check ad counter for free users
@@ -241,12 +268,18 @@ extension TradesEngine on StressTestNotifier {
     }
 
     if (shares <= 0 || cost <= 0) {
-      return TradeResult(success: false, reason: 'Invalid amount');
+      return TradeResult(
+        success: false,
+        reason: l10n?.tradesEngineInvalidAmount ?? 'Invalid amount',
+      );
     }
 
     if (isBuy) {
       if (cost > session.cash) {
-        return TradeResult(success: false, reason: 'Insufficient cash');
+        return TradeResult(
+          success: false,
+          reason: l10n?.tradesEngineInsufficientCash ?? 'Insufficient cash',
+        );
       }
     } else {
       final heldShares = session.holdings
@@ -266,7 +299,11 @@ extension TradesEngine on StressTestNotifier {
         if (shares <= heldShares + 0.000001) {
           shares = heldShares;
         } else {
-          return TradeResult(success: false, reason: 'Insufficient shares');
+          return TradeResult(
+            success: false,
+            reason:
+                l10n?.tradesEngineInsufficientShares ?? 'Insufficient shares',
+          );
         }
       }
     }
@@ -428,7 +465,8 @@ extension TradesEngine on StressTestNotifier {
           newHoldings.fold<double>(
             0,
             (sum, h) =>
-                sum + h.shares * (session.currentPrices[h.symbol] ?? h.entryPrice),
+                sum +
+                h.shares * (session.currentPrices[h.symbol] ?? h.entryPrice),
           );
       evaluateBuyTrade(
         profile: session.psychologyProfile,

@@ -31,8 +31,10 @@ class AppConstants {
   static const int maxSearchResults = 20;
 
   // Portfolio
+  // Fallback only — used when a Portfolio's own startingBalance is missing
+  // from stored/synced data (corrupted or pre-migration record). The real
+  // per-tier values live in portfolio_limits_provider.dart.
   static const double defaultStartingBalance = 10000.0;
-  static const int maxParallelStressTests = 5;
 
   // NYSE hours
   static const int nyseOpenHour = 9;

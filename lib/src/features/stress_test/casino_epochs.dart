@@ -63,6 +63,28 @@ extension CasinoEpochsEngine on StressTestNotifier {
       return MarketScenario.recovery;
     }
 
+    // ── Rule A: session-start ramp (device-test feedback 2026-08-12) ──
+    // A brand-new session shouldn't be able to open on a loss before the
+    // player has had any chance to build a cushion — confirmed on-device,
+    // epoch 0 landed Crash directly. Epoch 0: no Crash/BlackSwan/Bear at
+    // all. Epochs 1-4: Bear rejoins the pool, Crash/BlackSwan stay locked
+    // until epoch 5, when the pool opens up fully as normal.
+    final isSessionStartRamp = epochIdx <= 4;
+    final declineLockedSessionStart = epochIdx == 0;
+
+    // ── Rule B: post-catastrophe decline lockout (same session) ───────
+    // Real sessions showed Bear landing the instant the 2 scripted
+    // Recovery epochs ended — the recovery never got room to read as a
+    // recovery. For 5 total epochs after a Crash/BlackSwan (the 2
+    // scripted Recovery epochs above + 3 more here), Bear can't repeat
+    // either — Crash/BlackSwan are already excluded for that whole
+    // window by the existing minEpochsBetweenCatastrophes cooldown below.
+    final declineLockedPostCatastrophe =
+        epochsSinceLastCatastrophe >= 3 && epochsSinceLastCatastrophe <= 5;
+
+    final bearLocked =
+        declineLockedSessionStart || declineLockedPostCatastrophe;
+
     // Anti-stuck Bear correction: after 2+ consecutive Bear declines,
     // hard-redirect to Bull/Sideways/Volatility — prevents death loops.
     // Recovery is deliberately NOT one of the options here (see above).
@@ -89,6 +111,13 @@ extension CasinoEpochsEngine on StressTestNotifier {
     // (no long unbroken Bull streaks) without suppressing Bull's fair
     // share in the common case of an isolated single Bull epoch.
     if (_trailingStreak(session.epochHistory, MarketScenario.bull) >= 2) {
+      // Bear is off the table entirely while Rule A/B's lockout is active
+      // — split the redirect between Sideways/Volatility only instead.
+      if (bearLocked) {
+        return rng.nextBool()
+            ? MarketScenario.sideways
+            : MarketScenario.volatility;
+      }
       final antiStuckRoll = rng.nextDouble();
       if (antiStuckRoll < 0.40) return MarketScenario.bear;
       if (antiStuckRoll < 0.70) return MarketScenario.sideways;
@@ -109,20 +138,19 @@ extension CasinoEpochsEngine on StressTestNotifier {
     final allowCatastrophe =
         (epochIdx - lastCatIdx) >= minEpochsBetweenCatastrophes;
 
-    if (cooldown > 0 || !allowCatastrophe) {
-      // No manual weight redirect needed: removing catastrophes from
-      // `pool` without re-injecting their weight elsewhere lets the
-      // remaining pool members absorb that share proportionally on
-      // their own (recovery used to get a hand-picked 60% cut here —
-      // it can't anymore, since it's scripted-only now).
+    // No manual weight redirect needed: removing scenarios from `pool`
+    // without re-injecting their weight elsewhere lets the remaining pool
+    // members absorb that share proportionally on their own (recovery
+    // used to get a hand-picked 60% cut here — it can't anymore, since
+    // it's scripted-only now).
+    if (cooldown > 0 || !allowCatastrophe || isSessionStartRamp) {
       pool.removeWhere((s) => s.isCatastrophe);
-      for (final s in pool) {
-        weights.add(currentWeights[s.name] ?? s.weight.toDouble());
-      }
-    } else {
-      for (final s in pool) {
-        weights.add(currentWeights[s.name] ?? s.weight.toDouble());
-      }
+    }
+    if (bearLocked) {
+      pool.removeWhere((s) => s.isDecline);
+    }
+    for (final s in pool) {
+      weights.add(currentWeights[s.name] ?? s.weight.toDouble());
     }
 
     final totalWeight = weights.fold(0.0, (a, b) => a + b);
@@ -293,9 +321,7 @@ extension CasinoEpochsEngine on StressTestNotifier {
         '  casinoLastCatastropheEpoch=${session.casinoLastCatastropheEpoch}',
       );
       // ignore: avoid_print
-      print(
-        '  casinoCatastropheCooldown=${session.casinoCatastropheCooldown}',
-      );
+      print('  casinoCatastropheCooldown=${session.casinoCatastropheCooldown}');
       // ignore: avoid_print
       print('  casinoDeclineStreak=${session.casinoDeclineStreak}');
       // ignore: avoid_print
@@ -331,9 +357,10 @@ extension CasinoEpochsEngine on StressTestNotifier {
     // is the active one fixes this — every regime the roulette landed on
     // now gets a fair (if attenuated, given the cap) say in the price.
     final totalSegments = missedRolls + 1; // + the trailing current epoch
-    final ticksPerSegment = (_maxCatchUpTicks / totalSegments)
-        .floor()
-        .clamp(1, _maxCatchUpTicks);
+    final ticksPerSegment = (_maxCatchUpTicks / totalSegments).floor().clamp(
+      1,
+      _maxCatchUpTicks,
+    );
 
     for (int r = 0; r < missedRolls; r++) {
       // ── Scenario-roll RNG: deterministic per epoch, NOT the shared

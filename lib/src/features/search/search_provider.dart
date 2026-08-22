@@ -12,22 +12,39 @@ final searchProvider = ChangeNotifierProvider<SearchNotifier>(
   (ref) => SearchNotifier(ref.read(finnhubServiceProvider)),
 );
 
+/// Kept as a type instead of a raw error string — this provider has no
+/// BuildContext to localize through, so the UI layer (search_screen.dart)
+/// maps this to the actual displayed text via AppLocalizations.
+enum SearchErrorType {
+  connectionTimeout,
+  serverNotResponding,
+  noInternet,
+  rateLimited,
+  generic,
+}
+
 class SearchNotifier extends ChangeNotifier {
   final FinnhubService _api;
   List<Map<String, dynamic>> results = [];
-  List<String> recentSearches = [];
   bool isLoading = false;
   String query = '';
-  String? errorMessage;
+  SearchErrorType? errorType;
   Timer? _debounce;
+
+  // Bumped on every keystroke; a pending request only applies its result if
+  // it's still the most recent one when it resolves — otherwise a slow
+  // response for an older query could land after (and overwrite) a faster
+  // response for a newer one.
+  int _requestId = 0;
 
   SearchNotifier(this._api);
 
   /// Called on every keystroke — debounces 500ms before actual API call
   void onSearchInput(String q) {
     query = q;
-    errorMessage = null;
+    errorType = null;
     _debounce?.cancel();
+    final requestId = ++_requestId;
 
     if (q.length < 2) {
       results = [];
@@ -40,34 +57,37 @@ class SearchNotifier extends ChangeNotifier {
     notifyListeners();
 
     _debounce = Timer(const Duration(milliseconds: 500), () async {
+      List<Map<String, dynamic>> newResults = [];
+      SearchErrorType? newError;
       try {
-        results = await _api.searchLocal(q);
-        errorMessage = null;
+        newResults = await _api.searchLocal(q);
       } catch (e) {
         debugPrint('❌ Search error for "$q": $e');
-        if (e is DioException && e.type == DioExceptionType.connectionTimeout) {
-          errorMessage = 'Connection timed out. Check your internet.';
-        } else if (e is DioException && e.type == DioExceptionType.receiveTimeout) {
-          errorMessage = 'Server not responding. Try again.';
-        } else if (e.toString().contains('API') ||
-            e.toString().contains('limit') ||
-            e.toString().contains('rate')) {
-          errorMessage = 'API limit reached. Please try again later.';
-        } else {
-          errorMessage = null; // quiet fail for non-API errors
+        if (e is DioException) {
+          switch (e.type) {
+            case DioExceptionType.connectionTimeout:
+              newError = SearchErrorType.connectionTimeout;
+            case DioExceptionType.receiveTimeout:
+              newError = SearchErrorType.serverNotResponding;
+            case DioExceptionType.connectionError:
+              newError = SearchErrorType.noInternet;
+            case DioExceptionType.badResponse:
+              newError = e.response?.statusCode == 429
+                  ? SearchErrorType.rateLimited
+                  : SearchErrorType.generic;
+            default:
+              newError = SearchErrorType.generic;
+          }
         }
-        results = [];
       }
+
+      if (requestId != _requestId) return; // superseded by a newer keystroke
+
+      results = newResults;
+      errorType = newError;
       isLoading = false;
       notifyListeners();
     });
-  }
-
-  void selectCompany(String symbol) {
-    if (!recentSearches.contains(symbol)) {
-      recentSearches.insert(0, symbol);
-      if (recentSearches.length > 10) recentSearches.removeLast();
-    }
   }
 
   @override

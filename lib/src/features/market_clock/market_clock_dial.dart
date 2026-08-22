@@ -18,20 +18,80 @@ const dialLight = Color(0xFF173A2E);
 const dialBrassLight = Color(0xFFE8C468);
 const dialIvory = Color(0xFFF3E7C9);
 
+/// Palette for the dark "instrument panel" card family. Centralizes what
+/// used to be individual dialLight/dialMid/dialDark/dialIvory consts
+/// referenced directly by ~34 files, so a future alternate palette (e.g. a
+/// premium theme) is a single new [DarkCardPalette] instance + one swap
+/// point, not another pass through every dark-card consumer. Only
+/// [instrumentPanel] exists today — no switching mechanism yet, this just
+/// prepares the seam for one.
+class DarkCardPalette {
+  final Color gradientStart;
+  final Color gradientMid;
+  final Color gradientEnd;
+  final Color accentGold;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textTertiary;
+
+  const DarkCardPalette({
+    required this.gradientStart,
+    required this.gradientMid,
+    required this.gradientEnd,
+    required this.accentGold,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textTertiary,
+  });
+
+  // Text stays plain white — user explicitly kept white text on 2026-08-14
+  // when rolling the radial gradient out app-wide (only the gradient shape
+  // was the ask, not Market Clock's own dialIvory tone). Fields exist so a
+  // real future palette can override them; not wired to any widget yet.
+  static const instrumentPanel = DarkCardPalette(
+    gradientStart: dialLight,
+    gradientMid: dialMid,
+    gradientEnd: dialDark,
+    accentGold: dialBrassLight,
+    textPrimary: Colors.white,
+    textSecondary: Colors.white70,
+    textTertiary: Colors.white54,
+  );
+}
+
+/// Shared dark-card shell — the radial "instrument panel" gradient, now the
+/// single standard for every dark/premium card, button, pill and badge (was
+/// previously Market Clock only; the rest used a flat linear
+/// `[dialLight, dialDark]` gradient — see docs/DESIGN_TOKENS.md §3/§11,
+/// unified 2026-08-14). [borderRadius] defaults to the unified 22px card
+/// radius; pass a smaller one for buttons/pills/badges.
+/// The gradient alone, for the rare shape (e.g. a circular avatar-style
+/// badge) that can't take a [BoxDecoration.borderRadius] at all.
+RadialGradient darkCardGradient({
+  DarkCardPalette palette = DarkCardPalette.instrumentPanel,
+}) => RadialGradient(
+  center: const Alignment(0, -0.3),
+  radius: 1.2,
+  colors: [palette.gradientStart, palette.gradientMid, palette.gradientEnd],
+  stops: const [0.0, 0.6, 1.0],
+);
+
+BoxDecoration darkCardDecoration({
+  BorderRadius? borderRadius,
+  DarkCardPalette palette = DarkCardPalette.instrumentPanel,
+}) => BoxDecoration(
+  gradient: darkCardGradient(palette: palette),
+  borderRadius: borderRadius ?? FomoShieldTheme.cardRadius,
+  boxShadow: FomoShieldTheme.shadowSoft,
+);
+
 /// Card wrapper for anything sitting on the same instrument-panel dial
 /// background — keeps the Market Clock screen and Home widget visually
 /// unified (gradient IS the card background, not a separate surface color).
+/// Now a thin alias over [darkCardDecoration] — kept as its own named
+/// function since Market Clock's own call sites read more clearly this way.
 BoxDecoration marketClockCardDecoration({BorderRadius? borderRadius}) =>
-    BoxDecoration(
-      gradient: const RadialGradient(
-        center: Alignment(0, -0.3),
-        radius: 1.2,
-        colors: [dialLight, dialMid, dialDark],
-        stops: [0.0, 0.6, 1.0],
-      ),
-      borderRadius: borderRadius ?? FomoShieldTheme.cardRadius,
-      boxShadow: FomoShieldTheme.shadowSoft,
-    );
+    darkCardDecoration(borderRadius: borderRadius);
 
 class MarketClockDial extends StatelessWidget {
   final MarketClockState state;
@@ -58,7 +118,10 @@ class MarketClockDial extends StatelessWidget {
         children: [
           CustomPaint(
             size: Size(size, size),
-            painter: _RingPainter(strokeWidth: ringStroke, color: dialBrassLight),
+            painter: _RingPainter(
+              strokeWidth: ringStroke,
+              color: dialBrassLight,
+            ),
           ),
           SizedBox(
             width: faceSize,
@@ -68,7 +131,11 @@ class MarketClockDial extends StatelessWidget {
           if (showDigitalReadout)
             Transform.translate(
               offset: Offset(0, size * 0.12),
-              child: _DigitalReadout(nowEt: state.nowEt, phase: state.phase, size: size),
+              child: _DigitalReadout(
+                nowEt: state.nowEt,
+                phase: state.phase,
+                size: size,
+              ),
             ),
           SizedBox(
             width: faceSize,
@@ -89,7 +156,11 @@ class _DigitalReadout extends StatelessWidget {
   final DateTime nowEt;
   final MarketPhase phase;
   final double size;
-  const _DigitalReadout({required this.nowEt, required this.phase, required this.size});
+  const _DigitalReadout({
+    required this.nowEt,
+    required this.phase,
+    required this.size,
+  });
 
   static Color _colorForPhase(MarketPhase phase) {
     switch (phase) {
@@ -111,11 +182,17 @@ class _DigitalReadout extends StatelessWidget {
     final color = _colorForPhase(phase);
     final fontSize = size * 0.065;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: size * 0.035, vertical: size * 0.012),
+      padding: EdgeInsets.symmetric(
+        horizontal: size * 0.035,
+        vertical: size * 0.012,
+      ),
       decoration: BoxDecoration(
         color: dialDark.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(size * 0.025),
-        border: Border.all(color: dialBrassLight.withValues(alpha: 0.4), width: size * 0.004),
+        border: Border.all(
+          color: dialBrassLight.withValues(alpha: 0.4),
+          width: size * 0.004,
+        ),
       ),
       child: Text(
         '$hh:$mm',
@@ -125,8 +202,14 @@ class _DigitalReadout extends StatelessWidget {
           color: color,
           letterSpacing: 1.0,
           shadows: [
-            Shadow(color: color.withValues(alpha: 0.8), blurRadius: fontSize * 0.35),
-            Shadow(color: color.withValues(alpha: 0.5), blurRadius: fontSize * 0.7),
+            Shadow(
+              color: color.withValues(alpha: 0.8),
+              blurRadius: fontSize * 0.35,
+            ),
+            Shadow(
+              color: color.withValues(alpha: 0.5),
+              blurRadius: fontSize * 0.7,
+            ),
           ],
         ),
       ),
@@ -219,7 +302,8 @@ class _ClockFaceBackgroundPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ClockFaceBackgroundPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _ClockFaceBackgroundPainter oldDelegate) =>
+      false;
 }
 
 /// Hour/minute hands + center pivot cap only — painted on top of the digital
@@ -268,5 +352,6 @@ class _ClockHandsPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ClockHandsPainter oldDelegate) => oldDelegate.time != time;
+  bool shouldRepaint(covariant _ClockHandsPainter oldDelegate) =>
+      oldDelegate.time != time;
 }

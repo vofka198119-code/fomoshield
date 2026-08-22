@@ -80,6 +80,7 @@ class _PortfolioWidgetsSettingsSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -103,7 +104,7 @@ class _PortfolioWidgetsSettingsSheetState
             child: Row(
               children: [
                 Text(
-                  'Portfolio Widgets',
+                  l10n.portfolioWidgetsSettingsSheetTitle,
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -123,7 +124,7 @@ class _PortfolioWidgetsSettingsSheetState
                     });
                   },
                   child: Text(
-                    'Reset',
+                    l10n.marketClockWidgetSettingsReset,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: ThemeV2.primary,

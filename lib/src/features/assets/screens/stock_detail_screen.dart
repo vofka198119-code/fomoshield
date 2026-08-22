@@ -17,6 +17,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
@@ -84,7 +85,8 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
 
     final priceHist = session.priceHistory[widget.symbol] ?? [];
     if (priceHist.isEmpty) {
-      final price = session.currentPrices[widget.symbol] ??
+      final price =
+          session.currentPrices[widget.symbol] ??
           session.basePrices[widget.symbol] ??
           100.0;
       final now = DateTime.now();
@@ -159,25 +161,28 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   /// test. Explicit ask — don't reintroduce elapsed gating here.
   List<StressTestSparkPeriod> _availablePeriods(StressTestSession session) {
     return switch (session.duration) {
-      TestDuration.week1 => [StressTestSparkPeriod.d1, StressTestSparkPeriod.w1],
+      TestDuration.week1 => [
+        StressTestSparkPeriod.d1,
+        StressTestSparkPeriod.w1,
+      ],
       TestDuration.month1 => [
-          StressTestSparkPeriod.d1,
-          StressTestSparkPeriod.w1,
-          StressTestSparkPeriod.m1,
-        ],
+        StressTestSparkPeriod.d1,
+        StressTestSparkPeriod.w1,
+        StressTestSparkPeriod.m1,
+      ],
       TestDuration.months3 => [
-          StressTestSparkPeriod.d1,
-          StressTestSparkPeriod.w1,
-          StressTestSparkPeriod.m1,
-          StressTestSparkPeriod.m3,
-        ],
+        StressTestSparkPeriod.d1,
+        StressTestSparkPeriod.w1,
+        StressTestSparkPeriod.m1,
+        StressTestSparkPeriod.m3,
+      ],
       TestDuration.infinite || TestDuration.custom => [
-          StressTestSparkPeriod.d1,
-          StressTestSparkPeriod.w1,
-          StressTestSparkPeriod.m1,
-          StressTestSparkPeriod.m3,
-          StressTestSparkPeriod.y1,
-        ],
+        StressTestSparkPeriod.d1,
+        StressTestSparkPeriod.w1,
+        StressTestSparkPeriod.m1,
+        StressTestSparkPeriod.m3,
+        StressTestSparkPeriod.y1,
+      ],
     };
   }
 
@@ -192,17 +197,21 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   /// For a new asset not yet in the portfolio, fetch the current price
   /// from Finnhub and store it in the engine via setExternalPrice.
   Future<void> _ensurePriceForNewAsset() async {
-    final session =
-        ref.read(stressTestProvider.notifier).getSession(widget.sessionId);
+    final session = ref
+        .read(stressTestProvider.notifier)
+        .getSession(widget.sessionId);
     if (session == null) return;
 
     final isHeld = session.holdings.any((h) => h.symbol == widget.symbol);
-    final hasPrice = session.currentPrices.containsKey(widget.symbol) ||
+    final hasPrice =
+        session.currentPrices.containsKey(widget.symbol) ||
         session.basePrices.containsKey(widget.symbol);
 
     if (!isHeld && !hasPrice) {
       try {
-        final quote = await ref.read(finnhubServiceProvider).quote(widget.symbol);
+        final quote = await ref
+            .read(finnhubServiceProvider)
+            .quote(widget.symbol);
         if (!mounted) return;
         final price = (quote['c'] as num?)?.toDouble() ?? 0;
         if (price > 0) {
@@ -231,19 +240,23 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     });
     final session = _session;
     if (session == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: Text('Session not found')),
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.stressTestSessionNotFound),
+        ),
       );
     }
 
-    final currentPrice = session.currentPrices[widget.symbol] ??
+    final currentPrice =
+        session.currentPrices[widget.symbol] ??
         session.basePrices[widget.symbol] ??
         0;
     final basePrice = session.basePrices[widget.symbol] ?? currentPrice;
     final priceChange = currentPrice - basePrice;
-    final priceChangePercent =
-        basePrice > 0 ? (priceChange / basePrice) * 100 : 0.0;
+    final priceChangePercent = basePrice > 0
+        ? (priceChange / basePrice) * 100
+        : 0.0;
     final isPositive = priceChange >= 0;
     final holding = _findHolding(session);
     final logoAsync = ref.watch(cachedLogoProvider(widget.symbol));
@@ -264,7 +277,10 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: PriceHeader(
                         logo: logoAsync.valueOrNull,
-                        companyName: resolveStressTestCompanyName(ref, widget.symbol),
+                        companyName: resolveStressTestCompanyName(
+                          ref,
+                          widget.symbol,
+                        ),
                         symbol: widget.symbol,
                         showFsScore: false,
                         price: currentPrice,
@@ -301,9 +317,10 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       priceChangePercent: priceChangePercent,
                       isPositive: isPositive,
                       latestExplanation:
-                          session.explanationLog[widget.symbol]?.isNotEmpty == true
-                              ? session.explanationLog[widget.symbol]!.last
-                              : null,
+                          session.explanationLog[widget.symbol]?.isNotEmpty ==
+                              true
+                          ? session.explanationLog[widget.symbol]!.last
+                          : null,
                     ),
                     StockLimitOrdersSection(
                       sessionId: widget.sessionId,
@@ -323,7 +340,10 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                 extra: {
                   'type': 'buy',
                   'price': currentPrice,
-                  'companyName': resolveStressTestCompanyName(ref, widget.symbol),
+                  'companyName': resolveStressTestCompanyName(
+                    ref,
+                    widget.symbol,
+                  ),
                   'logo': logoAsync.valueOrNull,
                 },
               ),
@@ -332,7 +352,10 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                 extra: {
                   'type': 'sell',
                   'price': currentPrice,
-                  'companyName': resolveStressTestCompanyName(ref, widget.symbol),
+                  'companyName': resolveStressTestCompanyName(
+                    ref,
+                    widget.symbol,
+                  ),
                   'logo': logoAsync.valueOrNull,
                 },
               ),
@@ -344,6 +367,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: AppBar(
@@ -353,7 +377,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
         toolbarHeight: 64,
         centerTitle: true,
         title: Text(
-          'COMPANY CARD',
+          l10n.stockDetailAppBarTitle,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.inter(

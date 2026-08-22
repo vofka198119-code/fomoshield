@@ -36,7 +36,9 @@ final sectorAveragePeProvider = FutureProvider<Map<GicsSector, double>>((
     sums[sector] = (sums[sector] ?? 0) + pe;
     counts[sector] = (counts[sector] ?? 0) + 1;
   }
-  return {for (final sector in sums.keys) sector: sums[sector]! / counts[sector]!};
+  return {
+    for (final sector in sums.keys) sector: sums[sector]! / counts[sector]!,
+  };
 });
 
 final companyDetailProvider =
@@ -105,7 +107,8 @@ final companyDetailProvider =
       // (e.g. a recent IPO) — never guess.
       double? priceCagr5Y;
       try {
-        final fiveYearsAgo = DateTime.now()
+        final fiveYearsAgo =
+            DateTime.now()
                 .subtract(const Duration(days: 1825))
                 .millisecondsSinceEpoch ~/
             1000;
@@ -166,10 +169,8 @@ final companyDetailProvider =
 /// without PriceChart and PriceHeader needing to know about each other
 /// directly — keyed by symbol so switching companies can't leak a stale
 /// value across screens.
-final chartHoverPriceProvider = StateProvider.autoDispose.family<
-  double?,
-  String
->((ref, symbol) => null);
+final chartHoverPriceProvider = StateProvider.autoDispose
+    .family<double?, String>((ref, symbol) => null);
 
 /// Change/%change for whichever period is currently selected on
 /// `PriceChart` (plus its label, e.g. "1D"), or null before the chart's
@@ -177,17 +178,21 @@ final chartHoverPriceProvider = StateProvider.autoDispose.family<
 /// the selected period instead of always showing the fixed daily change
 /// — same PriceChart<->PriceHeader decoupling pattern as
 /// [chartHoverPriceProvider].
-final chartPeriodChangeProvider = StateProvider.autoDispose.family<
-  ({double change, double changePercent, String periodLabel})?,
-  String
->((ref, symbol) => null);
+final chartPeriodChangeProvider = StateProvider.autoDispose
+    .family<
+      ({double change, double changePercent, String periodLabel})?,
+      String
+    >((ref, symbol) => null);
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 /// Сохраняет логотип компании в LogoCache.
-Future<void> cacheCompanyLogo(String symbol, Map<String, dynamic> profile) async {
+Future<void> cacheCompanyLogo(
+  String symbol,
+  Map<String, dynamic> profile,
+) async {
   try {
     final dao = LogoDao();
     final existing = await dao.getLogo(symbol);

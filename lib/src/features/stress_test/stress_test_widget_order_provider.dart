@@ -7,6 +7,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 /// Configuration for a reorderable widget on the stress test screen.
 class StressTestWidgetConfig {
@@ -15,26 +16,26 @@ class StressTestWidgetConfig {
 
   const StressTestWidgetConfig({required this.id, required this.visible});
 
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (id) {
       case 'allocation_chart':
-        return 'Portfolio Balance';
+        return l10n.stressTestWidgetPortfolioBalance;
       case 'cash':
-        return 'Cash Available';
+        return l10n.stressTestWidgetCashAvailable;
       case 'psychology_meter':
-        return 'Psychology Meter';
+        return l10n.stressTestWidgetPsychologyMeter;
       case 'my_assets':
-        return 'Holdings';
+        return l10n.stressTestWidgetHoldings;
       case 'price_chart':
-        return 'Price Chart';
+        return l10n.stressTestWidgetPriceChart;
       case 'epoch_history':
-        return 'Epochs';
+        return l10n.stressTestWidgetEpochs;
       case 'trade_history':
-        return 'Trade History';
+        return l10n.stressTestWidgetTradeHistory;
       case 'limit_orders':
-        return 'My Limit Orders';
+        return l10n.stressTestWidgetLimitOrders;
       case 'timer':
-        return 'Timer';
+        return l10n.stressTestWidgetTimer;
       default:
         return id;
     }

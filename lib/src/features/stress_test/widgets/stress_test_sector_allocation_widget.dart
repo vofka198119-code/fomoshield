@@ -8,27 +8,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../market_clock/market_clock_dial.dart' show dialLight, dialDark;
+import '../../../l10n/gen/app_localizations.dart';
+import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../stress_test_models.dart';
 import '../stress_test_naming.dart';
 import 'allocation_bar_row.dart';
 
 const double _sectorWarningThreshold = 75.0;
 
-// Every sector stressTestSectorName() can return — kept in sync with that
-// helper so a sector with zero holdings still shows up (as an empty bar)
-// instead of only appearing once the user actually buys into it.
-const _allSectors = [
-  'Technology',
-  'Finance',
-  'Healthcare',
-  'Consumer',
-  'Automotive',
-  'Biotech',
-  'Energy',
-  'Tech',
-  'Other',
+// The 11 real GICS sectors (stressTestGicsSector() resolves any real ticker
+// bought via Search into one of these, not just a curated ~50-name
+// whitelist) plus 'Other' for the rare symbol neither it nor the fictional
+// stress-test-asset override can classify — kept as an always-shown bar so
+// a sector with zero holdings appears empty instead of vanishing entirely.
+List<String> _allSectors(AppLocalizations l10n) => [
+  for (final s in GicsSector.values) s.localizedLabel(l10n),
+  l10n.commonOther,
 ];
 
 class StressTestSectorAllocationCard extends StatelessWidget {
@@ -38,13 +35,16 @@ class StressTestSectorAllocationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final holdings = session.holdings;
-    final sectorTotals = <String, double>{for (final s in _allSectors) s: 0};
+    final sectorTotals = <String, double>{
+      for (final s in _allSectors(l10n)) s: 0,
+    };
     double totalInvested = 0;
     for (final h in holdings) {
       final price = session.currentPrices[h.symbol] ?? h.entryPrice;
       final val = h.shares * price;
-      final sector = stressTestSectorName(h.symbol);
+      final sector = stressTestGicsSector(h.symbol)?.localizedLabel(l10n) ?? l10n.commonOther;
       sectorTotals[sector] = (sectorTotals[sector] ?? 0) + val;
       totalInvested += val;
     }
@@ -54,14 +54,7 @@ class StressTestSectorAllocationCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       child: Column(
         children: [
           SizedBox(

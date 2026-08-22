@@ -72,11 +72,12 @@ class SearchCounterNotifier extends StateNotifier<int> {
   }
 }
 
-final searchCounterProvider =
-    StateNotifierProvider<SearchCounterNotifier, int>((ref) {
-  final user = ref.watch(currentUserProvider);
-  return SearchCounterNotifier(userId: user?.id);
-});
+final searchCounterProvider = StateNotifierProvider<SearchCounterNotifier, int>(
+  (ref) {
+    final user = ref.watch(currentUserProvider);
+    return SearchCounterNotifier(userId: user?.id);
+  },
+);
 
 /// Provides whether the current user can perform a search.
 final canSearchProvider = Provider<bool>((ref) {

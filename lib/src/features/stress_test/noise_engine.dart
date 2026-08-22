@@ -33,6 +33,16 @@ part of 'stress_test_engine.dart';
 // the noise term.
 // ---------------------------------------------------------------------------
 
+// ── Price-swing radar (device-test feedback 2026-08-12) ──────────────────
+// How often (real wall-clock time) each holding's price is re-sampled for
+// the swing check, and how big a move between two samples counts as a
+// "swing" worth a notification. User's own spec: "к примеру час" (an hour,
+// as an example) narrowed down to 10 minutes; threshold "10 процентов...
+// можно снизить до 6%" — 10% picked as the starting value, tune down
+// toward 6% later if it reads as too rare on-device.
+const Duration _swingCheckInterval = Duration(minutes: 10);
+const double _swingThreshold = 0.10;
+
 // ── Recovery cross-asset tuning (device-test feedback 2026-07-23) ────────
 // Snapshot the price anchors the divergence-limit floor and the crash-
 // depth recovery-drift weighting both depend on (see gbm_engine.dart's
@@ -262,9 +272,10 @@ extension NoiseEngine on StressTestNotifier {
     // ticks oscillating ±1-2% right against it. Scaling dt to the
     // CURRENT epoch's real tick count spreads the scenario's full
     // designed magnitude evenly across the whole epoch instead.
-    final ticksPerEpoch = (rollInterval.inSeconds / _tickSeconds)
-        .round()
-        .clamp(1, 1 << 30);
+    final ticksPerEpoch = (rollInterval.inSeconds / _tickSeconds).round().clamp(
+      1,
+      1 << 30,
+    );
     final dtPerTick = 1.0 / ticksPerEpoch;
     final sqrtDt = sqrt(dtPerTick);
 
@@ -298,6 +309,29 @@ extension NoiseEngine on StressTestNotifier {
         final newsEvent = _maybeFireNewsEvent(session, rng, now);
         if (newsEvent != null) {
           session.activeNewsEvent = newsEvent;
+          // Only pop up/record for a genuine live tick (ticks<=1) — a
+          // catch-up batch (ticks>1, see this method's own doc comment)
+          // can roll News for epochs the user never actually watched live,
+          // and a popup for a "headline" from 3 days ago the instant the
+          // app reopens would be exactly the stale-notification spam the
+          // price-swing radar is being built to avoid (same principle,
+          // applied here too).
+          if (ticks <= 1) {
+            _onNotify?.call(
+              AppNotification(
+                id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+                type: AppNotificationType.news,
+                portfolioKind: NotificationPortfolioKind.stressTest,
+                portfolioId: session.id,
+                portfolioLabel: 'Stress Test — ${session.duration.displayName}',
+                symbol: newsEvent.symbol,
+                companyName: stressTestCompanyName(newsEvent.symbol),
+                title: newsEvent.headline,
+                detail: stressTestCompanyName(newsEvent.symbol),
+                createdAt: DateTime.now(),
+              ),
+            );
+          }
         }
       }
     }
@@ -359,8 +393,10 @@ extension NoiseEngine on StressTestNotifier {
       final hypeIncrements = _hypeTickIncrements(session);
 
       final epochFraction = ticksPerEpoch > 0
-          ? ((epochElapsedTicksNow - (ticks - 1 - tick)) / ticksPerEpoch)
-                .clamp(0.0, 1.0)
+          ? ((epochElapsedTicksNow - (ticks - 1 - tick)) / ticksPerEpoch).clamp(
+              0.0,
+              1.0,
+            )
           : 0.0;
 
       for (final h in session.holdings) {
@@ -393,14 +429,15 @@ extension NoiseEngine on StressTestNotifier {
         final driftMultiplier = regime == _MacroRegime.crash
             ? _crashDriftMultiplier(epochFraction)
             : regime == _MacroRegime.recovery
-            ? _recoveryDriftMultiplier(
-                _recoveryCrashDropPct(session, h.symbol),
-              )
+            ? _recoveryDriftMultiplier(_recoveryCrashDropPct(session, h.symbol))
             : 1.0;
         final effectiveAnnualDrift =
-            params.annualDrift + _varianceDragCompensation(params.annualVolatility);
+            params.annualDrift +
+            _varianceDragCompensation(params.annualVolatility);
         final rawChange =
-            effectiveAnnualDrift * dtPerTick * driftMultiplier + noise + microNoise;
+            effectiveAnnualDrift * dtPerTick * driftMultiplier +
+            noise +
+            microNoise;
         final clampedChange = _clampDrift(rawChange, regime);
         currentPrice = currentPrice * (1 + clampedChange);
         // Gated behind kDebugMode — this fires once per held symbol per
@@ -523,10 +560,7 @@ extension NoiseEngine on StressTestNotifier {
           newsRaw: newsIncrement,
           hypeRaw: hypeIncrement,
         );
-        var symLog = <TickExplanation>[
-          ...(explanations[h.symbol] ?? []),
-          expl,
-        ];
+        var symLog = <TickExplanation>[...(explanations[h.symbol] ?? []), expl];
         // Cap per-symbol log — see _maxExplanationLogEntries.
         if (symLog.length > _maxExplanationLogEntries) {
           symLog = symLog.sublist(symLog.length - _maxExplanationLogEntries);
@@ -656,6 +690,15 @@ extension NoiseEngine on StressTestNotifier {
       return (hist, ts);
     }();
 
+    // ── Price-swing radar (notifications) ────────────────────────────
+    // Live-tick only (ticks<=1) — same principle as the News notification
+    // gate above: a catch-up batch replaying several missed epochs at once
+    // isn't a "sudden" move the user is watching happen, it's the engine
+    // catching up on price history, so it must never fire this.
+    if (ticks <= 1) {
+      _checkPriceSwings(session, newPrices, now);
+    }
+
     state = [
       for (int i = 0; i < state.length; i++)
         if (i == idx)
@@ -719,5 +762,70 @@ extension NoiseEngine on StressTestNotifier {
           state[i],
     ];
     _save();
+  }
+
+  // ── Price-swing radar (device-test feedback 2026-08-12) ────────────
+  // Passive: only observes prices that already moved (via GBM/News/Hype
+  // above), never generates movement itself. Periodic wall-clock sampling
+  // per symbol — NOT a per-tick check — so it naturally can't fire from a
+  // catch-up burst (which replays many simulated ticks within a single
+  // real-world instant, never accumulating _swingCheckInterval of real
+  // time between samples) even without the ticks<=1 guard at the call
+  // site; the explicit guard is a second, belt-and-suspenders layer for
+  // the same requirement. Up to 5 sessions can run at once (premium) —
+  // each session's own snapshot map is keyed independently, so their
+  // 10-minute windows naturally desync by whenever each session was last
+  // opened rather than needing explicit staggering.
+  void _checkPriceSwings(
+    StressTestSession session,
+    Map<String, double> prices,
+    DateTime now,
+  ) {
+    final snapshots = _swingSnapshots.putIfAbsent(session.id, () => {});
+
+    for (final h in session.holdings) {
+      final price = prices[h.symbol];
+      if (price == null || price <= 0) continue;
+
+      final snap = snapshots[h.symbol];
+      if (snap == null) {
+        // First time seeing this holding — just establish a baseline,
+        // nothing to compare against yet.
+        snapshots[h.symbol] = (price: price, checkedAt: now);
+        continue;
+      }
+      if (now.difference(snap.checkedAt) < _swingCheckInterval) continue;
+
+      final changePct = (price - snap.price) / snap.price;
+      snapshots[h.symbol] = (price: price, checkedAt: now);
+      if (changePct.abs() < _swingThreshold) continue;
+
+      final name = stressTestCompanyName(h.symbol);
+      _onNotify?.call(
+        AppNotification(
+          id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+          type: AppNotificationType.priceSwing,
+          portfolioKind: NotificationPortfolioKind.stressTest,
+          portfolioId: session.id,
+          portfolioLabel: 'Stress Test — ${session.duration.displayName}',
+          symbol: h.symbol,
+          companyName: name,
+          title:
+              '$name ${changePct >= 0 ? 'jumped' : 'dropped'} '
+              '${(changePct.abs() * 100).toStringAsFixed(1)}%',
+          detail:
+              'In your ${session.duration.displayName} test, ${h.symbol} moved '
+              '${changePct >= 0 ? '+' : ''}${(changePct * 100).toStringAsFixed(1)}% '
+              'over the last ~${_swingCheckInterval.inMinutes} min.',
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
+
+    // Drop snapshots for symbols no longer held, so a later re-buy starts
+    // a fresh baseline instead of comparing against a stale price.
+    snapshots.removeWhere(
+      (symbol, _) => !session.holdings.any((h) => h.symbol == symbol),
+    );
   }
 }

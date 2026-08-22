@@ -104,9 +104,9 @@ class ScoringEngine {
 
     return {
       // Named 'financial_score' (not 'fs_score') to avoid the collision
-      // with Stress Test's unrelated behavioral Psychology Meter, which
-      // also produces a 0-100 number under the same 'fs_score' name —
-      // see docs/CODEBASE_REFERENCE.md section 4.5.
+      // with Stress Test's unrelated behavioral Psychology Meter score
+      // (TraderPsychologyProfile.compositeScore), which also produces a
+      // 0-100 number under the same 'fs_score' name.
       'financial_score': finalScore.round(),
       'markers': {
         'valuation': _markerResult('Valuation', valuation, 'P/E vs sector average'),

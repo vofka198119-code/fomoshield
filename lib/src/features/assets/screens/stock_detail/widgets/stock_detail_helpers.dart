@@ -8,10 +8,6 @@ import 'package:intl/intl.dart';
 // — those are domain data consumed well beyond this screen, these are not.
 // ---------------------------------------------------------------------------
 
-/// Full currency format — NEVER compact (4.67K, 1.5M). Always $X,XXX.XX
-String fmtFullCurrency(double v) =>
-    NumberFormat.currency(locale: 'en_US', symbol: r'$').format(v);
-
 /// Date formatter: "Jan 15"
 String fmtTradeDate(DateTime d) => DateFormat('MMM d').format(d);
 

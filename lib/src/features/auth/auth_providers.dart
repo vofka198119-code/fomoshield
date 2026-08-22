@@ -1,17 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_client.dart';
-
-// ---------------------------------------------------------------------------
-// Secure Storage instance (single shared instance)
-// ---------------------------------------------------------------------------
-
-const _secureStorage = FlutterSecureStorage();
+import '../../shared/services/finnhub_service.dart';
+import '../disclaimer/disclaimer_providers.dart';
 
 // ---------------------------------------------------------------------------
 // Supabase Session Check (for splash screen)
 // ---------------------------------------------------------------------------
+//
+// Supabase's own SDK persists the session locally and restores it during
+// Supabase.initialize() in main() — before this provider (or anything else)
+// ever runs. This is the single source of truth for "is there a live
+// session", for every sign-in method (email/password AND Google) alike.
+// There is deliberately no separate stored-password/re-login mechanism —
+// that used to exist here and caused a real bug: Google accounts have no
+// password to replay, so they were always treated as "can't restore" and
+// force-signed-out on every cold start (fixed 2026-08-14).
 
 /// True if a valid Supabase session exists (user is logged in).
 final hasSupabaseSessionProvider = FutureProvider<bool>((ref) async {
@@ -20,73 +24,24 @@ final hasSupabaseSessionProvider = FutureProvider<bool>((ref) async {
 });
 
 // ---------------------------------------------------------------------------
-// Remember Me — saved email + password in secure storage
+// isLoggedIn — the user's own "Remember me" choice
 // ---------------------------------------------------------------------------
-
-class RememberMeCredentials {
-  final String email;
-  final String password;
-
-  const RememberMeCredentials({required this.email, required this.password});
-}
-
-class RememberMeNotifier extends StateNotifier<RememberMeCredentials?> {
-  RememberMeNotifier() : super(null) {
-    _load();
-  }
-
-  static const _emailKey = 'saved_email';
-  static const _passwordKey = 'saved_password';
-
-  Future<void> _load() async {
-    final email = await _secureStorage.read(key: _emailKey);
-    final password = await _secureStorage.read(key: _passwordKey);
-    if (email != null && password != null) {
-      state = RememberMeCredentials(email: email, password: password);
-    }
-  }
-
-  Future<void> save(String email, String password) async {
-    await _secureStorage.write(key: _emailKey, value: email);
-    await _secureStorage.write(key: _passwordKey, value: password);
-    state = RememberMeCredentials(email: email, password: password);
-  }
-
-  Future<void> clear() async {
-    await _secureStorage.delete(key: _emailKey);
-    await _secureStorage.delete(key: _passwordKey);
-    state = null;
-  }
-}
-
-final rememberMeProvider =
-    StateNotifierProvider<RememberMeNotifier, RememberMeCredentials?>((ref) {
-  return RememberMeNotifier();
-});
-
-/// Reads saved credentials directly from secure storage (for splash screen).
-final savedCredentialsProvider = FutureProvider<RememberMeCredentials?>((ref) async {
-  final email = await _secureStorage.read(key: RememberMeNotifier._emailKey);
-  final password = await _secureStorage.read(key: RememberMeNotifier._passwordKey);
-  if (email != null && password != null) {
-    return RememberMeCredentials(email: email, password: password);
-  }
-  return null;
-});
-
-// ---------------------------------------------------------------------------
-// isLoggedIn — the ONLY flag that controls auto-login on splash
-// True ONLY if user checked "Remember Me" and login succeeded.
-// ---------------------------------------------------------------------------
+//
+// This does NOT gate whether a session can be restored (Supabase always
+// restores its own session regardless). It gates whether SplashScreen
+// honors that restored session or deliberately signs the user back out —
+// i.e. "Remember me" unchecked means "don't keep me signed in past this
+// app session", same intent for every sign-in method.
 
 /// Whether user checked "Remember me" in a previous session.
-/// Read by SplashScreen to decide: go to /auth or auto-login.
+/// Read by SplashScreen to decide: honor the restored Supabase session, or
+/// sign out and send the user to /auth.
 final isLoggedInProvider = FutureProvider<bool>((ref) async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getBool('is_logged_in') ?? false;
 });
 
-/// Sets the is_logged_in flag (call after successful login with Remember Me).
+/// Sets the is_logged_in flag (call after successful login/signup).
 Future<void> setIsLoggedIn(bool value) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool('is_logged_in', value);
@@ -96,18 +51,44 @@ Future<void> setIsLoggedIn(bool value) async {
 // Session Data Cleanup — call on logout to prevent data leaks between accounts
 // ---------------------------------------------------------------------------
 
-/// Clears auth session data and credentials.
-/// Does NOT clear SharedPreferences (portfolios, watchlist, widget order)
-/// so data persists for the next login under the same email.
+/// Clears auth session data. Does NOT clear SharedPreferences (portfolios,
+/// watchlist, widget order) so data persists for the next login under the
+/// same email.
 Future<void> clearAllSessionData() async {
-  // 1) Clear Remember Me credentials from FlutterSecureStorage
-  await _secureStorage.delete(key: RememberMeNotifier._emailKey);
-  await _secureStorage.delete(key: RememberMeNotifier._passwordKey);
-
-  // 2) Clear is_logged_in flag
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool('is_logged_in', false);
-
-  // 3) Sign out from Supabase
   await SupabaseConfig.client.auth.signOut();
+}
+
+// ---------------------------------------------------------------------------
+// Post-auth destination — shared by SplashScreen (cold-start session
+// resume) and AuthScreen (email/password + Google sign-in), so a
+// pending-deletion account is caught the same way no matter how the user
+// ends up authenticated.
+// ---------------------------------------------------------------------------
+
+/// Resolves where a just-authenticated (or session-resumed) user should
+/// land: the full-block Restore Account screen if this account is pending
+/// deletion (2026-08-16, see profile_screen.dart's Delete Account flow),
+/// otherwise the existing disclaimer-gate → home logic. A failed status
+/// check (network hiccup) doesn't block sign-in — falls through to normal
+/// resolution, same as every other non-critical startup check. `extra`
+/// carries the deletion status through to AccountRestoreScreen when the
+/// route is '/account-restore' — GoRouter's `extra:` param, not encoded in
+/// the route string itself.
+Future<({String route, Object? extra})> resolvePostAuthRoute(
+  WidgetRef ref,
+) async {
+  try {
+    final status = await FinnhubService().accountDeletionStatus();
+    if (status.pendingDeletion) {
+      return (route: '/account-restore', extra: status);
+    }
+  } catch (_) {
+    // Ignore — see doc comment above.
+  }
+  final disclaimerAccepted = await ref.read(
+    isDisclaimerAcceptedProvider.future,
+  );
+  return (route: disclaimerAccepted ? '/home' : '/disclaimer', extra: null);
 }

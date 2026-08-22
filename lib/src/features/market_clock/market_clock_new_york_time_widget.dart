@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_dial.dart';
 import 'market_clock_engine.dart';
 
@@ -17,6 +18,7 @@ class NewYorkTimeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: marketClockCardDecoration(),
       child: Column(
@@ -25,7 +27,7 @@ class NewYorkTimeWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
             child: Text(
-              'NEW YORK TIME',
+              l10n.marketClockNewYorkTimeTitle,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -45,7 +47,9 @@ class NewYorkTimeWidget extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return _MarketClockInstrumentPanel(
-                    state: state, area: constraints.maxWidth);
+                  state: state,
+                  area: constraints.maxWidth,
+                );
               },
             ),
           ),
@@ -86,32 +90,32 @@ class _MacroPhase {
 /// on a non-trading day these countdowns still tick against the ordinary
 /// daily cycle rather than the next actual trading day. Acceptable v1
 /// simplification; revisit if it reads as wrong on a real weekend.
-const _macroPhases = [
+List<_MacroPhase> _macroPhasesFor(AppLocalizations l10n) => [
   _MacroPhase(
     phase: MarketPhase.preMarket,
     icon: Icons.wb_twilight,
-    label: 'PRE-MARKET',
+    label: l10n.marketClockMacroPhasePreMarketLabel,
     start: 240,
     end: 570,
   ),
   _MacroPhase(
     phase: MarketPhase.marketOpen,
     icon: Icons.wb_sunny_rounded,
-    label: 'MARKET OPEN',
+    label: l10n.marketClockMacroPhaseMarketOpenLabel,
     start: 570,
     end: 960,
   ),
   _MacroPhase(
     phase: MarketPhase.afterHours,
     icon: Icons.nightlight_round,
-    label: 'AFTER HOURS',
+    label: l10n.marketClockMacroPhaseAfterHoursLabel,
     start: 960,
     end: 1200,
   ),
   _MacroPhase(
     phase: MarketPhase.closed,
     icon: Icons.bedtime_rounded,
-    label: 'MARKET CLOSED',
+    label: l10n.marketClockMacroPhaseMarketClosedLabel,
     start: 1200,
     end: 240,
   ),
@@ -144,6 +148,8 @@ class _MarketClockInstrumentPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final macroPhases = _macroPhasesFor(l10n);
     final panelSize = area / 2;
     final dialSize = area * 0.62;
     // True circle, radius matched tightly to the dial's own outer edge (incl.
@@ -172,10 +178,14 @@ class _MarketClockInstrumentPanel extends StatelessWidget {
       final duration = (macro.end - macro.start + 1440) % 1440;
       final elapsed = (nowMinute - macro.start + 1440) % 1440;
       final active = elapsed < duration;
-      final remaining = active ? duration - elapsed : (macro.start - nowMinute + 1440) % 1440;
+      final remaining = active
+          ? duration - elapsed
+          : (macro.start - nowMinute + 1440) % 1440;
       return Positioned(
         top: (c == _Corner.topLeft || c == _Corner.topRight) ? 0 : null,
-        bottom: (c == _Corner.bottomLeft || c == _Corner.bottomRight) ? 0 : null,
+        bottom: (c == _Corner.bottomLeft || c == _Corner.bottomRight)
+            ? 0
+            : null,
         left: (c == _Corner.topLeft || c == _Corner.bottomLeft) ? 0 : null,
         right: (c == _Corner.topRight || c == _Corner.bottomRight) ? 0 : null,
         width: panelW,
@@ -198,11 +208,17 @@ class _MarketClockInstrumentPanel extends StatelessWidget {
       height: area,
       child: Stack(
         children: [
-          Center(child: MarketClockDial(state: state, size: dialSize, showDigitalReadout: true)),
-          corner(_Corner.topLeft, _macroPhases[0]),
-          corner(_Corner.topRight, _macroPhases[1]),
-          corner(_Corner.bottomRight, _macroPhases[2]),
-          corner(_Corner.bottomLeft, _macroPhases[3]),
+          Center(
+            child: MarketClockDial(
+              state: state,
+              size: dialSize,
+              showDigitalReadout: true,
+            ),
+          ),
+          corner(_Corner.topLeft, macroPhases[0]),
+          corner(_Corner.topRight, macroPhases[1]),
+          corner(_Corner.bottomRight, macroPhases[2]),
+          corner(_Corner.bottomLeft, macroPhases[3]),
         ],
       ),
     );
@@ -236,26 +252,31 @@ class _CornerPanel extends StatelessWidget {
   // have been shrunk for the gap) — so shrinking the panel just moves its
   // own far edge away from that fixed point, without moving the circle.
   Offset get _notchCenter => switch (corner) {
-        _Corner.topLeft => Offset(panelSize, panelSize),
-        _Corner.topRight => Offset(panelW - panelSize, panelSize),
-        _Corner.bottomLeft => Offset(panelSize, panelH - panelSize),
-        _Corner.bottomRight => Offset(panelW - panelSize, panelH - panelSize),
-      };
+    _Corner.topLeft => Offset(panelSize, panelSize),
+    _Corner.topRight => Offset(panelW - panelSize, panelSize),
+    _Corner.bottomLeft => Offset(panelSize, panelH - panelSize),
+    _Corner.bottomRight => Offset(panelW - panelSize, panelH - panelSize),
+  };
 
   Alignment get _contentAlignment => switch (corner) {
-        _Corner.topLeft => Alignment.topLeft,
-        _Corner.topRight => Alignment.topRight,
-        _Corner.bottomLeft => Alignment.bottomLeft,
-        _Corner.bottomRight => Alignment.bottomRight,
-      };
+    _Corner.topLeft => Alignment.topLeft,
+    _Corner.topRight => Alignment.topRight,
+    _Corner.bottomLeft => Alignment.bottomLeft,
+    _Corner.bottomRight => Alignment.bottomRight,
+  };
 
-  bool get _mirrored => corner == _Corner.bottomLeft || corner == _Corner.bottomRight;
+  bool get _mirrored =>
+      corner == _Corner.bottomLeft || corner == _Corner.bottomRight;
 
-  bool get _rightSide => corner == _Corner.topRight || corner == _Corner.bottomRight;
+  bool get _rightSide =>
+      corner == _Corner.topRight || corner == _Corner.bottomRight;
 
   @override
   Widget build(BuildContext context) {
-    final accent = active ? _macroPhaseColor(macro.phase) : Colors.white.withValues(alpha: 0.4);
+    final l10n = AppLocalizations.of(context)!;
+    final accent = active
+        ? _macroPhaseColor(macro.phase)
+        : Colors.white.withValues(alpha: 0.4);
 
     final labelStyle = GoogleFonts.inter(
       fontSize: panelSize * 0.072,
@@ -268,7 +289,9 @@ class _CornerPanel extends StatelessWidget {
       fontWeight: FontWeight.w700,
       color: dialIvory,
     );
-    final timerString = active ? 'Ends ${_formatHm(remainingMinutes)}' : 'Starts ${_formatHm(remainingMinutes)}';
+    final timerString = active
+        ? l10n.marketClockCountdownEnds(_formatHm(remainingMinutes))
+        : l10n.marketClockCountdownStarts(_formatHm(remainingMinutes));
 
     // The notch only bites into the corner nearest the dial, so a thin band
     // along the panel's OUTER edge (top edge for top panels, bottom edge
@@ -276,8 +299,18 @@ class _CornerPanel extends StatelessWidget {
     // most of panelSize as width, as long as the whole block stays short
     // (label line + timer line, each capped to 1 line so neither can ever
     // grow past the box and spill outside the panel).
-    final labelRow = Text(macro.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: labelStyle);
-    final timerText = Text(timerString, maxLines: 1, overflow: TextOverflow.ellipsis, style: timerStyle);
+    final labelRow = Text(
+      macro.label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: labelStyle,
+    );
+    final timerText = Text(
+      timerString,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: timerStyle,
+    );
 
     final spacer = SizedBox(height: panelSize * 0.03);
 
@@ -305,7 +338,9 @@ class _CornerPanel extends StatelessWidget {
               borderColor: active
                   ? _macroPhaseColor(macro.phase).withValues(alpha: 0.7)
                   : dialBrassLight.withValues(alpha: 0.3),
-              fillColor: active ? _macroPhaseColor(macro.phase).withValues(alpha: 0.1) : dialDark.withValues(alpha: 0.25),
+              fillColor: active
+                  ? _macroPhaseColor(macro.phase).withValues(alpha: 0.1)
+                  : dialDark.withValues(alpha: 0.25),
             ),
           ),
           Padding(
@@ -315,7 +350,9 @@ class _CornerPanel extends StatelessWidget {
               child: SizedBox(
                 width: panelW * 0.82,
                 child: Column(
-                  crossAxisAlignment: _rightSide ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  crossAxisAlignment: _rightSide
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: _mirrored
                       ? [timerText, spacer, labelRow]
@@ -366,20 +403,34 @@ class _NotchedPanelPainter extends CustomPainter {
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final rrect = RRect.fromRectAndCorners(
       rect,
-      topLeft: corner == _Corner.topLeft ? Radius.circular(cornerRadius) : Radius.zero,
-      topRight: corner == _Corner.topRight ? Radius.circular(cornerRadius) : Radius.zero,
-      bottomLeft: corner == _Corner.bottomLeft ? Radius.circular(cornerRadius) : Radius.zero,
-      bottomRight: corner == _Corner.bottomRight ? Radius.circular(cornerRadius) : Radius.zero,
+      topLeft: corner == _Corner.topLeft
+          ? Radius.circular(cornerRadius)
+          : Radius.zero,
+      topRight: corner == _Corner.topRight
+          ? Radius.circular(cornerRadius)
+          : Radius.zero,
+      bottomLeft: corner == _Corner.bottomLeft
+          ? Radius.circular(cornerRadius)
+          : Radius.zero,
+      bottomRight: corner == _Corner.bottomRight
+          ? Radius.circular(cornerRadius)
+          : Radius.zero,
     );
     final rectPath = Path()..addRRect(rrect);
-    final notchPath = Path()..addOval(Rect.fromCircle(center: notchCenter, radius: notchRadius));
+    final notchPath = Path()
+      ..addOval(Rect.fromCircle(center: notchCenter, radius: notchRadius));
     return Path.combine(PathOperation.difference, rectPath, notchPath);
   }
 
   @override
   void paint(Canvas canvas, Size size) {
     final path = _buildPath(size);
-    canvas.drawPath(path, Paint()..color = fillColor..style = PaintingStyle.fill);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = fillColor
+        ..style = PaintingStyle.fill,
+    );
     canvas.drawPath(
       path,
       Paint()
@@ -391,5 +442,6 @@ class _NotchedPanelPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _NotchedPanelPainter oldDelegate) =>
-      oldDelegate.borderColor != borderColor || oldDelegate.fillColor != fillColor;
+      oldDelegate.borderColor != borderColor ||
+      oldDelegate.fillColor != fillColor;
 }

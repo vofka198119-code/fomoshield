@@ -6,6 +6,7 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../orders/order_provider.dart';
 import '../../orders/widgets/order_row_tile.dart';
 import '../../orders/widgets/order_list_sheet.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // My Limit Orders — Portfolio screen widget listing this portfolio's own
@@ -29,6 +30,7 @@ class MyLimitOrdersWidget extends ConsumerWidget {
         .where((o) => o.portfolioId == portfolioId)
         .toList();
     final shown = orders.take(_inlineLimit).toList();
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       width: double.infinity,
@@ -37,14 +39,17 @@ class MyLimitOrdersWidget extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('MY LIMIT ORDERS', style: FomoShieldTheme.cardTitle()),
+          Text(l10n.myLimitOrdersTitle, style: FomoShieldTheme.cardTitle()),
           const Divider(height: 20, color: Color(0x0F000000)),
           if (orders.isEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: Text(
-                'You currently have no active orders',
-                style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+                l10n.myLimitOrdersEmpty,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: ThemeV2.textSecondary,
+                ),
               ),
             )
           else ...[
@@ -56,12 +61,12 @@ class MyLimitOrdersWidget extends ConsumerWidget {
                   child: TextButton(
                     onPressed: () => showOrderListSheet(
                       context,
-                      title: 'My Limit Orders',
+                      title: l10n.myLimitOrdersSheetTitle,
                       orders: orders,
                       subtitleFor: (_) => null,
                     ),
                     child: Text(
-                      'See all ${orders.length} orders',
+                      l10n.myLimitOrdersSeeAll(orders.length),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,

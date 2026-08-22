@@ -9,6 +9,7 @@
 import 'dart:math';
 import 'order_model.dart';
 import '../portfolio/portfolio_providers.dart';
+import '../../shared/utils/currency_format.dart';
 
 /// Result of evaluating/executing a single order
 class OrderExecutionResult {
@@ -38,8 +39,10 @@ class OrderBatchResult {
   });
 
   List<Order> get updatedOrders => results.map((r) => r.updatedOrder).toList();
-  List<Transaction> get transactions =>
-      results.where((r) => r.transaction != null).map((r) => r.transaction!).toList();
+  List<Transaction> get transactions => results
+      .where((r) => r.transaction != null)
+      .map((r) => r.transaction!)
+      .toList();
 }
 
 // ---------------------------------------------------------------------------
@@ -170,7 +173,8 @@ class OrderExecutionService {
       return OrderExecutionResult(
         updatedOrder: order,
         wasExecuted: false,
-        message: 'Waiting: ${order.side == OrderSide.buy ? 'current > limit' : 'current < limit'}',
+        message:
+            'Waiting: ${order.side == OrderSide.buy ? 'current > limit' : 'current < limit'}',
       );
     }
 
@@ -330,7 +334,9 @@ class OrderExecutionService {
       updatedOrder: updatedOrder,
       transaction: tx,
       wasExecuted: true,
-      message: isFull ? 'Filled at \$${executionPrice.toStringAsFixed(2)}' : 'Partially filled',
+      message: isFull
+          ? 'Filled at ${formatUsd(executionPrice)}'
+          : 'Partially filled',
     );
   }
 

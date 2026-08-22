@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../stress_test_pending_orders_provider.dart';
 import '../../assets/screens/stock_detail/widgets/stress_test_order_row_tile.dart';
 
@@ -24,9 +25,9 @@ class StressTestMyLimitOrdersWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final orders =
-        ref.watch(stressTestSessionPendingOrdersProvider(sessionId));
+    final orders = ref.watch(stressTestSessionPendingOrdersProvider(sessionId));
     final shown = orders.take(_inlineLimit).toList();
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       width: double.infinity,
@@ -35,14 +36,17 @@ class StressTestMyLimitOrdersWidget extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('MY LIMIT ORDERS', style: FomoShieldTheme.cardTitle()),
+          Text(l10n.myLimitOrdersTitle, style: FomoShieldTheme.cardTitle()),
           const Divider(height: 20, color: Color(0x0F000000)),
           if (orders.isEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: Text(
-                'You currently have no active orders',
-                style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textSecondary),
+                l10n.myLimitOrdersEmpty,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: ThemeV2.textSecondary,
+                ),
               ),
             )
           else ...[
@@ -54,7 +58,7 @@ class StressTestMyLimitOrdersWidget extends ConsumerWidget {
                   child: TextButton(
                     onPressed: () => _showAllSheet(context),
                     child: Text(
-                      'See all ${orders.length} orders',
+                      l10n.myLimitOrdersSeeAll(orders.length),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -99,7 +103,7 @@ class StressTestMyLimitOrdersWidget extends ConsumerWidget {
                 ),
               ),
               Text(
-                'My Limit Orders',
+                AppLocalizations.of(context)!.myLimitOrdersSheetTitle,
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../features/market_clock/market_clock_dial.dart';
 import '../../../features/market_clock/market_clock_engine.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Market Clock Widget — Home mini card. Same instrument-panel dial as the
@@ -22,13 +23,18 @@ class MarketClockWidget extends StatefulWidget {
 class _MarketClockWidgetState extends State<MarketClockWidget> {
   late Timer _timer;
   late MarketClockState _state;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _state = resolveMarketClockState(nowInNewYork());
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+    final l10n = AppLocalizations.of(context)!;
+    _state = resolveMarketClockState(l10n, nowInNewYork());
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() => _state = resolveMarketClockState(nowInNewYork()));
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _state = resolveMarketClockState(l10n, nowInNewYork()));
     });
   }
 
@@ -56,7 +62,7 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
               child: Row(
                 children: [
                   Text(
-                    'MARKET CLOCK',
+                    AppLocalizations.of(context)!.marketClockTitle,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -65,7 +71,11 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
                     ),
                   ),
                   const Spacer(),
-                  Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.7), size: 20),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white.withValues(alpha: 0.7),
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -78,7 +88,7 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
-                'NEW YORK TIME',
+                AppLocalizations.of(context)!.marketClockNewYorkTime,
                 style: GoogleFonts.inter(
                   fontSize: 9,
                   fontWeight: FontWeight.w700,
@@ -100,7 +110,10 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
                       children: [
                         Row(
                           children: [
-                            Text(window.emoji, style: const TextStyle(fontSize: 15)),
+                            Text(
+                              window.emoji,
+                              style: const TextStyle(fontSize: 15),
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(

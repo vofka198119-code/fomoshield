@@ -8,6 +8,7 @@ import '../../../shared/widgets/company_logo.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../home_providers.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Watchlist Widget — Compact
@@ -29,7 +30,7 @@ class WatchlistWidget extends ConsumerWidget {
     final preview = watchlistSymbols.take(2).toList();
 
     return WidgetContainer(
-      title: 'WATCHLIST',
+      title: AppLocalizations.of(context)!.watchlistTitle,
       onTap: () => context.push('/watchlist'),
       showFooter: watchlistSymbols.length > 2,
       children: preview.map((s) => _WatchlistTile(symbol: s)).toList(),
@@ -38,17 +39,18 @@ class WatchlistWidget extends ConsumerWidget {
 
   Widget _emptyContainer(BuildContext context) {
     return WidgetContainer(
-      title: 'WATCHLIST',
+      title: AppLocalizations.of(context)!.watchlistTitle,
       onTap: () => context.push('/watchlist'),
       showFooter: false,
-      emptyText: 'Nothing here yet',
+      emptyText: AppLocalizations.of(context)!.watchlistEmpty,
     );
   }
 }
 
 // ---------------------------------------------------------------------------
 // Watchlist Tile — Compact version (no accordion), no live price (see
-// cachedLogoEntryProvider doc comment: no Finnhub call ever from this tile).
+// cachedLogoEntryProvider doc comment: no Finnhub call ever from this tile,
+// by design).
 // ---------------------------------------------------------------------------
 
 class _WatchlistTile extends ConsumerWidget {
@@ -61,7 +63,10 @@ class _WatchlistTile extends ConsumerWidget {
     final name = logoEntry?.companyName.isNotEmpty == true
         ? logoEntry!.companyName
         : symbol;
-    final sector = resolveGicsSector(symbol, companyName: logoEntry?.companyName);
+    final sector = resolveGicsSector(
+      symbol,
+      companyName: logoEntry?.companyName,
+    );
 
     return InkWell(
       onTap: () => context.push('/company/$symbol'),
@@ -122,4 +127,3 @@ class _WatchlistTile extends ConsumerWidget {
     );
   }
 }
-

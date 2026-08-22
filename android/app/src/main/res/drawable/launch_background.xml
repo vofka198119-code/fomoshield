@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@android:color/white" />
+<!-- Native pre-Flutter-frame launch screen — matches SplashScreen's own
+     background (Color(0xFFF7F7F5)) and shield mark, so the gap between
+     tapping the app icon and Flutter's first frame reads as one continuous
+     branded splash instead of a bare white/black flash (fixed 2026-08-14,
+     was previously an unbranded @android:color/white with no logo, and the
+     -v21 variant used the dynamic ?android:colorBackground which resolves
+     to black under this device's dark system theme).
 
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
+     branding_shield.png (drawable-nodpi/) is NOT the raw logo asset — it's
+     an actual on-device screenshot of Flutter's own rendered Splash
+     (shield + FOMO/SHIELD wordmark, status bar area painted over with the
+     background color to erase the baked-in system clock/icons), cropped
+     just above where the loading ring starts. This guarantees a pixel-
+     identical handoff on THIS device: the shield and wordmark don't shift
+     at all when Flutter's first frame takes over (which itself no longer
+     animates them in — see splash_screen.dart, 2026-08-14 — only the
+     ring fades in after).
+
+     Tradeoff, worth knowing before reusing this on another device: this
+     bitmap is fixed at this device's exact 1080x1850px capture, not
+     responsive. On a different screen size/aspect ratio it will misalign
+     or leave gaps, unlike Flutter's own centered layout. Fine for a
+     solo-dev single test device today; would need re-capturing (or a
+     proper responsive native-splash setup, e.g. the flutter_native_splash
+     package) before shipping to a range of real devices. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/ic_launcher_background" />
+    <item android:gravity="top">
         <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+            android:gravity="top"
+            android:src="@drawable/branding_shield" />
+    </item>
 </layer-list>

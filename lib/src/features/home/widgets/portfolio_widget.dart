@@ -6,11 +6,13 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/router/navigation_history_provider.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../../portfolio/portfolio_providers.dart';
 import '../../portfolio/widgets/target_widget.dart' show targetDisplayPercent;
+import '../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Portfolio Widget — Live portfolio summary for Home screen
@@ -64,16 +66,21 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
         context,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-          child: Text('No portfolio',
-              style: GoogleFonts.inter(
-                  fontSize: 14, color: ThemeV2.textSecondary)),
+          child: Text(
+            AppLocalizations.of(context)!.portfolioWidgetNoPortfolio,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
         ),
       );
     }
 
     final activeId = ref.watch(activePortfolioIdProvider);
-    int index =
-        activeId != null ? portfolios.indexWhere((p) => p.id == activeId) : 0;
+    int index = activeId != null
+        ? portfolios.indexWhere((p) => p.id == activeId)
+        : 0;
     if (index < 0) index = 0;
     _currentIndex = _currentIndex.clamp(0, portfolios.length - 1);
 
@@ -134,10 +141,12 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
   /// Card chrome + header, shared by loading/error/empty/data states.
   Widget _shell(
     BuildContext context, {
-    String title = 'PORTFOLIO',
+    String? title,
     bool showPremiumBadge = false,
     required Widget child,
   }) {
+    final resolvedTitle =
+        title ?? AppLocalizations.of(context)!.portfolioWidgetTitle;
     return InkWell(
       onTap: () {
         ref.read(previousTabRouteProvider.notifier).state = '/home';
@@ -156,14 +165,14 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
                 children: [
                   Flexible(
                     child: Text(
-                      title,
+                      resolvedTitle,
                       style: FomoShieldTheme.cardTitle(),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (showPremiumBadge) ...[
                     const SizedBox(width: 8),
-                    _premiumPill(),
+                    _premiumPill(context),
                   ],
                 ],
               ),
@@ -181,19 +190,12 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
     );
   }
 
-  Widget _premiumPill() {
+  Widget _premiumPill(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(12)),
       child: Text(
-        'PREMIUM',
+        AppLocalizations.of(context)!.profilePremiumBadge,
         style: GoogleFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w800,
@@ -244,8 +246,10 @@ class _PortfolioPerformanceView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final performanceAsync =
-        ref.watch(portfolioPerformanceProvider(portfolioId));
+    final l10n = AppLocalizations.of(context)!;
+    final performanceAsync = ref.watch(
+      portfolioPerformanceProvider(portfolioId),
+    );
 
     return performanceAsync.when(
       loading: () => Row(
@@ -254,19 +258,28 @@ class _PortfolioPerformanceView extends ConsumerWidget {
             width: 18,
             height: 18,
             child: CircularProgressIndicator(
-                strokeWidth: 2, color: ThemeV2.primary),
+              strokeWidth: 2,
+              color: ThemeV2.primary,
+            ),
           ),
           const SizedBox(width: 12),
-          Text('Loading...',
-              style: GoogleFonts.inter(
-                  fontSize: 14, color: ThemeV2.textSecondary)),
+          Text(
+            l10n.commonLoading,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: ThemeV2.textSecondary,
+            ),
+          ),
         ],
       ),
-      error: (_, _) => Text('\$– – –',
-          style: interNums(
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-              color: ThemeV2.textPrimary)),
+      error: (_, _) => Text(
+        '\$– – –',
+        style: interNums(
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+          color: ThemeV2.textPrimary,
+        ),
+      ),
       data: (perf) {
         final isUp = perf.pnl >= 0;
         final pnlColor = isUp ? ThemeV2.success : ThemeV2.loss;
@@ -289,28 +302,27 @@ class _PortfolioPerformanceView extends ConsumerWidget {
                 child: Column(
                   children: [
                     _cell(
-                      label: 'PORTFOLIO BALANCE',
-                      value: '\$${perf.currentValue.toStringAsFixed(2)}',
+                      label: l10n.portfolioBalanceLabel,
+                      value: formatUsd(perf.currentValue),
                       bgColor: ThemeV2.primaryBg,
                     ),
                     const SizedBox(height: 6),
                     _cell(
-                      label: 'CASH AVAILABLE',
-                      value: '\$${perf.cash.toStringAsFixed(2)}',
+                      label: l10n.portfolioCashLabel,
+                      value: formatUsd(perf.cash),
                       bgColor: ThemeV2.primaryBg,
                     ),
                     const SizedBox(height: 6),
                     _cell(
-                      label: 'UNREALIZED P&L',
-                      value:
-                          '${isUp ? '+' : ''}\$${perf.pnl.toStringAsFixed(2)}',
+                      label: l10n.portfolioUnrealizedPnl,
+                      value: formatUsdSigned(perf.pnl),
                       valueFontSize: 14,
                       bgColor: pnlBg,
                       valueColor: pnlColor,
                     ),
                     const SizedBox(height: 6),
                     _cell(
-                      label: 'CHANGE',
+                      label: l10n.shieldSignalChange,
                       value:
                           '${isUp ? '+' : ''}${perf.pnlPercent.toStringAsFixed(2)}%',
                       valueFontSize: 14,
@@ -321,9 +333,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Expanded(
-                child: _VerticalProgressBar(currentPercent: barPercent),
-              ),
+              Expanded(child: _VerticalProgressBar(currentPercent: barPercent)),
             ],
           ),
         );
@@ -404,14 +414,7 @@ class _VerticalProgressBar extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(10, 10, 12, 14),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       // Same window title treatment as the cells to the left (label above
       // content), just in white — the cells' primary-green label color
       // would be invisible against this dark gradient. The window itself
@@ -422,7 +425,7 @@ class _VerticalProgressBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'TARGET',
+            AppLocalizations.of(context)!.targetLabel,
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
@@ -465,13 +468,19 @@ class _VerticalProgressBar extends StatelessWidget {
                     widthFactor: 0.65,
                     child: Column(
                       verticalDirection: VerticalDirection.up,
-                      children: List.generate(SegmentGaugeMath.segmentCount, (i) {
-                        final fraction =
-                            SegmentGaugeMath.fillFraction(currentPercent, i);
+                      children: List.generate(SegmentGaugeMath.segmentCount, (
+                        i,
+                      ) {
+                        final fraction = SegmentGaugeMath.fillFraction(
+                          currentPercent,
+                          i,
+                        );
                         return Expanded(
                           child: Container(
                             margin: EdgeInsets.only(
-                              top: i == SegmentGaugeMath.segmentCount - 1 ? 0 : 3,
+                              top: i == SegmentGaugeMath.segmentCount - 1
+                                  ? 0
+                                  : 3,
                             ),
                             clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
@@ -484,7 +493,10 @@ class _VerticalProgressBar extends StatelessWidget {
                                     child: FractionallySizedBox(
                                       heightFactor: fraction,
                                       child: Container(
-                                          color: SegmentGaugeMath.colorForIndex(i)),
+                                        color: SegmentGaugeMath.colorForIndex(
+                                          i,
+                                        ),
+                                      ),
                                     ),
                                   )
                                 : null,

@@ -14,9 +14,11 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/company_logo.dart';
 import 'stress_test_models.dart';
 import 'stress_test_naming.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 class StressTestTradeDetailScreen extends StatelessWidget {
   final String sessionId;
@@ -30,6 +32,7 @@ class StressTestTradeDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final t = trade;
 
     return Scaffold(
@@ -46,7 +49,7 @@ class StressTestTradeDetailScreen extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'TRADE DETAIL',
+          l10n.tradeDetailTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -55,12 +58,18 @@ class StressTestTradeDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: t == null
-          ? const Center(child: Text('Trade not found'))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: _TradeDetailCard(trade: t),
-            ),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: t == null
+            ? Center(child: Text(l10n.tradeNotFound))
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: _TradeDetailCard(trade: t),
+              ),
+      ),
     );
   }
 }
@@ -72,6 +81,7 @@ class _TradeDetailCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final accent = trade.isBuy ? ThemeV2.success : ThemeV2.loss;
     final companyName = resolveStressTestCompanyName(ref, trade.symbol);
 
@@ -142,16 +152,13 @@ class _TradeDetailCard extends ConsumerWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: accent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  trade.isBuy ? 'BUY' : 'SELL',
+                  trade.isBuy ? l10n.tradeBuy : l10n.tradeSell,
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -164,28 +171,29 @@ class _TradeDetailCard extends ConsumerWidget {
           const SizedBox(height: 20),
           Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
           const SizedBox(height: 16),
-          _DetailRow(label: 'Order Type', value: 'Market'),
           _DetailRow(
-            label: trade.isBuy ? 'Shares Bought' : 'Shares Sold',
+            label: l10n.tradeOrderTypeLabel,
+            value: l10n.tradeMarketType,
+          ),
+          _DetailRow(
+            label: trade.isBuy
+                ? l10n.tradeSharesBoughtLabel
+                : l10n.tradeSharesSoldLabel,
             value: trade.shares.toStringAsFixed(4),
           ),
           _DetailRow(
-            label: 'Price per Share',
-            value: '\$${trade.price.toStringAsFixed(2)}',
+            label: l10n.tradePricePerShareLabel,
+            value: formatUsd(trade.price),
           ),
           _DetailRow(
-            label: 'Total Value',
-            value: '\$${(trade.shares * trade.price).toStringAsFixed(2)}',
+            label: l10n.tradeTotalValueLabel,
+            value: formatUsd(trade.shares * trade.price),
           ),
-          _DetailRow(
-            label: 'Date',
-            value: _formatDate(trade.date),
-          ),
+          _DetailRow(label: l10n.tradeDateLabel, value: _formatDate(trade.date)),
           if (trade.realizedPnl != null)
             _DetailRow(
-              label: 'Realized P&L',
-              value:
-                  '${trade.realizedPnl! >= 0 ? '+' : '-'}\$${trade.realizedPnl!.abs().toStringAsFixed(2)}',
+              label: l10n.tradeRealizedPnlLabel,
+              value: formatUsdSigned(trade.realizedPnl!),
               valueColor: trade.realizedPnl! >= 0
                   ? ThemeV2.success
                   : ThemeV2.loss,
@@ -198,8 +206,18 @@ class _TradeDetailCard extends ConsumerWidget {
 
   String _formatDate(DateTime d) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }

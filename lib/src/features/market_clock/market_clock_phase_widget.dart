@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 
 // ---------------------------------------------------------------------------
@@ -14,10 +15,15 @@ import 'market_clock_engine.dart';
 class MarketPhaseWidget extends StatelessWidget {
   final MarketWindow window;
   final bool isEarlyClose;
-  const MarketPhaseWidget({super.key, required this.window, required this.isEarlyClose});
+  const MarketPhaseWidget({
+    super.key,
+    required this.window,
+    required this.isEarlyClose,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: FomoShieldTheme.cardDecoration,
       child: Column(
@@ -29,7 +35,10 @@ class MarketPhaseWidget extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text('MARKET PHASE', style: FomoShieldTheme.cardTitle()),
+                  Text(
+                    l10n.marketPhaseWidgetTitle,
+                    style: FomoShieldTheme.cardTitle(),
+                  ),
                   const Spacer(),
                   const Icon(
                     Icons.chevron_right_rounded,
@@ -57,7 +66,10 @@ class MarketPhaseWidget extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(window.emoji, style: const TextStyle(fontSize: 18)),
+                          Text(
+                            window.emoji,
+                            style: const TextStyle(fontSize: 18),
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -74,7 +86,10 @@ class MarketPhaseWidget extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         window.shortDetail,
-                        style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: ThemeV2.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -89,9 +104,13 @@ class MarketPhaseWidget extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => context.push('/market-clock/period/${window.id}'),
-                  icon: const Icon(Icons.help_outline_rounded, color: ThemeV2.primary),
-                  tooltip: 'Details',
+                  onPressed: () =>
+                      context.push('/market-clock/period/${window.id}'),
+                  icon: const Icon(
+                    Icons.help_outline_rounded,
+                    color: ThemeV2.primary,
+                  ),
+                  tooltip: l10n.marketPhaseWidgetDetailsTooltip,
                 ),
               ],
             ),

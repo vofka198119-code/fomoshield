@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../order_model.dart';
 import '../order_provider.dart';
 import '../order_cancel_dialog.dart';
@@ -25,6 +27,7 @@ class OrderRowTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isBuy = order.side == OrderSide.buy;
     final accentColor = isBuy ? ThemeV2.success : ThemeV2.loss;
     final price = order.limitPrice ?? order.stopPrice;
@@ -46,14 +49,23 @@ class OrderRowTile extends ConsumerWidget {
             width: 8,
             height: 8,
             margin: const EdgeInsets.only(top: 5, right: 10),
-            decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: accentColor,
+              shape: BoxShape.circle,
+            ),
           ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${isBuy ? 'Buy' : 'Sell'} ${formatOrderQuantity(order.quantity)} shares',
+                  isBuy
+                      ? l10n.stressTestOrderRowBuyLine(
+                          formatOrderQuantity(order.quantity),
+                        )
+                      : l10n.stressTestOrderRowSellLine(
+                          formatOrderQuantity(order.quantity),
+                        ),
                   style: interNums(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -63,12 +75,18 @@ class OrderRowTile extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   companyName,
-                  style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textPrimary),
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: ThemeV2.textPrimary,
+                  ),
                 ),
                 if (price != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    '${order.type.label} Price \$${price.toStringAsFixed(2)}',
+                    l10n.orderRowTilePriceLabel(
+                      order.type.label,
+                      formatUsd(price),
+                    ),
                     style: interNums(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -80,14 +98,21 @@ class OrderRowTile extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: ThemeV2.textSecondary,
+                    ),
                   ),
                 ],
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 18, color: ThemeV2.textSecondary),
+            icon: const Icon(
+              Icons.close_rounded,
+              size: 18,
+              color: ThemeV2.textSecondary,
+            ),
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               final confirmed = await confirmCancelOrder(context);

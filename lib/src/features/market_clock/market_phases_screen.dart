@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 
 // ---------------------------------------------------------------------------
@@ -24,13 +25,18 @@ class MarketPhasesScreen extends StatefulWidget {
 class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
   late Timer _timer;
   late String _activeWindowId;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _activeWindowId = resolveMarketClockState(nowInNewYork()).window.id;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+    final l10n = AppLocalizations.of(context)!;
+    _activeWindowId = resolveMarketClockState(l10n, nowInNewYork()).window.id;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final id = resolveMarketClockState(nowInNewYork()).window.id;
+      final l10n = AppLocalizations.of(context)!;
+      final id = resolveMarketClockState(l10n, nowInNewYork()).window.id;
       if (id != _activeWindowId) setState(() => _activeWindowId = id);
     });
   }
@@ -43,11 +49,12 @@ class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final allWindows = [
-      ...marketWindows,
-      weekendClosedWindow,
-      marketHolidayWindow,
-      earlyCloseWindow,
+      ...marketWindowsFor(l10n),
+      weekendClosedWindowFor(l10n),
+      marketHolidayWindowFor(l10n),
+      earlyCloseWindowFor(l10n),
     ];
 
     return Scaffold(
@@ -56,7 +63,7 @@ class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'MARKET PHASES',
+          l10n.marketPhasesScreenTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -65,18 +72,24 @@ class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            for (int i = 0; i < allWindows.length; i++) ...[
-              if (i > 0) const SizedBox(height: 16),
-              _PhaseListCard(
-                window: allWindows[i],
-                isActive: allWindows[i].id == _activeWindowId,
-              ),
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              for (int i = 0; i < allWindows.length; i++) ...[
+                if (i > 0) const SizedBox(height: 16),
+                _PhaseListCard(
+                  window: allWindows[i],
+                  isActive: allWindows[i].id == _activeWindowId,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -95,6 +108,7 @@ class _PhaseListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: FomoShieldTheme.card,
@@ -122,14 +136,16 @@ class _PhaseListCard extends StatelessWidget {
                 if (isActive) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: ThemeV2.primary,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      'NOW',
+                      l10n.marketPhasesScreenNowBadge,
                       style: GoogleFonts.inter(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
@@ -197,6 +213,7 @@ class _ClampedBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return LayoutBuilder(
       builder: (context, constraints) {
         final overflow = _overflows(constraints.maxWidth);
@@ -217,13 +234,15 @@ class _ClampedBody extends StatelessWidget {
                   onPressed: () =>
                       context.push('/market-clock/period/$windowId'),
                   style: TextButton.styleFrom(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 0,
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: Text(
-                    'More',
+                    l10n.marketPhasesScreenMoreLink,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,

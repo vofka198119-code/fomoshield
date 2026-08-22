@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/typography_helpers.dart';
+import '../../../../../shared/utils/currency_format.dart';
 import '../../../../orders/order_cancel_dialog.dart';
 import '../../../../stress_test/stress_test_pending_order.dart';
 import '../../../../stress_test/stress_test_pending_orders_provider.dart';
 import '../../../../stress_test/stress_test_naming.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Stress Test Order Row Tile — same olive-box visual as the real orders
@@ -23,6 +25,7 @@ class StressTestOrderRowTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final accentColor = order.isBuy ? ThemeV2.success : ThemeV2.loss;
     final companyName = resolveStressTestCompanyName(ref, order.symbol);
 
@@ -42,14 +45,23 @@ class StressTestOrderRowTile extends ConsumerWidget {
             width: 8,
             height: 8,
             margin: const EdgeInsets.only(top: 5, right: 10),
-            decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: accentColor,
+              shape: BoxShape.circle,
+            ),
           ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${order.isBuy ? 'Buy' : 'Sell'} ${_formatQuantity(order.quantity)} shares',
+                  order.isBuy
+                      ? l10n.stressTestOrderRowBuyLine(
+                          _formatQuantity(order.quantity),
+                        )
+                      : l10n.stressTestOrderRowSellLine(
+                          _formatQuantity(order.quantity),
+                        ),
                   style: interNums(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -59,11 +71,16 @@ class StressTestOrderRowTile extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   companyName,
-                  style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textPrimary),
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: ThemeV2.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Limit Price \$${order.limitPrice.toStringAsFixed(2)}',
+                  l10n.stressTestOrderRowLimitPriceLine(
+                    formatUsd(order.limitPrice),
+                  ),
                   style: interNums(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -74,12 +91,18 @@ class StressTestOrderRowTile extends ConsumerWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 18, color: ThemeV2.textSecondary),
+            icon: const Icon(
+              Icons.close_rounded,
+              size: 18,
+              color: ThemeV2.textSecondary,
+            ),
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               final confirmed = await confirmCancelOrder(context);
               if (confirmed) {
-                ref.read(stressTestPendingOrdersProvider.notifier).cancelOrder(order.id);
+                ref
+                    .read(stressTestPendingOrdersProvider.notifier)
+                    .cancelOrder(order.id);
               }
             },
           ),

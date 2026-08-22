@@ -23,7 +23,7 @@ part of 'stress_test_engine.dart';
 //   - 5% roll chance when checked.
 // If it fires: one random holding, one random headline from
 // [newsScenarios] (sign matches the headline's own positive/negative
-// list), a signed total move of 10-25%, ramped in over a random
+// list), a signed total move of 6-12%, ramped in over a random
 // 2-6 hour window with NO reversal — a real news-driven move mostly
 // sticks, it doesn't mechanically snap back to zero the way Hype's
 // overshoot-then-correct curve does.
@@ -129,7 +129,8 @@ const List<NewsScenario> newsScenarios = [
   ),
   NewsScenario(
     headline: 'Guidance Cut',
-    description: 'Management lowered its financial guidance for the rest of the year.',
+    description:
+        'Management lowered its financial guidance for the rest of the year.',
     isPositive: false,
   ),
   NewsScenario(
@@ -152,7 +153,8 @@ const List<NewsScenario> newsScenarios = [
   ),
   NewsScenario(
     headline: 'CEO Departure',
-    description: 'The CEO unexpectedly announced their departure from the role.',
+    description:
+        'The CEO unexpectedly announced their departure from the role.',
     isPositive: false,
   ),
   NewsScenario(
@@ -175,12 +177,14 @@ const List<NewsScenario> newsScenarios = [
   ),
   NewsScenario(
     headline: 'Regulatory Investigation',
-    description: 'A regulator opened a formal investigation into the company\'s operations.',
+    description:
+        'A regulator opened a formal investigation into the company\'s operations.',
     isPositive: false,
   ),
   NewsScenario(
     headline: 'Key Client Lost',
-    description: 'One of the company\'s largest clients declined to renew its long-term contract.',
+    description:
+        'One of the company\'s largest clients declined to renew its long-term contract.',
     isPositive: false,
   ),
   NewsScenario(
@@ -228,12 +232,14 @@ extension NewsEventEngine on StressTestNotifier {
     final holding = session.holdings[rng.nextInt(session.holdings.length)];
     final scenario = newsScenarios[rng.nextInt(newsScenarios.length)];
     final magnitude =
-        _newsAmplitudeMin + rng.nextDouble() * (_newsAmplitudeMax - _newsAmplitudeMin);
+        _newsAmplitudeMin +
+        rng.nextDouble() * (_newsAmplitudeMax - _newsAmplitudeMin);
     final signedAmplitude = scenario.isPositive ? magnitude : -magnitude;
 
     final rampMs =
         _newsRampMin.inMilliseconds +
-        rng.nextDouble() * (_newsRampMax.inMilliseconds - _newsRampMin.inMilliseconds);
+        rng.nextDouble() *
+            (_newsRampMax.inMilliseconds - _newsRampMin.inMilliseconds);
     final rampTicks = (rampMs / 1000 / _tickSeconds).round().clamp(1, 1000000);
 
     return NewsEvent(

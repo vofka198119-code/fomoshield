@@ -12,14 +12,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/models/app_notification.dart';
+import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/numeric_keypad.dart';
+import '../../../core/supabase/supabase_providers.dart';
+import '../portfolio_limits_provider.dart';
 import '../portfolio_providers.dart';
-
-// Fallback only — normally the min goal is the portfolio's own
-// startingBalance ($15k for the first portfolio, $50k for the 2nd/3rd).
-const double _fallbackMinGoal = 15000;
 
 class SetGoalScreen extends ConsumerStatefulWidget {
   final String portfolioId;
@@ -32,7 +34,8 @@ class SetGoalScreen extends ConsumerStatefulWidget {
 
 class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
   late final TextEditingController _controller;
-  late final bool _isEditing;
+  late bool _isEditing;
+  double? _previousGoal;
   bool _keypadOpen = false;
 
   @override
@@ -42,6 +45,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
     final portfolio = portfolios.where((p) => p.id == widget.portfolioId);
     final currentGoal = portfolio.isEmpty ? null : portfolio.first.goalAmount;
     _isEditing = currentGoal != null;
+    _previousGoal = currentGoal;
     _controller = TextEditingController(
       text: currentGoal != null ? currentGoal.toStringAsFixed(0) : '',
     );
@@ -56,35 +60,67 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
   double get _minGoal {
     final portfolios = ref.read(portfoliosProvider);
     final portfolio = portfolios.where((p) => p.id == widget.portfolioId);
-    return portfolio.isEmpty ? _fallbackMinGoal : portfolio.first.startingBalance;
+    if (portfolio.isNotEmpty) return portfolio.first.startingBalance;
+    // Fallback only — portfolio not found is an edge case that shouldn't
+    // happen in practice; falls back to this tier's own starting capital.
+    return startingCapitalForTier(ref.read(subscriptionTierProvider));
   }
 
   void _save() {
+    final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_controller.text);
     final minGoal = _minGoal;
     if (amount == null || amount < minGoal) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Minimum target is \$${minGoal.toStringAsFixed(0)}',
+            l10n.setGoalScreenMinimumTargetError(formatUsd(minGoal)),
           ),
         ),
       );
       return;
     }
     ref.read(portfoliosProvider.notifier).setGoal(widget.portfolioId, amount);
-    context.pop();
+
+    final previous = _previousGoal;
+    showTransientAppNotificationPopup(
+      AppNotification(
+        id: 'notif_${DateTime.now().microsecondsSinceEpoch}',
+        type: AppNotificationType.goalUpdated,
+        portfolioKind: NotificationPortfolioKind.real,
+        portfolioId: widget.portfolioId,
+        title: previous == null
+            ? l10n.setGoalScreenNotifTitleSet
+            : l10n.setGoalScreenNotifTitleUpdated,
+        detail: previous == null
+            ? l10n.setGoalScreenNotifDetailSet(formatUsd(amount))
+            : l10n.setGoalScreenNotifDetailUpdated(
+                formatUsd(amount),
+                formatUsdSigned(amount - previous),
+              ),
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    setState(() {
+      _previousGoal = amount;
+      _isEditing = true;
+      _keypadOpen = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final minGoal = _minGoal;
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
-          _isEditing ? 'CHANGE GOAL' : 'SET GOAL',
+          _isEditing
+              ? l10n.setGoalScreenTitleChange
+              : l10n.setGoalScreenTitleSet,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -93,7 +129,10 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: ThemeV2.textPrimary,
+          ),
           onPressed: () => context.pop(),
         ),
       ),
@@ -107,7 +146,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'What total portfolio value do you want to reach?',
+                      l10n.setGoalScreenPrompt,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -116,8 +155,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'This is your target total balance, not extra profit on top. '
-                      'Minimum \$${minGoal.toStringAsFixed(0)}.',
+                      l10n.setGoalScreenSubtitle(formatUsd(minGoal)),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: ThemeV2.textSecondary,
@@ -189,7 +227,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
           elevation: 0,
         ),
         child: Text(
-          'Save Goal',
+          AppLocalizations.of(context)!.setGoalScreenSaveButton,
           style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),

@@ -4,16 +4,51 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 import 'metric_info_data.dart';
 
 // ---------------------------------------------------------------------------
 // Financial Score Widget — gauge + radar chart + 6 marker details. Named
 // distinctly from Stress Test's unrelated behavioral "Psychology Meter"
-// (which also produces a 0-100 number) — see
-// docs/CODEBASE_REFERENCE.md section 4.5.
+// (which also produces a 0-100 number via TraderPsychologyProfile.compositeScore).
 // ---------------------------------------------------------------------------
+
+// scoring_engine.dart's marker name/description/details stay fixed English
+// identifiers (also used as metricInfoIdByLabel lookup keys and in the radar
+// chart's switch statement) — these map them to the localized display text,
+// same pattern as verdict's `_scenarioLabel`.
+String _markerDisplayName(AppLocalizations l10n, String name) => switch (name) {
+  'Valuation' => l10n.companyDetailMarkerValuation,
+  'Financial Health' => l10n.companyDetailMarkerFinancialHealth,
+  'Growth Potential' => l10n.companyDetailMarkerGrowthPotential,
+  'Efficiency' => l10n.companyDetailMarkerEfficiency,
+  'Historical Trend' => l10n.companyDetailMarkerHistoricalTrend,
+  'Shareholder Returns' => l10n.companyDetailMarkerShareholderReturns,
+  _ => name,
+};
+
+String _markerDisplayDescription(AppLocalizations l10n, String name) =>
+    switch (name) {
+      'Valuation' => l10n.companyDetailMarkerDescValuation,
+      'Financial Health' => l10n.companyDetailMarkerDescFinancialHealth,
+      'Growth Potential' => l10n.companyDetailMarkerDescGrowth,
+      'Efficiency' => l10n.companyDetailMarkerDescEfficiency,
+      'Historical Trend' => l10n.companyDetailMarkerDescHistoricalTrend,
+      'Shareholder Returns' => l10n.companyDetailMarkerDescShareholderReturns,
+      _ => name,
+    };
+
+String _markerDisplayDetails(AppLocalizations l10n, String details) =>
+    switch (details) {
+      'Excellent' => l10n.companyDetailRatingExcellent,
+      'Good' => l10n.companyDetailRatingGood,
+      'Average' => l10n.companyDetailRatingAverage,
+      'Weak' => l10n.companyDetailRatingWeak,
+      'Poor' => l10n.companyDetailRatingPoor,
+      _ => details,
+    };
 
 class FinancialScoreWidget extends StatelessWidget {
   final Map<String, dynamic> score;
@@ -22,6 +57,7 @@ class FinancialScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final fsScore = score['financial_score'] as int? ?? 0;
     final markers = score['markers'] as Map<String, dynamic>? ?? {};
     final penalty = score['dividend_trap_penalty'] as int? ?? 0;
@@ -31,24 +67,21 @@ class FinancialScoreWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [dialLight, dialDark],
-          ),
-          borderRadius: FomoShieldTheme.cardRadius,
-        ),
+        decoration: darkCardDecoration(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Title ──
             Row(
               children: [
-                Icon(Icons.shield_rounded, size: 18, color: _gaugeColor(fsScore)),
+                Icon(
+                  Icons.shield_rounded,
+                  size: 18,
+                  color: _gaugeColor(fsScore),
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  'FS SCORE',
+                  l10n.companyDetailFsScoreLabel,
                   style: FomoShieldTheme.cardTitle(Colors.white),
                 ),
               ],
@@ -61,7 +94,7 @@ class FinancialScoreWidget extends StatelessWidget {
             Row(
               children: [
                 // Gauge
-                _buildFsScoreGauge(fsScore),
+                _buildFsScoreGauge(l10n, fsScore),
                 const SizedBox(width: 24),
                 // Radar chart
                 Expanded(
@@ -76,19 +109,28 @@ class FinancialScoreWidget extends StatelessWidget {
             if (penalty > 0) ...[
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: ThemeV2.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: ThemeV2.warning.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.warning_amber_rounded, size: 14, color: ThemeV2.warning),
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      size: 14,
+                      color: ThemeV2.warning,
+                    ),
                     const SizedBox(width: 6),
                     Text(
-                      'Dividend trap penalty: -$penalty pts',
+                      l10n.companyDetailDividendTrapPenalty(penalty),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -103,20 +145,29 @@ class FinancialScoreWidget extends StatelessWidget {
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: ThemeV2.loss.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: ThemeV2.loss.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: ThemeV2.loss.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.warning_amber_rounded, size: 14, color: ThemeV2.loss),
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      size: 14,
+                      color: ThemeV2.loss,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'Catastrophic loss penalty: -$lossPenalty pts (net margin below -100%)',
+                        l10n.companyDetailCatastrophicLossPenalty(lossPenalty),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -141,7 +192,10 @@ class FinancialScoreWidget extends StatelessWidget {
               onTap: () => context.push('/metric-info/fs-score-legal'),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: dialBrassLight, width: 1),
                   borderRadius: BorderRadius.circular(10),
@@ -158,7 +212,7 @@ class FinancialScoreWidget extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Legal Disclaimer & Methodology',
+                        l10n.companyDetailLegalDisclaimerMethodology,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -187,7 +241,7 @@ class FinancialScoreWidget extends StatelessWidget {
     return ThemeV2.loss;
   }
 
-  Widget _buildFsScoreGauge(int score) {
+  Widget _buildFsScoreGauge(AppLocalizations l10n, int score) {
     final color = _gaugeColor(score);
 
     return Container(
@@ -219,7 +273,7 @@ class FinancialScoreWidget extends StatelessWidget {
               ),
             ),
             Text(
-              'FS SCORE',
+              l10n.companyDetailFsScoreLabel,
               style: GoogleFonts.inter(
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
@@ -335,29 +389,37 @@ class _RadarChartPainter extends CustomPainter {
       final y = center.dy + r * math.sin(angle);
 
       // Dot
-      canvas.drawCircle(
-        Offset(x, y),
-        3.5,
-        Paint()..color = dialBrassLight,
-      );
+      canvas.drawCircle(Offset(x, y), 3.5, Paint()..color = dialBrassLight);
 
       // Label at edge
       final labelR = radius + 12;
       final lx = center.dx + labelR * math.cos(angle);
       final ly = center.dy + labelR * math.sin(angle);
-      _drawLabel(canvas, _shortName(marker['name'] as String? ?? ''), Offset(lx, ly), angle);
+      _drawLabel(
+        canvas,
+        _shortName(marker['name'] as String? ?? ''),
+        Offset(lx, ly),
+        angle,
+      );
     }
   }
 
   String _shortName(String name) {
     switch (name) {
-      case 'Valuation': return 'VAL';
-      case 'Financial Health': return 'FIN';
-      case 'Growth Potential': return 'GRW';
-      case 'Efficiency': return 'EFF';
-      case 'Historical Trend': return 'TRD';
-      case 'Shareholder Returns': return 'SHR';
-      default: return name.substring(0, 3).toUpperCase();
+      case 'Valuation':
+        return 'VAL';
+      case 'Financial Health':
+        return 'FIN';
+      case 'Growth Potential':
+        return 'GRW';
+      case 'Efficiency':
+        return 'EFF';
+      case 'Historical Trend':
+        return 'TRD';
+      case 'Shareholder Returns':
+        return 'SHR';
+      default:
+        return name.substring(0, 3).toUpperCase();
     }
   }
 
@@ -375,10 +437,7 @@ class _RadarChartPainter extends CustomPainter {
     )..layout();
 
     // Center the label around the position
-    final offset = Offset(
-      pos.dx - tp.width / 2,
-      pos.dy - tp.height / 2,
-    );
+    final offset = Offset(pos.dx - tp.width / 2, pos.dy - tp.height / 2);
     tp.paint(canvas, offset);
   }
 
@@ -397,9 +456,9 @@ class _MarkerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final name = marker['name'] as String? ?? '';
     final score = marker['score'] as int? ?? 0;
-    final description = marker['description'] as String? ?? '';
     final details = marker['details'] as String? ?? '';
     final colorStr = marker['color'] as String? ?? '';
     final infoId = metricInfoIdByLabel[name];
@@ -448,7 +507,7 @@ class _MarkerCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      name,
+                      _markerDisplayName(l10n, name),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -481,7 +540,7 @@ class _MarkerCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  description,
+                  _markerDisplayDescription(l10n, name),
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     color: Colors.white.withValues(alpha: 0.7),
@@ -505,7 +564,7 @@ class _MarkerCard extends StatelessWidget {
                 ),
               ),
               Text(
-                details,
+                _markerDisplayDetails(l10n, details),
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -519,4 +578,3 @@ class _MarkerCard extends StatelessWidget {
     );
   }
 }
-

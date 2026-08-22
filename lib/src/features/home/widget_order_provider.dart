@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/services/user_data_service.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Home Widget Order Provider (SharedPreferences-backed)
@@ -32,18 +33,18 @@ class HomeWidgetConfig {
 
   const HomeWidgetConfig({required this.id, required this.visible});
 
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (id) {
       case 'shield_signal':
-        return 'Shield Signal';
+        return l10n.homeWidgetShieldSignal;
       case 'watchlist':
-        return 'Watchlist';
+        return l10n.homeWidgetWatchlist;
       case 'news':
-        return 'Market Clock';
+        return l10n.homeWidgetMarketClock;
       case 'stress_test':
-        return 'Stress Test';
+        return l10n.navStressTest;
       case 'portfolio':
-        return 'My Portfolio';
+        return l10n.homeWidgetPortfolio;
       default:
         return id;
     }
@@ -52,9 +53,7 @@ class HomeWidgetConfig {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HomeWidgetConfig &&
-          id == other.id &&
-          visible == other.visible;
+      other is HomeWidgetConfig && id == other.id && visible == other.visible;
 
   @override
   int get hashCode => id.hashCode ^ visible.hashCode;
@@ -71,8 +70,7 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
   // loadFromSupabase() and clobbering the just-synced server data.
   bool _loadedFromSupabase = false;
 
-  HomeWidgetsNotifier(this._supabaseService, {this._userId})
-      : super([]) {
+  HomeWidgetsNotifier(this._supabaseService, {this._userId}) : super([]) {
     _load();
   }
 
@@ -137,7 +135,9 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
   Future<void> _saveLocal() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-        _prefsKey(_userId), state.map((c) => c.id).toList());
+      _prefsKey(_userId),
+      state.map((c) => c.id).toList(),
+    );
     await prefs.setString(
       _prefsVisibilityKey(_userId),
       state.map((c) => '${c.id}:${c.visible}').join(','),
@@ -192,7 +192,7 @@ class HomeWidgetsNotifier extends StateNotifier<List<HomeWidgetConfig>> {
 
 final homeWidgetsProvider =
     StateNotifierProvider<HomeWidgetsNotifier, List<HomeWidgetConfig>>((ref) {
-  final service = ref.read(userDataServiceProvider);
-  final user = ref.watch(currentUserProvider);
-  return HomeWidgetsNotifier(service, userId: user?.id);
-});
+      final service = ref.read(userDataServiceProvider);
+      final user = ref.watch(currentUserProvider);
+      return HomeWidgetsNotifier(service, userId: user?.id);
+    });

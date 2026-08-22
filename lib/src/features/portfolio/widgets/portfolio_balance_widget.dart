@@ -18,8 +18,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
+import '../../../core/cache/logo_providers.dart'
+    show resolvedCompanyNameProvider;
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../portfolio_providers.dart';
 
 class PortfolioBalanceWidget extends ConsumerStatefulWidget {
@@ -39,26 +42,14 @@ class PortfolioBalanceWidget extends ConsumerStatefulWidget {
       _PortfolioBalanceWidgetState();
 }
 
-class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget> {
+class _PortfolioBalanceWidgetState
+    extends ConsumerState<PortfolioBalanceWidget> {
   static const int _legendPreviewLimit = 5;
   bool _showAll = false;
 
-  /// Full number format with commas and fixed 2 decimals — e.g. $15,000.00
-  String _fmtFull(double v) {
-    final parts = v.toStringAsFixed(2).split('.');
-    final intStr = parts[0];
-    final buf = StringBuffer();
-    for (int i = 0; i < intStr.length; i++) {
-      if (i > 0 && (intStr.length - i) % 3 == 0) buf.write(',');
-      buf.write(intStr[i]);
-    }
-    buf.write('.');
-    buf.write(parts[1]);
-    return buf.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (widget.isLoading || widget.hasError || widget.performance == null) {
       return Container(
         width: double.infinity,
@@ -67,13 +58,19 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
         alignment: Alignment.center,
         child: widget.hasError
             ? Text(
-                'Failed to load',
-                style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+                l10n.commonFailedToLoad,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: ThemeV2.textSecondary,
+                ),
               )
             : const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: ThemeV2.primary),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: ThemeV2.primary,
+                ),
               ),
       );
     }
@@ -81,7 +78,10 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
     final perf = widget.performance!;
     final holdings = List<HoldingPerformance>.from(perf.holdings)
       ..sort((a, b) => b.currentValue.compareTo(a.currentValue));
-    final totalInvested = holdings.fold<double>(0, (s, h) => s + h.currentValue);
+    final totalInvested = holdings.fold<double>(
+      0,
+      (s, h) => s + h.currentValue,
+    );
     final hasData = holdings.isNotEmpty && totalInvested > 0;
 
     final portfolioTotal = perf.currentValue;
@@ -98,8 +98,8 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
         ? ThemeV2.success
         : ThemeV2.loss;
     final pnlText = isZero
-        ? '\$0.00'
-        : '${isPositive ? '+' : '-'}\$${_fmtFull(pnl.abs())} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
+        ? formatUsd(0)
+        : '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
 
     return Container(
       width: double.infinity,
@@ -111,7 +111,10 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
             width: double.infinity,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-              child: Text('PORTFOLIO BALANCE', style: FomoShieldTheme.cardTitle()),
+              child: Text(
+                l10n.portfolioBalanceLabel,
+                style: FomoShieldTheme.cardTitle(),
+              ),
             ),
           ),
           Divider(
@@ -153,7 +156,7 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'BALANCE',
+                            l10n.balanceRingLabel,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -163,7 +166,7 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            '\$${_fmtFull(portfolioTotal)}',
+                            formatUsd(portfolioTotal),
                             style: interNums(
                               fontSize: 28,
                               fontWeight: FontWeight.w600,
@@ -221,8 +224,11 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
                             Expanded(
                               child: Text(
                                 ref
-                                        .watch(resolvedCompanyNameProvider(
-                                            holdings[i].symbol))
+                                        .watch(
+                                          resolvedCompanyNameProvider(
+                                            holdings[i].symbol,
+                                          ),
+                                        )
                                         .valueOrNull ??
                                     holdings[i].symbol,
                                 overflow: TextOverflow.ellipsis,
@@ -258,8 +264,10 @@ class _PortfolioBalanceWidgetState extends ConsumerState<PortfolioBalanceWidget>
                           child: Center(
                             child: Text(
                               _showAll
-                                  ? 'Less'
-                                  : 'More (${holdings.length - _legendPreviewLimit})',
+                                  ? l10n.commonLess
+                                  : l10n.commonMoreCount(
+                                      holdings.length - _legendPreviewLimit,
+                                    ),
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,

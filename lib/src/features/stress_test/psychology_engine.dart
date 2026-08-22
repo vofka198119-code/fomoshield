@@ -206,10 +206,7 @@ void evaluateSellTrade({
   if (realizedPnl == null) return;
 
   if (realizedPnl > 0) {
-    profile.panicResistance = (profile.panicResistance + 0.05).clamp(
-      0.0,
-      1.0,
-    );
+    profile.panicResistance = (profile.panicResistance + 0.05).clamp(0.0, 1.0);
     profile.patience = (profile.patience + 0.05).clamp(0.0, 1.0);
     return;
   }
@@ -229,8 +226,10 @@ void evaluateSellTrade({
   }
 
   final severity = lossPct * 0.5 + bottomProximity * 0.5;
-  profile.panicResistance = (profile.panicResistance - severity * 0.30)
-      .clamp(0.0, 1.0);
+  profile.panicResistance = (profile.panicResistance - severity * 0.30).clamp(
+    0.0,
+    1.0,
+  );
 }
 
 /// The 5 independent signals behind the Strategy pillar, plus their
@@ -312,7 +311,7 @@ StrategySubScores computeStrategySubScores({
 
   final sectorTotals = <String, double>{};
   for (final h in holdings) {
-    final sector = stressTestSectorName(h.symbol);
+    final sector = stressTestGicsSector(h.symbol)?.label ?? 'Other';
     sectorTotals[sector] = (sectorTotals[sector] ?? 0) + values[h.symbol]!;
   }
   final maxSectorPct = sectorTotals.values.reduce(math.max) / total;
@@ -328,7 +327,8 @@ StrategySubScores computeStrategySubScores({
   final etfCount = holdings
       .where(
         (h) =>
-            h.isEtf || resolveAssetSector(h.symbol) == AssetSector.etfBroadMarket,
+            h.isEtf ||
+            resolveAssetSector(h.symbol) == AssetSector.etfBroadMarket,
       )
       .length;
   final etfScore = etfExposureScoreForCount(etfCount) / 100;
@@ -349,6 +349,29 @@ StrategySubScores computeStrategySubScores({
     target: target,
   );
 }
+
+/// The portfolio-construction half of the split score (0.0-1.0) — every
+/// signal shown on the Strategy/Diversification cards, each weighted
+/// directly here instead of being squeezed through the old lagging
+/// `strategyAdherence` EMA into just 15% of one blended composite
+/// (2026-08-16 split — see [TraderPsychologyProfile.psychologicalScore]
+/// for the counterpart). Always computed fresh from the same numbers the
+/// individual bars/rows already show, so this can never disagree with them
+/// the way the old lagging value could.
+double computeStrategicScore({
+  required double diversification,
+  required double sector,
+  required double concentration,
+  required double etf,
+  required double cashBuffer,
+  required double safetyMarker,
+}) =>
+    diversification * 0.25 +
+    sector * 0.20 +
+    concentration * 0.20 +
+    etf * 0.15 +
+    cashBuffer * 0.10 +
+    safetyMarker * 0.10;
 
 /// Evaluates the Strategy pillar — called once per trade (buy or sell),
 /// never per-tick. The old version (`recordGoodDiversification`/

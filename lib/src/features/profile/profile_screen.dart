@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../auth/auth_providers.dart';
@@ -13,18 +15,112 @@ import '../search/search_provider.dart';
 import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
+import '../../shared/services/finnhub_service.dart';
+
+/// App version + build number, read from the actual installed build (not
+/// hardcoded) — build number auto-increments on every commit, see
+/// .git/hooks/pre-commit.
+final packageInfoProvider = FutureProvider<PackageInfo>(
+  (ref) => PackageInfo.fromPlatform(),
+);
+
+Future<void> _openLink(String url) async {
+  final uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context)!;
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(
+        l10n.profileDeleteAccountTitle,
+        style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+      ),
+      content: Text(
+        l10n.profileDeleteAccountBody,
+        style: GoogleFonts.inter(fontSize: 14),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: Text(
+            l10n.profileCancel,
+            style: GoogleFonts.inter(color: ThemeV2.textSecondary),
+          ),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(
+            l10n.profileDelete,
+            style: GoogleFonts.inter(
+              color: ThemeV2.loss,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true || !context.mounted) return;
+
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) =>
+        const Center(child: CircularProgressIndicator(color: ThemeV2.primary)),
+  );
+
+  try {
+    // Schedules deletion 14 days out instead of an immediate hard delete —
+    // see finnhub_service.dart's doc comment and accountCleanup.js on the
+    // backend for the actual sweep that does the permanent erase.
+    await FinnhubService().scheduleAccountDeletion();
+    await clearAllSessionData();
+    if (!context.mounted) return;
+    Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
+    // Same cache invalidation as Sign Out — see that button's comment.
+    ref.invalidate(isLoggedInProvider);
+    ref.invalidate(hasSupabaseSessionProvider);
+    ref.invalidate(watchlistSymbolsProvider);
+    ref.invalidate(portfoliosProvider);
+    ref.invalidate(homeWidgetsProvider);
+    ref.invalidate(searchProvider);
+    ref.invalidate(searchCounterProvider);
+    if (!context.mounted) return;
+    context.go('/auth');
+  } catch (_) {
+    if (!context.mounted) return;
+    Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          l10n.profileDeleteFailed,
+          style: GoogleFonts.inter(fontSize: 13),
+        ),
+        backgroundColor: ThemeV2.loss,
+      ),
+    );
+  }
+}
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(currentUserProvider);
     final subscriptionTier = ref.watch(subscriptionTierProvider);
     final isAdmin = ref.watch(isAdminProvider);
 
-    final email = user?.email ?? 'Not signed in';
+    final email = user?.email ?? l10n.profileNotSignedIn;
     final displayName = email.split('@').first;
     final isPremium = subscriptionTier == SubscriptionTier.premium;
 
@@ -34,7 +130,7 @@ class ProfileScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'PROFILE',
+          l10n.profileTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -55,10 +151,12 @@ class ProfileScreen extends ConsumerWidget {
                   CircleAvatar(
                     radius: 28,
                     backgroundColor: () {
-                      if (isAdmin)
+                      if (isAdmin) {
                         return ThemeV2.primary.withValues(alpha: 0.15);
-                      if (isPremium)
+                      }
+                      if (isPremium) {
                         return ThemeV2.primary.withValues(alpha: 0.15);
+                      }
                       return ThemeV2.primary.withValues(alpha: 0.15);
                     }(),
                     child: Icon(
@@ -101,17 +199,13 @@ class ProfileScreen extends ConsumerWidget {
                                   horizontal: 8,
                                   vertical: 3,
                                 ),
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [dialLight, dialDark],
-                                  ),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6)),
+                                decoration: darkCardDecoration(
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  isAdmin ? 'ADMIN' : 'PREMIUM',
+                                  isAdmin
+                                      ? l10n.profileAdminBadge
+                                      : l10n.profilePremiumBadge,
                                   style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
@@ -119,8 +213,9 @@ class ProfileScreen extends ConsumerWidget {
                                     letterSpacing: 1,
                                     shadows: [
                                       Shadow(
-                                        color:
-                                            dialBrassLight.withValues(alpha: 0.5),
+                                        color: dialBrassLight.withValues(
+                                          alpha: 0.5,
+                                        ),
                                         blurRadius: 6,
                                       ),
                                     ],
@@ -238,8 +333,7 @@ class ProfileScreen extends ConsumerWidget {
                             .read(portfoliosProvider.notifier)
                             .deletePortfolio(p.id);
                       }
-                      ref.read(activePortfolioIdProvider.notifier).state =
-                          null;
+                      ref.read(activePortfolioIdProvider.notifier).state = null;
                       _showSnack(context, 'All portfolios cleared');
                     },
                   ),
@@ -269,35 +363,35 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // ── Language ─────────────────────────────────────────────
-          _section('Preferences'),
+          _section(l10n.profilePreferencesSection),
           Card(
             child: ListTile(
               leading: const Icon(Icons.language, color: ThemeV2.primary),
               title: Text(
-                'Language',
+                l10n.languageTitle,
                 style: GoogleFonts.inter(color: ThemeV2.textPrimary),
               ),
               trailing: const Icon(
                 Icons.chevron_right,
                 color: ThemeV2.textSecondary,
               ),
-              onTap: () {},
+              onTap: () => context.push('/language'),
             ),
           ),
 
           const SizedBox(height: 24),
 
           // ── Statistics ────────────────────────────────────────────
-          _section('Statistics'),
+          _section(l10n.profileStatisticsSection),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _statItem('Days', '1'),
-                  _statItem('Companies', '0'),
-                  _statItem('Tests', '0'),
+                  _statItem(l10n.profileStatDays, '1'),
+                  _statItem(l10n.profileStatCompanies, '0'),
+                  _statItem(l10n.profileStatTests, '0'),
                 ],
               ),
             ),
@@ -306,50 +400,66 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // ── Legal ─────────────────────────────────────────────────
-          _section('Legal'),
+          _section(l10n.profileLegalSection),
           Card(
             child: Column(
               children: [
                 ListTile(
                   title: Text(
-                    'Privacy Policy',
+                    l10n.profilePrivacyPolicy,
                     style: GoogleFonts.inter(color: ThemeV2.textPrimary),
                   ),
                   trailing: const Icon(
                     Icons.chevron_right,
                     color: ThemeV2.textSecondary,
                   ),
-                  onTap: () {},
+                  onTap: () => _openLink('https://fomoshield.app/privacy'),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   title: Text(
-                    'Terms of Use',
+                    l10n.profileTermsOfUse,
                     style: GoogleFonts.inter(color: ThemeV2.textPrimary),
                   ),
                   trailing: const Icon(
                     Icons.chevron_right,
                     color: ThemeV2.textSecondary,
                   ),
-                  onTap: () {},
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  title: Text(
-                    'Methodology',
-                    style: GoogleFonts.inter(color: ThemeV2.textPrimary),
-                  ),
-                  trailing: const Icon(
-                    Icons.chevron_right,
-                    color: ThemeV2.textSecondary,
-                  ),
-                  onTap: () {},
+                  onTap: () => _openLink('https://fomoshield.app/terms'),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
+
+          Center(
+            child: ref
+                .watch(packageInfoProvider)
+                .when(
+                  data: (info) {
+                    // Compact "1.0.004" form — major.minor from the version
+                    // string, build number zero-padded to 3 digits, instead
+                    // of the old "v1.0.0 (build 4)".
+                    final versionParts = info.version.split('.');
+                    final majorMinor = versionParts.length >= 2
+                        ? '${versionParts[0]}.${versionParts[1]}'
+                        : info.version;
+                    final build = info.buildNumber.padLeft(3, '0');
+                    return Text(
+                      'v$majorMinor.$build',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: ThemeV2.textSecondary.withValues(alpha: 0.5),
+                      ),
+                    );
+                  },
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
+                ),
+          ),
+
+          const SizedBox(height: 16),
 
           // ── Sign Out ─────────────────────────────────────────────
           SizedBox(
@@ -359,19 +469,25 @@ class ProfileScreen extends ConsumerWidget {
               onPressed: () async {
                 // 1) Clear ALL user session data (SharedPrefs + SecureStorage)
                 await clearAllSessionData();
-                // 2) Invalidate Riverpod providers so they re-load fresh
+                // 2) Invalidate Riverpod providers so they re-load fresh —
+                // isLoggedIn/hasSupabaseSession are cached FutureProviders;
+                // without this, navigating back to Splash mid-session would
+                // read their stale pre-signout value and silently restore
+                // the old session (real bug, found 2026-08-14).
+                ref.invalidate(isLoggedInProvider);
+                ref.invalidate(hasSupabaseSessionProvider);
                 ref.invalidate(watchlistSymbolsProvider);
                 ref.invalidate(portfoliosProvider);
                 ref.invalidate(homeWidgetsProvider);
                 ref.invalidate(searchProvider);
                 ref.invalidate(searchCounterProvider);
-                // 3) Navigate instantly to login (skip Splash 2.5s delay)
+                // 3) Navigate instantly to login (skip Splash's loading delay)
                 if (!context.mounted) return;
                 context.go('/auth');
               },
               icon: const Icon(Icons.logout_rounded, color: ThemeV2.loss),
               label: Text(
-                'Sign Out',
+                l10n.profileSignOut,
                 style: GoogleFonts.inter(color: ThemeV2.loss, fontSize: 15),
               ),
               style: OutlinedButton.styleFrom(
@@ -383,8 +499,35 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
+          const SizedBox(height: 12),
+
+          // ── Delete Account ───────────────────────────────────────
+          // Deliberately lower visual weight than Sign Out (smaller,
+          // muted) — rare/dangerous action, shouldn't compete with the
+          // common one, but still reachable in one tap per Apple App Store
+          // Review Guideline 5.1.1(v) (in-app account deletion required).
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: TextButton.icon(
+              onPressed: () => _confirmDeleteAccount(context, ref),
+              icon: Icon(
+                Icons.delete_forever_rounded,
+                color: ThemeV2.loss.withValues(alpha: 0.55),
+                size: 20,
+              ),
+              label: Text(
+                l10n.profileDeleteAccount,
+                style: GoogleFonts.inter(
+                  color: ThemeV2.loss.withValues(alpha: 0.55),
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+
           const DisclaimerFooter(),
-          const SizedBox(height: 40),
+          SizedBox(height: shellBottomClearance(context)),
         ],
       ),
     );
@@ -472,6 +615,7 @@ class ProfileScreen extends ConsumerWidget {
 class _PremiumStatusCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final details = ref.watch(premiumDetailsProvider);
 
     return Container(
@@ -494,14 +638,14 @@ class _PremiumStatusCard extends ConsumerWidget {
         ],
       ),
       child: details.when(
-        data: (data) => _buildContent(data),
+        data: (data) => _buildContent(l10n, data),
         loading: () => _buildShimmer(),
-        error: (_, _) => _buildContent(null),
+        error: (_, _) => _buildContent(l10n, null),
       ),
     );
   }
 
-  Widget _buildContent(PremiumDetails? details) {
+  Widget _buildContent(AppLocalizations l10n, PremiumDetails? details) {
     final isLifetime = details?.isLifetime ?? false;
     final daysLeft = details?.daysRemaining ?? 0;
     final isExpired = details?.isExpired ?? false;
@@ -530,7 +674,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Premium Active',
+                    l10n.premiumActive,
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -539,10 +683,10 @@ class _PremiumStatusCard extends ConsumerWidget {
                   ),
                   Text(
                     isLifetime
-                        ? 'Lifetime subscription'
+                        ? l10n.premiumLifetime
                         : isExpired
-                        ? 'Subscription expired'
-                        : '${daysLeft}d remaining',
+                        ? l10n.premiumExpired
+                        : l10n.premiumDaysRemaining(daysLeft),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: ThemeV2.primary.withValues(alpha: 0.7),
@@ -570,7 +714,9 @@ class _PremiumStatusCard extends ConsumerWidget {
                   ),
                 ),
                 child: Text(
-                  isExpired ? 'EXPIRED' : '${daysLeft}d',
+                  isExpired
+                      ? l10n.premiumExpiredBadge
+                      : l10n.premiumDaysBadge(daysLeft),
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -601,15 +747,15 @@ class _PremiumStatusCard extends ConsumerWidget {
         ),
         const SizedBox(height: 14),
         // Benefits list
-        _benefitRow(Icons.search_rounded, 'Unlimited daily searches'),
+        _benefitRow(Icons.search_rounded, l10n.premiumBenefitSearches),
         const SizedBox(height: 6),
-        _benefitRow(Icons.account_balance_rounded, 'Up to 3 portfolios'),
+        _benefitRow(Icons.account_balance_rounded, l10n.premiumBenefitPortfolios),
         const SizedBox(height: 6),
-        _benefitRow(Icons.monetization_on_rounded, '\$50,000 starting capital'),
+        _benefitRow(Icons.monetization_on_rounded, l10n.premiumBenefitCapital),
         const SizedBox(height: 6),
-        _benefitRow(Icons.psychology_rounded, 'Up to 5 stress tests'),
+        _benefitRow(Icons.psychology_rounded, l10n.premiumBenefitStressTests),
         const SizedBox(height: 6),
-        _benefitRow(Icons.block_rounded, 'Ad-free experience'),
+        _benefitRow(Icons.block_rounded, l10n.premiumBenefitAdFree),
       ],
     );
   }

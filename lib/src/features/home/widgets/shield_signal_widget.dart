@@ -4,13 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../market_clock/market_clock_dial.dart';
 import '../home_providers.dart';
-
-// Same dark-green instrument-panel gradient as the TARGET widget's graph
-// window (market_clock_dial.dart's dialLight/dialDark).
-const List<Color> _priceCellGradient = [dialLight, dialDark];
 
 // ---------------------------------------------------------------------------
 // Shield Signal Widget — S&P 500 / NASDAQ / Dow Jones sentiment, swipeable
@@ -20,8 +18,7 @@ class ShieldSignalWidget extends ConsumerStatefulWidget {
   const ShieldSignalWidget({super.key});
 
   @override
-  ConsumerState<ShieldSignalWidget> createState() =>
-      _ShieldSignalWidgetState();
+  ConsumerState<ShieldSignalWidget> createState() => _ShieldSignalWidgetState();
 }
 
 class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
@@ -52,6 +49,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final indicesAsync = ref.watch(marketIndicesProvider);
 
     return _shell(
@@ -62,19 +60,28 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
               width: 18,
               height: 18,
               child: CircularProgressIndicator(
-                  strokeWidth: 2, color: ThemeV2.primary),
+                strokeWidth: 2,
+                color: ThemeV2.primary,
+              ),
             ),
             const SizedBox(width: 12),
-            Text('Loading...',
-                style: GoogleFonts.inter(
-                    fontSize: 14, color: ThemeV2.textSecondary)),
+            Text(
+              l10n.commonLoading,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: ThemeV2.textSecondary,
+              ),
+            ),
           ],
         ),
-        error: (_, _) => Text('\$– – –',
-            style: interNums(
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-                color: ThemeV2.textPrimary)),
+        error: (_, _) => Text(
+          '\$– – –',
+          style: interNums(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+            color: ThemeV2.textPrimary,
+          ),
+        ),
         data: (indices) {
           if (indices.isEmpty) return const SizedBox.shrink();
           final safeIndex = _index.clamp(0, indices.length - 1);
@@ -133,7 +140,10 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text('SHIELD SIGNAL', style: FomoShieldTheme.cardTitle()),
+            child: Text(
+              AppLocalizations.of(context)!.shieldSignalTitle,
+              style: FomoShieldTheme.cardTitle(),
+            ),
           ),
           Divider(
             height: 1,
@@ -187,24 +197,21 @@ class _IndexView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isUp = index.change >= 0;
     final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
     final changeBg = isUp ? ThemeV2.successBg : ThemeV2.lossBg;
-    final mood = _moodFor(index.change);
+    final mood = _moodFor(l10n, index.change);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _cell(
           label: index.name,
-          value: '\$${index.price.toStringAsFixed(2)}',
+          value: formatUsd(index.price),
           valueFontSize: 18,
           labelFontSize: 14,
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: _priceCellGradient,
-          ),
+          gradient: darkCardGradient(),
           labelColor: changeColor,
           labelGlowColor: changeColor,
           valueColor: Colors.white,
@@ -218,9 +225,8 @@ class _IndexView extends StatelessWidget {
           children: [
             Expanded(
               child: _cell(
-                label: 'CHANGE',
-                value:
-                    '${isUp ? '+' : ''}\$${index.changeAbs.toStringAsFixed(2)}',
+                label: l10n.shieldSignalChange,
+                value: formatUsdSigned(index.changeAbs),
                 valueFontSize: 14,
                 bgColor: changeBg,
                 valueColor: changeColor,
@@ -229,7 +235,7 @@ class _IndexView extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: _cell(
-                label: 'CHANGE %',
+                label: l10n.shieldSignalChangePercent,
                 value: '${isUp ? '+' : ''}${index.change.toStringAsFixed(2)}%',
                 valueFontSize: 14,
                 bgColor: changeBg,
@@ -242,12 +248,7 @@ class _IndexView extends StatelessWidget {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: _priceCellGradient,
-            ),
+          decoration: darkCardDecoration(
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -301,8 +302,14 @@ class _IndexView extends StatelessWidget {
         shadows: labelGlowColor == null
             ? null
             : [
-                Shadow(color: labelGlowColor.withValues(alpha: 0.9), blurRadius: 10),
-                Shadow(color: labelGlowColor.withValues(alpha: 0.5), blurRadius: 20),
+                Shadow(
+                  color: labelGlowColor.withValues(alpha: 0.9),
+                  blurRadius: 10,
+                ),
+                Shadow(
+                  color: labelGlowColor.withValues(alpha: 0.5),
+                  blurRadius: 20,
+                ),
               ],
       ),
     );
@@ -311,8 +318,11 @@ class _IndexView extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(leadingIcon,
-                  size: 16, color: leadingIconColor ?? (labelColor ?? ThemeV2.primary)),
+              Icon(
+                leadingIcon,
+                size: 16,
+                color: leadingIconColor ?? (labelColor ?? ThemeV2.primary),
+              ),
               const SizedBox(width: 6),
               labelText,
             ],
@@ -344,11 +354,7 @@ class _IndexView extends StatelessWidget {
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                labelText,
-                const SizedBox(height: 4),
-                valueText,
-              ],
+              children: [labelText, const SizedBox(height: 4), valueText],
             ),
     );
   }
@@ -356,51 +362,20 @@ class _IndexView extends StatelessWidget {
   /// Emotional headline + body, keyed by the day's percent move. Thresholds
   /// split each direction into a "small" and "strong" band, with a ±0.1%
   /// dead zone in the middle counting as neutral.
-  _Mood _moodFor(double changePercent) {
+  _Mood _moodFor(AppLocalizations l10n, double changePercent) {
     if (changePercent >= 1.0) {
-      return const _Mood(
-        'Bullish Momentum',
-        'Buyers are clearly leading today\'s market. Strong demand is '
-            'pushing prices higher across many companies, and positive news '
-            'or growing optimism is encouraging investors to keep buying. '
-            'Momentum is on the bulls\' side — just remember, even strong '
-            'trends eventually slow down, so avoid chasing prices out of '
-            'excitement.',
-      );
+      return _Mood(l10n.moodBullishTitle, l10n.moodBullishBody);
     }
     if (changePercent > 0.1) {
-      return const _Mood(
-        'Steady Climb',
-        'Buyers have a slight advantage today. Demand is a little stronger '
-            'than selling pressure, pushing the index higher. The move is '
-            'healthy and controlled, with no signs of panic or excessive '
-            'excitement — confidence is slowly building.',
-      );
+      return _Mood(l10n.moodSteadyClimbTitle, l10n.moodSteadyClimbBody);
     }
     if (changePercent >= -0.1) {
-      return const _Mood(
-        'Waiting for Direction',
-        'The market is taking a breath. Buyers and sellers are evenly '
-            'matched, so prices are moving very little. Nothing unusual is '
-            'happening right now — investors are simply waiting for the '
-            'next piece of important news before choosing a direction.',
-      );
+      return _Mood(l10n.moodWaitingTitle, l10n.moodWaitingBody);
     }
     if (changePercent >= -1.0) {
-      return const _Mood(
-        'Growing Caution',
-        'Sellers have gained a small advantage. The market is drifting '
-            'lower, but there are no signs of panic. Small pullbacks like '
-            'this are a normal part of investing.',
-      );
+      return _Mood(l10n.moodCautionTitle, l10n.moodCautionBody);
     }
-    return const _Mood(
-      'Storm Warning',
-      'Fear is spreading through the market. Selling pressure is much '
-          'stronger than buying, causing prices to fall quickly. Sharp '
-          'declines can feel uncomfortable, but emotional decisions often '
-          'make difficult days even worse.',
-    );
+    return _Mood(l10n.moodStormTitle, l10n.moodStormBody);
   }
 }
 

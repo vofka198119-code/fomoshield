@@ -5,11 +5,11 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
+import '../utils/currency_format.dart';
 
 class BalancePanel extends StatelessWidget {
   final StressTestSession session;
@@ -39,28 +39,37 @@ class BalancePanel extends StatelessWidget {
           Expanded(
             child: _MetricCard(
               label: 'Balance',
-              value: '\$${_fmt(totalValue)}',
+              value: formatUsd(totalValue),
               valueColor: textColor,
               subTextColor: subTextColor,
             ),
           ),
-          Container(width: 1, height: 48, color: isDark ? Colors.white12 : Colors.black12),
+          Container(
+            width: 1,
+            height: 48,
+            color: isDark ? Colors.white12 : Colors.black12,
+          ),
           // P&L
           Expanded(
             child: _MetricCard(
               label: 'P&L',
-              value: '${isPositive ? '+' : ''}\$${_fmt(pnl.abs())}',
+              value: formatUsdSigned(pnl),
               valueColor: isPositive ? ThemeV2.success : ThemeV2.loss,
-              subText: '${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(1)}%',
+              subText:
+                  '${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(1)}%',
               subTextColor: isPositive ? ThemeV2.success : ThemeV2.loss,
             ),
           ),
-          Container(width: 1, height: 48, color: isDark ? Colors.white12 : Colors.black12),
+          Container(
+            width: 1,
+            height: 48,
+            color: isDark ? Colors.white12 : Colors.black12,
+          ),
           // Cash
           Expanded(
             child: _MetricCard(
               label: 'Cash',
-              value: '\$${_fmt(session.cash)}',
+              value: formatUsd(session.cash),
               valueColor: textColor,
               subTextColor: subTextColor,
             ),
@@ -68,10 +77,6 @@ class BalancePanel extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _fmt(double v) {
-    return NumberFormat('#,##0.00', 'en_US').format(v);
   }
 }
 
@@ -125,4 +130,3 @@ class _MetricCard extends StatelessWidget {
     );
   }
 }
-

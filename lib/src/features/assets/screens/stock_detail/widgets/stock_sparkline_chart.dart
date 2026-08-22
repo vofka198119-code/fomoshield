@@ -4,12 +4,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../../shared/utils/currency_format.dart';
 import '../../../../../shared/widgets/chart_line_glow_painter.dart';
+import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark;
+    show darkCardDecoration;
 import '../../../../stress_test/stress_test_engine.dart' show ChartDataPoint;
 
 // ---------------------------------------------------------------------------
@@ -34,8 +35,6 @@ const Map<StressTestSparkPeriod, String> _periodLabels = {
   StressTestSparkPeriod.m3: '3M',
   StressTestSparkPeriod.y1: '1Y',
 };
-
-final _priceFmt = NumberFormat('#,##0.00', 'en_US');
 
 /// Time-bucket averaging: splits [domainStart, domainEnd] into [maxBuckets]
 /// equal time slices and averages every raw point that falls in the same
@@ -152,6 +151,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (!widget.ready || widget.points.length < 2) {
       return Container(
         height: 280,
@@ -179,7 +179,10 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Text('PRICE CHART', style: FomoShieldTheme.cardTitle()),
+            child: Text(
+              l10n.stockSparklineChartTitle,
+              style: FomoShieldTheme.cardTitle(),
+            ),
           ),
           const SizedBox(height: 10),
           Padding(
@@ -222,14 +225,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 6),
               decoration: isSelected
-                  ? BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [dialLight, dialDark],
-                      ),
-                      borderRadius: BorderRadius.circular(6),
-                    )
+                  ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
                   : null,
               child: Text(
                 _periodLabels[period]!,
@@ -248,6 +244,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   }
 
   Widget _buildChartArea() {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
 
     DateTime domainStart;
@@ -264,7 +261,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
       if (points.length < 2) {
         return Center(
           child: Text(
-            'Not enough data for this period',
+            l10n.stressTestChartNotEnoughDataForPeriod,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,
@@ -289,7 +286,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
       if (points.length < 2) {
         return Center(
           child: Text(
-            'Not enough data for this period',
+            l10n.stressTestChartNotEnoughDataForPeriod,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: ThemeV2.textSecondary,
@@ -509,7 +506,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
           top: 0,
           right: 3,
           child: Text(
-            '\$${_priceFmt.format(maxValue)}',
+            formatUsd(maxValue),
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -521,7 +518,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
           bottom: 0,
           right: 3,
           child: Text(
-            '\$${_priceFmt.format(minValue)}',
+            formatUsd(minValue),
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -534,7 +531,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             top: (avgLineTop - 14).clamp(0.0, chartHeight - 14),
             right: 3,
             child: Text(
-              '\$${_priceFmt.format(avgPrice)}',
+              formatUsd(avgPrice),
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,

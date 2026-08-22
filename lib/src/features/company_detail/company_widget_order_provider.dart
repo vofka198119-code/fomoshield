@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Company Detail Widget Order Provider (SharedPreferences-backed)
@@ -21,8 +22,9 @@ const List<String> defaultCompanyWidgetOrder = [
 
 String _orderPrefsKey(String? uid) =>
     uid != null ? 'company_widget_order_$uid' : 'company_widget_order';
-String _visibilityPrefsKey(String? uid) =>
-    uid != null ? 'company_widget_visibility_$uid' : 'company_widget_visibility';
+String _visibilityPrefsKey(String? uid) => uid != null
+    ? 'company_widget_visibility_$uid'
+    : 'company_widget_visibility';
 
 /// Model representing a company detail widget's configuration.
 class CompanyWidgetConfig {
@@ -31,20 +33,20 @@ class CompanyWidgetConfig {
 
   const CompanyWidgetConfig({required this.id, required this.visible});
 
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (id) {
       case 'price_header':
-        return 'Price & Header';
+        return l10n.companyWidgetPriceHeader;
       case 'chart':
-        return 'Price Chart';
+        return l10n.stressTestWidgetPriceChart;
       case 'key_metrics':
-        return 'Key Metrics';
+        return l10n.companyWidgetKeyMetrics;
       case 'financial_score':
-        return 'Financial Score';
+        return l10n.companyWidgetFinancialScore;
       case 'position':
-        return 'Your Position';
+        return l10n.companyWidgetPosition;
       case 'limit_orders':
-        return 'Limit Orders';
+        return l10n.companyWidgetLimitOrders;
       default:
         return id;
     }
@@ -90,7 +92,9 @@ class CompanyWidgetsNotifier extends StateNotifier<List<CompanyWidgetConfig>> {
     // user last saved their layout).
     if (savedOrder != null) {
       final savedSet = Set<String>.from(savedOrder);
-      final missing = defaultCompanyWidgetOrder.where((id) => !savedSet.contains(id));
+      final missing = defaultCompanyWidgetOrder.where(
+        (id) => !savedSet.contains(id),
+      );
       order = [
         ...savedOrder.where(defaultCompanyWidgetOrder.contains),
         ...missing,
@@ -121,7 +125,9 @@ class CompanyWidgetsNotifier extends StateNotifier<List<CompanyWidgetConfig>> {
   Future<void> _saveLocal() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-        _orderPrefsKey(_userId), state.map((c) => c.id).toList());
+      _orderPrefsKey(_userId),
+      state.map((c) => c.id).toList(),
+    );
     await prefs.setString(
       _visibilityPrefsKey(_userId),
       state.map((c) => '${c.id}:${c.visible}').join(','),
@@ -170,7 +176,9 @@ class CompanyWidgetsNotifier extends StateNotifier<List<CompanyWidgetConfig>> {
 // ---------------------------------------------------------------------------
 
 final companyWidgetsProvider =
-    StateNotifierProvider<CompanyWidgetsNotifier, List<CompanyWidgetConfig>>((ref) {
-  final user = ref.watch(currentUserProvider);
-  return CompanyWidgetsNotifier(userId: user?.id);
-});
+    StateNotifierProvider<CompanyWidgetsNotifier, List<CompanyWidgetConfig>>((
+      ref,
+    ) {
+      final user = ref.watch(currentUserProvider);
+      return CompanyWidgetsNotifier(userId: user?.id);
+    });

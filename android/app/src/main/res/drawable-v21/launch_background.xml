@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
+<!-- Same branded background as drawable/launch_background.xml — deliberately
+     a FIXED color, not ?android:colorBackground, so this doesn't turn black
+     under a dark system theme (that was the actual cause of the original
+     "black screen" on launch, fixed 2026-08-14). See that file's comment
+     for what branding_shield.png actually is (an on-device screenshot
+     crop, not the raw logo asset) and its device-specific tradeoff. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="?android:colorBackground" />
-
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
+    <item android:drawable="@color/ic_launcher_background" />
+    <item android:gravity="top">
         <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+            android:gravity="top"
+            android:src="@drawable/branding_shield" />
+    </item>
 </layer-list>

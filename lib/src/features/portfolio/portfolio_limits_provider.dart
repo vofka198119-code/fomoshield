@@ -4,24 +4,18 @@ import '../../core/supabase/supabase_providers.dart';
 // ---------------------------------------------------------------------------
 // Portfolio Limits & Capital — based on subscription tier
 // ---------------------------------------------------------------------------
-// FREE:  1 portfolio max
-// PREMIUM: 3 portfolios max (base + 2)
-// Starting capital is based on the portfolio's POSITION, not the tier:
-//   1st portfolio (free or premium): $15,000
-//   2nd/3rd portfolio (premium only): $50,000 each
+// One portfolio for every tier — the old free/premium slot-count split (1
+// vs 3) is gone; only the starting capital of that single portfolio still
+// differs by tier.
+// FREE:    1 portfolio, $7,000 starting capital
+// PREMIUM: 1 portfolio, $10,000 starting capital
 // ---------------------------------------------------------------------------
 
-const int _freeMaxPortfolios = 1;
-const int _premiumMaxPortfolios = 3;
-const double firstPortfolioStartingCapital = 15000;
-const double additionalPortfolioStartingCapital = 50000;
+const int _maxPortfolios = 1;
+const double _freeStartingCapital = 7000;
+const double _premiumStartingCapital = 10000;
 
-final maxPortfoliosProvider = Provider<int>((ref) {
-  final tier = ref.watch(subscriptionTierProvider);
-  return (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
-      ? _premiumMaxPortfolios
-      : _freeMaxPortfolios;
-});
+final maxPortfoliosProvider = Provider<int>((ref) => _maxPortfolios);
 
 // Real Portfolio buys go through the app's own backend, which proxies/caches
 // Finnhub — a single free-tier user buying dozens of $10 positions would
@@ -37,8 +31,8 @@ final maxHoldingsPerPortfolioProvider = Provider<int>((ref) {
       : _freeMaxHoldingsPerPortfolio;
 });
 
-/// Starting capital for a portfolio at [index] (0-based, existing-portfolio
-/// count before creation). The first portfolio is always $15k regardless of
-/// tier; premium's 2nd/3rd portfolios are $50k each.
-double startingCapitalForIndex(int index) =>
-    index == 0 ? firstPortfolioStartingCapital : additionalPortfolioStartingCapital;
+/// Starting capital for the one portfolio a user of [tier] gets.
+double startingCapitalForTier(SubscriptionTier tier) =>
+    (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
+        ? _premiumStartingCapital
+        : _freeStartingCapital;

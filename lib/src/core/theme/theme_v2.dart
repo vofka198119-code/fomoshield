@@ -47,15 +47,16 @@ abstract final class ThemeV2 {
   static const Color background = Color(0xFFF8F5EC);
 
   /// Gradient background for the entire app.
-  /// Top: 3 tones lighter than base (#F8F5EC → #FDFBF5) — airy cream.
-  /// Bottom: noticeably darker warm beige (#C8BFA8) — visible depth.
+  /// Top: #F7F7F5 — matches the splash screen's flat background.
+  /// Bottom: #DCDBD7 — neutral warm-grey, deliberately no yellow/pink cast
+  /// (replaces the earlier warm cream gradient, 2026-08-13).
   /// Applied in main.dart via BoxDecoration. All Scaffolds must use transparent bg.
   static const LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color(0xFFFDFBF5), // 3 тона светлее базового #F8F5EC
-      Color(0xFFC8BFA8), // средне-тёмный бежевый — видимый градиент
+      Color(0xFFF7F7F5), // matches splash background
+      Color(0xFFDCDBD7), // neutral grey, no warm cast
     ],
   );
 

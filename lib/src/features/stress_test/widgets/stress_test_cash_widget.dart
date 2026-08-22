@@ -8,8 +8,10 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
-    show dialLight, dialDark, dialBrassLight;
+    show dialBrassLight, darkCardDecoration;
 import '../stress_test_models.dart';
 
 /// Dark-green gradient card (same brand gradient as TARGET / Shield Signal)
@@ -20,32 +22,11 @@ class StressTestCashWidget extends StatelessWidget {
 
   const StressTestCashWidget({super.key, required this.session});
 
-  /// Full number format with commas and fixed 2 decimals — e.g. $15,000.00
-  String _fmtFull(double v) {
-    final parts = v.toStringAsFixed(2).split('.');
-    final intStr = parts[0];
-    final buf = StringBuffer();
-    for (int i = 0; i < intStr.length; i++) {
-      if (i > 0 && (intStr.length - i) % 3 == 0) buf.write(',');
-      buf.write(intStr[i]);
-    }
-    buf.write('.');
-    buf.write(parts[1]);
-    return buf.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [dialLight, dialDark],
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       child: Column(
         children: [
           SizedBox(
@@ -53,7 +34,7 @@ class StressTestCashWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Text(
-                'CASH AVAILABLE',
+                AppLocalizations.of(context)!.portfolioCashLabel,
                 style: FomoShieldTheme.cardTitle(Colors.white),
               ),
             ),
@@ -69,7 +50,7 @@ class StressTestCashWidget extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: Text(
-                '\$${_fmtFull(session.cash)}',
+                formatUsd(session.cash),
                 textAlign: TextAlign.center,
                 style:
                     interNums(

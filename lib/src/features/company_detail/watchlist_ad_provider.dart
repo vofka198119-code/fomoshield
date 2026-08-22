@@ -22,8 +22,9 @@ class WatchlistAdNotifier extends StateNotifier<int> {
     _load();
   }
 
-  String get _prefsKey =>
-      _userId != null ? 'watchlist_view_counter_$_userId' : 'watchlist_view_counter';
+  String get _prefsKey => _userId != null
+      ? 'watchlist_view_counter_$_userId'
+      : 'watchlist_view_counter';
 
   /// Set user ID to re-scope the local cache key.
   void setUserId(String? uid) {
@@ -62,8 +63,9 @@ class WatchlistAdNotifier extends StateNotifier<int> {
   }
 }
 
-final watchlistAdProvider =
-    StateNotifierProvider<WatchlistAdNotifier, int>((ref) {
+final watchlistAdProvider = StateNotifierProvider<WatchlistAdNotifier, int>((
+  ref,
+) {
   final user = ref.watch(currentUserProvider);
   return WatchlistAdNotifier(userId: user?.id);
 });
@@ -71,6 +73,7 @@ final watchlistAdProvider =
 /// Whether an ad should be shown (respects premium tier).
 final shouldShowAdProvider = Provider<bool>((ref) {
   final tier = ref.watch(subscriptionTierProvider);
-  if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) return false;
+  if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
+    return false;
   return ref.watch(watchlistAdProvider.notifier).shouldShowAd;
 });

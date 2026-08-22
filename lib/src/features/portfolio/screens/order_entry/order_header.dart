@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../shared/utils/currency_format.dart';
 import '../../../../shared/widgets/company_logo.dart';
+import '../../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Order Header — plain top bar (back arrow + centered "BUY/SELL Company"
@@ -35,6 +37,7 @@ class OrderHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         SafeArea(
@@ -53,7 +56,7 @@ class OrderHeader extends StatelessWidget {
                 Expanded(
                   child: Center(
                     child: Text(
-                      '${isBuy ? 'BUY' : 'SELL'} $companyName',
+                      '${isBuy ? l10n.tradeBuy : l10n.tradeSell} $companyName',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
@@ -73,7 +76,11 @@ class OrderHeader extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: ThemeV2.primary, width: 1.5),
                     ),
-                    child: CompanyLogo(ticker: symbol, logoUrl: logo, radius: 16),
+                    child: CompanyLogo(
+                      ticker: symbol,
+                      logoUrl: logo,
+                      radius: 16,
+                    ),
                   ),
                 ),
               ],
@@ -82,7 +89,7 @@ class OrderHeader extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '\$${price.toStringAsFixed(2)}',
+          formatUsd(price),
           textAlign: TextAlign.center,
           style: interNums(
             fontSize: 28,
@@ -113,25 +120,47 @@ class OrderTypeTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 28, 16, 8),
       child: Row(
         children: [
-          Expanded(child: _tab(context, 'Market', !isLimit, () => onChanged(false))),
+          Expanded(
+            child: _tab(
+              context,
+              l10n.orderEntryTabMarket,
+              !isLimit,
+              () => onChanged(false),
+            ),
+          ),
           const SizedBox(width: 8),
-          Expanded(child: _tab(context, 'Limit', isLimit, () => onChanged(true))),
+          Expanded(
+            child: _tab(
+              context,
+              l10n.orderEntryTabLimit,
+              isLimit,
+              () => onChanged(true),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _tab(BuildContext context, String label, bool active, VoidCallback onTap) {
+  Widget _tab(
+    BuildContext context,
+    String label,
+    bool active,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: active ? ThemeV2.primary.withValues(alpha: 0.08) : Colors.transparent,
+          color: active
+              ? ThemeV2.primary.withValues(alpha: 0.08)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: active ? ThemeV2.primary : ThemeV2.divider),
         ),

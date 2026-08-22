@@ -2,21 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/segment_gauge_math.dart';
 import '../../market_clock/market_clock_dial.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../portfolio_providers.dart';
-
-// Shared gradient for the graph window and the CTA button below it —
-// same instrument-panel dial colors as the Market Clock widget.
-const List<Color> _indicatorGradient = [dialLight, dialDark];
-
-String _fmtCurrency(double amount) =>
-    '\$${NumberFormat('#,##0', 'en_US').format(amount)}';
 
 /// Maps a portfolio's current total value onto the -100%/0%/+100% scale.
 /// Below starting capital: -100%..0% spans $0..startingBalance (fixed).
@@ -88,7 +82,10 @@ class TargetWidget extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text('TARGET', style: FomoShieldTheme.cardTitle()),
+            child: Text(
+              AppLocalizations.of(context)!.targetLabel,
+              style: FomoShieldTheme.cardTitle(),
+            ),
           ),
           Divider(
             height: 1,
@@ -98,9 +95,7 @@ class TargetWidget extends ConsumerWidget {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-            child: _GraphWindow(
-              currentPercent: currentPercent,
-            ),
+            child: _GraphWindow(currentPercent: currentPercent),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -134,18 +129,17 @@ class _GoalSummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final goalText = goalAmount != null ? _fmtCurrency(goalAmount!) : '—';
+    final goalText = goalAmount != null ? formatUsd(goalAmount!) : '—';
 
     String remainingText = '—';
     Color remainingColor = ThemeV2.textPrimary;
     Color remainingBg = ThemeV2.primaryBg;
     if (remaining != null) {
+      remainingText = formatUsdSigned(-remaining!);
       if (remaining! > 0) {
-        remainingText = '-${_fmtCurrency(remaining!)}';
         remainingColor = ThemeV2.loss;
         remainingBg = ThemeV2.lossBg;
       } else {
-        remainingText = '+${_fmtCurrency(-remaining!)}';
         remainingColor = ThemeV2.success;
         remainingBg = ThemeV2.successBg;
       }
@@ -155,7 +149,7 @@ class _GoalSummaryRow extends StatelessWidget {
       children: [
         Expanded(
           child: _summaryBox(
-            label: 'GOAL',
+            label: AppLocalizations.of(context)!.targetGoalLabel,
             value: goalText,
             alignEnd: false,
             bgColor: ThemeV2.primaryBg,
@@ -164,7 +158,7 @@ class _GoalSummaryRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _summaryBox(
-            label: 'LEFT TO GOAL',
+            label: AppLocalizations.of(context)!.targetLeftToGoal,
             value: remainingText,
             valueColor: remainingColor,
             alignEnd: true,
@@ -204,7 +198,9 @@ class _GoalSummaryRow extends StatelessWidget {
     required bool alignEnd,
     Color valueColor = ThemeV2.textPrimary,
   }) {
-    final crossAlign = alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final crossAlign = alignEnd
+        ? CrossAxisAlignment.end
+        : CrossAxisAlignment.start;
     final boxAlign = alignEnd ? Alignment.centerRight : Alignment.centerLeft;
     return Column(
       crossAxisAlignment: crossAlign,
@@ -252,12 +248,7 @@ class _SelectGoalButton extends StatelessWidget {
       width: double.infinity,
       height: ThemeV2.buttonHeight,
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: _indicatorGradient,
-          ),
+        decoration: darkCardDecoration(
           borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
         ),
         child: Material(
@@ -267,7 +258,9 @@ class _SelectGoalButton extends StatelessWidget {
             onTap: () => context.push('/portfolio/$portfolioId/goal'),
             child: Center(
               child: Text(
-                hasGoal ? 'Change Goal' : 'Select Goal',
+                hasGoal
+                    ? AppLocalizations.of(context)!.targetChangeGoal
+                    : AppLocalizations.of(context)!.targetSelectGoal,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -294,14 +287,7 @@ class _GraphWindow extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: _indicatorGradient,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -311,11 +297,7 @@ class _GraphWindow extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              _Tick('-100%'),
-              _Tick('0%'),
-              _Tick('+100%'),
-            ],
+            children: const [_Tick('-100%'), _Tick('0%'), _Tick('+100%')],
           ),
         ],
       ),
@@ -354,9 +336,10 @@ class _MarkerRow extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           const pillWidth = 42.0;
-          final x =
-              (t * constraints.maxWidth - pillWidth / 2)
-                  .clamp(0.0, constraints.maxWidth - pillWidth);
+          final x = (t * constraints.maxWidth - pillWidth / 2).clamp(
+            0.0,
+            constraints.maxWidth - pillWidth,
+          );
           return Stack(
             children: [
               Positioned(
@@ -419,7 +402,9 @@ class _SegmentedBar extends StatelessWidget {
                   ? FractionallySizedBox(
                       widthFactor: fraction,
                       alignment: Alignment.centerLeft,
-                      child: Container(color: SegmentGaugeMath.colorForIndex(i)),
+                      child: Container(
+                        color: SegmentGaugeMath.colorForIndex(i),
+                      ),
                     )
                   : null,
             ),

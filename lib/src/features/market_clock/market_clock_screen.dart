@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 import 'market_clock_new_york_time_widget.dart';
 import 'market_clock_phase_widget.dart';
@@ -21,13 +22,18 @@ class MarketClockScreen extends ConsumerStatefulWidget {
 class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
   late Timer _timer;
   late MarketClockState _state;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _state = resolveMarketClockState(nowInNewYork());
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+    final l10n = AppLocalizations.of(context)!;
+    _state = resolveMarketClockState(l10n, nowInNewYork());
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() => _state = resolveMarketClockState(nowInNewYork()));
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _state = resolveMarketClockState(l10n, nowInNewYork()));
     });
   }
 
@@ -75,6 +81,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final widgetConfigs = ref.watch(marketClockWidgetsProvider);
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
 
@@ -84,7 +91,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'MARKET CLOCK',
+          l10n.marketClockScreenTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -93,51 +100,57 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          children: [
-            for (int i = 0; i < visibleWidgets.length; i++) ...[
-              if (i > 0) const SizedBox(height: 24),
-              KeyedSubtree(
-                key: ValueKey(visibleWidgets[i].id),
-                child: _buildWidget(visibleWidgets[i].id),
-              ),
-            ],
-            const SizedBox(height: 24),
-            // Add widgets button
-            Center(
-              child: TextButton.icon(
-                onPressed: _showWidgetsBottomSheet,
-                icon: const Icon(
-                  Icons.add_rounded,
-                  color: ThemeV2.primary,
-                  size: 20,
+      body: SafeArea(
+        bottom: true,
+        top: false,
+        left: false,
+        right: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Column(
+            children: [
+              for (int i = 0; i < visibleWidgets.length; i++) ...[
+                if (i > 0) const SizedBox(height: 24),
+                KeyedSubtree(
+                  key: ValueKey(visibleWidgets[i].id),
+                  child: _buildWidget(visibleWidgets[i].id),
                 ),
-                label: Text(
-                  'Add widgets',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+              ],
+              const SizedBox(height: 24),
+              // Add widgets button
+              Center(
+                child: TextButton.icon(
+                  onPressed: _showWidgetsBottomSheet,
+                  icon: const Icon(
+                    Icons.add_rounded,
                     color: ThemeV2.primary,
+                    size: 20,
                   ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(
+                  label: Text(
+                    l10n.marketClockAddWidgetsButton,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                       color: ThemeV2.primary,
-                      width: 0.5,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      side: const BorderSide(
+                        color: ThemeV2.primary,
+                        width: 0.5,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

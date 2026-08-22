@@ -7,9 +7,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_naming.dart';
@@ -33,8 +33,9 @@ class AssetRowWidget extends ConsumerWidget {
     final costBasis = holding.shares * holding.avgCost;
     final positionValue = costBasis + pnl;
     final totalValue = session.totalValue;
-    final allocation =
-        totalValue > 0 ? (positionValue / totalValue) * 100 : 0.0;
+    final allocation = totalValue > 0
+        ? (positionValue / totalValue) * 100
+        : 0.0;
 
     final logoAsync = ref.watch(cachedLogoProvider(holding.symbol));
 
@@ -43,9 +44,7 @@ class AssetRowWidget extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
         decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Color(0xFFE8E5DF)),
-          ),
+          border: Border(bottom: BorderSide(color: Color(0xFFE8E5DF))),
         ),
         child: Row(
           children: [
@@ -61,8 +60,7 @@ class AssetRowWidget extends ConsumerWidget {
                 ),
                 error: (_, _) =>
                     CompanyLogo(ticker: holding.symbol, radius: 20),
-                loading: () =>
-                    CompanyLogo(ticker: holding.symbol, radius: 20),
+                loading: () => CompanyLogo(ticker: holding.symbol, radius: 20),
               ),
             ),
             const SizedBox(width: 12),
@@ -95,7 +93,7 @@ class AssetRowWidget extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '\$${_fmtValue(positionValue)}',
+                  formatUsd(positionValue),
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -104,13 +102,11 @@ class AssetRowWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${isPositive ? '+' : ''}${_fmtValue(pnl)}',
+                  formatUsdSigned(pnl),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: isPositive
-                        ? ThemeV2.success
-                        : ThemeV2.loss,
+                    color: isPositive ? ThemeV2.success : ThemeV2.loss,
                   ),
                 ),
               ],
@@ -126,9 +122,4 @@ class AssetRowWidget extends ConsumerWidget {
       ),
     );
   }
-
-  String _fmtValue(double v) {
-    return NumberFormat('#,##0.00', 'en_US').format(v);
-  }
 }
-

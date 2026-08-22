@@ -9,6 +9,7 @@ import '../top_companies_provider.dart';
 import 'browse_lane.dart';
 import 'company_list_sheet.dart';
 import 'company_mini_card.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Browse Lanes — shown on the empty-query state. "TOP S&P 500" + per-sector
@@ -23,6 +24,15 @@ import 'company_mini_card.dart';
 // ---------------------------------------------------------------------------
 
 const _lanePreviewCount = 6;
+
+// The "TOP S&P 500" lane's own "see all" used to hand company_list_sheet
+// all ~500 ranked constituents at once — opening it fired a burst of
+// concurrent profile/logo fetches for every row scrolled into view,
+// hitting the backend's per-client rate limit within a second on a cold
+// cache. Real users don't need all 500 in one flat list anyway — the
+// per-sector lanes below already cover the full roster, dosed out lane by
+// lane instead of in one 500-row dump.
+const _topSp500Limit = 30;
 
 // Lanes cascade in over a ~2s total window (matches roughly how long it
 // takes to scroll to the bottom) instead of a flat per-lane delay that
@@ -45,6 +55,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final recentlyViewed = ref.watch(recentlyViewedProvider);
     final topCompanies = ref.watch(topCompaniesProvider);
 
@@ -56,9 +67,12 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            "Couldn't load top companies. Pull to retry shortly.",
+            l10n.searchTopCompaniesLoadError,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 13),
+            style: GoogleFonts.inter(
+              color: ThemeV2.textSecondary,
+              fontSize: 13,
+            ),
           ),
         ),
       ),
@@ -68,18 +82,32 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
-                'Top companies list is still being built on the server.',
+                l10n.searchTopCompaniesBuilding,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 13),
+                style: GoogleFonts.inter(
+                  color: ThemeV2.textSecondary,
+                  fontSize: 13,
+                ),
               ),
             ),
           );
         }
 
         final bySector = <GicsSector, List<TopCompanyEntry>>{};
+        // Companies resolveGicsSector can't place in any of the 11 GICS
+        // sectors (mid/small-cap names outside CompanyTagMapper's curated
+        // table — ~236 of the 502 real S&P 500 constituents, spot-checked
+        // 2026-08-22) used to just vanish from every lane instead of
+        // showing up in the sector they'd normally belong to — real stocks
+        // here, not ETFs/crypto (the other null case), so "unclassified"
+        // beats "invisible". Collected into its own OTHER lane below.
+        final unclassified = <TopCompanyEntry>[];
         for (final c in companies) {
           final sector = resolveGicsSector(c.symbol);
-          if (sector == null) continue;
+          if (sector == null) {
+            unclassified.add(c);
+            continue;
+          }
           bySector.putIfAbsent(sector, () => []).add(c);
         }
 
@@ -89,36 +117,71 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
         // was firing ~50+ simultaneous network calls on open.
         final lanes = <BrowseLane>[
           BrowseLane(
-            title: 'TOP S&P 500',
+            title: l10n.searchTopSp500,
             items: _cards(companies.take(_lanePreviewCount).toList()),
-            onSeeAll: () =>
-                showCompanyListSheet(context, 'TOP S&P 500', companies),
+            onSeeAll: () => showCompanyListSheet(
+              context,
+              l10n.searchTopSp500,
+              companies.take(_topSp500Limit).toList(),
+              onTapSymbol: widget.onTapSymbol,
+            ),
           ),
           for (final sector in GicsSector.values)
             if (bySector[sector] != null)
               BrowseLane(
-                title: sector.label.toUpperCase(),
+                title: sector.localizedLabel(l10n).toUpperCase(),
                 items: _cards(
                   bySector[sector]!.take(_lanePreviewCount).toList(),
                 ),
                 onSeeAll: () => showCompanyListSheet(
                   context,
-                  sector.label.toUpperCase(),
+                  sector.localizedLabel(l10n).toUpperCase(),
                   bySector[sector]!,
+                  onTapSymbol: widget.onTapSymbol,
                 ),
               ),
+          if (unclassified.isNotEmpty)
+            BrowseLane(
+              title: l10n.searchOtherSector,
+              items: _cards(unclassified.take(_lanePreviewCount).toList()),
+              onSeeAll: () => showCompanyListSheet(
+                context,
+                l10n.searchOtherSector,
+                unclassified,
+                onTapSymbol: widget.onTapSymbol,
+              ),
+            ),
           if (recentlyViewed.isNotEmpty)
             BrowseLane(
-              title: 'RECENTLY VIEWED',
-              items: [
-                for (int i = 0; i < recentlyViewed.length; i++)
-                  CompanyMiniCard(
-                    symbol: recentlyViewed[i].symbol,
-                    name: recentlyViewed[i].name,
-                    onTap: () => widget.onTapSymbol(recentlyViewed[i].symbol),
-                    showDivider: i < recentlyViewed.length - 1,
-                  ),
-              ],
+              title: l10n.searchRecentlyViewed,
+              items: _cards(
+                recentlyViewed
+                    .take(_lanePreviewCount)
+                    .map(
+                      (e) => TopCompanyEntry(
+                        symbol: e.symbol,
+                        name: e.name,
+                        marketCap: 0,
+                      ),
+                    )
+                    .toList(),
+              ),
+              onSeeAll: recentlyViewed.length > _lanePreviewCount
+                  ? () => showCompanyListSheet(
+                      context,
+                      l10n.searchRecentlyViewed,
+                      recentlyViewed
+                          .map(
+                            (e) => TopCompanyEntry(
+                              symbol: e.symbol,
+                              name: e.name,
+                              marketCap: 0,
+                            ),
+                          )
+                          .toList(),
+                      onTapSymbol: widget.onTapSymbol,
+                    )
+                  : null,
             ),
         ];
 

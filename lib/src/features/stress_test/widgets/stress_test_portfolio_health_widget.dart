@@ -13,6 +13,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -69,7 +70,7 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
 
       final sectorTotals = <String, double>{};
       for (final h in holdings) {
-        final sector = stressTestSectorName(h.symbol);
+        final sector = stressTestGicsSector(h.symbol)?.label ?? 'Other';
         sectorTotals[sector] = (sectorTotals[sector] ?? 0) + values[h.symbol]!;
       }
       final maxSectorPct = sectorTotals.values.reduce(math.max) / total * 100;
@@ -96,10 +97,7 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'PORTFOLIO HEALTH',
-                    style: FomoShieldTheme.cardTitle(),
-                  ),
+                  Text('PORTFOLIO HEALTH', style: FomoShieldTheme.cardTitle()),
                   GestureDetector(
                     onTap: () => context.push('/metric-info/portfolio-health'),
                     child: Container(
@@ -107,7 +105,9 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
                       height: 20,
                       decoration: BoxDecoration(
                         color: ThemeV2.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          ThemeV2.radiusSmall,
+                        ),
                       ),
                       alignment: Alignment.center,
                       child: const Icon(
