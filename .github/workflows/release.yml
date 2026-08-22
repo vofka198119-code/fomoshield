@@ -21,15 +21,16 @@ permissions:
   contents: write
 
 jobs:
-  # ── Bump version: read pubspec, compute the release tag ────────────────────
-  # Reads the version from pubspec.yaml and computes the release tag. The
-  # pre-release label is derived from the source BRANCH, not hardcoded, so the
-  # same workflow works on any branch without producing fake "dev" releases:
+  # ── Compute release tag: read pubspec version, derive branch label, set tag ─
+  # Resolves the exact release tag this run publishes — nothing is bumped
+  # blindly. Reads the version from pubspec.yaml, derives the pre-release label
+  # from the source BRANCH (not hardcoded), so the same workflow works on any
+  # branch without producing fake "dev" releases:
   #   branch push → v{version}-{label}.{run_number}  (pre-release)
   #   tag push    → the pushed tag itself             (stable release)
   # Precedence (semver pre-release identifiers): stable > main > dev > other > 0
   bump-version:
-    name: Bump version
+    name: Compute release tag
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.set.outputs.tag }}
