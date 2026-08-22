@@ -464,6 +464,30 @@ abstract class AppLocalizations {
   /// **'Restarting to apply the update…'**
   String get updateRestarting;
 
+  /// No description provided for @updateDownloadApk.
+  ///
+  /// In en, this message translates to:
+  /// **'Download APK'**
+  String get updateDownloadApk;
+
+  /// No description provided for @updateDownloadIpa.
+  ///
+  /// In en, this message translates to:
+  /// **'Download IPA'**
+  String get updateDownloadIpa;
+
+  /// No description provided for @updateDownloadPackage.
+  ///
+  /// In en, this message translates to:
+  /// **'Download package'**
+  String get updateDownloadPackage;
+
+  /// No description provided for @updateOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded — open the file from your Downloads folder.'**
+  String get updateOpenFailed;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:

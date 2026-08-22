@@ -206,6 +206,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateRestarting => 'Restarting to apply the update…';
 
   @override
+  String get updateDownloadApk => 'Download APK';
+
+  @override
+  String get updateDownloadIpa => 'Download IPA';
+
+  @override
+  String get updateDownloadPackage => 'Download package';
+
+  @override
+  String get updateOpenFailed =>
+      'Downloaded — open the file from your Downloads folder.';
+
+  @override
   String get profileDeleteAccount => 'Delete Account';
 
   @override

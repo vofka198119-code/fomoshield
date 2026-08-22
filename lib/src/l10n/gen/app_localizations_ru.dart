@@ -205,6 +205,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get updateRestarting => 'Перезапуск для применения обновления…';
 
   @override
+  String get updateDownloadApk => 'Скачать APK';
+
+  @override
+  String get updateDownloadIpa => 'Скачать IPA';
+
+  @override
+  String get updateDownloadPackage => 'Скачать пакет';
+
+  @override
+  String get updateOpenFailed =>
+      'Скачано — откройте файл в папке «Загрузки».';
+
+  @override
   String get profileDeleteAccount => 'Удалить аккаунт';
 
   @override

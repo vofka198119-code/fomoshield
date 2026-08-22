@@ -139,7 +139,10 @@ class UpdateService {
   /// The release-asset suffix this platform downloads, or null for store-only
   /// platforms (iOS). The public repo names assets `ScanCo.{ext}`:
   /// `.apk` (Android), `.zip` (Windows), `.tar.gz` (Linux), `.dmg` (macOS).
-  /// The release-asset suffix for [platform], null for store-only (iOS).
+  /// The release-asset suffix this platform downloads (null for unknown
+  /// platforms). The public repo names assets `ScanCo.{ext}`:
+  /// `.apk` (Android), `.ipa` (iOS), `.zip` (Windows), `.tar.gz` (Linux),
+  /// `.dmg` (macOS).
   @visibleForTesting
   String? assetSuffix(TargetPlatform platform) => _assetSuffix(platform);
 
@@ -154,9 +157,9 @@ class UpdateService {
       case TargetPlatform.macOS:
         return '.dmg';
       case TargetPlatform.iOS:
-        return null; // store-based
+        return '.ipa';
       default:
-        return null;
+        return null; // unknown platform — no asset
     }
   }
 

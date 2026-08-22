@@ -121,8 +121,8 @@ void main() {
       expect(service.assetSuffix(TargetPlatform.macOS), '.dmg');
     });
 
-    test('iOS (store-based) has no asset', () {
-      expect(service.assetSuffix(TargetPlatform.iOS), isNull);
+    test('iOS maps to the IPA asset', () {
+      expect(service.assetSuffix(TargetPlatform.iOS), '.ipa');
     });
   });
 }

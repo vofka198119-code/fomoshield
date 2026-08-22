@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/models/update_info.dart';
@@ -254,6 +255,11 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     final isDesktop = defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.linux ||
         defaultTargetPlatform == TargetPlatform.macOS;
+    final downloadLabel = switch (defaultTargetPlatform) {
+      TargetPlatform.android => _l10n.updateDownloadApk,
+      TargetPlatform.iOS => _l10n.updateDownloadIpa,
+      _ => _l10n.updateDownloadPackage,
+    };
 
     return Column(
       key: const ValueKey('info'),
@@ -317,11 +323,11 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         SizedBox(
           width: double.infinity,
           child: TextButton(
-            onPressed: _openReleasePage,
+            onPressed: _downloadAndOpen,
             child: Text(
-              _l10n.updateViewOnGithub,
+              downloadLabel,
               style: TextStyle(
-                color: const Color(0xFF6B6B6B),
+                color: const Color(0xFF1B365D),
                 fontFamily: _fontFamily,
               ),
             ),
@@ -387,6 +393,53 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   void _cancelDownload() {
     _cancelToken?.cancel();
     if (mounted) setState(() => _state = _DialogState.info);
+  }
+
+  /// Direct binary download: grabs the platform package (APK/IPA/desktop
+  /// archive) and opens it so the user can "open now". Falls back to the
+  /// release page when the release has no binary for this platform.
+  Future<void> _downloadAndOpen() async {
+    final info = _updateInfo;
+    final url = info?.downloadUrl;
+    if (url == null) {
+      _openReleasePage();
+      return;
+    }
+
+    setState(() {
+      _state = _DialogState.downloading;
+      _progress = 0;
+    });
+    _cancelToken = CancelToken();
+    try {
+      final service = ref.read(updateServiceProvider);
+      final file = await service.downloadPackage(
+        url,
+        (p) {
+          if (mounted) setState(() => _progress = p);
+        },
+        cancelToken: _cancelToken,
+      );
+      if (!mounted) return;
+
+      setState(() => _state = _DialogState.info);
+      final result = defaultTargetPlatform == TargetPlatform.android
+          ? await OpenFilex.open(
+              file.path,
+              type: 'application/vnd.android.package-archive',
+            )
+          : await OpenFilex.open(file.path);
+      if (result.type != ResultType.done && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_l10n.updateOpenFailed)),
+        );
+      }
+    } on DioException catch (_) {
+      if (mounted) setState(() => _state = _DialogState.info);
+    } catch (e) {
+      debugPrint('[UpdateDialog] Download failed: $e');
+      if (mounted) setState(() => _state = _DialogState.info);
+    }
   }
 
   /// Android + iOS can only ship updates through their own app stores — the
