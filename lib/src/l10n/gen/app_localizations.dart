@@ -494,6 +494,30 @@ abstract class AppLocalizations {
   /// **'Update directly'**
   String get updateDirectly;
 
+  /// No description provided for @updateDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get updateDownloaded;
+
+  /// No description provided for @updateOpenNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open now'**
+  String get updateOpenNow;
+
+  /// No description provided for @updateShowInFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in folder'**
+  String get updateShowInFolder;
+
+  /// No description provided for @updateDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get updateDone;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:

@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/models/update_info.dart';
@@ -12,18 +13,18 @@ import '../../core/services/update_service.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 /// Internal states for the update dialog lifecycle.
-enum _DialogState { checking, upToDate, info, downloading, restarting }
+enum _DialogState { checking, upToDate, info, downloading, ready, restarting }
 
 /// Numeric App Store ID — set once the app is published to the App Store.
 const String _appStoreId = ''; // TODO(publish): fill in after App Store submission
 
-/// A 3-state auto-update dialog.
+/// An auto-update dialog.
 ///
-/// Opens in [CHECKING] with a spinner, calls the GitHub Releases API,
-/// then transitions to [UP_TO_DATE] (auto-dismiss) or [INFO] (new version).
-/// Android & iOS can only ship updates through their own app stores, so the
-/// [INFO] "Update" button opens the Play Store / App Store (desktop falls
-/// back to the GitHub release page). No in-app download or install.
+/// Opens in [CHECKING] with a spinner, calls the GitHub Releases API, then
+/// transitions to [UP_TO_DATE] (auto-dismiss) or [INFO] (new version).
+/// Mobile: primary opens the Play Store / App Store; "Update directly"
+/// downloads the binary and proposes opening it. Desktop: "Update directly"
+/// performs a full self-update (download → install → relaunch).
 ///
 /// Follows FOMO Shield Design Bible:
 /// - Editorial Heritage palette (#F6F1E7, #1B365D, #4A5D23, #3F7CFF)
@@ -46,6 +47,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   UpdateInfo? _updateInfo;
   double _progress = 0;
   CancelToken? _cancelToken;
+  File? _downloadedFile;
 
   AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
@@ -115,6 +117,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         _DialogState.upToDate => _buildUpToDate(),
         _DialogState.info => _buildInfo(),
         _DialogState.downloading => _buildDownloading(),
+        _DialogState.ready => _buildReady(),
         _DialogState.restarting => _buildRestarting(),
       },
     );
@@ -247,6 +250,72 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     );
   }
 
+  // ── READY (downloaded) ──────────────────────────────────────────────────
+
+  Widget _buildReady() {
+    return Column(
+      key: const ValueKey('ready'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.download_done, color: Color(0xFF4A5D23), size: 48),
+        const SizedBox(height: 12),
+        Text(
+          _l10n.updateDownloaded,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1B365D),
+            fontFamily: _fontFamily,
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: _openNow,
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF1B365D),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              _l10n.updateOpenNow,
+              style: const TextStyle(fontFamily: 'Inter'),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: _showInFolder,
+            child: Text(
+              _l10n.updateShowInFolder,
+              style: TextStyle(
+                color: const Color(0xFF6B6B6B),
+                fontFamily: _fontFamily,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              _l10n.updateDone,
+              style: TextStyle(
+                color: const Color(0xFF6B6B6B),
+                fontFamily: _fontFamily,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   // ── INFO ────────────────────────────────────────────────────────────────
 
   Widget _buildInfo() {
@@ -263,7 +332,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         isDesktop ? _startDesktopUpdate : _openStore;
     final secondaryLabel =
         isDesktop ? _l10n.updateDownloadPackage : _l10n.updateDirectly;
-    final VoidCallback secondaryAction = _openBrowserDownload;
+    final VoidCallback secondaryAction = _updateDirectly;
 
     return Column(
       key: const ValueKey('info'),
@@ -397,18 +466,88 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     if (mounted) setState(() => _state = _DialogState.info);
   }
 
-  /// "Update directly": open the platform package (APK/IPA/desktop archive)
-  /// in the external browser, where the download is handled natively — robust,
-  /// no in-app download/install. Falls back to the release page when the
-  /// release has no binary URL for this platform.
-  void _openBrowserDownload() {
+  /// "Update directly": download the platform package in-app, then PROPOSE
+  /// opening it directly ("Open now"). The download is a plain dio GET to a
+  /// temp dir — robust; opening uses the OS default handler on desktop and
+  /// the system installer on Android.
+  Future<void> _updateDirectly() async {
     final info = _updateInfo;
     final url = info?.downloadUrl;
     if (url == null) {
       _openReleasePage();
       return;
     }
-    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    setState(() {
+      _state = _DialogState.downloading;
+      _progress = 0;
+    });
+    _cancelToken = CancelToken();
+    try {
+      final service = ref.read(updateServiceProvider);
+      final file = await service.downloadPackage(
+        url,
+        (p) {
+          if (mounted) setState(() => _progress = p);
+        },
+        cancelToken: _cancelToken,
+      );
+      if (!mounted) return;
+      _downloadedFile = file;
+      setState(() => _state = _DialogState.ready);
+    } on DioException catch (_) {
+      if (mounted) setState(() => _state = _DialogState.info);
+    } catch (e) {
+      debugPrint('[UpdateDialog] Download failed: $e');
+      if (mounted) setState(() => _state = _DialogState.info);
+    }
+  }
+
+  /// Open the downloaded file with the OS default handler (desktop) or the
+  /// system installer (Android APK). Falls back to revealing the file.
+  Future<void> _openNow() async {
+    final file = _downloadedFile;
+    if (file == null) return;
+
+    if (Platform.isWindows) {
+      await Process.start('explorer.exe', [file.path]);
+    } else if (Platform.isMacOS) {
+      await Process.start('open', [file.path]);
+    } else if (Platform.isLinux) {
+      await Process.start('xdg-open', [file.path]);
+    } else {
+      // Android / iOS — use the system handler (APK → package installer).
+      final result = await OpenFilex.open(
+        file.path,
+        type: Platform.isAndroid
+            ? 'application/vnd.android.package-archive'
+            : null,
+      );
+      if (result.type != ResultType.done && mounted) {
+        _showInFolder();
+        return;
+      }
+    }
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  /// Reveal the downloaded file in the OS file manager (or a hint on mobile).
+  void _showInFolder() {
+    final file = _downloadedFile;
+    if (file == null) return;
+    if (Platform.isWindows) {
+      Process.start('explorer.exe', ['/select,"${file.path}"']);
+    } else if (Platform.isMacOS) {
+      Process.start('open', ['-R', file.path]);
+    } else if (Platform.isLinux) {
+      Process.start('xdg-open', [file.parent.path]);
+    } else {
+      // Android / iOS — no folder reveal; tell the user where it went.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_l10n.updateOpenFailed)),
+        );
+      }
+    }
     if (mounted) Navigator.of(context).pop();
   }
 

@@ -221,6 +221,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get updateDirectly => 'Обновить напрямую';
 
   @override
+  String get updateDownloaded => 'Скачано';
+
+  @override
+  String get updateOpenNow => 'Открыть';
+
+  @override
+  String get updateShowInFolder => 'Показать в папке';
+
+  @override
+  String get updateDone => 'Готово';
+
+  @override
   String get profileDeleteAccount => 'Удалить аккаунт';
 
   @override

@@ -222,6 +222,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateDirectly => 'Update directly';
 
   @override
+  String get updateDownloaded => 'Downloaded';
+
+  @override
+  String get updateOpenNow => 'Open now';
+
+  @override
+  String get updateShowInFolder => 'Show in folder';
+
+  @override
+  String get updateDone => 'Done';
+
+  @override
   String get profileDeleteAccount => 'Delete Account';
 
   @override
