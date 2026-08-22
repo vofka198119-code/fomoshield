@@ -18,8 +18,6 @@ import '../../shared/widgets/disclaimer_footer.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import '../market_clock/market_clock_dial.dart';
-import '../../shared/guardian/guardian_engine.dart';
-import '../../shared/guardian/guardian_providers.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_dca_provider.dart';
@@ -122,11 +120,6 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       await markStressTestDcaFunded(ref, widget.sessionId);
     }
     notifier.startTest(widget.sessionId);
-
-    // Record test start for Guardian intelligence
-    ref.read(guardianEngineProvider).whenData((engine) {
-      engine.recordAction(UserAction.startedTest);
-    });
 
     if (mounted) {
       context.push('/stress-test/${widget.sessionId}');
