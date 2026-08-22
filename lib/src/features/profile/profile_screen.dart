@@ -440,44 +440,48 @@ class ProfileScreen extends ConsumerWidget {
                 .watch(packageInfoProvider)
                 .when(
                   data: (info) {
-                    // Standard "v1.0.0 (24)" form — version + build number.
-                    // Build number prefers the CI run number (APP_BUILD) so
-                    // installed CI builds match their release tag.
+                    // Standard "v1.0.0 (24) ⟳" form — version + build number
+                    // with an inline manual update trigger (reuses the same
+                    // UpdateDialog the app auto-shows after launch).
                     final build = kAppBuildOverride.isNotEmpty
                         ? kAppBuildOverride
                         : info.buildNumber;
-                    return Text(
-                      'v${info.version} ($build)',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: ThemeV2.textSecondary.withValues(alpha: 0.5),
-                      ),
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'v${info.version} ($build)',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: ThemeV2.textSecondary
+                                .withValues(alpha: 0.5),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            builder: (_) => const UpdateDialog(),
+                          ),
+                          icon: const Icon(
+                            Icons.system_update_alt,
+                            size: 16,
+                            color: ThemeV2.textSecondary,
+                          ),
+                          tooltip: 'Check for updates',
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.only(left: 6),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                        ),
+                      ],
                     );
                   },
                   loading: () => const SizedBox.shrink(),
                   error: (_, _) => const SizedBox.shrink(),
                 ),
-          ),
-
-          // ── Manual update check ─────────────────────────────────
-          // Calm, user-initiated (no pressure) — reuses the same UpdateDialog
-          // the app auto-shows after launch, so the check flow is identical.
-          const SizedBox(height: 4),
-          Center(
-            child: TextButton.icon(
-              onPressed: () => showDialog(
-                context: context,
-                barrierDismissible: true,
-                builder: (_) => const UpdateDialog(),
-              ),
-              icon: const Icon(Icons.system_update_alt, size: 16),
-              label: const Text('Check for updates'),
-              style: TextButton.styleFrom(
-                foregroundColor: ThemeV2.textSecondary,
-                visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-              ),
-            ),
           ),
 
           const SizedBox(height: 16),
