@@ -1528,6 +1528,7 @@
   "disclaimerScreenAcceptAndThe": ", а также ",
   "disclaimerScreenPrivacyPolicyLink": "Политику конфиденциальности",
   "disclaimerScreenAcceptButton": "Принимаю",
+  "disclaimerScreenLinkFailed": "Не удалось открыть ссылку. Проверьте подключение к интернету.",
   "accountRestoreScreenRestoreFailed": "Не удалось восстановить аккаунт. Попробуйте ещё раз.",
   "accountRestoreScreenTitle": "Аккаунт назначен к удалению",
   "accountRestoreScreenDaysLeft": "{count, plural, one{У вас остался {count} день, чтобы восстановить аккаунт} few{У вас осталось {count} дня, чтобы восстановить аккаунт} many{У вас осталось {count} дней, чтобы восстановить аккаунт} other{У вас осталось {count} дня, чтобы восстановить аккаунт}}",

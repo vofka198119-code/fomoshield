@@ -23,6 +23,13 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.disclaimerScreenLinkFailed),
+          backgroundColor: ThemeV2.loss,
+        ),
+      );
     }
   }
 

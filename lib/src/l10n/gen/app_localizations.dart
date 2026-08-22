@@ -9145,6 +9145,12 @@ abstract class AppLocalizations {
   /// **'I Accept'**
   String get disclaimerScreenAcceptButton;
 
+  /// No description provided for @disclaimerScreenLinkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the link. Please check your internet connection.'**
+  String get disclaimerScreenLinkFailed;
+
   /// No description provided for @accountRestoreScreenRestoreFailed.
   ///
   /// In en, this message translates to:

@@ -5438,6 +5438,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get disclaimerScreenAcceptButton => 'Принимаю';
 
   @override
+  String get disclaimerScreenLinkFailed =>
+      'Не удалось открыть ссылку. Проверьте подключение к интернету.';
+
+  @override
   String get accountRestoreScreenRestoreFailed =>
       'Не удалось восстановить аккаунт. Попробуйте ещё раз.';
 

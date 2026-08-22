@@ -5423,6 +5423,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disclaimerScreenAcceptButton => 'I Accept';
 
   @override
+  String get disclaimerScreenLinkFailed =>
+      'Couldn\'t open the link. Please check your internet connection.';
+
+  @override
   String get accountRestoreScreenRestoreFailed =>
       'Could not restore your account. Please try again.';
 
