@@ -20,6 +20,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../core/utils/app_build.dart';
+import '../update/update_dialog.dart';
 
 /// App version + build number, read from the actual installed build (not
 /// hardcoded) — build number auto-increments on every commit, see
@@ -456,6 +457,27 @@ class ProfileScreen extends ConsumerWidget {
                   loading: () => const SizedBox.shrink(),
                   error: (_, _) => const SizedBox.shrink(),
                 ),
+          ),
+
+          // ── Manual update check ─────────────────────────────────
+          // Calm, user-initiated (no pressure) — reuses the same UpdateDialog
+          // the app auto-shows after launch, so the check flow is identical.
+          const SizedBox(height: 4),
+          Center(
+            child: TextButton.icon(
+              onPressed: () => showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (_) => const UpdateDialog(),
+              ),
+              icon: const Icon(Icons.system_update_alt, size: 16),
+              label: const Text('Check for updates'),
+              style: TextButton.styleFrom(
+                foregroundColor: ThemeV2.textSecondary,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+            ),
           ),
 
           const SizedBox(height: 16),
