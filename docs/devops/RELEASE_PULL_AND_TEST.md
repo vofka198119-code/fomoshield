@@ -31,9 +31,11 @@ gh api repos/vofka198119-code/fomoshield/actions/runs/<run-id>/jobs --jq '.jobs[
 gh api repos/vofka198119-code/fomoshield/actions/runs/<run-id>/artifacts --jq '.artifacts[] | .name+" | "+(.size_in_bytes|tostring)+" | "+(.id|tostring)'
 ```
 
-**Готовые релизы** смотри в `https://github.com/vofka198119-code/fomoshield/releases`
-(тег вида `v1.0.0-dev.<run>`). Но артефакты доступны уже **во время** run —
-до того, как джоба Release закончила работу.
+**Готовые релизы** (финальные бинарники, без токена) — в **публичном** зеркале:
+`https://github.com/vofka198119-code/fomoshield-releases/releases`
+(тег вида `v1.0.0-dev.<run>`). В приватном `vofka198119-code/fomoshield` тоже есть
+Release, но качать оттуда без токена нельзя. Артефакты доступны уже **во время**
+run — до того, как джоба Release закончила работу.
 
 ---
 
@@ -70,27 +72,34 @@ gh run view <run-id> -R vofka198119-code/fomoshield --log > .github/.logs/run-<i
 ```powershell
 # 1) Почистить прошлый pull (оставить только последний)
 Get-ChildItem .bin -Directory | Where-Object Name -match '^\d+$' | Remove-Item -Recurse -Force
+```
 
-# 2) Скачать нужные артефакты
+**Способ А (основной, без токена) — из ПУБЛИЧНОГО релизного репозитория:**
+`gh release download` сохраняет файлы **как есть** (никакой самовольной распаковки):
+
+```powershell
+$TAG = v1.0.0-dev.<run>   # тег из публичного релиза
+$RID = <run-id>           # id запуска (для имени папки .bin)
+
+gh release download $TAG -R vofka198119-code/fomoshield-releases -p "ScanCo.apk"     -D .bin/$RID/android
+gh release download $TAG -R vofka198119-code/fomoshield-releases -p "ScanCo.zip"     -D .bin/$RID/windows
+gh release download $TAG -R vofka198119-code/fomoshield-releases -p "ScanCo.tar.gz" -D .bin/$RID/linux
+gh release download $TAG -R vofka198119-code/fomoshield-releases -p "ScanCo.dmg"     -D .bin/$RID/macos
+gh release download $TAG -R vofka198119-code/fomoshield-releases -p "ScanCo.ipa"     -D .bin/$RID/iphone
+```
+
+**Способ Б (альтернатива, пока идёт run) — артефакты из приватного CI:**
+
+```powershell
 gh run download <run-id> -R vofka198119-code/fomoshield -n linux  -D .bin/<run-id>/linux
 gh run download <run-id> -R vofka198119-code/fomoshield -n android -D .bin/<run-id>/android
 gh run download <run-id> -R vofka198119-code/fomoshield -n iphone  -D .bin/<run-id>/iphone
 ```
 
 > **Грабли `gh run download`:** он **распаковывает** содержимое артефакта.
-> Для `windows` (артефакт = `ScanCo.zip`) это приводит к «распаковке внутри
-> распаковки» и битому результату. Поэтому **Windows качаем напрямую по API**:
-
-```powershell
-# 3) Windows — напрямую через API (сохраняет ScanCo.zip целым)
-$id = <artifact_id артефакта "windows">        # из списка артефактов, шаг 2
-$t = gh auth token
-New-Item -ItemType Directory -Force -Path .bin/<run-id>/windows | Out-Null
-curl.exe -sL -H "Authorization: Bearer $t" -o .bin/<run-id>/windows/container.zip `
-  "https://api.github.com/repos/vofka198119-code/fomoshield/actions/artifacts/$id/zip"
-Expand-Archive .bin/<run-id>/windows/container.zip -DestinationPath .bin/<run-id>/windows -Force
-Remove-Item .bin/<run-id>/windows/container.zip
-```
+> Для `windows` (артефакт = `ScanCo.zip`) это «распаковка внутри распаковки» и
+> битый результат — поэтому Windows из артефактов качают напрямую по API
+> (`/actions/artifacts/{id}/zip` + Expand-Archive). Способ А этих граблей лишён.
 
 ### 3.1 Извлекаем executables и выбрасываем архивы
 
@@ -254,18 +263,16 @@ tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
 - Updater **build-aware**: не предлагает `dev.N`, если установлена та же N.
 - На iOS/desktop приложение установить не может — открывает страницу релиза GitHub.
 
-### Настройка публичного репозитория релизов (один раз)
+### Публичный репозиторий релизов (настроено ✅)
 
-1. Создать **публичный** репозиторий `vofka198119-code/fomoshield-releases`
-   (если название другое — поправить `_repo` в `lib/src/core/services/update_service.dart`
-   и строку `repository:` в джобе `publish-public`).
-2. Сделать минимум один коммит (README) — нужен HEAD дефолтной ветки.
-3. В **приватном** репо: Settings → Secrets and variables → Actions → New secret
-   **`RELEASE_PUBLISH_TOKEN`** = fine-grained PAT (Access: только публичный
-   релизный репо, Permissions: **Contents: write**). Токен живёт только в CI —
-   в приложение не попадает.
-4. Пайплайн: джоба `publish-public` после сборки заливает `ScanCo.*` в публичный
-   репозиторий с тем же тегом; приложение скачивает их анонимно.
+- Публичное зеркало: `vofka198119-code/fomoshield-releases` — джоба `publish-public`
+  после сборки заливает `ScanCo.*` с тем же тегом; приложение качает их анонимно.
+- README-коммит и секрет `RELEASE_PUBLISH_TOKEN` (fine-grained PAT, Contents: write
+  на публичный репо) уже настроены. Пошаговая настройка (если нужно повторить):
+  `docs/devops/vofka_secret_setup.md`.
+- Если название репозитория изменится — поправить `_repo` в
+  `lib/src/core/services/update_service.dart` и строку `repository:` в джобе
+  `publish-public`.
 
 ---
 
@@ -284,6 +291,6 @@ tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
 gh run list -R vofka198119-code/fomoshield --workflow release.yml --limit 5
 gh run view <run-id> -R vofka198119-code/fomoshield --log            # стрим логов (только gh)
 gh run view <run-id> -R vofka198119-code/fomoshield --log > .github/.logs/run-<id>.log   # ОПЦИОНАЛЬНО: локальный кэш для grep
-gh release view -R vofka198119-code/fomoshield                                        # assets релиза
-gh release download <tag> -R vofka198119-code/fomoshield -D .bin/<tag>                 # сразу из релиза
+gh release view -R vofka198119-code/fomoshield-releases                              # assets публичного релиза
+gh release download <tag> -R vofka198119-code/fomoshield-releases -p "ScanCo.*" -D .bin/<run-id>  # без токена
 ```
