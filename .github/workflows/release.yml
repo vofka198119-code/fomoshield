@@ -27,7 +27,7 @@ jobs:
       tag: ${{ steps.set.outputs.tag }}
       prerelease: ${{ steps.set.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - id: set
         run: |
@@ -48,7 +48,7 @@ jobs:
     needs: [version]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: subosito/flutter-action@v2
         with:
@@ -84,13 +84,14 @@ jobs:
           name: apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-  # ── iOS IPA (macos, no containers available, uses caching) ──────────────────
+  # ── iOS IPA (skipped — unsigned, requires Apple Developer account) ─────────
   build-ios:
+    if: false
     name: IPA
     needs: [version]
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: subosito/flutter-action@v2
         with:
@@ -122,14 +123,11 @@ jobs:
   # ── Create release + auto-create lightweight tag ──────────────────────────
   release:
     name: Release
-    needs: [version, build-android, build-ios]
+    needs: [version, build-android]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
         with: { name: apk }
-
-      - uses: actions/download-artifact@v4
-        with: { name: ipa }
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -138,5 +136,4 @@ jobs:
           prerelease: ${{ needs.version.outputs.prerelease }}
           files: |
             app-release.apk
-            app-release.ipa
           generate_release_notes: true
