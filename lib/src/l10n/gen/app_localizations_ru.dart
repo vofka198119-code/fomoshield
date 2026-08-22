@@ -218,6 +218,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Скачано — откройте файл в папке «Загрузки».';
 
   @override
+  String get updateDirectly => 'Обновить напрямую';
+
+  @override
   String get profileDeleteAccount => 'Удалить аккаунт';
 
   @override

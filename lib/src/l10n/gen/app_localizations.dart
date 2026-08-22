@@ -488,6 +488,12 @@ abstract class AppLocalizations {
   /// **'Downloaded — open the file from your Downloads folder.'**
   String get updateOpenFailed;
 
+  /// No description provided for @updateDirectly.
+  ///
+  /// In en, this message translates to:
+  /// **'Update directly'**
+  String get updateDirectly;
+
   /// No description provided for @profileDeleteAccount.
   ///
   /// In en, this message translates to:

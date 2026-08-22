@@ -79,6 +79,7 @@
   "updateDownloadIpa": "Download IPA",
   "updateDownloadPackage": "Download package",
   "updateOpenFailed": "Downloaded — open the file from your Downloads folder.",
+  "updateDirectly": "Update directly",
   "profileDeleteAccount": "Delete Account",
   "profileDeleteAccountTitle": "Delete Account?",
   "profileDeleteAccountBody": "You'll have 14 days to restore your account after this. If you don't restore it within that window, your account and all your data — portfolios, watchlist, stress test history — will be permanently erased, with no way to recover it.",

@@ -219,6 +219,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Downloaded — open the file from your Downloads folder.';
 
   @override
+  String get updateDirectly => 'Update directly';
+
+  @override
   String get profileDeleteAccount => 'Delete Account';
 
   @override

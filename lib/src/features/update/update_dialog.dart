@@ -255,11 +255,16 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
     final isDesktop = defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.linux ||
         defaultTargetPlatform == TargetPlatform.macOS;
-    final downloadLabel = switch (defaultTargetPlatform) {
-      TargetPlatform.android => _l10n.updateDownloadApk,
-      TargetPlatform.iOS => _l10n.updateDownloadIpa,
-      _ => _l10n.updateDownloadPackage,
-    };
+    // Desktop: "Update directly" = the in-app self-update (download+install+
+    // relaunch); the raw package download stays as the manual secondary.
+    // Mobile: primary goes to the app store; secondary downloads the binary.
+    final primaryLabel =
+        isDesktop ? _l10n.updateDirectly : _l10n.updateFromStore;
+    final VoidCallback primaryAction =
+        isDesktop ? _startDesktopUpdate : _openStore;
+    final secondaryLabel =
+        isDesktop ? _l10n.updateDownloadPackage : _l10n.updateDirectly;
+    final VoidCallback secondaryAction = _downloadAndOpen;
 
     return Column(
       key: const ValueKey('info'),
@@ -304,7 +309,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-            onPressed: isDesktop ? _startDesktopUpdate : _openStore,
+            onPressed: primaryAction,
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFF1B365D),
               shape: RoundedRectangleBorder(
@@ -312,9 +317,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
               ),
             ),
             child: Text(
-              isDesktop
-                  ? _l10n.updateDownloadAndInstall
-                  : _l10n.updateFromStore,
+              primaryLabel,
               style: const TextStyle(fontFamily: 'Inter'),
             ),
           ),
@@ -323,9 +326,9 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
         SizedBox(
           width: double.infinity,
           child: TextButton(
-            onPressed: _downloadAndOpen,
+            onPressed: secondaryAction,
             child: Text(
-              downloadLabel,
+              secondaryLabel,
               style: TextStyle(
                 color: const Color(0xFF1B365D),
                 fontFamily: _fontFamily,
