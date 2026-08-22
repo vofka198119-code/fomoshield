@@ -125,7 +125,9 @@ final isPremium = tier == SubscriptionTier.premium || tier == SubscriptionTier.a
   `docs/devops/RELEASE_PULL_AND_TEST.md`.
 - Правило скачивания: **executables** в `.bin/{run-id}/{platform}/` (не архивы);
   при новом pull — удалять старые `.bin/{run-id}/`.
-- Логи запусков локально: `.github/.logs/run-<id>.log` (не коммитить).
+- Логи запусков: читаются **только через GitHub CLI** (`gh run view <run-id> --log`).
+  Скачивание в `.github/.logs/run-<id>.log` — **опциональный** локальный кэш для
+  grep (не коммитить).
 
 ---
 

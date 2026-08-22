@@ -37,6 +37,29 @@ gh api repos/vofka198119-code/fomoshield/actions/runs/<run-id>/artifacts --jq '.
 
 ---
 
+### 2.1 Чтение логов запусков — только через GitHub CLI
+
+GitHub не отдаёт логи по прямой ссылке без авторизации — читать логи раннера
+можно **только через GitHub CLI** (или REST API с токеном). Стрим-вывод прямо в
+терминал:
+
+```powershell
+gh run view <run-id> -R vofka198119-code/fomoshield --log
+```
+
+**Скачивать логи в `.github/.logs/` НЕ обязательно.** Это просто локальный кэш
+для удобного офлайн-анализа (grep по большому логу, сравнение запусков). Если
+работаешь только через `gh` — достаточно стрима выше. Если нужен локальный
+файл (например, чтобы искать `##[error]`/`##[warning]` по всему запуску):
+
+```powershell
+gh run view <run-id> -R vofka198119-code/fomoshield --log > .github/.logs/run-<id>.log
+```
+
+Формат лога: строки `тab-разделены` — `<job> <step> <message>`.
+
+---
+
 ## 3. Скачивание executables → `.bin/{actionId}/{platform}/`
 
 **Правило папок:** всегда кладём **исполняемые файлы** (не архивы) в
@@ -188,7 +211,8 @@ APK **не запускается на Windows**. Варианты:
 
 ```powershell
 gh run list -R vofka198119-code/fomoshield --workflow release.yml --limit 5
-gh run view <run-id> -R vofka198119-code/fomoshield --log > .github/.logs/run-<id>.log   # полный лог
+gh run view <run-id> -R vofka198119-code/fomoshield --log            # стрим логов (только gh)
+gh run view <run-id> -R vofka198119-code/fomoshield --log > .github/.logs/run-<id>.log   # ОПЦИОНАЛЬНО: локальный кэш для grep
 gh release view -R vofka198119-code/fomoshield                                        # assets релиза
 gh release download <tag> -R vofka198119-code/fomoshield -D .bin/<tag>                 # сразу из релиза
 ```
