@@ -77,9 +77,9 @@ jobs:
             echo "storeFile=upload-keystore.p12"
           } > android/key.properties
 
-      - run: flutter build apk --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+      - run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: apk
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -115,7 +115,7 @@ jobs:
           cp -r Runner.app Payload/
           zip -r app-release.ipa Payload
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ipa
           path: build/ios/iphoneos/app-release.ipa
@@ -152,7 +152,7 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "scanco-windows.zip" -Force
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows
           path: scanco-windows.zip
@@ -193,7 +193,7 @@ jobs:
       - name: Package Linux app
         run: tar -czf scanco-linux.tar.gz -C build/linux/x64/release/bundle .
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: linux
           path: scanco-linux.tar.gz
@@ -229,7 +229,7 @@ jobs:
       - name: Package macOS app
         run: ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/Runner.app scanco-macos.zip
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos
           path: scanco-macos.zip
@@ -240,19 +240,19 @@ jobs:
     needs: [version, build-android, build-windows, build-linux, build-macos]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with: { name: apk }
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with: { name: windows }
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with: { name: linux }
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with: { name: macos }
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.version.outputs.tag }}
           name: ${{ needs.version.outputs.tag }}
