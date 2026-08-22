@@ -163,12 +163,12 @@ jobs:
 
       - name: Package Windows app
         shell: pwsh
-        run: Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "ScanCo-windows.zip" -Force
+        run: Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "ScanCo.zip" -Force
 
       - uses: actions/upload-artifact@v7
         with:
           name: windows
-          path: ScanCo-windows.zip
+          path: ScanCo.zip
 
   # ── Linux desktop ─────────────────────────────────────────────────────────
   build-linux:
@@ -205,12 +205,12 @@ jobs:
       - run: flutter build linux --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
       - name: Package Linux app
-        run: tar -czf ScanCo-linux.tar.gz -C build/linux/x64/release/bundle .
+        run: tar -czf ScanCo.tar.gz -C build/linux/x64/release/bundle .
 
       - uses: actions/upload-artifact@v7
         with:
           name: linux
-          path: ScanCo-linux.tar.gz
+          path: ScanCo.tar.gz
 
   # ── macOS desktop ─────────────────────────────────────────────────────────
   build-macos:
@@ -244,13 +244,13 @@ jobs:
       - run: flutter clean
       - run: flutter build macos --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
-      - name: Package macOS app
-        run: ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/scanco.app ScanCo-macos.zip
+      - name: Package macOS app (DMG)
+        run: hdiutil create -volname ScanCo -srcfolder build/macos/Build/Products/Release/scanco.app -ov -format UDZO ScanCo.dmg
 
       - uses: actions/upload-artifact@v7
         with:
           name: macos
-          path: ScanCo-macos.zip
+          path: ScanCo.dmg
 
   # ── Release ────────────────────────────────────────────────────────────────
   # One release per tag. `if: !cancelled()` means a failed build never blocks
@@ -297,7 +297,7 @@ jobs:
         with:
           tag_name: ${{ needs.version.outputs.tag }}
           overwrite_files: true
-          files: ScanCo-windows.zip
+          files: ScanCo.zip
       - uses: softprops/action-gh-release@v3
         if: ${{ needs.build-windows.result != 'success' }}
         with:
@@ -331,7 +331,7 @@ jobs:
         with:
           tag_name: ${{ needs.version.outputs.tag }}
           overwrite_files: true
-          files: ScanCo-linux.tar.gz
+          files: ScanCo.tar.gz
       - uses: softprops/action-gh-release@v3
         if: ${{ needs.build-linux.result != 'success' }}
         with:
@@ -348,7 +348,7 @@ jobs:
         with:
           tag_name: ${{ needs.version.outputs.tag }}
           overwrite_files: true
-          files: ScanCo-macos.zip
+          files: ScanCo.dmg
       - uses: softprops/action-gh-release@v3
         if: ${{ needs.build-macos.result != 'success' }}
         with:
