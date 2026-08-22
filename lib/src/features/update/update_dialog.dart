@@ -368,7 +368,7 @@ class _UpdateDialogState extends ConsumerState<UpdateDialog> {
   void _openReleasePage() {
     launchUrl(
       Uri.parse(
-        'https://github.com/Anecho/fomoshield-releases/releases/latest',
+        'https://github.com/vofka198119-code/fomoshield-releases/releases/latest',
       ),
       mode: LaunchMode.externalApplication,
     );

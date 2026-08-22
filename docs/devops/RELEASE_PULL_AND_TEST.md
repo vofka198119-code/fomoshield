@@ -241,7 +241,7 @@ tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
 ## 9. Проверка авто-обновления
 
 - Приложение читает релизы из **публичного** репозитория
-  `Anecho/fomoshield-releases` (зеркало бинарников) — **без токена**.
+  `vofka198119-code/fomoshield-releases` (зеркало бинарников) — **без токена**.
   Приватный репозиторий исходников не используется и не раскрывается.
 - На Android обновление работает в приложении: примерно через **5 сек** после
   запуска (и по кнопке **⟳** на Профиле) приложение проверяет GitHub Releases,
@@ -256,7 +256,7 @@ tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
 
 ### Настройка публичного репозитория релизов (один раз)
 
-1. Создать **публичный** репозиторий `Anecho/fomoshield-releases`
+1. Создать **публичный** репозиторий `vofka198119-code/fomoshield-releases`
    (если название другое — поправить `_repo` в `lib/src/core/services/update_service.dart`
    и строку `repository:` в джобе `publish-public`).
 2. Сделать минимум один коммит (README) — нужен HEAD дефолтной ветки.

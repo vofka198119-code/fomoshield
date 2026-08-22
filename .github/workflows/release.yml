@@ -359,7 +359,7 @@ jobs:
   # ── Mirror ScanCo.* binaries to the PUBLIC releases repo ──────────────────
   # The app's auto-update reads releases from here (public → no token in app).
   # Setup (once, in the repo settings):
-  #   - create a PUBLIC repo, e.g. Anecho/fomoshield-releases
+  #   - create a PUBLIC repo, e.g. vofka198119-code/fomoshield-releases
   #     (make at least one commit, e.g. README, so it has a default branch)
   #   - add repo SECRET  RELEASE_PUBLISH_TOKEN = fine-grained PAT
   #     (Contents: write) on that public repo ONLY — used by CI, never shipped
@@ -383,7 +383,7 @@ jobs:
 
       - uses: softprops/action-gh-release@v3
         with:
-          repository: Anecho/fomoshield-releases
+          repository: vofka198119-code/fomoshield-releases
           token: ${{ secrets.RELEASE_PUBLISH_TOKEN }}
           tag_name: ${{ needs.version.outputs.tag }}
           name: ${{ needs.version.outputs.tag }}

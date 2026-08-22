@@ -27,7 +27,7 @@ class UpdateService {
   static const _baseUrl = 'https://api.github.com';
 
   /// Public binaries-only repo. Change here if the repo is named differently.
-  static const _repo = 'Anecho/fomoshield-releases';
+  static const _repo = 'vofka198119-code/fomoshield-releases';
 
   late final Dio _dio;
 
