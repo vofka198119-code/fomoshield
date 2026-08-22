@@ -10,9 +10,19 @@ import '../../core/theme/theme_v2.dart';
 // Если logoUrl отсутствует — показывает первую букву названия в круге.
 //
 // Приоритет:
-//   1. logoUrl (из LogoCache) → CachedNetworkImage
+//   1. logoUrl (из LogoCache, если тикер уже реально резолвился)
 //   2. domain → Clearbit (logo.clearbit.com/$domain)
-//   3. Ничего → первая буква ticker в CircleAvatar
+//   3. FMP image-stock по тикеру напрямую (financialmodelingprep.com/
+//      image-stock/{TICKER}.png) — бесплатный, без ключа, без похода в
+//      Finnhub/наш бэкенд вообще: URL строится из одного тикера, который
+//      у виджета и так уже есть. Это ПОСЛЕДНИЙ уровень именно потому, что
+//      если тикер уже реально резолвился (шаг 1), у нас есть более точный
+//      URL — но пока этого не случилось, каждый виджет везде (ленты,
+//      список секторов, Watchlist, Portfolio) показывает лого сразу, а не
+//      буквенный аватар до первого открытия карточки. CachedNetworkImage
+//      ниже сам подменит его на букву, если конкретный тикер не найдётся
+//      на FMP (редкость — обычные буквенные ошибки не показываются).
+//   4. Ничего не резолвилось — первая буква ticker в CircleAvatar
 // ---------------------------------------------------------------------------
 
 class CompanyLogo extends StatelessWidget {
@@ -55,8 +65,15 @@ class CompanyLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final initial = ticker.isNotEmpty ? ticker[0].toUpperCase() : '?';
 
-    // Приоритет: явный logoUrl > Clearbit по domain
-    final url = logoUrl ?? (domain != null ? 'https://logo.clearbit.com/$domain' : null);
+    // Приоритет: явный logoUrl > Clearbit по domain > FMP по тикеру
+    // (см. doc comment выше — этот последний уровень не требует сети для
+    // построения URL, только для загрузки самой картинки).
+    final url = logoUrl ??
+        (domain != null ? 'https://logo.clearbit.com/$domain' : null) ??
+        (ticker.isNotEmpty
+            ? 'https://financialmodelingprep.com/image-stock/'
+                  '${ticker.toUpperCase()}.png'
+            : null);
 
     if (url != null) {
       return CachedNetworkImage(

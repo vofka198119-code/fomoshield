@@ -141,4 +141,70 @@ class LogoRepository {
 
   /// Проверяет, есть ли логотип в кэше.
   Future<bool> hasLogo(String ticker) async => _dao.hasLogo(ticker);
+
+  /// Записывает логотип+сектор из уже загруженного profile-ответа —
+  /// для вызывающих сторон, у которых profile и так уже под рукой
+  /// (Company Detail: тот же самый /profile/:symbol, что и её price
+  /// header, без второго похода в сеть). Раньше Company Detail писал в
+  /// LogoDao напрямую (company_detail_provider.dart's старый
+  /// cacheCompanyLogo) — та запись не заполняла gicsSector вообще
+  /// (сектор в ней навсегда оставался "не проверялся"), и, что хуже,
+  /// ничего не инвалидировало quickLogoProvider/quickGicsSectorProvider —
+  /// поэтому Search-виджет с этим же тикером продолжал показывать
+  /// буквенный аватар даже после того, как Company Detail уже реально
+  /// подтянул и лого, и сектор. Объединено в один путь записи 2026-08-22.
+  Future<void> cacheFromProfile(
+    String ticker,
+    Map<String, dynamic> profile,
+  ) async {
+    final key = ticker.trim().toUpperCase();
+    final existing = await _dao.getLogo(key);
+    final nameUseless =
+        existing != null && existing.companyName.toUpperCase() == key;
+    final sectorMissing = existing != null && existing.gicsSector == null;
+    if (existing != null && !nameUseless && !sectorMissing) {
+      return; // уже полная запись, писать нечего
+    }
+
+    final weburl = profile['weburl'] as String?;
+    final finnhubLogo = profile['logo'] as String?;
+    final profileName = profile['name'] as String?;
+
+    String? domain;
+    if (weburl != null && weburl.isNotEmpty) {
+      try {
+        final uri = Uri.parse(weburl);
+        domain = uri.host;
+        if (domain.startsWith('www.')) domain = domain.substring(4);
+      } catch (_) {}
+    }
+
+    final tickerLogoUrl = key.isNotEmpty
+        ? 'https://financialmodelingprep.com/image-stock/$key.png'
+        : null;
+    final logoUrl =
+        finnhubLogo ??
+        (domain != null ? 'https://logo.clearbit.com/$domain' : null) ??
+        tickerLogoUrl;
+    if (logoUrl == null || logoUrl.isEmpty) return;
+
+    final rawIndustry = profile['finnhubIndustry'] as String?;
+    final mappedSector = rawIndustry != null
+        ? finnhubIndustryToGics[rawIndustry]
+        : null;
+
+    await _dao.saveLogo(
+      LogoCacheEntry(
+        ticker: key,
+        companyName: (profileName != null && profileName.isNotEmpty)
+            ? profileName
+            : key,
+        domain: domain,
+        logoUrl: logoUrl,
+        createdAt: DateTime.now(),
+        gicsSector: mappedSector?.name ?? '',
+        finnhubIndustry: rawIndustry ?? '',
+      ),
+    );
+  }
 }

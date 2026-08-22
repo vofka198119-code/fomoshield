@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/cache/logo_dao.dart';
-import '../../core/models/logo_cache_entry.dart';
+import '../../core/cache/logo_providers.dart';
+import '../../core/cache/sector_providers.dart';
 import '../../core/services/gics_sector_mapper.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/scoring_engine.dart';
@@ -61,7 +61,7 @@ final companyDetailProvider =
         final profile = await api.companyProfile(symbol);
         final quote = await api.quote(symbol);
 
-        cacheCompanyLogo(symbol, profile);
+        cacheCompanyLogo(ref, symbol, profile);
 
         Map<String, dynamic> metrics = {};
         final cachedMetrics = metricsCache.get(symbol);
@@ -138,7 +138,7 @@ final companyDetailProvider =
       );
 
       // Сохранить логотип в LogoCache (если есть и нет в кэше)
-      cacheCompanyLogo(symbol, profile);
+      cacheCompanyLogo(ref, symbol, profile);
 
       // Сохранить score в 30-дневный кэш — null (fund/ETF, no
       // fundamentals) cached as {} so a re-open this session doesn't
@@ -188,39 +188,27 @@ final chartPeriodChangeProvider = StateProvider.autoDispose
 // Helpers
 // ---------------------------------------------------------------------------
 
-/// Сохраняет логотип компании в LogoCache.
+/// Сохраняет логотип+сектор компании в постоянный кэш из уже загруженного
+/// profile (без второго запроса к Finnhub) — LogoRepository.cacheFromProfile
+/// — и инвалидирует cache-only провайдеры (quickLogoProvider/
+/// quickGicsSectorProvider), которые Search/Watchlist читают. Без этого
+/// шага виджет со списком продолжал показывать буквенный аватар даже
+/// после того, как Company Detail для того же тикера уже реально
+/// подтянул и лого, и сектор — сам факт записи в LogoDao никак не был
+/// виден Riverpod-провайдерам, кэширующим свой Future отдельно
+/// (подтверждено на устройстве 2026-08-22).
 Future<void> cacheCompanyLogo(
+  Ref ref,
   String symbol,
   Map<String, dynamic> profile,
 ) async {
   try {
-    final dao = LogoDao();
-    final existing = await dao.getLogo(symbol);
-    if (existing != null) return; // уже есть в кэше
-
-    final finnhubLogo = profile['logo'] as String?;
-    final weburl = profile['weburl'] as String?;
-    String? domain;
-    if (weburl != null && weburl.isNotEmpty) {
-      try {
-        final uri = Uri.parse(weburl);
-        domain = uri.host;
-        if (domain.startsWith('www.')) domain = domain.substring(4);
-      } catch (_) {}
-    }
-    final logoUrl =
-        finnhubLogo ??
-        (domain != null ? 'https://logo.clearbit.com/$domain' : null);
-    if (logoUrl == null) return;
-
-    final entry = LogoCacheEntry(
-      ticker: symbol.toUpperCase(),
-      companyName: profile['name'] as String? ?? symbol,
-      domain: domain,
-      logoUrl: logoUrl,
-      createdAt: DateTime.now(),
-    );
-    await dao.saveLogo(entry);
+    await ref.read(logoRepositoryProvider).cacheFromProfile(symbol, profile);
+    ref.invalidate(quickLogoProvider(symbol));
+    ref.invalidate(quickGicsSectorProvider(symbol));
+    ref.invalidate(cachedLogoProvider(symbol));
+    ref.invalidate(cachedGicsSectorProvider(symbol));
+    ref.invalidate(cachedLogoEntryProvider(symbol));
   } catch (_) {
     // Не ломаем UI
   }

@@ -15,11 +15,14 @@ import '../../../shared/widgets/company_logo.dart';
 // bottom divider between rows. Lanes stack these vertically instead of
 // scrolling horizontally.
 //
-// Logo resolution: if the caller already has a URL (e.g. from a live search
-// result), pass it in directly. Otherwise this falls back to the same
-// permanent on-device logo cache the rest of the app uses (LogoDao via
-// cachedLogoProvider) — a known ticker like AAPL resolves instantly from
-// cache with no network call.
+// Logo/sector resolution: if the caller already has a URL, pass it in
+// directly. Otherwise this reads quickLogoProvider/quickGicsSectorProvider
+// — cache-only (LogoDao), never fetching — falling back to a letter avatar
+// / resolveGicsSector's static table on a miss rather than firing a live
+// Finnhub call. Up to ~10 lanes x 6 preview cards render the instant Search
+// opens; using the live-fetching cachedLogoProvider/cachedGicsSectorProvider
+// here (confirmed bug, fixed 2026-08-22) meant a cold device could fire ~60
+// simultaneous profile fetches with zero taps into any company card.
 //
 // No price here, by design — a lane full of these rows must never trigger
 // a live quote per row (that's what blew through Finnhub's rate limit).
@@ -72,7 +75,7 @@ class CompanyMiniCard extends StatelessWidget {
                   : Consumer(
                       builder: (context, ref, _) {
                         final resolved = ref
-                            .watch(cachedLogoProvider(symbol))
+                            .watch(quickLogoProvider(symbol))
                             .valueOrNull;
                         return CompanyLogo(
                           ticker: symbol,
@@ -101,11 +104,11 @@ class CompanyMiniCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Consumer(
                     builder: (context, ref, _) {
-                      final liveSector = ref
-                          .watch(cachedGicsSectorProvider(symbol))
+                      final cachedSector = ref
+                          .watch(quickGicsSectorProvider(symbol))
                           .valueOrNull;
                       final sector =
-                          liveSector ??
+                          cachedSector ??
                           resolveGicsSector(symbol, companyName: name);
                       return Text(
                         sector?.label ?? symbol,

@@ -204,6 +204,16 @@ class AppRouter {
       GoRoute(
         path: '/search/company-list',
         name: 'search-company-list',
+        // `extra` carries a raw List<TopCompanyEntry> and even a closure
+        // (onTapSymbol) — neither survives Android restoring the nav stack
+        // from just the URL after the process was killed in the
+        // background (or a hot reload replaying routes), which lands here
+        // with state.extra == null instead of never re-entering this
+        // route at all. A hard `as Map` cast crashed the whole app on
+        // that path (confirmed on-device 2026-08-22); redirect to plain
+        // Search instead since the original list can't be reconstructed.
+        redirect: (context, state) =>
+            state.extra is Map<String, dynamic> ? null : '/search',
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>;
           return CompanyListScreen(

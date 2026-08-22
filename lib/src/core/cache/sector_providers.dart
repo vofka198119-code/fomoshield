@@ -32,3 +32,19 @@ final cachedGicsSectorProvider =
   if (cached != null) return cached;
   return repo.loadSector(ticker);
 });
+
+// ---------------------------------------------------------------------------
+// Quick GICS Sector Check — только проверка кэша, без загрузки
+// ---------------------------------------------------------------------------
+// Cache-only мирроring quickLogoProvider — для мест, где ряд рендерится
+// сразу списком (Search lanes/company list) и не должен сам по себе
+// стрелять в Finnhub на каждый непопавший в кэш тикер. Сектор либо уже
+// живёт в LogoDao (кто-то раньше открыл Company Detail/купил в Stress
+// Test), либо остаётся null — вызывающий код сам решает, чем это
+// подменить (обычно resolveGicsSector's static table).
+
+final quickGicsSectorProvider =
+    FutureProvider.family<GicsSector?, String>((ref, ticker) async {
+  final repo = ref.read(sectorRepositoryProvider);
+  return repo.getCachedSector(ticker);
+});

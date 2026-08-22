@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../core/cache/logo_providers.dart';
+import '../../core/cache/sector_providers.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
@@ -289,9 +291,25 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     _cacheDetailLogo();
   }
 
+  // Belt-and-suspenders: companyDetailProvider itself already ran this
+  // (see cacheCompanyLogo in company_detail_provider.dart) before
+  // widget.data ever reached this widget — kept here in case a future
+  // caller hands this widget pre-fetched data some other way. WidgetRef
+  // isn't a Ref, so this can't just call the shared helper directly.
   Future<void> _cacheDetailLogo() async {
     final profile = widget.data['profile'] as Map<String, dynamic>? ?? {};
-    await cacheCompanyLogo(widget.symbol, profile);
+    try {
+      await ref
+          .read(logoRepositoryProvider)
+          .cacheFromProfile(widget.symbol, profile);
+      ref.invalidate(quickLogoProvider(widget.symbol));
+      ref.invalidate(quickGicsSectorProvider(widget.symbol));
+      ref.invalidate(cachedLogoProvider(widget.symbol));
+      ref.invalidate(cachedGicsSectorProvider(widget.symbol));
+      ref.invalidate(cachedLogoEntryProvider(widget.symbol));
+    } catch (_) {
+      // Не ломаем UI
+    }
   }
 
   // Quote/profile already loaded for this screen — handed to the order
