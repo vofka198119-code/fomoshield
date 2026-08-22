@@ -8,6 +8,10 @@ name: Release
 #                  precedence: stable tag > main > dev > other branch > numeric (0)
 # push tag v*     → stable release v1.0.1 (top precedence, never auto-bumped)
 #
+# Branch pushes build ONLY android + windows + linux (fast dev loop). macOS and
+# iPhone are skippable — they run on tag releases (v*) or when chosen via
+# workflow_dispatch (all / desktop).
+#
 # Tester reopens the app → auto-update dialog → download & install.
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -16,6 +20,18 @@ on:
     branches: [feature/auto-update]
     tags:
       - 'v*'
+  # Manual trigger — pick which platforms to build.
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Platforms to build'
+        required: true
+        type: choice
+        default: 'all'
+        options:
+          - all
+          - desktop
+          - android-windows-linux
 
 permissions:
   contents: write
@@ -167,6 +183,9 @@ jobs:
   # ── iOS (iPhone) build — unsigned IPA ─────────────────────────────────────
   build-ios:
     name: iPhone
+    # Skippable: run only on tag releases (v*) or when selected via
+    # workflow_dispatch (all). Branch pushes skip it to keep the dev loop fast.
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.platforms == 'all') || startsWith(github.ref, 'refs/tags/') }}
     needs: [bump-version]
     runs-on: macos-latest
     steps:
@@ -312,6 +331,10 @@ jobs:
   # ── macOS desktop ─────────────────────────────────────────────────────────
   build-macos:
     name: macOS
+    # Skippable: run only on tag releases (v*) or when selected via
+    # workflow_dispatch (all / desktop). Branch pushes skip it to keep the dev
+    # loop fast.
+    if: ${{ (github.event_name == 'workflow_dispatch' && (inputs.platforms == 'all' || inputs.platforms == 'desktop')) || startsWith(github.ref, 'refs/tags/') }}
     needs: [bump-version]
     runs-on: macos-latest
     # Flutter beta 3.48 fixed the desktop-AOT snapshotter bug that crashed
