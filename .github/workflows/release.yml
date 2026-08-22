@@ -175,10 +175,6 @@ jobs:
     name: Linux
     needs: [version]
     runs-on: ubuntu-latest
-    # Flutter 3.47.x AOT snapshotter crashes on Linux release builds
-    # ("Class with illegal cid" in dart:ffi, aot_elf_release). Keep building
-    # so we can see when a fixed Flutter lands, but never block the release.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v5
 
@@ -260,7 +256,7 @@ jobs:
   # ── Create release + auto-create lightweight tag ──────────────────────────
   release:
     name: Release
-    needs: [version, build-android, build-windows, build-ios]
+    needs: [version, build-android, build-windows, build-ios, build-linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
@@ -272,6 +268,9 @@ jobs:
       - uses: actions/download-artifact@v7
         with: { name: iphone }
 
+      - uses: actions/download-artifact@v7
+        with: { name: linux }
+
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.version.outputs.tag }}
@@ -281,4 +280,5 @@ jobs:
             ScanCo.apk
             ScanCo-windows.zip
             ScanCo.ipa
+            ScanCo-linux.tar.gz
           generate_release_notes: true
