@@ -138,6 +138,17 @@ jobs:
       - name: Scaffold Windows platform
         run: flutter create --platforms=windows --org com.scanco --project-name scanco .
 
+      # firebase_cpp_sdk ships an old cmake_minimum_required(<3.5) that CMake 3.31+
+      # rejects. Set the policy minimum at the top level so subprojects build anyway.
+      - name: Work around firebase_cpp_sdk CMake minimum version
+        shell: pwsh
+        run: |
+          $cm = 'windows\CMakeLists.txt'
+          $content = Get-Content $cm -Raw
+          if ($content -notmatch 'CMAKE_POLICY_VERSION_MINIMUM') {
+            Set-Content -Path $cm -Value "set(CMAKE_POLICY_VERSION_MINIMUM 3.5)`n$content" -NoNewline
+          }
+
       - run: flutter pub get
 
       - name: Setup .env
@@ -174,7 +185,7 @@ jobs:
       - name: Install Linux build deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build libgtk-3-dev liblzma-dev
+          sudo apt-get install -y ninja-build libgtk-3-dev liblzma-dev libsecret-1-dev libjsoncpp-dev
 
       # Scaffold the linux/ folder (not committed yet) so the build works.
       - name: Scaffold Linux platform
@@ -203,6 +214,10 @@ jobs:
     name: macOS
     needs: [version]
     runs-on: macos-latest
+    # Flutter 3.47.x AOT snapshotter crashes on macOS release builds
+    # ("Class with illegal cid" in _window_macos.dart). Keep building so we can
+    # see when a fixed Flutter lands, but never block the release.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v5
 
@@ -224,6 +239,7 @@ jobs:
           echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
+      - run: flutter clean
       - run: flutter build macos --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
       - name: Package macOS app
@@ -237,7 +253,7 @@ jobs:
   # ── Create release + auto-create lightweight tag ──────────────────────────
   release:
     name: Release
-    needs: [version, build-android, build-windows, build-linux, build-macos]
+    needs: [version, build-android, build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
@@ -249,9 +265,6 @@ jobs:
       - uses: actions/download-artifact@v7
         with: { name: linux }
 
-      - uses: actions/download-artifact@v7
-        with: { name: macos }
-
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.version.outputs.tag }}
@@ -261,5 +274,4 @@ jobs:
             app-release.apk
             scanco-windows.zip
             scanco-linux.tar.gz
-            scanco-macos.zip
           generate_release_notes: true
