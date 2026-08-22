@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,14 +14,38 @@ import 'src/core/cache/sector_providers.dart';
 import 'src/core/localization/language_provider.dart';
 import 'src/core/overlay/app_overlay_host.dart';
 import 'src/core/router/app_router.dart';
+import 'src/core/services/file_logger.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
 import 'src/features/orders/pending_orders_checker.dart';
 import 'src/features/update/update_dialog.dart';
 import 'src/l10n/gen/app_localizations.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Run the whole bootstrap inside a guarded zone so that:
+  //  - every print()/debugPrint() is mirrored to logs/app.log (full diagnostics)
+  //  - any uncaught async error is captured and written to the log
+  runZonedGuarded(
+    () async {
+      await _bootstrap();
+    },
+    (Object error, StackTrace stack) {
+      FileLogger.instance.error('Uncaught zone error: $error\n$stack');
+    },
+    zoneSpecification: ZoneSpecification(
+      print: (self, parent, zone, line) {
+        FileLogger.instance.write('PRINT $line');
+        parent.print(zone, line);
+      },
+    ),
+  );
+}
+
+Future<void> _bootstrap() async {
+  await FileLogger.instance.init();
+  FileLogger.instance.info('main: ensureInitialized');
 
   // Mobile-only startup that has no meaning/implementation on desktop or web:
   // edge-to-edge system UI, Firebase (only Android has FirebaseOptions here),
@@ -43,6 +69,7 @@ void main() async {
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
     );
+    FileLogger.instance.info('main: system chrome configured (mobile)');
   }
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
@@ -55,15 +82,33 @@ void main() async {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
       !kDebugMode,
     );
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    FlutterError.onError = (details) {
+      FileLogger.instance
+          .error('FlutterError: ${details.exception}\n${details.stack}');
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    };
     PlatformDispatcher.instance.onError = (error, stack) {
+      FileLogger.instance.error('Platform error: $error\n$stack');
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
+    FileLogger.instance.info('main: firebase + crashlytics ready (android)');
+  } else {
+    // Desktop/web: no Firebase — still capture errors to the log file.
+    FlutterError.onError = (details) {
+      FileLogger.instance
+          .error('FlutterError: ${details.exception}\n${details.stack}');
+    };
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FileLogger.instance.error('Platform error: $error\n$stack');
+      return true;
+    };
+    FileLogger.instance.info('main: firebase skipped (non-android)');
   }
 
   // Load .env — optional so the app doesn't crash if the file is missing
   await dotenv.load(fileName: '.env', isOptional: true);
+  FileLogger.instance.info('main: .env loaded');
 
   // 🐛 Debug: verify API configuration loaded correctly
   final rawKey = dotenv.env['FINNHUB_API_KEY'] ?? '';
@@ -76,10 +121,17 @@ void main() async {
   debugPrint('📁 .env loaded successfully');
   debugPrint('═══════════════════════════════════════');
 
-  await Supabase.initialize(
-    url: SupabaseConfig.projectUrl,
-    publishableKey: SupabaseConfig.anonKey,
-  );
+  // Supabase is needed for auth/data, but a failure on a given platform
+  // shouldn't blank the whole UI — log it and let the app still start.
+  try {
+    await Supabase.initialize(
+      url: SupabaseConfig.projectUrl,
+      publishableKey: SupabaseConfig.anonKey,
+    );
+    FileLogger.instance.info('main: supabase initialized');
+  } catch (e, s) {
+    FileLogger.instance.error('main: Supabase.initialize failed: $e\n$s');
+  }
 
   // GoogleSignIn.instance.initialize() moved off this blocking path
   // (2026-08-14) — it isn't needed until the user actually taps "Continue
@@ -96,11 +148,17 @@ void main() async {
   // manual ProviderContainer lets this finish before runApp, instead of
   // racing the app's first frame with a fire-and-forget read.
   final container = ProviderContainer();
-  await container.read(sectorRepositoryProvider).hydrateLiveCache();
+  try {
+    await container.read(sectorRepositoryProvider).hydrateLiveCache();
+    FileLogger.instance.info('main: sector cache hydrated');
+  } catch (e, s) {
+    FileLogger.instance.error('main: hydrateLiveCache failed: $e\n$s');
+  }
 
   runApp(
     UncontrolledProviderScope(container: container, child: const ScanCoApp()),
   );
+  FileLogger.instance.info('main: runApp called');
 }
 
 class ScanCoApp extends ConsumerStatefulWidget {
