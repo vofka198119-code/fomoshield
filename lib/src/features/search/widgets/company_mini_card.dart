@@ -50,7 +50,10 @@ class CompanyMiniCard extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 60,
+        // A few px taller than the tightest fit — some devices' font
+        // metrics render the title+sector stack slightly taller than
+        // others (confirmed overflow on a Redmi Note 9S at 60px).
+        height: 66,
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
         decoration: showDivider
             ? BoxDecoration(

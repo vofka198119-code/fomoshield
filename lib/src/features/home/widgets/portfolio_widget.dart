@@ -29,8 +29,11 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
   // Fixed height for the swipeable page area, sized to the actual 4-cell
   // content: top row (Balance/Cash stack, ~132) + 8 spacer + P&L/Change
   // stack (~122). Text is all fixed-size numbers/labels, so real content
-  // height barely varies between portfolios.
-  static const double _pageAreaHeight = 270;
+  // height barely varies between portfolios. +30px over the tightest fit
+  // as a safety margin — some devices' font metrics render the 4 cells'
+  // labels/values a bit taller than others (confirmed overflow on a Redmi
+  // Note 9S at 270, even with single-line labels).
+  static const double _pageAreaHeight = 306;
 
   late final PageController _pageController;
   int _currentIndex = 0;
@@ -359,13 +362,18 @@ class _PortfolioPerformanceView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.6,
-              color: ThemeV2.primary,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              label,
+              maxLines: 1,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+                color: ThemeV2.primary,
+              ),
             ),
           ),
           const SizedBox(height: 4),
