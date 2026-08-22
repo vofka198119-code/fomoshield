@@ -12,6 +12,7 @@ import '../home/home_providers.dart'
     show watchlistSymbolsProvider, marketIndicesProvider;
 import '../home/widget_order_provider.dart' show homeWidgetsProvider;
 import '../portfolio/portfolio_providers.dart' show portfoliosProvider;
+import '../update/update_dialog.dart';
 
 // Brand shield-logo palette — matches the reference splash mock, kept local
 // to this file the way every other brand-gradient consumer in the app does
@@ -41,6 +42,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   ({String route, Object? extra})? _resolved;
   bool _routeReady = false;
   bool _navigated = false;
+  bool _updateGateShown = false;
+  bool _updateGateOpen = false;
 
   @override
   void initState() {
@@ -75,6 +78,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       clientId: SupabaseConfig.googleIosClientId,
       serverClientId: SupabaseConfig.googleWebClientId,
     );
+
+    // Auto-update: run the check while the splash is still loading and PAUSE
+    // the hand-off until the user deals with the prompt — the update dialog
+    // appears BEFORE the main UI, using the loading time instead of nagging
+    // the user after they've already reached the home screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future<void>.delayed(const Duration(milliseconds: 300), _showUpdateGate);
+    });
   }
 
   /// Auth/disclaimer resolution — returns a destination instead of
@@ -133,9 +144,27 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     ref.read(marketIndicesProvider);
   }
 
+  /// Shows the modal auto-update dialog over the splash. The hand-off waits
+  /// for it to be dismissed (see [_maybeNavigate]), so an available update is
+  /// surfaced before the main UI — not after the user is already there.
+  void _showUpdateGate() {
+    if (_updateGateShown || !mounted) return;
+    _updateGateShown = true;
+    _updateGateOpen = true;
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const UpdateDialog(silentWhenUpToDate: true),
+    ).then((_) {
+      _updateGateOpen = false;
+      if (mounted) _maybeNavigate();
+    });
+  }
+
   void _maybeNavigate() {
     if (_navigated) return;
     if (!_progressController.isCompleted || !_routeReady) return;
+    if (_updateGateOpen) return; // wait for the update dialog to be dismissed
     _navigated = true;
     Future.delayed(const Duration(milliseconds: 250), () {
       if (mounted) context.go(_resolved!.route, extra: _resolved!.extra);
