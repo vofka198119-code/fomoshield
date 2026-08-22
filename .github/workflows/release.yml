@@ -217,10 +217,9 @@ jobs:
     name: macOS
     needs: [version]
     runs-on: macos-latest
-    # Flutter 3.47.x AOT snapshotter crashes on macOS release builds
-    # ("Class with illegal cid" in _window_macos.dart). Keep building so we can
-    # see when a fixed Flutter lands, but never block the release.
-    continue-on-error: true
+    # Flutter beta 3.48 fixed the desktop-AOT snapshotter bug that crashed
+    # 3.47.x macOS release builds ("Class with illegal cid"). macOS is now a
+    # full release platform (no continue-on-error — a real failure is real).
     steps:
       - uses: actions/checkout@v5
 
@@ -246,7 +245,7 @@ jobs:
       - run: flutter build macos --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
 
       - name: Package macOS app
-        run: ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/Runner.app ScanCo-macos.zip
+        run: ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/scanco.app ScanCo-macos.zip
 
       - uses: actions/upload-artifact@v7
         with:
@@ -270,7 +269,6 @@ jobs:
           tag_name: ${{ needs.version.outputs.tag }}
           name: ${{ needs.version.outputs.tag }}
           prerelease: ${{ needs.version.outputs.prerelease }}
-          update_release: true
           body: ScanCo build — per-platform results are attached / appended below.
 
       # ── Android ──
@@ -281,14 +279,12 @@ jobs:
         if: ${{ needs.build-android.result == 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
-          overwrite: true
+          overwrite_files: true
           files: ScanCo.apk
       - uses: softprops/action-gh-release@v3
         if: ${{ needs.build-android.result != 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
           append_body: true
           body: "❌ **Android** — result: `${{ needs.build-android.result }}` (see run log)."
 
@@ -300,14 +296,12 @@ jobs:
         if: ${{ needs.build-windows.result == 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
-          overwrite: true
+          overwrite_files: true
           files: ScanCo-windows.zip
       - uses: softprops/action-gh-release@v3
         if: ${{ needs.build-windows.result != 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
           append_body: true
           body: "❌ **Windows** — result: `${{ needs.build-windows.result }}` (see run log)."
 
@@ -319,14 +313,12 @@ jobs:
         if: ${{ needs.build-ios.result == 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
-          overwrite: true
+          overwrite_files: true
           files: ScanCo.ipa
       - uses: softprops/action-gh-release@v3
         if: ${{ needs.build-ios.result != 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
           append_body: true
           body: "❌ **iPhone** — result: `${{ needs.build-ios.result }}` (see run log)."
 
@@ -338,14 +330,12 @@ jobs:
         if: ${{ needs.build-linux.result == 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
-          overwrite: true
+          overwrite_files: true
           files: ScanCo-linux.tar.gz
       - uses: softprops/action-gh-release@v3
         if: ${{ needs.build-linux.result != 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
           append_body: true
           body: "❌ **Linux** — result: `${{ needs.build-linux.result }}` (see run log)."
 
@@ -357,13 +347,11 @@ jobs:
         if: ${{ needs.build-macos.result == 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
-          overwrite: true
+          overwrite_files: true
           files: ScanCo-macos.zip
       - uses: softprops/action-gh-release@v3
         if: ${{ needs.build-macos.result != 'success' }}
         with:
           tag_name: ${{ needs.version.outputs.tag }}
-          update_release: true
           append_body: true
           body: "❌ **macOS** — result: `${{ needs.build-macos.result }}` (see run log)."
