@@ -121,6 +121,11 @@ final isPremium = tier == SubscriptionTier.premium || tier == SubscriptionTier.a
 
 - Релизный пайплайн: `.github/workflows/release.yml` (сборка Android/Windows/Linux/macOS/iPhone →
   единый GitHub Release с ассетами `ScanCo.{ext}`).
+- **Публичный репозиторий релизов** `Anecho/fomoshield-releases` — зеркало
+  бинарников: джоба `publish-public` заливает туда `ScanCo.*` после сборки. Приложение
+  читает обновления именно оттуда (**без токена в бинарнике**; приватный исходник не
+  раскрывается). Секрет `RELEASE_PUBLISH_TOKEN` (fine-grained PAT, Contents: write на
+  публичный репо) живёт только в CI.
 - **Как качать релизы и тестировать билды на Windows/WSL2/Android/macOS** — см.
   `docs/devops/RELEASE_PULL_AND_TEST.md`.
 - Правило скачивания: **executables** в `.bin/{run-id}/{platform}/` (не архивы);

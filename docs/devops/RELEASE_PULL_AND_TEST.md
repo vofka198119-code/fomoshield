@@ -240,6 +240,9 @@ tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
 
 ## 9. Проверка авто-обновления
 
+- Приложение читает релизы из **публичного** репозитория
+  `Anecho/fomoshield-releases` (зеркало бинарников) — **без токена**.
+  Приватный репозиторий исходников не используется и не раскрывается.
 - На Android обновление работает в приложении: примерно через **5 сек** после
   запуска (и по кнопке **⟳** на Профиле) приложение проверяет GitHub Releases,
   показывает «New Version Available» → скачивает APK в приложении (с прогрессом)
@@ -250,6 +253,19 @@ tail -30 "/Applications/scanco.app/Contents/MacOS/logs/app.log"
   (из `--dart-define=APP_BUILD`), не статичный номер из pubspec.
 - Updater **build-aware**: не предлагает `dev.N`, если установлена та же N.
 - На iOS/desktop приложение установить не может — открывает страницу релиза GitHub.
+
+### Настройка публичного репозитория релизов (один раз)
+
+1. Создать **публичный** репозиторий `Anecho/fomoshield-releases`
+   (если название другое — поправить `_repo` в `lib/src/core/services/update_service.dart`
+   и строку `repository:` в джобе `publish-public`).
+2. Сделать минимум один коммит (README) — нужен HEAD дефолтной ветки.
+3. В **приватном** репо: Settings → Secrets and variables → Actions → New secret
+   **`RELEASE_PUBLISH_TOKEN`** = fine-grained PAT (Access: только публичный
+   релизный репо, Permissions: **Contents: write**). Токен живёт только в CI —
+   в приложение не попадает.
+4. Пайплайн: джоба `publish-public` после сборки заливает `ScanCo.*` в публичный
+   репозиторий с тем же тегом; приложение скачивает их анонимно.
 
 ---
 

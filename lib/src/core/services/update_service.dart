@@ -17,17 +17,17 @@ final updateServiceProvider = Provider<UpdateService>((ref) {
 
 // ─── Service ────────────────────────────────────────────────────────────────
 
-/// Checks GitHub Releases for newer app versions and downloads APKs (Android).
+/// Checks the PUBLIC releases repo for newer app versions and downloads APKs
+/// (Android). The repo is public, so NO authentication/token is needed — the
+/// updater works for anyone, and the private source repo is never exposed.
 ///
-/// Uses a fine-grained PAT injected at build time via --dart-define:
-///   flutter build apk --dart-define=GITHUB_TOKEN=github_pat_...
+/// The public repo is a CI mirror: `.github/workflows/release.yml` publishes
+/// the ScanCo.* binaries there (job `publish-public`).
 class UpdateService {
   static const _baseUrl = 'https://api.github.com';
-  static const _repo = 'vofka198119-code/fomoshield';
 
-  /// GitHub fine-grained PAT — injected at build time, never in source code.
-  /// Scope: Contents: Read on vofka198119-code/fomoshield only.
-  static const _token = String.fromEnvironment('GITHUB_TOKEN');
+  /// Public binaries-only repo. Change here if the repo is named differently.
+  static const _repo = 'Anecho/fomoshield-releases';
 
   late final Dio _dio;
 
@@ -37,13 +37,12 @@ class UpdateService {
       connectTimeout: const Duration(seconds: 5),
       receiveTimeout: const Duration(seconds: 10),
       headers: {
-        if (_token.isNotEmpty) 'Authorization': 'Bearer $_token',
         'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
       },
     ));
 
-    // Debug logging (minimal — does NOT log the Authorization header).
+    // Debug logging (minimal).
     _dio.interceptors.add(LogInterceptor(
       requestBody: false,
       responseBody: false,
