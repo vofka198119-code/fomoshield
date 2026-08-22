@@ -137,6 +137,12 @@ jobs:
       - name: Rename APK to ScanCo.apk
         run: cp build/app/outputs/flutter-apk/app-release.apk ScanCo.apk
 
+      - name: Verify APK
+        run: |
+          test -s ScanCo.apk
+          unzip -l ScanCo.apk | grep -q 'classes.dex'
+          echo "APK OK ($(stat -c%s ScanCo.apk) bytes)"
+
       - uses: actions/upload-artifact@v7
         with:
           name: android
@@ -171,6 +177,11 @@ jobs:
           mkdir -p Payload
           cp -r Runner.app Payload/
           zip -r ScanCo.ipa Payload
+
+      - name: Verify IPA
+        run: |
+          unzip -l build/ios/iphoneos/ScanCo.ipa | grep -q 'Payload/.*\.app/'
+          echo "IPA OK ($(stat -f%z build/ios/iphoneos/ScanCo.ipa) bytes)"
 
       - uses: actions/upload-artifact@v7
         with:
@@ -220,6 +231,16 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "ScanCo.zip" -Force
 
+      - name: Verify Windows package
+        shell: pwsh
+        run: |
+          if (-not (Test-Path ScanCo.zip)) { throw 'ScanCo.zip missing' }
+          $v = Join-Path $env:TEMP 'verify'
+          Remove-Item $v -Recurse -Force -ErrorAction SilentlyContinue
+          Expand-Archive -Path ScanCo.zip -DestinationPath $v
+          if (-not (Test-Path (Join-Path $v 'scanco.exe'))) { throw 'scanco.exe missing from ScanCo.zip' }
+          Write-Output "Windows OK: $((Get-Item ScanCo.zip).Length) bytes, scanco.exe present"
+
       - uses: actions/upload-artifact@v7
         with:
           name: windows
@@ -262,6 +283,11 @@ jobs:
       - name: Package Linux app
         run: tar -czf ScanCo.tar.gz -C build/linux/x64/release/bundle .
 
+      - name: Verify Linux package
+        run: |
+          tar -tzf ScanCo.tar.gz | grep -q 'scanco'
+          echo "Linux OK ($(stat -c%s ScanCo.tar.gz) bytes)"
+
       - uses: actions/upload-artifact@v7
         with:
           name: linux
@@ -301,6 +327,12 @@ jobs:
 
       - name: Package macOS app (DMG)
         run: hdiutil create -volname ScanCo -srcfolder build/macos/Build/Products/Release/scanco.app -ov -format UDZO ScanCo.dmg
+
+      - name: Verify DMG
+        run: |
+          test -s ScanCo.dmg
+          hdiutil verify ScanCo.dmg
+          echo "DMG OK ($(stat -f%z ScanCo.dmg) bytes)"
 
       - uses: actions/upload-artifact@v7
         with:
