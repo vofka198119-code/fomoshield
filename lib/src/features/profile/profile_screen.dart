@@ -19,6 +19,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/services/finnhub_service.dart';
+import '../../core/utils/app_build.dart';
 
 /// App version + build number, read from the actual installed build (not
 /// hardcoded) — build number auto-increments on every commit, see
@@ -438,16 +439,14 @@ class ProfileScreen extends ConsumerWidget {
                 .watch(packageInfoProvider)
                 .when(
                   data: (info) {
-                    // Compact "1.0.004" form — major.minor from the version
-                    // string, build number zero-padded to 3 digits, instead
-                    // of the old "v1.0.0 (build 4)".
-                    final versionParts = info.version.split('.');
-                    final majorMinor = versionParts.length >= 2
-                        ? '${versionParts[0]}.${versionParts[1]}'
-                        : info.version;
-                    final build = info.buildNumber.padLeft(3, '0');
+                    // Standard "v1.0.0 (24)" form — version + build number.
+                    // Build number prefers the CI run number (APP_BUILD) so
+                    // installed CI builds match their release tag.
+                    final build = kAppBuildOverride.isNotEmpty
+                        ? kAppBuildOverride
+                        : info.buildNumber;
                     return Text(
-                      'v$majorMinor.$build',
+                      'v${info.version} ($build)',
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         color: ThemeV2.textSecondary.withValues(alpha: 0.5),

@@ -77,7 +77,7 @@ jobs:
             echo "storeFile=upload-keystore.p12"
           } > android/key.properties
 
-      - run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+      - run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }} --dart-define=APP_BUILD=${{ github.run_number }}
 
       - name: Rename APK to ScanCo.apk
         run: cp build/app/outputs/flutter-apk/app-release.apk ScanCo.apk
@@ -109,7 +109,7 @@ jobs:
           echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
-      - run: flutter build ios --release --no-codesign --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+      - run: flutter build ios --release --no-codesign --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }} --dart-define=APP_BUILD=${{ github.run_number }}
 
       - run: |
           cd build/ios/iphoneos
@@ -159,7 +159,7 @@ jobs:
           echo "BACKEND_BASE_URL=${{ secrets.BACKEND_BASE_URL }}" >> .env
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
-      - run: flutter build windows --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+      - run: flutter build windows --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }} --dart-define=APP_BUILD=${{ github.run_number }}
 
       - name: Package Windows app
         shell: pwsh
@@ -202,7 +202,7 @@ jobs:
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
       - run: flutter clean
-      - run: flutter build linux --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+      - run: flutter build linux --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }} --dart-define=APP_BUILD=${{ github.run_number }}
 
       - name: Package Linux app
         run: tar -czf ScanCo.tar.gz -C build/linux/x64/release/bundle .
@@ -242,7 +242,7 @@ jobs:
           echo "BACKEND_API_KEY=${{ secrets.BACKEND_API_KEY }}" >> .env
 
       - run: flutter clean
-      - run: flutter build macos --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }}
+      - run: flutter build macos --release --dart-define=GITHUB_TOKEN=${{ secrets.RELEASE_READ_TOKEN }} --dart-define=APP_BUILD=${{ github.run_number }}
 
       - name: Package macOS app (DMG)
         run: hdiutil create -volname ScanCo -srcfolder build/macos/Build/Products/Release/scanco.app -ov -format UDZO ScanCo.dmg

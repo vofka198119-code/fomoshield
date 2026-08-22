@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../models/update_info.dart';
+import '../utils/app_build.dart';
 
 // ─── Provider ───────────────────────────────────────────────────────────────
 
@@ -62,6 +63,14 @@ class UpdateService {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version; // e.g. "1.0.0"
+      // Build-aware: prefer the CI run number injected via APP_BUILD, else the
+      // pubspec build number. Lets us skip releases we're already on.
+      final currentBuild = int.tryParse(
+            kAppBuildOverride.isNotEmpty
+                ? kAppBuildOverride
+                : packageInfo.buildNumber,
+          ) ??
+          0;
 
       // Use /releases (not /releases/latest) to include pre-releases.
       final response = await _dio.get('/repos/$_repo/releases', queryParameters: {
@@ -76,7 +85,7 @@ class UpdateService {
         final tagName =
             (data['tag_name'] as String).replaceFirst(RegExp(r'^v'), '');
 
-        if (_isNewer(tagName, currentVersion)) {
+        if (_isNewer(tagName, currentVersion, currentBuild)) {
           final assets = data['assets'] as List<dynamic>? ?? [];
           final platform = Platform.isAndroid
               ? TargetPlatform.android
@@ -144,23 +153,32 @@ class UpdateService {
 
   // ─── Private ─────────────────────────────────────────────────────────────
 
-  /// Semver comparison handling both stable tags ("1.0.1") and dev
-  /// pre-releases ("1.0.0-dev.123" from CI builds on main).
+  /// Build-aware semver comparison.
   ///
-  /// Returns true if [latest] > [current].
+  /// Returns true if [latest] is newer than the installed build identified by
+  /// [current] (version) and [currentBuild] (build/run number).
   ///
-  /// Examples:
-  ///   isNewer("1.0.0-dev.5", "1.0.0")     → true  (dev build is newer)
-  ///   isNewer("1.0.0-dev.12", "1.0.0-dev.5") → true
-  ///   isNewer("1.0.1", "1.0.0-dev.99")    → true  (higher base semver)
-  ///   isNewer("1.0.0", "1.0.0")           → false
+  /// Releases are tagged `v{major.minor.patch}-dev.{run_number}` where the run
+  /// number is the CI build number (injected as `APP_BUILD` at build time), so
+  /// dev pre-releases are compared by that number — same build = no update.
+  ///
+  /// Examples (currentBuild = 24):
+  ///   isNewer("1.0.0-dev.25", "1.0.0", 24) → true   (25 > 24)
+  ///   isNewer("1.0.0-dev.24", "1.0.0", 24) → false  (same build)
+  ///   isNewer("1.0.0-dev.10", "1.0.0", 24) → false  (older build)
+  ///   isNewer("1.0.1", "1.0.0", 24)        → true   (higher base semver)
+  ///   isNewer("1.0.0", "1.0.0", 24)        → false  (stable, same base)
   @visibleForTesting
-  bool isNewer(String latest, String current) => _isNewer(latest, current);
+  bool isNewer(String latest, String current, int currentBuild) =>
+      _isNewer(latest, current, currentBuild);
 
-  bool _isNewer(String latest, String current) {
+  bool _isNewer(String latest, String current, int currentBuild) {
     // Normalize: strip leading 'v' and split base from pre-release suffix.
-    final lBase = latest.split('-').first;
-    final cBase = current.split('-').first;
+    final l = latest.startsWith('v') ? latest.substring(1) : latest;
+    final c = current.startsWith('v') ? current.substring(1) : current;
+
+    final lBase = l.split('-').first;
+    final cBase = c.split('-').first;
 
     final lNum = lBase.split('.').map((p) => int.tryParse(p) ?? 0).toList();
     final cNum = cBase.split('.').map((p) => int.tryParse(p) ?? 0).toList();
@@ -175,33 +193,19 @@ class UpdateService {
       if (lNum[i] < cNum[i]) return false;
     }
 
-    // Same base version — compare pre-release suffixes.
-    final lSuffix = latest.contains('-') ? latest.split('-').last : '';
-    final cSuffix = current.contains('-') ? current.split('-').last : '';
+    // Same base version — compare pre-release build numbers.
+    final lSuffix = l.contains('-') ? l.split('-').last : '';
+    if (lSuffix.isNotEmpty) {
+      // Dev/pre-release: newer only if its run number exceeds the installed
+      // build number. Same or older run → already up to date.
+      final lBuild = int.tryParse(
+            RegExp(r'\d+').firstMatch(lSuffix)?.group(0) ?? '',
+          ) ??
+          0;
+      return lBuild > currentBuild;
+    }
 
-    // No suffix on either side → equal.
-    if (lSuffix.isEmpty && cSuffix.isEmpty) return false;
-
-    // Latest has a suffix, current does not → latest is a pre-release
-    // (dev build). Consider it newer so dev builds are picked up.
-    if (lSuffix.isNotEmpty && cSuffix.isEmpty) return true;
-
-    // Current has a suffix but latest doesn't → latest is stable,
-    // current is a dev build. Stable is newer.
-    if (lSuffix.isEmpty && cSuffix.isNotEmpty) return false;
-
-    // Both have suffixes — compare numerically.
-    // Extract numeric part from patterns like "dev.123".
-    final lBuild = int.tryParse(
-      RegExp(r'\d+').firstMatch(lSuffix)?.group(0) ?? '',
-    );
-    final cBuild = int.tryParse(
-      RegExp(r'\d+').firstMatch(cSuffix)?.group(0) ?? '',
-    );
-
-    if (lBuild != null && cBuild != null) return lBuild > cBuild;
-
-    // Fallback: string comparison of suffixes.
-    return lSuffix.compareTo(cSuffix) > 0;
+    // Latest is stable with the same base version → not newer.
+    return false;
   }
 }
