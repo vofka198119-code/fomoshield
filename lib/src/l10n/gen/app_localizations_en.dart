@@ -204,16 +204,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumBenefitSearches => 'Unlimited daily searches';
 
   @override
-  String get premiumBenefitPortfolios => 'Up to 3 portfolios';
+  String get premiumBenefitPortfolios => '\$10,000 portfolio starting capital';
 
   @override
-  String get premiumBenefitCapital => '\$50,000 starting capital';
+  String get premiumBenefitCapital => '\$15,000 stress test starting capital';
 
   @override
-  String get premiumBenefitStressTests => 'Up to 5 stress tests';
+  String get premiumBenefitStressTests => 'Up to 3 stress tests';
 
   @override
   String get premiumBenefitAdFree => 'Ad-free experience';
+
+  @override
+  String get premiumBenefitWeeklyPayout => '\$180 portfolio top-up every week';
+
+  @override
+  String get premiumBenefitStressTestDca =>
+      'Simulated weekly funding in Stress Test';
 
   @override
   String get tradeBuy => 'BUY';
@@ -678,6 +685,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stressTestWidgetTimer => 'Timer';
+
+  @override
+  String get portfolioWidgetDisplayNameTarget => 'Target';
 
   @override
   String get stressTestInvestmentDisclaimerTitle =>
@@ -5979,4 +5989,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verdictScreenPatienceLabel => 'Patience';
+
+  @override
+  String get notificationsScreenTitle => 'NOTIFICATIONS';
+
+  @override
+  String get notificationsScreenMarkAllRead => 'Mark all read';
+
+  @override
+  String get notificationsScreenEmptyState => 'No notifications yet.';
+
+  @override
+  String get notificationsRelativeTimeJustNow => 'now';
+
+  @override
+  String notificationsRelativeTimeMinutesAgo(int count) {
+    return '${count}m ago';
+  }
+
+  @override
+  String notificationsRelativeTimeHoursAgo(int count) {
+    return '${count}h ago';
+  }
+
+  @override
+  String notificationsRelativeTimeDaysAgo(int count) {
+    return '${count}d ago';
+  }
 }

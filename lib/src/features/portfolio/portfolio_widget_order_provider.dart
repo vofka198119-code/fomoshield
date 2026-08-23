@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_providers.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Portfolio Widget Order Provider (SharedPreferences-backed)
@@ -32,20 +33,20 @@ class PortfolioWidgetConfig {
 
   const PortfolioWidgetConfig({required this.id, required this.visible});
 
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (id) {
       case 'portfolio_balance':
-        return 'Portfolio Balance';
+        return l10n.stressTestWidgetPortfolioBalance;
       case 'portfolio_cash':
-        return 'Cash Available';
+        return l10n.stressTestWidgetCashAvailable;
       case 'target':
-        return 'Target';
+        return l10n.portfolioWidgetDisplayNameTarget;
       case 'portfolio_holdings':
-        return 'Holdings';
+        return l10n.stressTestWidgetHoldings;
       case 'trade_history':
-        return 'Trade History';
+        return l10n.stressTestWidgetTradeHistory;
       case 'my_limit_orders':
-        return 'My Limit Orders';
+        return l10n.stressTestWidgetLimitOrders;
       default:
         return id;
     }

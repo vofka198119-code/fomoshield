@@ -7,6 +7,7 @@ import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../core/overlay/app_notification_popup.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/company_logo.dart';
 
 // ---------------------------------------------------------------------------
@@ -53,6 +54,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final notifications = ref.watch(notificationsProvider);
     final unread = ref.watch(unreadNotificationCountProvider);
 
@@ -62,7 +64,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(
-          'NOTIFICATIONS',
+          l10n.notificationsScreenTitle,
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -76,7 +78,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               onPressed: () =>
                   ref.read(notificationsProvider.notifier).markAllRead(),
               child: Text(
-                'Mark all read',
+                l10n.notificationsScreenMarkAllRead,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -92,7 +94,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         left: false,
         right: false,
         child: notifications.isEmpty
-            ? _emptyState()
+            ? _emptyState(l10n)
             : SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                 child: Container(
@@ -122,12 +124,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
   }
 
-  Widget _emptyState() {
+  Widget _emptyState(AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Text(
-          'No notifications yet.',
+          l10n.notificationsScreenEmptyState,
           style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
         ),
       ),
@@ -173,16 +175,21 @@ class _NotificationRow extends StatelessWidget {
     }
   }
 
-  String get _relativeTime {
+  String _relativeTime(AppLocalizations l10n) {
     final diff = DateTime.now().difference(notification.createdAt);
-    if (diff.inMinutes < 1) return 'now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
+    if (diff.inMinutes < 1) return l10n.notificationsRelativeTimeJustNow;
+    if (diff.inMinutes < 60) {
+      return l10n.notificationsRelativeTimeMinutesAgo(diff.inMinutes);
+    }
+    if (diff.inHours < 24) {
+      return l10n.notificationsRelativeTimeHoursAgo(diff.inHours);
+    }
+    return l10n.notificationsRelativeTimeDaysAgo(diff.inDays);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -229,7 +236,7 @@ class _NotificationRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        notification.portfolioLabel ?? _relativeTime,
+                        notification.portfolioLabel ?? _relativeTime(l10n),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
@@ -242,7 +249,7 @@ class _NotificationRow extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  _relativeTime,
+                  _relativeTime(l10n),
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     color: ThemeV2.textSecondary,

@@ -455,19 +455,19 @@ abstract class AppLocalizations {
   /// No description provided for @premiumBenefitPortfolios.
   ///
   /// In en, this message translates to:
-  /// **'Up to 3 portfolios'**
+  /// **'\$10,000 portfolio starting capital'**
   String get premiumBenefitPortfolios;
 
   /// No description provided for @premiumBenefitCapital.
   ///
   /// In en, this message translates to:
-  /// **'\$50,000 starting capital'**
+  /// **'\$15,000 stress test starting capital'**
   String get premiumBenefitCapital;
 
   /// No description provided for @premiumBenefitStressTests.
   ///
   /// In en, this message translates to:
-  /// **'Up to 5 stress tests'**
+  /// **'Up to 3 stress tests'**
   String get premiumBenefitStressTests;
 
   /// No description provided for @premiumBenefitAdFree.
@@ -475,6 +475,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ad-free experience'**
   String get premiumBenefitAdFree;
+
+  /// No description provided for @premiumBenefitWeeklyPayout.
+  ///
+  /// In en, this message translates to:
+  /// **'\$180 portfolio top-up every week'**
+  String get premiumBenefitWeeklyPayout;
+
+  /// No description provided for @premiumBenefitStressTestDca.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulated weekly funding in Stress Test'**
+  String get premiumBenefitStressTestDca;
 
   /// No description provided for @tradeBuy.
   ///
@@ -1308,6 +1320,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Timer'**
   String get stressTestWidgetTimer;
+
+  /// No description provided for @portfolioWidgetDisplayNameTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get portfolioWidgetDisplayNameTarget;
 
   /// No description provided for @stressTestInvestmentDisclaimerTitle.
   ///
@@ -10090,6 +10108,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Patience'**
   String get verdictScreenPatienceLabel;
+
+  /// No description provided for @notificationsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTIFICATIONS'**
+  String get notificationsScreenTitle;
+
+  /// No description provided for @notificationsScreenMarkAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get notificationsScreenMarkAllRead;
+
+  /// No description provided for @notificationsScreenEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet.'**
+  String get notificationsScreenEmptyState;
+
+  /// No description provided for @notificationsRelativeTimeJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get notificationsRelativeTimeJustNow;
+
+  /// No description provided for @notificationsRelativeTimeMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}m ago'**
+  String notificationsRelativeTimeMinutesAgo(int count);
+
+  /// No description provided for @notificationsRelativeTimeHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h ago'**
+  String notificationsRelativeTimeHoursAgo(int count);
+
+  /// No description provided for @notificationsRelativeTimeDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}d ago'**
+  String notificationsRelativeTimeDaysAgo(int count);
 }
 
 class _AppLocalizationsDelegate

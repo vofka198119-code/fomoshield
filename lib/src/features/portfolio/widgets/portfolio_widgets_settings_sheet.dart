@@ -206,7 +206,7 @@ class _PortfolioWidgetsSettingsSheetState
                       ],
                     ),
                     title: Text(
-                      config.displayName,
+                      config.displayName(l10n),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

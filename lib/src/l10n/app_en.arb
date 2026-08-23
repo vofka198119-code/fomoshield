@@ -87,10 +87,12 @@
     }
   },
   "premiumBenefitSearches": "Unlimited daily searches",
-  "premiumBenefitPortfolios": "Up to 3 portfolios",
-  "premiumBenefitCapital": "$50,000 starting capital",
-  "premiumBenefitStressTests": "Up to 5 stress tests",
+  "premiumBenefitPortfolios": "$10,000 portfolio starting capital",
+  "premiumBenefitCapital": "$15,000 stress test starting capital",
+  "premiumBenefitStressTests": "Up to 3 stress tests",
   "premiumBenefitAdFree": "Ad-free experience",
+  "premiumBenefitWeeklyPayout": "$180 portfolio top-up every week",
+  "premiumBenefitStressTestDca": "Simulated weekly funding in Stress Test",
   "tradeBuy": "BUY",
   "tradeSell": "SELL",
   "tradeDetailTitle": "TRADE DETAIL",
@@ -310,6 +312,7 @@
   "stressTestWidgetTradeHistory": "Trade History",
   "stressTestWidgetLimitOrders": "My Limit Orders",
   "stressTestWidgetTimer": "Timer",
+  "portfolioWidgetDisplayNameTarget": "Target",
   "stressTestInvestmentDisclaimerTitle": "INVESTMENT DISCLAIMER\n& LIMITATION OF LIABILITY",
   "stressTestInvestmentDisclaimerBody": "This verdict is generated automatically by a mathematical model based solely on your simulated historical behavior within this closed testing environment. It is provided for educational and illustrative purposes only and does NOT constitute personalized investment, legal, or financial advice. Past performance within this simulator does not guarantee, predict, or reflect real-world market outcomes. Final financial decisions, asset purchases, or trading activities in real life carry substantial risk and are made solely at your own discretion and responsibility. The creators of F.O.M.O. Shield accept no liability for financial losses incurred in real-world trading.",
   "stressTestIUnderstandAccept": "I Understand & Accept",
@@ -2357,5 +2360,33 @@
   "verdictScreenPanicTitle": "PANIC",
   "verdictScreenPanicLabel": "Panic",
   "verdictScreenPatienceTitle": "PATIENCE",
-  "verdictScreenPatienceLabel": "Patience"
+  "verdictScreenPatienceLabel": "Patience",
+  "notificationsScreenTitle": "NOTIFICATIONS",
+  "notificationsScreenMarkAllRead": "Mark all read",
+  "notificationsScreenEmptyState": "No notifications yet.",
+  "notificationsRelativeTimeJustNow": "now",
+  "notificationsRelativeTimeMinutesAgo": "{count}m ago",
+  "@notificationsRelativeTimeMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsRelativeTimeHoursAgo": "{count}h ago",
+  "@notificationsRelativeTimeHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsRelativeTimeDaysAgo": "{count}d ago",
+  "@notificationsRelativeTimeDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

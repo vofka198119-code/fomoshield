@@ -203,16 +203,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get premiumBenefitSearches => 'Неограниченный поиск каждый день';
 
   @override
-  String get premiumBenefitPortfolios => 'До 3 портфелей';
+  String get premiumBenefitPortfolios => 'Стартовый капитал портфеля \$10 000';
 
   @override
-  String get premiumBenefitCapital => 'Стартовый капитал \$50 000';
+  String get premiumBenefitCapital => 'Стартовый капитал стресс-теста \$15 000';
 
   @override
-  String get premiumBenefitStressTests => 'До 5 стресс-тестов';
+  String get premiumBenefitStressTests => 'До 3 стресс-тестов';
 
   @override
   String get premiumBenefitAdFree => 'Без рекламы';
+
+  @override
+  String get premiumBenefitWeeklyPayout =>
+      'Пополнение портфеля на \$180 каждую неделю';
+
+  @override
+  String get premiumBenefitStressTestDca =>
+      'Симуляция еженедельного пополнения в стресс-тесте';
 
   @override
   String get tradeBuy => 'ПОКУПКА';
@@ -679,6 +687,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get stressTestWidgetTimer => 'Таймер';
+
+  @override
+  String get portfolioWidgetDisplayNameTarget => 'Цель';
 
   @override
   String get stressTestInvestmentDisclaimerTitle =>
@@ -6000,4 +6011,31 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get verdictScreenPatienceLabel => 'Терпение';
+
+  @override
+  String get notificationsScreenTitle => 'УВЕДОМЛЕНИЯ';
+
+  @override
+  String get notificationsScreenMarkAllRead => 'Отметить все как прочитанные';
+
+  @override
+  String get notificationsScreenEmptyState => 'Пока нет уведомлений.';
+
+  @override
+  String get notificationsRelativeTimeJustNow => 'сейчас';
+
+  @override
+  String notificationsRelativeTimeMinutesAgo(int count) {
+    return '$count мин назад';
+  }
+
+  @override
+  String notificationsRelativeTimeHoursAgo(int count) {
+    return '$count ч назад';
+  }
+
+  @override
+  String notificationsRelativeTimeDaysAgo(int count) {
+    return '$count дн назад';
+  }
 }
