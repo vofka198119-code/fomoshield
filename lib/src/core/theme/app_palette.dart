@@ -68,6 +68,12 @@ class AppPalette {
   /// this field existed.
   final Gradient? windowGradient;
 
+  /// Header/section divider — a horizontal left-to-right gradient (light
+  /// gold → dark gold for Luxury Gold), companion to [borderGradient]'s
+  /// vertical version. Null means "plain flat divider," same as before
+  /// this field existed.
+  final Gradient? dividerGradient;
+
   const AppPalette({
     this.background,
     this.backgroundGradient,
@@ -85,6 +91,7 @@ class AppPalette {
     this.glowShadow,
     this.cardGlow,
     this.windowGradient,
+    this.dividerGradient,
   });
 
   static const standard = AppPalette(
@@ -114,6 +121,7 @@ class AppPalette {
     glowShadow: LuxuryGoldTheme.glowShadow(),
     cardGlow: LuxuryGoldTheme.cardGlow(),
     windowGradient: LuxuryGoldTheme.windowGradient,
+    dividerGradient: LuxuryGoldTheme.dividerGradient,
   );
 }
 

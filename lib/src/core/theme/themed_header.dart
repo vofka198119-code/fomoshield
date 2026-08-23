@@ -18,20 +18,12 @@ import 'app_palette.dart';
 // as before this existed.
 // ---------------------------------------------------------------------------
 
-Widget themedHeaderText(
-  String text,
-  AppPalette palette,
-  TextStyle baseStyle,
-) {
-  final child = Text(
-    text,
-    style: baseStyle.copyWith(
-      color: palette.titleGradient != null
-          ? Colors.white
-          : palette.accentPrimary,
-      shadows: palette.titleShadow != null ? [palette.titleShadow!] : null,
-    ),
-  );
+/// Wraps [child] in the theme's metallic gold ShaderMask (same recipe
+/// [themedHeaderText]/[themedHeaderIcon] use), or returns it unchanged
+/// when the palette doesn't define one. [child] must already be colored
+/// white (or near-white) — `BlendMode.modulate` multiplies the gradient
+/// through whatever color is underneath, so anything darker mutes it.
+Widget themedGoldGradient(Widget child, AppPalette palette) {
   if (palette.titleGradient == null) return child;
   return ShaderMask(
     blendMode: BlendMode.modulate,
@@ -40,23 +32,61 @@ Widget themedHeaderText(
   );
 }
 
+Widget themedHeaderText(
+  String text,
+  AppPalette palette,
+  TextStyle baseStyle,
+) {
+  return themedGoldGradient(
+    Text(
+      text,
+      style: baseStyle.copyWith(
+        color: palette.titleGradient != null
+            ? Colors.white
+            : palette.accentPrimary,
+        shadows: palette.titleShadow != null ? [palette.titleShadow!] : null,
+      ),
+    ),
+    palette,
+  );
+}
+
 Widget themedHeaderIcon(
   IconData icon,
   AppPalette palette, {
   double size = 24,
 }) {
-  final child = Icon(
-    icon,
-    size: size,
-    color: palette.titleGradient != null
-        ? Colors.white
-        : palette.accentPrimary,
-    shadows: palette.titleShadow != null ? [palette.titleShadow!] : null,
+  return themedGoldGradient(
+    Icon(
+      icon,
+      size: size,
+      color: palette.titleGradient != null
+          ? Colors.white
+          : palette.accentPrimary,
+      shadows: palette.titleShadow != null ? [palette.titleShadow!] : null,
+    ),
+    palette,
   );
-  if (palette.titleGradient == null) return child;
-  return ShaderMask(
-    blendMode: BlendMode.modulate,
-    shaderCallback: (bounds) => palette.titleGradient!.createShader(bounds),
-    child: child,
+}
+
+// ---------------------------------------------------------------------------
+// Themed price text — the canonical treatment for EVERY neutral price
+// figure app-wide (a $ value with no up/down meaning of its own — an
+// index price, a holding's market value, a portfolio balance) once a
+// theme defines [AppPalette.titleGradient]: the same metallic gold sheen
+// used on header titles. Confirmed 2026-08-23 on Shield Signal's index
+// price cell as the pattern to replicate at every other plain-price call
+// site in the app.
+//
+// Do NOT use this for a price/percent/amount that already carries its own
+// up-down color (P&L, change $, change %, any gain/loss figure) — those
+// keep [ThemeV2.success]/[ThemeV2.loss] (or the palette equivalent)
+// untouched; the green/red signal is the point there, not gold.
+// ---------------------------------------------------------------------------
+
+Widget themedPriceText(String text, AppPalette palette, TextStyle baseStyle) {
+  return themedGoldGradient(
+    Text(text, style: baseStyle.copyWith(color: Colors.white)),
+    palette,
   );
 }

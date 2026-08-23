@@ -7,6 +7,7 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_border.dart';
+import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
@@ -130,6 +131,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
                 count: indices.length,
                 current: safeIndex,
                 onTap: (i) => _goTo(i, indices.length),
+                palette: palette,
               ),
             ],
           );
@@ -159,14 +161,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
               FomoShieldTheme.cardTitle(),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: palette.cardGradient != null
-                ? palette.border.withValues(alpha: 0.4)
-                : Colors.black.withValues(alpha: 0.06),
-          ),
+          themedDivider(palette),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: child,
@@ -180,7 +175,14 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
     required int count,
     required int current,
     required void Function(int) onTap,
+    required AppPalette palette,
   }) {
+    // Same treatment as buttons: active dot fills with the theme's button
+    // gradient (+ its glow) instead of a flat brand color; inactive dots
+    // dim the theme's own accent instead of the brand green. Null
+    // buttonGradient (Standard theme) falls back to the original flat
+    // ThemeV2.primary look, unchanged.
+    final buttonGradient = palette.buttonGradient;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(count, (i) {
@@ -193,10 +195,23 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
             width: isActive ? 16 : 6,
             height: 6,
             decoration: BoxDecoration(
-              color: isActive
-                  ? ThemeV2.primary
-                  : ThemeV2.primary.withValues(alpha: 0.25),
+              color: buttonGradient == null
+                  ? (isActive
+                        ? ThemeV2.primary
+                        : ThemeV2.primary.withValues(alpha: 0.25))
+                  : (isActive
+                        ? null
+                        : palette.accentPrimary.withValues(alpha: 0.25)),
+              gradient: buttonGradient != null && isActive
+                  ? buttonGradient
+                  : null,
               borderRadius: BorderRadius.circular(3),
+              boxShadow:
+                  buttonGradient != null &&
+                      isActive &&
+                      palette.glowShadow != null
+                  ? [palette.glowShadow!]
+                  : null,
             ),
           ),
         );
@@ -239,6 +254,7 @@ class _IndexView extends StatelessWidget {
             labelColor: changeColor,
             labelGlowColor: changeColor,
             valueColor: Colors.white,
+            goldValue: true,
             leadingIcon: isUp ? Icons.trending_up : Icons.trending_down,
             leadingIconColor: changeColor,
             horizontalLayout: true,
@@ -259,6 +275,8 @@ class _IndexView extends StatelessWidget {
                   valueFontSize: 14,
                   bgColor: changeBg,
                   valueColor: changeColor,
+                  labelColor: changeColor,
+                  labelGlowColor: changeColor,
                   palette: palette,
                 ),
               ),
@@ -270,10 +288,13 @@ class _IndexView extends StatelessWidget {
                 borderRadius: cellRadius,
                 child: _cell(
                   label: l10n.shieldSignalChangePercent,
-                  value: '${isUp ? '+' : ''}${index.change.toStringAsFixed(2)}%',
+                  value:
+                      '${isUp ? '+' : ''}${index.change.toStringAsFixed(2)}%',
                   valueFontSize: 14,
                   bgColor: changeBg,
                   valueColor: changeColor,
+                  labelColor: changeColor,
+                  labelGlowColor: changeColor,
                   palette: palette,
                 ),
               ),
@@ -335,6 +356,10 @@ class _IndexView extends StatelessWidget {
     double valueFontSize = 18,
     double labelFontSize = 10,
     bool horizontalLayout = false,
+    // Canonical gold treatment for a neutral price with no up/down meaning
+    // of its own (see themedPriceText's doc comment) — never combine with
+    // a green/red valueColor, the two are mutually exclusive by design.
+    bool goldValue = false,
   }) {
     final labelText = Text(
       label,
@@ -371,15 +396,15 @@ class _IndexView extends StatelessWidget {
               labelText,
             ],
           );
-    final valueText = Text(
-      value,
-      style: interNums(
-        fontSize: valueFontSize,
-        fontWeight: FontWeight.w600,
-        color: valueColor ?? ThemeV2.textPrimary,
-        letterSpacing: -0.3,
-      ),
+    final valueStyle = interNums(
+      fontSize: valueFontSize,
+      fontWeight: FontWeight.w600,
+      color: valueColor ?? ThemeV2.textPrimary,
+      letterSpacing: -0.3,
     );
+    final valueText = goldValue
+        ? themedPriceText(value, palette, valueStyle)
+        : Text(value, style: valueStyle);
 
     // The gradient-border wrapper (themedBorder) already draws a border
     // around this cell when the theme defines one — don't also draw this
@@ -393,7 +418,9 @@ class _IndexView extends StatelessWidget {
     // up/down signal still comes through via labelColor/valueColor.
     final effectiveGradient =
         gradient ??
-        (hasThemedBorder ? (palette.windowGradient ?? darkCardGradient()) : null);
+        (hasThemedBorder
+            ? (palette.windowGradient ?? darkCardGradient())
+            : null);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
