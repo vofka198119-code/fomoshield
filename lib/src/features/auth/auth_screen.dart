@@ -149,7 +149,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             email: email,
             password: password,
           );
-          // Sign in succeeded → user already exists with this email+password
+          // Sign in succeeded → user already exists with this email+password.
+          // This probe's only purpose was to check for a duplicate — undo
+          // the session it accidentally established before surfacing the
+          // error, so the app doesn't end up silently authenticated as
+          // this account while still showing the Sign Up screen.
+          await SupabaseConfig.client.auth.signOut();
           if (!mounted) return;
           setState(() {
             _errorText = _l10n.authEmailAlreadyRegistered;

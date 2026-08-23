@@ -107,11 +107,12 @@ VerdictTier _tier81to100(AppLocalizations l10n) => VerdictTier(
 );
 
 /// Picks the verdict tier for Patience. [score] is 0.0-1.0 (same
-/// convention as [VerdictArchiveEntry.patience]); [totalTrades] mirrors
-/// [VerdictArchiveEntry.totalTrades] — 0 means no trade was ever made, so
-/// the score never left its neutral 50 default.
-VerdictTier patienceTierFor(AppLocalizations l10n, double score, int totalTrades) {
-  if (totalTrades <= 0) return _tierNoData(l10n);
+/// convention as [VerdictArchiveEntry.patience]); [hasData] mirrors
+/// [VerdictArchiveEntry.patienceHasData] — false means the score never
+/// left its neutral 50 default (patience only moves on a profitable sell
+/// or a catastrophe event, not on buys, so a trade count alone can't tell).
+VerdictTier patienceTierFor(AppLocalizations l10n, double score, bool hasData) {
+  if (!hasData) return _tierNoData(l10n);
   final pct = score * 100;
   if (pct <= 20) return _tier0to20(l10n);
   if (pct <= 40) return _tier21to40(l10n);

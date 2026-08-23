@@ -4801,6 +4801,12 @@ abstract class AppLocalizations {
   /// **'Not enough available cash — {cash} free (some is reserved for pending orders)'**
   String orderEntryNotEnoughCash(String cash);
 
+  /// No description provided for @orderEntryNotEnoughShares.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough shares — you hold {shares}'**
+  String orderEntryNotEnoughShares(String shares);
+
   /// No description provided for @orderEntryInfoMarket.
   ///
   /// In en, this message translates to:

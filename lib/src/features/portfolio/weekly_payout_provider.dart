@@ -18,19 +18,21 @@ import 'portfolio_providers.dart';
 // and on its periodic refresh timer) and credits however many full weeks
 // have elapsed since the portfolio's own lastWeeklyPayoutAt, all at once.
 //
-// Freezing on a lapsed subscription falls out for free: this only ever
-// credits while subscriptionTierProvider reads premium/admin RIGHT NOW, so
-// a free-tier check-in simply does nothing — no separate "frozen" flag on
-// the portfolio itself, just a paused clock. Resuming premium later picks
-// up from lastWeeklyPayoutAt exactly where it left off (no back-pay for the
-// lapsed period, since the clock only ever advances when credited).
+// Freezing on a lapsed subscription: this only ever credits while
+// subscriptionTierProvider reads premium/admin RIGHT NOW. While lapsed, a
+// free-tier check-in pins lastWeeklyPayoutAt to now instead of crediting —
+// no separate "frozen" flag on the portfolio itself, just a clock that
+// keeps getting reset forward so no backlog accrues. Resuming premium
+// later starts counting fresh from whenever that last lapsed check-in was
+// (no back-pay for the lapsed period).
 // ---------------------------------------------------------------------------
 
 const double weeklyPayoutAmount = 180;
 const Duration weeklyPayoutInterval = Duration(days: 7);
 
-String _wasPremiumKey(String? uid) =>
-    uid != null ? 'weekly_payout_was_premium_$uid' : 'weekly_payout_was_premium';
+String _wasPremiumKey(String? uid) => uid != null
+    ? 'weekly_payout_was_premium_$uid'
+    : 'weekly_payout_was_premium';
 
 /// Runs one check-in: credits any elapsed weeks if currently premium/admin,
 /// and fires the pause/status-change popups on a tier transition. Safe to
@@ -45,8 +47,7 @@ Future<void> checkWeeklyPayout(WidgetRef ref, AppLocalizations l10n) async {
   final portfolio = portfolios.first;
 
   final tier = ref.read(subscriptionTierProvider);
-  final isPremiumNow =
-      tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+  final isPremiumNow = tier.isPremiumOrAdmin;
 
   final user = ref.read(currentUserProvider);
   final prefs = await SharedPreferences.getInstance();
@@ -138,6 +139,16 @@ Future<void> checkWeeklyPayout(WidgetRef ref, AppLocalizations l10n) async {
           createdAt: DateTime.now(),
         ),
       );
+    }
+    // Pin the clock to now on every lapsed check-in (once a clock exists),
+    // so the elapsed-weeks calc above never spans the lapsed stretch once
+    // Premium resumes — otherwise a frozen lastWeeklyPayoutAt would make
+    // the next check-in look like weeks of backlog and pay it all out at
+    // once, instead of "no back-pay for the lapsed period" as intended.
+    if (portfolio.lastWeeklyPayoutAt != null) {
+      ref
+          .read(portfoliosProvider.notifier)
+          .startWeeklyPayoutClock(portfolio.id, DateTime.now());
     }
     await prefs.setBool(key, false);
   }

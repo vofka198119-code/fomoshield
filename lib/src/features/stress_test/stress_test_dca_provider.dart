@@ -83,10 +83,10 @@ Future<bool> isStressTestDcaFunded(WidgetRef ref, String sessionId) async {
 
 /// Catch-up check for one session — credits any elapsed weeks of DCA
 /// funding if currently premium/admin. No-ops for a non-DCA session or a
-/// non-active one. Freezing on a lapsed subscription falls out the same
-/// way as Portfolio's weekly payout: this only ever credits while the tier
-/// reads premium/admin right now, so the clock simply doesn't advance
-/// otherwise — no back-pay for the lapsed stretch once renewed.
+/// non-active one. Freezing on a lapsed subscription works the same way as
+/// Portfolio's weekly payout: while the tier doesn't read premium/admin,
+/// the clock is pinned to now on every check-in instead of crediting —
+/// so no backlog accrues for the lapsed stretch once renewed.
 Future<void> checkStressTestDcaPayout(
   WidgetRef ref,
   StressTestSession session,
@@ -99,13 +99,18 @@ Future<void> checkStressTestDcaPayout(
   if (entry == null) return; // not a DCA-funded session
 
   final tier = ref.read(subscriptionTierProvider);
-  if (tier != SubscriptionTier.premium && tier != SubscriptionTier.admin) {
+  if (!tier.isPremiumOrAdmin) {
+    // Pin the clock to now while lapsed, so the elapsed-weeks calc below
+    // never spans the lapsed stretch once Premium resumes — otherwise the
+    // frozen lastPayoutAt would make the next check-in look like weeks of
+    // backlog and pay it all out at once.
+    store[session.id] = _DcaEntry(lastPayoutAt: DateTime.now());
+    await _saveStore(uid, store);
     return;
   }
 
   final lastPayout = entry.lastPayoutAt ?? DateTime.now();
-  final elapsedWeeks =
-      DateTime.now().difference(lastPayout).inDays ~/ 7;
+  final elapsedWeeks = DateTime.now().difference(lastPayout).inDays ~/ 7;
   if (elapsedWeeks <= 0) return;
 
   final amount = elapsedWeeks * dcaWeeklyAmount;

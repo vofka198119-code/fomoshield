@@ -1112,6 +1112,14 @@
       }
     }
   },
+  "orderEntryNotEnoughShares": "Not enough shares — you hold {shares}",
+  "@orderEntryNotEnoughShares": {
+    "placeholders": {
+      "shares": {
+        "type": "String"
+      }
+    }
+  },
   "orderEntryInfoMarket": "Market orders execute at the best available price. Execution is guaranteed, but the final price may differ from expectations.",
   "orderEntryInfoLimit": "Limit orders execute only at the specified price or better. Partial or full execution is not guaranteed.",
   "orderEntryInfoStop": "Stop orders activate when the stop price is reached, then execute as a market order.",

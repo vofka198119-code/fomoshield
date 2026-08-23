@@ -1465,6 +1465,16 @@ class VerdictArchiveEntry {
   final double patience;
   final double strategyAdherence;
 
+  /// True once [panicResistance]/[patience] were ever actually evaluated
+  /// (a sell trade resolved, or a catastrophe-survival psychology event
+  /// fired) — unlike [discipline], which moves on every trade including
+  /// buys, these two only move on a sell or a catastrophe event, so
+  /// [totalTrades] alone can't tell "untouched neutral 0.5" apart from a
+  /// real score. Distinct from a real, scored 0.5, same convention as
+  /// [safetyMarkerHasData].
+  final bool panicHasData;
+  final bool patienceHasData;
+
   /// The 5 signals behind [strategyAdherence], snapshotted the same way —
   /// see [StrategySubScores]/computeStrategySubScores in psychology_engine.dart.
   /// Stored as flat doubles rather than the holdings list itself, since
@@ -1528,6 +1538,8 @@ class VerdictArchiveEntry {
     this.discipline = 0,
     this.panicResistance = 0,
     this.patience = 0,
+    this.panicHasData = false,
+    this.patienceHasData = false,
     this.strategyAdherence = 0,
     this.strategyDiversification = 0,
     this.strategyConcentration = 0,
@@ -1555,6 +1567,8 @@ class VerdictArchiveEntry {
     'discipline': discipline,
     'panicResistance': panicResistance,
     'patience': patience,
+    'panicHasData': panicHasData,
+    'patienceHasData': patienceHasData,
     'strategyAdherence': strategyAdherence,
     'strategyDiversification': strategyDiversification,
     'strategyConcentration': strategyConcentration,
@@ -1596,6 +1610,12 @@ class VerdictArchiveEntry {
     discipline: (json['discipline'] as num?)?.toDouble() ?? 0,
     panicResistance: (json['panicResistance'] as num?)?.toDouble() ?? 0,
     patience: (json['patience'] as num?)?.toDouble() ?? 0,
+    // Absent for verdicts archived before this field existed — falls back
+    // to false, same as a never-scored marker (matches prior behavior for
+    // old archives, which is the best available without re-deriving it
+    // from a trades list that itself may be absent).
+    panicHasData: json['panicHasData'] as bool? ?? false,
+    patienceHasData: json['patienceHasData'] as bool? ?? false,
     strategyAdherence: (json['strategyAdherence'] as num?)?.toDouble() ?? 0,
     strategyDiversification:
         (json['strategyDiversification'] as num?)?.toDouble() ?? 0,

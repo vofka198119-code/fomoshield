@@ -16,6 +16,17 @@ const String adminEmail = 'fomoshield@gmail.com';
 /// Subscription tier enum.
 enum SubscriptionTier { free, premium, admin }
 
+extension SubscriptionTierAccess on SubscriptionTier {
+  /// True for premium or admin — the single predicate for "has premium
+  /// access", used everywhere a feature is gated on paid status. Was
+  /// re-derived inline as `tier == SubscriptionTier.premium || tier ==
+  /// SubscriptionTier.admin` (or the equivalent isPremium-then-OR-isAdmin
+  /// shape) at 12+ call sites — a future tier (e.g. a trial tier) needs
+  /// updating in exactly one place now instead of an N-site sweep.
+  bool get isPremiumOrAdmin =>
+      this == SubscriptionTier.premium || this == SubscriptionTier.admin;
+}
+
 /// Internal state — holds the subscription tier fetched from the DB.
 /// Updated asynchronously by [_premiumLoaderProvider].
 final _dbSubscriptionTierProvider = StateProvider<SubscriptionTier?>(
@@ -101,9 +112,17 @@ class PremiumDetails {
   final int daysRemaining;
 
   PremiumDetails({this.expiresAt})
-    : daysRemaining = expiresAt != null
-          ? DateTime.now().difference(expiresAt).inDays.abs()
-          : 365; // NULL = lifetime, show 365+
+    : daysRemaining = expiresAt == null
+          ? 365 // NULL = lifetime, show 365+
+          : _daysUntil(expiresAt);
+
+  // Clamped at 0 rather than going negative once expired — .abs() used to
+  // be here, which reported "N days remaining" for a subscription that
+  // actually expired N days ago instead of 0.
+  static int _daysUntil(DateTime expiresAt) {
+    final days = expiresAt.difference(DateTime.now()).inDays;
+    return days < 0 ? 0 : days;
+  }
 
   bool get isLifetime => expiresAt == null;
   bool get isExpired {

@@ -201,13 +201,14 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
     ref.read(portfoliosProvider.notifier).loadFromSupabase(portfolioList);
   }
 
-  // Load watchlist
+  // Load watchlist — including an empty list, so a watchlist genuinely
+  // cleared on another device actually propagates here (unlike portfolios/
+  // widget order below, an empty watchlist is a normal, reachable user
+  // state, not just "nothing synced yet").
   final watchlist = (data['watchlist'] as List<dynamic>)
       .map((e) => e.toString())
       .toList();
-  if (watchlist.isNotEmpty) {
-    ref.read(watchlistSymbolsProvider.notifier).loadFromSupabase(watchlist);
-  }
+  ref.read(watchlistSymbolsProvider.notifier).loadFromSupabase(watchlist);
 
   // Load widget order
   final widgetOrder = (data['widget_order'] as List<dynamic>)

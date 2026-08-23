@@ -73,7 +73,17 @@ extension GicsSectorLabel on GicsSector {
 GicsSector? resolveGicsSector(String symbol, {String? companyName}) {
   final ticker = symbol.trim().toUpperCase();
 
-  // ── Live Finnhub-derived sector (highest priority) ──────────────────
+  // ── Curated override (highest priority) ─────────────────────────────
+  // These exist specifically to correct tickers that a coarser classifier
+  // gets wrong — including Finnhub's own live industry data (e.g. it tags
+  // solar/hydrogen equipment makers as "Renewable Energy" → Energy, when
+  // they belong in Industrials). Must outrank the live cache below, or the
+  // first live fetch for one of these tickers silently overwrites the
+  // correction it exists to make.
+  final override = _overrides[ticker];
+  if (override != null) return override;
+
+  // ── Live Finnhub-derived sector ──────────────────────────────────────
   // Populated by SectorRepository (lib/core/cache/sector_repository.dart)
   // when a holding is first bought — real per-company data instead of the
   // static heuristics below. This map is a synchronous, in-memory mirror
@@ -81,9 +91,6 @@ GicsSector? resolveGicsSector(String symbol, {String? companyName}) {
   // hydrated from disk once at app startup) so the simulation engine's
   // synchronous tick loop can consult it without awaiting anything.
   if (_liveCache.containsKey(ticker)) return _liveCache[ticker];
-
-  final override = _overrides[ticker];
-  if (override != null) return override;
 
   final tag = CompanyTagMapper.tag(ticker, companyName: companyName);
   final bucket = tag?.sector;

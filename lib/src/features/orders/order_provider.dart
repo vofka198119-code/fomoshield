@@ -276,26 +276,21 @@ class OrderNotifier extends StateNotifier<List<Order>> {
 
       for (final execResult in result.results) {
         _upsertOrder(execResult.updatedOrder);
-      }
 
-      for (final tx in result.transactions) {
-        final portfolioId = _findPortfolioForOrder(tx.symbol);
-        if (portfolioId != null) {
-          _applyTransaction(portfolioId, tx);
-          transactions.add(tx);
+        final tx = execResult.transaction;
+        if (tx == null) continue;
+        // The order's own portfolioId, not a re-derived symbol lookup —
+        // exact even if the same symbol is ever held across more than one
+        // portfolio.
+        final portfolioId = execResult.updatedOrder.portfolioId;
+        _applyTransaction(portfolioId, tx);
+        transactions.add(tx);
 
-          // Notification for a limit/stop order filling LATER (this method
-          // runs from a background price check, not the order-entry screen
-          // — market orders already notify at their own UI call site, this
-          // covers only the async fill case, which has nowhere else to).
-          final filledOrder = result.results
-              .map((r) => r.updatedOrder)
-              .where((o) => o.orderId == tx.orderId)
-              .firstOrNull;
-          if (filledOrder != null) {
-            _onFill?.call(portfolioId, tx, filledOrder);
-          }
-        }
+        // Notification for a limit/stop order filling LATER (this method
+        // runs from a background price check, not the order-entry screen
+        // — market orders already notify at their own UI call site, this
+        // covers only the async fill case, which has nowhere else to).
+        _onFill?.call(portfolioId, tx, execResult.updatedOrder);
       }
     }
 
@@ -343,23 +338,6 @@ class OrderNotifier extends StateNotifier<List<Order>> {
     void Function(String portfolioId, Transaction tx, Order order)? cb,
   ) {
     _onFill = cb;
-  }
-
-  String? _findPortfolioForOrder(String symbol) {
-    // Find the first portfolio containing an active order for this symbol
-    final matching = state.where(
-      (o) =>
-          o.assetSymbol == symbol &&
-          (o.status == OrderStatus.filled ||
-              o.status == OrderStatus.partiallyFilled),
-    );
-    if (matching.isNotEmpty) return matching.first.portfolioId;
-    // Fallback: find by first active order with this symbol
-    final active = state.where(
-      (o) => o.assetSymbol == symbol && o.status.isActive,
-    );
-    if (active.isNotEmpty) return active.first.portfolioId;
-    return null;
   }
 
   /// Load orders from Supabase (on login)

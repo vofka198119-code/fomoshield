@@ -19,6 +19,11 @@ String _notificationsKey(String? uid) =>
 
 class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
   final String? _userId;
+  // Guards against _load()'s async SharedPreferences read finishing AFTER
+  // add()/markRead()/markAllRead() already ran and clobbering that
+  // just-made change with the pre-mutation disk snapshot. Whichever side
+  // sets this first wins — the other backs off.
+  bool _loaded = false;
 
   NotificationsNotifier([this._userId]) : super([]) {
     _load();
@@ -26,6 +31,8 @@ class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    if (_loaded) return;
+    _loaded = true;
     final raw = prefs.getString(_notificationsKey(_userId));
     if (raw == null) return;
     final list = jsonDecode(raw) as List;
@@ -47,6 +54,7 @@ class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
   /// `pushAppNotification` in app_notification_popup.dart for the combined
   /// "record + pop up" entry point every trigger site should call.
   void add(AppNotification notification) {
+    _loaded = true;
     final updated = [notification, ...state];
     state = updated.length > _maxNotifications
         ? updated.sublist(0, _maxNotifications)

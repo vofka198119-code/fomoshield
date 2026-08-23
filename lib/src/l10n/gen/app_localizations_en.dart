@@ -2726,6 +2726,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String orderEntryNotEnoughShares(String shares) {
+    return 'Not enough shares — you hold $shares';
+  }
+
+  @override
   String get orderEntryInfoMarket =>
       'Market orders execute at the best available price. Execution is guaranteed, but the final price may differ from expectations.';
 

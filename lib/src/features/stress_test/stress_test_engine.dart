@@ -132,17 +132,13 @@ String _archiveKey(String? uid) => uid != null
 
 final maxStressTestSessionsProvider = Provider<int>((ref) {
   final tier = ref.watch(subscriptionTierProvider);
-  return (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
-      ? _premiumMaxSessions
-      : _freeMaxSessions;
+  return (tier.isPremiumOrAdmin) ? _premiumMaxSessions : _freeMaxSessions;
 });
 
 /// Starting cash for a stress test based on subscription tier.
 final stressTestStartingCashProvider = Provider<double>((ref) {
   final tier = ref.watch(subscriptionTierProvider);
-  return (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
-      ? _premiumStartingCash
-      : _freeStartingCash;
+  return (tier.isPremiumOrAdmin) ? _premiumStartingCash : _freeStartingCash;
 });
 
 /// Slot position (0-based, by creation order) of [sessionId] among ALL of
@@ -167,7 +163,7 @@ bool isStressTestSlotFrozen(
   String sessionId,
   SubscriptionTier tier,
 ) {
-  if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) {
+  if (tier.isPremiumOrAdmin) {
     return false;
   }
   final slot = stressTestSlotIndex(allSessions, sessionId);
@@ -188,6 +184,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   List<VerdictArchiveEntry> _verdictArchive = [];
 
   final UserDataService? _supabaseService;
+  // Shared singleton (rate limiter + cache) — see trades_engine.dart's
+  // _fetchSafetyMarkerScore/_fetchIsEtfFlag, which used to instantiate a
+  // fresh FinnhubService() per buy, bypassing the shared budget. Optional
+  // so existing tests that construct this notifier directly still work;
+  // falls back to a fresh instance in that case, same as before.
+  final FinnhubService? _finnhubService;
   // Guards against _load()'s async SharedPreferences read finishing AFTER
   // loadFromSupabase() and clobbering the just-synced server data with an
   // empty/stale local cache — same race fixed for the other 4 sync
@@ -229,8 +231,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// Used in test suites to avoid setting marketOpenOverride per-instance.
   static bool Function(DateTime)? globalMarketOpenOverride;
 
-  StressTestNotifier({this._userId, int? seed, this._supabaseService})
-    : super([]) {
+  StressTestNotifier({
+    this._userId,
+    int? seed,
+    this._supabaseService,
+    this._finnhubService,
+  }) : super([]) {
     _random = (seed != null) ? Random(seed) : Random();
     _load();
   }
@@ -1089,6 +1095,13 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       cash: completed.cash,
     );
     final finalSafetyMarker = safetyMarkerFor(completed.holdings);
+    // panicResistance/patience only move on a sell trade or a catastrophe
+    // psychology event — unlike discipline, which moves on every trade —
+    // so totalTrades alone can't gate their "no data" state. See
+    // VerdictArchiveEntry.panicHasData/patienceHasData.
+    final hasPanicPatienceData =
+        completed.trades.any((t) => !t.isBuy) ||
+        completed.catastropheSurvivalRecorded;
     final scenarioCounts = <String, int>{};
     for (final epoch in completed.epochHistory) {
       scenarioCounts[epoch.scenario.name] =
@@ -1114,6 +1127,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       discipline: completed.psychologyProfile.discipline,
       panicResistance: completed.psychologyProfile.panicResistance,
       patience: completed.psychologyProfile.patience,
+      panicHasData: hasPanicPatienceData,
+      patienceHasData: hasPanicPatienceData,
       strategyAdherence: completed.psychologyProfile.strategyAdherence,
       strategyDiversification: finalStrategyScores.diversification,
       strategyConcentration: finalStrategyScores.concentration,
@@ -1434,6 +1449,7 @@ final stressTestProvider =
       final notifier = StressTestNotifier(
         userId: user?.id,
         supabaseService: supabaseService,
+        finnhubService: ref.read(finnhubServiceProvider),
       );
       notifier.onNotify = (notification) {
         pushAppNotification(

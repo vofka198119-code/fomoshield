@@ -326,6 +326,17 @@ class _PortfolioOrderEntryScreenState
           return;
         }
       }
+    } else {
+      if (shares > _heldShares + 0.0001) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.orderEntryNotEnoughShares(_heldShares.toStringAsFixed(4)),
+            ),
+          ),
+        );
+        return;
+      }
     }
 
     _executeOrder(
@@ -343,8 +354,7 @@ class _PortfolioOrderEntryScreenState
   /// so it just gets a plain notice — there's nothing to upsell them to.
   void _showHoldingsLimitReached(AppLocalizations l10n, int maxHoldings) {
     final tier = ref.read(subscriptionTierProvider);
-    final isPremium =
-        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    final isPremium = tier.isPremiumOrAdmin;
     if (isPremium) {
       showDialog(
         context: context,
@@ -511,7 +521,14 @@ class _PortfolioOrderEntryScreenState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    if (_isLoading) {
+    // Also wait on portfolio performance (cash/holdings) — _availableCash
+    // and _heldShares read it via ref.read and default to 0 before it
+    // resolves, which could otherwise flash a false "not enough cash" (or
+    // "not enough shares") rejection if the user submits in that window.
+    final performanceLoading = ref
+        .watch(portfolioPerformanceProvider(widget.portfolioId))
+        .isLoading;
+    if (_isLoading || performanceLoading) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(

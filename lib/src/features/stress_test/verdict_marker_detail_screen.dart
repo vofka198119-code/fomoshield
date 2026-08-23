@@ -119,9 +119,9 @@ VerdictTier? _tierFor(
     case 'discipline':
       return disciplineTierFor(l10n, entry.discipline, entry.totalTrades);
     case 'panic':
-      return panicTierFor(l10n, entry.panicResistance, entry.totalTrades);
+      return panicTierFor(l10n, entry.panicResistance, entry.panicHasData);
     case 'patience':
-      return patienceTierFor(l10n, entry.patience, entry.totalTrades);
+      return patienceTierFor(l10n, entry.patience, entry.patienceHasData);
     default:
       return null;
   }

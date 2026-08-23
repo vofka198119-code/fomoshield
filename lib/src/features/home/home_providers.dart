@@ -124,9 +124,10 @@ class WatchlistNotifier extends StateNotifier<List<String>> {
     _load();
   }
 
-  /// Load watchlist from Supabase data (replaces local).
+  /// Load watchlist from Supabase data (replaces local) — including an
+  /// empty list, so a watchlist genuinely cleared on another device
+  /// actually propagates here instead of leaving stale local entries.
   void loadFromSupabase(List<String> symbols) {
-    if (symbols.isEmpty) return;
     _loadedFromSupabase = true;
     state = symbols;
     _saveLocal();

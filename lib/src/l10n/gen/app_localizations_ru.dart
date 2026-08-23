@@ -2731,6 +2731,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String orderEntryNotEnoughShares(String shares) {
+    return 'Недостаточно акций — у вас есть $shares';
+  }
+
+  @override
   String get orderEntryInfoMarket =>
       'Рыночные ордера исполняются по лучшей доступной цене. Исполнение гарантировано, но итоговая цена может отличаться от ожидаемой.';
 

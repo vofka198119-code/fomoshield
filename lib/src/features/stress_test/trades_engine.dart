@@ -397,6 +397,7 @@ extension TradesEngine on StressTestNotifier {
             entryPrice: existing.entryPrice,
             cachedLogoUrl: existing.cachedLogoUrl,
             entryFsScore: existing.entryFsScore,
+            isEtf: existing.isEtf,
           );
         }
       }
@@ -595,13 +596,16 @@ extension TradesEngine on StressTestNotifier {
   /// symbol. Fire-and-forget: doesn't block the buy that triggered it,
   /// patches the holding's `entryFsScore` in place once resolved.
   ///
-  /// Uses a plain `FinnhubService()` + `ScoringEngine.calculate()` call
-  /// directly (no sectorPe/priceCagr5Y — those two markers just stay
-  /// neutral 50, a documented fallback in scoring_engine.dart) rather
-  /// than going through `companyDetailProvider`, since StressTestNotifier
-  /// isn't constructed with a Riverpod `Ref` to read that provider.
+  /// Uses the shared `_finnhubService` (threaded in via the provider, same
+  /// singleton as `finnhubServiceProvider` — falls back to a fresh
+  /// instance only for tests that construct this notifier directly) +
+  /// `ScoringEngine.calculate()` directly (no sectorPe/priceCagr5Y — those
+  /// two markers just stay neutral 50, a documented fallback in
+  /// scoring_engine.dart) rather than going through `companyDetailProvider`,
+  /// since StressTestNotifier isn't constructed with a Riverpod `Ref` to
+  /// read that provider.
   void _fetchSafetyMarkerScore(String sessionId, String symbol) {
-    FinnhubService()
+    (_finnhubService ?? FinnhubService())
         .metrics(symbol)
         .then((metrics) {
           final score = ScoringEngine.calculate(metrics);
@@ -648,7 +652,7 @@ extension TradesEngine on StressTestNotifier {
   /// bought that way (only in AssetSector.etfBroadMarket's small static
   /// list, which neither is).
   void _fetchIsEtfFlag(String sessionId, String symbol) {
-    FinnhubService()
+    (_finnhubService ?? FinnhubService())
         .search(symbol)
         .then((results) {
           final isEtf = results.any((r) {

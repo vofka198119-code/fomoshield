@@ -416,18 +416,17 @@ class FinnhubService {
   /// Uses the FREE `/quote` endpoint (no date parameters needed).
   /// Avoids `/stock/candle` which is a PAID endpoint.
   Future<Map<String, dynamic>> previousTradingDayQuote(String symbol) async {
-    try {
-      // /quote works on free Finnhub tier — returns real-time price, change, prev close
-      final q = await quote(symbol);
-      final c = (q['c'] as num?)?.toDouble() ?? 0;
-      final dp = (q['dp'] as num?)?.toDouble() ?? 0;
-      final pc = (q['pc'] as num?)?.toDouble() ?? 0;
-      debugPrint('📊 quote($symbol): c=$c dp=$dp pc=$pc');
-      return {'c': c, 'dp': dp, 'pc': pc};
-    } catch (e) {
-      debugPrint('❌ previousTradingDayQuote error for $symbol: $e');
-      return {'c': 0, 'dp': 0, 'pc': 0};
-    }
+    // /quote works on free Finnhub tier — returns real-time price, change, prev close.
+    // Deliberately doesn't catch: callers (e.g. marketIndicesProvider's
+    // Future.wait over SPY/QQQ/DIA) need a failure on ANY one symbol to
+    // fail the whole batch, not silently succeed with a zeroed entry that
+    // then gets cached for hours indistinguishable from a real flat market.
+    final q = await quote(symbol);
+    final c = (q['c'] as num?)?.toDouble() ?? 0;
+    final dp = (q['dp'] as num?)?.toDouble() ?? 0;
+    final pc = (q['pc'] as num?)?.toDouble() ?? 0;
+    debugPrint('📊 quote($symbol): c=$c dp=$dp pc=$pc');
+    return {'c': c, 'dp': dp, 'pc': pc};
   }
 
   // ---------------------------------------------------------------------------
