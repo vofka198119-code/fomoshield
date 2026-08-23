@@ -221,6 +221,16 @@ SET subscription_tier = 'premium',
     subscription_expires_at = now() + INTERVAL '5 years'
 WHERE email = 'vofka198119@gmail.com';
 
+-- =============================================================================
+-- Set Aleksejs.Ziznevskis@gmail.com as Premium (10 years from now — tester account)
+-- Run this AFTER running Migration 003 ALTER statements above.
+-- =============================================================================
+
+UPDATE public.users
+SET subscription_tier = 'premium',
+    subscription_expires_at = now() + INTERVAL '10 years'
+WHERE email = 'Aleksejs.Ziznevskis@gmail.com';
+
 
 -- =============================================================================
 -- F.O.M.O. Shield — Supabase Migration 004
