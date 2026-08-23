@@ -13,7 +13,5 @@ const int _premiumMaxWatchlist = 50;
 
 final maxWatchlistProvider = Provider<int>((ref) {
   final tier = ref.watch(subscriptionTierProvider);
-  return (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
-      ? _premiumMaxWatchlist
-      : _freeMaxWatchlist;
+  return (tier.isPremiumOrAdmin) ? _premiumMaxWatchlist : _freeMaxWatchlist;
 });

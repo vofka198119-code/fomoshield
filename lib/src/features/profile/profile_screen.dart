@@ -193,7 +193,7 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 8),
                             // Subscription badge (FREE → no badge)
-                            if (isPremium || isAdmin)
+                            if (subscriptionTier.isPremiumOrAdmin)
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
@@ -241,7 +241,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
 
           // ── Premium Status Card (gold, for premium/admin users) ──
-          if (isPremium || isAdmin) ...[
+          if (subscriptionTier.isPremiumOrAdmin) ...[
             const SizedBox(height: 12),
             _PremiumStatusCard(),
           ],
@@ -752,7 +752,10 @@ class _PremiumStatusCard extends ConsumerWidget {
         // Benefits list
         _benefitRow(Icons.search_rounded, l10n.premiumBenefitSearches),
         const SizedBox(height: 6),
-        _benefitRow(Icons.account_balance_rounded, l10n.premiumBenefitPortfolios),
+        _benefitRow(
+          Icons.account_balance_rounded,
+          l10n.premiumBenefitPortfolios,
+        ),
         const SizedBox(height: 6),
         _benefitRow(Icons.monetization_on_rounded, l10n.premiumBenefitCapital),
         const SizedBox(height: 6),
@@ -760,10 +763,7 @@ class _PremiumStatusCard extends ConsumerWidget {
         const SizedBox(height: 6),
         _benefitRow(Icons.savings_rounded, l10n.premiumBenefitWeeklyPayout),
         const SizedBox(height: 6),
-        _benefitRow(
-          Icons.auto_graph_rounded,
-          l10n.premiumBenefitStressTestDca,
-        ),
+        _benefitRow(Icons.auto_graph_rounded, l10n.premiumBenefitStressTestDca),
         const SizedBox(height: 6),
         _benefitRow(Icons.block_rounded, l10n.premiumBenefitAdFree),
       ],

@@ -26,13 +26,11 @@ const int _premiumMaxHoldingsPerPortfolio = 30;
 
 final maxHoldingsPerPortfolioProvider = Provider<int>((ref) {
   final tier = ref.watch(subscriptionTierProvider);
-  return (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
+  return (tier.isPremiumOrAdmin)
       ? _premiumMaxHoldingsPerPortfolio
       : _freeMaxHoldingsPerPortfolio;
 });
 
 /// Starting capital for the one portfolio a user of [tier] gets.
 double startingCapitalForTier(SubscriptionTier tier) =>
-    (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
-        ? _premiumStartingCapital
-        : _freeStartingCapital;
+    (tier.isPremiumOrAdmin) ? _premiumStartingCapital : _freeStartingCapital;

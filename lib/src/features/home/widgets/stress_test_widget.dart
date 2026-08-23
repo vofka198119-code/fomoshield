@@ -250,8 +250,7 @@ class StressTestWidget extends ConsumerWidget {
   Color _playIconColor(WidgetRef ref, int index) {
     if (index == 0) return Colors.white;
     final tier = ref.watch(subscriptionTierProvider);
-    final isPremiumTier =
-        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    final isPremiumTier = tier.isPremiumOrAdmin;
     if (index == 1) return isPremiumTier ? dialBrassLight : Colors.white;
     return dialBrassLight;
   }
@@ -269,8 +268,7 @@ class StressTestWidget extends ConsumerWidget {
     if (index == 0) return null;
 
     final tier = ref.watch(subscriptionTierProvider);
-    final isPremiumTier =
-        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    final isPremiumTier = tier.isPremiumOrAdmin;
 
     if (index == 1 && !isPremiumTier) {
       return InkWell(

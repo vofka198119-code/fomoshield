@@ -117,9 +117,46 @@ class MarketValueChart extends ConsumerStatefulWidget {
   ConsumerState<MarketValueChart> createState() => _MarketValueChartState();
 }
 
+/// Everything _buildChartArea derives from (points, selected period) alone
+/// — independent of live touch state (_touchDx/_touchedSpotIndex) and the
+/// layout-time plot width. Memoized so a touch-drag's per-frame setState
+/// (which only moves the touch indicator) doesn't re-filter/re-downsample/
+/// rebuild the whole spots list on every pointer-move event.
+class _ChartGeometry {
+  final List<ChartDataPoint> filtered;
+  final List<FlSpot> spots;
+  final Color lineColor;
+  final double minValue;
+  final double maxValue;
+  final double chartMinY;
+  final double chartMaxY;
+  final double touchLineTopY;
+  final bool intraday;
+
+  const _ChartGeometry({
+    required this.filtered,
+    required this.spots,
+    required this.lineColor,
+    required this.minValue,
+    required this.maxValue,
+    required this.chartMinY,
+    required this.chartMaxY,
+    required this.touchLineTopY,
+    required this.intraday,
+  });
+}
+
 class _MarketValueChartState extends ConsumerState<MarketValueChart> {
+  // The touch-indicator line's own top stops at the date tooltip's bottom
+  // edge (~24px, matching its padding+text height) instead of piercing
+  // straight through the box — same as PriceChart.
+  static const _dateTooltipHeight = 24.0;
+  static const _chartHeight = 220.0;
+
   _ValuePeriod _selected = _ValuePeriod.d1;
   List<ChartDataPoint>? _cachedPoints;
+  _ChartGeometry? _cachedGeometry;
+  int? _lastGeometrySignature;
   // Cheap proxy for "has real new tick data landed since the last compute"
   // — sum of held symbols' priceHistory lengths. Used instead of a
   // wall-clock throttle: the screen rebuilds this widget every 20s (engine
@@ -303,108 +340,25 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
       _selected = available.last;
     }
 
-    final now = DateTime.now();
-    final DateTime domainStart;
-    final DateTime domainEnd;
-    List<ChartDataPoint> filtered;
-    if (_selected == _ValuePeriod.d1) {
-      final todayStart = DateTime(now.year, now.month, now.day);
-      final todayEnd = todayStart.add(const Duration(days: 1));
-      filtered = points
-          .where(
-            (p) => !p.time.isBefore(todayStart) && !p.time.isAfter(todayEnd),
-          )
-          .toList();
-      if (filtered.length < 2) {
-        return Center(
-          child: Text(
-            l10n.stressTestChartNotEnoughDataForPeriod,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: ThemeV2.textSecondary,
-            ),
-          ),
-        );
-      }
-      // Left edge anchors to wherever today's REAL data actually starts —
-      // not literal midnight. A simulated session can't backfill more than
-      // ~5 real hours of catch-up (_maxCatchUpTicks), so pinning to
-      // midnight would show a permanent empty gap every time the app was
-      // closed overnight. The right edge stays fixed at midnight tomorrow
-      // so the line still stops at "now" with empty space after it —
-      // that's a genuine "hasn't happened yet" gap, not a missing-data one.
-      domainStart = filtered.first.time;
-      domainEnd = todayEnd;
-    } else {
-      // Periods longer than a day always stretch to fill the chart's full
-      // width using whatever real data falls in the rolling window —
-      // explicit ask: unlike 1D, these don't stop short at "now" with
-      // empty trailing space.
-      final cutoff = now.subtract(_periodCutoffs[_selected]!);
-      filtered = points.where((p) => !p.time.isBefore(cutoff)).toList();
-      if (filtered.length < 2) {
-        return Center(
-          child: Text(
-            l10n.stressTestChartNotEnoughDataForPeriod,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: ThemeV2.textSecondary,
-            ),
-          ),
-        );
-      }
-      domainStart = filtered.first.time;
-      domainEnd = filtered.last.time;
+    final geometry = _getGeometry(points);
+    if (geometry == null) {
+      return Center(
+        child: Text(
+          l10n.stressTestChartNotEnoughDataForPeriod,
+          style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+        ),
+      );
     }
-
-    // Downsample before rendering — priceHistory can hold up to
-    // _maxPriceHistoryPoints (5000) per symbol, and a long-running test's
-    // 1Y/ALL view could otherwise hand fl_chart thousands of points for a
-    // ~300px-wide plot area, most of which land on the same screen pixel.
-    // Always keeps the first/last point so the domain's real boundaries
-    // (start-of-data for 1D, filtered.first/last for longer periods) don't
-    // shift.
-    filtered = _downsampleForRender(filtered, domainStart, domainEnd, 200);
-
-    // 1D uses the fixed calendar-day domain computed above (so it can stop
-    // short of the right edge); every other period's domain is just
-    // [filtered.first, filtered.last], stretching to fill the full width.
-    final minTimeMs = domainStart.millisecondsSinceEpoch.toDouble();
-    final maxTimeMs = domainEnd.millisecondsSinceEpoch.toDouble();
-    final timeRange = maxTimeMs - minTimeMs;
-    final spots = <FlSpot>[];
-    for (int i = 0; i < filtered.length; i++) {
-      final t = filtered[i].time.millisecondsSinceEpoch.toDouble();
-      final x = timeRange > 0
-          ? ((t - minTimeMs) / timeRange).clamp(0.0, 1.0)
-          : 0.0;
-      spots.add(FlSpot(x, filtered[i].value));
-    }
-
-    final isUp = spots.last.y >= spots.first.y;
-    final lineColor = isUp ? ThemeV2.success : ThemeV2.loss;
-
-    final values = filtered.map((p) => p.value);
-    final minValue = values.reduce((a, b) => a < b ? a : b);
-    final maxValue = values.reduce((a, b) => a > b ? a : b);
-    final valueRange = maxValue - minValue;
-    // 15% headroom each side — the line occupies ~70% of the chart's
-    // height instead of nearly touching top/bottom, matching the
-    // reference chart's proportions.
-    final headroom = valueRange > 0 ? valueRange * 0.15 : maxValue * 0.15;
-    final chartMinY = minValue - headroom;
-    final chartMaxY = maxValue + headroom;
-
-    // The touch-indicator line's own top stops at the date tooltip's
-    // bottom edge (~24px, matching its padding+text height) instead of
-    // piercing straight through the box — same as PriceChart.
-    const dateTooltipHeight = 24.0;
-    const chartHeight = 220.0;
-    final touchLineTopY =
-        chartMaxY - (dateTooltipHeight / chartHeight) * (chartMaxY - chartMinY);
-
-    final intraday =
-        _selected == _ValuePeriod.d1 || _selected == _ValuePeriod.w1;
+    final filtered = geometry.filtered;
+    final spots = geometry.spots;
+    final lineColor = geometry.lineColor;
+    final minValue = geometry.minValue;
+    final maxValue = geometry.maxValue;
+    final chartMinY = geometry.chartMinY;
+    final chartMaxY = geometry.chartMaxY;
+    final touchLineTopY = geometry.touchLineTopY;
+    final intraday = geometry.intraday;
+    const chartHeight = _chartHeight;
 
     return Stack(
       children: [
@@ -601,6 +555,114 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             ),
           ),
       ],
+    );
+  }
+
+  /// Memoized wrapper around [_computeGeometry] — recomputes only when the
+  /// underlying [points] (by identity — only changes when [_getPoints]
+  /// actually recomputes) or [_selected] period change, not on every
+  /// touch-drag frame (see [_ChartGeometry]'s doc comment).
+  _ChartGeometry? _getGeometry(List<ChartDataPoint> points) {
+    final signature = Object.hash(identityHashCode(points), _selected);
+    if (_cachedGeometry == null || _lastGeometrySignature != signature) {
+      _cachedGeometry = _computeGeometry(points);
+      _lastGeometrySignature = signature;
+    }
+    return _cachedGeometry;
+  }
+
+  /// Null when [_selected]'s period has fewer than 2 points after
+  /// filtering — caller shows the "not enough data for period" message.
+  _ChartGeometry? _computeGeometry(List<ChartDataPoint> points) {
+    final now = DateTime.now();
+    final DateTime domainStart;
+    final DateTime domainEnd;
+    List<ChartDataPoint> filtered;
+    if (_selected == _ValuePeriod.d1) {
+      final todayStart = DateTime(now.year, now.month, now.day);
+      final todayEnd = todayStart.add(const Duration(days: 1));
+      filtered = points
+          .where(
+            (p) => !p.time.isBefore(todayStart) && !p.time.isAfter(todayEnd),
+          )
+          .toList();
+      if (filtered.length < 2) return null;
+      // Left edge anchors to wherever today's REAL data actually starts —
+      // not literal midnight. A simulated session can't backfill more than
+      // ~5 real hours of catch-up (_maxCatchUpTicks), so pinning to
+      // midnight would show a permanent empty gap every time the app was
+      // closed overnight. The right edge stays fixed at midnight tomorrow
+      // so the line still stops at "now" with empty space after it —
+      // that's a genuine "hasn't happened yet" gap, not a missing-data one.
+      domainStart = filtered.first.time;
+      domainEnd = todayEnd;
+    } else {
+      // Periods longer than a day always stretch to fill the chart's full
+      // width using whatever real data falls in the rolling window —
+      // explicit ask: unlike 1D, these don't stop short at "now" with
+      // empty trailing space.
+      final cutoff = now.subtract(_periodCutoffs[_selected]!);
+      filtered = points.where((p) => !p.time.isBefore(cutoff)).toList();
+      if (filtered.length < 2) return null;
+      domainStart = filtered.first.time;
+      domainEnd = filtered.last.time;
+    }
+
+    // Downsample before rendering — priceHistory can hold up to
+    // _maxPriceHistoryPoints (5000) per symbol, and a long-running test's
+    // 1Y/ALL view could otherwise hand fl_chart thousands of points for a
+    // ~300px-wide plot area, most of which land on the same screen pixel.
+    // Always keeps the first/last point so the domain's real boundaries
+    // (start-of-data for 1D, filtered.first/last for longer periods) don't
+    // shift.
+    filtered = _downsampleForRender(filtered, domainStart, domainEnd, 200);
+
+    // 1D uses the fixed calendar-day domain computed above (so it can stop
+    // short of the right edge); every other period's domain is just
+    // [filtered.first, filtered.last], stretching to fill the full width.
+    final minTimeMs = domainStart.millisecondsSinceEpoch.toDouble();
+    final maxTimeMs = domainEnd.millisecondsSinceEpoch.toDouble();
+    final timeRange = maxTimeMs - minTimeMs;
+    final spots = <FlSpot>[];
+    for (int i = 0; i < filtered.length; i++) {
+      final t = filtered[i].time.millisecondsSinceEpoch.toDouble();
+      final x = timeRange > 0
+          ? ((t - minTimeMs) / timeRange).clamp(0.0, 1.0)
+          : 0.0;
+      spots.add(FlSpot(x, filtered[i].value));
+    }
+
+    final isUp = spots.last.y >= spots.first.y;
+    final lineColor = isUp ? ThemeV2.success : ThemeV2.loss;
+
+    final values = filtered.map((p) => p.value);
+    final minValue = values.reduce((a, b) => a < b ? a : b);
+    final maxValue = values.reduce((a, b) => a > b ? a : b);
+    final valueRange = maxValue - minValue;
+    // 15% headroom each side — the line occupies ~70% of the chart's
+    // height instead of nearly touching top/bottom, matching the
+    // reference chart's proportions.
+    final headroom = valueRange > 0 ? valueRange * 0.15 : maxValue * 0.15;
+    final chartMinY = minValue - headroom;
+    final chartMaxY = maxValue + headroom;
+
+    final touchLineTopY =
+        chartMaxY -
+        (_dateTooltipHeight / _chartHeight) * (chartMaxY - chartMinY);
+
+    final intraday =
+        _selected == _ValuePeriod.d1 || _selected == _ValuePeriod.w1;
+
+    return _ChartGeometry(
+      filtered: filtered,
+      spots: spots,
+      lineColor: lineColor,
+      minValue: minValue,
+      maxValue: maxValue,
+      chartMinY: chartMinY,
+      chartMaxY: chartMaxY,
+      touchLineTopY: touchLineTopY,
+      intraday: intraday,
     );
   }
 

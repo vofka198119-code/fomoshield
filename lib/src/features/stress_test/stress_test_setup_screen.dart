@@ -53,8 +53,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
   void _startTest() async {
     final tier = ref.read(subscriptionTierProvider);
-    final isPremium =
-        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    final isPremium = tier.isPremiumOrAdmin;
 
     // Safety guard: Free cannot start Infinite or Custom
     if (!isPremium &&
@@ -245,7 +244,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
   Widget _buildPremiumBadge() {
     final tier = ref.watch(subscriptionTierProvider);
-    if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) {
+    if (tier.isPremiumOrAdmin) {
       return const SizedBox.shrink();
     }
     // Which concurrent slot this session (still in setup, not yet
@@ -302,8 +301,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
   Widget _buildBalanceCard(StressTestSession session) {
     final tier = ref.watch(subscriptionTierProvider);
-    final isPremium =
-        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    final isPremium = tier.isPremiumOrAdmin;
     final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
@@ -379,8 +377,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
   Widget _buildDurationSelector() {
     final tier = ref.watch(subscriptionTierProvider);
-    final isPremium =
-        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    final isPremium = tier.isPremiumOrAdmin;
     final accentColor = isPremium
         ? const Color(0xFFD4AF37) // Gold for Premium/Admin
         : ThemeV2.textSecondary; // Gray for Free

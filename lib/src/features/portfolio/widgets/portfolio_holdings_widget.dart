@@ -43,6 +43,30 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
   static const int _previewLimit = 10;
   bool _showAll = false;
 
+  // Memoized sort — re-sorting the full holdings list is O(n log n) and
+  // this widget rebuilds on every price tick as well as the "More/Less"
+  // toggle; re-sort only when the underlying data actually changed.
+  // Mutating plain fields (not calling setState) during build is safe
+  // here since it's a pure memoization, not a state change that needs its
+  // own rebuild trigger — same pattern as MarketValueChart._getPoints.
+  List<HoldingPerformance>? _cachedSorted;
+  int? _lastHoldingsSignature;
+
+  List<HoldingPerformance> _sortedHoldings(List<HoldingPerformance> holdings) {
+    final signature = Object.hashAll(
+      holdings.map((h) => Object.hash(h.symbol, h.currentValue)),
+    );
+    if (_cachedSorted == null || _lastHoldingsSignature != signature) {
+      // Sort descending by currentValue — same order the Portfolio
+      // Balance donut's legend uses, so donutAllocationColor(i) lines up
+      // with the same color for the same holding across both widgets.
+      _cachedSorted = List<HoldingPerformance>.from(holdings)
+        ..sort((a, b) => b.currentValue.compareTo(a.currentValue));
+      _lastHoldingsSignature = signature;
+    }
+    return _cachedSorted!;
+  }
+
   Widget _addButton(BuildContext context) {
     return GestureDetector(
       onTap: () =>
@@ -82,11 +106,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
       );
     }
 
-    // Sort descending by currentValue — same order the Portfolio Balance
-    // donut's legend uses, so donutAllocationColor(i) lines up with the
-    // same color for the same holding across both widgets.
-    final sorted = List<HoldingPerformance>.from(holdings)
-      ..sort((a, b) => b.currentValue.compareTo(a.currentValue));
+    final sorted = _sortedHoldings(holdings);
     final display = _showAll ? sorted : sorted.take(_previewLimit).toList();
 
     return Container(

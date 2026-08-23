@@ -6,27 +6,61 @@ import '../models/logo_cache_entry.dart';
 // ---------------------------------------------------------------------------
 // LogoDao — отдельное хранилище логотипов компаний
 // ---------------------------------------------------------------------------
-// Хранит LogoCacheEntry в SharedPreferences как JSON-карту.
+// Хранит LogoCacheEntry в SharedPreferences — один ключ на тикер, плюс
+// небольшой индекс тикеров (для getAllEntries). Раньше всё хранилось одним
+// общим JSON-блобом под ключом _legacyStorageKey: каждое чтение/запись
+// декодировало/перекодировало ВЕСЬ кэш ради одного тикера, и saveLogo делал
+// неатомарный read-modify-write — параллельные сохранения для разных
+// тикеров (например, 8 одновременных подгрузок логотипов в списке) могли
+// затереть записи друг друга. Один ключ на тикер убирает обе проблемы:
+// чтение/запись касается только своего тикера, конкурентные записи для
+// разных тикеров больше не пересекаются.
 // Не имеет TTL — данные хранятся навсегда.
 // Не зависит от StockCache и других DAO.
 // ---------------------------------------------------------------------------
 
 class LogoDao {
-  static const String _storageKey = 'logo_cache';
+  static const String _legacyStorageKey = 'logo_cache';
+  static const String _indexKey = 'logo_cache_v2_index';
+  static String _entryKey(String ticker) => 'logo_cache_v2:$ticker';
+
+  bool _migrated = false;
+
+  /// One-time move of any pre-existing single-blob cache into the new
+  /// per-ticker keys, so upgrading users don't silently lose their whole
+  /// logo cache and mass-refetch from Finnhub — see project memory on the
+  /// app's prior Finnhub rate-limit incidents.
+  Future<void> _migrateLegacyIfNeeded(SharedPreferences prefs) async {
+    if (_migrated) return;
+    _migrated = true;
+    final legacyJson = prefs.getString(_legacyStorageKey);
+    if (legacyJson == null) return;
+    try {
+      final map = Map<String, dynamic>.from(json.decode(legacyJson) as Map);
+      final tickers = <String>{...(prefs.getStringList(_indexKey) ?? [])};
+      for (final entry in map.entries) {
+        await prefs.setString(_entryKey(entry.key), json.encode(entry.value));
+        tickers.add(entry.key);
+      }
+      await prefs.setStringList(_indexKey, tickers.toList());
+    } catch (e) {
+      debugPrint('❌ LogoDao migration error: $e');
+    } finally {
+      await prefs.remove(_legacyStorageKey);
+    }
+  }
 
   /// Возвращает логотип для тикера, или null если не найден.
   Future<LogoCacheEntry?> getLogo(String ticker) async {
     final key = ticker.toUpperCase();
     final prefs = await SharedPreferences.getInstance();
-    final jsonMap = prefs.getString(_storageKey);
-    if (jsonMap == null) return null;
+    await _migrateLegacyIfNeeded(prefs);
+    final raw = prefs.getString(_entryKey(key));
+    if (raw == null) return null;
 
     try {
-      final map = Map<String, dynamic>.from(json.decode(jsonMap) as Map);
-      final entryJson = map[key];
-      if (entryJson == null) return null;
       return LogoCacheEntry.fromJson(
-        Map<String, dynamic>.from(entryJson as Map),
+        Map<String, dynamic>.from(json.decode(raw) as Map),
       );
     } catch (e) {
       debugPrint('❌ LogoDao.getLogo error for $ticker: $e');
@@ -38,17 +72,13 @@ class LogoDao {
   Future<void> saveLogo(LogoCacheEntry entry) async {
     final key = entry.ticker.toUpperCase();
     final prefs = await SharedPreferences.getInstance();
-    final jsonMap = prefs.getString(_storageKey);
-    final map = <String, dynamic>{};
+    await _migrateLegacyIfNeeded(prefs);
+    await prefs.setString(_entryKey(key), json.encode(entry.toJson()));
 
-    if (jsonMap != null) {
-      try {
-        map.addAll(Map<String, dynamic>.from(json.decode(jsonMap) as Map));
-      } catch (_) {}
+    final index = prefs.getStringList(_indexKey) ?? [];
+    if (!index.contains(key)) {
+      await prefs.setStringList(_indexKey, [...index, key]);
     }
-
-    map[key] = entry.toJson();
-    await prefs.setString(_storageKey, json.encode(map));
   }
 
   /// Проверяет, существует ли логотип для тикера.
@@ -62,20 +92,20 @@ class LogoDao {
   /// (см. SectorRepository.hydrateLiveCache).
   Future<Map<String, LogoCacheEntry>> getAllEntries() async {
     final prefs = await SharedPreferences.getInstance();
-    final jsonMap = prefs.getString(_storageKey);
-    if (jsonMap == null) return {};
-
-    try {
-      final map = Map<String, dynamic>.from(json.decode(jsonMap) as Map);
-      return map.map(
-        (key, value) => MapEntry(
-          key,
-          LogoCacheEntry.fromJson(Map<String, dynamic>.from(value as Map)),
-        ),
-      );
-    } catch (e) {
-      debugPrint('❌ LogoDao.getAllEntries error: $e');
-      return {};
+    await _migrateLegacyIfNeeded(prefs);
+    final index = prefs.getStringList(_indexKey) ?? [];
+    final result = <String, LogoCacheEntry>{};
+    for (final ticker in index) {
+      final raw = prefs.getString(_entryKey(ticker));
+      if (raw == null) continue;
+      try {
+        result[ticker] = LogoCacheEntry.fromJson(
+          Map<String, dynamic>.from(json.decode(raw) as Map),
+        );
+      } catch (e) {
+        debugPrint('❌ LogoDao.getAllEntries error for $ticker: $e');
+      }
     }
+    return result;
   }
 }

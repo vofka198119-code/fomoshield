@@ -63,7 +63,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   Future<void> _checkAd() async {
     final tier = ref.read(subscriptionTierProvider);
     // Admin/premium bypass ads entirely
-    if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) {
+    if (tier.isPremiumOrAdmin) {
       return;
     }
     try {
@@ -330,12 +330,11 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.read(portfoliosProvider);
     final tier = ref.read(subscriptionTierProvider);
-    final isPremiumTier =
-        tier == SubscriptionTier.premium || tier == SubscriptionTier.admin;
+    final isPremiumTier = tier.isPremiumOrAdmin;
     if (portfolios.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.companyDetailNoPortfolios)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.companyDetailNoPortfolios)));
       return;
     }
 
@@ -668,7 +667,9 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
               changePercent: shownChangePercent,
               isUp: shownChange >= 0,
               changeLabel: periodChange != null
-                  ? l10n.companyDetailChangePeriodLabel(periodChange.periodLabel)
+                  ? l10n.companyDetailChangePeriodLabel(
+                      periodChange.periodLabel,
+                    )
                   : l10n.companyDetailChangeLabel,
               fsScore: scoreData['financial_score'] as int?,
             ),

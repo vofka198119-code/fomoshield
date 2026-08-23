@@ -40,7 +40,7 @@ final verdictAccessProvider = FutureProvider.family<bool, String>((
   if (entry == null || !entry.wasPremiumSlot) return true;
 
   final tier = ref.watch(subscriptionTierProvider);
-  if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin) {
+  if (tier.isPremiumOrAdmin) {
     return true;
   }
 

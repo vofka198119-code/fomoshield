@@ -73,7 +73,6 @@ final watchlistAdProvider = StateNotifierProvider<WatchlistAdNotifier, int>((
 /// Whether an ad should be shown (respects premium tier).
 final shouldShowAdProvider = Provider<bool>((ref) {
   final tier = ref.watch(subscriptionTierProvider);
-  if (tier == SubscriptionTier.premium || tier == SubscriptionTier.admin)
-    return false;
+  if (tier.isPremiumOrAdmin) return false;
   return ref.watch(watchlistAdProvider.notifier).shouldShowAd;
 });

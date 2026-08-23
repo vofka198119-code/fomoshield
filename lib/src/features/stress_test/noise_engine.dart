@@ -91,7 +91,6 @@ extension NoiseEngine on StressTestNotifier {
     required double priceAfter,
     required int epochIndex,
     required MarketScenario scenario,
-    required MarketSector sector,
     required bool hasCorrection,
     double? marketDriftRaw,
     double? sectorDriftRaw,
@@ -417,7 +416,6 @@ extension NoiseEngine on StressTestNotifier {
             preBouncePrices[h.symbol] ??
             session.currentPrices[h.symbol] ??
             h.entryPrice;
-        final sector = _getSector(h.symbol);
         final assetSector = _getAssetSector(h.symbol);
         final params = _getSectorParams(h.symbol, scenario);
 
@@ -562,7 +560,6 @@ extension NoiseEngine on StressTestNotifier {
           priceAfter: currentPrice,
           epochIndex: currentEpoch.index,
           scenario: scenario,
-          sector: sector,
           hasCorrection: hasCorrection,
           marketDriftRaw: effectiveAnnualDrift * dtPerTick * driftMultiplier,
           sectorDriftRaw:
