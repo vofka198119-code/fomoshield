@@ -83,7 +83,14 @@ class _PortfolioWidgetsSettingsSheetState
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        // viewInsets covers the keyboard; padding.bottom covers the
+        // device's own system nav bar / gesture area — now that this
+        // sheet pushes onto the root Navigator (see the useRootNavigator
+        // fix at its call site), it's no longer sitting above the app's
+        // own bottom nav bar, so it needs to clear the OS one itself.
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

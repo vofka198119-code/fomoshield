@@ -52,6 +52,14 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
 
     showModalBottomSheet(
       context: context,
+      // Without this, the sheet pushes onto the ShellRoute's own nested
+      // Navigator (this screen's `context`), which sits inside the app
+      // shell's Scaffold body — and that Scaffold uses `extendBody: true`
+      // for its bottom nav bar, so the persistent nav bar paints on top
+      // of the sheet's lower edge instead of the sheet covering it.
+      // Pushing onto the root Navigator instead gives proper full-screen
+      // coverage over the bottom nav bar.
+      useRootNavigator: true,
       backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

@@ -39,6 +39,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     showModalBottomSheet(
       context: context,
+      // See portfolio_body.dart's identical fix: without this, the sheet
+      // pushes onto the ShellRoute's nested Navigator, and the shell's
+      // extendBody Scaffold paints its persistent bottom nav bar on top
+      // of the sheet's lower edge instead of the sheet covering it.
+      useRootNavigator: true,
       backgroundColor: ThemeV2.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -244,7 +249,9 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

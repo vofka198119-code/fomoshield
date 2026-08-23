@@ -71,7 +71,9 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.55,
