@@ -117,6 +117,11 @@ final premiumDetailsProvider = FutureProvider<PremiumDetails?>((ref) async {
   final user = SupabaseConfig.client.auth.currentUser;
   if (user == null) return null;
 
+  // Admin status is a hardcoded-email override (see isAdminProvider above),
+  // not necessarily reflected in the DB's subscription_tier — always
+  // lifetime, regardless of what that row says.
+  if (user.email == adminEmail) return PremiumDetails();
+
   try {
     final response = await SupabaseConfig.client
         .from('users')
@@ -125,7 +130,8 @@ final premiumDetailsProvider = FutureProvider<PremiumDetails?>((ref) async {
         .maybeSingle();
 
     if (response == null) return null;
-    if (response['subscription_tier'] != 'premium') return null;
+    final tier = response['subscription_tier'];
+    if (tier != 'premium' && tier != 'admin') return null;
 
     final expiresAtStr = response['subscription_expires_at'] as String?;
     return PremiumDetails(

@@ -194,11 +194,13 @@ class _WatchlistRow extends ConsumerWidget {
       onTap: () => context.push('/company/$symbol'),
       behavior: HitTestBehavior.opaque,
       child: Container(
-        // A few px taller than the tightest fit — some devices' font
-        // metrics render the title+sector stack slightly taller than
-        // others (confirmed overflow on a Redmi Note 9S at 60px, same
-        // row style as company_mini_card.dart).
-        height: 66,
+        // minHeight (not a hard height) so the row can grow instead of
+        // overflowing when the title+sector stack renders taller than
+        // this — confirmed happening on a Redmi Note 9S both from RU font
+        // metrics at a fixed 60px and, separately, from the OS
+        // accessibility text-scale slider, same row style as
+        // company_mini_card.dart.
+        constraints: const BoxConstraints(minHeight: 66),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: showDivider
             ? BoxDecoration(

@@ -240,8 +240,11 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Premium Status Card (gold, for premium users) ────────
-          if (isPremium) ...[const SizedBox(height: 12), _PremiumStatusCard()],
+          // ── Premium Status Card (gold, for premium/admin users) ──
+          if (isPremium || isAdmin) ...[
+            const SizedBox(height: 12),
+            _PremiumStatusCard(),
+          ],
 
           // ── Admin Badge ──────────────────────────────────────────
           if (isAdmin) ...[
@@ -628,10 +631,10 @@ class _PremiumStatusCard extends ConsumerWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.4)),
+        border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: ThemeV2.primary.withValues(alpha: 0.08),
+            color: ThemeV2.warning.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -659,12 +662,12 @@ class _PremiumStatusCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: ThemeV2.primary.withValues(alpha: 0.15),
+                color: ThemeV2.warning.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 Icons.workspace_premium_rounded,
-                color: ThemeV2.primary,
+                color: ThemeV2.warning,
                 size: 20,
               ),
             ),
@@ -678,7 +681,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: ThemeV2.primary,
+                      color: ThemeV2.warning,
                     ),
                   ),
                   Text(
@@ -689,7 +692,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                         : l10n.premiumDaysRemaining(daysLeft),
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.primary.withValues(alpha: 0.7),
+                      color: ThemeV2.warning.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -705,12 +708,12 @@ class _PremiumStatusCard extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: isExpired
                       ? ThemeV2.loss.withValues(alpha: 0.2)
-                      : ThemeV2.primary.withValues(alpha: 0.15),
+                      : ThemeV2.warning.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isExpired
                         ? ThemeV2.loss.withValues(alpha: 0.3)
-                        : ThemeV2.primary.withValues(alpha: 0.3),
+                        : ThemeV2.warning.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(
@@ -720,7 +723,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    color: isExpired ? ThemeV2.loss : ThemeV2.primary,
+                    color: isExpired ? ThemeV2.loss : ThemeV2.warning,
                   ),
                 ),
               )
@@ -731,15 +734,15 @@ class _PremiumStatusCard extends ConsumerWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: ThemeV2.primary.withValues(alpha: 0.15),
+                  color: ThemeV2.warning.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: ThemeV2.primary.withValues(alpha: 0.3),
+                    color: ThemeV2.warning.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Icon(
                   Icons.all_inclusive_rounded,
-                  color: ThemeV2.primary,
+                  color: ThemeV2.warning,
                   size: 18,
                 ),
               ),
@@ -755,6 +758,13 @@ class _PremiumStatusCard extends ConsumerWidget {
         const SizedBox(height: 6),
         _benefitRow(Icons.psychology_rounded, l10n.premiumBenefitStressTests),
         const SizedBox(height: 6),
+        _benefitRow(Icons.savings_rounded, l10n.premiumBenefitWeeklyPayout),
+        const SizedBox(height: 6),
+        _benefitRow(
+          Icons.auto_graph_rounded,
+          l10n.premiumBenefitStressTestDca,
+        ),
+        const SizedBox(height: 6),
         _benefitRow(Icons.block_rounded, l10n.premiumBenefitAdFree),
       ],
     );
@@ -763,14 +773,16 @@ class _PremiumStatusCard extends ConsumerWidget {
   Widget _benefitRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: ThemeV2.primary.withValues(alpha: 0.7)),
+        Icon(icon, size: 14, color: ThemeV2.warning.withValues(alpha: 0.7)),
         const SizedBox(width: 8),
-        Text(
-          text,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            color: ThemeV2.primary.withValues(alpha: 0.85),
-            fontWeight: FontWeight.w500,
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: ThemeV2.warning.withValues(alpha: 0.85),
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
@@ -784,7 +796,7 @@ class _PremiumStatusCard extends ConsumerWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: ThemeV2.primary.withValues(alpha: 0.1),
+            color: ThemeV2.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
         ),
@@ -796,7 +808,7 @@ class _PremiumStatusCard extends ConsumerWidget {
               width: 120,
               height: 14,
               decoration: BoxDecoration(
-                color: ThemeV2.primary.withValues(alpha: 0.1),
+                color: ThemeV2.warning.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -805,7 +817,7 @@ class _PremiumStatusCard extends ConsumerWidget {
               width: 80,
               height: 10,
               decoration: BoxDecoration(
-                color: ThemeV2.primary.withValues(alpha: 0.07),
+                color: ThemeV2.warning.withValues(alpha: 0.07),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

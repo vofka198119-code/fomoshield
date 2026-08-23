@@ -126,17 +126,30 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
       ],
       routerConfig: AppRouter.router,
       builder: (context, child) {
-        return Container(
-          decoration: const BoxDecoration(gradient: ThemeV2.backgroundGradient),
-          child: Center(
-            child: SizedBox(
-              width: 430,
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  scaffoldBackgroundColor: Colors.transparent,
-                  canvasColor: Colors.transparent,
+        // Caps the OS accessibility "larger font" setting so it can't blow
+        // past what our fixed-size cards/rows were built to tolerate — real
+        // devices with this cranked up (e.g. Redmi 9S) overflowed widget
+        // edges before this was added. Still lets users get noticeably
+        // bigger text, just not unbounded.
+        return MediaQuery.withClampedTextScaling(
+          minScaleFactor: 1.0,
+          maxScaleFactor: 1.3,
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: ThemeV2.backgroundGradient,
+            ),
+            child: Center(
+              child: SizedBox(
+                width: 430,
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    scaffoldBackgroundColor: Colors.transparent,
+                    canvasColor: Colors.transparent,
+                  ),
+                  child: AppOverlayHost(
+                    child: child ?? const SizedBox.shrink(),
+                  ),
                 ),
-                child: AppOverlayHost(child: child ?? const SizedBox.shrink()),
               ),
             ),
           ),

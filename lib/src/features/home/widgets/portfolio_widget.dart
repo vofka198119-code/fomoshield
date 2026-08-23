@@ -432,13 +432,17 @@ class _VerticalProgressBar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            AppLocalizations.of(context)!.targetLabel,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.6,
-              color: Colors.white,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              AppLocalizations.of(context)!.targetLabel,
+              maxLines: 1,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+                color: Colors.white,
+              ),
             ),
           ),
           const SizedBox(height: 6),
@@ -458,12 +462,15 @@ class _VerticalProgressBar extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text(
-                        '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: ThemeV2.primary,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: ThemeV2.primary,
+                          ),
                         ),
                       ),
                     ),

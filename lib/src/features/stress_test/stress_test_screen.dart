@@ -889,7 +889,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                         onTapCancel: () {},
                         behavior: HitTestBehavior.opaque,
                         child: Container(
-                          height: 72,
+                          constraints: const BoxConstraints(minHeight: 72),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 6,
