@@ -158,6 +158,30 @@ abstract class AppLocalizations {
   /// **'Choose the language for the app\'s interface.'**
   String get languagePickerSubtitle;
 
+  /// No description provided for @themeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeTitle;
+
+  /// No description provided for @themePickerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the app\'s visual theme. Admin preview only for now.'**
+  String get themePickerSubtitle;
+
+  /// No description provided for @themeOptionStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get themeOptionStandard;
+
+  /// No description provided for @themeOptionLuxuryGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Luxury Gold'**
+  String get themeOptionLuxuryGold;
+
   /// No description provided for @authWelcomeBack.
   ///
   /// In en, this message translates to:
@@ -9742,14 +9766,8 @@ abstract class AppLocalizations {
   /// No description provided for @orderAmountSectionAvailable.
   ///
   /// In en, this message translates to:
-  /// **'Available: {cash}'**
+  /// **'Available funds: {cash}'**
   String orderAmountSectionAvailable(String cash);
-
-  /// No description provided for @orderAmountSectionRemaining.
-  ///
-  /// In en, this message translates to:
-  /// **'After purchase: {cash}'**
-  String orderAmountSectionRemaining(String cash);
 
   /// No description provided for @orderEntryNotifYouBought.
   ///

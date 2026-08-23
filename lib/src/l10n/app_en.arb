@@ -10,6 +10,10 @@
   "languageEnglish": "English",
   "languageRussian": "Русский",
   "languagePickerSubtitle": "Choose the language for the app's interface.",
+  "themeTitle": "Theme",
+  "themePickerSubtitle": "Choose the app's visual theme. Admin preview only for now.",
+  "themeOptionStandard": "Standard",
+  "themeOptionLuxuryGold": "Luxury Gold",
   "authWelcomeBack": "Welcome back",
   "authCreateAccount": "Create account",
   "authSignInSubtitle": "Sign in to continue investing with discipline",
@@ -2267,16 +2271,8 @@
       }
     }
   },
-  "orderAmountSectionAvailable": "Available: {cash}",
+  "orderAmountSectionAvailable": "Available funds: {cash}",
   "@orderAmountSectionAvailable": {
-    "placeholders": {
-      "cash": {
-        "type": "String"
-      }
-    }
-  },
-  "orderAmountSectionRemaining": "After purchase: {cash}",
-  "@orderAmountSectionRemaining": {
     "placeholders": {
       "cash": {
         "type": "String"

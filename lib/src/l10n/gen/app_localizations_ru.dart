@@ -39,6 +39,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get languagePickerSubtitle => 'Выберите язык интерфейса приложения.';
 
   @override
+  String get themeTitle => 'Тема';
+
+  @override
+  String get themePickerSubtitle =>
+      'Выберите визуальную тему приложения. Пока доступно только в admin-превью.';
+
+  @override
+  String get themeOptionStandard => 'Стандартная';
+
+  @override
+  String get themeOptionLuxuryGold => 'Luxury Gold';
+
+  @override
   String get authWelcomeBack => 'С возвращением';
 
   @override
@@ -5812,12 +5825,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String orderAmountSectionAvailable(String cash) {
-    return 'Доступно: $cash';
-  }
-
-  @override
-  String orderAmountSectionRemaining(String cash) {
-    return 'Останется: $cash';
+    return 'Доступно средств: $cash';
   }
 
   @override

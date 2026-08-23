@@ -4,6 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_border.dart';
+import '../../../core/theme/theme_variant_provider.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -51,8 +55,10 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final indicesAsync = ref.watch(marketIndicesProvider);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return _shell(
+      palette: palette,
       child: indicesAsync.when(
         loading: () => Row(
           children: [
@@ -101,7 +107,8 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
                     child: IndexedStack(
                       index: 0,
                       children: [
-                        for (final idx in indices) _IndexView(index: idx),
+                        for (final idx in indices)
+                          _IndexView(index: idx, palette: palette),
                       ],
                     ),
                   ),
@@ -112,7 +119,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
                       onPageChanged: (i) => setState(() => _index = i),
                       itemBuilder: (context, i) => Align(
                         alignment: Alignment.topCenter,
-                        child: _IndexView(index: indices[i]),
+                        child: _IndexView(index: indices[i], palette: palette),
                       ),
                     ),
                   ),
@@ -131,25 +138,34 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
     );
   }
 
-  Widget _shell({required Widget child}) {
+  Widget _shell({required Widget child, required AppPalette palette}) {
+    // Luxury Gold pilot widget (2026-08-23): gradient border + glow
+    // (molecule 2) and radial card background (molecule 4) — title/divider
+    // recolored here only because a dark card background would otherwise
+    // make the original dark-on-light title/divider unreadable; the rest
+    // of this widget's content is untouched (molecule 3 still deferred).
     return CardFrame(
       showTopBar: false,
       padding: EdgeInsets.zero,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text(
+            child: themedHeaderText(
               AppLocalizations.of(context)!.shieldSignalTitle,
-              style: FomoShieldTheme.cardTitle(),
+              palette,
+              FomoShieldTheme.cardTitle(),
             ),
           ),
           Divider(
             height: 1,
             indent: 16,
             endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
+            color: palette.cardGradient != null
+                ? palette.border.withValues(alpha: 0.4)
+                : Colors.black.withValues(alpha: 0.06),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -192,8 +208,9 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
 /// Renders price/change cells + plain-language explanation for one index.
 class _IndexView extends StatelessWidget {
   final MarketIndex index;
+  final AppPalette palette;
 
-  const _IndexView({required this.index});
+  const _IndexView({required this.index, required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -202,76 +219,97 @@ class _IndexView extends StatelessWidget {
     final changeColor = isUp ? ThemeV2.success : ThemeV2.loss;
     final changeBg = isUp ? ThemeV2.successBg : ThemeV2.lossBg;
     final mood = _moodFor(l10n, index.change);
+    // Every inner "window" (stat tile, mood panel) gets the same border
+    // treatment as the outer card — confirmed universal, 2026-08-23. See
+    // themed_border.dart's doc comment.
+    const cellRadius = BorderRadius.all(Radius.circular(16));
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _cell(
-          label: index.name,
-          value: formatUsd(index.price),
-          valueFontSize: 18,
-          labelFontSize: 14,
-          gradient: darkCardGradient(),
-          labelColor: changeColor,
-          labelGlowColor: changeColor,
-          valueColor: Colors.white,
-          leadingIcon: isUp ? Icons.trending_up : Icons.trending_down,
-          leadingIconColor: changeColor,
-          horizontalLayout: true,
+        themedBorder(
+          palette: palette,
+          borderRadius: cellRadius,
+          child: _cell(
+            label: index.name,
+            value: formatUsd(index.price),
+            valueFontSize: 18,
+            labelFontSize: 14,
+            gradient: darkCardGradient(),
+            labelColor: changeColor,
+            labelGlowColor: changeColor,
+            valueColor: Colors.white,
+            leadingIcon: isUp ? Icons.trending_up : Icons.trending_down,
+            leadingIconColor: changeColor,
+            horizontalLayout: true,
+            palette: palette,
+          ),
         ),
         const SizedBox(height: 8),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: _cell(
-                label: l10n.shieldSignalChange,
-                value: formatUsdSigned(index.changeAbs),
-                valueFontSize: 14,
-                bgColor: changeBg,
-                valueColor: changeColor,
+              child: themedBorder(
+                palette: palette,
+                borderRadius: cellRadius,
+                child: _cell(
+                  label: l10n.shieldSignalChange,
+                  value: formatUsdSigned(index.changeAbs),
+                  valueFontSize: 14,
+                  bgColor: changeBg,
+                  valueColor: changeColor,
+                  palette: palette,
+                ),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _cell(
-                label: l10n.shieldSignalChangePercent,
-                value: '${isUp ? '+' : ''}${index.change.toStringAsFixed(2)}%',
-                valueFontSize: 14,
-                bgColor: changeBg,
-                valueColor: changeColor,
+              child: themedBorder(
+                palette: palette,
+                borderRadius: cellRadius,
+                child: _cell(
+                  label: l10n.shieldSignalChangePercent,
+                  value: '${isUp ? '+' : ''}${index.change.toStringAsFixed(2)}%',
+                  valueFontSize: 14,
+                  bgColor: changeBg,
+                  valueColor: changeColor,
+                  palette: palette,
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: darkCardDecoration(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                mood.title,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+        themedBorder(
+          palette: palette,
+          borderRadius: cellRadius,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: darkCardDecoration(borderRadius: cellRadius),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  mood.title,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                mood.body,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: Colors.white.withValues(alpha: 0.85),
-                  height: 1.5,
+                const SizedBox(height: 6),
+                Text(
+                  mood.body,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.85),
+                    height: 1.5,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -279,6 +317,7 @@ class _IndexView extends StatelessWidget {
   }
 
   Widget _cell({
+    required AppPalette palette,
     required String label,
     required String value,
     Color? bgColor,
@@ -337,14 +376,28 @@ class _IndexView extends StatelessWidget {
       ),
     );
 
+    // The gradient-border wrapper (themedBorder) already draws a border
+    // around this cell when the theme defines one — don't also draw this
+    // flat divider border, or the two would double up.
+    final hasThemedBorder = palette.borderGradient != null;
+    // bgColor (e.g. changeBg) is a translucent tint meant to sit on a
+    // white background — at only ~10% alpha it let the gold border's
+    // gradient bleed through and read as a solid gold box once the
+    // backdrop became dark. Fall back to the same opaque dark fill the
+    // other two windows in this widget use; the up/down signal still
+    // comes through via labelColor/valueColor.
+    final effectiveGradient =
+        gradient ?? (hasThemedBorder ? darkCardGradient() : null);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: gradient == null ? bgColor : null,
-        gradient: gradient,
+        color: effectiveGradient == null ? bgColor : null,
+        gradient: effectiveGradient,
         borderRadius: BorderRadius.circular(16),
-        border: gradient == null ? Border.all(color: ThemeV2.divider) : null,
+        border: effectiveGradient == null && !hasThemedBorder
+            ? Border.all(color: ThemeV2.divider)
+            : null,
       ),
       child: horizontalLayout
           ? Row(

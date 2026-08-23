@@ -40,6 +40,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose the language for the app\'s interface.';
 
   @override
+  String get themeTitle => 'Theme';
+
+  @override
+  String get themePickerSubtitle =>
+      'Choose the app\'s visual theme. Admin preview only for now.';
+
+  @override
+  String get themeOptionStandard => 'Standard';
+
+  @override
+  String get themeOptionLuxuryGold => 'Luxury Gold';
+
+  @override
   String get authWelcomeBack => 'Welcome back';
 
   @override
@@ -5794,12 +5807,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String orderAmountSectionAvailable(String cash) {
-    return 'Available: $cash';
-  }
-
-  @override
-  String orderAmountSectionRemaining(String cash) {
-    return 'After purchase: $cash';
+    return 'Available funds: $cash';
   }
 
   @override

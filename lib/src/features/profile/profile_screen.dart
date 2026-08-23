@@ -382,6 +382,28 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
+          // ── Theme (admin-only preview for now) ─────────────────────
+          if (isAdmin) ...[
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                leading: const Icon(
+                  Icons.palette_rounded,
+                  color: ThemeV2.primary,
+                ),
+                title: Text(
+                  l10n.themeTitle,
+                  style: GoogleFonts.inter(color: ThemeV2.textPrimary),
+                ),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: ThemeV2.textSecondary,
+                ),
+                onTap: () => context.push('/theme'),
+              ),
+            ),
+          ],
+
           const SizedBox(height: 24),
 
           // ── Statistics ────────────────────────────────────────────

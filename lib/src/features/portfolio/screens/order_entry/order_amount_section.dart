@@ -243,26 +243,14 @@ class OrderAmountSection extends StatelessWidget {
         child: Column(
           children: [
             if (isBuy) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    l10n.orderAmountSectionAvailable(formatUsd(availableCash)),
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: ThemeV2.textSecondary,
-                    ),
-                  ),
-                  Text(
-                    l10n.orderAmountSectionRemaining(formatUsd(remaining)),
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: dialBrassLight,
-                    ),
-                  ),
-                ],
+              Text(
+                l10n.orderAmountSectionAvailable(formatUsd(remaining)),
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: dialBrassLight,
+                ),
               ),
               const SizedBox(height: 10),
             ],

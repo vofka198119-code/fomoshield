@@ -21,6 +21,13 @@ class DisclaimerFooter extends StatelessWidget {
         textAlign: TextAlign.center,
         style: GoogleFonts.inter(
           fontSize: 10,
+          // Decision (2026-08-23, Luxury Gold pilot): this exact color —
+          // ThemeV2.textSecondary at 50% alpha — reads fine as-is against
+          // the new dark backdrop on Home and is the reference/canonical
+          // treatment for fine-print/disclaimer text under Luxury Gold
+          // too. Left un-themed on purpose (no AppPalette override here)
+          // rather than wiring a theme-specific color — don't "fix" it
+          // during the text/molecule-3 pass unless it actually looks bad.
           color: ThemeV2.textSecondary.withValues(alpha: 0.5),
           height: 1.4,
         ),

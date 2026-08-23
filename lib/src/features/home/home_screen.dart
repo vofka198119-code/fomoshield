@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/theme_variant_provider.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'home_providers.dart';
@@ -65,17 +68,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
 
-    return Scaffold(
+    // Resolved once per build from whichever theme is active — see
+    // app_palette.dart. Molecule 1 (background) plus minimal AppBar/button
+    // legibility for Luxury Gold; everything else on this screen (widget
+    // cards, disclaimer footer) is untouched until later molecules land.
+    // Adding a future theme needs no changes here — see resolveAppPalette.
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+
+    final scaffold = Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           'F.O.M.O. SHIELD',
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -87,17 +97,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               label: Text('$unreadCount'),
               backgroundColor: ThemeV2.loss,
               textColor: Colors.white,
-              child: const Icon(
-                Icons.notifications_none_rounded,
-                color: ThemeV2.primary,
-              ),
+              child: themedHeaderIcon(Icons.notifications_none_rounded, palette),
             ),
           ),
         ],
       ),
       body: RefreshIndicator(
-        color: ThemeV2.primary,
-        backgroundColor: ThemeV2.surface,
+        color: palette.accentPrimary,
+        backgroundColor: palette.card,
         onRefresh: () async {
           _onRefresh();
           await Future.delayed(const Duration(milliseconds: 500));
@@ -123,17 +130,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Center(
                 child: TextButton.icon(
                   onPressed: _showWidgetsBottomSheet,
-                  icon: const Icon(
-                    Icons.add_rounded,
-                    color: ThemeV2.primary,
-                    size: 20,
-                  ),
+                  icon: Icon(Icons.add_rounded, color: palette.accentPrimary, size: 20),
                   label: Text(
                     AppLocalizations.of(context)!.homeAddWidgets,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                     ),
                   ),
                   style: TextButton.styleFrom(
@@ -143,10 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
-                      side: const BorderSide(
-                        color: ThemeV2.primary,
-                        width: 0.5,
-                      ),
+                      side: BorderSide(color: palette.accentPrimary, width: 0.5),
                     ),
                   ),
                 ),
@@ -158,6 +158,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
+
+    // Painted here (not in main.dart) so only Home gets it for now —
+    // everything else in the app stays on the normal light background
+    // until this theme rolls out further. Gradient takes priority over a
+    // flat color when a theme defines both.
+    if (palette.backgroundGradient != null) {
+      return DecoratedBox(
+        decoration: BoxDecoration(gradient: palette.backgroundGradient),
+        child: scaffold,
+      );
+    }
+    if (palette.background != null) {
+      return ColoredBox(color: palette.background!, child: scaffold);
+    }
+    return scaffold;
   }
 
   Widget _buildWidget(String id) {

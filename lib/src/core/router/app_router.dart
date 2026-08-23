@@ -25,6 +25,7 @@ import '../../features/market_clock/market_period_detail_screen.dart';
 import '../../features/market_clock/market_clock_risk_detail_screen.dart';
 import '../../features/market_clock/market_phases_screen.dart';
 import '../../features/profile/language_picker_screen.dart';
+import '../../features/profile/theme_picker_screen.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
@@ -126,6 +127,13 @@ class AppRouter {
         path: '/language',
         name: 'language',
         builder: (context, state) => const LanguagePickerScreen(),
+      ),
+
+      // Admin-only preview for now — see profile_screen.dart's gating.
+      GoRoute(
+        path: '/theme',
+        name: 'theme',
+        builder: (context, state) => const ThemePickerScreen(),
       ),
 
       // Account Restore — full-block gate for a pending-deletion account,
