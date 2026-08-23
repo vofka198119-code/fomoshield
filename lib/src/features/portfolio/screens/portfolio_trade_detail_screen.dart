@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
@@ -208,7 +209,10 @@ class _TradeDetailCard extends ConsumerWidget {
             label: l10n.tradeTotalValueLabel,
             value: formatUsd(tx.shares * tx.price),
           ),
-          _DetailRow(label: l10n.tradeDateLabel, value: _formatDate(tx.date)),
+          _DetailRow(
+            label: l10n.tradeDateLabel,
+            value: _formatDate(context, tx.date),
+          ),
           if (tx.realizedPnl != null)
             _DetailRow(
               label: l10n.tradeRealizedPnlLabel,
@@ -221,22 +225,9 @@ class _TradeDetailCard extends ConsumerWidget {
     );
   }
 
-  String _formatDate(DateTime d) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[d.month - 1]} ${d.day}, ${d.year}';
+  String _formatDate(BuildContext context, DateTime d) {
+    final locale = Localizations.localeOf(context).languageCode;
+    return DateFormat.yMMMd(locale).format(d);
   }
 }
 

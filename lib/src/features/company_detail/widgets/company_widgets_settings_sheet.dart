@@ -85,7 +85,11 @@ class _CompanyWidgetsSettingsSheetState
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        // viewInsets covers the keyboard; padding.bottom covers the
+        // device's own system nav bar / gesture area.
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
