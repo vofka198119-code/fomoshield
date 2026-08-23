@@ -40,13 +40,14 @@ import '../stress_test_models.dart';
 
 enum _ValuePeriod { d1, w1, m1, m3, y1 }
 
-const Map<_ValuePeriod, String> _periodLabels = {
-  _ValuePeriod.d1: '1D',
-  _ValuePeriod.w1: '1W',
-  _ValuePeriod.m1: '1M',
-  _ValuePeriod.m3: '3M',
-  _ValuePeriod.y1: '1Y',
-};
+String _periodLabel(AppLocalizations l10n, _ValuePeriod period) =>
+    switch (period) {
+      _ValuePeriod.d1 => l10n.chartPeriod1D,
+      _ValuePeriod.w1 => l10n.chartPeriod1W,
+      _ValuePeriod.m1 => l10n.chartPeriod1M,
+      _ValuePeriod.m3 => l10n.chartPeriod3M,
+      _ValuePeriod.y1 => l10n.chartPeriod1Y,
+    };
 
 const Map<_ValuePeriod, Duration> _periodCutoffs = {
   _ValuePeriod.d1: Duration(days: 1),
@@ -288,6 +289,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
   }
 
   Widget _buildPeriodSelector() {
+    final l10n = AppLocalizations.of(context)!;
     final available = _availablePeriods(widget.session);
     if (!available.contains(_selected)) {
       _selected = available.last;
@@ -308,7 +310,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                   ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
                   : null,
               child: Text(
-                _periodLabels[period]!,
+                _periodLabel(l10n, period),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 12,

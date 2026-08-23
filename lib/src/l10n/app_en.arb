@@ -328,6 +328,14 @@
   "stressTestPriceChartTitle": "PRICE CHART",
   "stressTestChartNotEnoughData": "Not enough data yet",
   "stressTestChartNotEnoughDataForPeriod": "Not enough data for this period",
+  "chartPeriod1D": "1D",
+  "chartPeriod1W": "1W",
+  "chartPeriod1M": "1M",
+  "chartPeriod3M": "3M",
+  "chartPeriod6M": "6M",
+  "chartPeriod1Y": "1Y",
+  "chartPeriod5Y": "5Y",
+  "chartPeriodAll": "All",
   "searchTitle": "SEARCH",
   "searchHint": "Search ticker or company...",
   "searchNoResults": "No results",
@@ -2255,6 +2263,22 @@
   "@orderAmountSectionApproxUsd": {
     "placeholders": {
       "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderAmountSectionAvailable": "Available: {cash}",
+  "@orderAmountSectionAvailable": {
+    "placeholders": {
+      "cash": {
+        "type": "String"
+      }
+    }
+  },
+  "orderAmountSectionRemaining": "After purchase: {cash}",
+  "@orderAmountSectionRemaining": {
+    "placeholders": {
+      "cash": {
         "type": "String"
       }
     }

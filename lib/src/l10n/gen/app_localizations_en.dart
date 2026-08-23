@@ -738,6 +738,30 @@ class AppLocalizationsEn extends AppLocalizations {
       'Not enough data for this period';
 
   @override
+  String get chartPeriod1D => '1D';
+
+  @override
+  String get chartPeriod1W => '1W';
+
+  @override
+  String get chartPeriod1M => '1M';
+
+  @override
+  String get chartPeriod3M => '3M';
+
+  @override
+  String get chartPeriod6M => '6M';
+
+  @override
+  String get chartPeriod1Y => '1Y';
+
+  @override
+  String get chartPeriod5Y => '5Y';
+
+  @override
+  String get chartPeriodAll => 'All';
+
+  @override
   String get searchTitle => 'SEARCH';
 
   @override
@@ -5766,6 +5790,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String orderAmountSectionApproxUsd(String amount) {
     return '≈ $amount';
+  }
+
+  @override
+  String orderAmountSectionAvailable(String cash) {
+    return 'Available: $cash';
+  }
+
+  @override
+  String orderAmountSectionRemaining(String cash) {
+    return 'After purchase: $cash';
   }
 
   @override

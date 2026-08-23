@@ -28,13 +28,14 @@ import '../../../../stress_test/stress_test_engine.dart' show ChartDataPoint;
 
 enum StressTestSparkPeriod { d1, w1, m1, m3, y1 }
 
-const Map<StressTestSparkPeriod, String> _periodLabels = {
-  StressTestSparkPeriod.d1: '1D',
-  StressTestSparkPeriod.w1: '1W',
-  StressTestSparkPeriod.m1: '1M',
-  StressTestSparkPeriod.m3: '3M',
-  StressTestSparkPeriod.y1: '1Y',
-};
+String _periodLabel(AppLocalizations l10n, StressTestSparkPeriod period) =>
+    switch (period) {
+      StressTestSparkPeriod.d1 => l10n.chartPeriod1D,
+      StressTestSparkPeriod.w1 => l10n.chartPeriod1W,
+      StressTestSparkPeriod.m1 => l10n.chartPeriod1M,
+      StressTestSparkPeriod.m3 => l10n.chartPeriod3M,
+      StressTestSparkPeriod.y1 => l10n.chartPeriod1Y,
+    };
 
 /// Time-bucket averaging: splits [domainStart, domainEnd] into [maxBuckets]
 /// equal time slices and averages every raw point that falls in the same
@@ -212,6 +213,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   }
 
   Widget _periodSelector() {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: widget.availablePeriods.map((period) {
         final isSelected = period == widget.selectedPeriod;
@@ -228,7 +230,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                   ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
                   : null,
               child: Text(
-                _periodLabels[period]!,
+                _periodLabel(l10n, period),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 12,

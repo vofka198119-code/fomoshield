@@ -21,26 +21,18 @@ import '../company_detail_provider.dart'
 
 enum ChartPeriod { day1, week1, month1, month6, year1, year5, all }
 
-extension ChartPeriodExt on ChartPeriod {
-  String get label {
-    switch (this) {
-      case ChartPeriod.day1:
-        return '1D';
-      case ChartPeriod.week1:
-        return '1W';
-      case ChartPeriod.month1:
-        return '1M';
-      case ChartPeriod.month6:
-        return '6M';
-      case ChartPeriod.year1:
-        return '1Y';
-      case ChartPeriod.year5:
-        return '5Y';
-      case ChartPeriod.all:
-        return 'All';
-    }
-  }
+String _periodLabel(AppLocalizations l10n, ChartPeriod period) =>
+    switch (period) {
+      ChartPeriod.day1 => l10n.chartPeriod1D,
+      ChartPeriod.week1 => l10n.chartPeriod1W,
+      ChartPeriod.month1 => l10n.chartPeriod1M,
+      ChartPeriod.month6 => l10n.chartPeriod6M,
+      ChartPeriod.year1 => l10n.chartPeriod1Y,
+      ChartPeriod.year5 => l10n.chartPeriod5Y,
+      ChartPeriod.all => l10n.chartPeriodAll,
+    };
 
+extension ChartPeriodExt on ChartPeriod {
   /// Whether this period's points are within a single day/week (Yahoo
   /// intraday resolution) rather than daily+ closes — the touch tooltip
   /// needs to show a time, not just a date, for these.
@@ -181,7 +173,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
         ref.read(chartPeriodChangeProvider(widget.symbol).notifier).state = (
           change: periodChange,
           changePercent: periodChangePercent,
-          periodLabel: _selectedPeriod.label,
+          periodLabel: _periodLabel(AppLocalizations.of(context)!, _selectedPeriod),
         );
       }
     } catch (e) {
@@ -268,6 +260,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
   }
 
   Widget _buildPeriodSelector() {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: ChartPeriod.values.map((period) {
         final isSelected = period == _selectedPeriod;
@@ -285,7 +278,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                   ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
                   : null,
               child: Text(
-                period.label,
+                _periodLabel(l10n, period),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 12,

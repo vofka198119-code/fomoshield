@@ -1417,6 +1417,54 @@ abstract class AppLocalizations {
   /// **'Not enough data for this period'**
   String get stressTestChartNotEnoughDataForPeriod;
 
+  /// No description provided for @chartPeriod1D.
+  ///
+  /// In en, this message translates to:
+  /// **'1D'**
+  String get chartPeriod1D;
+
+  /// No description provided for @chartPeriod1W.
+  ///
+  /// In en, this message translates to:
+  /// **'1W'**
+  String get chartPeriod1W;
+
+  /// No description provided for @chartPeriod1M.
+  ///
+  /// In en, this message translates to:
+  /// **'1M'**
+  String get chartPeriod1M;
+
+  /// No description provided for @chartPeriod3M.
+  ///
+  /// In en, this message translates to:
+  /// **'3M'**
+  String get chartPeriod3M;
+
+  /// No description provided for @chartPeriod6M.
+  ///
+  /// In en, this message translates to:
+  /// **'6M'**
+  String get chartPeriod6M;
+
+  /// No description provided for @chartPeriod1Y.
+  ///
+  /// In en, this message translates to:
+  /// **'1Y'**
+  String get chartPeriod1Y;
+
+  /// No description provided for @chartPeriod5Y.
+  ///
+  /// In en, this message translates to:
+  /// **'5Y'**
+  String get chartPeriod5Y;
+
+  /// No description provided for @chartPeriodAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get chartPeriodAll;
+
   /// No description provided for @searchTitle.
   ///
   /// In en, this message translates to:
@@ -9690,6 +9738,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'≈ {amount}'**
   String orderAmountSectionApproxUsd(String amount);
+
+  /// No description provided for @orderAmountSectionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available: {cash}'**
+  String orderAmountSectionAvailable(String cash);
+
+  /// No description provided for @orderAmountSectionRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'After purchase: {cash}'**
+  String orderAmountSectionRemaining(String cash);
 
   /// No description provided for @orderEntryNotifYouBought.
   ///

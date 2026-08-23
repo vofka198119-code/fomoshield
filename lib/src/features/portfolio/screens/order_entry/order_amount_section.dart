@@ -65,7 +65,9 @@ class OrderAmountSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final displayAmount = double.tryParse(controller.text) ?? 0;
 
-    return Column(children: [_amountInput(l10n, displayAmount), _slider()]);
+    return Column(
+      children: [_amountInput(l10n, displayAmount), _slider(l10n, displayAmount)],
+    );
   }
 
   Widget _amountInput(AppLocalizations l10n, double displayAmount) {
@@ -222,7 +224,17 @@ class OrderAmountSection extends StatelessWidget {
     );
   }
 
-  Widget _slider() {
+  Widget _slider(AppLocalizations l10n, double displayAmount) {
+    // Cash-equivalent of whatever's currently entered, regardless of
+    // input mode — same conversion the "≈" preview lines above use.
+    final costEquivalent = inputMode == OrderInputMode.cost
+        ? displayAmount
+        : displayAmount * currentPrice;
+    final remaining = (availableCash - costEquivalent).clamp(
+      0,
+      availableCash,
+    );
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Container(
@@ -230,6 +242,30 @@ class OrderAmountSection extends StatelessWidget {
         decoration: darkCardDecoration(),
         child: Column(
           children: [
+            if (isBuy) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.orderAmountSectionAvailable(formatUsd(availableCash)),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: ThemeV2.textSecondary,
+                    ),
+                  ),
+                  Text(
+                    l10n.orderAmountSectionRemaining(formatUsd(remaining)),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: dialBrassLight,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+            ],
             SliderTheme(
               data: SliderThemeData(
                 trackHeight: 4,

@@ -740,6 +740,30 @@ class AppLocalizationsRu extends AppLocalizations {
       'Недостаточно данных за этот период';
 
   @override
+  String get chartPeriod1D => '1Д';
+
+  @override
+  String get chartPeriod1W => '1Н';
+
+  @override
+  String get chartPeriod1M => '1М';
+
+  @override
+  String get chartPeriod3M => '3М';
+
+  @override
+  String get chartPeriod6M => '6М';
+
+  @override
+  String get chartPeriod1Y => '1Г';
+
+  @override
+  String get chartPeriod5Y => '5Г';
+
+  @override
+  String get chartPeriodAll => 'Все';
+
+  @override
   String get searchTitle => 'ПОИСК';
 
   @override
@@ -5784,6 +5808,16 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String orderAmountSectionApproxUsd(String amount) {
     return '≈ $amount';
+  }
+
+  @override
+  String orderAmountSectionAvailable(String cash) {
+    return 'Доступно: $cash';
+  }
+
+  @override
+  String orderAmountSectionRemaining(String cash) {
+    return 'Останется: $cash';
   }
 
   @override
