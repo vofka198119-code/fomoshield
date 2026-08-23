@@ -235,7 +235,7 @@ class _IndexView extends StatelessWidget {
             value: formatUsd(index.price),
             valueFontSize: 18,
             labelFontSize: 14,
-            gradient: darkCardGradient(),
+            gradient: palette.windowGradient ?? darkCardGradient(),
             labelColor: changeColor,
             labelGlowColor: changeColor,
             valueColor: Colors.white,
@@ -287,7 +287,12 @@ class _IndexView extends StatelessWidget {
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
-            decoration: darkCardDecoration(borderRadius: cellRadius),
+            decoration: palette.windowGradient != null
+                ? BoxDecoration(
+                    gradient: palette.windowGradient,
+                    borderRadius: cellRadius,
+                  )
+                : darkCardDecoration(borderRadius: cellRadius),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -383,11 +388,12 @@ class _IndexView extends StatelessWidget {
     // bgColor (e.g. changeBg) is a translucent tint meant to sit on a
     // white background — at only ~10% alpha it let the gold border's
     // gradient bleed through and read as a solid gold box once the
-    // backdrop became dark. Fall back to the same opaque dark fill the
-    // other two windows in this widget use; the up/down signal still
-    // comes through via labelColor/valueColor.
+    // backdrop became dark. Fall back to the theme's own window gradient
+    // (same one the other two windows in this widget use) instead; the
+    // up/down signal still comes through via labelColor/valueColor.
     final effectiveGradient =
-        gradient ?? (hasThemedBorder ? darkCardGradient() : null);
+        gradient ??
+        (hasThemedBorder ? (palette.windowGradient ?? darkCardGradient()) : null);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),

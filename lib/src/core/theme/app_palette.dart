@@ -60,6 +60,14 @@ class AppPalette {
   /// decoration provides.
   final BoxShadow? cardGlow;
 
+  /// Inner "window"/panel background (stat tiles, mood/explanation boxes
+  /// nested inside a widget) — deliberately separate from [cardGradient],
+  /// which is the widget's own OUTER card only. Null means "no opinion" —
+  /// callers fall back to whatever pre-Luxury look they already had (e.g.
+  /// ShieldSignalWidget's `darkCardGradient()` stopgap), same as before
+  /// this field existed.
+  final Gradient? windowGradient;
+
   const AppPalette({
     this.background,
     this.backgroundGradient,
@@ -76,6 +84,7 @@ class AppPalette {
     this.buttonGradient,
     this.glowShadow,
     this.cardGlow,
+    this.windowGradient,
   });
 
   static const standard = AppPalette(
@@ -104,6 +113,7 @@ class AppPalette {
     buttonGradient: LuxuryGoldTheme.buttonGradient,
     glowShadow: LuxuryGoldTheme.glowShadow(),
     cardGlow: LuxuryGoldTheme.cardGlow(),
+    windowGradient: LuxuryGoldTheme.windowGradient,
   );
 }
 

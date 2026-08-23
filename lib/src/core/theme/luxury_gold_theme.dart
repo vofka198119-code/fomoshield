@@ -45,6 +45,25 @@ abstract final class LuxuryGoldTheme {
   /// above — prefer [cardGradient] for actual card backgrounds.
   static const card = darkGraphite;
 
+  /// Center tone for [windowGradient] — a step lighter than [_lightTone]
+  /// (the card gradient's lightest end) so an inner window reads as
+  /// sitting visibly above the card, not blending into it. Not part of
+  /// the canonical 7-swatch reference — a UI-role-only tweak, same as
+  /// [_titleHighlight].
+  static const _windowCenter = Color(0xFF262B32);
+
+  /// Inner "window"/panel background (stat tiles, mood/explanation boxes)
+  /// — LOCKED IN (2026-08-23): radial, light graphite center fading to
+  /// Dark Graphite ([card]) at the edge. Deliberately its own gradient,
+  /// separate from [cardGradient] — nested panels are meant to read as a
+  /// lighter surface floating above the card, not a repeat of the card's
+  /// own background.
+  static const windowGradient = RadialGradient(
+    center: Alignment.center,
+    radius: 1.1,
+    colors: [_windowCenter, card],
+  );
+
   /// Borders/strokes — "Bronze Stroke".
   static const borderStroke = bronzeStroke;
 
