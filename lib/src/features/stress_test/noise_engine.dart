@@ -104,12 +104,22 @@ extension NoiseEngine on StressTestNotifier {
     double sW = (sectorDriftRaw?.abs() ?? 0.0);
     double nW = (noiseRaw?.abs() ?? 0.0);
     // Real News event (news_event.dart) takes priority when this symbol is
-    // the one it's targeting; otherwise fall back to the old synthetic
-    // proxy (any >5% correction gets SOME "News" attribution) for organic
-    // large moves that aren't from a real News event.
-    final double newsW = (newsRaw != null && newsRaw.abs() > 0.0001)
-        ? newsRaw.abs()
-        : (hasCorrection ? 0.15 : 0.0);
+    // the one it's targeting. A >5% correction with no real News event
+    // used to get the same "News" attribution via a synthetic 0.15 proxy
+    // — but WhyDiagnosticsAccumulator's episode history (stress_test_why_
+    // diagnostics.dart) only ever counts real News events (keyed off
+    // newsRaw), so that synthetic weight inflated the whole-period "News"
+    // percentage while the episode count stayed at 0 for the exact same
+    // ticks — the two numbers on the admin diagnostics screen visibly
+    // disagreed. Folding it into Noise instead keeps both consistent;
+    // this only changes the explanatory attribution label, not any price
+    // the simulation actually produces (contributions here are computed
+    // AFTER priceBefore/priceAfter, purely for display).
+    final bool realNewsActive = newsRaw != null && newsRaw.abs() > 0.0001;
+    final double newsW = realNewsActive ? newsRaw.abs() : 0.0;
+    if (!realNewsActive && hasCorrection) {
+      nW += 0.15;
+    }
     // Real Hype event (hype/hype_event.dart) — previously computed and
     // applied to the price but never passed in here, so a sector-wide
     // Hype move had no attribution slot and got silently absorbed into
@@ -327,7 +337,8 @@ extension NoiseEngine on StressTestNotifier {
                 symbol: newsEvent.symbol,
                 companyName: stressTestCompanyName(newsEvent.symbol),
                 title: newsEvent.headline,
-                detail: stressTestCompanyName(newsEvent.symbol),
+                detail: newsEvent.description,
+                newsScenarioIndex: newsEvent.scenarioIndex,
                 createdAt: DateTime.now(),
               ),
             );
@@ -818,6 +829,9 @@ extension NoiseEngine on StressTestNotifier {
               '${changePct >= 0 ? '+' : ''}${(changePct * 100).toStringAsFixed(1)}% '
               'over the last ~${_swingCheckInterval.inMinutes} min.',
           createdAt: DateTime.now(),
+          priceSwingIsUp: changePct >= 0,
+          priceSwingChangePercent: changePct.abs() * 100,
+          priceSwingWindowMinutes: _swingCheckInterval.inMinutes,
         ),
       );
     }

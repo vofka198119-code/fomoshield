@@ -230,7 +230,8 @@ extension NewsEventEngine on StressTestNotifier {
     if (rng.nextDouble() >= _newsChancePerEpochCheck) return null;
 
     final holding = session.holdings[rng.nextInt(session.holdings.length)];
-    final scenario = newsScenarios[rng.nextInt(newsScenarios.length)];
+    final scenarioIndex = rng.nextInt(newsScenarios.length);
+    final scenario = newsScenarios[scenarioIndex];
     final magnitude =
         _newsAmplitudeMin +
         rng.nextDouble() * (_newsAmplitudeMax - _newsAmplitudeMin);
@@ -245,6 +246,8 @@ extension NewsEventEngine on StressTestNotifier {
     return NewsEvent(
       symbol: holding.symbol,
       headline: scenario.headline,
+      description: scenario.description,
+      scenarioIndex: scenarioIndex,
       isPositive: scenario.isPositive,
       targetAmplitude: signedAmplitude,
       startedAt: now,

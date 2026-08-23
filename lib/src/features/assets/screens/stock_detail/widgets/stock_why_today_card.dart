@@ -8,7 +8,8 @@ import '../../../../../core/theme/typography_helpers.dart';
 import '../../../../../core/supabase/supabase_providers.dart';
 import '../../../../market_clock/market_clock_dial.dart'
     show darkCardDecoration;
-import '../../../../stress_test/stress_test_models.dart' show TickExplanation;
+import '../../../../stress_test/stress_test_models.dart'
+    show TickExplanation, PriceContribution;
 import '../../../../../shared/utils/currency_format.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
 
@@ -71,6 +72,15 @@ class StockWhyTodayCard extends ConsumerWidget {
   final bool isPositive;
   final TickExplanation? latestExplanation;
 
+  /// Weighted-average breakdown across the same window [priceChange]/
+  /// [priceChangePercent] cover (see aggregatePriceContributions in
+  /// stress_test_models.dart) — used for the bars/hint instead of
+  /// [latestExplanation]'s single instant, so a factor that clearly drove
+  /// the period (e.g. a News event ramping in) doesn't read as 0% just
+  /// because the most recent tick alone wasn't the one moving it. Falls
+  /// back to [latestExplanation]'s own contributions when not supplied.
+  final PriceContribution? aggregatedContributions;
+
   const StockWhyTodayCard({
     super.key,
     required this.sessionId,
@@ -79,13 +89,15 @@ class StockWhyTodayCard extends ConsumerWidget {
     required this.priceChangePercent,
     required this.isPositive,
     this.latestExplanation,
+    this.aggregatedContributions,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final isAdmin = ref.watch(isAdminProvider);
-    final contributions = latestExplanation?.contributions;
+    final contributions =
+        aggregatedContributions ?? latestExplanation?.contributions;
     final marketPct = contributions?.marketPct ?? 0;
     final sectorPct = contributions?.sectorPct ?? 0;
     final newsPct = contributions?.newsPct ?? 0;
@@ -299,14 +311,17 @@ class StockWhyTodayCard extends ConsumerWidget {
       children: [
         SizedBox(
           width: 104,
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.inter(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              label,
+              maxLines: 1,
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
           ),
         ),

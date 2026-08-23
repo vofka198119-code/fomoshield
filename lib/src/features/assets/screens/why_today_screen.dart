@@ -45,6 +45,7 @@ import '../../stress_test/stress_test_models.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../core/notifications/news_scenario_l10n.dart';
 
 const _marketColor = FomoShieldTheme.factorMarket;
 const _sectorColor = FomoShieldTheme.factorSector;
@@ -411,14 +412,17 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         children: [
           SizedBox(
             width: 104,
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: ThemeV2.textPrimary,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: GoogleFonts.inter(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: ThemeV2.textPrimary,
+                ),
               ),
             ),
           ),
@@ -518,7 +522,11 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       children: [
         if (newsActive != null) ...[
           _liveEventRow(
-            l10n.whyTodayScreenNewsLiveLabel(newsActive.headline),
+            l10n.whyTodayScreenNewsLiveLabel(
+              newsActive.scenarioIndex >= 0
+                  ? newsScenarioHeadline(l10n, newsActive.scenarioIndex)
+                  : newsActive.headline,
+            ),
             newsActive.isPositive,
             l10n.whyTodayScreenTargetDetail(
               '${newsActive.isPositive ? '+' : ''}${(newsActive.targetAmplitude * 100).toStringAsFixed(1)}',

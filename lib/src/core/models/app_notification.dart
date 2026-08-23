@@ -49,10 +49,28 @@ class AppNotification {
   final String? companyName;
   final String? logoUrl;
 
+  /// English fallback text — still what any consumer without richer i18n
+  /// support uses as-is (e.g. an OS-level push). Screens with real
+  /// AppLocalizations access (notifications screen/popup) prefer the
+  /// structured fields below when present, re-localizing at render time,
+  /// since the engine code that fires these has no BuildContext to
+  /// resolve a locale from (see project memory).
   final String title;
   final String detail;
   final DateTime createdAt;
   final bool read;
+
+  /// Set only for [AppNotificationType.news] — this event's index into
+  /// news_event.dart's `newsScenarios`, resolved via
+  /// news_scenario_l10n.dart instead of reading [title]/[detail] above.
+  final int? newsScenarioIndex;
+
+  /// Set only for [AppNotificationType.priceSwing] — lets the render
+  /// side rebuild a localized title/detail instead of reading the
+  /// English [title]/[detail] above.
+  final bool? priceSwingIsUp;
+  final double? priceSwingChangePercent;
+  final int? priceSwingWindowMinutes;
 
   const AppNotification({
     required this.id,
@@ -67,6 +85,10 @@ class AppNotification {
     required this.detail,
     required this.createdAt,
     this.read = false,
+    this.newsScenarioIndex,
+    this.priceSwingIsUp,
+    this.priceSwingChangePercent,
+    this.priceSwingWindowMinutes,
   });
 
   AppNotification copyWith({bool? read}) => AppNotification(
@@ -82,6 +104,10 @@ class AppNotification {
     detail: detail,
     createdAt: createdAt,
     read: read ?? this.read,
+    newsScenarioIndex: newsScenarioIndex,
+    priceSwingIsUp: priceSwingIsUp,
+    priceSwingChangePercent: priceSwingChangePercent,
+    priceSwingWindowMinutes: priceSwingWindowMinutes,
   );
 
   Map<String, dynamic> toJson() => {
@@ -97,6 +123,10 @@ class AppNotification {
     'detail': detail,
     'createdAt': createdAt.toIso8601String(),
     'read': read,
+    'newsScenarioIndex': newsScenarioIndex,
+    'priceSwingIsUp': priceSwingIsUp,
+    'priceSwingChangePercent': priceSwingChangePercent,
+    'priceSwingWindowMinutes': priceSwingWindowMinutes,
   };
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {
@@ -119,6 +149,11 @@ class AppNotification {
       detail: json['detail'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       read: json['read'] as bool? ?? false,
+      newsScenarioIndex: json['newsScenarioIndex'] as int?,
+      priceSwingIsUp: json['priceSwingIsUp'] as bool?,
+      priceSwingChangePercent: (json['priceSwingChangePercent'] as num?)
+          ?.toDouble(),
+      priceSwingWindowMinutes: json['priceSwingWindowMinutes'] as int?,
     );
   }
 }

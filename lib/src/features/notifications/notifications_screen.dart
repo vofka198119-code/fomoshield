@@ -6,14 +6,20 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
+import '../../core/notifications/notification_text.dart';
 import '../../core/overlay/app_notification_popup.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/company_logo.dart';
 
 // ---------------------------------------------------------------------------
-// Notifications Screen — bell-icon history. One card, compact rows; tap
-// expands inline details, EXCEPT stress-test-completion rows, which jump
-// straight to that session's Verdict per explicit spec.
+// Notifications Screen — bell-icon history. One card, compact rows; the
+// title/detail text is always visible (no expand/collapse step — see
+// 2026-08-23 project memory for why that round-tripped a few times), and
+// tapping anywhere on a row navigates to whatever it's about: Verdict for
+// a completion, the symbol for a trade confirmation/price swing/news,
+// Portfolio for a goal/payout update, Profile for a subscription change.
+// A type with nothing to navigate to (missing symbol/portfolioId) just
+// marks itself read.
 // ---------------------------------------------------------------------------
 
 class NotificationsScreen extends ConsumerStatefulWidget {
@@ -25,16 +31,16 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
-  final Set<String> _expandedIds = {};
-
   void _handleTap(AppNotification n) {
     ref.read(notificationsProvider.notifier).markRead(n.id);
+
     if (n.type == AppNotificationType.stressTestCompleted &&
         n.portfolioId != null) {
       context.go('/stress-test/${n.portfolioId}/verdict');
       return;
     }
-    if (n.type == AppNotificationType.weeklyPayout) {
+    if (n.type == AppNotificationType.weeklyPayout ||
+        n.type == AppNotificationType.weeklyPayoutPaused) {
       if (n.portfolioKind == NotificationPortfolioKind.stressTest &&
           n.portfolioId != null) {
         context.go('/stress-test/${n.portfolioId}');
@@ -43,13 +49,31 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       }
       return;
     }
-    setState(() {
-      if (_expandedIds.contains(n.id)) {
-        _expandedIds.remove(n.id);
+    if (n.type == AppNotificationType.subscriptionStatusChanged) {
+      context.go('/profile');
+      return;
+    }
+    if (n.type == AppNotificationType.goalUpdated) {
+      context.go('/portfolio');
+      return;
+    }
+    // Everything else (buy/sell/limit orders, priceSwing, news) points at
+    // one specific symbol — jump there. Safe now that the row's own text
+    // is always visible (see file header) instead of only showing on tap,
+    // so navigating away never loses the one thing worth reading on it.
+    if (n.portfolioKind == NotificationPortfolioKind.stressTest &&
+        n.portfolioId != null) {
+      if (n.symbol != null) {
+        context.push('/stress-test/${n.portfolioId}/stock/${n.symbol}');
       } else {
-        _expandedIds.add(n.id);
+        context.go('/stress-test/${n.portfolioId}');
       }
-    });
+    } else if (n.symbol != null) {
+      context.push(
+        '/company/${n.symbol}',
+        extra: {'portfolioId': n.portfolioId},
+      );
+    }
   }
 
   @override
@@ -63,27 +87,28 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
-          l10n.notificationsScreenTitle,
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
-            letterSpacing: 1.5,
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            l10n.notificationsScreenTitle,
+            maxLines: 1,
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: ThemeV2.primary,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
         actions: [
           if (unread > 0)
-            TextButton(
+            IconButton(
               onPressed: () =>
                   ref.read(notificationsProvider.notifier).markAllRead(),
-              child: Text(
-                l10n.notificationsScreenMarkAllRead,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: ThemeV2.primary,
-                ),
+              tooltip: l10n.notificationsScreenMarkAllRead,
+              icon: const Icon(
+                Icons.done_all_rounded,
+                color: ThemeV2.primary,
               ),
             ),
         ],
@@ -112,7 +137,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           ),
                         _NotificationRow(
                           notification: notifications[i],
-                          expanded: _expandedIds.contains(notifications[i].id),
                           onTap: () => _handleTap(notifications[i]),
                         ),
                       ],
@@ -139,12 +163,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
 class _NotificationRow extends StatelessWidget {
   final AppNotification notification;
-  final bool expanded;
   final VoidCallback onTap;
 
   const _NotificationRow({
     required this.notification,
-    required this.expanded,
     required this.onTap,
   });
 
@@ -219,7 +241,7 @@ class _NotificationRow extends StatelessWidget {
                             ),
                           Expanded(
                             child: Text(
-                              notification.title,
+                              notificationTitle(notification, l10n),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.inter(
@@ -257,20 +279,18 @@ class _NotificationRow extends StatelessWidget {
                 ),
               ],
             ),
-            if (expanded) ...[
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(left: 48),
-                child: Text(
-                  notification.detail,
-                  style: GoogleFonts.inter(
-                    fontSize: 12.5,
-                    color: ThemeV2.textPrimary,
-                    height: 1.4,
-                  ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.only(left: 48),
+              child: Text(
+                notificationDetail(notification, l10n),
+                style: GoogleFonts.inter(
+                  fontSize: 12.5,
+                  color: ThemeV2.textPrimary,
+                  height: 1.4,
                 ),
               ),
-            ],
+            ),
           ],
         ),
       ),

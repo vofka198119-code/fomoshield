@@ -10150,6 +10150,329 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count}d ago'**
   String notificationsRelativeTimeDaysAgo(int count);
+
+  /// No description provided for @newsScenario0Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Earnings Beat Expectations'**
+  String get newsScenario0Headline;
+
+  /// No description provided for @newsScenario0Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company reported quarterly revenue and profit above analyst forecasts.'**
+  String get newsScenario0Description;
+
+  /// No description provided for @newsScenario1Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Guidance Raised'**
+  String get newsScenario1Headline;
+
+  /// No description provided for @newsScenario1Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Management raised its revenue and profit guidance for the current fiscal year.'**
+  String get newsScenario1Description;
+
+  /// No description provided for @newsScenario2Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Major Contract Signed'**
+  String get newsScenario2Headline;
+
+  /// No description provided for @newsScenario2Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company announced a multi-year agreement with a large corporate client.'**
+  String get newsScenario2Description;
+
+  /// No description provided for @newsScenario3Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Buyback Announced'**
+  String get newsScenario3Headline;
+
+  /// No description provided for @newsScenario3Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The board approved a large-scale program to repurchase the company\'s own shares.'**
+  String get newsScenario3Description;
+
+  /// No description provided for @newsScenario4Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Dividend Increase'**
+  String get newsScenario4Headline;
+
+  /// No description provided for @newsScenario4Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company raised its quarterly dividend and reaffirmed a stable dividend policy.'**
+  String get newsScenario4Description;
+
+  /// No description provided for @newsScenario5Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deal Successfully Closed'**
+  String get newsScenario5Headline;
+
+  /// No description provided for @newsScenario5Description.
+  ///
+  /// In en, this message translates to:
+  /// **'All required approvals were obtained and the acquisition of another company officially closed.'**
+  String get newsScenario5Description;
+
+  /// No description provided for @newsScenario6Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'New Product Approved'**
+  String get newsScenario6Headline;
+
+  /// No description provided for @newsScenario6Description.
+  ///
+  /// In en, this message translates to:
+  /// **'A regulator approved the launch of a new product, opening an additional revenue stream for the company.'**
+  String get newsScenario6Description;
+
+  /// No description provided for @newsScenario7Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost Reduction Program'**
+  String get newsScenario7Headline;
+
+  /// No description provided for @newsScenario7Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company announced an optimization program expected to significantly cut operating expenses.'**
+  String get newsScenario7Description;
+
+  /// No description provided for @newsScenario8Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt Repayment'**
+  String get newsScenario8Headline;
+
+  /// No description provided for @newsScenario8Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company repaid part of its debt load ahead of schedule and improved its balance sheet.'**
+  String get newsScenario8Description;
+
+  /// No description provided for @newsScenario9Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Expansion'**
+  String get newsScenario9Headline;
+
+  /// No description provided for @newsScenario9Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Management announced entry into a new international market with local operations launching.'**
+  String get newsScenario9Description;
+
+  /// No description provided for @newsScenario10Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Base Growth'**
+  String get newsScenario10Headline;
+
+  /// No description provided for @newsScenario10Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The number of active customers reached a record high for the company.'**
+  String get newsScenario10Description;
+
+  /// No description provided for @newsScenario11Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategic Partnership'**
+  String get newsScenario11Headline;
+
+  /// No description provided for @newsScenario11Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company signed a long-term cooperation agreement with an industry leader.'**
+  String get newsScenario11Description;
+
+  /// No description provided for @newsScenario12Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Earnings Miss Expectations'**
+  String get newsScenario12Headline;
+
+  /// No description provided for @newsScenario12Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company reported results below analyst forecasts for profit and revenue.'**
+  String get newsScenario12Description;
+
+  /// No description provided for @newsScenario13Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Guidance Cut'**
+  String get newsScenario13Headline;
+
+  /// No description provided for @newsScenario13Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Management lowered its financial guidance for the rest of the year.'**
+  String get newsScenario13Description;
+
+  /// No description provided for @newsScenario14Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deal Falls Through'**
+  String get newsScenario14Headline;
+
+  /// No description provided for @newsScenario14Description.
+  ///
+  /// In en, this message translates to:
+  /// **'A planned acquisition of another company was called off after lengthy negotiations.'**
+  String get newsScenario14Description;
+
+  /// No description provided for @newsScenario15Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Product Recall'**
+  String get newsScenario15Headline;
+
+  /// No description provided for @newsScenario15Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company began a large-scale product recall due to manufacturing defects.'**
+  String get newsScenario15Description;
+
+  /// No description provided for @newsScenario16Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Cyberattack'**
+  String get newsScenario16Headline;
+
+  /// No description provided for @newsScenario16Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company confirmed a cyberattack that affected part of its internal systems.'**
+  String get newsScenario16Description;
+
+  /// No description provided for @newsScenario17Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'CEO Departure'**
+  String get newsScenario17Headline;
+
+  /// No description provided for @newsScenario17Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The CEO unexpectedly announced their departure from the role.'**
+  String get newsScenario17Description;
+
+  /// No description provided for @newsScenario18Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Lawsuit Filed'**
+  String get newsScenario18Headline;
+
+  /// No description provided for @newsScenario18Description.
+  ///
+  /// In en, this message translates to:
+  /// **'A major class-action lawsuit tied to the company\'s core business was filed against it.'**
+  String get newsScenario18Description;
+
+  /// No description provided for @newsScenario19Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Supply Chain Issues'**
+  String get newsScenario19Headline;
+
+  /// No description provided for @newsScenario19Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company warned of supply chain disruptions and possible production delays.'**
+  String get newsScenario19Description;
+
+  /// No description provided for @newsScenario20Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt Load Increase'**
+  String get newsScenario20Headline;
+
+  /// No description provided for @newsScenario20Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company reported a significant increase in debt following its latest financial report.'**
+  String get newsScenario20Description;
+
+  /// No description provided for @newsScenario21Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Regulatory Investigation'**
+  String get newsScenario21Headline;
+
+  /// No description provided for @newsScenario21Description.
+  ///
+  /// In en, this message translates to:
+  /// **'A regulator opened a formal investigation into the company\'s operations.'**
+  String get newsScenario21Description;
+
+  /// No description provided for @newsScenario22Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Client Lost'**
+  String get newsScenario22Headline;
+
+  /// No description provided for @newsScenario22Description.
+  ///
+  /// In en, this message translates to:
+  /// **'One of the company\'s largest clients declined to renew its long-term contract.'**
+  String get newsScenario22Description;
+
+  /// No description provided for @newsScenario23Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Production Halted'**
+  String get newsScenario23Headline;
+
+  /// No description provided for @newsScenario23Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Operations at one of the company\'s main production facilities were temporarily halted due to technical issues.'**
+  String get newsScenario23Description;
+
+  /// No description provided for @newsScenario24Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Layoffs Announced'**
+  String get newsScenario24Headline;
+
+  /// No description provided for @newsScenario24Description.
+  ///
+  /// In en, this message translates to:
+  /// **'The company announced a major restructuring involving workforce reductions.'**
+  String get newsScenario24Description;
+
+  /// No description provided for @notificationsPriceSwingTitleUp.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} jumped {percent}%'**
+  String notificationsPriceSwingTitleUp(String name, String percent);
+
+  /// No description provided for @notificationsPriceSwingTitleDown.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} dropped {percent}%'**
+  String notificationsPriceSwingTitleDown(String name, String percent);
+
+  /// No description provided for @notificationsPriceSwingDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'In your {duration} test, {symbol} moved {percent}% over the last ~{minutes} min.'**
+  String notificationsPriceSwingDetail(
+    String duration,
+    String symbol,
+    String percent,
+    int minutes,
+  );
 }
 
 class _AppLocalizationsDelegate

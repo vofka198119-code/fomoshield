@@ -559,6 +559,56 @@ class PriceContribution {
       );
 }
 
+/// Weighted-average contribution breakdown across [ticks], weighted by
+/// each tick's own price move (bigger swings count more) — same
+/// weighting formula as WhyDiagnosticsAccumulator.averaged
+/// (stress_test_why_diagnostics.dart), just computed on demand over
+/// whatever ticks are passed in (e.g. a symbol's capped explanationLog)
+/// instead of a persistent admin-only accumulator. Use this instead of a
+/// single TickExplanation.contributions when a UI number represents a
+/// whole window (e.g. "change since market open") rather than one
+/// instant — a single latest tick can read as ~0% for a factor (News,
+/// Hype) that clearly drove the period's move but isn't contributing
+/// anything at this exact instant, which visibly disagreed with the
+/// window's own $/% headline number (confirmed live 2026-08-23: an
+/// active News event moved the price, but the latest-tick-only
+/// breakdown showed 0% News).
+PriceContribution aggregatePriceContributions(
+  Iterable<TickExplanation> ticks,
+) {
+  double weightedMarket = 0;
+  double weightedSector = 0;
+  double weightedNews = 0;
+  double weightedHype = 0;
+  double weightedNoise = 0;
+  double totalWeight = 0;
+  for (final t in ticks) {
+    final w = t.changePercent.abs();
+    final effectiveW = w > 0 ? w : 0.0001;
+    weightedMarket += t.contributions.marketPct * effectiveW;
+    weightedSector += t.contributions.sectorPct * effectiveW;
+    weightedNews += t.contributions.newsPct * effectiveW;
+    weightedHype += t.contributions.hypePct * effectiveW;
+    weightedNoise += t.contributions.noisePct * effectiveW;
+    totalWeight += effectiveW;
+  }
+  if (totalWeight <= 0) {
+    return const PriceContribution(
+      marketPct: 0,
+      sectorPct: 0,
+      newsPct: 0,
+      noisePct: 0,
+    );
+  }
+  return PriceContribution(
+    marketPct: weightedMarket / totalWeight,
+    sectorPct: weightedSector / totalWeight,
+    newsPct: weightedNews / totalWeight,
+    hypePct: weightedHype / totalWeight,
+    noisePct: weightedNoise / totalWeight,
+  );
+}
+
 /// Объяснение изменения цены для одного тикера за один тик симуляции.
 class TickExplanation {
   /// Индекс эпохи, в которой произошёл тик.
@@ -668,6 +718,21 @@ class EpochPriceRange {
 class NewsEvent {
   final String symbol;
   final String headline;
+
+  /// The scenario's explanatory body text (news_event.dart's
+  /// [NewsScenario.description]) — carried through so the notification
+  /// (and any other consumer) can show real "why this happened" copy
+  /// instead of just the one-line headline. English only, same as
+  /// [headline] — see [scenarioIndex] for the re-localizable version.
+  final String description;
+
+  /// This event's position in news_event.dart's `newsScenarios` list —
+  /// lets a consumer with real AppLocalizations access (unlike this
+  /// engine's tick loop) re-localize [headline]/[description] via
+  /// news_scenario_l10n.dart instead of showing the English fallback
+  /// above. -1 for events loaded from a pre-this-field persisted session
+  /// (see [fromJson]) — falls back to the English strings in that case.
+  final int scenarioIndex;
   final bool isPositive;
 
   /// Total signed price move over the event's full life (e.g. 0.09 = +9%,
@@ -685,6 +750,8 @@ class NewsEvent {
   NewsEvent({
     required this.symbol,
     required this.headline,
+    required this.description,
+    required this.scenarioIndex,
     required this.isPositive,
     required this.targetAmplitude,
     required this.startedAt,
@@ -720,6 +787,8 @@ class NewsEvent {
   NewsEvent copy() => NewsEvent(
     symbol: symbol,
     headline: headline,
+    description: description,
+    scenarioIndex: scenarioIndex,
     isPositive: isPositive,
     targetAmplitude: targetAmplitude,
     startedAt: startedAt,
@@ -730,6 +799,8 @@ class NewsEvent {
   Map<String, dynamic> toJson() => {
     'symbol': symbol,
     'headline': headline,
+    'description': description,
+    'scenarioIndex': scenarioIndex,
     'isPositive': isPositive,
     'targetAmplitude': targetAmplitude,
     'startedAt': startedAt.toIso8601String(),
@@ -740,6 +811,11 @@ class NewsEvent {
   factory NewsEvent.fromJson(Map<String, dynamic> json) => NewsEvent(
     symbol: json['symbol'] as String,
     headline: json['headline'] as String,
+    // Old persisted sessions from before this field existed — fall back
+    // to empty rather than crash; a stale in-progress News event just
+    // shows no body text until it expires naturally.
+    description: json['description'] as String? ?? '',
+    scenarioIndex: json['scenarioIndex'] as int? ?? -1,
     isPositive: json['isPositive'] as bool,
     targetAmplitude: (json['targetAmplitude'] as num).toDouble(),
     startedAt: DateTime.parse(json['startedAt'] as String),

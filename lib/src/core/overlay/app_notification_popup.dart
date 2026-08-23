@@ -3,8 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../models/app_notification.dart';
 import '../notifications/notification_providers.dart';
+import '../notifications/notification_text.dart';
 import '../theme/theme_v2.dart';
 import 'app_overlay_host.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/company_logo.dart';
 
 // ---------------------------------------------------------------------------
@@ -200,6 +202,7 @@ class _AppNotificationPopupState extends State<_AppNotificationPopup>
 
   Widget _card() {
     final n = widget.notification;
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: _handleTap,
       behavior: HitTestBehavior.opaque,
@@ -229,7 +232,7 @@ class _AppNotificationPopupState extends State<_AppNotificationPopup>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      n.title,
+                      notificationTitle(n, l10n),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
@@ -243,7 +246,7 @@ class _AppNotificationPopupState extends State<_AppNotificationPopup>
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      n.detail,
+                      notificationDetail(n, l10n),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(

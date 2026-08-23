@@ -220,9 +220,11 @@ class _StressTestSearchSheetState
             symbol: _selectedSymbol,
             companyName: _selectedDescription,
             title: AppLocalizations.of(context)!.orderEntryNotifYouBought,
-            detail:
-                '${(_amount / _selectedPrice).toStringAsFixed(4)} shares of '
-                '$_selectedDescription at ${formatUsd(_selectedPrice)}',
+            detail: AppLocalizations.of(context)!.orderEntryNotifFilledDetail(
+              (_amount / _selectedPrice).toStringAsFixed(4),
+              _selectedDescription,
+              formatUsd(_selectedPrice),
+            ),
             createdAt: DateTime.now(),
           ),
         );

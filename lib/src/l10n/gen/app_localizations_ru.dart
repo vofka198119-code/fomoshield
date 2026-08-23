@@ -6038,4 +6038,199 @@ class AppLocalizationsRu extends AppLocalizations {
   String notificationsRelativeTimeDaysAgo(int count) {
     return '$count дн назад';
   }
+
+  @override
+  String get newsScenario0Headline => 'Прибыль превысила ожидания';
+
+  @override
+  String get newsScenario0Description =>
+      'Компания отчиталась о квартальной выручке и прибыли выше прогнозов аналитиков.';
+
+  @override
+  String get newsScenario1Headline => 'Повышен годовой прогноз';
+
+  @override
+  String get newsScenario1Description =>
+      'Руководство повысило прогноз по выручке и прибыли на текущий финансовый год.';
+
+  @override
+  String get newsScenario2Headline => 'Подписан крупный контракт';
+
+  @override
+  String get newsScenario2Description =>
+      'Компания объявила о многолетнем соглашении с крупным корпоративным клиентом.';
+
+  @override
+  String get newsScenario3Headline => 'Объявлен байбэк акций';
+
+  @override
+  String get newsScenario3Description =>
+      'Совет директоров одобрил масштабную программу обратного выкупа собственных акций.';
+
+  @override
+  String get newsScenario4Headline => 'Повышены дивиденды';
+
+  @override
+  String get newsScenario4Description =>
+      'Компания повысила квартальные дивиденды и подтвердила стабильную дивидендную политику.';
+
+  @override
+  String get newsScenario5Headline => 'Сделка успешно закрыта';
+
+  @override
+  String get newsScenario5Description =>
+      'Получены все необходимые согласования, и приобретение другой компании официально завершено.';
+
+  @override
+  String get newsScenario6Headline => 'Одобрен новый продукт';
+
+  @override
+  String get newsScenario6Description =>
+      'Регулятор одобрил запуск нового продукта, открыв компании дополнительный источник дохода.';
+
+  @override
+  String get newsScenario7Headline => 'Программа сокращения расходов';
+
+  @override
+  String get newsScenario7Description =>
+      'Компания объявила программу оптимизации, которая должна значительно снизить операционные расходы.';
+
+  @override
+  String get newsScenario8Headline => 'Погашение долга';
+
+  @override
+  String get newsScenario8Description =>
+      'Компания досрочно погасила часть долговой нагрузки и улучшила баланс.';
+
+  @override
+  String get newsScenario9Headline => 'Расширение бизнеса';
+
+  @override
+  String get newsScenario9Description =>
+      'Руководство объявило о выходе на новый международный рынок с запуском локальных операций.';
+
+  @override
+  String get newsScenario10Headline => 'Рост клиентской базы';
+
+  @override
+  String get newsScenario10Description =>
+      'Число активных клиентов компании достигло рекордного значения.';
+
+  @override
+  String get newsScenario11Headline => 'Стратегическое партнёрство';
+
+  @override
+  String get newsScenario11Description =>
+      'Компания подписала долгосрочное соглашение о сотрудничестве с лидером отрасли.';
+
+  @override
+  String get newsScenario12Headline => 'Прибыль не оправдала ожиданий';
+
+  @override
+  String get newsScenario12Description =>
+      'Компания отчиталась о результатах ниже прогнозов аналитиков по прибыли и выручке.';
+
+  @override
+  String get newsScenario13Headline => 'Снижен прогноз';
+
+  @override
+  String get newsScenario13Description =>
+      'Руководство понизило финансовый прогноз на оставшуюся часть года.';
+
+  @override
+  String get newsScenario14Headline => 'Сделка сорвалась';
+
+  @override
+  String get newsScenario14Description =>
+      'Запланированное приобретение другой компании было отменено после долгих переговоров.';
+
+  @override
+  String get newsScenario15Headline => 'Отзыв продукции';
+
+  @override
+  String get newsScenario15Description =>
+      'Компания начала масштабный отзыв продукции из-за производственного брака.';
+
+  @override
+  String get newsScenario16Headline => 'Кибератака';
+
+  @override
+  String get newsScenario16Description =>
+      'Компания подтвердила кибератаку, затронувшую часть внутренних систем.';
+
+  @override
+  String get newsScenario17Headline => 'Уход генерального директора';
+
+  @override
+  String get newsScenario17Description =>
+      'Генеральный директор неожиданно объявил об уходе с поста.';
+
+  @override
+  String get newsScenario18Headline => 'Подан иск';
+
+  @override
+  String get newsScenario18Description =>
+      'Против компании подан крупный коллективный иск, связанный с её основным бизнесом.';
+
+  @override
+  String get newsScenario19Headline => 'Проблемы с поставками';
+
+  @override
+  String get newsScenario19Description =>
+      'Компания предупредила о сбоях в цепочке поставок и возможных задержках производства.';
+
+  @override
+  String get newsScenario20Headline => 'Рост долговой нагрузки';
+
+  @override
+  String get newsScenario20Description =>
+      'Компания отчиталась о значительном росте долга по итогам последнего отчётного периода.';
+
+  @override
+  String get newsScenario21Headline => 'Расследование регулятора';
+
+  @override
+  String get newsScenario21Description =>
+      'Регулятор начал официальное расследование деятельности компании.';
+
+  @override
+  String get newsScenario22Headline => 'Потерян ключевой клиент';
+
+  @override
+  String get newsScenario22Description =>
+      'Один из крупнейших клиентов компании отказался продлевать долгосрочный контракт.';
+
+  @override
+  String get newsScenario23Headline => 'Остановка производства';
+
+  @override
+  String get newsScenario23Description =>
+      'Работа одного из основных производственных предприятий компании была временно приостановлена из-за технических проблем.';
+
+  @override
+  String get newsScenario24Headline => 'Объявлены сокращения';
+
+  @override
+  String get newsScenario24Description =>
+      'Компания объявила о масштабной реструктуризации с сокращением персонала.';
+
+  @override
+  String notificationsPriceSwingTitleUp(String name, String percent) {
+    return 'Акции $name выросли на $percent%';
+  }
+
+  @override
+  String notificationsPriceSwingTitleDown(String name, String percent) {
+    return 'Акции $name упали на $percent%';
+  }
+
+  @override
+  String notificationsPriceSwingDetail(
+    String duration,
+    String symbol,
+    String percent,
+    int minutes,
+  ) {
+    return 'В вашем тесте «$duration»: $symbol изменился на $percent% за последние ~$minutes мин.';
+  }
 }

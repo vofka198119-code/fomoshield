@@ -6016,4 +6016,199 @@ class AppLocalizationsEn extends AppLocalizations {
   String notificationsRelativeTimeDaysAgo(int count) {
     return '${count}d ago';
   }
+
+  @override
+  String get newsScenario0Headline => 'Earnings Beat Expectations';
+
+  @override
+  String get newsScenario0Description =>
+      'The company reported quarterly revenue and profit above analyst forecasts.';
+
+  @override
+  String get newsScenario1Headline => 'Annual Guidance Raised';
+
+  @override
+  String get newsScenario1Description =>
+      'Management raised its revenue and profit guidance for the current fiscal year.';
+
+  @override
+  String get newsScenario2Headline => 'Major Contract Signed';
+
+  @override
+  String get newsScenario2Description =>
+      'The company announced a multi-year agreement with a large corporate client.';
+
+  @override
+  String get newsScenario3Headline => 'Share Buyback Announced';
+
+  @override
+  String get newsScenario3Description =>
+      'The board approved a large-scale program to repurchase the company\'s own shares.';
+
+  @override
+  String get newsScenario4Headline => 'Dividend Increase';
+
+  @override
+  String get newsScenario4Description =>
+      'The company raised its quarterly dividend and reaffirmed a stable dividend policy.';
+
+  @override
+  String get newsScenario5Headline => 'Deal Successfully Closed';
+
+  @override
+  String get newsScenario5Description =>
+      'All required approvals were obtained and the acquisition of another company officially closed.';
+
+  @override
+  String get newsScenario6Headline => 'New Product Approved';
+
+  @override
+  String get newsScenario6Description =>
+      'A regulator approved the launch of a new product, opening an additional revenue stream for the company.';
+
+  @override
+  String get newsScenario7Headline => 'Cost Reduction Program';
+
+  @override
+  String get newsScenario7Description =>
+      'The company announced an optimization program expected to significantly cut operating expenses.';
+
+  @override
+  String get newsScenario8Headline => 'Debt Repayment';
+
+  @override
+  String get newsScenario8Description =>
+      'The company repaid part of its debt load ahead of schedule and improved its balance sheet.';
+
+  @override
+  String get newsScenario9Headline => 'Business Expansion';
+
+  @override
+  String get newsScenario9Description =>
+      'Management announced entry into a new international market with local operations launching.';
+
+  @override
+  String get newsScenario10Headline => 'Customer Base Growth';
+
+  @override
+  String get newsScenario10Description =>
+      'The number of active customers reached a record high for the company.';
+
+  @override
+  String get newsScenario11Headline => 'Strategic Partnership';
+
+  @override
+  String get newsScenario11Description =>
+      'The company signed a long-term cooperation agreement with an industry leader.';
+
+  @override
+  String get newsScenario12Headline => 'Earnings Miss Expectations';
+
+  @override
+  String get newsScenario12Description =>
+      'The company reported results below analyst forecasts for profit and revenue.';
+
+  @override
+  String get newsScenario13Headline => 'Guidance Cut';
+
+  @override
+  String get newsScenario13Description =>
+      'Management lowered its financial guidance for the rest of the year.';
+
+  @override
+  String get newsScenario14Headline => 'Deal Falls Through';
+
+  @override
+  String get newsScenario14Description =>
+      'A planned acquisition of another company was called off after lengthy negotiations.';
+
+  @override
+  String get newsScenario15Headline => 'Product Recall';
+
+  @override
+  String get newsScenario15Description =>
+      'The company began a large-scale product recall due to manufacturing defects.';
+
+  @override
+  String get newsScenario16Headline => 'Cyberattack';
+
+  @override
+  String get newsScenario16Description =>
+      'The company confirmed a cyberattack that affected part of its internal systems.';
+
+  @override
+  String get newsScenario17Headline => 'CEO Departure';
+
+  @override
+  String get newsScenario17Description =>
+      'The CEO unexpectedly announced their departure from the role.';
+
+  @override
+  String get newsScenario18Headline => 'Lawsuit Filed';
+
+  @override
+  String get newsScenario18Description =>
+      'A major class-action lawsuit tied to the company\'s core business was filed against it.';
+
+  @override
+  String get newsScenario19Headline => 'Supply Chain Issues';
+
+  @override
+  String get newsScenario19Description =>
+      'The company warned of supply chain disruptions and possible production delays.';
+
+  @override
+  String get newsScenario20Headline => 'Debt Load Increase';
+
+  @override
+  String get newsScenario20Description =>
+      'The company reported a significant increase in debt following its latest financial report.';
+
+  @override
+  String get newsScenario21Headline => 'Regulatory Investigation';
+
+  @override
+  String get newsScenario21Description =>
+      'A regulator opened a formal investigation into the company\'s operations.';
+
+  @override
+  String get newsScenario22Headline => 'Key Client Lost';
+
+  @override
+  String get newsScenario22Description =>
+      'One of the company\'s largest clients declined to renew its long-term contract.';
+
+  @override
+  String get newsScenario23Headline => 'Production Halted';
+
+  @override
+  String get newsScenario23Description =>
+      'Operations at one of the company\'s main production facilities were temporarily halted due to technical issues.';
+
+  @override
+  String get newsScenario24Headline => 'Layoffs Announced';
+
+  @override
+  String get newsScenario24Description =>
+      'The company announced a major restructuring involving workforce reductions.';
+
+  @override
+  String notificationsPriceSwingTitleUp(String name, String percent) {
+    return '$name jumped $percent%';
+  }
+
+  @override
+  String notificationsPriceSwingTitleDown(String name, String percent) {
+    return '$name dropped $percent%';
+  }
+
+  @override
+  String notificationsPriceSwingDetail(
+    String duration,
+    String symbol,
+    String percent,
+    int minutes,
+  ) {
+    return 'In your $duration test, $symbol moved $percent% over the last ~$minutes min.';
+  }
 }

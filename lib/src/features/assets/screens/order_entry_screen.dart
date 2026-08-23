@@ -241,6 +241,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
             limitPrice: confirmedLimitPrice,
           );
 
+      final companyName = widget.companyName ?? widget.symbol;
       pushAppNotification(
         ref.read(notificationsProvider.notifier),
         AppNotification(
@@ -252,10 +253,14 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           symbol: widget.symbol,
           companyName: widget.companyName,
           logoUrl: widget.logo,
-          title: 'Limit ${_isBuy ? 'Buy' : 'Sell'} Order Placed',
+          title: l10n.orderEntryNotifOrderPlacedTitle(
+            l10n.orderEntryTabLimit,
+            _isBuy ? l10n.orderEntryNotifBuyWord : l10n.orderEntryNotifSellWord,
+          ),
           detail:
-              '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-              'at ${formatUsd(confirmedLimitPrice)} — Pending',
+              '${l10n.orderEntryNotifPendingDetailBase(shares.toStringAsFixed(4), companyName)}'
+              '${l10n.orderEntryNotifAtPrice(formatUsd(confirmedLimitPrice))}'
+              '${l10n.orderEntryNotifPendingSuffix}',
           createdAt: DateTime.now(),
         ),
       );
@@ -302,10 +307,14 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         symbol: widget.symbol,
         companyName: widget.companyName,
         logoUrl: widget.logo,
-        title: _isBuy ? 'You Bought' : 'You Sold',
-        detail:
-            '${shares.toStringAsFixed(4)} shares of ${widget.companyName ?? widget.symbol} '
-            'at ${formatUsd(_currentPrice)}',
+        title: _isBuy
+            ? l10n.orderEntryNotifYouBought
+            : l10n.orderEntryNotifYouSold,
+        detail: l10n.orderEntryNotifFilledDetail(
+          shares.toStringAsFixed(4),
+          widget.companyName ?? widget.symbol,
+          formatUsd(_currentPrice),
+        ),
         createdAt: DateTime.now(),
       ),
     );

@@ -2388,5 +2388,94 @@
         "type": "int"
       }
     }
+  },
+  "newsScenario0Headline": "Earnings Beat Expectations",
+  "newsScenario0Description": "The company reported quarterly revenue and profit above analyst forecasts.",
+  "newsScenario1Headline": "Annual Guidance Raised",
+  "newsScenario1Description": "Management raised its revenue and profit guidance for the current fiscal year.",
+  "newsScenario2Headline": "Major Contract Signed",
+  "newsScenario2Description": "The company announced a multi-year agreement with a large corporate client.",
+  "newsScenario3Headline": "Share Buyback Announced",
+  "newsScenario3Description": "The board approved a large-scale program to repurchase the company's own shares.",
+  "newsScenario4Headline": "Dividend Increase",
+  "newsScenario4Description": "The company raised its quarterly dividend and reaffirmed a stable dividend policy.",
+  "newsScenario5Headline": "Deal Successfully Closed",
+  "newsScenario5Description": "All required approvals were obtained and the acquisition of another company officially closed.",
+  "newsScenario6Headline": "New Product Approved",
+  "newsScenario6Description": "A regulator approved the launch of a new product, opening an additional revenue stream for the company.",
+  "newsScenario7Headline": "Cost Reduction Program",
+  "newsScenario7Description": "The company announced an optimization program expected to significantly cut operating expenses.",
+  "newsScenario8Headline": "Debt Repayment",
+  "newsScenario8Description": "The company repaid part of its debt load ahead of schedule and improved its balance sheet.",
+  "newsScenario9Headline": "Business Expansion",
+  "newsScenario9Description": "Management announced entry into a new international market with local operations launching.",
+  "newsScenario10Headline": "Customer Base Growth",
+  "newsScenario10Description": "The number of active customers reached a record high for the company.",
+  "newsScenario11Headline": "Strategic Partnership",
+  "newsScenario11Description": "The company signed a long-term cooperation agreement with an industry leader.",
+  "newsScenario12Headline": "Earnings Miss Expectations",
+  "newsScenario12Description": "The company reported results below analyst forecasts for profit and revenue.",
+  "newsScenario13Headline": "Guidance Cut",
+  "newsScenario13Description": "Management lowered its financial guidance for the rest of the year.",
+  "newsScenario14Headline": "Deal Falls Through",
+  "newsScenario14Description": "A planned acquisition of another company was called off after lengthy negotiations.",
+  "newsScenario15Headline": "Product Recall",
+  "newsScenario15Description": "The company began a large-scale product recall due to manufacturing defects.",
+  "newsScenario16Headline": "Cyberattack",
+  "newsScenario16Description": "The company confirmed a cyberattack that affected part of its internal systems.",
+  "newsScenario17Headline": "CEO Departure",
+  "newsScenario17Description": "The CEO unexpectedly announced their departure from the role.",
+  "newsScenario18Headline": "Lawsuit Filed",
+  "newsScenario18Description": "A major class-action lawsuit tied to the company's core business was filed against it.",
+  "newsScenario19Headline": "Supply Chain Issues",
+  "newsScenario19Description": "The company warned of supply chain disruptions and possible production delays.",
+  "newsScenario20Headline": "Debt Load Increase",
+  "newsScenario20Description": "The company reported a significant increase in debt following its latest financial report.",
+  "newsScenario21Headline": "Regulatory Investigation",
+  "newsScenario21Description": "A regulator opened a formal investigation into the company's operations.",
+  "newsScenario22Headline": "Key Client Lost",
+  "newsScenario22Description": "One of the company's largest clients declined to renew its long-term contract.",
+  "newsScenario23Headline": "Production Halted",
+  "newsScenario23Description": "Operations at one of the company's main production facilities were temporarily halted due to technical issues.",
+  "newsScenario24Headline": "Layoffs Announced",
+  "newsScenario24Description": "The company announced a major restructuring involving workforce reductions.",
+  "notificationsPriceSwingTitleUp": "{name} jumped {percent}%",
+  "@notificationsPriceSwingTitleUp": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsPriceSwingTitleDown": "{name} dropped {percent}%",
+  "@notificationsPriceSwingTitleDown": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsPriceSwingDetail": "In your {duration} test, {symbol} moved {percent}% over the last ~{minutes} min.",
+  "@notificationsPriceSwingDetail": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
   }
 }

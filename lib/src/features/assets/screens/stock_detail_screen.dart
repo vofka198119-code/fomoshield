@@ -321,6 +321,18 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                               true
                           ? session.explanationLog[widget.symbol]!.last
                           : null,
+                      // Aggregated over the same capped log as the latest
+                      // tick above, so the bars explain the whole window
+                      // priceChange/priceChangePercent cover instead of
+                      // just this one instant (see aggregatePriceContributions'
+                      // own doc for why that mismatch was a real bug).
+                      aggregatedContributions:
+                          session.explanationLog[widget.symbol]?.isNotEmpty ==
+                              true
+                          ? aggregatePriceContributions(
+                              session.explanationLog[widget.symbol]!,
+                            )
+                          : null,
                     ),
                     StockLimitOrdersSection(
                       sessionId: widget.sessionId,
