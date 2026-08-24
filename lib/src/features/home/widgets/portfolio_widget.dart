@@ -5,6 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_border.dart';
+import '../../../core/theme/themed_divider.dart';
 import '../../../core/router/navigation_history_provider.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
@@ -63,18 +68,17 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
   @override
   Widget build(BuildContext context) {
     final portfolios = ref.watch(portfoliosProvider);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     if (portfolios.isEmpty) {
       return _shell(
         context,
+        palette: palette,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           child: Text(
             AppLocalizations.of(context)!.portfolioWidgetNoPortfolio,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: ThemeV2.textSecondary,
-            ),
+            style: GoogleFonts.inter(fontSize: 14, color: palette.textBody),
           ),
         ),
       );
@@ -105,34 +109,51 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
       context,
       title: portfolios[index].name.toUpperCase(),
       showPremiumBadge: index > 0,
+      palette: palette,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
         child: Column(
           children: [
-            SizedBox(
-              height: _pageAreaHeight,
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: portfolios.length,
-                onPageChanged: (i) {
-                  setState(() => _currentIndex = i);
-                  ref.read(activePortfolioIdProvider.notifier).state =
-                      portfolios[i].id;
-                },
-                itemBuilder: (context, i) => Align(
-                  alignment: Alignment.topCenter,
-                  child: _PortfolioPerformanceView(
-                    portfolioId: portfolios[i].id,
+            // Single portfolio (the norm now — multi-portfolio swiping is
+            // no longer a live product path) renders directly, sized to
+            // its own content instead of the fixed _pageAreaHeight the
+            // PageView needs to avoid jank between differently-tall pages.
+            // That fixed height was taller than any single portfolio's
+            // real content, which read as a large dead gap under the gold
+            // border. Multi-portfolio (if it ever comes back) still gets
+            // the original PageView + dots, untouched.
+            if (portfolios.length > 1)
+              SizedBox(
+                height: _pageAreaHeight,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: portfolios.length,
+                  onPageChanged: (i) {
+                    setState(() => _currentIndex = i);
+                    ref.read(activePortfolioIdProvider.notifier).state =
+                        portfolios[i].id;
+                  },
+                  itemBuilder: (context, i) => Align(
+                    alignment: Alignment.topCenter,
+                    child: _PortfolioPerformanceView(
+                      portfolioId: portfolios[i].id,
+                      palette: palette,
+                    ),
                   ),
                 ),
+              )
+            else
+              _PortfolioPerformanceView(
+                portfolioId: portfolios[index].id,
+                palette: palette,
               ),
-            ),
             if (portfolios.length > 1) ...[
               const SizedBox(height: 12),
               _dots(
                 count: portfolios.length,
                 current: _currentIndex,
                 onTap: (i) => _goTo(i, portfolios),
+                palette: palette,
               ),
             ],
           ],
@@ -146,6 +167,7 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
     BuildContext context, {
     String? title,
     bool showPremiumBadge = false,
+    required AppPalette palette,
     required Widget child,
   }) {
     final resolvedTitle =
@@ -159,6 +181,7 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
       child: CardFrame(
         showTopBar: false,
         padding: EdgeInsets.zero,
+        palette: palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -167,25 +190,21 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
               child: Row(
                 children: [
                   Flexible(
-                    child: Text(
+                    child: themedHeaderText(
                       resolvedTitle,
-                      style: FomoShieldTheme.cardTitle(),
+                      palette,
+                      FomoShieldTheme.cardTitle(),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (showPremiumBadge) ...[
                     const SizedBox(width: 8),
-                    _premiumPill(context),
+                    _premiumPill(context, palette),
                   ],
                 ],
               ),
             ),
-            Divider(
-              height: 1,
-              indent: 16,
-              endIndent: 16,
-              color: Colors.black.withValues(alpha: 0.06),
-            ),
+            themedDivider(palette),
             child,
           ],
         ),
@@ -193,20 +212,32 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
     );
   }
 
-  Widget _premiumPill(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(12)),
-      child: Text(
-        AppLocalizations.of(context)!.profilePremiumBadge,
-        style: GoogleFonts.inter(
-          fontSize: 10,
-          fontWeight: FontWeight.w800,
-          color: dialBrassLight,
-          letterSpacing: 1.5,
-          shadows: [
-            Shadow(color: dialBrassLight.withValues(alpha: 0.5), blurRadius: 6),
-          ],
+  Widget _premiumPill(BuildContext context, AppPalette palette) {
+    return themedBorder(
+      palette: palette,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: palette.windowGradient != null
+            ? BoxDecoration(
+                gradient: palette.windowGradient,
+                borderRadius: BorderRadius.circular(12),
+              )
+            : darkCardDecoration(borderRadius: BorderRadius.circular(12)),
+        child: Text(
+          AppLocalizations.of(context)!.profilePremiumBadge,
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            color: dialBrassLight,
+            letterSpacing: 1.5,
+            shadows: [
+              Shadow(
+                color: dialBrassLight.withValues(alpha: 0.5),
+                blurRadius: 6,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -216,7 +247,10 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
     required int count,
     required int current,
     required void Function(int) onTap,
+    required AppPalette palette,
   }) {
+    // Same button-style treatment as Shield Signal's swipe dots.
+    final buttonGradient = palette.buttonGradient;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(count, (i) {
@@ -229,10 +263,23 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
             width: isActive ? 16 : 6,
             height: 6,
             decoration: BoxDecoration(
-              color: isActive
-                  ? ThemeV2.primary
-                  : ThemeV2.primary.withValues(alpha: 0.25),
+              color: buttonGradient == null
+                  ? (isActive
+                        ? ThemeV2.primary
+                        : ThemeV2.primary.withValues(alpha: 0.25))
+                  : (isActive
+                        ? null
+                        : palette.accentPrimary.withValues(alpha: 0.25)),
+              gradient: buttonGradient != null && isActive
+                  ? buttonGradient
+                  : null,
               borderRadius: BorderRadius.circular(3),
+              boxShadow:
+                  buttonGradient != null &&
+                      isActive &&
+                      palette.glowShadow != null
+                  ? [palette.glowShadow!]
+                  : null,
             ),
           ),
         );
@@ -244,8 +291,12 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
 /// Renders the 4-cell performance breakdown for a single portfolio.
 class _PortfolioPerformanceView extends ConsumerWidget {
   final String portfolioId;
+  final AppPalette palette;
 
-  const _PortfolioPerformanceView({required this.portfolioId});
+  const _PortfolioPerformanceView({
+    required this.portfolioId,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -304,39 +355,70 @@ class _PortfolioPerformanceView extends ConsumerWidget {
               Expanded(
                 child: Column(
                   children: [
-                    _cell(
-                      label: l10n.portfolioBalanceLabel,
-                      value: formatUsd(perf.currentValue),
-                      bgColor: ThemeV2.primaryBg,
+                    themedBorder(
+                      palette: palette,
+                      borderRadius: BorderRadius.circular(16),
+                      child: _cell(
+                        label: l10n.portfolioBalanceLabel,
+                        value: formatUsd(perf.currentValue),
+                        bgColor: ThemeV2.primaryBg,
+                        goldValue: true,
+                        palette: palette,
+                      ),
                     ),
                     const SizedBox(height: 6),
-                    _cell(
-                      label: l10n.portfolioCashLabel,
-                      value: formatUsd(perf.cash),
-                      bgColor: ThemeV2.primaryBg,
+                    themedBorder(
+                      palette: palette,
+                      borderRadius: BorderRadius.circular(16),
+                      child: _cell(
+                        label: l10n.portfolioCashLabel,
+                        value: formatUsd(perf.cash),
+                        bgColor: ThemeV2.primaryBg,
+                        goldValue: true,
+                        palette: palette,
+                      ),
                     ),
                     const SizedBox(height: 6),
-                    _cell(
-                      label: l10n.portfolioUnrealizedPnl,
-                      value: formatUsdSigned(perf.pnl),
-                      valueFontSize: 14,
-                      bgColor: pnlBg,
-                      valueColor: pnlColor,
+                    themedBorder(
+                      palette: palette,
+                      borderRadius: BorderRadius.circular(16),
+                      child: _cell(
+                        label: l10n.portfolioUnrealizedPnl,
+                        value: formatUsdSigned(perf.pnl),
+                        valueFontSize: 14,
+                        bgColor: pnlBg,
+                        valueColor: pnlColor,
+                        palette: palette,
+                      ),
                     ),
                     const SizedBox(height: 6),
-                    _cell(
-                      label: l10n.shieldSignalChange,
-                      value:
-                          '${isUp ? '+' : ''}${perf.pnlPercent.toStringAsFixed(2)}%',
-                      valueFontSize: 14,
-                      bgColor: pnlBg,
-                      valueColor: pnlColor,
+                    themedBorder(
+                      palette: palette,
+                      borderRadius: BorderRadius.circular(16),
+                      child: _cell(
+                        label: l10n.shieldSignalChange,
+                        value:
+                            '${isUp ? '+' : ''}${perf.pnlPercent.toStringAsFixed(2)}%',
+                        valueFontSize: 14,
+                        bgColor: pnlBg,
+                        valueColor: pnlColor,
+                        palette: palette,
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 10),
-              Expanded(child: _VerticalProgressBar(currentPercent: barPercent)),
+              Expanded(
+                child: themedBorder(
+                  palette: palette,
+                  borderRadius: BorderRadius.circular(16),
+                  child: _VerticalProgressBar(
+                    currentPercent: barPercent,
+                    palette: palette,
+                  ),
+                ),
+              ),
             ],
           ),
         );
@@ -345,19 +427,39 @@ class _PortfolioPerformanceView extends ConsumerWidget {
   }
 
   Widget _cell({
+    required AppPalette palette,
     required String label,
     required String value,
     Color? bgColor,
     Color? valueColor,
     double valueFontSize = 18,
+    // Canonical gold treatment for a neutral price with no up/down meaning
+    // of its own (see themedPriceText's doc comment) — never combine with
+    // a green/red valueColor.
+    bool goldValue = false,
   }) {
+    // The gradient-border wrapper (themedBorder) already draws a border
+    // around this cell when the theme defines one — don't also draw this
+    // flat divider border, or the two would double up. Same reasoning as
+    // ShieldSignalWidget's _cell().
+    final hasThemedBorder = palette.borderGradient != null;
+    final effectiveGradient = hasThemedBorder ? palette.windowGradient : null;
+    final valueStyle = interNums(
+      fontSize: valueFontSize,
+      fontWeight: FontWeight.w600,
+      color: valueColor ?? palette.textHeader,
+      letterSpacing: -0.3,
+    );
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: effectiveGradient == null ? bgColor : null,
+        gradient: effectiveGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeV2.divider),
+        border: effectiveGradient == null && !hasThemedBorder
+            ? Border.all(color: ThemeV2.divider)
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,7 +474,7 @@ class _PortfolioPerformanceView extends ConsumerWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.6,
-                color: ThemeV2.primary,
+                color: palette.accentPrimary,
               ),
             ),
           ),
@@ -380,15 +482,9 @@ class _PortfolioPerformanceView extends ConsumerWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(
-              value,
-              style: interNums(
-                fontSize: valueFontSize,
-                fontWeight: FontWeight.w600,
-                color: valueColor ?? ThemeV2.textPrimary,
-                letterSpacing: -0.3,
-              ),
-            ),
+            child: goldValue
+                ? themedPriceText(value, palette, valueStyle)
+                : Text(value, style: valueStyle),
           ),
         ],
       ),
@@ -404,8 +500,12 @@ class _PortfolioPerformanceView extends ConsumerWidget {
 /// card — no extra whitespace around a narrower track.
 class _VerticalProgressBar extends StatelessWidget {
   final double currentPercent; // -100..100
+  final AppPalette palette;
 
-  const _VerticalProgressBar({required this.currentPercent});
+  const _VerticalProgressBar({
+    required this.currentPercent,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -422,7 +522,12 @@ class _VerticalProgressBar extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(10, 10, 12, 14),
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(16),
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       // Same window title treatment as the cells to the left (label above
       // content), just in white — the cells' primary-green label color
       // would be invisible against this dark gradient. The window itself
@@ -441,7 +546,15 @@ class _VerticalProgressBar extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.6,
-                color: Colors.white,
+                // This panel is unconditionally dark in both themes (the
+                // pre-existing "instrument panel" look) — plain white stays
+                // the Standard-theme default (accentPrimary there is green,
+                // which the comment above already found invisible against
+                // this dark gradient); only Luxury Gold's gold accentPrimary
+                // is legible here, matching the BALANCE/CASH cell labels.
+                color: palette.windowGradient != null
+                    ? palette.accentPrimary
+                    : Colors.white,
               ),
             ),
           ),
@@ -525,10 +638,10 @@ class _VerticalProgressBar extends StatelessWidget {
                 // -100%/0%/+100% ticks, bottom to top.
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    _VerticalTick('+100%'),
-                    _VerticalTick('0%'),
-                    _VerticalTick('-100%'),
+                  children: [
+                    _VerticalTick('+100%', palette: palette),
+                    _VerticalTick('0%', palette: palette),
+                    _VerticalTick('-100%', palette: palette),
                   ],
                 ),
               ],
@@ -542,7 +655,8 @@ class _VerticalProgressBar extends StatelessWidget {
 
 class _VerticalTick extends StatelessWidget {
   final String label;
-  const _VerticalTick(this.label);
+  final AppPalette palette;
+  const _VerticalTick(this.label, {required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -551,7 +665,13 @@ class _VerticalTick extends StatelessWidget {
       style: GoogleFonts.inter(
         fontSize: 10,
         fontWeight: FontWeight.w600,
-        color: Colors.white.withValues(alpha: 0.5),
+        // Same reasoning as the ЦЕЛЬ/targetLabel title above — this panel
+        // is unconditionally dark in both themes, so palette.textHeader
+        // (dark, Standard-theme text) only applies once Luxury Gold makes
+        // it a light color; Standard keeps the original translucent white.
+        color: palette.windowGradient != null
+            ? palette.textHeader
+            : Colors.white.withValues(alpha: 0.5),
       ),
     );
   }

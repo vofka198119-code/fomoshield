@@ -35,11 +35,15 @@ Widget themedGoldGradient(Widget child, AppPalette palette) {
 Widget themedHeaderText(
   String text,
   AppPalette palette,
-  TextStyle baseStyle,
-) {
+  TextStyle baseStyle, {
+  TextOverflow? overflow,
+  int? maxLines,
+}) {
   return themedGoldGradient(
     Text(
       text,
+      overflow: overflow,
+      maxLines: maxLines,
       style: baseStyle.copyWith(
         color: palette.titleGradient != null
             ? Colors.white
@@ -51,11 +55,7 @@ Widget themedHeaderText(
   );
 }
 
-Widget themedHeaderIcon(
-  IconData icon,
-  AppPalette palette, {
-  double size = 24,
-}) {
+Widget themedHeaderIcon(IconData icon, AppPalette palette, {double size = 24}) {
   return themedGoldGradient(
     Icon(
       icon,

@@ -252,7 +252,6 @@ class _IndexView extends StatelessWidget {
             labelFontSize: 14,
             gradient: palette.windowGradient ?? darkCardGradient(),
             labelColor: changeColor,
-            labelGlowColor: changeColor,
             valueColor: Colors.white,
             goldValue: true,
             leadingIcon: isUp ? Icons.trending_up : Icons.trending_down,
@@ -275,8 +274,7 @@ class _IndexView extends StatelessWidget {
                   valueFontSize: 14,
                   bgColor: changeBg,
                   valueColor: changeColor,
-                  labelColor: changeColor,
-                  labelGlowColor: changeColor,
+                  labelColor: palette.accentPrimary,
                   palette: palette,
                 ),
               ),
@@ -293,8 +291,7 @@ class _IndexView extends StatelessWidget {
                   valueFontSize: 14,
                   bgColor: changeBg,
                   valueColor: changeColor,
-                  labelColor: changeColor,
-                  labelGlowColor: changeColor,
+                  labelColor: palette.accentPrimary,
                   palette: palette,
                 ),
               ),
@@ -350,7 +347,6 @@ class _IndexView extends StatelessWidget {
     Gradient? gradient,
     Color? valueColor,
     Color? labelColor,
-    Color? labelGlowColor,
     IconData? leadingIcon,
     Color? leadingIconColor,
     double valueFontSize = 18,
@@ -361,6 +357,9 @@ class _IndexView extends StatelessWidget {
     // a green/red valueColor, the two are mutually exclusive by design.
     bool goldValue = false,
   }) {
+    // No glow — a text-shadow blur read as too smeared/hard to focus on
+    // (2026-08-24). Flat label color only, same as target_widget.dart's
+    // reference _summaryCell.
     final labelText = Text(
       label,
       style: GoogleFonts.inter(
@@ -368,18 +367,6 @@ class _IndexView extends StatelessWidget {
         fontWeight: FontWeight.w700,
         letterSpacing: 0.6,
         color: labelColor ?? ThemeV2.primary,
-        shadows: labelGlowColor == null
-            ? null
-            : [
-                Shadow(
-                  color: labelGlowColor.withValues(alpha: 0.9),
-                  blurRadius: 10,
-                ),
-                Shadow(
-                  color: labelGlowColor.withValues(alpha: 0.5),
-                  blurRadius: 20,
-                ),
-              ],
       ),
     );
     final labelWidget = leadingIcon == null
