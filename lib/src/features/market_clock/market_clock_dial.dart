@@ -2,6 +2,7 @@ import 'dart:math' show pi, cos, sin;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/theme_v2.dart';
 import 'market_clock_engine.dart';
@@ -99,12 +100,20 @@ class MarketClockDial extends StatelessWidget {
   final double ringStroke;
   final bool showDigitalReadout;
 
+  // Null (the default) is a complete no-op — the dial keeps its original
+  // green "instrument panel" face everywhere that doesn't pass a themed
+  // palette (e.g. the full Market Clock screen's own dial, not yet part
+  // of the Luxury Gold rollout). Only the face background is affected —
+  // ring/ticks/numerals stay as-is regardless.
+  final AppPalette? palette;
+
   const MarketClockDial({
     super.key,
     required this.state,
     this.size = 240,
     this.ringStroke = 7,
     this.showDigitalReadout = false,
+    this.palette,
   });
 
   @override
@@ -126,7 +135,11 @@ class MarketClockDial extends StatelessWidget {
           SizedBox(
             width: faceSize,
             height: faceSize,
-            child: CustomPaint(painter: _ClockFaceBackgroundPainter()),
+            child: CustomPaint(
+              painter: _ClockFaceBackgroundPainter(
+                faceGradient: palette?.windowGradient,
+              ),
+            ),
           ),
           if (showDigitalReadout)
             Transform.translate(
@@ -257,18 +270,30 @@ Offset _polar(Offset center, double radius, double degrees) {
 class _ClockFaceBackgroundPainter extends CustomPainter {
   static const _tickMinor = Color(0xFF5C6E64);
 
+  // Null keeps the original green instrument-panel gradient. Non-null
+  // (Luxury Gold's windowGradient) replaces it entirely — this face is
+  // just another "inner window" of the widget by the same rule every
+  // other nested panel follows.
+  final Gradient? faceGradient;
+  _ClockFaceBackgroundPainter({this.faceGradient});
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final r = size.width / 2;
 
+    final gradient =
+        faceGradient ??
+        const RadialGradient(
+          center: Alignment(0, -0.16),
+          radius: 0.9,
+          colors: [dialLight, dialMid, dialDark],
+          stops: [0.0, 0.7, 1.0],
+        );
     final dialPaint = Paint()
-      ..shader = RadialGradient(
-        center: const Alignment(0, -0.16),
-        radius: 0.9,
-        colors: [dialLight, dialMid, dialDark],
-        stops: const [0.0, 0.7, 1.0],
-      ).createShader(Rect.fromCircle(center: center, radius: r));
+      ..shader = gradient.createShader(
+        Rect.fromCircle(center: center, radius: r),
+      );
     canvas.drawCircle(center, r, dialPaint);
 
     for (int i = 0; i < 60; i++) {
@@ -303,7 +328,7 @@ class _ClockFaceBackgroundPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _ClockFaceBackgroundPainter oldDelegate) =>
-      false;
+      oldDelegate.faceGradient != faceGradient;
 }
 
 /// Hour/minute hands + center pivot cap only — painted on top of the digital

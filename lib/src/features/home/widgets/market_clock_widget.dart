@@ -1,11 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
 import '../../../features/market_clock/market_clock_dial.dart';
 import '../../../features/market_clock/market_clock_engine.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/widgets/card_frame.dart';
 
 // ---------------------------------------------------------------------------
 // Market Clock Widget — Home mini card. Same instrument-panel dial as the
@@ -13,14 +20,14 @@ import '../../../l10n/gen/app_localizations.dart';
 // compact status readout next to it. Tapping anywhere opens the full screen.
 // ---------------------------------------------------------------------------
 
-class MarketClockWidget extends StatefulWidget {
+class MarketClockWidget extends ConsumerStatefulWidget {
   const MarketClockWidget({super.key});
 
   @override
-  State<MarketClockWidget> createState() => _MarketClockWidgetState();
+  ConsumerState<MarketClockWidget> createState() => _MarketClockWidgetState();
 }
 
-class _MarketClockWidgetState extends State<MarketClockWidget> {
+class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
   late Timer _timer;
   late MarketClockState _state;
   bool _initialized = false;
@@ -47,13 +54,16 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
   @override
   Widget build(BuildContext context) {
     final window = _state.window;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return InkWell(
       onTap: () => context.push('/market-clock'),
-      borderRadius: BorderRadius.circular(22),
-      child: Container(
-        width: double.infinity,
+      borderRadius: FomoShieldTheme.cardRadius,
+      child: CardFrame(
+        showTopBar: false,
+        padding: EdgeInsets.zero,
         decoration: marketClockCardDecoration(),
+        palette: palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -61,14 +71,30 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text(
-                    AppLocalizations.of(context)!.marketClockTitle,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
+                  // This card is unconditionally dark in BOTH themes (its
+                  // own pre-existing "instrument panel" look under
+                  // Standard; the universal Luxury card gradient under
+                  // Luxury — CardFrame swaps to that automatically once a
+                  // palette with cardGradient is passed). White base text
+                  // stays correct either way; only the gold ShaderMask is
+                  // conditional. Don't use themedHeaderText's own
+                  // Standard-theme fallback here — it assumes a light
+                  // backdrop (accentPrimary/green), which this card never
+                  // has.
+                  themedGoldGradient(
+                    Text(
+                      AppLocalizations.of(context)!.marketClockTitle,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 1.2,
+                        shadows: palette.titleShadow != null
+                            ? [palette.titleShadow!]
+                            : null,
+                      ),
                     ),
+                    palette,
                   ),
                   const Spacer(),
                   Icon(
@@ -79,21 +105,34 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
                 ],
               ),
             ),
-            Divider(
-              height: 1,
-              indent: 16,
-              endIndent: 16,
-              color: Colors.white.withValues(alpha: 0.1),
-            ),
+            // Same always-dark reasoning as the title above — themedDivider's
+            // own Standard-theme fallback (near-black) would be invisible
+            // here, so only borrow its Luxury gradient, not its default.
+            palette.dividerGradient != null
+                ? themedDivider(palette)
+                : Divider(
+                    height: 1,
+                    indent: 16,
+                    endIndent: 16,
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
                 AppLocalizations.of(context)!.marketClockNewYorkTime,
+                // Matches the canonical small-label style (see Portfolio's
+                // BALANCE/CASH cell labels) — size/spacing always, color
+                // only under Luxury (this card is always dark, so the
+                // Standard-theme fallback stays dialBrassLight, not
+                // palette.accentPrimary/green, which would repeat the
+                // low-contrast pitfall documented elsewhere).
                 style: GoogleFonts.inter(
-                  fontSize: 9,
+                  fontSize: palette.windowGradient != null ? 10 : 9,
                   fontWeight: FontWeight.w700,
-                  color: dialBrassLight.withValues(alpha: 0.7),
-                  letterSpacing: 0.8,
+                  color: palette.windowGradient != null
+                      ? palette.accentPrimary
+                      : dialBrassLight.withValues(alpha: 0.7),
+                  letterSpacing: palette.windowGradient != null ? 0.6 : 0.8,
                 ),
               ),
             ),
@@ -102,7 +141,12 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  MarketClockDial(state: _state, size: 88, ringStroke: 4),
+                  MarketClockDial(
+                    state: _state,
+                    size: 88,
+                    ringStroke: 4,
+                    palette: palette,
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -134,9 +178,17 @@ class _MarketClockWidgetState extends State<MarketClockWidget> {
                           window.shortDetail,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
+                          // Matches the canonical muted secondary-text color
+                          // (see Watchlist's sector-name text) under Luxury
+                          // only — this card is always dark, so Standard
+                          // keeps its original dialIvory@70% (palette.textBody
+                          // there is a dark, light-backdrop color and would
+                          // be unreadable here).
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: dialIvory.withValues(alpha: 0.7),
+                            color: palette.windowGradient != null
+                                ? palette.textBody
+                                : dialIvory.withValues(alpha: 0.7),
                           ),
                         ),
                         const SizedBox(height: 6),
