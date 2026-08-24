@@ -567,26 +567,32 @@ class _VerticalProgressBar extends StatelessWidget {
                   width: 34,
                   child: Align(
                     alignment: Alignment(0, pillAlignY),
-                    child: Container(
-                      height: 20,
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: ThemeV2.primary,
+                    child: palette.windowGradient != null
+                        ? themedBorder(
+                            palette: palette,
+                            borderRadius: BorderRadius.circular(6),
+                            child: _pillContent(currentPercent, palette),
+                          )
+                        : Container(
+                            height: 20,
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: ThemeV2.primary,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -648,6 +654,30 @@ class _VerticalProgressBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Luxury-only pill fill: window style (gold border via [themedBorder]
+  /// wraps this), window gradient fill, gold digits — instead of the
+  /// button-gradient treatment used elsewhere (e.g. the swipe dots), per
+  /// explicit correction: this is a "window," not a button.
+  Widget _pillContent(double currentPercent, AppPalette palette) {
+    return Container(
+      height: 20,
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(gradient: palette.windowGradient),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: palette.accentPrimary,
+          ),
+        ),
       ),
     );
   }
