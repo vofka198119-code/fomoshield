@@ -31,7 +31,7 @@ Widget themedBorder({
   final radius = borderRadius ?? FomoShieldTheme.cardRadius;
   return Container(
     margin: margin,
-    padding: const EdgeInsets.all(1.5),
+    padding: const EdgeInsets.all(1),
     decoration: BoxDecoration(
       gradient: gradient,
       borderRadius: radius,
@@ -39,7 +39,7 @@ Widget themedBorder({
     ),
     child: ClipRRect(
       borderRadius: BorderRadius.circular(
-        (radius.topLeft.x - 1.5).clamp(0.0, double.infinity),
+        (radius.topLeft.x - 1).clamp(0.0, double.infinity),
       ),
       child: child,
     ),

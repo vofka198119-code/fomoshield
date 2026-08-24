@@ -96,7 +96,7 @@ class CardFrame extends StatelessWidget {
       return Container(
         width: double.infinity,
         margin: margin ?? EdgeInsets.zero,
-        padding: const EdgeInsets.all(1.5),
+        padding: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           gradient: borderGradient,
           borderRadius: FomoShieldTheme.cardRadius,
