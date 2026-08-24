@@ -69,13 +69,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
 
     // Resolved once per build from whichever theme is active — see
-    // app_palette.dart. Molecule 1 (background) plus minimal AppBar/button
-    // legibility for Luxury Gold; everything else on this screen (widget
-    // cards, disclaimer footer) is untouched until later molecules land.
-    // Adding a future theme needs no changes here — see resolveAppPalette.
+    // app_palette.dart. The app-wide background gradient itself is now
+    // painted once in main.dart (not here) so every screen picks it up
+    // uniformly; this local palette only drives this screen's own
+    // AppBar/button/widget-card styling.
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
-    final scaffold = Scaffold(
+    return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -158,21 +158,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
-
-    // Painted here (not in main.dart) so only Home gets it for now —
-    // everything else in the app stays on the normal light background
-    // until this theme rolls out further. Gradient takes priority over a
-    // flat color when a theme defines both.
-    if (palette.backgroundGradient != null) {
-      return DecoratedBox(
-        decoration: BoxDecoration(gradient: palette.backgroundGradient),
-        child: scaffold,
-      );
-    }
-    if (palette.background != null) {
-      return ColoredBox(color: palette.background!, child: scaffold);
-    }
-    return scaffold;
   }
 
   Widget _buildWidget(String id) {

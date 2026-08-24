@@ -14,6 +14,8 @@ import 'src/core/overlay/app_overlay_host.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
+import 'src/core/theme/app_palette.dart';
+import 'src/core/theme/theme_variant_provider.dart';
 import 'src/features/orders/pending_orders_checker.dart';
 import 'src/l10n/gen/app_localizations.dart';
 
@@ -110,6 +112,12 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
   @override
   Widget build(BuildContext context) {
     final languageOverride = ref.watch(languageProvider);
+    // Single global source for the app-wide background gradient AND status
+    // bar icon brightness — every screen sits on this (Home used to paint
+    // its own override on top since this was Standard-only; now that every
+    // screen is expected to pick up the active theme, this is the one
+    // place that needs to know about AppPalette, not each screen).
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return MaterialApp.router(
       title: 'F.O.M.O. Shield',
       debugShowCheckedModeBanner: false,
@@ -134,20 +142,48 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
         return MediaQuery.withClampedTextScaling(
           minScaleFactor: 1.0,
           maxScaleFactor: 1.3,
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: ThemeV2.backgroundGradient,
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            // Dark icons read fine on Standard's light background; once
+            // Luxury Gold's dark background is active, they'd be
+            // dark-on-dark and invisible, so flip to light icons whenever
+            // the palette defines a dark backdrop.
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness:
+                  palette.backgroundGradient != null || palette.background != null
+                  ? Brightness.light
+                  : Brightness.dark,
+              systemNavigationBarColor: Colors.transparent,
+              systemNavigationBarDividerColor: Colors.transparent,
+              systemNavigationBarIconBrightness:
+                  palette.backgroundGradient != null || palette.background != null
+                  ? Brightness.light
+                  : Brightness.dark,
             ),
-            child: Center(
-              child: SizedBox(
-                width: 430,
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    scaffoldBackgroundColor: Colors.transparent,
-                    canvasColor: Colors.transparent,
-                  ),
-                  child: AppOverlayHost(
-                    child: child ?? const SizedBox.shrink(),
+            child: Container(
+              decoration: BoxDecoration(
+                // Priority: a themed gradient, else a themed flat color,
+                // else Standard's own default gradient. Mirrors the
+                // 3-way fallback every screen used to hand-roll itself.
+                gradient: palette.backgroundGradient ??
+                    (palette.background == null
+                        ? ThemeV2.backgroundGradient
+                        : null),
+                color: palette.backgroundGradient == null
+                    ? palette.background
+                    : null,
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: 430,
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      scaffoldBackgroundColor: Colors.transparent,
+                      canvasColor: Colors.transparent,
+                    ),
+                    child: AppOverlayHost(
+                      child: child ?? const SizedBox.shrink(),
+                    ),
                   ),
                 ),
               ),
