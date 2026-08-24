@@ -18,6 +18,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../core/cache/logo_providers.dart'
     show resolvedCompanyNameProvider;
 import '../../../shared/utils/currency_format.dart';
@@ -29,12 +33,14 @@ class PortfolioBalanceWidget extends ConsumerStatefulWidget {
   final PortfolioPerformance? performance;
   final bool isLoading;
   final bool hasError;
+  final AppPalette palette;
 
   const PortfolioBalanceWidget({
     super.key,
     this.performance,
     this.isLoading = false,
     this.hasError = false,
+    required this.palette,
   });
 
   @override
@@ -50,28 +56,35 @@ class _PortfolioBalanceWidgetState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
     if (widget.isLoading || widget.hasError || widget.performance == null) {
-      return Container(
-        width: double.infinity,
-        height: 260,
+      return CardFrame(
+        showTopBar: false,
+        padding: EdgeInsets.zero,
         decoration: FomoShieldTheme.cardDecoration,
-        alignment: Alignment.center,
-        child: widget.hasError
-            ? Text(
-                l10n.commonFailedToLoad,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: ThemeV2.textSecondary,
-                ),
-              )
-            : const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: ThemeV2.primary,
-                ),
-              ),
+        palette: palette,
+        child: SizedBox(
+          width: double.infinity,
+          height: 260,
+          child: Center(
+            child: widget.hasError
+                ? Text(
+                    l10n.commonFailedToLoad,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: palette.textBody,
+                    ),
+                  )
+                : SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: palette.accentPrimary,
+                    ),
+                  ),
+          ),
+        ),
       );
     }
 
@@ -101,28 +114,25 @@ class _PortfolioBalanceWidgetState
         ? formatUsd(0)
         : '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         children: [
           SizedBox(
             width: double.infinity,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-              child: Text(
+              child: themedHeaderText(
                 l10n.portfolioBalanceLabel,
-                style: FomoShieldTheme.cardTitle(),
+                palette,
+                FomoShieldTheme.cardTitle(),
               ),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
+          themedDivider(palette),
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -160,18 +170,15 @@ class _PortfolioBalanceWidgetState
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: ThemeV2.primary,
+                              color: palette.accentPrimary,
                               letterSpacing: 0.5,
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text(
+                          themedPriceText(
                             formatUsd(portfolioTotal),
-                            style: interNums(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w600,
-                              color: ThemeV2.textPrimary,
-                            ),
+                            palette,
+                            interNums(fontSize: 28, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 6),
                           Text(
@@ -235,7 +242,7 @@ class _PortfolioBalanceWidgetState
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: ThemeV2.textPrimary,
+                                  color: palette.textHeader,
                                 ),
                               ),
                             ),
@@ -245,7 +252,7 @@ class _PortfolioBalanceWidgetState
                               style: interNums(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: ThemeV2.textSecondary,
+                                color: palette.textBody,
                               ),
                             ),
                           ],
@@ -258,7 +265,9 @@ class _PortfolioBalanceWidgetState
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
-                            color: ThemeV2.primary.withValues(alpha: 0.06),
+                            color: palette.accentPrimary.withValues(
+                              alpha: 0.06,
+                            ),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Center(
@@ -271,7 +280,7 @@ class _PortfolioBalanceWidgetState
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: ThemeV2.primary,
+                                color: palette.accentPrimary,
                               ),
                             ),
                           ),

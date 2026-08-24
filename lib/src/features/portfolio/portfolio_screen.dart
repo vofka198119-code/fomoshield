@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
 import '../../core/router/navigation_history_provider.dart';
 import '../../core/supabase/supabase_providers.dart';
 import 'portfolio_providers.dart';
@@ -41,6 +44,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     final activeId = ref.watch(activePortfolioIdProvider);
     final effectiveId =
         activeId ?? (portfolios.isNotEmpty ? portfolios.first.id : null);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -48,15 +52,15 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: ThemeV2.primary),
+          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
           onPressed: () => context.go(ref.read(previousTabRouteProvider)),
         ),
-        title: Text(
+        title: themedHeaderText(
           l10n.portfolioWidgetTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -133,14 +137,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
         ],
       ),
       body: portfolios.isEmpty
-          ? _emptyState(context)
+          ? _emptyState(context, palette)
           : effectiveId == null
-          ? _emptyState(context)
+          ? _emptyState(context, palette)
           : _PortfolioBody(portfolioId: effectiveId),
     );
   }
 
-  Widget _emptyState(BuildContext context) {
+  Widget _emptyState(BuildContext context, AppPalette palette) {
     final l10n = AppLocalizations.of(context)!;
     final tier = ref.watch(subscriptionTierProvider);
     final startingCapital = startingCapitalForTier(tier);
@@ -150,10 +154,10 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.account_balance_wallet_rounded,
               size: 64,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
             ),
             const SizedBox(height: 16),
             Text(
@@ -161,7 +165,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: ThemeV2.textPrimary,
+                color: palette.textHeader,
               ),
             ),
             const SizedBox(height: 8),
@@ -170,7 +174,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: ThemeV2.textSecondary,
+                color: palette.textBody,
               ),
             ),
             const SizedBox(height: 24),

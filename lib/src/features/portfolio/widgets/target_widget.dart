@@ -5,6 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../core/theme/themed_border.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/segment_gauge_math.dart';
@@ -73,35 +78,37 @@ class TargetWidget extends ConsumerWidget {
       goalAmount: goalAmount,
     );
     final remaining = goalAmount != null ? goalAmount - currentValue : null;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return CardFrame(
       showTopBar: false,
       padding: EdgeInsets.zero,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text(
+            child: themedHeaderText(
               AppLocalizations.of(context)!.targetLabel,
-              style: FomoShieldTheme.cardTitle(),
+              palette,
+              FomoShieldTheme.cardTitle(),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
+          themedDivider(palette),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-            child: _GraphWindow(currentPercent: currentPercent),
+            child: _GraphWindow(
+              currentPercent: currentPercent,
+              palette: palette,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
             child: _GoalSummaryRow(
               goalAmount: goalAmount,
               remaining: remaining,
+              palette: palette,
             ),
           ),
           Padding(
@@ -124,15 +131,20 @@ class TargetWidget extends ConsumerWidget {
 class _GoalSummaryRow extends StatelessWidget {
   final double? goalAmount;
   final double? remaining; // >0: still short, <=0: goal met/exceeded
+  final AppPalette palette;
 
-  const _GoalSummaryRow({required this.goalAmount, required this.remaining});
+  const _GoalSummaryRow({
+    required this.goalAmount,
+    required this.remaining,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
     final goalText = goalAmount != null ? formatUsd(goalAmount!) : '—';
 
     String remainingText = '—';
-    Color remainingColor = ThemeV2.textPrimary;
+    Color? remainingColor;
     Color remainingBg = ThemeV2.primaryBg;
     if (remaining != null) {
       remainingText = formatUsdSigned(-remaining!);
@@ -148,21 +160,30 @@ class _GoalSummaryRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: _summaryBox(
-            label: AppLocalizations.of(context)!.targetGoalLabel,
-            value: goalText,
-            alignEnd: false,
-            bgColor: ThemeV2.primaryBg,
+          child: themedBorder(
+            palette: palette,
+            borderRadius: BorderRadius.circular(16),
+            child: _summaryBox(
+              label: AppLocalizations.of(context)!.targetGoalLabel,
+              value: goalText,
+              alignEnd: false,
+              bgColor: ThemeV2.primaryBg,
+              goldValue: true,
+            ),
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: _summaryBox(
-            label: AppLocalizations.of(context)!.targetLeftToGoal,
-            value: remainingText,
-            valueColor: remainingColor,
-            alignEnd: true,
-            bgColor: remainingBg,
+          child: themedBorder(
+            palette: palette,
+            borderRadius: BorderRadius.circular(16),
+            child: _summaryBox(
+              label: AppLocalizations.of(context)!.targetLeftToGoal,
+              value: remainingText,
+              valueColor: remainingColor,
+              alignEnd: true,
+              bgColor: remainingBg,
+            ),
           ),
         ),
       ],
@@ -174,20 +195,27 @@ class _GoalSummaryRow extends StatelessWidget {
     required String value,
     required bool alignEnd,
     required Color bgColor,
-    Color valueColor = ThemeV2.textPrimary,
+    Color? valueColor,
+    bool goldValue = false,
   }) {
+    final hasThemedBorder = palette.borderGradient != null;
+    final effectiveGradient = hasThemedBorder ? palette.windowGradient : null;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: effectiveGradient == null ? bgColor : null,
+        gradient: effectiveGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeV2.divider),
+        border: effectiveGradient == null && !hasThemedBorder
+            ? Border.all(color: ThemeV2.divider)
+            : null,
       ),
       child: _summaryCell(
         label: label,
         value: value,
         alignEnd: alignEnd,
         valueColor: valueColor,
+        goldValue: goldValue,
       ),
     );
   }
@@ -196,12 +224,19 @@ class _GoalSummaryRow extends StatelessWidget {
     required String label,
     required String value,
     required bool alignEnd,
-    Color valueColor = ThemeV2.textPrimary,
+    Color? valueColor,
+    bool goldValue = false,
   }) {
     final crossAlign = alignEnd
         ? CrossAxisAlignment.end
         : CrossAxisAlignment.start;
     final boxAlign = alignEnd ? Alignment.centerRight : Alignment.centerLeft;
+    final valueStyle = interNums(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: valueColor ?? palette.textHeader,
+      letterSpacing: -0.3,
+    );
     return Column(
       crossAxisAlignment: crossAlign,
       children: [
@@ -211,22 +246,16 @@ class _GoalSummaryRow extends StatelessWidget {
             fontSize: 10,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.6,
-            color: ThemeV2.primary,
+            color: palette.accentPrimary,
           ),
         ),
         const SizedBox(height: 4),
         FittedBox(
           fit: BoxFit.scaleDown,
           alignment: boxAlign,
-          child: Text(
-            value,
-            style: interNums(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: valueColor,
-              letterSpacing: -0.3,
-            ),
-          ),
+          child: goldValue
+              ? themedPriceText(value, palette, valueStyle)
+              : Text(value, style: valueStyle),
         ),
       ],
     );
@@ -279,35 +308,47 @@ class _SelectGoalButton extends StatelessWidget {
 /// standard card, holding the marker, bar, and tick labels.
 class _GraphWindow extends StatelessWidget {
   final double currentPercent;
+  final AppPalette palette;
 
-  const _GraphWindow({required this.currentPercent});
+  const _GraphWindow({required this.currentPercent, required this.palette});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final radius = BorderRadius.circular(16);
+    final content = Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(gradient: palette.windowGradient, borderRadius: radius)
+          : darkCardDecoration(borderRadius: radius),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _MarkerRow(currentPercent: currentPercent),
+          _MarkerRow(currentPercent: currentPercent, palette: palette),
           const SizedBox(height: 4),
           _SegmentedBar(currentPercent: currentPercent),
           const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [_Tick('-100%'), _Tick('0%'), _Tick('+100%')],
+            children: [
+              _Tick('-100%', palette: palette),
+              _Tick('0%', palette: palette),
+              _Tick('+100%', palette: palette),
+            ],
           ),
         ],
       ),
     );
+    return palette.windowGradient != null
+        ? themedBorder(palette: palette, borderRadius: radius, child: content)
+        : content;
   }
 }
 
 class _Tick extends StatelessWidget {
   final String label;
-  const _Tick(this.label);
+  final AppPalette palette;
+  const _Tick(this.label, {required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -316,17 +357,23 @@ class _Tick extends StatelessWidget {
       style: GoogleFonts.inter(
         fontSize: 11,
         fontWeight: FontWeight.w600,
-        color: Colors.white.withValues(alpha: 0.5),
+        color: palette.windowGradient != null
+            ? palette.textHeader
+            : Colors.white.withValues(alpha: 0.5),
       ),
     );
   }
 }
 
 /// Small pill showing the current %, floating above the bar at the
-/// matching horizontal position.
+/// matching horizontal position. Window style (gold border + window
+/// gradient + flat gold digits) under Luxury, matching the identical
+/// pill on Home's compact Portfolio bar — not the button treatment, per
+/// explicit correction there.
 class _MarkerRow extends StatelessWidget {
   final double currentPercent; // any range, clamped for position only
-  const _MarkerRow({required this.currentPercent});
+  final AppPalette palette;
+  const _MarkerRow({required this.currentPercent, required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -340,30 +387,46 @@ class _MarkerRow extends StatelessWidget {
             0.0,
             constraints.maxWidth - pillWidth,
           );
-          return Stack(
-            children: [
-              Positioned(
-                left: x,
-                child: Container(
+          final pillRadius = BorderRadius.circular(6);
+          final pillText =
+              '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%';
+          final pill = palette.windowGradient != null
+              ? themedBorder(
+                  palette: palette,
+                  borderRadius: pillRadius,
+                  child: Container(
+                    width: pillWidth,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    decoration: BoxDecoration(gradient: palette.windowGradient),
+                    child: Text(
+                      pillText,
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: palette.accentPrimary,
+                      ),
+                    ),
+                  ),
+                )
+              : Container(
                   width: pillWidth,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: pillRadius,
                   ),
                   child: Text(
-                    '${currentPercent >= 0 ? '+' : ''}${currentPercent.toStringAsFixed(0)}%',
+                    pillText,
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: ThemeV2.primary,
                     ),
                   ),
-                ),
-              ),
-            ],
-          );
+                );
+          return Stack(children: [Positioned(left: x, child: pill)]);
         },
       ),
     );

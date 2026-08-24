@@ -17,6 +17,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
@@ -27,11 +31,13 @@ import '../portfolio_providers.dart';
 class PortfolioHoldingsWidget extends StatefulWidget {
   final String portfolioId;
   final List<HoldingPerformance>? holdings;
+  final AppPalette palette;
 
   const PortfolioHoldingsWidget({
     super.key,
     required this.portfolioId,
     this.holdings,
+    required this.palette,
   });
 
   @override
@@ -67,7 +73,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
     return _cachedSorted!;
   }
 
-  Widget _addButton(BuildContext context) {
+  Widget _addButton(BuildContext context, AppPalette palette) {
     return GestureDetector(
       onTap: () =>
           context.push('/search', extra: {'portfolioId': widget.portfolioId}),
@@ -75,11 +81,11 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
         width: 30,
         height: 30,
         decoration: BoxDecoration(
-          color: ThemeV2.primary.withValues(alpha: 0.12),
+          color: palette.accentPrimary.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(8),
         ),
         alignment: Alignment.center,
-        child: Icon(Icons.add_rounded, size: 18, color: ThemeV2.primary),
+        child: Icon(Icons.add_rounded, size: 18, color: palette.accentPrimary),
       ),
     );
   }
@@ -88,19 +94,26 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final holdings = widget.holdings;
+    final palette = widget.palette;
 
     if (holdings == null) {
-      return Container(
-        width: double.infinity,
-        height: 200,
+      return CardFrame(
+        showTopBar: false,
+        padding: EdgeInsets.zero,
         decoration: FomoShieldTheme.cardDecoration,
-        alignment: Alignment.center,
-        child: const SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: ThemeV2.primary,
+        palette: palette,
+        child: SizedBox(
+          width: double.infinity,
+          height: 200,
+          child: Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: palette.accentPrimary,
+              ),
+            ),
           ),
         ),
       );
@@ -109,10 +122,11 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
     final sorted = _sortedHoldings(holdings);
     final display = _showAll ? sorted : sorted.take(_previewLimit).toList();
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         children: [
           SizedBox(
@@ -121,9 +135,13 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text(l10n.holdingsTitle, style: FomoShieldTheme.cardTitle()),
+                  themedHeaderText(
+                    l10n.holdingsTitle,
+                    palette,
+                    FomoShieldTheme.cardTitle(),
+                  ),
                   const Spacer(),
-                  _addButton(context),
+                  _addButton(context, palette),
                 ],
               ),
             ),
@@ -139,7 +157,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
+                        color: palette.textHeader,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -147,7 +165,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                       l10n.holdingsEmptyHint,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: ThemeV2.textSecondary,
+                        color: palette.textBody,
                       ),
                     ),
                   ],
@@ -155,18 +173,14 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
               ),
             )
           else ...[
-            Divider(
-              height: 1,
-              indent: 16,
-              endIndent: 16,
-              color: Colors.black.withValues(alpha: 0.06),
-            ),
+            themedDivider(palette),
             for (int i = 0; i < display.length; i++)
               _HoldingRow(
                 holding: display[i],
                 portfolioId: widget.portfolioId,
                 colorIndex: i,
                 showDivider: i < display.length - 1,
+                palette: palette,
               ),
             if (sorted.length > _previewLimit)
               GestureDetector(
@@ -176,7 +190,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: ThemeV2.primary.withValues(alpha: 0.06),
+                    color: palette.accentPrimary.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
@@ -189,7 +203,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.primary,
+                        color: palette.accentPrimary,
                       ),
                     ),
                   ),
@@ -209,12 +223,14 @@ class _HoldingRow extends ConsumerWidget {
   final String portfolioId;
   final int colorIndex;
   final bool showDivider;
+  final AppPalette palette;
 
   const _HoldingRow({
     required this.holding,
     required this.portfolioId,
     required this.colorIndex,
     required this.showDivider,
+    required this.palette,
   });
 
   @override
@@ -285,7 +301,7 @@ class _HoldingRow extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -293,7 +309,7 @@ class _HoldingRow extends ConsumerWidget {
                     holding.symbol,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -305,7 +321,7 @@ class _HoldingRow extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ],
@@ -318,13 +334,10 @@ class _HoldingRow extends ConsumerWidget {
               children: [
                 FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(
+                  child: themedPriceText(
                     formatUsd(holding.currentValue),
-                    style: interNums(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
-                    ),
+                    palette,
+                    interNums(fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                 ),
                 const SizedBox(height: 2),

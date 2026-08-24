@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/themed_header.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../utils/currency_format.dart';
@@ -23,6 +25,9 @@ class TradeHistoryTile extends StatelessWidget {
   final double totalValue;
   final VoidCallback? onTap;
   final bool showDivider;
+  // Null (the default) is a complete no-op — every existing call site is
+  // unaffected unless it opts in by passing a palette.
+  final AppPalette? palette;
 
   const TradeHistoryTile({
     super.key,
@@ -32,11 +37,14 @@ class TradeHistoryTile extends StatelessWidget {
     required this.totalValue,
     this.onTap,
     this.showDivider = true,
+    this.palette,
   });
 
   @override
   Widget build(BuildContext context) {
     final accent = isBuy ? ThemeV2.success : ThemeV2.loss;
+    final headerColor = palette?.textHeader ?? ThemeV2.textPrimary;
+    final bodyColor = palette?.textBody ?? ThemeV2.textSecondary;
 
     return Material(
       color: Colors.transparent,
@@ -103,16 +111,13 @@ class TradeHistoryTile extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
+                        color: headerColor,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       symbol,
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: ThemeV2.textSecondary,
-                      ),
+                      style: GoogleFonts.inter(fontSize: 11, color: bodyColor),
                     ),
                   ],
                 ),
@@ -122,14 +127,20 @@ class TradeHistoryTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    formatUsd(totalValue),
-                    style: interNums(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
-                    ),
-                  ),
+                  palette != null
+                      ? themedPriceText(
+                          formatUsd(totalValue),
+                          palette!,
+                          interNums(fontSize: 14, fontWeight: FontWeight.w700),
+                        )
+                      : Text(
+                          formatUsd(totalValue),
+                          style: interNums(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: ThemeV2.textPrimary,
+                          ),
+                        ),
                   const SizedBox(height: 3),
                   Container(
                     padding: const EdgeInsets.symmetric(

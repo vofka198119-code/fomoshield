@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/cache/logo_providers.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/trade_history_tile.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -16,8 +17,13 @@ import '../portfolio_providers.dart';
 
 class PortfolioTradeHistoryWidget extends ConsumerWidget {
   final String portfolioId;
+  final AppPalette palette;
 
-  const PortfolioTradeHistoryWidget({super.key, required this.portfolioId});
+  const PortfolioTradeHistoryWidget({
+    super.key,
+    required this.portfolioId,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,6 +47,7 @@ class PortfolioTradeHistoryWidget extends ConsumerWidget {
       title: l10n.tradeHistoryTitle,
       showFooter: hasMore,
       footerText: l10n.commonMoreCount(allTx.length - 5),
+      palette: palette,
       onTap: hasMore
           ? () => context.push('/portfolio/$portfolioId/trade-history')
           : null,
@@ -56,6 +63,7 @@ class PortfolioTradeHistoryWidget extends ConsumerWidget {
               isBuy: tx.type == TransactionType.buy,
               totalValue: tx.shares * tx.price,
               showDivider: false,
+              palette: palette,
               onTap: () => context.push(
                 '/portfolio/$portfolioId/trade-detail',
                 extra: tx,

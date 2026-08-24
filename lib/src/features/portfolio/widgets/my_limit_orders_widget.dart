@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../orders/order_provider.dart';
 import '../../orders/widgets/order_row_tile.dart';
 import '../../orders/widgets/order_list_sheet.dart';
@@ -20,8 +23,13 @@ const int _inlineLimit = 5;
 
 class MyLimitOrdersWidget extends ConsumerWidget {
   final String portfolioId;
+  final AppPalette palette;
 
-  const MyLimitOrdersWidget({super.key, required this.portfolioId});
+  const MyLimitOrdersWidget({
+    super.key,
+    required this.portfolioId,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,15 +40,23 @@ class MyLimitOrdersWidget extends ConsumerWidget {
     final shown = orders.take(_inlineLimit).toList();
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
       padding: const EdgeInsets.fromLTRB(22, 14, 22, 4),
       decoration: FomoShieldTheme.cardDecoration,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.myLimitOrdersTitle, style: FomoShieldTheme.cardTitle()),
-          const Divider(height: 20, color: Color(0x0F000000)),
+          themedHeaderText(
+            l10n.myLimitOrdersTitle,
+            palette,
+            FomoShieldTheme.cardTitle(),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: themedDivider(palette, indent: 0, endIndent: 0),
+          ),
           if (orders.isEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 14),
@@ -48,7 +64,7 @@ class MyLimitOrdersWidget extends ConsumerWidget {
                 l10n.myLimitOrdersEmpty,
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: ThemeV2.textSecondary,
+                  color: palette.textBody,
                 ),
               ),
             )
@@ -70,7 +86,7 @@ class MyLimitOrdersWidget extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.primary,
+                        color: palette.accentPrimary,
                       ),
                     ),
                   ),

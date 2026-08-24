@@ -81,10 +81,11 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
     );
     final widgetConfigs = ref.watch(portfolioWidgetsProvider);
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return RefreshIndicator(
-      color: ThemeV2.primary,
-      backgroundColor: ThemeV2.surface,
+      color: palette.accentPrimary,
+      backgroundColor: palette.card,
       onRefresh: () async {
         ref.invalidate(portfolioPerformanceProvider(widget.portfolioId));
         await Future.delayed(const Duration(milliseconds: 500));
@@ -98,14 +99,14 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             // Render visible widgets in order
             ...performanceAsync.when(
               loading: () => [
-                _buildWidget('portfolio_balance', isLoading: true),
-                _buildWidget('portfolio_cash', isLoading: true),
-                _buildWidget('portfolio_holdings', isLoading: true),
+                _buildWidget('portfolio_balance', palette, isLoading: true),
+                _buildWidget('portfolio_cash', palette, isLoading: true),
+                _buildWidget('portfolio_holdings', palette, isLoading: true),
               ],
               error: (_, _) => [
-                _buildWidget('portfolio_balance', hasError: true),
-                _buildWidget('portfolio_cash', hasError: true),
-                _buildWidget('portfolio_holdings', hasError: true),
+                _buildWidget('portfolio_balance', palette, hasError: true),
+                _buildWidget('portfolio_cash', palette, hasError: true),
+                _buildWidget('portfolio_holdings', palette, hasError: true),
               ],
               data: (perf) => [
                 for (int i = 0; i < visibleWidgets.length; i++)
@@ -113,6 +114,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                     index: i,
                     child: _buildWidget(
                       visibleWidgets[i].id,
+                      palette,
                       performance: perf,
                     ),
                   ),
@@ -123,9 +125,9 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             Center(
               child: TextButton.icon(
                 onPressed: _showWidgetsBottomSheet,
-                icon: const Icon(
+                icon: Icon(
                   Icons.add_rounded,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                   size: 20,
                 ),
                 label: Text(
@@ -133,7 +135,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: ThemeV2.primary,
+                    color: palette.accentPrimary,
                   ),
                 ),
                 style: TextButton.styleFrom(
@@ -143,7 +145,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: ThemeV2.primary, width: 0.5),
+                    side: BorderSide(color: palette.accentPrimary, width: 0.5),
                   ),
                 ),
               ),
@@ -157,7 +159,8 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
   }
 
   Widget _buildWidget(
-    String id, {
+    String id,
+    AppPalette palette, {
     PortfolioPerformance? performance,
     bool isLoading = false,
     bool hasError = false,
@@ -170,6 +173,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             performance: performance,
             isLoading: isLoading,
             hasError: hasError,
+            palette: palette,
           ),
         );
       case 'portfolio_cash':
@@ -179,6 +183,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             cash: performance?.cash,
             isLoading: isLoading,
             hasError: hasError,
+            palette: palette,
           ),
         );
       case 'target':
@@ -198,6 +203,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             child: PortfolioHoldingsWidget(
               portfolioId: widget.portfolioId,
               holdings: null,
+              palette: palette,
             ),
           );
         }
@@ -207,17 +213,24 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
           child: PortfolioHoldingsWidget(
             portfolioId: widget.portfolioId,
             holdings: performance.holdings,
+            palette: palette,
           ),
         );
       case 'trade_history':
         return Padding(
           padding: const EdgeInsets.only(bottom: 24),
-          child: PortfolioTradeHistoryWidget(portfolioId: widget.portfolioId),
+          child: PortfolioTradeHistoryWidget(
+            portfolioId: widget.portfolioId,
+            palette: palette,
+          ),
         );
       case 'my_limit_orders':
         return Padding(
           padding: const EdgeInsets.only(bottom: 24),
-          child: MyLimitOrdersWidget(portfolioId: widget.portfolioId),
+          child: MyLimitOrdersWidget(
+            portfolioId: widget.portfolioId,
+            palette: palette,
+          ),
         );
       default:
         return const SizedBox.shrink();
