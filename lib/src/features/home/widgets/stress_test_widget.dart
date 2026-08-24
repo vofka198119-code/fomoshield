@@ -11,6 +11,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_border.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/widget_container.dart';
@@ -86,7 +90,17 @@ class StressTestWidget extends ConsumerWidget {
                     ),
                     itemBuilder: (_, i) {
                       final s = activeSessions[i];
-                      return _buildActiveSessionTile(sheetContext, ref, s, i);
+                      // This sheet is always light/white, unrelated to the
+                      // Luxury Gold rollout (modals stay out of scope) — an
+                      // explicit Standard palette keeps the tile's look
+                      // exactly as before regardless of the active theme.
+                      return _buildActiveSessionTile(
+                        sheetContext,
+                        ref,
+                        s,
+                        i,
+                        AppPalette.standard,
+                      );
                     },
                   ),
                 ),
@@ -110,6 +124,7 @@ class StressTestWidget extends ConsumerWidget {
         .toList();
     final tier = ref.watch(subscriptionTierProvider);
     final isFree = tier == SubscriptionTier.free;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     // Collect all children
     final List<Widget> children = [];
@@ -117,7 +132,7 @@ class StressTestWidget extends ConsumerWidget {
     // ── Active sessions ────────────────────────────────────────────
     if (activeSessions.isNotEmpty) {
       final preview = activeSessions.take(2).toList().asMap().entries.map((e) {
-        return _buildActiveSessionTile(context, ref, e.value, e.key);
+        return _buildActiveSessionTile(context, ref, e.value, e.key, palette);
       }).toList();
       children.addAll(preview);
     }
@@ -125,7 +140,7 @@ class StressTestWidget extends ConsumerWidget {
     // ── Completed results ("Мои результаты") ───────────────────────
     if (completedSessions.isNotEmpty) {
       final completedPreview = completedSessions.take(2).map((session) {
-        return _buildCompletedResultTile(context, ref, session);
+        return _buildCompletedResultTile(context, ref, session, palette);
       }).toList();
 
       children.add(
@@ -138,7 +153,7 @@ class StressTestWidget extends ConsumerWidget {
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                   letterSpacing: 0.6,
                 ),
               ),
@@ -146,27 +161,36 @@ class StressTestWidget extends ConsumerWidget {
               Icon(
                 Icons.check_circle_rounded,
                 size: 12,
-                color: ThemeV2.primary,
+                color: palette.accentPrimary,
               ),
               const Spacer(),
               // PREMIUM badge for free users
               if (isFree)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: darkCardDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    l10n.profilePremiumBadge,
-                    style: GoogleFonts.inter(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w800,
-                      color: dialBrassLight,
-                      letterSpacing: 1.2,
-                      shadows: _goldGlow(dialBrassLight),
+                themedBorder(
+                  palette: palette,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: palette.windowGradient != null
+                        ? BoxDecoration(
+                            gradient: palette.windowGradient,
+                            borderRadius: BorderRadius.circular(8),
+                          )
+                        : darkCardDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                    child: Text(
+                      l10n.profilePremiumBadge,
+                      style: GoogleFonts.inter(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                        color: dialBrassLight,
+                        letterSpacing: 1.2,
+                        shadows: _goldGlow(dialBrassLight),
+                      ),
                     ),
                   ),
                 ),
@@ -184,7 +208,7 @@ class StressTestWidget extends ConsumerWidget {
               l10n.stressTestMoreCompleted(completedSessions.length - 2),
               style: GoogleFonts.inter(
                 fontSize: 11,
-                color: ThemeV2.textSecondary,
+                color: palette.textBody,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -198,15 +222,16 @@ class StressTestWidget extends ConsumerWidget {
       return WidgetContainer(
         title: l10n.stressTestWidgetTitle,
         showFooter: false,
+        palette: palette,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.psychology_rounded,
-                  color: ThemeV2.textSecondary,
+                  color: palette.textBody,
                   size: 32,
                 ),
                 const SizedBox(height: 8),
@@ -215,7 +240,7 @@ class StressTestWidget extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -224,7 +249,7 @@ class StressTestWidget extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                   ),
                 ),
               ],
@@ -240,6 +265,7 @@ class StressTestWidget extends ConsumerWidget {
           ? () => _showAllTestsSheet(context, ref)
           : null,
       showFooter: activeSessions.length > 2,
+      palette: palette,
       children: children,
     );
   }
@@ -314,6 +340,7 @@ class StressTestWidget extends ConsumerWidget {
     WidgetRef ref,
     StressTestSession session,
     int index,
+    AppPalette palette,
   ) {
     final tierBadge = _tierBadge(ref, context, index);
     final l10n = AppLocalizations.of(context)!;
@@ -325,16 +352,25 @@ class StressTestWidget extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: darkCardDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                Icons.play_circle_rounded,
-                color: _playIconColor(ref, index),
-                size: 22,
+            themedBorder(
+              palette: palette,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: palette.windowGradient != null
+                    ? BoxDecoration(
+                        gradient: palette.windowGradient,
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                    : darkCardDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                child: Icon(
+                  Icons.play_circle_rounded,
+                  color: _playIconColor(ref, index),
+                  size: 22,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -349,7 +385,7 @@ class StressTestWidget extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
+                        color: palette.textHeader,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -364,13 +400,10 @@ class StressTestWidget extends ConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
+                themedPriceText(
                   formatUsd(session.totalValue),
-                  style: interNums(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.textPrimary,
-                  ),
+                  palette,
+                  interNums(fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -395,6 +428,7 @@ class StressTestWidget extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     StressTestSession session,
+    AppPalette palette,
   ) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -418,16 +452,25 @@ class StressTestWidget extends ConsumerWidget {
           children: [
             // Completed-test icon — same badge style as the active-test
             // play button, stop square instead of a play triangle.
-            Container(
-              width: 40,
-              height: 40,
-              decoration: darkCardDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.stop_circle_rounded,
-                color: dialBrassLight,
-                size: 22,
+            themedBorder(
+              palette: palette,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: palette.windowGradient != null
+                    ? BoxDecoration(
+                        gradient: palette.windowGradient,
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                    : darkCardDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                child: const Icon(
+                  Icons.stop_circle_rounded,
+                  color: dialBrassLight,
+                  size: 22,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -440,7 +483,7 @@ class StressTestWidget extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   const SizedBox(height: 1),
@@ -448,7 +491,7 @@ class StressTestWidget extends ConsumerWidget {
                     session.duration.localizedLabel(l10n),
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ],
@@ -464,9 +507,9 @@ class StressTestWidget extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
               size: 18,
             ),
           ],

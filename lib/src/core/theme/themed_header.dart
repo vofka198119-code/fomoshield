@@ -84,7 +84,32 @@ Widget themedHeaderIcon(IconData icon, AppPalette palette, {double size = 24}) {
 // untouched; the green/red signal is the point there, not gold.
 // ---------------------------------------------------------------------------
 
-Widget themedPriceText(String text, AppPalette palette, TextStyle baseStyle) {
+Widget themedPriceText(
+  String text,
+  AppPalette palette,
+  TextStyle baseStyle, {
+  // Color used when the palette has no gradient (Standard theme, or a
+  // future theme that doesn't opt in). Defaults to [AppPalette.textHeader]
+  // — correct for the common case (text sitting on a card that's light
+  // under Standard). A caller whose text sits on an unconditionally-dark
+  // panel in BOTH themes (e.g. Shield Signal's price cell, which always
+  // has a dark background) MUST override this to that panel's own
+  // correct Standard-theme color (e.g. white) — see this file's "always-
+  // dark panel" pattern note in the Luxury Gold project memory.
+  Color? fallbackColor,
+}) {
+  // White is only correct as the ShaderMask's multiply base when a
+  // gradient is actually being applied. Forcing it unconditionally
+  // (regardless of fallbackColor) left Standard-theme text plain white —
+  // invisible/wrong against a light card background (bug found
+  // 2026-08-24 on Portfolio's Balance/Cash cells after a Standard/Luxury
+  // toggle).
+  if (palette.titleGradient == null) {
+    return Text(
+      text,
+      style: baseStyle.copyWith(color: fallbackColor ?? palette.textHeader),
+    );
+  }
   return themedGoldGradient(
     Text(text, style: baseStyle.copyWith(color: Colors.white)),
     palette,

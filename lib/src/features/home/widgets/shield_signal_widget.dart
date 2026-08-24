@@ -389,8 +389,12 @@ class _IndexView extends StatelessWidget {
       color: valueColor ?? ThemeV2.textPrimary,
       letterSpacing: -0.3,
     );
+    // fallbackColor: valueColor — this cell's own dark bg is unconditional
+    // (both themes), so Standard's fallback must stay this cell's own
+    // white, not themedPriceText's normal-case default (palette.textHeader,
+    // which assumes a light Standard-theme backdrop this cell never has).
     final valueText = goldValue
-        ? themedPriceText(value, palette, valueStyle)
+        ? themedPriceText(value, palette, valueStyle, fallbackColor: valueColor)
         : Text(value, style: valueStyle);
 
     // The gradient-border wrapper (themedBorder) already draws a border
