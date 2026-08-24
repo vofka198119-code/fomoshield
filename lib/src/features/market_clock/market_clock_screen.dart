@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 import 'market_clock_new_york_time_widget.dart';
@@ -63,17 +66,18 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
     );
   }
 
-  Widget _buildWidget(String id) {
+  Widget _buildWidget(String id, AppPalette palette) {
     switch (id) {
       case 'ny_time':
-        return NewYorkTimeWidget(state: _state);
+        return NewYorkTimeWidget(state: _state, palette: palette);
       case 'market_phase':
         return MarketPhaseWidget(
           window: _state.window,
           isEarlyClose: _state.isEarlyCloseDay,
+          palette: palette,
         );
       case 'timing_indicator':
-        return FomoShieldStatusWidget(window: _state.window);
+        return FomoShieldStatusWidget(window: _state.window, palette: palette);
       default:
         return const SizedBox.shrink();
     }
@@ -84,18 +88,19 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
     final l10n = AppLocalizations.of(context)!;
     final widgetConfigs = ref.watch(marketClockWidgetsProvider);
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           l10n.marketClockScreenTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -113,7 +118,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
                 if (i > 0) const SizedBox(height: 24),
                 KeyedSubtree(
                   key: ValueKey(visibleWidgets[i].id),
-                  child: _buildWidget(visibleWidgets[i].id),
+                  child: _buildWidget(visibleWidgets[i].id, palette),
                 ),
               ],
               const SizedBox(height: 24),
@@ -121,9 +126,9 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
               Center(
                 child: TextButton.icon(
                   onPressed: _showWidgetsBottomSheet,
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.add_rounded,
-                    color: ThemeV2.primary,
+                    color: palette.accentPrimary,
                     size: 20,
                   ),
                   label: Text(
@@ -131,7 +136,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                     ),
                   ),
                   style: TextButton.styleFrom(
@@ -141,10 +146,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
-                      side: const BorderSide(
-                        color: ThemeV2.primary,
-                        width: 0.5,
-                      ),
+                      side: BorderSide(color: palette.accentPrimary, width: 0.5),
                     ),
                   ),
                 ),

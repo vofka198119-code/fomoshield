@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_dial.dart';
 import 'market_clock_engine.dart';
@@ -14,34 +18,52 @@ import 'market_clock_engine.dart';
 
 class NewYorkTimeWidget extends StatelessWidget {
   final MarketClockState state;
-  const NewYorkTimeWidget({super.key, required this.state});
+  final AppPalette palette;
+  const NewYorkTimeWidget({
+    super.key,
+    required this.state,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: marketClockCardDecoration(),
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text(
-              l10n.marketClockNewYorkTimeTitle,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-                letterSpacing: 1.2,
+            // Always-dark panel in both themes — same reasoning as the
+            // Home Market Clock widget's own title.
+            child: themedGoldGradient(
+              Text(
+                l10n.marketClockNewYorkTimeTitle,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                  shadows: palette.titleShadow != null
+                      ? [palette.titleShadow!]
+                      : null,
+                ),
               ),
+              palette,
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.white.withValues(alpha: 0.1),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.white.withValues(alpha: 0.1),
+                ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: LayoutBuilder(
@@ -49,6 +71,7 @@ class NewYorkTimeWidget extends StatelessWidget {
                 return _MarketClockInstrumentPanel(
                   state: state,
                   area: constraints.maxWidth,
+                  palette: palette,
                 );
               },
             ),
@@ -144,7 +167,12 @@ String _formatHm(int minutes) {
 class _MarketClockInstrumentPanel extends StatelessWidget {
   final MarketClockState state;
   final double area;
-  const _MarketClockInstrumentPanel({required this.state, required this.area});
+  final AppPalette palette;
+  const _MarketClockInstrumentPanel({
+    required this.state,
+    required this.area,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -213,6 +241,7 @@ class _MarketClockInstrumentPanel extends StatelessWidget {
               state: state,
               size: dialSize,
               showDigitalReadout: true,
+              palette: palette,
             ),
           ),
           corner(_Corner.topLeft, macroPhases[0]),

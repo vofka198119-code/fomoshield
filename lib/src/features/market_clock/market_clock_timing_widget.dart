@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_border.dart';
+import '../../core/theme/themed_divider.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_dial.dart';
 import 'market_clock_engine.dart';
@@ -55,22 +60,36 @@ TierStyle tierStyleFor(AppLocalizations l10n, RiskTier tier) =>
 
 /// Thin gold-bordered "window" — same instrument-panel language as the
 /// clock's digital readout / corner panels (dialBrassLight border on a
-/// dark, semi-transparent fill).
-Widget _goldWindow({required Widget child}) {
-  return Container(
+/// dark, semi-transparent fill) under Standard; under Luxury Gold this
+/// becomes the canonical themedBorder + windowGradient treatment instead
+/// of the bespoke hardcoded recipe, same as every other inner window in
+/// the app.
+Widget _goldWindow({required Widget child, required AppPalette palette}) {
+  final radius = BorderRadius.circular(12);
+  final content = Container(
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: dialDark.withValues(alpha: 0.35),
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: dialBrassLight.withValues(alpha: 0.4)),
-    ),
+    decoration: palette.windowGradient != null
+        ? BoxDecoration(gradient: palette.windowGradient, borderRadius: radius)
+        : BoxDecoration(
+            color: dialDark.withValues(alpha: 0.35),
+            borderRadius: radius,
+            border: Border.all(color: dialBrassLight.withValues(alpha: 0.4)),
+          ),
     child: child,
   );
+  return palette.windowGradient != null
+      ? themedBorder(palette: palette, borderRadius: radius, child: content)
+      : content;
 }
 
 class FomoShieldStatusWidget extends StatelessWidget {
   final MarketWindow window;
-  const FomoShieldStatusWidget({super.key, required this.window});
+  final AppPalette palette;
+  const FomoShieldStatusWidget({
+    super.key,
+    required this.window,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +98,11 @@ class FomoShieldStatusWidget extends StatelessWidget {
     final tier = window.riskTierFor(l10n);
     final style = _tierStylesFor(l10n)[tier]!;
 
-    return Container(
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: darkCardDecoration(),
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -91,24 +113,34 @@ class FomoShieldStatusWidget extends StatelessWidget {
               children: [
                 Icon(Icons.shield_rounded, color: dialBrassLight, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.marketClockFomoShieldStatusTitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                    color: Colors.white,
+                // Always-dark panel in both themes — same reasoning as the
+                // Home Market Clock widget's title.
+                themedGoldGradient(
+                  Text(
+                    l10n.marketClockFomoShieldStatusTitle,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                      color: Colors.white,
+                      shadows: palette.titleShadow != null
+                          ? [palette.titleShadow!]
+                          : null,
+                    ),
                   ),
+                  palette,
                 ),
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 20,
-            endIndent: 20,
-            color: dialBrassLight.withValues(alpha: 0.3),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 20,
+                  endIndent: 20,
+                  color: dialBrassLight.withValues(alpha: 0.3),
+                ),
 
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -150,6 +182,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                               '/market-clock/risk-status/${window.id}',
                             ),
                             child: _goldWindow(
+                              palette: palette,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -196,6 +229,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: _goldWindow(
+                          palette: palette,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
