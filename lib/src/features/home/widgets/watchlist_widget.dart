@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../core/cache/logo_providers.dart';
@@ -20,9 +21,10 @@ class WatchlistWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final watchlistSymbols = ref.watch(watchlistSymbolsProvider);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     if (watchlistSymbols.isEmpty) {
-      return _emptyContainer(context);
+      return _emptyContainer(context, palette);
     }
 
     // Show only first 2 — no live fetch involved, so no loading/error state
@@ -33,16 +35,20 @@ class WatchlistWidget extends ConsumerWidget {
       title: AppLocalizations.of(context)!.watchlistTitle,
       onTap: () => context.push('/watchlist'),
       showFooter: watchlistSymbols.length > 2,
-      children: preview.map((s) => _WatchlistTile(symbol: s)).toList(),
+      palette: palette,
+      children: preview
+          .map((s) => _WatchlistTile(symbol: s, palette: palette))
+          .toList(),
     );
   }
 
-  Widget _emptyContainer(BuildContext context) {
+  Widget _emptyContainer(BuildContext context, AppPalette palette) {
     return WidgetContainer(
       title: AppLocalizations.of(context)!.watchlistTitle,
       onTap: () => context.push('/watchlist'),
       showFooter: false,
       emptyText: AppLocalizations.of(context)!.watchlistEmpty,
+      palette: palette,
     );
   }
 }
@@ -55,7 +61,8 @@ class WatchlistWidget extends ConsumerWidget {
 
 class _WatchlistTile extends ConsumerWidget {
   final String symbol;
-  const _WatchlistTile({required this.symbol});
+  final AppPalette palette;
+  const _WatchlistTile({required this.symbol, required this.palette});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -74,12 +81,12 @@ class _WatchlistTile extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            // Company Logo (cached) — thin brand-green ring around it
+            // Company Logo (cached) — thin accent ring around it
             Container(
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: ThemeV2.primary, width: 1.5),
+                border: Border.all(color: palette.accentPrimary, width: 1.5),
               ),
               child: CompanyLogo(
                 ticker: symbol,
@@ -98,7 +105,7 @@ class _WatchlistTile extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -110,15 +117,15 @@ class _WatchlistTile extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
               size: 20,
             ),
           ],

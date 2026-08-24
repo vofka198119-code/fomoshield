@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'card_frame.dart';
 
@@ -28,6 +31,12 @@ class WidgetContainer extends StatelessWidget {
   // chevron. Has its own tap target — safe to combine with [onTap].
   final Widget? trailing;
 
+  // Null (the default) is a complete no-op — every existing call site is
+  // unaffected unless it opts in by passing a palette. See ShieldSignalWidget
+  // for the reference pattern this mirrors (CardFrame + themedHeaderText +
+  // themedDivider).
+  final AppPalette? palette;
+
   const WidgetContainer({
     super.key,
     required this.title,
@@ -37,6 +46,7 @@ class WidgetContainer extends StatelessWidget {
     this.showFooter = true,
     this.emptyText,
     this.trailing,
+    this.palette,
   });
 
   @override
@@ -44,9 +54,16 @@ class WidgetContainer extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final hasTap = onTap != null;
     final resolvedFooterText = footerText ?? l10n.commonMore;
+    final effectivePalette = palette ?? AppPalette.standard;
+    final titleStyle = GoogleFonts.inter(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 1.2,
+    );
     return CardFrame(
       showTopBar: false,
       padding: EdgeInsets.zero,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -57,15 +74,7 @@ class WidgetContainer extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    color: ThemeV2.primary,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+                  themedHeaderText(title, effectivePalette, titleStyle),
                   const Spacer(),
                   if (trailing != null) ...[
                     trailing!,
@@ -74,7 +83,7 @@ class WidgetContainer extends StatelessWidget {
                   if (hasTap)
                     Icon(
                       Icons.chevron_right_rounded,
-                      color: ThemeV2.textSecondary,
+                      color: palette?.textBody ?? ThemeV2.textSecondary,
                       size: 20,
                     ),
                 ],
@@ -84,58 +93,43 @@ class WidgetContainer extends StatelessWidget {
 
           // --- Title/content separator (matches TRADE HISTORY reference) ---
           if (children.isNotEmpty || emptyText != null)
-            Divider(
-              height: 1,
-              indent: 16,
-              endIndent: 16,
-              color: Colors.black.withValues(alpha: 0.06),
-            ),
+            themedDivider(effectivePalette),
 
           // --- Items with thin dividers (indented) ---
           if (children.isNotEmpty)
             ...List.generate(children.length * 2 - 1, (i) {
               if (i.isOdd) {
-                return Divider(
-                  height: 1,
-                  indent: 16,
-                  endIndent: 16,
-                  color: Colors.black.withValues(alpha: 0.06),
-                );
+                return themedDivider(effectivePalette);
               }
               return children[i ~/ 2];
             }),
 
           // --- Footer "More" button ---
           if (children.isNotEmpty && showFooter && hasTap)
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.06),
+            Column(
+              children: [
+                themedDivider(effectivePalette, indent: 0, endIndent: 0),
+                InkWell(
+                  onTap: onTap,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
                   ),
-                ),
-              ),
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Center(
-                    child: Text(
-                      resolvedFooterText,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: ThemeV2.primary,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Center(
+                      child: Text(
+                        resolvedFooterText,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: palette?.accentPrimary ?? ThemeV2.primary,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
 
           // --- Empty state fallback ---
@@ -147,7 +141,7 @@ class WidgetContainer extends StatelessWidget {
                   emptyText!,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: ThemeV2.textSecondary,
+                    color: palette?.textBody ?? ThemeV2.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -158,4 +152,3 @@ class WidgetContainer extends StatelessWidget {
     );
   }
 }
-
