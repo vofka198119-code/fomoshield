@@ -95,16 +95,16 @@ abstract final class LuxuryGoldTheme {
     blurRadius: 20,
   );
 
-  /// Card-lift shadow — same exact recipe as the splash screen's "FOMO"
-  /// wordmark shadow (splash_screen.dart: `offset: Offset(2, 3),
-  /// blurRadius: 4, color: Colors.black @ 25%`), just gold instead of
-  /// black. Decision (2026-08-23): this is the canonical "lift off
-  /// background" shadow for Luxury Gold cards — one shadow, not a
-  /// glow+shadow pair (an earlier, more elaborate attempt was scrapped in
-  /// favor of reusing this proven, already-shipped recipe).
+  /// Card-lift shadow — started as the exact splash screen "FOMO" wordmark
+  /// recipe (`offset: Offset(2, 3), blurRadius: 4, color: Colors.black @
+  /// 25%`), gold instead of black. Decision (2026-08-24): dropped the
+  /// rightward component — with a widget's own right-edge padding tight
+  /// enough (22px), the shadow's right side butted straight into it and
+  /// got clipped by a hard edge instead of fading out. Straight-down glow
+  /// avoids that regardless of how tight a card's surrounding padding is.
   static BoxShadow cardGlow({double opacity = 0.25}) => BoxShadow(
     color: accentGold.withValues(alpha: opacity),
-    offset: const Offset(2, 3),
+    offset: const Offset(0, 3),
     blurRadius: 4,
   );
 

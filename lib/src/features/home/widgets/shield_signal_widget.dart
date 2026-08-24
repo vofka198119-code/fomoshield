@@ -126,7 +126,7 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
               _dots(
                 count: indices.length,
                 current: safeIndex,
