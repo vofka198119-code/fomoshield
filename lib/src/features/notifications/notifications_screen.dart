@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../core/notifications/notification_text.dart';
@@ -81,6 +85,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final notifications = ref.watch(notificationsProvider);
     final unread = ref.watch(unreadNotificationCountProvider);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -89,15 +94,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         centerTitle: true,
         title: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(
+          child: themedHeaderText(
             l10n.notificationsScreenTitle,
-            maxLines: 1,
-            style: GoogleFonts.inter(
+            palette,
+            GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: ThemeV2.primary,
               letterSpacing: 1.5,
             ),
+            maxLines: 1,
           ),
         ),
         actions: [
@@ -106,10 +111,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               onPressed: () =>
                   ref.read(notificationsProvider.notifier).markAllRead(),
               tooltip: l10n.notificationsScreenMarkAllRead,
-              icon: const Icon(
-                Icons.done_all_rounded,
-                color: ThemeV2.primary,
-              ),
+              icon: Icon(Icons.done_all_rounded, color: palette.accentPrimary),
             ),
         ],
       ),
@@ -119,25 +121,30 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         left: false,
         right: false,
         child: notifications.isEmpty
-            ? _emptyState(l10n)
+            ? _emptyState(l10n, palette)
             : SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                child: Container(
+                child: CardFrame(
+                  showTopBar: false,
+                  padding: EdgeInsets.zero,
                   decoration: FomoShieldTheme.cardDecoration,
-                  clipBehavior: Clip.antiAlias,
+                  palette: palette,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       for (int i = 0; i < notifications.length; i++) ...[
                         if (i > 0)
-                          const Divider(
-                            height: 1,
-                            indent: 68,
-                            color: Color(0x0F000000),
-                          ),
+                          palette.dividerGradient != null
+                              ? themedDivider(palette, indent: 68, endIndent: 0)
+                              : const Divider(
+                                  height: 1,
+                                  indent: 68,
+                                  color: Color(0x0F000000),
+                                ),
                         _NotificationRow(
                           notification: notifications[i],
                           onTap: () => _handleTap(notifications[i]),
+                          palette: palette,
                         ),
                       ],
                     ],
@@ -148,13 +155,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
   }
 
-  Widget _emptyState(AppLocalizations l10n) {
+  Widget _emptyState(AppLocalizations l10n, AppPalette palette) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Text(
           l10n.notificationsScreenEmptyState,
-          style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
+          style: GoogleFonts.inter(fontSize: 14, color: palette.textBody),
         ),
       ),
     );
@@ -164,10 +171,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 class _NotificationRow extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback onTap;
+  final AppPalette palette;
 
   const _NotificationRow({
     required this.notification,
     required this.onTap,
+    required this.palette,
   });
 
   IconData get _icon {
@@ -234,8 +243,8 @@ class _NotificationRow extends StatelessWidget {
                               width: 7,
                               height: 7,
                               margin: const EdgeInsets.only(right: 6),
-                              decoration: const BoxDecoration(
-                                color: ThemeV2.primary,
+                              decoration: BoxDecoration(
+                                color: palette.accentPrimary,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -249,7 +258,7 @@ class _NotificationRow extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 color: notificationTitleColor(
                                   notification.type,
-                                  fallback: ThemeV2.textPrimary,
+                                  fallback: palette.textHeader,
                                 ),
                               ),
                             ),
@@ -263,7 +272,7 @@ class _NotificationRow extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
                           fontSize: 11.5,
-                          color: ThemeV2.textSecondary,
+                          color: palette.textBody,
                         ),
                       ),
                     ],
@@ -274,7 +283,7 @@ class _NotificationRow extends StatelessWidget {
                   _relativeTime(l10n),
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                   ),
                 ),
               ],
@@ -286,7 +295,7 @@ class _NotificationRow extends StatelessWidget {
                 notificationDetail(notification, l10n),
                 style: GoogleFonts.inter(
                   fontSize: 12.5,
-                  color: ThemeV2.textPrimary,
+                  color: palette.textHeader,
                   height: 1.4,
                 ),
               ),
@@ -303,7 +312,7 @@ class _NotificationRow extends StatelessWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: ThemeV2.primary, width: 1.5),
+          border: Border.all(color: palette.accentPrimary, width: 1.5),
         ),
         child: CompanyLogo(
           ticker: notification.symbol!,
