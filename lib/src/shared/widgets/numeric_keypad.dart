@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
 
 // ---------------------------------------------------------------------------
 // Numeric Keypad — custom digit input replacing the system Android
@@ -19,6 +20,9 @@ class NumericKeypad extends StatelessWidget {
   final VoidCallback onChanged;
   final VoidCallback onDone;
   final Widget? header;
+  // Null (the default) is a complete no-op — every existing call site is
+  // unaffected unless it opts in by passing a palette.
+  final AppPalette? palette;
 
   const NumericKeypad({
     super.key,
@@ -26,6 +30,7 @@ class NumericKeypad extends StatelessWidget {
     required this.onChanged,
     required this.onDone,
     this.header,
+    this.palette,
   });
 
   void _tapDigit(String digit) {
@@ -55,12 +60,15 @@ class NumericKeypad extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
+          gradient: palette?.windowGradient,
           // Matches backgroundGradient's bottom stop so the sheet blends
           // into the grey strip above the system nav bar instead of
           // showing a stark white-to-grey seam.
-          color: Color(0xFFDCDBD7),
-          border: Border(top: BorderSide(color: ThemeV2.divider)),
+          color: palette?.windowGradient == null
+              ? const Color(0xFFDCDBD7)
+              : null,
+          border: Border(top: BorderSide(color: palette?.border ?? ThemeV2.divider)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -71,7 +79,7 @@ class NumericKeypad extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 10),
                 decoration: BoxDecoration(
-                  color: ThemeV2.divider,
+                  color: palette?.border ?? ThemeV2.divider,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -111,17 +119,27 @@ class NumericKeypad extends StatelessWidget {
             height: 50,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Color.alphaBlend(ThemeV2.primaryBg, Colors.white),
+              // A dark "window" tile (not buttonGradient's bright gold —
+              // cream digit glyphs need a dark backdrop to stay legible,
+              // and bright-gold-on-bright-gold would be poor contrast).
+              gradient: palette?.windowGradient,
+              color: palette?.windowGradient == null
+                  ? Color.alphaBlend(ThemeV2.primaryBg, Colors.white)
+                  : null,
               borderRadius: BorderRadius.circular(14),
             ),
             child: label == '⌫'
-                ? const Icon(Icons.backspace_outlined, color: ThemeV2.textPrimary, size: 20)
+                ? Icon(
+                    Icons.backspace_outlined,
+                    color: palette?.textHeader ?? ThemeV2.textPrimary,
+                    size: 20,
+                  )
                 : Text(
                     label,
                     style: GoogleFonts.inter(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette?.textHeader ?? ThemeV2.textPrimary,
                     ),
                   ),
           ),

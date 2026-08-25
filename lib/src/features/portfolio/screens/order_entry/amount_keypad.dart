@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../shared/widgets/numeric_keypad.dart';
 import 'order_amount_section.dart' show OrderInputMode;
 import 'order_bottom_button.dart' show ReviewOrderButton;
@@ -20,6 +21,7 @@ class AmountKeypad extends StatelessWidget {
   final OrderInputMode inputMode;
   final double displayAmount;
   final VoidCallback? onSubmit;
+  final AppPalette palette;
 
   const AmountKeypad({
     super.key,
@@ -30,6 +32,7 @@ class AmountKeypad extends StatelessWidget {
     required this.inputMode,
     required this.displayAmount,
     required this.onSubmit,
+    required this.palette,
   });
 
   @override
@@ -39,6 +42,7 @@ class AmountKeypad extends StatelessWidget {
       onChanged: onChanged,
       onDone: onDone,
       header: ReviewOrderButton(isBuy: isBuy, onSubmit: onSubmit, height: 44),
+      palette: palette,
     );
   }
 }

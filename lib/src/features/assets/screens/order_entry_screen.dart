@@ -369,10 +369,12 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
               logo: widget.logo,
               isBuy: _isBuy,
               price: _currentPrice,
+              palette: palette,
             ),
             OrderTypeTabs(
               isLimit: _selectedOrderType == _OrderType.limit,
               onChanged: _onOrderTypeChanged,
+              palette: palette,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -392,6 +394,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                       onAmountChanged: _onAmountTextChanged,
                       onTapAmount: () =>
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
+                      palette: palette,
                     ),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
@@ -404,6 +407,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                         _activeKeypad = _ActiveKeypad.limitPrice;
                       }),
                       infoText: _infoText(l10n),
+                      palette: palette,
                       // No Extended Hours — simulated market is always open.
                     ),
                   ],
@@ -430,11 +434,13 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                 inputMode: _inputMode,
                 displayAmount: displayAmount,
                 onSubmit: displayAmount > 0 ? _submitOrder : null,
+                palette: palette,
               )
             else
               OrderBottomButton(
                 isBuy: _isBuy,
                 inputMode: _inputMode,
+                palette: palette,
                 displayAmount: displayAmount,
                 onSubmit: displayAmount > 0 ? _submitOrder : null,
               ),

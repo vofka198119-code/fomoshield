@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 
@@ -22,6 +22,7 @@ class LimitPriceInput extends StatefulWidget {
   final double currentPrice;
   final bool isBuy;
   final VoidCallback onTapField;
+  final AppPalette palette;
 
   const LimitPriceInput({
     super.key,
@@ -29,6 +30,7 @@ class LimitPriceInput extends StatefulWidget {
     required this.currentPrice,
     required this.isBuy,
     required this.onTapField,
+    required this.palette,
   });
 
   @override
@@ -80,7 +82,7 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
               fontSize: 16,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.2,
-              color: ThemeV2.primary,
+              color: widget.palette.accentPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -89,7 +91,10 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
                 ? l10n.orderEntryLimitPriceHintBuy
                 : l10n.orderEntryLimitPriceHintSell,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.textPrimary),
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: widget.palette.textHeader,
+            ),
           ),
           const SizedBox(height: 14),
           Center(
@@ -105,7 +110,7 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
                     style: interNums(
                       fontSize: 30,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: widget.palette.textHeader,
                     ),
                   ),
                 ),
@@ -135,10 +140,10 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: ThemeV2.primary.withValues(alpha: 0.12),
+          color: widget.palette.accentPrimary.withValues(alpha: 0.12),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: ThemeV2.primary, size: 20),
+        child: Icon(icon, color: widget.palette.accentPrimary, size: 20),
       ),
     );
   }

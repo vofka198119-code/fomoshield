@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/theme/themed_header.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../../shared/widgets/company_logo.dart';
 import '../../../../l10n/gen/app_localizations.dart';
@@ -25,6 +27,7 @@ class OrderHeader extends StatelessWidget {
   final String? logo;
   final bool isBuy;
   final double price;
+  final AppPalette palette;
 
   const OrderHeader({
     super.key,
@@ -33,6 +36,7 @@ class OrderHeader extends StatelessWidget {
     this.logo,
     required this.isBuy,
     required this.price,
+    required this.palette,
   });
 
   @override
@@ -47,24 +51,24 @@ class OrderHeader extends StatelessWidget {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_rounded,
-                    color: ThemeV2.textPrimary,
+                    color: palette.accentPrimary,
                   ),
                   onPressed: () => context.pop(),
                 ),
                 Expanded(
                   child: Center(
-                    child: Text(
+                    child: themedHeaderText(
                       '${isBuy ? l10n.tradeBuy : l10n.tradeSell} $companyName',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
+                      palette,
+                      GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: ThemeV2.textPrimary,
                         letterSpacing: 0.5,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                   ),
                 ),
@@ -74,7 +78,10 @@ class OrderHeader extends StatelessWidget {
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: ThemeV2.primary, width: 1.5),
+                      border: Border.all(
+                        color: palette.accentPrimary,
+                        width: 1.5,
+                      ),
                     ),
                     child: CompanyLogo(
                       ticker: symbol,
@@ -88,14 +95,11 @@ class OrderHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
+        themedPriceText(
           formatUsd(price),
-          textAlign: TextAlign.center,
-          style: interNums(
-            fontSize: 28,
-            fontWeight: FontWeight.w600,
-            color: ThemeV2.textPrimary,
-          ),
+          palette,
+          interNums(fontSize: 28, fontWeight: FontWeight.w600),
+          fallbackColor: ThemeV2.textPrimary,
         ),
         const SizedBox(height: 4),
       ],
@@ -111,11 +115,13 @@ class OrderHeader extends StatelessWidget {
 class OrderTypeTabs extends StatelessWidget {
   final bool isLimit;
   final ValueChanged<bool> onChanged;
+  final AppPalette palette;
 
   const OrderTypeTabs({
     super.key,
     required this.isLimit,
     required this.onChanged,
+    required this.palette,
   });
 
   @override
@@ -158,11 +164,14 @@ class OrderTypeTabs extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: active
-              ? ThemeV2.primary.withValues(alpha: 0.08)
+          gradient: active ? palette.windowGradient : null,
+          color: active && palette.windowGradient == null
+              ? palette.accentPrimary.withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: active ? ThemeV2.primary : ThemeV2.divider),
+          border: Border.all(
+            color: active ? palette.accentPrimary : palette.border,
+          ),
         ),
         alignment: Alignment.center,
         child: Text(
@@ -170,7 +179,7 @@ class OrderTypeTabs extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: active ? ThemeV2.primary : ThemeV2.textSecondary,
+            color: active ? palette.accentPrimary : palette.textBody,
           ),
         ),
       ),

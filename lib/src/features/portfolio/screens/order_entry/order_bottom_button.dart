@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../../../../l10n/gen/app_localizations.dart';
@@ -17,6 +18,7 @@ class OrderBottomButton extends StatelessWidget {
   final OrderInputMode inputMode;
   final double displayAmount;
   final VoidCallback? onSubmit;
+  final AppPalette palette;
 
   const OrderBottomButton({
     super.key,
@@ -24,6 +26,7 @@ class OrderBottomButton extends StatelessWidget {
     required this.inputMode,
     required this.displayAmount,
     required this.onSubmit,
+    required this.palette,
   });
 
   @override
@@ -32,9 +35,10 @@ class OrderBottomButton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
       decoration: BoxDecoration(
-        color: ThemeV2.surface,
+        gradient: palette.windowGradient,
+        color: palette.windowGradient == null ? ThemeV2.surface : null,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: const Border(top: BorderSide(color: ThemeV2.divider)),
+        border: Border(top: BorderSide(color: palette.border)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -51,7 +55,7 @@ class OrderBottomButton extends StatelessWidget {
                         : l10n.orderEntryQtyLabel,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                   Text(
@@ -63,7 +67,7 @@ class OrderBottomButton extends StatelessWidget {
                     style: interNums(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                 ],

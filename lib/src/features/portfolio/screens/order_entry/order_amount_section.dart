@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../shared/widgets/card_frame.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../../../market_clock/market_clock_dial.dart'
@@ -29,6 +30,7 @@ class OrderAmountSection extends StatelessWidget {
   final ValueChanged<double> onSliderChanged;
   final VoidCallback onAmountChanged;
   final VoidCallback onTapAmount;
+  final AppPalette palette;
 
   const OrderAmountSection({
     super.key,
@@ -43,6 +45,7 @@ class OrderAmountSection extends StatelessWidget {
     required this.onSliderChanged,
     required this.onAmountChanged,
     required this.onTapAmount,
+    required this.palette,
   });
 
   // Slider/percentage ceiling for the current mode:
@@ -74,8 +77,8 @@ class OrderAmountSection extends StatelessWidget {
     final hasValue = controller.text.isNotEmpty;
     final numberText = hasValue ? controller.text : '0';
     final numberColor = hasValue
-        ? ThemeV2.textPrimary
-        : ThemeV2.textPrimary.withValues(alpha: 0.3);
+        ? palette.textHeader
+        : palette.textHeader.withValues(alpha: 0.3);
     // Only the newest digit animates in — the rest of the number stays
     // put. Animating the whole string on every keystroke made the entire
     // number flash/strobe instead of reading as a single digit popping in.
@@ -158,7 +161,7 @@ class OrderAmountSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 12,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
             ),
           ),
           if (displayAmount > 0 && inputMode == OrderInputMode.cost)
@@ -174,7 +177,7 @@ class OrderAmountSection extends StatelessWidget {
                 style: interNums(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                 ),
               ),
             ),
@@ -189,7 +192,7 @@ class OrderAmountSection extends StatelessWidget {
                 style: interNums(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                 ),
               ),
             ),
@@ -212,7 +215,7 @@ class OrderAmountSection extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: darkCardGradient(),
+          gradient: palette.windowGradient ?? darkCardGradient(),
         ),
         alignment: Alignment.center,
         child: const Icon(
@@ -237,9 +240,11 @@ class OrderAmountSection extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Container(
+      child: CardFrame(
+        showTopBar: false,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: darkCardDecoration(),
+        palette: palette,
         child: Column(
           children: [
             if (isBuy) ...[

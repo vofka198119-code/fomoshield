@@ -22,6 +22,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/notifications/notification_providers.dart';
@@ -528,29 +531,32 @@ class _PortfolioOrderEntryScreenState
     final performanceLoading = ref
         .watch(portfolioPerformanceProvider(widget.portfolioId))
         .isLoading;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     if (_isLoading || performanceLoading) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: Text(
+          title: themedHeaderText(
             '${_isBuy ? l10n.tradeBuy : l10n.tradeSell} ${widget.symbol}',
-            style: GoogleFonts.inter(
+            palette,
+            GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: ThemeV2.primary,
               letterSpacing: 1.5,
             ),
           ),
           leading: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_rounded,
-              color: ThemeV2.textPrimary,
+              color: palette.accentPrimary,
             ),
             onPressed: () => context.pop(),
           ),
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(color: palette.accentPrimary),
+        ),
       );
     }
 
@@ -559,19 +565,19 @@ class _PortfolioOrderEntryScreenState
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: Text(
+          title: themedHeaderText(
             '${_isBuy ? l10n.tradeBuy : l10n.tradeSell} ${widget.symbol}',
-            style: GoogleFonts.inter(
+            palette,
+            GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: ThemeV2.primary,
               letterSpacing: 1.5,
             ),
           ),
           leading: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_rounded,
-              color: ThemeV2.textPrimary,
+              color: palette.accentPrimary,
             ),
             onPressed: () => context.pop(),
           ),
@@ -582,16 +588,16 @@ class _PortfolioOrderEntryScreenState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.cloud_off_rounded,
-                  color: ThemeV2.textSecondary,
+                  color: palette.textBody,
                   size: 56,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   l10n.orderEntryPriceLoadError,
                   style: GoogleFonts.inter(
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -627,10 +633,12 @@ class _PortfolioOrderEntryScreenState
               logo: widget.logo,
               isBuy: _isBuy,
               price: _currentPrice,
+              palette: palette,
             ),
             OrderTypeTabs(
               isLimit: _selectedOrderType == _OrderType.limit,
               onChanged: _onOrderTypeChanged,
+              palette: palette,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -650,6 +658,7 @@ class _PortfolioOrderEntryScreenState
                       onAmountChanged: _onAmountTextChanged,
                       onTapAmount: () =>
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
+                      palette: palette,
                     ),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
@@ -666,6 +675,7 @@ class _PortfolioOrderEntryScreenState
                       infoText: _infoText(l10n),
                       extendedHours: _extendedHours,
                       onExtendedHoursChanged: _setExtendedHours,
+                      palette: palette,
                     ),
                   ],
                 ),
@@ -691,6 +701,7 @@ class _PortfolioOrderEntryScreenState
                 inputMode: _inputMode,
                 displayAmount: displayAmount,
                 onSubmit: displayAmount > 0 ? _submitOrder : null,
+                palette: palette,
               )
             else
               OrderBottomButton(
@@ -698,6 +709,7 @@ class _PortfolioOrderEntryScreenState
                 inputMode: _inputMode,
                 displayAmount: displayAmount,
                 onSubmit: displayAmount > 0 ? _submitOrder : null,
+                palette: palette,
               ),
           ],
         ),

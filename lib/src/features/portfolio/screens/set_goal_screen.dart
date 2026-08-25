@@ -204,6 +204,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                 onChanged: () => setState(() {}),
                 onDone: () => setState(() => _keypadOpen = false),
                 header: _saveButton(height: 44),
+                palette: palette,
               )
             else
               Padding(

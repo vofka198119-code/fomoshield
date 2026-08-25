@@ -5,16 +5,23 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
 import '../../l10n/gen/app_localizations.dart';
 
-class SimulatedTradingDisclaimer extends StatelessWidget {
+// Sits directly on the screen background (no card behind it) — resolves
+// its own palette rather than being threaded a param, since it's reused
+// across several unrelated screens (order entry, Stress Test's Company
+// Card).
+class SimulatedTradingDisclaimer extends ConsumerWidget {
   const SimulatedTradingDisclaimer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
@@ -25,7 +32,7 @@ class SimulatedTradingDisclaimer extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
             ),
           ),
           const SizedBox(height: 6),
@@ -34,7 +41,7 @@ class SimulatedTradingDisclaimer extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
               height: 1.5,
             ),
           ),

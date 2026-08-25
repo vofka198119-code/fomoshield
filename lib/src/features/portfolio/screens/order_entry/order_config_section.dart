@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../shared/widgets/card_frame.dart';
 import '../../../../shared/widgets/simulated_trading_disclaimer.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import 'limit_price_input.dart';
@@ -23,6 +24,7 @@ class OrderConfigSection extends StatelessWidget {
   // of trading hours (Stress Test's simulated market is always open).
   final bool? extendedHours;
   final ValueChanged<bool>? onExtendedHoursChanged;
+  final AppPalette palette;
 
   const OrderConfigSection({
     super.key,
@@ -32,6 +34,7 @@ class OrderConfigSection extends StatelessWidget {
     required this.isBuy,
     required this.onTapLimitPriceField,
     required this.infoText,
+    required this.palette,
     this.extendedHours,
     this.onExtendedHoursChanged,
   });
@@ -47,6 +50,7 @@ class OrderConfigSection extends StatelessWidget {
             currentPrice: currentPrice,
             isBuy: isBuy,
             onTapField: onTapLimitPriceField,
+            palette: palette,
           ),
         _infoBox(),
         if (extendedHours != null && onExtendedHoursChanged != null)
@@ -57,17 +61,18 @@ class OrderConfigSection extends StatelessWidget {
   }
 
   Widget _infoBox() {
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(14),
       decoration: FomoShieldTheme.cardDecoration,
+      palette: palette,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             Icons.info_outline_rounded,
-            color: ThemeV2.textSecondary,
+            color: palette.textBody,
             size: 16,
           ),
           const SizedBox(width: 10),
@@ -76,7 +81,7 @@ class OrderConfigSection extends StatelessWidget {
               infoText,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: ThemeV2.textSecondary,
+                color: palette.textBody,
                 height: 1.5,
               ),
             ),
@@ -93,14 +98,16 @@ class OrderConfigSection extends StatelessWidget {
   ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Container(
+      child: CardFrame(
+        showTopBar: false,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: FomoShieldTheme.cardDecoration,
+        palette: palette,
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.access_time_rounded,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -113,14 +120,14 @@ class OrderConfigSection extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   Text(
                     l10n.orderEntryExtendedHoursSubtitle,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ],
@@ -129,7 +136,7 @@ class OrderConfigSection extends StatelessWidget {
             Switch(
               value: extendedHours,
               onChanged: onChanged,
-              activeTrackColor: ThemeV2.primary,
+              activeTrackColor: palette.accentPrimary,
             ),
           ],
         ),
