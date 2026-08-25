@@ -134,16 +134,22 @@ abstract final class LuxuryGoldTheme {
     blurRadius: 3,
   );
 
-  /// Header/section divider — LOCKED IN (2026-08-23): the same two-tone
-  /// gold family as [titleGradient] (light gold → base gold), just
-  /// rotated horizontal (left→right) instead of vertical, since a
-  /// divider is a thin strip rather than lettering. Reuses
-  /// [_titleHighlight]/[accentGold] rather than re-deriving new tones —
-  /// same "border and title share one gradient definition" principle
-  /// this theme has kept everywhere else.
-  static const dividerGradient = LinearGradient(
+  /// Header/section divider — LOCKED IN (2026-08-23), opacity revised
+  /// 2026-08-25: the same two-tone gold family as [titleGradient] (light
+  /// gold → base gold), just rotated horizontal (left→right) instead of
+  /// vertical, since a divider is a thin strip rather than lettering.
+  /// Reuses [_titleHighlight]/[accentGold] rather than re-deriving new
+  /// tones — same "border and title share one gradient definition"
+  /// principle this theme has kept everywhere else. Both stops dropped to
+  /// 30% opacity (was fully opaque) — applies uniformly everywhere
+  /// [themedDivider] is used: header-title underlines AND inter-item list
+  /// separators (e.g. between Watchlist rows) both read this same value.
+  static Gradient get dividerGradient => LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
-    colors: [_titleHighlight, accentGold],
+    colors: [
+      _titleHighlight.withValues(alpha: 0.3),
+      accentGold.withValues(alpha: 0.3),
+    ],
   );
 }

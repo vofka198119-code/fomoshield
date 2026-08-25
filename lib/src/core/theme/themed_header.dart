@@ -72,46 +72,38 @@ Widget themedHeaderIcon(IconData icon, AppPalette palette, {double size = 24}) {
 // ---------------------------------------------------------------------------
 // Themed price text — the canonical treatment for EVERY neutral price
 // figure app-wide (a $ value with no up/down meaning of its own — an
-// index price, a holding's market value, a portfolio balance) once a
-// theme defines [AppPalette.titleGradient]: the same metallic gold sheen
-// used on header titles. Confirmed 2026-08-23 on Shield Signal's index
-// price cell as the pattern to replicate at every other plain-price call
-// site in the app.
+// index price, a holding's market value, a portfolio balance): flat
+// [AppPalette.textHeader] — the SAME color/role as a company/instrument
+// name (see Watchlist's tile). REVISED 2026-08-25: this used to be a gold
+// ShaderMask sheen (matching header titles); user asked to drop the gold
+// and make every sum read as plain cream/textHeader instead, everywhere,
+// including on an unconditionally-dark panel — don't re-add the gradient.
 //
 // Do NOT use this for a price/percent/amount that already carries its own
 // up-down color (P&L, change $, change %, any gain/loss figure) — those
 // keep [ThemeV2.success]/[ThemeV2.loss] (or the palette equivalent)
-// untouched; the green/red signal is the point there, not gold.
+// untouched; the green/red signal is the point there, not this treatment.
 // ---------------------------------------------------------------------------
 
 Widget themedPriceText(
   String text,
   AppPalette palette,
   TextStyle baseStyle, {
-  // Color used when the palette has no gradient (Standard theme, or a
-  // future theme that doesn't opt in). Defaults to [AppPalette.textHeader]
-  // — correct for the common case (text sitting on a card that's light
-  // under Standard). A caller whose text sits on an unconditionally-dark
-  // panel in BOTH themes (e.g. Shield Signal's price cell, which always
-  // has a dark background) MUST override this to that panel's own
-  // correct Standard-theme color (e.g. white) — see this file's "always-
-  // dark panel" pattern note in the Luxury Gold project memory.
+  // Color used only when the palette has NO titleGradient (Standard
+  // theme, or a future theme that doesn't opt in) — under a theme that
+  // does (Luxury Gold), textHeader always wins regardless of this, since
+  // Luxury's textHeader (warm champagne) reads fine on any of its
+  // surfaces, dark-always-panel included. Defaults to
+  // [AppPalette.textHeader], correct for the common case (text sitting on
+  // a card that's light under Standard). A caller whose text sits on an
+  // unconditionally-dark panel in BOTH themes (e.g. Shield Signal's price
+  // cell) MUST override this to that panel's own correct Standard-theme
+  // color (e.g. white) — see this file's "always-dark panel" pattern note
+  // in the Luxury Gold project memory.
   Color? fallbackColor,
 }) {
-  // White is only correct as the ShaderMask's multiply base when a
-  // gradient is actually being applied. Forcing it unconditionally
-  // (regardless of fallbackColor) left Standard-theme text plain white —
-  // invisible/wrong against a light card background (bug found
-  // 2026-08-24 on Portfolio's Balance/Cash cells after a Standard/Luxury
-  // toggle).
-  if (palette.titleGradient == null) {
-    return Text(
-      text,
-      style: baseStyle.copyWith(color: fallbackColor ?? palette.textHeader),
-    );
-  }
-  return themedGoldGradient(
-    Text(text, style: baseStyle.copyWith(color: Colors.white)),
-    palette,
-  );
+  final color = palette.titleGradient != null
+      ? palette.textHeader
+      : (fallbackColor ?? palette.textHeader);
+  return Text(text, style: baseStyle.copyWith(color: color));
 }
