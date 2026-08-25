@@ -7,11 +7,17 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/theme/theme_variant_provider.dart';
+import '../../../../core/theme/themed_header.dart';
+import '../../../../core/theme/themed_divider.dart';
+import '../../../../shared/widgets/card_frame.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 
-class PsychologyMarkerCard extends StatelessWidget {
+class PsychologyMarkerCard extends ConsumerWidget {
   final String title;
   final String infoId; // pushes /metric-info/$infoId
   final Widget child;
@@ -24,10 +30,13 @@ class PsychologyMarkerCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
+      palette: palette,
       child: Column(
         children: [
           SizedBox(
@@ -37,7 +46,17 @@ class PsychologyMarkerCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(title, style: FomoShieldTheme.cardTitle(Colors.white)),
+                  themedGoldGradient(
+                    Text(
+                      title,
+                      style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                        shadows: palette.titleShadow != null
+                            ? [palette.titleShadow!]
+                            : null,
+                      ),
+                    ),
+                    palette,
+                  ),
                   GestureDetector(
                     onTap: () => context.push('/metric-info/$infoId'),
                     child: Container(
@@ -59,12 +78,14 @@ class PsychologyMarkerCard extends StatelessWidget {
               ),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.white.withValues(alpha: 0.12),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
             child: child,
