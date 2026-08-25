@@ -40,6 +40,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../../core/services/gics_sector_mapper.dart';
@@ -102,8 +105,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = _session;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     if (session == null) {
-      return _emptyScreen(l10n.stressTestSessionNotFound);
+      return _emptyScreen(l10n.stressTestSessionNotFound, palette);
     }
 
     final ticks = session.explanationLog[widget.symbol] ?? [];
@@ -135,11 +139,11 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: _buildAppBar(l10n),
+      appBar: _buildAppBar(l10n, palette),
       body: SafeArea(
         top: false,
         child: ticks.isEmpty
-            ? _buildEmptyState(l10n)
+            ? _buildEmptyState(l10n, palette)
             : SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Column(
@@ -251,7 +255,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
   }
 
   // ─── AppBar ──────────────────────────────────────────────────────────
-  PreferredSizeWidget _buildAppBar(AppLocalizations l10n) {
+  PreferredSizeWidget _buildAppBar(AppLocalizations l10n, AppPalette palette) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: AppBar(
@@ -260,20 +264,17 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         scrolledUnderElevation: 0,
         toolbarHeight: 64,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           l10n.whyTodayScreenAppBarTitle(widget.symbol),
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
-          ),
+          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -845,29 +846,34 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
   }
 
   // ─── Empty states ─────────────────────────────────────────────────
-  Widget _buildEmptyState(AppLocalizations l10n) {
+  Widget _buildEmptyState(AppLocalizations l10n, AppPalette palette) {
     return Center(
       child: Container(
         margin: const EdgeInsets.all(32),
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: ThemeV2.surface,
+          color: palette.card,
           borderRadius: ThemeV2.borderRadiusLarge,
           boxShadow: ThemeV2.cardShadow,
         ),
         child: Text(
           l10n.whyTodayScreenEmptyStateMessage,
-          style: ThemeV2.body.copyWith(color: ThemeV2.textSecondary),
+          style: ThemeV2.body.copyWith(color: palette.textBody),
           textAlign: TextAlign.center,
         ),
       ),
     );
   }
 
-  Widget _emptyScreen(String message) {
+  Widget _emptyScreen(String message, AppPalette palette) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Center(child: Text(message, style: ThemeV2.body)),
+      body: Center(
+        child: Text(
+          message,
+          style: ThemeV2.body.copyWith(color: palette.textBody),
+        ),
+      ),
     );
   }
 }

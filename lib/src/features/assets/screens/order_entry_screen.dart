@@ -20,6 +20,8 @@ import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../stress_test/stress_test_models.dart';
@@ -341,10 +343,16 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = _session;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     if (session == null) {
       return Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: Text(l10n.stressTestSessionNotFound)),
+        body: Center(
+          child: Text(
+            l10n.stressTestSessionNotFound,
+            style: TextStyle(color: palette.textBody),
+          ),
+        ),
       );
     }
 
