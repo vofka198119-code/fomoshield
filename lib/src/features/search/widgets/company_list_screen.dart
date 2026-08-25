@@ -4,7 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
-import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../top_companies_provider.dart';
 
@@ -28,7 +31,7 @@ import '../top_companies_provider.dart';
 // only shows once the user taps through to Company Detail.
 // ---------------------------------------------------------------------------
 
-class CompanyListScreen extends StatelessWidget {
+class CompanyListScreen extends ConsumerWidget {
   final String title;
   final List<TopCompanyEntry> companies;
   final void Function(String symbol) onTapSymbol;
@@ -52,18 +55,19 @@ class CompanyListScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           title,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -80,26 +84,31 @@ class CompanyListScreen extends StatelessWidget {
                     '${companies.length}',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0x0F000000)),
+            palette.dividerGradient != null
+                ? themedDivider(palette, indent: 0, endIndent: 0)
+                : const Divider(height: 1, color: Color(0x0F000000)),
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 itemCount: companies.length,
-                separatorBuilder: (_, _) => const Divider(
-                  height: 1,
-                  indent: 68,
-                  color: Color(0x0F000000),
-                ),
+                separatorBuilder: (_, _) => palette.dividerGradient != null
+                    ? themedDivider(palette, indent: 68, endIndent: 0)
+                    : const Divider(
+                        height: 1,
+                        indent: 68,
+                        color: Color(0x0F000000),
+                      ),
                 itemBuilder: (context, i) => _CompanyRow(
                   entry: companies[i],
                   onTapSymbol: onTapSymbol,
                   suppressSector: suppressSector,
+                  palette: palette,
                 ),
               ),
             ),
@@ -114,11 +123,13 @@ class _CompanyRow extends ConsumerWidget {
   final TopCompanyEntry entry;
   final void Function(String symbol) onTapSymbol;
   final bool suppressSector;
+  final AppPalette palette;
 
   const _CompanyRow({
     required this.entry,
     required this.onTapSymbol,
     required this.suppressSector,
+    required this.palette,
   });
 
   @override
@@ -144,7 +155,7 @@ class _CompanyRow extends ConsumerWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: ThemeV2.primary, width: 1.5),
+          border: Border.all(color: palette.accentPrimary, width: 1.5),
         ),
         child: CompanyLogo(ticker: entry.symbol, logoUrl: logoUrl, radius: 18),
       ),
@@ -155,18 +166,18 @@ class _CompanyRow extends ConsumerWidget {
         style: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: ThemeV2.textPrimary,
+          color: palette.textHeader,
         ),
       ),
       subtitle: Text(
         subtitle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+        style: GoogleFonts.inter(fontSize: 11, color: palette.textBody),
       ),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.chevron_right_rounded,
-        color: ThemeV2.textSecondary,
+        color: palette.textBody,
         size: 20,
       ),
     );

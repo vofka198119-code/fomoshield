@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/company_logo.dart';
@@ -59,6 +63,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(searchProvider);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     // Set when opened via a specific portfolio's "+" (e.g. Holdings widget)
     // — buying a result then skips company_detail_screen's portfolio picker
@@ -81,12 +86,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           centerTitle: true,
-          title: Text(
+          title: themedHeaderText(
             l10n.searchTitle,
-            style: GoogleFonts.inter(
+            palette,
+            GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: ThemeV2.primary,
               letterSpacing: 1.5,
             ),
           ),
@@ -108,7 +113,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   decoration: InputDecoration(
                     hintText: l10n.searchHint,
                     hintStyle: GoogleFonts.inter(
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                       fontSize: 14,
                     ),
                     border: InputBorder.none,
@@ -116,16 +121,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     suffixIcon: state.query.isEmpty
                         ? null
                         : IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.close_rounded,
-                              color: ThemeV2.textSecondary,
+                              color: palette.textBody,
                               size: 20,
                             ),
                             onPressed: _clear,
                           ),
                   ),
                   style: GoogleFonts.inter(
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                     fontSize: 14,
                   ),
                 ),
@@ -133,13 +138,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               const SizedBox(height: 12),
               Expanded(
                 child: state.isLoading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(
-                          color: ThemeV2.primary,
+                          color: palette.accentPrimary,
                         ),
                       )
                     : state.query.isEmpty
                     ? SearchBrowseLanes(
+                        palette: palette,
                         onTapSymbol: (symbol) {
                           // Same check+consume+navigate-inside-debounce
                           // sequence as the typed-result ListTile below —
@@ -197,7 +203,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 state.errorType != null
                                     ? Icons.cloud_off_rounded
                                     : Icons.search_off_rounded,
-                                color: ThemeV2.textSecondary,
+                                color: palette.textBody,
                                 size: 48,
                               ),
                               const SizedBox(height: 12),
@@ -207,7 +213,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                     : l10n.searchNoResults,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.inter(
-                                  color: ThemeV2.textSecondary,
+                                  color: palette.textBody,
                                   fontSize: 14,
                                 ),
                               ),
@@ -217,7 +223,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   l10n.searchApiExhausted,
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.inter(
-                                    color: ThemeV2.textSecondary,
+                                    color: palette.textBody,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -229,7 +235,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     : ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: state.results.length,
-                        separatorBuilder: (_, _) => const Divider(),
+                        separatorBuilder: (_, _) => palette.dividerGradient != null
+                            ? themedDivider(palette, indent: 0, endIndent: 0)
+                            : const Divider(),
                         itemBuilder: (context, i) {
                           final item = state.results[i];
                           final symbol = item['symbol'] as String? ?? '';
@@ -243,7 +251,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: ThemeV2.primary,
+                                  color: palette.accentPrimary,
                                   width: 1.5,
                                 ),
                               ),
@@ -268,7 +276,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: ThemeV2.textPrimary,
+                                    color: palette.textHeader,
                                   ),
                                 ),
                                 const SizedBox(width: 6),
@@ -279,7 +287,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               name,
                               style: GoogleFonts.inter(
                                 fontSize: 12,
-                                color: ThemeV2.textSecondary,
+                                color: palette.textBody,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -299,8 +307,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                             : Icons.bookmark_border,
                                         size: 20,
                                         color: inWatchlist
-                                            ? ThemeV2.primary
-                                            : ThemeV2.textSecondary,
+                                            ? palette.accentPrimary
+                                            : palette.textBody,
                                       ),
                                       onPressed: () {
                                         if (inWatchlist) {

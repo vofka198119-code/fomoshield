@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
-import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../../shared/widgets/company_logo.dart';
 
 // ---------------------------------------------------------------------------
@@ -34,11 +34,13 @@ class CompanyMiniCard extends StatelessWidget {
   final String? logoUrl;
   final VoidCallback? onTap;
   final bool showDivider;
+  final AppPalette palette;
 
   const CompanyMiniCard({
     super.key,
     required this.symbol,
     required this.name,
+    required this.palette,
     this.logoUrl,
     this.onTap,
     this.showDivider = false,
@@ -73,7 +75,7 @@ class CompanyMiniCard extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: ThemeV2.primary, width: 1.5),
+                border: Border.all(color: palette.accentPrimary, width: 1.5),
               ),
               child: logoUrl != null
                   ? CompanyLogo(ticker: symbol, logoUrl: logoUrl, radius: 18)
@@ -103,7 +105,7 @@ class CompanyMiniCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -121,7 +123,7 @@ class CompanyMiniCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: ThemeV2.textSecondary,
+                          color: palette.textBody,
                         ),
                       );
                     },
@@ -130,9 +132,9 @@ class CompanyMiniCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
               size: 20,
             ),
           ],

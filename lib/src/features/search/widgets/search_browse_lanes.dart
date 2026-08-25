@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_dao.dart';
-import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/widgets/stagger_fade_in.dart';
 import '../recently_viewed_provider.dart';
@@ -83,8 +83,13 @@ const _laneStaggerCap = Duration(milliseconds: 1800);
 
 class SearchBrowseLanes extends ConsumerStatefulWidget {
   final void Function(String symbol) onTapSymbol;
+  final AppPalette palette;
 
-  const SearchBrowseLanes({super.key, required this.onTapSymbol});
+  const SearchBrowseLanes({
+    super.key,
+    required this.onTapSymbol,
+    required this.palette,
+  });
 
   @override
   ConsumerState<SearchBrowseLanes> createState() => _SearchBrowseLanesState();
@@ -102,8 +107,8 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
         ref.watch(_persistedSectorOverridesProvider).valueOrNull ?? const {};
 
     return topCompanies.when(
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: ThemeV2.primary),
+      loading: () => Center(
+        child: CircularProgressIndicator(color: widget.palette.accentPrimary),
       ),
       error: (err, _) => Center(
         child: Padding(
@@ -112,7 +117,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
             l10n.searchTopCompaniesLoadError,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
-              color: ThemeV2.textSecondary,
+              color: widget.palette.textBody,
               fontSize: 13,
             ),
           ),
@@ -127,7 +132,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                 l10n.searchTopCompaniesBuilding,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
-                  color: ThemeV2.textSecondary,
+                  color: widget.palette.textBody,
                   fontSize: 13,
                 ),
               ),
@@ -176,6 +181,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           BrowseLane(
             title: l10n.searchTopSp500,
             items: _cards(companies.take(_lanePreviewCount).toList()),
+            palette: widget.palette,
             onSeeAll: () => _openList(
               context,
               l10n.searchTopSp500,
@@ -189,6 +195,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                 items: _cards(
                   bySector[sector]!.take(_lanePreviewCount).toList(),
                 ),
+                palette: widget.palette,
                 onSeeAll: () => _openList(
                   context,
                   sector.localizedLabel(l10n).toUpperCase(),
@@ -199,6 +206,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
             BrowseLane(
               title: l10n.searchOtherSector,
               items: _cards(unclassified.take(_lanePreviewCount).toList()),
+              palette: widget.palette,
               onSeeAll: () => _openList(
                 context,
                 l10n.searchOtherSector,
@@ -209,6 +217,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           if (recentlyViewed.isNotEmpty)
             BrowseLane(
               title: l10n.searchRecentlyViewed,
+              palette: widget.palette,
               items: _cards(
                 recentlyViewed
                     .take(_lanePreviewCount)
@@ -280,6 +289,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           name: data[i].name,
           onTap: () => widget.onTapSymbol(data[i].symbol),
           showDivider: i < data.length - 1,
+          palette: widget.palette,
         ),
     ];
   }
