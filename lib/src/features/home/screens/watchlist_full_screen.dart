@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -36,18 +40,19 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
   Widget build(BuildContext context) {
     final watchlistSymbols = ref.watch(watchlistSymbolsProvider);
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           l10n.watchlistTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -58,14 +63,16 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
         left: false,
         right: false,
         child: watchlistSymbols.isEmpty
-            ? _emptyState(l10n)
+            ? _emptyState(l10n, palette)
             : SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                 child: Column(
                   children: [
-                    Container(
+                    CardFrame(
+                      showTopBar: false,
+                      padding: EdgeInsets.zero,
                       decoration: FomoShieldTheme.cardDecoration,
-                      clipBehavior: Clip.antiAlias,
+                      palette: palette,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -73,9 +80,10 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
                             child: Row(
                               children: [
-                                Text(
+                                themedHeaderText(
                                   l10n.watchlistTitle,
-                                  style: FomoShieldTheme.cardTitle(),
+                                  palette,
+                                  FomoShieldTheme.cardTitle(),
                                 ),
                                 const Spacer(),
                                 InkWell(
@@ -83,21 +91,23 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                                       ? null
                                       : _navigateToSearch,
                                   borderRadius: BorderRadius.circular(20),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.add_rounded,
-                                    color: ThemeV2.primary,
+                                    color: palette.accentPrimary,
                                     size: 22,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          Divider(
-                            height: 1,
-                            indent: 16,
-                            endIndent: 16,
-                            color: Colors.black.withValues(alpha: 0.06),
-                          ),
+                          palette.dividerGradient != null
+                              ? themedDivider(palette)
+                              : Divider(
+                                  height: 1,
+                                  indent: 16,
+                                  endIndent: 16,
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                ),
                           // Lazy-built (shrinkWrap over the outer scroll
                           // view still only builds rows near the viewport,
                           // same as ListView.separated elsewhere) — a large
@@ -111,6 +121,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                               key: ValueKey(watchlistSymbols[i]),
                               symbol: watchlistSymbols[i],
                               showDivider: i < watchlistSymbols.length - 1,
+                              palette: palette,
                             ),
                           ),
                         ],
@@ -123,14 +134,14 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
     );
   }
 
-  Widget _emptyState(AppLocalizations l10n) {
+  Widget _emptyState(AppLocalizations l10n, AppPalette palette) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             Icons.visibility_off_rounded,
-            color: ThemeV2.textSecondary,
+            color: palette.textBody,
             size: 48,
           ),
           const SizedBox(height: 12),
@@ -139,7 +150,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
             ),
           ),
           const SizedBox(height: 4),
@@ -147,7 +158,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
             l10n.watchlistFullScreenEmptySubtitle,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
             ),
           ),
           const SizedBox(height: 24),
@@ -171,11 +182,13 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
 class _WatchlistRow extends ConsumerWidget {
   final String symbol;
   final bool showDivider;
+  final AppPalette palette;
 
   const _WatchlistRow({
     super.key,
     required this.symbol,
     required this.showDivider,
+    required this.palette,
   });
 
   @override
@@ -218,7 +231,7 @@ class _WatchlistRow extends ConsumerWidget {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: ThemeV2.primary, width: 1.5),
+                border: Border.all(color: palette.accentPrimary, width: 1.5),
               ),
               child: CompanyLogo(
                 ticker: symbol,
@@ -240,7 +253,7 @@ class _WatchlistRow extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -250,16 +263,16 @@ class _WatchlistRow extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
               size: 20,
             ),
           ],

@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 
@@ -15,14 +19,15 @@ import 'market_clock_engine.dart';
 // next to the MARKET PHASE widget's title on the Market Clock screen.
 // ---------------------------------------------------------------------------
 
-class MarketPhasesScreen extends StatefulWidget {
+class MarketPhasesScreen extends ConsumerStatefulWidget {
   const MarketPhasesScreen({super.key});
 
   @override
-  State<MarketPhasesScreen> createState() => _MarketPhasesScreenState();
+  ConsumerState<MarketPhasesScreen> createState() =>
+      _MarketPhasesScreenState();
 }
 
-class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
+class _MarketPhasesScreenState extends ConsumerState<MarketPhasesScreen> {
   late Timer _timer;
   late String _activeWindowId;
   bool _initialized = false;
@@ -56,18 +61,19 @@ class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
       marketHolidayWindowFor(l10n),
       earlyCloseWindowFor(l10n),
     ];
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           l10n.marketPhasesScreenTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -86,6 +92,7 @@ class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
                 _PhaseListCard(
                   window: allWindows[i],
                   isActive: allWindows[i].id == _activeWindowId,
+                  palette: palette,
                 ),
               ],
             ],
@@ -104,20 +111,32 @@ class _MarketPhasesScreenState extends State<MarketPhasesScreen> {
 class _PhaseListCard extends StatelessWidget {
   final MarketWindow window;
   final bool isActive;
-  const _PhaseListCard({required this.window, required this.isActive});
+  final AppPalette palette;
+  const _PhaseListCard({
+    required this.window,
+    required this.isActive,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Manually gated rather than CardFrame — CardFrame's own gradient
+    // border under Luxury would replace this card's per-item "active
+    // phase" border (thicker + accent-colored) with the same generic
+    // border on every card, losing the highlight signal entirely.
     return Container(
       decoration: BoxDecoration(
-        color: FomoShieldTheme.card,
+        gradient: palette.cardGradient,
+        color: palette.cardGradient == null ? FomoShieldTheme.card : null,
         borderRadius: FomoShieldTheme.cardRadius,
         border: Border.all(
-          color: isActive ? ThemeV2.primary : FomoShieldTheme.border,
+          color: isActive ? palette.accentPrimary : palette.border,
           width: isActive ? 1.5 : 1,
         ),
+        boxShadow: [if (palette.cardGlow != null) palette.cardGlow!],
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -128,9 +147,10 @@ class _PhaseListCard extends StatelessWidget {
                 Text(window.emoji, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
+                  child: themedHeaderText(
                     window.shortHeadline,
-                    style: FomoShieldTheme.cardTitle(),
+                    palette,
+                    FomoShieldTheme.cardTitle(),
                   ),
                 ),
                 if (isActive) ...[
@@ -141,7 +161,7 @@ class _PhaseListCard extends StatelessWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -158,12 +178,14 @@ class _PhaseListCard extends StatelessWidget {
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.black.withValues(alpha: 0.06),
+                ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: Column(
@@ -174,11 +196,15 @@ class _PhaseListCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: ThemeV2.primary,
+                    color: palette.accentPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
-                _ClampedBody(text: window.whatHappens, windowId: window.id),
+                _ClampedBody(
+                  text: window.whatHappens,
+                  windowId: window.id,
+                  palette: palette,
+                ),
               ],
             ),
           ),
@@ -193,14 +219,16 @@ class _PhaseListCard extends StatelessWidget {
 class _ClampedBody extends StatelessWidget {
   final String text;
   final String windowId;
-  const _ClampedBody({required this.text, required this.windowId});
+  final AppPalette palette;
+  const _ClampedBody({
+    required this.text,
+    required this.windowId,
+    required this.palette,
+  });
 
   static const int _maxLines = 4;
-  static final TextStyle _bodyStyle = GoogleFonts.inter(
-    fontSize: 13,
-    color: ThemeV2.textSecondary,
-    height: 1.4,
-  );
+  TextStyle get _bodyStyle =>
+      GoogleFonts.inter(fontSize: 13, color: palette.textBody, height: 1.4);
 
   bool _overflows(double maxWidth) {
     final tp = TextPainter(
@@ -246,7 +274,7 @@ class _ClampedBody extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                     ),
                   ),
                 ),
