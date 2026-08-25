@@ -9,8 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 /// Localized display name for each variant — the one place to add a case
@@ -30,6 +33,7 @@ class ThemePickerScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final current = ref.watch(themeVariantProvider);
+    final palette = resolveAppPalette(current);
 
     final options = [
       for (final variant in AppThemeVariant.values)
@@ -42,19 +46,19 @@ class ThemePickerScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           l10n.themeTitle.toUpperCase(),
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -73,22 +77,28 @@ class ThemePickerScreen extends ConsumerWidget {
                 l10n.themePickerSubtitle,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: ThemeV2.textSecondary,
+                  color: palette.textBody,
                 ),
               ),
             ),
             const SizedBox(height: 8),
-            Card(
+            CardFrame(
+              padding: EdgeInsets.zero,
+              palette: palette,
               child: Column(
                 children: [
                   for (int i = 0; i < options.length; i++) ...[
-                    if (i > 0) const Divider(height: 1),
+                    if (i > 0)
+                      palette.dividerGradient != null
+                          ? themedDivider(palette, indent: 0, endIndent: 0)
+                          : const Divider(height: 1),
                     _ThemeRow(
                       option: options[i],
                       selected: options[i].variant == current,
                       onTap: () => ref
                           .read(themeVariantProvider.notifier)
                           .setVariant(options[i].variant),
+                      palette: palette,
                     ),
                   ],
                 ],
@@ -111,11 +121,13 @@ class _ThemeRow extends StatelessWidget {
   final _ThemeOption option;
   final bool selected;
   final VoidCallback onTap;
+  final AppPalette palette;
 
   const _ThemeRow({
     required this.option,
     required this.selected,
     required this.onTap,
+    required this.palette,
   });
 
   @override
@@ -123,10 +135,10 @@ class _ThemeRow extends StatelessWidget {
     return ListTile(
       title: Text(
         option.label,
-        style: GoogleFonts.inter(color: ThemeV2.textPrimary),
+        style: GoogleFonts.inter(color: palette.textHeader),
       ),
       trailing: selected
-          ? const Icon(Icons.check_rounded, color: ThemeV2.primary)
+          ? Icon(Icons.check_rounded, color: palette.accentPrimary)
           : null,
       onTap: onTap,
     );

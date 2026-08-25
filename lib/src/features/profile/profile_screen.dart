@@ -5,6 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_border.dart';
+import '../../core/theme/themed_divider.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../auth/auth_providers.dart';
 import '../home/home_providers.dart';
@@ -123,18 +129,19 @@ class ProfileScreen extends ConsumerWidget {
     final email = user?.email ?? l10n.profileNotSignedIn;
     final displayName = email.split('@').first;
     final isPremium = subscriptionTier == SubscriptionTier.premium;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           l10n.profileTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -143,65 +150,63 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // ── User Info Card ───────────────────────────────────────
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: () {
-                      if (isAdmin) {
-                        return ThemeV2.primary.withValues(alpha: 0.15);
-                      }
-                      if (isPremium) {
-                        return ThemeV2.primary.withValues(alpha: 0.15);
-                      }
-                      return ThemeV2.primary.withValues(alpha: 0.15);
-                    }(),
-                    child: Icon(
-                      isAdmin
-                          ? Icons.admin_panel_settings_rounded
-                          : isPremium
-                          ? Icons.workspace_premium_rounded
-                          : Icons.person_rounded,
-                      color: isAdmin
-                          ? ThemeV2.primary
-                          : isPremium
-                          ? ThemeV2.primary
-                          : ThemeV2.primary,
-                      size: 32,
-                    ),
+          CardFrame(
+            padding: const EdgeInsets.all(20),
+            palette: palette,
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: palette.accentPrimary.withValues(
+                    alpha: 0.15,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                displayName,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.inter(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: ThemeV2.textPrimary,
-                                ),
+                  child: Icon(
+                    isAdmin
+                        ? Icons.admin_panel_settings_rounded
+                        : isPremium
+                        ? Icons.workspace_premium_rounded
+                        : Icons.person_rounded,
+                    color: palette.accentPrimary,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              displayName,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: palette.textHeader,
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            // Subscription badge (FREE → no badge)
-                            if (subscriptionTier.isPremiumOrAdmin)
-                              Container(
+                          ),
+                          const SizedBox(width: 8),
+                          // Subscription badge (FREE → no badge)
+                          if (subscriptionTier.isPremiumOrAdmin)
+                            themedBorder(
+                              palette: palette,
+                              borderRadius: BorderRadius.circular(6),
+                              child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 3,
                                 ),
-                                decoration: darkCardDecoration(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
+                                decoration: palette.windowGradient != null
+                                    ? BoxDecoration(
+                                        gradient: palette.windowGradient,
+                                        borderRadius: BorderRadius.circular(6),
+                                      )
+                                    : darkCardDecoration(
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
                                 child: Text(
                                   isAdmin
                                       ? l10n.profileAdminBadge
@@ -222,21 +227,21 @@ class ProfileScreen extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                          ],
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        email,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: palette.textBody,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          email,
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            color: ThemeV2.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
 
@@ -252,17 +257,17 @@ class ProfileScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: ThemeV2.primary.withValues(alpha: 0.1),
+                color: palette.accentPrimary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: ThemeV2.primary.withValues(alpha: 0.3),
+                  color: palette.accentPrimary.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.admin_panel_settings_rounded,
-                    color: ThemeV2.primary,
+                    color: palette.accentPrimary,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
@@ -270,7 +275,7 @@ class ProfileScreen extends ConsumerWidget {
                     'Admin Mode — all premium features unlocked',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -285,10 +290,13 @@ class ProfileScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: ThemeV2.primary.withValues(alpha: 0.08),
+                gradient: palette.windowGradient,
+                color: palette.windowGradient == null
+                    ? palette.accentPrimary.withValues(alpha: 0.08)
+                    : null,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: ThemeV2.primary.withValues(alpha: 0.2),
+                  color: palette.accentPrimary.withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -299,11 +307,12 @@ class ProfileScreen extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   _adminButton(
+                    palette: palette,
                     icon: Icons.search_rounded,
                     label: 'Reset search counter (→ 15)',
                     onTap: () {
@@ -313,6 +322,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   _adminButton(
+                    palette: palette,
                     icon: Icons.visibility_rounded,
                     label: 'Toggle Premium (24h)',
                     onTap: () {
@@ -326,6 +336,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   _adminButton(
+                    palette: palette,
                     icon: Icons.delete_sweep_rounded,
                     label: 'Clear all portfolios',
                     onTap: () {
@@ -342,6 +353,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   _adminButton(
+                    palette: palette,
                     icon: Icons.ads_click_rounded,
                     label: 'Reset watchlist ad counter',
                     onTap: () {
@@ -351,6 +363,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   _adminButton(
+                    palette: palette,
                     icon: Icons.psychology_rounded,
                     label: 'Reset all stress tests',
                     onTap: () {
@@ -366,18 +379,17 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // ── Language ─────────────────────────────────────────────
-          _section(l10n.profilePreferencesSection),
-          Card(
+          _section(l10n.profilePreferencesSection, palette),
+          CardFrame(
+            padding: EdgeInsets.zero,
+            palette: palette,
             child: ListTile(
-              leading: const Icon(Icons.language, color: ThemeV2.primary),
+              leading: Icon(Icons.language, color: palette.accentPrimary),
               title: Text(
                 l10n.languageTitle,
-                style: GoogleFonts.inter(color: ThemeV2.textPrimary),
+                style: GoogleFonts.inter(color: palette.textHeader),
               ),
-              trailing: const Icon(
-                Icons.chevron_right,
-                color: ThemeV2.textSecondary,
-              ),
+              trailing: Icon(Icons.chevron_right, color: palette.textBody),
               onTap: () => context.push('/language'),
             ),
           ),
@@ -385,20 +397,19 @@ class ProfileScreen extends ConsumerWidget {
           // ── Theme (admin-only preview for now) ─────────────────────
           if (isAdmin) ...[
             const SizedBox(height: 12),
-            Card(
+            CardFrame(
+              padding: EdgeInsets.zero,
+              palette: palette,
               child: ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.palette_rounded,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                 ),
                 title: Text(
                   l10n.themeTitle,
-                  style: GoogleFonts.inter(color: ThemeV2.textPrimary),
+                  style: GoogleFonts.inter(color: palette.textHeader),
                 ),
-                trailing: const Icon(
-                  Icons.chevron_right,
-                  color: ThemeV2.textSecondary,
-                ),
+                trailing: Icon(Icons.chevron_right, color: palette.textBody),
                 onTap: () => context.push('/theme'),
               ),
             ),
@@ -407,48 +418,51 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // ── Statistics ────────────────────────────────────────────
-          _section(l10n.profileStatisticsSection),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _statItem(l10n.profileStatDays, '1'),
-                  _statItem(l10n.profileStatCompanies, '0'),
-                  _statItem(l10n.profileStatTests, '0'),
-                ],
-              ),
+          _section(l10n.profileStatisticsSection, palette),
+          CardFrame(
+            padding: const EdgeInsets.all(16),
+            palette: palette,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _statItem(l10n.profileStatDays, '1', palette),
+                _statItem(l10n.profileStatCompanies, '0', palette),
+                _statItem(l10n.profileStatTests, '0', palette),
+              ],
             ),
           ),
 
           const SizedBox(height: 24),
 
           // ── Legal ─────────────────────────────────────────────────
-          _section(l10n.profileLegalSection),
-          Card(
+          _section(l10n.profileLegalSection, palette),
+          CardFrame(
+            padding: EdgeInsets.zero,
+            palette: palette,
             child: Column(
               children: [
                 ListTile(
                   title: Text(
                     l10n.profilePrivacyPolicy,
-                    style: GoogleFonts.inter(color: ThemeV2.textPrimary),
+                    style: GoogleFonts.inter(color: palette.textHeader),
                   ),
-                  trailing: const Icon(
+                  trailing: Icon(
                     Icons.chevron_right,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                   ),
                   onTap: () => _openLink('https://fomoshield.app/privacy'),
                 ),
-                const Divider(height: 1),
+                palette.dividerGradient != null
+                    ? themedDivider(palette, indent: 0, endIndent: 0)
+                    : const Divider(height: 1),
                 ListTile(
                   title: Text(
                     l10n.profileTermsOfUse,
-                    style: GoogleFonts.inter(color: ThemeV2.textPrimary),
+                    style: GoogleFonts.inter(color: palette.textHeader),
                   ),
-                  trailing: const Icon(
+                  trailing: Icon(
                     Icons.chevron_right,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                   ),
                   onTap: () => _openLink('https://fomoshield.app/terms'),
                 ),
@@ -475,7 +489,7 @@ class ProfileScreen extends ConsumerWidget {
                       'v$majorMinor.$build',
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: ThemeV2.textSecondary.withValues(alpha: 0.5),
+                        color: palette.textBody.withValues(alpha: 0.5),
                       ),
                     );
                   },
@@ -562,22 +576,23 @@ class ProfileScreen extends ConsumerWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    required AppPalette palette,
   }) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: onTap,
-        icon: Icon(icon, size: 16, color: ThemeV2.primary),
+        icon: Icon(icon, size: 16, color: palette.accentPrimary),
         label: Text(
           label,
           style: GoogleFonts.inter(
             fontSize: 12,
-            color: ThemeV2.primary,
+            color: palette.accentPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: ThemeV2.primary.withValues(alpha: 0.3)),
+          side: BorderSide(color: palette.accentPrimary.withValues(alpha: 0.3)),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -597,7 +612,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _section(String title) {
+  Widget _section(String title, AppPalette palette) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
@@ -605,14 +620,14 @@ class ProfileScreen extends ConsumerWidget {
         style: GoogleFonts.inter(
           fontSize: 11,
           fontWeight: FontWeight.w700,
-          color: ThemeV2.primary,
+          color: palette.accentPrimary,
           letterSpacing: 1.2,
         ),
       ),
     );
   }
 
-  Widget _statItem(String label, String value) {
+  Widget _statItem(String label, String value, AppPalette palette) {
     return Column(
       children: [
         Text(
@@ -620,13 +635,13 @@ class ProfileScreen extends ConsumerWidget {
           style: GoogleFonts.inter(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: ThemeV2.textPrimary,
+            color: palette.textHeader,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: ThemeV2.textSecondary),
+          style: GoogleFonts.inter(fontSize: 11, color: palette.textBody),
         ),
       ],
     );
