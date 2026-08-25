@@ -11,6 +11,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/utils/currency_format.dart';
@@ -129,21 +133,24 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   Widget build(BuildContext context) {
     final session = _session;
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     if (session == null) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: Text(
+          title: themedHeaderText(
             l10n.navStressTest,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: ThemeV2.primary,
-            ),
+            palette,
+            GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
           ),
         ),
-        body: Center(child: Text(l10n.stressTestSessionNotFound)),
+        body: Center(
+          child: Text(
+            l10n.stressTestSessionNotFound,
+            style: GoogleFonts.inter(color: palette.textBody),
+          ),
+        ),
       );
     }
 
@@ -151,19 +158,13 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(
+        title: themedHeaderText(
           l10n.stressTestSetupTitle,
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: ThemeV2.primary,
-          ),
+          palette,
+          GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
-          ),
+          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
           onPressed: () => context.go('/stress-test-hub'),
         ),
       ),
@@ -178,7 +179,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Cash Balance ────────────────────────────────────
-              _buildBalanceCard(session),
+              _buildBalanceCard(session, palette),
               const SizedBox(height: 24),
 
               // ── Duration Selector ────────────────────────────────
@@ -187,16 +188,16 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                   letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 12),
-              _buildDurationSelector(),
+              _buildDurationSelector(palette),
               const SizedBox(height: 24),
 
               // ── Premium Badge (for free users) ──────────────────
-              _buildPremiumBadge(),
+              _buildPremiumBadge(palette),
               const SizedBox(height: 12),
 
               // ── Start Button ────────────────────────────────────
@@ -242,7 +243,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     );
   }
 
-  Widget _buildPremiumBadge() {
+  Widget _buildPremiumBadge(AppPalette palette) {
     final tier = ref.watch(subscriptionTierProvider);
     if (tier.isPremiumOrAdmin) {
       return const SizedBox.shrink();
@@ -261,9 +262,12 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: ThemeV2.primary.withValues(alpha: 0.08),
+        gradient: palette.windowGradient,
+        color: palette.windowGradient == null
+            ? ThemeV2.primary.withValues(alpha: 0.08)
+            : null,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: palette.accentPrimary.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -289,7 +293,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               isFirst ? l10n.stressTestSlot1Free : l10n.stressTestSlot2Free,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: ThemeV2.primary,
+                color: palette.accentPrimary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -299,12 +303,12 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     );
   }
 
-  Widget _buildBalanceCard(StressTestSession session) {
+  Widget _buildBalanceCard(StressTestSession session, AppPalette palette) {
     final tier = ref.watch(subscriptionTierProvider);
     final isPremium = tier.isPremiumOrAdmin;
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -317,6 +321,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.black12),
       ),
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -375,7 +380,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     );
   }
 
-  Widget _buildDurationSelector() {
+  Widget _buildDurationSelector(AppPalette palette) {
     final tier = ref.watch(subscriptionTierProvider);
     final isPremium = tier.isPremiumOrAdmin;
     final accentColor = isPremium
@@ -388,7 +393,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: ThemeV2.surface,
+        gradient: palette.windowGradient,
+        color: palette.windowGradient == null ? ThemeV2.surface : null,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -441,10 +447,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         ? Icons.radio_button_checked_rounded
                         : Icons.radio_button_unchecked_rounded,
                     color: isPremiumLocked
-                        ? ThemeV2.textSecondary
+                        ? palette.textBody
                         : (selected || isCustomRow || isInfiniteRow)
                         ? rowColor
-                        : ThemeV2.textSecondary,
+                        : palette.textBody,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -458,10 +464,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         color: isPremiumLocked
-                            ? ThemeV2.textSecondary.withValues(alpha: 0.5)
+                            ? palette.textBody.withValues(alpha: 0.5)
                             : selected || isCustomRow || isInfiniteRow
                             ? rowColor
-                            : ThemeV2.textSecondary,
+                            : palette.textBody,
                         fontWeight: selected
                             ? FontWeight.w600
                             : FontWeight.w400,
