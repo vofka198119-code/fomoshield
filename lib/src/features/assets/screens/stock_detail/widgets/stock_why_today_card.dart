@@ -5,6 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../core/theme/typography_helpers.dart';
+import '../../../../../core/theme/app_palette.dart';
+import '../../../../../core/theme/themed_header.dart';
+import '../../../../../core/theme/themed_divider.dart';
+import '../../../../../shared/widgets/card_frame.dart';
 import '../../../../../core/supabase/supabase_providers.dart';
 import '../../../../market_clock/market_clock_dial.dart'
     show darkCardDecoration;
@@ -80,6 +84,7 @@ class StockWhyTodayCard extends ConsumerWidget {
   /// because the most recent tick alone wasn't the one moving it. Falls
   /// back to [latestExplanation]'s own contributions when not supplied.
   final PriceContribution? aggregatedContributions;
+  final AppPalette palette;
 
   const StockWhyTodayCard({
     super.key,
@@ -88,6 +93,7 @@ class StockWhyTodayCard extends ConsumerWidget {
     required this.priceChange,
     required this.priceChangePercent,
     required this.isPositive,
+    required this.palette,
     this.latestExplanation,
     this.aggregatedContributions,
   });
@@ -104,19 +110,24 @@ class StockWhyTodayCard extends ConsumerWidget {
     final hypePct = contributions?.hypePct ?? 0;
     final noisePct = contributions?.noisePct ?? 0;
 
-    return Container(
+    return CardFrame(
+      showTopBar: false,
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
       decoration: darkCardDecoration(),
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.whyTodayCardTitle,
-                style: FomoShieldTheme.cardTitle(Colors.white),
+              themedGoldGradient(
+                Text(
+                  l10n.whyTodayCardTitle,
+                  style: FomoShieldTheme.cardTitle(Colors.white),
+                ),
+                palette,
               ),
               // Admin-only — this button (and the detail screen behind it,
               // with the raw per-tick factor breakdown) is an engine
@@ -158,7 +169,9 @@ class StockWhyTodayCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+          palette.dividerGradient != null
+              ? themedDivider(palette, indent: 0, endIndent: 0)
+              : Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
           const SizedBox(height: 16),
           Row(
             children: [

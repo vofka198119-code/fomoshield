@@ -6,6 +6,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../../core/theme/app_palette.dart';
+import '../../../../../core/theme/themed_header.dart';
+import '../../../../../core/theme/themed_divider.dart';
+import '../../../../../shared/widgets/card_frame.dart';
 import '../../../../../shared/utils/currency_format.dart';
 import '../../../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
@@ -91,6 +95,8 @@ class StockSparklineChart extends StatefulWidget {
   final StressTestSparkPeriod selectedPeriod;
   final ValueChanged<StressTestSparkPeriod> onPeriodChanged;
 
+  final AppPalette palette;
+
   const StockSparklineChart({
     super.key,
     required this.ready,
@@ -98,6 +104,7 @@ class StockSparklineChart extends StatefulWidget {
     required this.availablePeriods,
     required this.selectedPeriod,
     required this.onPeriodChanged,
+    required this.palette,
     this.avgPrice,
   });
 
@@ -153,26 +160,29 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
     if (!widget.ready || widget.points.length < 2) {
       return Container(
         height: 280,
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
         decoration: FomoShieldTheme.cardDecoration,
-        child: const Center(
+        child: Center(
           child: CircularProgressIndicator(
-            color: ThemeV2.primary,
+            color: palette.accentPrimary,
             strokeWidth: 2,
           ),
         ),
       );
     }
 
-    return Container(
+    return CardFrame(
+      showTopBar: false,
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.symmetric(
         vertical: FomoShieldTheme.cardPadding,
       ),
       decoration: FomoShieldTheme.cardDecoration,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -180,9 +190,10 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Text(
+            child: themedHeaderText(
               l10n.stockSparklineChartTitle,
-              style: FomoShieldTheme.cardTitle(),
+              palette,
+              FomoShieldTheme.cardTitle(),
             ),
           ),
           const SizedBox(height: 10),
@@ -190,10 +201,9 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Divider(
-              height: 1,
-              color: Colors.black.withValues(alpha: 0.06),
-            ),
+            child: palette.dividerGradient != null
+                ? themedDivider(palette, indent: 0, endIndent: 0)
+                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
           ),
           const SizedBox(height: 12),
           Padding(
@@ -214,6 +224,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
 
   Widget _periodSelector() {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
     return Row(
       children: widget.availablePeriods.map((period) {
         final isSelected = period == widget.selectedPeriod;
@@ -226,16 +237,21 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 6),
-              decoration: isSelected
-                  ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
-                  : null,
+              decoration: !isSelected
+                  ? null
+                  : palette.windowGradient != null
+                  ? BoxDecoration(
+                      gradient: palette.windowGradient,
+                      borderRadius: BorderRadius.circular(6),
+                    )
+                  : darkCardDecoration(borderRadius: BorderRadius.circular(6)),
               child: Text(
                 _periodLabel(l10n, period),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected ? Colors.white : Colors.black,
+                  color: isSelected ? Colors.white : palette.textBody,
                 ),
               ),
             ),
@@ -266,7 +282,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             l10n.stressTestChartNotEnoughDataForPeriod,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: ThemeV2.textSecondary,
+              color: widget.palette.textBody,
             ),
           ),
         );
@@ -291,7 +307,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             l10n.stressTestChartNotEnoughDataForPeriod,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: ThemeV2.textSecondary,
+              color: widget.palette.textBody,
             ),
           ),
         );
@@ -512,7 +528,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: ThemeV2.textSecondary,
+              color: widget.palette.textBody,
             ),
           ),
         ),
@@ -524,7 +540,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: ThemeV2.textSecondary,
+              color: widget.palette.textBody,
             ),
           ),
         ),
@@ -537,7 +553,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: ThemeV2.textSecondary,
+                color: widget.palette.textBody,
               ),
             ),
           ),

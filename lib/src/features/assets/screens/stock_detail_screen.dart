@@ -306,6 +306,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       avgPrice: holding?.averagePrice,
                       availablePeriods: _availablePeriods(session),
                       selectedPeriod: _selectedPeriod,
+                      palette: palette,
                       onPeriodChanged: (p) {
                         setState(() => _selectedPeriod = p);
                         _generateSparkData();
@@ -324,6 +325,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       priceChange: priceChange,
                       priceChangePercent: priceChangePercent,
                       isPositive: isPositive,
+                      palette: palette,
                       latestExplanation:
                           session.explanationLog[widget.symbol]?.isNotEmpty ==
                               true
