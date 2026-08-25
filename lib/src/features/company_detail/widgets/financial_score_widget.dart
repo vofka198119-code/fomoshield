@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
@@ -52,8 +56,13 @@ String _markerDisplayDetails(AppLocalizations l10n, String details) =>
 
 class FinancialScoreWidget extends StatelessWidget {
   final Map<String, dynamic> score;
+  final AppPalette palette;
 
-  const FinancialScoreWidget({super.key, required this.score});
+  const FinancialScoreWidget({
+    super.key,
+    required this.score,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +74,11 @@ class FinancialScoreWidget extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
+      child: CardFrame(
+        showTopBar: false,
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
         decoration: darkCardDecoration(),
+        palette: palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -80,14 +91,19 @@ class FinancialScoreWidget extends StatelessWidget {
                   color: _gaugeColor(fsScore),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.companyDetailFsScoreLabel,
-                  style: FomoShieldTheme.cardTitle(Colors.white),
+                themedGoldGradient(
+                  Text(
+                    l10n.companyDetailFsScoreLabel,
+                    style: FomoShieldTheme.cardTitle(Colors.white),
+                  ),
+                  palette,
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+            palette.dividerGradient != null
+                ? themedDivider(palette, indent: 0, endIndent: 0)
+                : Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
             const SizedBox(height: 16),
 
             // ── Gauge + Radar row ──
@@ -249,7 +265,8 @@ class FinancialScoreWidget extends StatelessWidget {
       height: 120,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: ThemeV2.surface,
+        gradient: palette.windowGradient,
+        color: palette.windowGradient == null ? ThemeV2.surface : null,
         border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
         boxShadow: [
           BoxShadow(
@@ -278,7 +295,7 @@ class FinancialScoreWidget extends StatelessWidget {
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 2,
-                color: ThemeV2.textSecondary,
+                color: palette.textBody,
               ),
             ),
           ],

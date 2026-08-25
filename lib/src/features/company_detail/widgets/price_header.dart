@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
@@ -55,6 +57,7 @@ class PriceHeader extends StatelessWidget {
   // false there drops the session label from the price cell entirely
   // instead of showing something fake or misleadingly real.
   final bool showSessionLabel;
+  final AppPalette palette;
 
   const PriceHeader({
     super.key,
@@ -72,6 +75,7 @@ class PriceHeader extends StatelessWidget {
     this.phaseLabelColor,
     this.phaseGlow = false,
     this.showSessionLabel = true,
+    required this.palette,
   });
 
   @override
@@ -98,9 +102,11 @@ class PriceHeader extends StatelessWidget {
         // part of the widget order system).
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
+          child: CardFrame(
+            showTopBar: false,
             padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
             decoration: darkCardDecoration(),
+            palette: palette,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -156,7 +162,7 @@ class PriceHeader extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
-                              color: ThemeV2.primary,
+                              color: palette.accentPrimary,
                             ),
                           ),
                         ),
@@ -230,7 +236,10 @@ class PriceHeader extends StatelessWidget {
                     child: fsScore == null
                         ? Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              gradient: palette.windowGradient,
+                              color: palette.windowGradient == null
+                                  ? Colors.white
+                                  : null,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: ThemeV2.divider),
                             ),
@@ -257,10 +266,21 @@ class PriceHeader extends StatelessWidget {
   Widget _fsScoreCell(AppLocalizations l10n, int score) {
     final color = _gaugeColor(score);
 
+    // Manually gated rather than CardFrame — this cell's inner Column has
+    // an Expanded (the gauge circle fills the cell's own bounded height),
+    // which needs the outer Container to pass tight constraints straight
+    // through; CardFrame's own mainAxisSize.min wrapper Column isn't a
+    // safe fit for that here.
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
+      decoration: palette.borderGradient != null
+          ? BoxDecoration(
+              gradient: palette.cardGradient,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [if (palette.cardGlow != null) palette.cardGlow!],
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
           Text(
@@ -283,7 +303,10 @@ class PriceHeader extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: ThemeV2.surface,
+                      gradient: palette.windowGradient,
+                      color: palette.windowGradient == null
+                          ? ThemeV2.surface
+                          : null,
                       border: Border.all(
                         color: color.withValues(alpha: 0.3),
                         width: 3,
@@ -333,10 +356,11 @@ class PriceHeader extends StatelessWidget {
     final sessionColor =
         phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -434,7 +458,7 @@ class PriceHeader extends StatelessWidget {
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.6,
-              color: ThemeV2.primary,
+              color: palette.accentPrimary,
             ),
           ),
           const SizedBox(height: 4),

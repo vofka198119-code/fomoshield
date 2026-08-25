@@ -16,6 +16,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/services/finnhub_service.dart';
@@ -248,6 +250,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
       );
     }
 
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final currentPrice =
         session.currentPrices[widget.symbol] ??
         session.basePrices[widget.symbol] ??
@@ -290,6 +293,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                         // Simulated market has no real session concept —
                         // no label, no glow, plain price color throughout.
                         showSessionLabel: false,
+                        palette: palette,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -371,6 +375,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                   'logo': logoAsync.valueOrNull,
                 },
               ),
+              palette: palette,
             ),
           ],
         ),

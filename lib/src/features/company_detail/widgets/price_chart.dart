@@ -6,6 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
@@ -86,8 +90,9 @@ extension ChartPeriodExt on ChartPeriod {
 
 class PriceChart extends ConsumerStatefulWidget {
   final String symbol;
+  final AppPalette palette;
 
-  const PriceChart({super.key, required this.symbol});
+  const PriceChart({super.key, required this.symbol, required this.palette});
 
   @override
   ConsumerState<PriceChart> createState() => _PriceChartState();
@@ -213,11 +218,13 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     final l10n = AppLocalizations.of(context)!;
     final avgCost = _avgCost();
 
-    return Container(
+    return CardFrame(
+      showTopBar: false,
       padding: const EdgeInsets.symmetric(
         vertical: FomoShieldTheme.cardPadding,
       ),
       decoration: FomoShieldTheme.cardDecoration,
+      palette: widget.palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -225,17 +232,20 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Text(l10n.stressTestPriceChartTitle, style: FomoShieldTheme.cardTitle()),
+            child: themedHeaderText(
+              l10n.stressTestPriceChartTitle,
+              widget.palette,
+              FomoShieldTheme.cardTitle(),
+            ),
           ),
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Divider(
-              height: 1,
-              color: Colors.black.withValues(alpha: 0.06),
-            ),
+            child: widget.palette.dividerGradient != null
+                ? themedDivider(widget.palette, indent: 0, endIndent: 0)
+                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
           ),
           const SizedBox(height: 12),
 
@@ -261,6 +271,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
 
   Widget _buildPeriodSelector() {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
     return Row(
       children: ChartPeriod.values.map((period) {
         final isSelected = period == _selectedPeriod;
@@ -274,16 +285,21 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 6),
-              decoration: isSelected
-                  ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
-                  : null,
+              decoration: !isSelected
+                  ? null
+                  : palette.windowGradient != null
+                  ? BoxDecoration(
+                      gradient: palette.windowGradient,
+                      borderRadius: BorderRadius.circular(6),
+                    )
+                  : darkCardDecoration(borderRadius: BorderRadius.circular(6)),
               child: Text(
                 _periodLabel(l10n, period),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected ? Colors.white : Colors.black,
+                  color: isSelected ? Colors.white : palette.textBody,
                 ),
               ),
             ),
@@ -294,10 +310,11 @@ class _PriceChartState extends ConsumerState<PriceChart> {
   }
 
   Widget _buildChartArea(double? avgCost) {
+    final palette = widget.palette;
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
-          color: ThemeV2.primary,
+          color: palette.accentPrimary,
           strokeWidth: 2,
         ),
       );
@@ -308,18 +325,11 @@ class _PriceChartState extends ConsumerState<PriceChart> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.show_chart_rounded,
-              size: 40,
-              color: ThemeV2.textSecondary,
-            ),
+            Icon(Icons.show_chart_rounded, size: 40, color: palette.textBody),
             const SizedBox(height: 8),
             Text(
               _error!,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: ThemeV2.textSecondary,
-              ),
+              style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
             ),
           ],
         ),
@@ -333,7 +343,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
       return Center(
         child: Text(
           AppLocalizations.of(context)!.companyDetailChartNotEnoughData,
-          style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+          style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
         ),
       );
     }
@@ -546,7 +556,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
             ),
           ),
         ),
@@ -558,7 +568,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
             ),
           ),
         ),
@@ -571,7 +581,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: ThemeV2.textSecondary,
+                color: palette.textBody,
               ),
             ),
           ),

@@ -6,6 +6,10 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../core/cache/sector_providers.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import '../home/home_providers.dart';
@@ -105,23 +109,25 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     if (_showAd) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
-          child: Container(
+          child: CardFrame(
             margin: const EdgeInsets.all(32),
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: ThemeV2.surface,
               borderRadius: BorderRadius.circular(20),
             ),
+            palette: palette,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.play_circle_rounded,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                   size: 64,
                 ),
                 const SizedBox(height: 24),
@@ -130,7 +136,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -139,7 +145,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                     height: 1.5,
                   ),
                 ),
@@ -174,7 +180,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     l10n.companyDetailUpgradeNoAds,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                     ),
                   ),
                 ),
@@ -203,8 +209,8 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: asyncData.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: ThemeV2.primary),
+        loading: () => Center(
+          child: CircularProgressIndicator(color: palette.accentPrimary),
         ),
         error: (err, _) => Center(
           child: Padding(
@@ -212,16 +218,16 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.cloud_off_rounded,
-                  color: ThemeV2.textSecondary,
+                  color: palette.textBody,
                   size: 56,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   l10n.companyDetailLoadError,
                   style: GoogleFonts.inter(
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
@@ -231,7 +237,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 Text(
                   l10n.companyDetailLoadErrorBody,
                   style: GoogleFonts.inter(
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
@@ -426,6 +432,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final profile = widget.data['profile'] as Map<String, dynamic>? ?? {};
     final quote = widget.data['quote'] as Map<String, dynamic>? ?? {};
     final metrics = widget.data['metrics'] as Map<String, dynamic>? ?? {};
@@ -452,24 +459,24 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_rounded,
-                    color: ThemeV2.textPrimary,
+                    color: palette.accentPrimary,
                   ),
                   onPressed: () => context.pop(),
                 ),
                 Expanded(
                   child: Center(
-                    child: Text(
+                    child: themedHeaderText(
                       l10n.companyDetailTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
+                      palette,
+                      GoogleFonts.inter(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
-                        color: ThemeV2.primary,
                         letterSpacing: 1.5,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                   ),
                 ),
@@ -483,8 +490,8 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             ? Icons.bookmark_rounded
                             : Icons.bookmark_border_rounded,
                         color: inWatchlist
-                            ? ThemeV2.primary
-                            : ThemeV2.textSecondary,
+                            ? palette.accentPrimary
+                            : palette.textBody,
                       ),
                       onPressed: () {
                         if (inWatchlist) {
@@ -545,6 +552,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             isUp: isUp,
                             metrics: metrics,
                             scoreData: scoreData,
+                            palette: palette,
                           ),
                         ),
                       ),
@@ -555,9 +563,9 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                       child: Center(
                         child: TextButton.icon(
                           onPressed: _showWidgetsBottomSheet,
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.add_rounded,
-                            color: ThemeV2.primary,
+                            color: palette.accentPrimary,
                             size: 20,
                           ),
                           label: Text(
@@ -565,7 +573,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: ThemeV2.primary,
+                              color: palette.accentPrimary,
                             ),
                           ),
                           style: TextButton.styleFrom(
@@ -575,8 +583,8 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
-                              side: const BorderSide(
-                                color: ThemeV2.primary,
+                              side: BorderSide(
+                                color: palette.accentPrimary,
                                 width: 0.5,
                               ),
                             ),
@@ -586,6 +594,8 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                     ),
                     const SizedBox(height: 20),
                     // ── Educational Purpose & Legal Disclaimer ──
+                    // Sits directly on the scroll background, no card behind
+                    // it — needs its own palette-aware color (pitfall #3).
                     StaggerFadeIn(
                       index: visibleWidgets.length + 1,
                       child: Padding(
@@ -598,7 +608,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
-                                color: ThemeV2.textPrimary,
+                                color: palette.textHeader,
                               ),
                             ),
                             const SizedBox(height: 6),
@@ -607,7 +617,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 9,
-                                color: ThemeV2.textPrimary,
+                                color: palette.textBody,
                                 height: 1.5,
                               ),
                             ),
@@ -628,6 +638,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
           isUp: isUp,
           onBuy: () => _openOrderEntry('buy'),
           onSell: () => _openOrderEntry('sell'),
+          palette: palette,
         ),
       ],
     );
@@ -648,6 +659,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     required bool isUp,
     required Map<String, dynamic> metrics,
     required Map<String, dynamic> scoreData,
+    required AppPalette palette,
   }) {
     switch (id) {
       case 'price_header':
@@ -672,6 +684,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                     )
                   : l10n.companyDetailChangeLabel,
               fsScore: scoreData['financial_score'] as int?,
+              palette: palette,
             ),
             const SizedBox(height: 16),
           ],
@@ -681,7 +694,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: PriceChart(symbol: symbol),
+              child: PriceChart(symbol: symbol, palette: palette),
             ),
             const SizedBox(height: 24),
           ],
@@ -689,7 +702,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
       case 'key_metrics':
         return Column(
           children: [
-            KeyMetricsSection(metrics: metrics),
+            KeyMetricsSection(metrics: metrics, palette: palette),
             const SizedBox(height: 24),
           ],
         );
@@ -697,21 +710,21 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
         if (scoreData.isEmpty) return const SizedBox.shrink();
         return Column(
           children: [
-            FinancialScoreWidget(score: scoreData),
+            FinancialScoreWidget(score: scoreData, palette: palette),
             const SizedBox(height: 24),
           ],
         );
       case 'position':
         return Column(
           children: [
-            PositionSection(symbol: symbol, price: price),
+            PositionSection(symbol: symbol, price: price, palette: palette),
             const SizedBox(height: 24),
           ],
         );
       case 'limit_orders':
         return Column(
           children: [
-            LimitOrdersSection(symbol: symbol),
+            LimitOrdersSection(symbol: symbol, palette: palette),
             const SizedBox(height: 24),
           ],
         );

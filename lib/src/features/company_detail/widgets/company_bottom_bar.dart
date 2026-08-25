@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../../../l10n/gen/app_localizations.dart';
 
 // ===========================================================================
 // Sticky Bottom Bar: BUY / SELL
 // ===========================================================================
+// BUY/SELL are real filled CTA buttons — out of scope for the Luxury Gold
+// rollout per established precedent (see project memory), so this bar
+// accepts a palette for constructor-shape consistency with every other
+// dispatched widget but doesn't reach for it.
 
 class CompanyBottomBar extends StatelessWidget {
   final double price;
   final bool isUp;
   final VoidCallback onBuy;
   final VoidCallback onSell;
+  final AppPalette palette;
 
   const CompanyBottomBar({
     super.key,
@@ -20,6 +26,7 @@ class CompanyBottomBar extends StatelessWidget {
     required this.isUp,
     required this.onBuy,
     required this.onSell,
+    required this.palette,
   });
 
   @override

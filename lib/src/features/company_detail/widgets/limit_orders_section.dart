@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../orders/order_provider.dart';
 import '../../orders/widgets/order_row_tile.dart';
@@ -20,8 +23,13 @@ const int _inlineLimit = 5;
 
 class LimitOrdersSection extends ConsumerWidget {
   final String symbol;
+  final AppPalette palette;
 
-  const LimitOrdersSection({super.key, required this.symbol});
+  const LimitOrdersSection({
+    super.key,
+    required this.symbol,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,15 +51,22 @@ class LimitOrdersSection extends ConsumerWidget {
 
     final shown = orders.take(_inlineLimit).toList();
 
-    return Container(
+    return CardFrame(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.fromLTRB(22, 14, 22, 4),
       decoration: FomoShieldTheme.cardDecoration,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.companyDetailLimitOrdersTitle, style: FomoShieldTheme.cardTitle()),
-          const Divider(height: 20, color: Color(0x0F000000)),
+          themedHeaderText(
+            l10n.companyDetailLimitOrdersTitle,
+            palette,
+            FomoShieldTheme.cardTitle(),
+          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette, indent: 0, endIndent: 0)
+              : const Divider(height: 20, color: Color(0x0F000000)),
           for (final order in shown)
             OrderRowTile(
               order: order,
@@ -73,7 +88,7 @@ class LimitOrdersSection extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                     ),
                   ),
                 ),

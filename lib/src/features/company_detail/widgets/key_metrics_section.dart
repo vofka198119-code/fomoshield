@@ -4,6 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import 'metric_info_data.dart';
 
@@ -13,8 +17,13 @@ import 'metric_info_data.dart';
 
 class KeyMetricsSection extends StatelessWidget {
   final Map<String, dynamic> metrics;
+  final AppPalette palette;
 
-  const KeyMetricsSection({super.key, required this.metrics});
+  const KeyMetricsSection({
+    super.key,
+    required this.metrics,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +73,22 @@ class KeyMetricsSection extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
+      child: CardFrame(
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
         decoration: FomoShieldTheme.cardDecoration,
+        palette: palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.companyDetailKeyMetricsTitle, style: FomoShieldTheme.cardTitle()),
+            themedHeaderText(
+              l10n.companyDetailKeyMetricsTitle,
+              palette,
+              FomoShieldTheme.cardTitle(),
+            ),
             const SizedBox(height: 10),
-            Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+            palette.dividerGradient != null
+                ? themedDivider(palette, indent: 0, endIndent: 0)
+                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
             const SizedBox(height: 12),
             for (int i = 0; i < items.length; i++) ...[
               if (i > 0) const SizedBox(height: 8),
@@ -106,19 +122,16 @@ class KeyMetricsSection extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: palette.textHeader,
           ),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            themedPriceText(
               value,
-              style: interNums(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+              palette,
+              interNums(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             if (infoId != null) ...[
               const SizedBox(width: 6),
@@ -128,14 +141,14 @@ class KeyMetricsSection extends StatelessWidget {
                   width: 20,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: ThemeV2.primary.withValues(alpha: 0.1),
+                    color: palette.accentPrimary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
                   ),
                   alignment: Alignment.center,
-                  child: const Icon(
+                  child: Icon(
                     Icons.help_outline_rounded,
                     size: 13,
-                    color: ThemeV2.primary,
+                    color: palette.accentPrimary,
                   ),
                 ),
               ),
