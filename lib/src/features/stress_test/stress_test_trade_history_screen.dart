@@ -8,8 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import '../../shared/widgets/trade_history_tile.dart';
@@ -26,6 +29,7 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
     final session = ref.watch(stressTestSessionProvider(sessionId));
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -33,19 +37,19 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           l10n.tradeHistoryTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -57,17 +61,25 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
         right: false,
         child: session == null
             ? Center(
-                child: Text(l10n.stressTestTradeHistoryScreenSessionNotFound),
+                child: Text(
+                  l10n.stressTestTradeHistoryScreenSessionNotFound,
+                  style: GoogleFonts.inter(color: palette.textBody),
+                ),
               )
             : session.trades.isEmpty
             ? Center(
-                child: Text(l10n.stressTestTradeHistoryScreenNoTradesYet),
+                child: Text(
+                  l10n.stressTestTradeHistoryScreenNoTradesYet,
+                  style: GoogleFonts.inter(color: palette.textBody),
+                ),
               )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
-                child: Container(
+                child: CardFrame(
+                  showTopBar: false,
+                  padding: EdgeInsets.zero,
                   decoration: FomoShieldTheme.cardDecoration,
-                  clipBehavior: Clip.antiAlias,
+                  palette: palette,
                   child: Column(
                     children: [
                       for (int i = 0; i < session.trades.length; i++)
@@ -86,6 +98,7 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
                                 isBuy: trade.isBuy,
                                 totalValue: trade.shares * trade.price,
                                 showDivider: i != session.trades.length - 1,
+                                palette: palette,
                                 onTap: () => context.push(
                                   '/stress-test/$sessionId/trade-detail',
                                   extra: trade,

@@ -10,8 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/psychology_meter.dart';
 import 'stress_test_engine.dart';
@@ -35,6 +39,7 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
     final data = session == null
         ? null
         : PsychologyMeterData.fromSession(session);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -42,19 +47,19 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           l10n.stressTestPsychologyMeterTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -73,6 +78,7 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
                     _FsScoreGaugeCard(
                       score: data.strategicScore,
                       label: l10n.psychologyMeterScreenStrategyScore,
+                      palette: palette,
                     ),
                     const SizedBox(height: 16),
                     PsychologyStrategyCard(session: session),
@@ -82,6 +88,7 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
                     _FsScoreGaugeCard(
                       score: data.psychologicalScore,
                       label: l10n.psychologyMeterScreenPsychologyScore,
+                      palette: palette,
                     ),
                     const SizedBox(height: 16),
                     PsychologyDisciplineCard(
@@ -97,7 +104,7 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
                       patience: session.psychologyProfile.patience,
                     ),
                     const SizedBox(height: 16),
-                    _PsychologyMeterDetailCard(data: data),
+                    _PsychologyMeterDetailCard(data: data, palette: palette),
                     const StressTestVerdictDisclaimer(),
                   ],
                 ),
@@ -115,15 +122,21 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
 class _FsScoreGaugeCard extends StatelessWidget {
   final double score;
   final String label;
+  final AppPalette palette;
 
-  const _FsScoreGaugeCard({required this.score, required this.label});
+  const _FsScoreGaugeCard({
+    required this.score,
+    required this.label,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -132,7 +145,7 @@ class _FsScoreGaugeCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(label, style: FomoShieldTheme.cardTitle()),
+                themedHeaderText(label, palette, FomoShieldTheme.cardTitle()),
                 GestureDetector(
                   onTap: () => context.push('/metric-info/investor-score'),
                   child: Container(
@@ -146,19 +159,14 @@ class _FsScoreGaugeCard extends StatelessWidget {
                     child: Icon(
                       Icons.help_outline_rounded,
                       size: 13,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
+          themedDivider(palette),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
             child: FsScoreRing(score: score),
@@ -171,32 +179,30 @@ class _FsScoreGaugeCard extends StatelessWidget {
 
 class _PsychologyMeterDetailCard extends StatelessWidget {
   final PsychologyMeterData data;
+  final AppPalette palette;
 
-  const _PsychologyMeterDetailCard({required this.data});
+  const _PsychologyMeterDetailCard({required this.data, required this.palette});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            child: Text(
+            child: themedHeaderText(
               l10n.psychologyMeterScreenSessionStats,
-              style: FomoShieldTheme.cardTitle(),
+              palette,
+              FomoShieldTheme.cardTitle(),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
+          themedDivider(palette),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
             child: PsychologyAnalyticsSection(data: data),
