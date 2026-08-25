@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../../core/theme/app_palette.dart';
+import '../../../../../core/theme/themed_header.dart';
+import '../../../../../core/theme/themed_divider.dart';
+import '../../../../../shared/widgets/card_frame.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../stress_test/stress_test_pending_orders_provider.dart';
 import 'stress_test_order_row_tile.dart';
@@ -20,11 +24,13 @@ const int _inlineLimit = 5;
 class StockLimitOrdersSection extends ConsumerWidget {
   final String sessionId;
   final String symbol;
+  final AppPalette palette;
 
   const StockLimitOrdersSection({
     super.key,
     required this.sessionId,
     required this.symbol,
+    required this.palette,
   });
 
   @override
@@ -39,15 +45,22 @@ class StockLimitOrdersSection extends ConsumerWidget {
 
     final shown = orders.take(_inlineLimit).toList();
 
-    return Container(
+    return CardFrame(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(22, 14, 22, 4),
       decoration: FomoShieldTheme.cardDecoration,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.stockLimitOrdersTitle, style: FomoShieldTheme.cardTitle()),
-          const Divider(height: 20, color: Color(0x0F000000)),
+          themedHeaderText(
+            l10n.stockLimitOrdersTitle,
+            palette,
+            FomoShieldTheme.cardTitle(),
+          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette, indent: 0, endIndent: 0)
+              : const Divider(height: 20, color: Color(0x0F000000)),
           for (final order in shown) StressTestOrderRowTile(order: order),
           if (orders.length > _inlineLimit)
             Padding(
@@ -60,7 +73,7 @@ class StockLimitOrdersSection extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                     ),
                   ),
                 ),

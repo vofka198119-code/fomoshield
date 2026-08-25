@@ -3,6 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/theme_v2.dart';
 import '../../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../../core/theme/typography_helpers.dart';
+import '../../../../../core/theme/app_palette.dart';
+import '../../../../../core/theme/themed_header.dart';
+import '../../../../../core/theme/themed_divider.dart';
+import '../../../../../shared/widgets/card_frame.dart';
 import '../../../../../shared/utils/currency_format.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../market_clock/market_clock_dial.dart'
@@ -21,12 +25,14 @@ class StockPositionCard extends StatelessWidget {
   final double shares;
   final double avgPrice;
   final double pnl;
+  final AppPalette palette;
 
   const StockPositionCard({
     super.key,
     required this.shares,
     required this.avgPrice,
     required this.pnl,
+    required this.palette,
   });
 
   @override
@@ -38,19 +44,26 @@ class StockPositionCard extends StatelessWidget {
     final positionValue = costBasis + pnl;
     final pnlPercent = costBasis > 0 ? (pnl / costBasis) * 100 : 0.0;
 
-    return Container(
+    return CardFrame(
+      showTopBar: false,
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
       decoration: darkCardDecoration(),
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.stockPositionCardTitle,
-            style: FomoShieldTheme.cardTitle(Colors.white),
+          themedGoldGradient(
+            Text(
+              l10n.stockPositionCardTitle,
+              style: FomoShieldTheme.cardTitle(Colors.white),
+            ),
+            palette,
           ),
           const SizedBox(height: 10),
-          Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+          palette.dividerGradient != null
+              ? themedDivider(palette, indent: 0, endIndent: 0)
+              : Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
           const SizedBox(height: 12),
           _row(l10n.stockPositionCardAssetValueLabel, formatUsd(positionValue)),
           const SizedBox(height: 8),
@@ -81,13 +94,11 @@ class StockPositionCard extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-      Text(
+      themedPriceText(
         value,
-        style: interNums(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
+        palette,
+        interNums(fontSize: 14, fontWeight: FontWeight.w600),
+        fallbackColor: Colors.white,
       ),
     ],
   );

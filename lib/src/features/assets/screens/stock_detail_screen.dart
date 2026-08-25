@@ -15,9 +15,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/services/finnhub_service.dart';
@@ -241,16 +241,19 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
       _generateSparkData();
     });
     final session = _session;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     if (session == null) {
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
-          child: Text(AppLocalizations.of(context)!.stressTestSessionNotFound),
+          child: Text(
+            AppLocalizations.of(context)!.stressTestSessionNotFound,
+            style: TextStyle(color: palette.textBody),
+          ),
         ),
       );
     }
 
-    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final currentPrice =
         session.currentPrices[widget.symbol] ??
         session.basePrices[widget.symbol] ??
@@ -266,7 +269,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: _buildAppBar(context),
+      appBar: _buildAppBar(context, palette),
       body: SafeArea(
         top: false,
         child: Column(
@@ -313,6 +316,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                         shares: holding.shares,
                         avgPrice: holding.averagePrice,
                         pnl: session.positionPnL[widget.symbol] ?? 0.0,
+                        palette: palette,
                       ),
                     StockWhyTodayCard(
                       sessionId: widget.sessionId,
@@ -341,6 +345,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                     StockLimitOrdersSection(
                       sessionId: widget.sessionId,
                       symbol: widget.symbol,
+                      palette: palette,
                     ),
                     const SimulatedTradingDisclaimer(),
                     const SizedBox(height: 80),
@@ -383,7 +388,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, AppPalette palette) {
     final l10n = AppLocalizations.of(context)!;
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
@@ -393,22 +398,19 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
         scrolledUnderElevation: 0,
         toolbarHeight: 64,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           l10n.stockDetailAppBarTitle,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
-          ),
+          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
           onPressed: () => context.pop(),
         ),
       ),

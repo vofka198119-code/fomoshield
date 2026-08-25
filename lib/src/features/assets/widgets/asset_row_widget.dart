@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart' show themedPriceText;
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
@@ -18,12 +20,14 @@ class AssetRowWidget extends ConsumerWidget {
   final StressTestHolding holding;
   final StressTestSession session;
   final VoidCallback onTap;
+  final AppPalette palette;
 
   const AssetRowWidget({
     super.key,
     required this.holding,
     required this.session,
     required this.onTap,
+    required this.palette,
   });
 
   @override
@@ -43,9 +47,7 @@ class AssetRowWidget extends ConsumerWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFFE8E5DF))),
-        ),
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: palette.border))),
         child: Row(
           children: [
             // Logo
@@ -74,7 +76,7 @@ class AssetRowWidget extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -82,7 +84,7 @@ class AssetRowWidget extends ConsumerWidget {
                     '${holding.symbol} · ${allocation.toStringAsFixed(2)}%',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ],
@@ -92,13 +94,11 @@ class AssetRowWidget extends ConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
+                themedPriceText(
                   formatUsd(positionValue),
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.textPrimary,
-                  ),
+                  palette,
+                  GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
+                  fallbackColor: ThemeV2.textPrimary,
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -112,9 +112,9 @@ class AssetRowWidget extends ConsumerWidget {
               ],
             ),
             const SizedBox(width: 4),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
               size: 20,
             ),
           ],
