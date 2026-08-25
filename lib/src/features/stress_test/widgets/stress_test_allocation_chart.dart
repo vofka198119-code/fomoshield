@@ -11,6 +11,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
@@ -21,8 +25,13 @@ import '../stress_test_naming.dart';
 /// styled to the standard light card (see reference_widget_card_standard).
 class StressTestAllocationChart extends ConsumerStatefulWidget {
   final StressTestSession session;
+  final AppPalette palette;
 
-  const StressTestAllocationChart({super.key, required this.session});
+  const StressTestAllocationChart({
+    super.key,
+    required this.session,
+    required this.palette,
+  });
 
   @override
   ConsumerState<StressTestAllocationChart> createState() =>
@@ -37,6 +46,7 @@ class _StressTestAllocationChartState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
     final session = widget.session;
     final holdings = session.holdings;
     final isEmpty = holdings.isEmpty;
@@ -74,10 +84,11 @@ class _StressTestAllocationChartState
         ? formatUsd(0)
         : '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         children: [
           InkWell(
@@ -89,14 +100,15 @@ class _StressTestAllocationChartState
                 padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
                 child: Row(
                   children: [
-                    Text(
+                    themedHeaderText(
                       l10n.portfolioBalanceLabel,
-                      style: FomoShieldTheme.cardTitle(),
+                      palette,
+                      FomoShieldTheme.cardTitle(),
                     ),
                     const Spacer(),
-                    const Icon(
+                    Icon(
                       Icons.chevron_right_rounded,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                       size: 20,
                     ),
                   ],
@@ -104,12 +116,7 @@ class _StressTestAllocationChartState
               ),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
+          themedDivider(palette),
           const SizedBox(height: 16),
           Padding(
             // Wider than the title's 22px inset on purpose — shrinks the
@@ -151,18 +158,15 @@ class _StressTestAllocationChartState
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: ThemeV2.primary,
+                              color: palette.accentPrimary,
                               letterSpacing: 0.5,
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text(
+                          themedPriceText(
                             formatUsd(portfolioTotal),
-                            style: interNums(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w600,
-                              color: ThemeV2.textPrimary,
-                            ),
+                            palette,
+                            interNums(fontSize: 28, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 6),
                           Text(
@@ -222,7 +226,7 @@ class _StressTestAllocationChartState
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: ThemeV2.textPrimary,
+                                  color: palette.textHeader,
                                 ),
                               ),
                             ),
@@ -232,7 +236,7 @@ class _StressTestAllocationChartState
                               style: interNums(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: ThemeV2.textSecondary,
+                                color: palette.textBody,
                               ),
                             ),
                           ],
@@ -245,7 +249,9 @@ class _StressTestAllocationChartState
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
-                            color: ThemeV2.primary.withValues(alpha: 0.06),
+                            color: palette.accentPrimary.withValues(
+                              alpha: 0.06,
+                            ),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Center(
@@ -258,7 +264,7 @@ class _StressTestAllocationChartState
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: ThemeV2.primary,
+                                color: palette.accentPrimary,
                               ),
                             ),
                           ),

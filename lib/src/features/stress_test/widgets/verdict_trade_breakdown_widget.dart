@@ -21,6 +21,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../market_clock/market_clock_dial.dart'
@@ -29,18 +33,24 @@ import '../stress_test_models.dart';
 
 class VerdictTradeBreakdownWidget extends StatelessWidget {
   final VerdictArchiveEntry entry;
+  final AppPalette palette;
 
-  const VerdictTradeBreakdownWidget({super.key, required this.entry});
+  const VerdictTradeBreakdownWidget({
+    super.key,
+    required this.entry,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final totalPnl = entry.finalValue - entry.startingCash;
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -50,9 +60,16 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  l10n.verdictTradeBreakdownTitle,
-                  style: FomoShieldTheme.cardTitle(Colors.white),
+                themedGoldGradient(
+                  Text(
+                    l10n.verdictTradeBreakdownTitle,
+                    style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                      shadows: palette.titleShadow != null
+                          ? [palette.titleShadow!]
+                          : null,
+                    ),
+                  ),
+                  palette,
                 ),
                 GestureDetector(
                   onTap: () => context.push(
@@ -67,12 +84,14 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.white.withValues(alpha: 0.12),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
             child: Column(
@@ -121,13 +140,11 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          Text(
+          themedPriceText(
             value,
-            style: interNums(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: dialBrassLight,
-            ),
+            palette,
+            interNums(fontSize: 15, fontWeight: FontWeight.w700),
+            fallbackColor: dialBrassLight,
           ),
         ],
       ),

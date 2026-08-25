@@ -19,6 +19,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
+import '../../core/theme/themed_border.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -593,11 +599,12 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   /// Returns [SizedBox.shrink] if the widget's conditions aren't met.
   Widget _buildWidgetById(String id, StressTestSession session) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     switch (id) {
       case 'allocation_chart':
-        return StressTestAllocationChart(session: session);
+        return StressTestAllocationChart(session: session, palette: palette);
       case 'cash':
-        return StressTestCashWidget(session: session);
+        return StressTestCashWidget(session: session, palette: palette);
       case 'psychology_meter':
         return PsychologyMeter(
           data: PsychologyMeterData.fromSession(session),
@@ -642,12 +649,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           noInnerPadding: true,
           child: Column(
             children: [
-              Divider(
-                height: 1,
-                indent: 16,
-                endIndent: 16,
-                color: Colors.black.withValues(alpha: 0.06),
-              ),
+              themedDivider(palette),
               ...displayTrades.asMap().entries.map(
                 (entry) => TradeHistoryTile(
                   symbol: entry.value.symbol,
@@ -655,6 +657,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   isBuy: entry.value.isBuy,
                   totalValue: entry.value.shares * entry.value.price,
                   showDivider: entry.key != displayTrades.length - 1,
+                  palette: palette,
                   onTap: () => context.push(
                     '/stress-test/${widget.sessionId}/trade-detail',
                     extra: entry.value,
@@ -672,7 +675,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: ThemeV2.primary.withValues(alpha: 0.06),
+                      color: palette.accentPrimary.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
@@ -681,7 +684,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: ThemeV2.primary,
+                          color: palette.accentPrimary,
                         ),
                       ),
                     ),
@@ -692,7 +695,10 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
         );
       case 'limit_orders':
-        return StressTestMyLimitOrdersWidget(sessionId: session.id);
+        return StressTestMyLimitOrdersWidget(
+          sessionId: session.id,
+          palette: palette,
+        );
       case 'timer':
         return _buildTimerBar(session);
       default:
@@ -739,9 +745,12 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     required Widget child,
     bool noInnerPadding = false,
   }) {
-    return Container(
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -753,18 +762,12 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(title, style: FomoShieldTheme.cardTitle()),
+                  themedHeaderText(title, palette, FomoShieldTheme.cardTitle()),
                   ?trailing,
                 ],
               ),
             ),
-          if (!noInnerPadding)
-            Divider(
-              height: 1,
-              indent: 16,
-              endIndent: 16,
-              color: Colors.black.withValues(alpha: 0.06),
-            ),
+          if (!noInnerPadding) themedDivider(palette),
           if (noInnerPadding)
             child
           else
@@ -1277,6 +1280,8 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 
   Widget _buildCompletedView(StressTestSession session) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    final hasThemedBorder = palette.borderGradient != null;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -1289,56 +1294,60 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           const SizedBox(height: 16),
 
           // ── Allocation Chart ────────────────────────────
-          StressTestAllocationChart(session: session),
+          StressTestAllocationChart(session: session, palette: palette),
           const SizedBox(height: 16),
 
           // ── Cash Row ────────────────────────────────────
           Row(
             children: [
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: ThemeV2.primaryBg,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: ThemeV2.divider),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.stressTestFinalBalance,
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: ThemeV2.primary,
-                          letterSpacing: 0.6,
+                child: themedBorder(
+                  palette: palette,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: hasThemedBorder ? null : ThemeV2.primaryBg,
+                      gradient: hasThemedBorder ? palette.windowGradient : null,
+                      borderRadius: BorderRadius.circular(16),
+                      border: hasThemedBorder
+                          ? null
+                          : Border.all(color: ThemeV2.divider),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.stressTestFinalBalance,
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: palette.accentPrimary,
+                            letterSpacing: 0.6,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        formatUsd(session.totalValue),
-                        style: interNums(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: ThemeV2.textPrimary,
+                        const SizedBox(height: 4),
+                        themedPriceText(
+                          formatUsd(session.totalValue),
+                          palette,
+                          interNums(fontSize: 18, fontWeight: FontWeight.w600),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${session.profitLoss >= 0 ? '+' : ''}${session.profitLossPercent.toStringAsFixed(1)}%',
-                        style: interNums(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: session.profitLoss >= 0
-                              ? ThemeV2.success
-                              : ThemeV2.loss,
+                        const SizedBox(height: 4),
+                        Text(
+                          '${session.profitLoss >= 0 ? '+' : ''}${session.profitLossPercent.toStringAsFixed(1)}%',
+                          style: interNums(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: session.profitLoss >= 0
+                                ? ThemeV2.success
+                                : ThemeV2.loss,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -16,6 +16,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_border.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../market_clock/market_clock_dial.dart'
     show darkCardDecoration, dialDark;
@@ -39,6 +43,7 @@ class VerdictScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final archive = ref.watch(verdictArchiveProvider);
     final entry = archive.cast<VerdictArchiveEntry?>().firstWhere(
       (e) => e?.sessionId == sessionId,
@@ -50,27 +55,27 @@ class VerdictScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: Text(
+          title: themedHeaderText(
             l10n.verdictTitle,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: ThemeV2.primary,
-            ),
+            palette,
+            GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
           ),
         ),
         body: Center(
-          child: Text(l10n.verdictNotAvailable),
+          child: Text(
+            l10n.verdictNotAvailable,
+            style: GoogleFonts.inter(color: palette.textBody),
+          ),
         ),
       );
     }
 
     final access = ref.watch(verdictAccessProvider(sessionId));
     if (access.isLoading) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
-          child: CircularProgressIndicator(color: ThemeV2.primary),
+          child: CircularProgressIndicator(color: palette.accentPrimary),
         ),
       );
     }
@@ -80,13 +85,10 @@ class VerdictScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: Text(
+          title: themedHeaderText(
             l10n.verdictTitle,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: ThemeV2.primary,
-            ),
+            palette,
+            GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
           ),
         ),
         body: Center(
@@ -95,11 +97,7 @@ class VerdictScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.lock_rounded,
-                  size: 48,
-                  color: ThemeV2.textSecondary,
-                ),
+                Icon(Icons.lock_rounded, size: 48, color: palette.textBody),
                 const SizedBox(height: 16),
                 Text(
                   l10n.verdictAccessLockedTitle,
@@ -107,7 +105,7 @@ class VerdictScreen extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -116,7 +114,7 @@ class VerdictScreen extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -136,19 +134,19 @@ class VerdictScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           l10n.verdictSessionCompleteTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.go('/stress-test-hub'),
@@ -164,11 +162,11 @@ class VerdictScreen extends ConsumerWidget {
           child: Column(
             children: [
               // ── Guardian Verdict ────────────────────────────────
-              const KeyedSubtree(
-                key: ValueKey('guardian'),
+              KeyedSubtree(
+                key: const ValueKey('guardian'),
                 child: StaggerFadeIn(
                   index: 0,
-                  child: _GuardianVerdictSection(),
+                  child: _GuardianVerdictSection(palette: palette),
                 ),
               ),
               const SizedBox(height: 24),
@@ -190,6 +188,7 @@ class VerdictScreen extends ConsumerWidget {
                             100)
                         .round(),
                     l10n.verdictScreenStrategyScoreLabel,
+                    palette,
                   ),
                 ),
               ),
@@ -238,6 +237,7 @@ class VerdictScreen extends ConsumerWidget {
                             100)
                         .round(),
                     l10n.verdictScreenPsychologyScoreLabel,
+                    palette,
                   ),
                 ),
               ),
@@ -294,7 +294,10 @@ class VerdictScreen extends ConsumerWidget {
                 key: const ValueKey('tradeBreakdown'),
                 child: StaggerFadeIn(
                   index: 8,
-                  child: VerdictTradeBreakdownWidget(entry: entry),
+                  child: VerdictTradeBreakdownWidget(
+                    entry: entry,
+                    palette: palette,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -366,7 +369,7 @@ class VerdictScreen extends ConsumerWidget {
                         l10n.verdictBackToHome,
                         style: GoogleFonts.inter(
                           fontSize: 14,
-                          color: ThemeV2.textSecondary,
+                          color: palette.textBody,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -382,19 +385,26 @@ class VerdictScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFsScoreGauge(int score, String label) {
+  Widget _buildFsScoreGauge(int score, String label, AppPalette palette) {
     final color = score >= 70
         ? ThemeV2.success
         : score >= 40
         ? ThemeV2.warning
         : ThemeV2.loss;
+    // This gauge is normal-case (light-under-Standard, dark-under-Luxury)
+    // — swap the flat circle fill only when Luxury is active, keeping
+    // Standard pixel-for-pixel (palette.card isn't guaranteed to equal
+    // FomoShieldTheme.card's exact value).
+    final circleColor = palette.titleGradient != null
+        ? palette.card
+        : FomoShieldTheme.card;
 
     return Container(
       width: 180,
       height: 180,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: FomoShieldTheme.card,
+        color: circleColor,
         border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
         boxShadow: [
           BoxShadow(
@@ -430,7 +440,7 @@ class VerdictScreen extends ConsumerWidget {
                 fontWeight: FontWeight.w700,
                 letterSpacing: 2.5,
                 height: 1.4,
-                color: ThemeV2.textSecondary,
+                color: palette.textBody,
               ),
             ),
           ],
@@ -451,18 +461,24 @@ class VerdictScreen extends ConsumerWidget {
 // Short intro here; "View your analysis" pushes /metric-info/guardian-verdict
 // for the expanded copy, same shape as every other "?" info screen.
 class _GuardianVerdictSection extends StatelessWidget {
-  const _GuardianVerdictSection();
+  final AppPalette palette;
+  const _GuardianVerdictSection({required this.palette});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    final hasThemedBorder = palette.borderGradient != null;
+    final radius = BorderRadius.circular(20);
+    final content = Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ThemeV2.primary.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.2)),
+        color: hasThemedBorder ? null : ThemeV2.primary.withValues(alpha: 0.06),
+        gradient: hasThemedBorder ? palette.windowGradient : null,
+        borderRadius: radius,
+        border: hasThemedBorder
+            ? null
+            : Border.all(color: ThemeV2.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -472,13 +488,13 @@ class _GuardianVerdictSection extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: ThemeV2.primary.withValues(alpha: 0.12),
+              color: palette.accentPrimary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(24),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.shield_rounded,
               size: 24,
-              color: ThemeV2.primary,
+              color: palette.accentPrimary,
             ),
           ),
           const SizedBox(width: 16),
@@ -493,7 +509,7 @@ class _GuardianVerdictSection extends StatelessWidget {
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.2,
-                    color: ThemeV2.primary,
+                    color: palette.accentPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -502,7 +518,7 @@ class _GuardianVerdictSection extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -512,7 +528,7 @@ class _GuardianVerdictSection extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     height: 1.5,
-                    color: FomoShieldTheme.text,
+                    color: palette.textBody,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -523,7 +539,7 @@ class _GuardianVerdictSection extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                     ),
                   ),
                 ),
@@ -533,5 +549,8 @@ class _GuardianVerdictSection extends StatelessWidget {
         ],
       ),
     );
+    return hasThemedBorder
+        ? themedBorder(palette: palette, borderRadius: radius, child: content)
+        : content;
   }
 }

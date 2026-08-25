@@ -12,6 +12,11 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import '../market_clock/market_clock_dial.dart' show darkCardDecoration;
@@ -39,6 +44,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
       portfolioBalanceWidgetOrderProvider(sessionId),
     );
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -46,19 +52,19 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           l10n.portfolioBalanceScreenTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -76,7 +82,11 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
                 for (int i = 0; i < visibleWidgets.length; i++) ...[
                   StaggerFadeIn(
                     index: i,
-                    child: _buildWidgetById(visibleWidgets[i].id, session),
+                    child: _buildWidgetById(
+                      visibleWidgets[i].id,
+                      session,
+                      palette,
+                    ),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -85,9 +95,9 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
                 Center(
                   child: TextButton.icon(
                     onPressed: () => _showWidgetSettingsSheet(context, ref),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.add_rounded,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                       size: 20,
                     ),
                     label: Text(
@@ -95,7 +105,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.primary,
+                        color: palette.accentPrimary,
                       ),
                     ),
                     style: TextButton.styleFrom(
@@ -105,8 +115,8 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
-                        side: const BorderSide(
-                          color: ThemeV2.primary,
+                        side: BorderSide(
+                          color: palette.accentPrimary,
                           width: 0.5,
                         ),
                       ),
@@ -115,7 +125,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
                 ),
 
                 // ── Educational disclaimer ───────────────────────
-                _educationalDisclaimer(l10n),
+                _educationalDisclaimer(l10n, palette),
               ],
             ],
           ),
@@ -124,16 +134,26 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildWidgetById(String id, StressTestSession session) {
+  Widget _buildWidgetById(
+    String id,
+    StressTestSession session,
+    AppPalette palette,
+  ) {
     switch (id) {
       case 'portfolio_health':
-        return StressTestPortfolioHealthCard(session: session);
+        return StressTestPortfolioHealthCard(
+          session: session,
+          palette: palette,
+        );
       case 'asset_allocation':
-        return _AssetAllocationBarsCard(session: session);
+        return _AssetAllocationBarsCard(session: session, palette: palette);
       case 'diversification_indicator':
-        return StressTestSectorAllocationCard(session: session);
+        return StressTestSectorAllocationCard(
+          session: session,
+          palette: palette,
+        );
       case 'diversification_progress':
-        return StressTestAssetCountCard(session: session);
+        return StressTestAssetCountCard(session: session, palette: palette);
       default:
         return const SizedBox.shrink();
     }
@@ -163,7 +183,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
 
   // Same centered title+body shape as order_config_section.dart's
   // Simulated Trading disclaimer ("Company Card style").
-  Widget _educationalDisclaimer(AppLocalizations l10n) {
+  Widget _educationalDisclaimer(AppLocalizations l10n, AppPalette palette) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
@@ -174,7 +194,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
             ),
           ),
           const SizedBox(height: 6),
@@ -183,7 +203,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
               height: 1.5,
             ),
           ),
@@ -200,8 +220,9 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
 /// screen the ring's legend "More" button can't fully replace.
 class _AssetAllocationBarsCard extends ConsumerWidget {
   final StressTestSession session;
+  final AppPalette palette;
 
-  const _AssetAllocationBarsCard({required this.session});
+  const _AssetAllocationBarsCard({required this.session, required this.palette});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -218,9 +239,11 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
     invested.sort((a, b) => b.value.compareTo(a.value));
     final hasData = invested.isNotEmpty && totalInvested > 0;
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
+      palette: palette,
       child: Column(
         children: [
           SizedBox(
@@ -230,9 +253,16 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    l10n.portfolioBalanceScreenAssetAllocationTitle,
-                    style: FomoShieldTheme.cardTitle(Colors.white),
+                  themedGoldGradient(
+                    Text(
+                      l10n.portfolioBalanceScreenAssetAllocationTitle,
+                      style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                        shadows: palette.titleShadow != null
+                            ? [palette.titleShadow!]
+                            : null,
+                      ),
+                    ),
+                    palette,
                   ),
                   GestureDetector(
                     onTap: () =>
@@ -256,12 +286,14 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
               ),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.white.withValues(alpha: 0.12),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
           if (hasData)
             Padding(
               padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),

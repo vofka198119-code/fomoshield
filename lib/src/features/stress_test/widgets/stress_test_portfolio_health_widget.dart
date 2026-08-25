@@ -17,6 +17,10 @@ import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../psychology_engine.dart' show diversificationScoreForCount;
 import '../stress_test_models.dart';
@@ -37,8 +41,13 @@ const Map<AssetSector, double> _sectorRiskWeight = {
 
 class StressTestPortfolioHealthCard extends StatelessWidget {
   final StressTestSession session;
+  final AppPalette palette;
 
-  const StressTestPortfolioHealthCard({super.key, required this.session});
+  const StressTestPortfolioHealthCard({
+    super.key,
+    required this.session,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,10 +95,11 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
       stability = (100 - riskWeighted * 100).clamp(0.0, 100.0);
     }
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         children: [
           SizedBox(
@@ -99,9 +109,10 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  themedHeaderText(
                     l10n.portfolioHealthWidgetTitle,
-                    style: FomoShieldTheme.cardTitle(),
+                    palette,
+                    FomoShieldTheme.cardTitle(),
                   ),
                   GestureDetector(
                     onTap: () => context.push('/metric-info/portfolio-health'),
@@ -109,16 +120,16 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        color: ThemeV2.primary.withValues(alpha: 0.1),
+                        color: palette.accentPrimary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           ThemeV2.radiusSmall,
                         ),
                       ),
                       alignment: Alignment.center,
-                      child: const Icon(
+                      child: Icon(
                         Icons.help_outline_rounded,
                         size: 13,
-                        color: ThemeV2.primary,
+                        color: palette.accentPrimary,
                       ),
                     ),
                   ),
@@ -126,12 +137,7 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
               ),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
+          themedDivider(palette),
           if (hasData)
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
@@ -141,6 +147,7 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
                   concentration: concentration,
                   sectorBalance: sectorBalance,
                   stability: stability,
+                  palette: palette,
                 ),
               ),
             )
@@ -162,6 +169,16 @@ Color _colorForScore(double s) {
   return _zoneGreen;
 }
 
+// The gauge track (the pale full-circle guide behind the colored score
+// arc) was a flat black@8% — fine on this card's light Standard
+// background, but nearly invisible once the card turns dark under
+// Luxury. `palette.titleGradient != null` is this file's stand-in for
+// "Luxury is active" (this card has exactly one dark state, so no
+// finer-grained gating is needed).
+Color _trackColorFor(AppPalette palette) => palette.titleGradient != null
+    ? Colors.white.withValues(alpha: 0.08)
+    : Colors.black.withValues(alpha: 0.08);
+
 // Corner gap orientation: each satellite gauge's opening faces INWARD,
 // toward the center circle, instead of always facing down. Gap is a fixed
 // 90° wide, centered on the angle pointing from that corner toward the
@@ -180,12 +197,14 @@ class _HealthGaugeCluster extends StatelessWidget {
   final double concentration;
   final double sectorBalance;
   final double stability;
+  final AppPalette palette;
 
   const _HealthGaugeCluster({
     required this.diversification,
     required this.concentration,
     required this.sectorBalance,
     required this.stability,
+    required this.palette,
   });
 
   static const double _clusterSize = 300;
@@ -220,6 +239,7 @@ class _HealthGaugeCluster extends StatelessWidget {
                   diameter: _miniDiameter,
                   startAngle: _startAngleNW,
                   labelBelow: false,
+                  palette: palette,
                 ),
               ),
             ),
@@ -238,6 +258,7 @@ class _HealthGaugeCluster extends StatelessWidget {
                   diameter: _miniDiameter,
                   startAngle: _startAngleNE,
                   labelBelow: false,
+                  palette: palette,
                 ),
               ),
             ),
@@ -256,6 +277,7 @@ class _HealthGaugeCluster extends StatelessWidget {
                   diameter: _miniDiameter,
                   startAngle: _startAngleSW,
                   labelBelow: true,
+                  palette: palette,
                 ),
               ),
             ),
@@ -274,6 +296,7 @@ class _HealthGaugeCluster extends StatelessWidget {
                   diameter: _miniDiameter,
                   startAngle: _startAngleSE,
                   labelBelow: true,
+                  palette: palette,
                 ),
               ),
             ),
@@ -292,6 +315,7 @@ class _HealthGaugeCluster extends StatelessWidget {
                     startAngle: -math.pi / 2,
                     totalSweep: 2 * math.pi,
                     glowOffset: 4,
+                    trackColor: _trackColorFor(palette),
                   ),
                 ),
                 Text(
@@ -320,6 +344,7 @@ class _CornerGauge extends StatelessWidget {
   final double diameter;
   final double startAngle;
   final bool labelBelow;
+  final AppPalette palette;
 
   const _CornerGauge({
     required this.label,
@@ -327,6 +352,7 @@ class _CornerGauge extends StatelessWidget {
     required this.diameter,
     required this.startAngle,
     required this.labelBelow,
+    required this.palette,
   });
 
   @override
@@ -338,7 +364,7 @@ class _CornerGauge extends StatelessWidget {
       style: GoogleFonts.inter(
         fontSize: 11,
         fontWeight: FontWeight.w600,
-        color: ThemeV2.textSecondary,
+        color: palette.textBody,
       ),
     );
     final gauge = SizedBox(
@@ -355,6 +381,7 @@ class _CornerGauge extends StatelessWidget {
               startAngle: startAngle,
               totalSweep: 3 * math.pi / 2,
               glowOffset: 4,
+              trackColor: _trackColorFor(palette),
             ),
           ),
           Text(
@@ -388,6 +415,7 @@ class _GaugePainter extends CustomPainter {
   final double startAngle;
   final double totalSweep;
   final double glowOffset;
+  final Color trackColor;
 
   const _GaugePainter({
     required this.percent,
@@ -395,6 +423,7 @@ class _GaugePainter extends CustomPainter {
     required this.startAngle,
     required this.totalSweep,
     this.glowOffset = 0,
+    this.trackColor = const Color(0x14000000), // black @ 8%, prior default
   });
 
   // Matches the Allocation ring's stroke width (stress_test_allocation_
@@ -410,7 +439,7 @@ class _GaugePainter extends CustomPainter {
     final rect = Rect.fromCircle(center: center, radius: radius);
 
     final trackPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.08)
+      ..color = trackColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = _strokeWidth
       ..strokeCap = StrokeCap.round;
@@ -445,5 +474,6 @@ class _GaugePainter extends CustomPainter {
       oldDelegate.percent != percent ||
       oldDelegate.color != color ||
       oldDelegate.startAngle != startAngle ||
-      oldDelegate.totalSweep != totalSweep;
+      oldDelegate.totalSweep != totalSweep ||
+      oldDelegate.trackColor != trackColor;
 }

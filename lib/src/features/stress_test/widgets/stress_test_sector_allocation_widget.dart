@@ -10,6 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../stress_test_models.dart';
@@ -30,8 +34,13 @@ List<String> _allSectors(AppLocalizations l10n) => [
 
 class StressTestSectorAllocationCard extends StatelessWidget {
   final StressTestSession session;
+  final AppPalette palette;
 
-  const StressTestSectorAllocationCard({super.key, required this.session});
+  const StressTestSectorAllocationCard({
+    super.key,
+    required this.session,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +61,11 @@ class StressTestSectorAllocationCard extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
     final hasData = totalInvested > 0;
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
+      palette: palette,
       child: Column(
         children: [
           SizedBox(
@@ -64,9 +75,16 @@ class StressTestSectorAllocationCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'DIVERSIFICATION INDICATOR',
-                    style: FomoShieldTheme.cardTitle(Colors.white),
+                  themedGoldGradient(
+                    Text(
+                      'DIVERSIFICATION INDICATOR',
+                      style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                        shadows: palette.titleShadow != null
+                            ? [palette.titleShadow!]
+                            : null,
+                      ),
+                    ),
+                    palette,
                   ),
                   GestureDetector(
                     onTap: () =>
@@ -90,12 +108,14 @@ class StressTestSectorAllocationCard extends StatelessWidget {
               ),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.white.withValues(alpha: 0.12),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
           if (hasData)
             Padding(
               padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
