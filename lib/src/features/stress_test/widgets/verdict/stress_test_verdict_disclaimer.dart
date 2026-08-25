@@ -13,16 +13,19 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/theme_v2.dart';
+import '../../../../core/theme/theme_variant_provider.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 
-class StressTestVerdictDisclaimer extends StatelessWidget {
+class StressTestVerdictDisclaimer extends ConsumerWidget {
   const StressTestVerdictDisclaimer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
@@ -33,7 +36,7 @@ class StressTestVerdictDisclaimer extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
             ),
           ),
           const SizedBox(height: 6),
@@ -42,7 +45,7 @@ class StressTestVerdictDisclaimer extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
               height: 1.5,
             ),
           ),

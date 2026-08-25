@@ -8,14 +8,21 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/theme/theme_variant_provider.dart';
+import '../../../../core/theme/themed_header.dart';
+import '../../../../core/theme/themed_divider.dart';
+import '../../../../core/theme/themed_border.dart';
+import '../../../../shared/widgets/card_frame.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 
-class VerdictMarkerRow extends StatelessWidget {
+class VerdictMarkerRow extends ConsumerWidget {
   final String sessionId;
   final String markerId;
   final String label;
@@ -42,15 +49,22 @@ class VerdictMarkerRow extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final color = _color;
+    final radius = BorderRadius.circular(12);
 
-    return Container(
+    return themedBorder(
+      palette: palette,
+      borderRadius: radius,
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        borderRadius: radius,
+        border: palette.borderGradient != null
+            ? null
+            : Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Row(
         children: [
@@ -102,6 +116,7 @@ class VerdictMarkerRow extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -109,7 +124,7 @@ class VerdictMarkerRow extends StatelessWidget {
 /// One-row version of the DIVERSIFICATION/STRATEGY combo-card shape, for
 /// markers that stand alone (Discipline/Panic/Patience) rather than
 /// sharing a card with siblings.
-class VerdictSingleMarkerCard extends StatelessWidget {
+class VerdictSingleMarkerCard extends ConsumerWidget {
   final String sessionId;
   final String markerId;
   final String title; // card header, e.g. 'DISCIPLINE'
@@ -126,11 +141,13 @@ class VerdictSingleMarkerCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -139,7 +156,17 @@ class VerdictSingleMarkerCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: FomoShieldTheme.cardTitle(Colors.white)),
+                themedGoldGradient(
+                  Text(
+                    title,
+                    style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                      shadows: palette.titleShadow != null
+                          ? [palette.titleShadow!]
+                          : null,
+                    ),
+                  ),
+                  palette,
+                ),
                 GestureDetector(
                   onTap: () =>
                       context.push('/metric-info/psychology-$markerId'),
@@ -161,12 +188,14 @@ class VerdictSingleMarkerCard extends StatelessWidget {
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.white.withValues(alpha: 0.12),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
             child: VerdictMarkerRow(

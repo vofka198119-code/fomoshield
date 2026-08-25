@@ -14,8 +14,14 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/theme/theme_variant_provider.dart';
+import '../../../../core/theme/themed_header.dart';
+import '../../../../core/theme/themed_divider.dart';
+import '../../../../shared/widgets/card_frame.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import 'verdict_marker_row.dart';
@@ -31,7 +37,7 @@ class _DiversificationRow {
   });
 }
 
-class VerdictDiversificationCard extends StatelessWidget {
+class VerdictDiversificationCard extends ConsumerWidget {
   final String sessionId;
   final double sectorDiversificationScore;
   final double safetyMarkerScore;
@@ -46,8 +52,9 @@ class VerdictDiversificationCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final rows = [
       _DiversificationRow(
         markerId: 'sector-diversification',
@@ -66,10 +73,11 @@ class VerdictDiversificationCard extends StatelessWidget {
       ),
     ];
 
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -78,9 +86,16 @@ class VerdictDiversificationCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  l10n.verdictDiversificationCardTitle,
-                  style: FomoShieldTheme.cardTitle(Colors.white),
+                themedGoldGradient(
+                  Text(
+                    l10n.verdictDiversificationCardTitle,
+                    style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                      shadows: palette.titleShadow != null
+                          ? [palette.titleShadow!]
+                          : null,
+                    ),
+                  ),
+                  palette,
                 ),
                 GestureDetector(
                   onTap: () =>
@@ -103,12 +118,14 @@ class VerdictDiversificationCard extends StatelessWidget {
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.white.withValues(alpha: 0.12),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
             child: Column(
