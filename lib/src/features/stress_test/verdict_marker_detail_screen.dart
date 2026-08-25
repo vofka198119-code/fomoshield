@@ -13,6 +13,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
@@ -149,6 +153,7 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
     final markerLabel = marker == null
         ? l10n.verdictMarkerDetailFallbackTitle
         : _labelForMarker(l10n, markerId);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -156,19 +161,19 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           markerLabel.toUpperCase(),
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -179,13 +184,19 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
         left: false,
         right: false,
         child: (entry == null || marker == null)
-            ? Center(child: Text(l10n.verdictMarkerNotAvailable))
+            ? Center(
+                child: Text(
+                  l10n.verdictMarkerNotAvailable,
+                  style: GoogleFonts.inter(color: palette.textBody),
+                ),
+              )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: _MarkerDetailBody(
                   label: markerLabel,
                   score: marker.score(entry),
                   tier: _tierFor(l10n, markerId, entry),
+                  palette: palette,
                 ),
               ),
       ),
@@ -197,11 +208,13 @@ class _MarkerDetailBody extends StatelessWidget {
   final String label;
   final double score; // 0.0-1.0
   final VerdictTier? tier;
+  final AppPalette palette;
 
   const _MarkerDetailBody({
     required this.label,
     required this.score,
     this.tier,
+    required this.palette,
   });
 
   Color get _color {
@@ -223,7 +236,8 @@ class _MarkerDetailBody extends StatelessWidget {
           height: 140,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: FomoShieldTheme.card,
+            gradient: palette.windowGradient,
+            color: palette.windowGradient == null ? FomoShieldTheme.card : null,
             border: Border.all(color: color.withValues(alpha: 0.3), width: 3),
           ),
           child: Center(
@@ -250,7 +264,7 @@ class _MarkerDetailBody extends StatelessWidget {
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.5,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                     ),
                   ),
                 ),
@@ -260,18 +274,17 @@ class _MarkerDetailBody extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         if (tier != null)
-          _TierArticle(tier: tier!, accentColor: color)
+          _TierArticle(tier: tier!, accentColor: color, palette: palette)
         else
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
+          CardFrame(
             decoration: FomoShieldTheme.cardDecoration,
+            palette: palette,
             child: Text(
               l10n.verdictMarkerFeedbackComingSoon(label),
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: ThemeV2.textSecondary,
+                color: palette.textBody,
                 height: 1.5,
               ),
             ),
@@ -286,11 +299,18 @@ class _MarkerDetailBody extends StatelessWidget {
 /// market_period_detail_screen.dart's phase detail page: a bold title,
 /// flowing intro paragraphs, then labeled sub-sections (caps brand-color
 /// label + body) for things like "How can you improve?".
+// Sits directly on the screen background (no card behind it) — needs its
+// own palette-aware color rather than a hardcoded Standard one (pitfall #3).
 class _TierArticle extends StatelessWidget {
   final VerdictTier tier;
   final Color accentColor;
+  final AppPalette palette;
 
-  const _TierArticle({required this.tier, required this.accentColor});
+  const _TierArticle({
+    required this.tier,
+    required this.accentColor,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -311,7 +331,7 @@ class _TierArticle extends StatelessWidget {
           tier.intro,
           style: GoogleFonts.inter(
             fontSize: 14,
-            color: ThemeV2.textPrimary,
+            color: palette.textHeader,
             height: 1.6,
           ),
         ),
@@ -322,7 +342,7 @@ class _TierArticle extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: ThemeV2.primary,
+              color: palette.accentPrimary,
               letterSpacing: 1,
             ),
           ),
@@ -331,7 +351,7 @@ class _TierArticle extends StatelessWidget {
             section.body,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
               height: 1.6,
             ),
           ),
