@@ -231,7 +231,24 @@ extension NoiseEngine on StressTestNotifier {
     DateTime? priceHistoryAsOf,
   }) {
     final session = state[idx];
-    if (session.holdings.isEmpty) return;
+
+    // ── Background engine for symbols under a pending limit order ──────
+    // A brand-new symbol with an open BUY limit order isn't in
+    // session.holdings yet (no trade has executed), so without this it
+    // would sit frozen at its seeded quote forever — a limit price below
+    // a price that never moves can never cross. Driving it through the
+    // same tick loop as real holdings (just without adding it to
+    // holdings/portfolio value) means that if/when the order fills, the
+    // symbol already "lived" under the test's regime instead of starting
+    // from a flat line. Wired via [_watchedSymbolsFor] (set by
+    // stress_test_pending_orders_provider.dart) rather than an import
+    // here, keeping this engine file unaware of the pending-order system
+    // — same isolation principle as stress_test_pending_order.dart.
+    final heldSymbols = session.holdings.map((h) => h.symbol).toSet();
+    final watchedExtra =
+        (_watchedSymbolsFor?.call(session.id) ?? const <String>{})
+            .difference(heldSymbols);
+    if (session.holdings.isEmpty && watchedExtra.isEmpty) return;
 
     final now = DateTime.now();
     final tickTimestamp = (priceHistoryAsOf ?? now).millisecondsSinceEpoch;
@@ -332,7 +349,8 @@ extension NoiseEngine on StressTestNotifier {
                 type: AppNotificationType.news,
                 portfolioKind: NotificationPortfolioKind.stressTest,
                 portfolioId: session.id,
-                portfolioLabel: 'Stress Test — ${session.duration.displayName}',
+                portfolioLabel:
+                    'Market Simulation — ${session.duration.displayName}',
                 symbol: newsEvent.symbol,
                 companyName: stressTestCompanyName(newsEvent.symbol),
                 title: newsEvent.headline,
@@ -396,6 +414,17 @@ extension NoiseEngine on StressTestNotifier {
     final tickTimestamps = <int>[];
     final tickIntervalMs = _tickSeconds * 1000;
 
+    // entryPrice only exists for real holdings — watchedExtra symbols fall
+    // back to their already-seeded base/current price instead (see
+    // seedPrice below), so this map is intentionally partial.
+    final heldEntryPriceBySymbol = {
+      for (final h in session.holdings) h.symbol: h.entryPrice,
+    };
+    final symbolsThisTick = <String>[
+      ...session.holdings.map((h) => h.symbol),
+      ...watchedExtra,
+    ];
+
     for (int tick = 0; tick < ticks; tick++) {
       // Peek once per tick (not once per holding — one Hype event can
       // target many holdings within the same tick); advanced once after
@@ -409,15 +438,24 @@ extension NoiseEngine on StressTestNotifier {
             )
           : 0.0;
 
-      for (final h in session.holdings) {
-        final basePrice = session.basePrices[h.symbol] ?? h.entryPrice;
-        double currentPrice = newPrices[h.symbol] ?? h.entryPrice;
+      for (final symbol in symbolsThisTick) {
+        // Real holdings always have entryPrice; a watchedExtra symbol
+        // (pending limit order, not bought yet) falls back to whatever
+        // price it was already seeded with when its stock detail page
+        // was first opened (see _ensurePriceForNewAsset/setExternalPrice).
+        final entryPriceFallback =
+            heldEntryPriceBySymbol[symbol] ??
+            session.basePrices[symbol] ??
+            session.currentPrices[symbol] ??
+            0.0;
+        final basePrice = session.basePrices[symbol] ?? entryPriceFallback;
+        double currentPrice = newPrices[symbol] ?? entryPriceFallback;
         final priceBefore =
-            preBouncePrices[h.symbol] ??
-            session.currentPrices[h.symbol] ??
-            h.entryPrice;
-        final assetSector = _getAssetSector(h.symbol);
-        final params = _getSectorParams(h.symbol, scenario);
+            preBouncePrices[symbol] ??
+            session.currentPrices[symbol] ??
+            entryPriceFallback;
+        final assetSector = _getAssetSector(symbol);
+        final params = _getSectorParams(symbol, scenario);
 
         // ── Geometric Brownian Motion with dt scaling ─────────────
         // P_new = P_old × (1 + μ×dt + σ×ε×√dt + microNoiseFactor×ε₂×√dt)
@@ -438,7 +476,7 @@ extension NoiseEngine on StressTestNotifier {
         final driftMultiplier = regime == _MacroRegime.crash
             ? _crashDriftMultiplier(epochFraction)
             : regime == _MacroRegime.recovery
-            ? _recoveryDriftMultiplier(_recoveryCrashDropPct(session, h.symbol))
+            ? _recoveryDriftMultiplier(_recoveryCrashDropPct(session, symbol))
             : 1.0;
         final effectiveAnnualDrift =
             params.annualDrift +
@@ -457,7 +495,7 @@ extension NoiseEngine on StressTestNotifier {
         if (kDebugMode) {
           // ignore: avoid_print
           print(
-            '[TICK] ${h.symbol} basePrice=${basePrice.toStringAsFixed(4)} beforeGbm=${beforeGbm.toStringAsFixed(4)} afterGbm=${currentPrice.toStringAsFixed(4)} regime=${regime.name}',
+            '[TICK] $symbol basePrice=${basePrice.toStringAsFixed(4)} beforeGbm=${beforeGbm.toStringAsFixed(4)} afterGbm=${currentPrice.toStringAsFixed(4)} regime=${regime.name}',
           );
         }
 
@@ -465,14 +503,14 @@ extension NoiseEngine on StressTestNotifier {
         // Mutates session.activeNewsEvent in place (advances currentTick,
         // clears to null on expiry) so multi-tick catch-up batches
         // (ticks>1) progress correctly call-by-call.
-        final newsIncrement = _applyNewsEvent(session, h.symbol);
+        final newsIncrement = _applyNewsEvent(session, symbol);
         if (newsIncrement.abs() > 0.0001) {
           currentPrice *= (1.0 + newsIncrement);
         }
 
         // ── Hype: apply this tick's sector increment, if this holding's
         // GICS sector currently has an active Hype event ──────────────
-        final holdingGicsSector = resolveGicsSector(h.symbol);
+        final holdingGicsSector = resolveGicsSector(symbol);
         double hypeIncrement = holdingGicsSector != null
             ? (hypeIncrements[holdingGicsSector] ?? 0.0)
             : 0.0;
@@ -499,7 +537,7 @@ extension NoiseEngine on StressTestNotifier {
         if (kDebugMode && (currentPrice - beforeClamp).abs() > 0.0001) {
           // ignore: avoid_print
           print(
-            '[CLAMP] ${h.symbol} clamped '
+            '[CLAMP] $symbol clamped '
             '${((beforeClamp - basePrice) / basePrice * 100).toStringAsFixed(1)}% → '
             '${((currentPrice - basePrice) / basePrice * 100).toStringAsFixed(1)}% '
             '(bounds: ${regimeBounds.minPriceMultiplier.toStringAsFixed(2)}x–'
@@ -520,7 +558,7 @@ extension NoiseEngine on StressTestNotifier {
         // untouched. No-op if this holding wasn't held yet when the
         // recovery window started (no anchor to measure against).
         if (regime == _MacroRegime.recovery) {
-          final recoveryAnchor = session.recoveryStartPrices[h.symbol];
+          final recoveryAnchor = session.recoveryStartPrices[symbol];
           if (recoveryAnchor != null && recoveryAnchor > 0) {
             final floor = recoveryAnchor * (1 - _recoveryDivergenceFloor);
             if (currentPrice < floor) currentPrice = floor;
@@ -544,18 +582,18 @@ extension NoiseEngine on StressTestNotifier {
 
         // ── Stabilization Period ───────────────────────────────────
         // Freeze price at entryPrice for 30 seconds after purchase
-        final stabDeadline = session.stabilizationDeadlines[h.symbol];
+        final stabDeadline = session.stabilizationDeadlines[symbol];
         if (stabDeadline != null && now.isBefore(stabDeadline)) {
-          currentPrice = h.entryPrice;
+          currentPrice = entryPriceFallback;
         }
-        newPrices[h.symbol] = currentPrice;
+        newPrices[symbol] = currentPrice;
 
         // ── Explainable Simulation ────────────────────────────────
         final hasCorrection =
             priceBefore > 0 &&
             (priceBefore - currentPrice).abs() / priceBefore > 0.05;
         final expl = _explainPriceChange(
-          symbol: h.symbol,
+          symbol: symbol,
           priceBefore: priceBefore,
           priceAfter: currentPrice,
           epochIndex: currentEpoch.index,
@@ -568,18 +606,18 @@ extension NoiseEngine on StressTestNotifier {
           newsRaw: newsIncrement,
           hypeRaw: hypeIncrement,
         );
-        var symLog = <TickExplanation>[...(explanations[h.symbol] ?? []), expl];
+        var symLog = <TickExplanation>[...(explanations[symbol] ?? []), expl];
         // Cap per-symbol log — see _maxExplanationLogEntries.
         if (symLog.length > _maxExplanationLogEntries) {
           symLog = symLog.sublist(symLog.length - _maxExplanationLogEntries);
         }
-        explanations[h.symbol] = symLog;
+        explanations[symbol] = symLog;
 
         // Fold into the whole-period Why Diagnostics accumulator BEFORE
         // the cap above can trim this tick out of explanationLog — see
         // stress_test_why_diagnostics.dart for why this can't just be
         // derived from explanationLog after the fact.
-        _foldWhyDiagnostics(session.id, h.symbol, expl);
+        _foldWhyDiagnostics(session.id, symbol, expl);
 
         // Advance the anchor to this tick's result so the NEXT tick (in
         // this same catch-up batch) diffs against its immediate
@@ -588,13 +626,13 @@ extension NoiseEngine on StressTestNotifier {
         // `preBouncePrices` snapshot ("priceBefore MUST equal the
         // previous tick's priceAfter"), which the loop was violating for
         // ticks > 1.
-        preBouncePrices[h.symbol] = currentPrice;
+        preBouncePrices[symbol] = currentPrice;
 
         // Track price range for peak/bottom detection
-        if (!newRanges.containsKey(h.symbol)) {
-          newRanges[h.symbol] = EpochPriceRange(currentPrice, currentPrice);
+        if (!newRanges.containsKey(symbol)) {
+          newRanges[symbol] = EpochPriceRange(currentPrice, currentPrice);
         } else {
-          final range = newRanges[h.symbol]!;
+          final range = newRanges[symbol]!;
           if (currentPrice < range.min) range.min = currentPrice;
           if (currentPrice > range.max) range.max = currentPrice;
         }
@@ -815,7 +853,8 @@ extension NoiseEngine on StressTestNotifier {
           type: AppNotificationType.priceSwing,
           portfolioKind: NotificationPortfolioKind.stressTest,
           portfolioId: session.id,
-          portfolioLabel: 'Stress Test — ${session.duration.displayName}',
+          portfolioLabel:
+              'Market Simulation — ${session.duration.displayName}',
           symbol: h.symbol,
           companyName: name,
           title:

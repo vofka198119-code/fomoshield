@@ -24,6 +24,7 @@ class MarketPeriodDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        leading: themedBackButton(context, palette),
         title: themedHeaderText(
           window?.shortHeadline.toUpperCase() ??
               l10n.marketPeriodDetailFallbackTitle,

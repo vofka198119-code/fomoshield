@@ -23,6 +23,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_divider.dart';
+import '../../core/theme/themed_button.dart';
 import '../../core/theme/themed_border.dart';
 import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
@@ -300,6 +301,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           backgroundColor: Colors.transparent,
           toolbarHeight: 64,
           centerTitle: true,
+          leading: themedBackButton(context, palette),
           title: themedHeaderText(
             l10n.stressTestPortfolioTitle,
             palette,
@@ -555,34 +557,11 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
 
                   // ── Add widgets button ───────────────────────────
                   Center(
-                    child: TextButton.icon(
-                      onPressed: _showWidgetSettingsSheet,
-                      icon: Icon(
-                        Icons.add_rounded,
-                        color: palette.accentPrimary,
-                        size: 20,
-                      ),
-                      label: Text(
-                        l10n.homeAddWidgets,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: palette.accentPrimary,
-                        ),
-                      ),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          side: BorderSide(
-                            color: palette.accentPrimary,
-                            width: 0.5,
-                          ),
-                        ),
-                      ),
+                    child: themedAddWidgetsButton(
+                      context,
+                      palette,
+                      label: l10n.homeAddWidgets,
+                      onTap: _showWidgetSettingsSheet,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -642,6 +621,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             currentEpochIndex: epochIndex,
             activeEpochProgress: epochProgress,
             initialLimit: 3,
+            palette: palette,
           ),
         );
       case 'trade_history':
@@ -886,143 +866,139 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                     builder: (context, ref, _) {
                       final logoAsync = ref.watch(cachedLogoProvider(h.symbol));
 
-                      return GestureDetector(
-                        onTap: () => _onAssetRowTap(h.symbol),
-                        onTapDown: (_) {},
-                        onTapCancel: () {},
-                        behavior: HitTestBehavior.opaque,
-                        child: Container(
-                          constraints: const BoxConstraints(minHeight: 72),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 6,
-                          ),
-                          decoration: i < sorted.length - 1
-                              ? BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.06,
-                                      ),
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                )
-                              : null,
-                          child: Row(
-                            children: [
-                              // Logo 40×40 с цветным кольцом от аллокации
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: donutAllocationColor(
-                                      i,
-                                    ).withValues(alpha: 0.7),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                padding: const EdgeInsets.all(1.5),
-                                child: ClipOval(
-                                  child: SizedBox(
-                                    width: 36,
-                                    height: 36,
-                                    child: logoAsync.when(
-                                      data: (url) => CompanyLogo(
-                                        ticker: h.symbol,
-                                        logoUrl: url,
-                                        radius: 18,
-                                      ),
-                                      error: (_, _) => CompanyLogo(
-                                        ticker: h.symbol,
-                                        radius: 18,
-                                      ),
-                                      loading: () => CompanyLogo(
-                                        ticker: h.symbol,
-                                        radius: 18,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () => _onAssetRowTap(h.symbol),
+                            onTapDown: (_) {},
+                            onTapCancel: () {},
+                            behavior: HitTestBehavior.opaque,
+                            child: Container(
+                              constraints: const BoxConstraints(minHeight: 72),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 6,
                               ),
-                              const SizedBox(width: 12),
-                              // Symbol + shares (как в Portfolio Holdings)
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      _companyName(h.symbol),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: palette.textHeader,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      h.symbol,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        color: palette.textBody,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      l10n.sharesCount(
-                                        h.shares.toStringAsFixed(2),
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        color: palette.textBody,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              // Position value + P&L (как в Portfolio Holdings)
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              child: Row(
                                 children: [
-                                  FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: themedPriceText(
-                                      formatUsd(positionValue),
-                                      palette,
-                                      interNums(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
+                                  // Logo 40×40 с цветным кольцом от аллокации
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: donutAllocationColor(
+                                          i,
+                                        ).withValues(alpha: 0.7),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.all(1.5),
+                                    child: ClipOval(
+                                      child: SizedBox(
+                                        width: 36,
+                                        height: 36,
+                                        child: logoAsync.when(
+                                          data: (url) => CompanyLogo(
+                                            ticker: h.symbol,
+                                            logoUrl: url,
+                                            radius: 18,
+                                          ),
+                                          error: (_, _) => CompanyLogo(
+                                            ticker: h.symbol,
+                                            radius: 18,
+                                          ),
+                                          loading: () => CompanyLogo(
+                                            ticker: h.symbol,
+                                            radius: 18,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 2),
-                                  FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
-                                      style: interNums(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: isPositive
-                                            ? ThemeV2.success
-                                            : ThemeV2.loss,
-                                      ),
+                                  const SizedBox(width: 12),
+                                  // Symbol + shares (как в Portfolio Holdings)
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          _companyName(h.symbol),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: palette.textHeader,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          h.symbol,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            color: palette.textBody,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          l10n.sharesCount(
+                                            h.shares.toStringAsFixed(2),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            color: palette.textBody,
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // Position value + P&L (как в Portfolio Holdings)
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: themedPriceText(
+                                          formatUsd(positionValue),
+                                          palette,
+                                          interNums(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)',
+                                          style: interNums(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: isPositive
+                                                ? ThemeV2.success
+                                                : ThemeV2.loss,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                          if (i < sorted.length - 1) themedRowDivider(palette),
+                        ],
                       );
                     },
                   );
@@ -1167,9 +1143,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                       label,
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: isExpiredTimer
-                            ? ThemeV2.loss
-                            : palette.textBody,
+                        color: isExpiredTimer ? ThemeV2.loss : palette.textBody,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

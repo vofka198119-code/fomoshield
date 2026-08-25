@@ -6,6 +6,7 @@ import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_button.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -80,6 +81,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        // Bottom-nav tab root (ShellRoute) — normally not poppable, so
+        // Flutter's own automaticallyImplyLeading already shows nothing.
+        // Only supply a themed one for the rare case this screen IS
+        // pushed with a back stack, instead of unconditionally adding a
+        // back button that wasn't there before.
+        leading: Navigator.canPop(context)
+            ? themedBackButton(context, palette)
+            : null,
         title: themedHeaderText(
           'F.O.M.O. SHIELD',
           palette,
@@ -97,7 +106,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               label: Text('$unreadCount'),
               backgroundColor: ThemeV2.loss,
               textColor: Colors.white,
-              child: themedHeaderIcon(Icons.notifications_none_rounded, palette),
+              child: themedHeaderIcon(
+                Icons.notifications_none_rounded,
+                palette,
+              ),
             ),
           ),
         ],
@@ -128,27 +140,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 24),
               // Add widgets button
               Center(
-                child: TextButton.icon(
-                  onPressed: _showWidgetsBottomSheet,
-                  icon: Icon(Icons.add_rounded, color: palette.accentPrimary, size: 20),
-                  label: Text(
-                    AppLocalizations.of(context)!.homeAddWidgets,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: palette.accentPrimary,
-                    ),
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      side: BorderSide(color: palette.accentPrimary, width: 0.5),
-                    ),
-                  ),
+                child: themedAddWidgetsButton(
+                  context,
+                  palette,
+                  label: AppLocalizations.of(context)!.homeAddWidgets,
+                  onTap: _showWidgetsBottomSheet,
                 ),
               ),
               const DisclaimerFooter(),

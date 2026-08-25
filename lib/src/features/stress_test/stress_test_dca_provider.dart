@@ -127,7 +127,7 @@ Future<void> checkStressTestDcaPayout(
       type: AppNotificationType.weeklyPayout,
       portfolioKind: NotificationPortfolioKind.stressTest,
       portfolioId: session.id,
-      portfolioLabel: 'Stress Test — ${session.duration.displayName}',
+      portfolioLabel: 'Market Simulation — ${session.duration.displayName}',
       title: l10n.weeklyPayoutTitle,
       detail: l10n.weeklyPayoutDetail(formatUsd(amount)),
       createdAt: DateTime.now(),

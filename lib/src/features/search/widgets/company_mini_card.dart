@@ -5,6 +5,7 @@ import '../../../core/cache/logo_providers.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_divider.dart';
 import '../../../shared/widgets/company_logo.dart';
 
 // ---------------------------------------------------------------------------
@@ -48,98 +49,105 @@ class CompanyMiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        // minHeight (not a hard height) so the row can grow instead of
-        // overflowing when the title+sector stack renders taller than
-        // this — confirmed happening on a Redmi Note 9S both from RU font
-        // metrics at a fixed 60px and, separately, from the OS
-        // accessibility text-scale slider.
-        constraints: const BoxConstraints(minHeight: 66),
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
-        decoration: showDivider
-            ? BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    width: 0.5,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            // minHeight (not a hard height) so the row can grow instead of
+            // overflowing when the title+sector stack renders taller than
+            // this — confirmed happening on a Redmi Note 9S both from RU font
+            // metrics at a fixed 60px and, separately, from the OS
+            // accessibility text-scale slider.
+            constraints: const BoxConstraints(minHeight: 66),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: palette.accentPrimary,
+                      width: 1.5,
+                    ),
                   ),
-                ),
-              )
-            : null,
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: palette.accentPrimary, width: 1.5),
-              ),
-              child: logoUrl != null
-                  ? CompanyLogo(ticker: symbol, logoUrl: logoUrl, radius: 18)
-                  : Consumer(
-                      builder: (context, ref, _) {
-                        final resolved = ref
-                            .watch(quickLogoProvider(symbol))
-                            .valueOrNull;
-                        return CompanyLogo(
+                  child: logoUrl != null
+                      ? CompanyLogo(
                           ticker: symbol,
-                          logoUrl: resolved,
+                          logoUrl: logoUrl,
                           radius: 18,
-                        );
-                      },
-                    ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: palette.textHeader,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Consumer(
-                    builder: (context, ref, _) {
-                      final cachedSector = ref
-                          .watch(quickGicsSectorProvider(symbol))
-                          .valueOrNull;
-                      final sector =
-                          cachedSector ??
-                          resolveGicsSector(symbol, companyName: name);
-                      return Text(
-                        sector?.label ?? symbol,
+                        )
+                      : Consumer(
+                          builder: (context, ref, _) {
+                            final resolved = ref
+                                .watch(quickLogoProvider(symbol))
+                                .valueOrNull;
+                            return CompanyLogo(
+                              ticker: symbol,
+                              logoUrl: resolved,
+                              radius: 18,
+                            );
+                          },
+                        ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: palette.textBody,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: palette.textHeader,
                         ),
-                      );
-                    },
+                      ),
+                      const SizedBox(height: 2),
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final cachedSector = ref
+                              .watch(quickGicsSectorProvider(symbol))
+                              .valueOrNull;
+                          final sector =
+                              cachedSector ??
+                              resolveGicsSector(symbol, companyName: name);
+                          return Text(
+                            sector?.label ?? symbol,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              // Same fix as watchlist_widget.dart's tile —
+                              // see its comment.
+                              color: palette.titleGradient != null
+                                  ? Colors.white.withValues(alpha: 0.85)
+                                  : palette.textBody,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: palette.textBody,
+                  size: 20,
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: palette.textBody,
-              size: 20,
-            ),
-          ],
+          ),
         ),
-      ),
+        if (showDivider) themedRowDivider(palette),
+      ],
     );
   }
 }

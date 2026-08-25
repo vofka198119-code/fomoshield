@@ -352,8 +352,9 @@ DateTime _easterSunday(int year) {
 }
 
 DateTime _observedFixed(DateTime date) {
-  if (date.weekday == DateTime.saturday)
+  if (date.weekday == DateTime.saturday) {
     return date.subtract(const Duration(days: 1));
+  }
   if (date.weekday == DateTime.sunday) return date.add(const Duration(days: 1));
   return date;
 }
@@ -401,8 +402,9 @@ bool isEarlyCloseDay(DateTime dateEt) {
   final blackFriday = thanksgiving.add(const Duration(days: 1));
   final christmasEve = DateTime(y, 12, 24);
   if (_isSameDate(dateEt, blackFriday)) return true;
-  if (_isSameDate(dateEt, christmasEve) && !isWeekend(christmasEve))
+  if (_isSameDate(dateEt, christmasEve) && !isWeekend(christmasEve)) {
     return true;
+  }
   return false;
 }
 

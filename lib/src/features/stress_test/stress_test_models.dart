@@ -1749,7 +1749,7 @@ class StressTestAnalytics {
     cash: 0,
     holdingCount: 0,
     auditTitle: 'No Data',
-    auditSubtitle: 'Start a stress test to see analytics',
+    auditSubtitle: 'Start a market simulation to see analytics',
     activeRiskLabel: '',
   );
 

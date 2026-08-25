@@ -134,7 +134,7 @@ class _MonetizationSheet extends ConsumerWidget {
             child: OutlinedButton.icon(
               onPressed: () {
                 Navigator.pop(context);
-                _showAdOverlay(context, ref);
+                _showAdOverlay(context);
               },
               icon: const Icon(Icons.play_circle_rounded, size: 20),
               label: Text(
@@ -195,14 +195,14 @@ class _MonetizationSheet extends ConsumerWidget {
 // Simulated Ad Overlay
 // ===========================================================================
 
-void _showAdOverlay(BuildContext context, WidgetRef ref) {
+void _showAdOverlay(BuildContext context) {
   Navigator.of(context).push(
     PageRouteBuilder(
       opaque: false,
       barrierColor: Colors.black87,
       barrierDismissible: false,
       pageBuilder: (context, animation, secondaryAnimation) =>
-          _AdOverlay(ref: ref),
+          const _AdOverlay(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(opacity: animation, child: child);
       },
@@ -211,15 +211,22 @@ void _showAdOverlay(BuildContext context, WidgetRef ref) {
   );
 }
 
-class _AdOverlay extends StatefulWidget {
-  final WidgetRef ref;
-  const _AdOverlay({required this.ref});
+class _AdOverlay extends ConsumerStatefulWidget {
+  const _AdOverlay();
 
   @override
-  State<_AdOverlay> createState() => _AdOverlayState();
+  ConsumerState<_AdOverlay> createState() => _AdOverlayState();
 }
 
-class _AdOverlayState extends State<_AdOverlay>
+// Was a plain StatefulWidget holding a WidgetRef borrowed from the
+// _MonetizationSheet that pushed this overlay — but that sheet is popped
+// (and its ref disposed) well before the 3s countdown/Skip fires, so
+// widget.ref.read(...) in _grantRewardAndClose threw a Riverpod
+// StateError ("Cannot use ref after the widget was disposed"), which
+// happened BEFORE the Navigator.pop() below it — the overlay stayed
+// stuck on screen forever, blocking Search underneath. ConsumerState
+// owns a ref tied to THIS still-mounted widget's own lifecycle instead.
+class _AdOverlayState extends ConsumerState<_AdOverlay>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _progress;
@@ -249,7 +256,7 @@ class _AdOverlayState extends State<_AdOverlay>
   }
 
   void _grantRewardAndClose() {
-    widget.ref.read(searchCounterProvider.notifier).addSearches(15);
+    ref.read(searchCounterProvider.notifier).addSearches(15);
     if (mounted) {
       final l10n = AppLocalizations.of(context)!;
       Navigator.of(context).pop();

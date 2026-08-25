@@ -197,7 +197,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       key: const ValueKey('breakdownDisclaimer'),
                       child: StaggerFadeIn(
                         index: 7,
-                        child: _TradeBreakdownDisclaimer(palette: palette),
+                        child: const _TradeBreakdownDisclaimer(),
                       ),
                     ),
                   ],
@@ -793,19 +793,18 @@ class _TradeRow extends ConsumerWidget {
 }
 
 class _TradeBreakdownDisclaimer extends StatelessWidget {
-  final AppPalette palette;
-
-  const _TradeBreakdownDisclaimer({required this.palette});
+  const _TradeBreakdownDisclaimer();
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Sits directly on the screen background (no card behind it) — unlike
-    // every other element on this screen, it can't assume a dark backdrop.
-    // Pre-existing bug independent of the Luxury rollout: this was
-    // hardcoded white, nearly invisible on the light Standard background;
-    // fixed here alongside the theming pass since it's the same "plain
-    // text on background" gap (pitfall #3).
+    // Sits directly on the screen background (no card behind it). Color is
+    // the same fixed muted gray as DisclaimerFooter's reference treatment
+    // (2026-08-25: unify every card-level disclaimer to that one look) —
+    // NOT palette-based, so it's readable regardless of backdrop in both
+    // themes without needing the "always-dark panel" gating this file's
+    // other elements require.
+    final disclaimerColor = ThemeV2.textSecondary.withValues(alpha: 0.5);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
@@ -816,7 +815,7 @@ class _TradeBreakdownDisclaimer extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: palette.textHeader,
+              color: disclaimerColor,
             ),
           ),
           const SizedBox(height: 6),
@@ -825,7 +824,7 @@ class _TradeBreakdownDisclaimer extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,
-              color: palette.textBody,
+              color: disclaimerColor,
               height: 1.5,
             ),
           ),

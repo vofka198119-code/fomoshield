@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navPortfolio => 'Portfolio';
 
   @override
-  String get navStressTest => 'Stress Test';
+  String get navStressTest => 'Market Simulation';
 
   @override
   String get navProfile => 'Profile';
@@ -179,7 +179,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileDeleteAccountBody =>
-      'You\'ll have 14 days to restore your account after this. If you don\'t restore it within that window, your account and all your data — portfolios, watchlist, stress test history — will be permanently erased, with no way to recover it.';
+      'You\'ll have 14 days to restore your account after this. If you don\'t restore it within that window, your account and all your data — portfolios, watchlist, market simulation history — will be permanently erased, with no way to recover it.';
 
   @override
   String get profileCancel => 'Cancel';
@@ -220,10 +220,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumBenefitPortfolios => '\$10,000 portfolio starting capital';
 
   @override
-  String get premiumBenefitCapital => '\$15,000 stress test starting capital';
+  String get premiumBenefitCapital =>
+      '\$15,000 market simulation starting capital';
 
   @override
-  String get premiumBenefitStressTests => 'Up to 3 stress tests';
+  String get premiumBenefitStressTests => 'Up to 3 market simulations';
 
   @override
   String get premiumBenefitAdFree => 'Ad-free experience';
@@ -233,7 +234,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumBenefitStressTestDca =>
-      'Simulated weekly funding in Stress Test';
+      'Simulated weekly funding in Market Simulation';
 
   @override
   String get tradeBuy => 'BUY';
@@ -380,10 +381,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get targetLabel => 'TARGET';
 
   @override
-  String get stressTestWidgetTitle => 'MY STRESS TEST';
+  String get stressTestWidgetTitle => 'MY MARKET SIMULATION';
 
   @override
-  String get stressTestActiveTests => 'Active Tests';
+  String get stressTestActiveTests => 'Active Simulations';
 
   @override
   String get stressTestMyResults => 'MY RESULTS';
@@ -394,10 +395,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get stressTestNoActiveTests => 'No active tests';
+  String get stressTestNoActiveTests => 'No active simulations';
 
   @override
-  String get stressTestStartNewTest => 'Start a new test from the bottom panel';
+  String get stressTestStartNewTest =>
+      'Start a new simulation from the bottom panel';
 
   @override
   String get stressTestGoPremium => 'GO PREMIUM';
@@ -411,29 +413,29 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get stressTestHubTitle => 'STRESS TEST';
+  String get stressTestHubTitle => 'MARKET SIMULATION';
 
   @override
-  String get stressTestCompletedTestsSheetTitle => 'Completed Tests';
+  String get stressTestCompletedTestsSheetTitle => 'Completed Simulations';
 
   @override
-  String get stressTestActiveTestsTitle => 'ACTIVE TESTS';
+  String get stressTestActiveTestsTitle => 'ACTIVE SIMULATIONS';
 
   @override
-  String get stressTestCompletedTestsTitle => 'COMPLETED TESTS';
+  String get stressTestCompletedTestsTitle => 'COMPLETED SIMULATIONS';
 
   @override
-  String get stressTestNoCompletedTestsYet => 'No completed tests yet';
+  String get stressTestNoCompletedTestsYet => 'No completed simulations yet';
 
   @override
-  String get stressTestNoTestsYet => 'No stress tests yet';
+  String get stressTestNoTestsYet => 'No market simulations yet';
 
   @override
   String get stressTestNoTestsHint =>
-      'Tap the button above to start your first test';
+      'Tap the button above to start your first simulation';
 
   @override
-  String get stressTestNewTest => 'New Stress Test';
+  String get stressTestNewTest => 'New Market Simulation';
 
   @override
   String stressTestActiveCountFree(int active, int max) {
@@ -444,11 +446,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stressTestEmotionalResilience => 'Test your emotional resilience';
 
   @override
-  String get stressTestLimitReachedTitle => 'Stress test limit reached';
+  String get stressTestLimitReachedTitle => 'Market simulation limit reached';
 
   @override
   String get stressTestMaxSessionsReached =>
-      'Maximum active test sessions reached';
+      'Maximum active simulation sessions reached';
 
   @override
   String stressTestArchiveSummary(String amount, int holdings, int trades) {
@@ -459,21 +461,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stressTestSessionNotFound => 'Session not found';
 
   @override
-  String get stressTestSetupTitle => 'Stress Test Setup';
+  String get stressTestSetupTitle => 'Market Simulation Setup';
 
   @override
-  String get stressTestDurationSectionTitle => 'TEST DURATION';
+  String get stressTestDurationSectionTitle => 'SIMULATION DURATION';
 
   @override
-  String get stressTestStartButton => 'START STRESS TEST';
+  String get stressTestStartButton => 'START MARKET SIMULATION';
 
   @override
   String get stressTestSlot1Free =>
-      'Test slot 1/2 free · Upgrade for 5 at once & no ads';
+      'Simulation slot 1/2 free · Upgrade for 5 at once & no ads';
 
   @override
   String get stressTestSlot2Free =>
-      'Test slot 2/2 free · Premium = 5 at once, no ads';
+      'Simulation slot 2/2 free · Premium = 5 at once, no ads';
 
   @override
   String get stressTestAvailableCash => 'Available Cash';
@@ -496,7 +498,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stressTestPremiumFeatureBody =>
-      'This test duration is available exclusively to Premium subscribers. Upgrade to unlock unlimited possibilities.';
+      'This simulation duration is available exclusively to Premium subscribers. Upgrade to unlock unlimited possibilities.';
 
   @override
   String get stressTestUpgradeToPremium => 'Upgrade to Premium';
@@ -505,11 +507,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stressTestNotNow => 'Not now';
 
   @override
-  String get stressTestCustomDurationTitle => 'Custom Test Duration';
+  String get stressTestCustomDurationTitle => 'Custom Simulation Duration';
 
   @override
   String get stressTestCustomDurationWarning =>
-      'Once started, a custom-duration test cannot be interrupted or stopped early. The simulation will run for the full period you select below.';
+      'Once started, a custom-duration simulation cannot be interrupted or stopped early. It will run for the full period you select below.';
 
   @override
   String stressTestDaysCount(int days) {
@@ -539,11 +541,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'You have read the full disclaimer';
 
   @override
-  String get stressTestIAgreeStart => 'I Agree — Start Test';
+  String get stressTestIAgreeStart => 'I Agree — Start Simulation';
 
   @override
   String get stressTestDisclaimerIntro =>
-      'This stress test uses a specialized algorithmic engine that simulates extreme market scenarios, including prolonged bear trends, systemic crises, and complete financial market collapses.';
+      'This market simulation uses a specialized algorithmic engine that simulates extreme market scenarios, including prolonged bear trends, systemic crises, and complete financial market collapses.';
 
   @override
   String get stressTestDisclaimerAck =>
@@ -555,7 +557,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stressTestBulletNotAdvice =>
-      'Not Financial Advice — The final verdict, analytics, and any conclusions drawn from this test are for informational and educational purposes only. They do not constitute personalized investment advice, a recommendation to buy or sell assets, or any form of financial solicitation.';
+      'Not Financial Advice — The final verdict, analytics, and any conclusions drawn from this simulation are for informational and educational purposes only. They do not constitute personalized investment advice, a recommendation to buy or sell assets, or any form of financial solicitation.';
 
   @override
   String get stressTestBulletObjective =>
@@ -563,7 +565,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stressTestBulletLiability =>
-      'Limitation of Liability — A positive test result (i.e., your portfolio successfully \"survived\" a simulated market crash) does not guarantee similar real-world performance. The platform and its developers assume no responsibility for your investment decisions, nor for any direct or indirect losses, including but not limited to loss of capital in real markets.';
+      'Limitation of Liability — A positive simulation result (i.e., your portfolio successfully \"survived\" a simulated market crash) does not guarantee similar real-world performance. The platform and its developers assume no responsibility for your investment decisions, nor for any direct or indirect losses, including but not limited to loss of capital in real markets.';
 
   @override
   String get stressTestBulletPastPerformance =>
@@ -573,14 +575,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stressTestEndOfDisclaimer => '▸ End of Disclaimer';
 
   @override
-  String get stressTestUnlimitedTesting => 'Unlimited Testing';
+  String get stressTestUnlimitedTesting => 'Unlimited Simulation';
 
   @override
   String get stressTestInfiniteUpsellBody =>
-      'The Infinite duration stress test is available exclusively to Premium subscribers. Upgrade to unlock:';
+      'The Infinite duration market simulation is available exclusively to Premium subscribers. Upgrade to unlock:';
 
   @override
-  String get stressTestUpsellUnlimitedDuration => 'Unlimited test duration';
+  String get stressTestUpsellUnlimitedDuration =>
+      'Unlimited simulation duration';
 
   @override
   String get stressTestUpsellFullCrashScenarios =>
@@ -591,16 +594,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'Advanced portfolio analytics';
 
   @override
-  String get stressTestAccessTitle => 'Stress test access';
+  String get stressTestAccessTitle => 'Market simulation access';
 
   @override
-  String get stressTestPortfolioTitle => 'STRESS TEST PORTFOLIO';
+  String get stressTestPortfolioTitle => 'MARKET SIMULATION PORTFOLIO';
 
   @override
-  String get stressTestNotStartedYet => 'Test not started yet';
+  String get stressTestNotStartedYet => 'Simulation not started yet';
 
   @override
-  String get stressTestGoBackToSetup => 'Go back to setup and start the test';
+  String get stressTestGoBackToSetup =>
+      'Go back to setup and start the simulation';
 
   @override
   String get stressTestGoToSetup => 'Go to Setup';
@@ -633,7 +637,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stressTestTapToBuyAssets => 'Tap (+) to buy assets';
 
   @override
-  String get stressTestTestComplete => 'Test Complete';
+  String get stressTestTestComplete => 'Simulation Complete';
 
   @override
   String get stressTestTimeRemaining => 'Time Remaining';
@@ -657,14 +661,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get stressTestFinishTestButton => 'FINISH TEST';
+  String get stressTestFinishTestButton => 'FINISH SIMULATION';
 
   @override
-  String get stressTestFinishTest => 'Finish Test';
+  String get stressTestFinishTest => 'Finish Simulation';
 
   @override
   String get stressTestFinishTestConfirm =>
-      'End this test now and get your verdict? This can\'t be undone.';
+      'End this simulation now and get your verdict? This can\'t be undone.';
 
   @override
   String get stressTestFinalBalance => 'FINAL BALANCE';
@@ -708,7 +712,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stressTestInvestmentDisclaimerBody =>
-      'This verdict is generated automatically by a mathematical model based solely on your simulated historical behavior within this closed testing environment. It is provided for educational and illustrative purposes only and does NOT constitute personalized investment, legal, or financial advice. Past performance within this simulator does not guarantee, predict, or reflect real-world market outcomes. Final financial decisions, asset purchases, or trading activities in real life carry substantial risk and are made solely at your own discretion and responsibility. The creators of F.O.M.O. Shield accept no liability for financial losses incurred in real-world trading.';
+      'This verdict is generated automatically by a mathematical model based solely on your simulated historical behavior within this closed simulation environment. It is provided for educational and illustrative purposes only and does NOT constitute personalized investment, legal, or financial advice. Past performance within this simulator does not guarantee, predict, or reflect real-world market outcomes. Final financial decisions, asset purchases, or trading activities in real life carry substantial risk and are made solely at your own discretion and responsibility. The creators of F.O.M.O. Shield accept no liability for financial losses incurred in real-world trading.';
 
   @override
   String get stressTestIUnderstandAccept => 'I Understand & Accept';
@@ -1259,7 +1263,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verdictTradeBreakdownDisclaimerBody =>
-      'The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user\'s own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.';
+      'The results of this market simulation are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user\'s own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the market simulation is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.';
 
   @override
   String get verdictCashBufferNoDataTitle => 'No Cash Data Yet';
@@ -2362,7 +2366,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verdictGuardianShortText =>
-      'Your stress test is complete. You experienced different market conditions and saw how your portfolio and decisions responded. Now it\'s time to see what your results reveal about your investment behavior.';
+      'Your market simulation is complete. You experienced different market conditions and saw how your portfolio and decisions responded. Now it\'s time to see what your results reveal about your investment behavior.';
 
   @override
   String get verdictViewYourAnalysis => 'View your analysis →';
@@ -4452,14 +4456,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metricInfoGuardianVerdictSubtitle =>
-      'Congratulations — you have completed your portfolio stress test.';
+      'Congratulations — you have completed your portfolio market simulation.';
 
   @override
-  String get metricInfoGuardianVerdictSection1Header => 'Stress Test Complete';
+  String get metricInfoGuardianVerdictSection1Header =>
+      'Market Simulation Complete';
 
   @override
   String get metricInfoGuardianVerdictSection1Body =>
-      'During the simulation, you experienced different market periods and scenarios based on patterns observed throughout real market history. Events that can unfold over months or even years in the real world were accelerated in the simulation, allowing you to experience their effects in a much shorter period of time.\n\nYou saw how your portfolio could behave under very different conditions:\n\n📈 Market growth\n➖ Sideways markets and uncertainty\n📉 Market declines\n🔄 Recovery after a downturn\n🚀 Market hype\n🎲 Speculative movements\n⚠️ Crisis scenarios\n🦢 Rare extreme events and Black Swan scenarios\n\nEach of these market phases has its own characteristics.\n\nHype is not simply a rising price.\n\nSpeculation is not the same as long-term investing.\n\nA market decline does not automatically mean that a business is becoming weaker.\n\nAnd strong price growth does not automatically mean that an asset has become a better investment.\n\nDuring the test, you have already seen these patterns in action. Some of them you may have recognized immediately. Others may have passed unnoticed. That is why one test may not be enough.\n\nTry running different stress tests again. Change your portfolio and observe how your decisions and portfolio behavior change under different market conditions.\n\nOver time, you may become better at recognizing different market phases and understanding why the same action can have a very different meaning depending on the situation.';
+      'During the simulation, you experienced different market periods and scenarios based on patterns observed throughout real market history. Events that can unfold over months or even years in the real world were accelerated in the simulation, allowing you to experience their effects in a much shorter period of time.\n\nYou saw how your portfolio could behave under very different conditions:\n\n📈 Market growth\n➖ Sideways markets and uncertainty\n📉 Market declines\n🔄 Recovery after a downturn\n🚀 Market hype\n🎲 Speculative movements\n⚠️ Crisis scenarios\n🦢 Rare extreme events and Black Swan scenarios\n\nEach of these market phases has its own characteristics.\n\nHype is not simply a rising price.\n\nSpeculation is not the same as long-term investing.\n\nA market decline does not automatically mean that a business is becoming weaker.\n\nAnd strong price growth does not automatically mean that an asset has become a better investment.\n\nDuring the simulation, you have already seen these patterns in action. Some of them you may have recognized immediately. Others may have passed unnoticed. That is why one simulation may not be enough.\n\nTry running different market simulations again. Change your portfolio and observe how your decisions and portfolio behavior change under different market conditions.\n\nOver time, you may become better at recognizing different market phases and understanding why the same action can have a very different meaning depending on the situation.';
 
   @override
   String get metricInfoGuardianVerdictSection2Header =>
@@ -4794,7 +4799,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketClockWindowWeekendClosedStressTestPromoBody =>
-      'The Stress Test is always available.\n\nPractice building portfolios, reacting to market events, and making investment decisions without risking real money.\n\nThe simulator is designed to help you understand how markets behave and build discipline before investing in live markets.\n\nEvery trade inside Stress Test is completely independent of real market prices, so you can experiment, learn from mistakes, and improve with confidence.';
+      'The Market Simulation is always available.\n\nPractice building portfolios, reacting to market events, and making investment decisions without risking real money.\n\nThe simulator is designed to help you understand how markets behave and build discipline before investing in live markets.\n\nEvery trade inside Market Simulation is completely independent of real market prices, so you can experiment, learn from mistakes, and improve with confidence.';
 
   @override
   String get marketClockWindowMarketHolidayShortHeadline => 'Market Holiday';
@@ -4835,7 +4840,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketClockWindowMarketHolidayStressTestPromoBody =>
-      'Although the live market is closed, the Stress Test remains fully available.\n\nIt\'s the perfect place to practice buying, selling, portfolio management, and emotional discipline without risking real money.\n\nYou can explore different strategies, make mistakes safely, and better understand how markets react in different situations.\n\nWhen the real market opens again, you\'ll return with more experience and greater confidence.';
+      'Although the live market is closed, the Market Simulation remains fully available.\n\nIt\'s the perfect place to practice buying, selling, portfolio management, and emotional discipline without risking real money.\n\nYou can explore different strategies, make mistakes safely, and better understand how markets react in different situations.\n\nWhen the real market opens again, you\'ll return with more experience and greater confidence.';
 
   @override
   String get marketClockWindowEarlyCloseSessionShortHeadline =>
@@ -4870,7 +4875,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketClockWindowEarlyCloseSessionStressTestPromoBody =>
-      'A shortened, faster-moving session can feel unfamiliar. Practice it in Stress Test — no real money on the line, just real market conditions to learn from.';
+      'A shortened, faster-moving session can feel unfamiliar. Practice it in Market Simulation — no real money on the line, just real market conditions to learn from.';
 
   @override
   String get marketClockRiskEarlyPreMarketWhyNow =>
@@ -4942,7 +4947,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketClockRiskEarlyCloseSessionWhatToDo =>
-      'If you\'re investing for the long term and your decision has already been made, a shortened trading day is not necessarily a reason to avoid investing.\n\nHowever, if your trade isn\'t time-sensitive, waiting until the next full trading session often provides better liquidity and more stable market conditions.\n\nUse the extra time to review your watchlist, read company reports, or practice in Stress Test.\n\nAn early market close isn\'t a reason to rush your decisions. Sometimes the smartest move is simply to wait for the next full trading day, when the market returns to normal conditions.';
+      'If you\'re investing for the long term and your decision has already been made, a shortened trading day is not necessarily a reason to avoid investing.\n\nHowever, if your trade isn\'t time-sensitive, waiting until the next full trading session often provides better liquidity and more stable market conditions.\n\nUse the extra time to review your watchlist, read company reports, or practice in Market Simulation.\n\nAn early market close isn\'t a reason to rush your decisions. Sometimes the smartest move is simply to wait for the next full trading day, when the market returns to normal conditions.';
 
   @override
   String get marketClockRiskClosedWhyNow =>
@@ -4950,7 +4955,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketClockRiskClosedWhatToDo =>
-      'Review your portfolio, read company reports, and prepare your plan for the next trading day. You can also practice in Stress Test, where every trade is simulated and completely independent of the live market.';
+      'Review your portfolio, read company reports, and prepare your plan for the next trading day. You can also practice in Market Simulation, where every trade is simulated and completely independent of the live market.';
 
   @override
   String get marketClockRiskWeekendHolidayWhyNow =>
@@ -4958,7 +4963,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketClockRiskWeekendHolidayWhatToDo =>
-      'Take the opportunity to learn without pressure. Explore new companies, improve your investing knowledge, or practice in Stress Test. It\'s a safe environment where you can build confidence, develop discipline, and test ideas without risking real money.';
+      'Take the opportunity to learn without pressure. Explore new companies, improve your investing knowledge, or practice in Market Simulation. It\'s a safe environment where you can build confidence, develop discipline, and test ideas without risking real money.';
 
   @override
   String get marketClockNewYorkTimeTitle => 'NEW YORK TIME';
@@ -5133,7 +5138,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your realized losses are adding up. Consider smaller position sizes until you find your rhythm.';
 
   @override
-  String get psychologyAuditFreshTitle => 'Your stress test has just begun!';
+  String get psychologyAuditFreshTitle =>
+      'Your market simulation has just begun!';
 
   @override
   String get psychologyAuditFreshTip =>
@@ -5231,7 +5237,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'What Should Beginners Do?';
 
   @override
-  String get marketPeriodDetailOpenStressTestButton => 'Open Stress Test';
+  String get marketPeriodDetailOpenStressTestButton => 'Open Market Simulation';
 
   @override
   String get marketPeriodDetailFomoShieldTipLabel => 'F.O.M.O. SHIELD TIP';
@@ -5670,7 +5676,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get disclaimerScreenDataSourcesBody =>
-      'Market data is provided by Finnhub and Wikipedia APIs. While we strive for accuracy, we cannot guarantee that all data is complete, accurate, or up-to-date. Past performance is not indicative of future results. Stress test scenarios are simulations based on mathematical models and historical patterns.';
+      'Market data is provided by Finnhub and Wikipedia APIs. While we strive for accuracy, we cannot guarantee that all data is complete, accurate, or up-to-date. Past performance is not indicative of future results. Market simulation scenarios are based on mathematical models and historical patterns.';
 
   @override
   String get disclaimerScreenPrivacyTitle => 'Privacy';
@@ -5854,7 +5860,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verdictDisclaimerBody =>
-      'Please note: the stress test results, scores, insights, and written feedback provided by this application are intended for educational and informational purposes only.\n\nAll verdicts are generated automatically by analyzing your decisions within simulated market scenarios inspired by historical market events and generally accepted long-term investing principles. While every effort has been made to create realistic simulations, they cannot account for every factor that may influence real financial markets.\n\nPast market events and historical performance do not guarantee that similar conditions or outcomes will occur in the future. Real-world market behavior may differ significantly from the scenarios presented in this application. Any similarities between the simulations and actual market events should be viewed solely as educational examples and not as predictions or forecasts.\n\nThis application does not provide investment, financial, legal, or tax advice and should not be interpreted as a recommendation to buy, sell, or hold any security, asset, or financial instrument.\n\nAll investment decisions are made solely by the user and remain the user\'s sole responsibility. The developers of this application accept no liability for any financial losses, lost profits, investment outcomes, or any direct, indirect, incidental, or consequential damages resulting from the use of this application, its content, or decisions made based on the information provided.\n\nThe primary purpose of this application is to help users better understand the fundamentals of investing, portfolio diversification, risk management, long-term investing principles, and the psychological aspects of investment decision-making. All content is provided exclusively for educational purposes and should not be considered a substitute for professional financial advice or a guide for making real-world investment decisions.';
+      'Please note: the market simulation results, scores, insights, and written feedback provided by this application are intended for educational and informational purposes only.\n\nAll verdicts are generated automatically by analyzing your decisions within simulated market scenarios inspired by historical market events and generally accepted long-term investing principles. While every effort has been made to create realistic simulations, they cannot account for every factor that may influence real financial markets.\n\nPast market events and historical performance do not guarantee that similar conditions or outcomes will occur in the future. Real-world market behavior may differ significantly from the scenarios presented in this application. Any similarities between the simulations and actual market events should be viewed solely as educational examples and not as predictions or forecasts.\n\nThis application does not provide investment, financial, legal, or tax advice and should not be interpreted as a recommendation to buy, sell, or hold any security, asset, or financial instrument.\n\nAll investment decisions are made solely by the user and remain the user\'s sole responsibility. The developers of this application accept no liability for any financial losses, lost profits, investment outcomes, or any direct, indirect, incidental, or consequential damages resulting from the use of this application, its content, or decisions made based on the information provided.\n\nThe primary purpose of this application is to help users better understand the fundamentals of investing, portfolio diversification, risk management, long-term investing principles, and the psychological aspects of investment decision-making. All content is provided exclusively for educational purposes and should not be considered a substitute for professional financial advice or a guide for making real-world investment decisions.';
 
   @override
   String get portfolioBalanceScreenTitle => 'PORTFOLIO BALANCE';

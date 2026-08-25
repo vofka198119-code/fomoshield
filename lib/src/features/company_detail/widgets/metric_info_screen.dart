@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
@@ -77,21 +78,32 @@ class MetricInfoScreen extends ConsumerWidget {
                 ),
               if (content.showAcademicDisclaimer) ...[
                 const SizedBox(height: 18),
-                Text(
-                  l10n.companyDetailAcademicDisclaimerTitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: palette.textBody,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.companyDetailAcademicDisclaimerBody,
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    color: palette.textBody,
-                  ),
+                // Was left-aligned (inherited from this screen's own
+                // Column) and palette-based — unified 2026-08-25 to the
+                // same centered, fixed-muted-gray "Company Card style"
+                // every other disclaimer uses (see DisclaimerFooter).
+                Column(
+                  children: [
+                    Text(
+                      l10n.companyDetailAcademicDisclaimerTitle,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: ThemeV2.textSecondary.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.companyDetailAcademicDisclaimerBody,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 9,
+                        color: ThemeV2.textSecondary.withValues(alpha: 0.5),
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
               ],
               if (content.showStressTestDisclaimer)

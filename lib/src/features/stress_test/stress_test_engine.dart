@@ -222,6 +222,19 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   set onNotify(void Function(AppNotification notification)? cb) =>
       _onNotify = cb;
 
+  /// Callback set externally by the provider definition, same pattern as
+  /// [onNotify] — returns the symbols with an open pending BUY limit order
+  /// for a session (from stress_test_pending_orders_provider.dart), so the
+  /// tick loop in noise_engine.dart can keep a brand-new asset's price
+  /// moving in the background while its limit order is still unfilled,
+  /// even though it isn't in session.holdings yet. Wired from the pending-
+  /// orders side (not imported here) so this engine stays unaware of the
+  /// pending-order system, mirroring stress_test_pending_order.dart's own
+  /// isolation comment.
+  Set<String> Function(String sessionId)? _watchedSymbolsFor;
+  set watchedSymbolsProvider(Set<String> Function(String sessionId)? cb) =>
+      _watchedSymbolsFor = cb;
+
   /// Override for testing: if set, bypasses real clock for _isMarketOpen.
   /// Allows tests to simulate prices regardless of time/day.
   // ignore: prefer_private_fields
@@ -1159,8 +1172,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         type: AppNotificationType.stressTestCompleted,
         portfolioKind: NotificationPortfolioKind.stressTest,
         portfolioId: session.id,
-        portfolioLabel: 'Stress Test — ${session.duration.displayName}',
-        title: 'Stress Test Completed',
+        portfolioLabel: 'Market Simulation — ${session.duration.displayName}',
+        title: 'Market Simulation Completed',
         detail:
             '${session.duration.displayName} test finished — '
             '${entry.pnlPercent >= 0 ? '+' : ''}${entry.pnlPercent.toStringAsFixed(2)}% — '

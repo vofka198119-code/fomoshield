@@ -178,16 +178,20 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                           window.shortDetail,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          // Matches the canonical muted secondary-text color
-                          // (see Watchlist's sector-name text) under Luxury
-                          // only — this card is always dark, so Standard
-                          // keeps its original dialIvory@70% (palette.textBody
-                          // there is a dark, light-backdrop color and would
-                          // be unreadable here).
+                          // REVISED 2026-08-25: was palette.textBody (Muted
+                          // Silver) — read as flat gray. This card is
+                          // always-dark in BOTH themes (see pitfall notes),
+                          // so — same as Shield Signal's mood-panel body
+                          // text (shield_signal_widget.dart) — plain white
+                          // is the correct fix under Luxury too, not a
+                          // palette field (textHeader would be near-black
+                          // under Standard, textBody was gray under
+                          // Luxury). Standard's own dialIvory@70% is
+                          // untouched.
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: palette.windowGradient != null
-                                ? palette.textBody
+                                ? Colors.white.withValues(alpha: 0.85)
                                 : dialIvory.withValues(alpha: 0.7),
                           ),
                         ),

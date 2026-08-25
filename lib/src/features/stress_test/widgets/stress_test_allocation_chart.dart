@@ -246,6 +246,7 @@ class _StressTestAllocationChartState
                       GestureDetector(
                         onTap: () => setState(() => _showAll = !_showAll),
                         child: Container(
+                          margin: const EdgeInsets.only(top: 6, bottom: 16),
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(

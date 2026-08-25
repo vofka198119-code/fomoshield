@@ -197,9 +197,7 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                     child: Text(
                       _showAll
                           ? l10n.commonLess
-                          : l10n.commonMoreCount(
-                              sorted.length - _previewLimit,
-                            ),
+                          : l10n.commonMoreCount(sorted.length - _previewLimit),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -242,122 +240,118 @@ class _HoldingRow extends ConsumerWidget {
         ref.watch(resolvedCompanyNameProvider(holding.symbol)).valueOrNull ??
         holding.symbol;
 
-    return GestureDetector(
-      onTap: () => context.push(
-        '/company/${holding.symbol}',
-        extra: {'portfolioId': portfolioId},
-      ),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 72),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        decoration: showDivider
-            ? BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    width: 0.5,
-                  ),
-                ),
-              )
-            : null,
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: donutAllocationColor(
-                    colorIndex,
-                  ).withValues(alpha: 0.7),
-                  width: 1.5,
-                ),
-              ),
-              padding: const EdgeInsets.all(1.5),
-              child: ClipOval(
-                child: SizedBox(
-                  width: 36,
-                  height: 36,
-                  child: CompanyLogo(
-                    ticker: holding.symbol,
-                    logoUrl: logoUrl,
-                    radius: 18,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    companyName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: palette.textHeader,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    holding.symbol,
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: palette.textBody,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.sharesCount(holding.shares.toStringAsFixed(2)),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: palette.textBody,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () => context.push(
+            '/company/${holding.symbol}',
+            extra: {'portfolioId': portfolioId},
+          ),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 72),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: Row(
               children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: themedPriceText(
-                    formatUsd(holding.currentValue),
-                    palette,
-                    interNums(fontSize: 14, fontWeight: FontWeight.w700),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    '${formatUsdSigned(holding.pnl)} '
-                    '(${isPositive ? '+' : ''}${holding.pnlPercent.toStringAsFixed(2)}%)',
-                    style: interNums(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isPositive ? ThemeV2.success : ThemeV2.loss,
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: donutAllocationColor(
+                        colorIndex,
+                      ).withValues(alpha: 0.7),
+                      width: 1.5,
                     ),
                   ),
+                  padding: const EdgeInsets.all(1.5),
+                  child: ClipOval(
+                    child: SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: CompanyLogo(
+                        ticker: holding.symbol,
+                        logoUrl: logoUrl,
+                        radius: 18,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        companyName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: palette.textHeader,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        holding.symbol,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: palette.textBody,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.sharesCount(holding.shares.toStringAsFixed(2)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: palette.textBody,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: themedPriceText(
+                        formatUsd(holding.currentValue),
+                        palette,
+                        interNums(fontSize: 14, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '${formatUsdSigned(holding.pnl)} '
+                        '(${isPositive ? '+' : ''}${holding.pnlPercent.toStringAsFixed(2)}%)',
+                        style: interNums(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isPositive ? ThemeV2.success : ThemeV2.loss,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
-      ),
+        if (showDivider) themedRowDivider(palette),
+      ],
     );
   }
 }

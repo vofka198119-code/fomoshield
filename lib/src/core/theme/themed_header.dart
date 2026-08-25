@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'app_palette.dart';
 
 // ---------------------------------------------------------------------------
@@ -52,6 +53,27 @@ Widget themedHeaderText(
       ),
     ),
     palette,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Themed back button — the canonical AppBar `leading` for every screen.
+// The root ThemeData's AppBarTheme.foregroundColor is a fixed near-black
+// (ThemeV2.textPrimary) regardless of theme variant — invisible against
+// Luxury Gold's dark background if an AppBar omits `leading` and falls
+// back to Flutter's auto-generated back button. Use this everywhere an
+// AppBar needs a back arrow instead of leaving `leading` unset or
+// hand-rolling the IconButton per screen.
+// ---------------------------------------------------------------------------
+
+Widget themedBackButton(
+  BuildContext context,
+  AppPalette palette, {
+  VoidCallback? onPressed,
+}) {
+  return IconButton(
+    icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
+    onPressed: onPressed ?? () => context.pop(),
   );
 }
 

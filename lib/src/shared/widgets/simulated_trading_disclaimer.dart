@@ -5,23 +5,22 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/app_palette.dart';
-import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/theme_v2.dart';
 import '../../l10n/gen/app_localizations.dart';
 
-// Sits directly on the screen background (no card behind it) — resolves
-// its own palette rather than being threaded a param, since it's reused
-// across several unrelated screens (order entry, Stress Test's Company
-// Card).
-class SimulatedTradingDisclaimer extends ConsumerWidget {
+// Sits directly on the screen background (no card behind it). Color is
+// deliberately the same fixed muted gray as DisclaimerFooter's reference
+// treatment (2026-08-25: unify every card-level disclaimer to that one
+// look) — NOT palette-based, so it no longer reads full-opacity-black
+// under Standard or gold under Luxury.
+class SimulatedTradingDisclaimer extends StatelessWidget {
   const SimulatedTradingDisclaimer({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    final disclaimerColor = ThemeV2.textSecondary.withValues(alpha: 0.5);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
@@ -32,7 +31,7 @@ class SimulatedTradingDisclaimer extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: palette.textHeader,
+              color: disclaimerColor,
             ),
           ),
           const SizedBox(height: 6),
@@ -41,7 +40,7 @@ class SimulatedTradingDisclaimer extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,
-              color: palette.textHeader,
+              color: disclaimerColor,
               height: 1.5,
             ),
           ),

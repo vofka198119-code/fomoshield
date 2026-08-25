@@ -173,8 +173,9 @@ class PortfolioWidgetsNotifier
   Future<void> toggleVisibility(String id) async {
     if (id == _pinnedFirstId) return;
     state = state.map((c) {
-      if (c.id == id)
+      if (c.id == id) {
         return PortfolioWidgetConfig(id: c.id, visible: !c.visible);
+      }
       return c;
     }).toList();
     await _saveLocal();

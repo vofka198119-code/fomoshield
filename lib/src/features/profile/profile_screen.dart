@@ -136,6 +136,11 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        // Bottom-nav tab root (ShellRoute) — see home_screen.dart's
+        // matching comment for why this is conditional on canPop.
+        leading: Navigator.canPop(context)
+            ? themedBackButton(context, palette)
+            : null,
         title: themedHeaderText(
           l10n.profileTitle,
           palette,

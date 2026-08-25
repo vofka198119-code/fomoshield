@@ -117,7 +117,12 @@ class _WatchlistTile extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: palette.textBody,
+                      // Under Luxury, palette.textBody (Muted Silver) read
+                      // as flat gray — same fix as Market Clock's shortDetail,
+                      // brighten to white instead. Standard is untouched.
+                      color: palette.titleGradient != null
+                          ? Colors.white.withValues(alpha: 0.85)
+                          : palette.textBody,
                     ),
                   ),
                 ],

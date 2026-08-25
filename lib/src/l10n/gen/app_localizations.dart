@@ -119,7 +119,7 @@ abstract class AppLocalizations {
   /// No description provided for @navStressTest.
   ///
   /// In en, this message translates to:
-  /// **'Stress Test'**
+  /// **'Market Simulation'**
   String get navStressTest;
 
   /// No description provided for @navProfile.
@@ -413,7 +413,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileDeleteAccountBody.
   ///
   /// In en, this message translates to:
-  /// **'You\'ll have 14 days to restore your account after this. If you don\'t restore it within that window, your account and all your data — portfolios, watchlist, stress test history — will be permanently erased, with no way to recover it.'**
+  /// **'You\'ll have 14 days to restore your account after this. If you don\'t restore it within that window, your account and all your data — portfolios, watchlist, market simulation history — will be permanently erased, with no way to recover it.'**
   String get profileDeleteAccountBody;
 
   /// No description provided for @profileCancel.
@@ -485,13 +485,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumBenefitCapital.
   ///
   /// In en, this message translates to:
-  /// **'\$15,000 stress test starting capital'**
+  /// **'\$15,000 market simulation starting capital'**
   String get premiumBenefitCapital;
 
   /// No description provided for @premiumBenefitStressTests.
   ///
   /// In en, this message translates to:
-  /// **'Up to 3 stress tests'**
+  /// **'Up to 3 market simulations'**
   String get premiumBenefitStressTests;
 
   /// No description provided for @premiumBenefitAdFree.
@@ -509,7 +509,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumBenefitStressTestDca.
   ///
   /// In en, this message translates to:
-  /// **'Simulated weekly funding in Stress Test'**
+  /// **'Simulated weekly funding in Market Simulation'**
   String get premiumBenefitStressTestDca;
 
   /// No description provided for @tradeBuy.
@@ -791,13 +791,13 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestWidgetTitle.
   ///
   /// In en, this message translates to:
-  /// **'MY STRESS TEST'**
+  /// **'MY MARKET SIMULATION'**
   String get stressTestWidgetTitle;
 
   /// No description provided for @stressTestActiveTests.
   ///
   /// In en, this message translates to:
-  /// **'Active Tests'**
+  /// **'Active Simulations'**
   String get stressTestActiveTests;
 
   /// No description provided for @stressTestMyResults.
@@ -815,13 +815,13 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestNoActiveTests.
   ///
   /// In en, this message translates to:
-  /// **'No active tests'**
+  /// **'No active simulations'**
   String get stressTestNoActiveTests;
 
   /// No description provided for @stressTestStartNewTest.
   ///
   /// In en, this message translates to:
-  /// **'Start a new test from the bottom panel'**
+  /// **'Start a new simulation from the bottom panel'**
   String get stressTestStartNewTest;
 
   /// No description provided for @stressTestGoPremium.
@@ -845,49 +845,49 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestHubTitle.
   ///
   /// In en, this message translates to:
-  /// **'STRESS TEST'**
+  /// **'MARKET SIMULATION'**
   String get stressTestHubTitle;
 
   /// No description provided for @stressTestCompletedTestsSheetTitle.
   ///
   /// In en, this message translates to:
-  /// **'Completed Tests'**
+  /// **'Completed Simulations'**
   String get stressTestCompletedTestsSheetTitle;
 
   /// No description provided for @stressTestActiveTestsTitle.
   ///
   /// In en, this message translates to:
-  /// **'ACTIVE TESTS'**
+  /// **'ACTIVE SIMULATIONS'**
   String get stressTestActiveTestsTitle;
 
   /// No description provided for @stressTestCompletedTestsTitle.
   ///
   /// In en, this message translates to:
-  /// **'COMPLETED TESTS'**
+  /// **'COMPLETED SIMULATIONS'**
   String get stressTestCompletedTestsTitle;
 
   /// No description provided for @stressTestNoCompletedTestsYet.
   ///
   /// In en, this message translates to:
-  /// **'No completed tests yet'**
+  /// **'No completed simulations yet'**
   String get stressTestNoCompletedTestsYet;
 
   /// No description provided for @stressTestNoTestsYet.
   ///
   /// In en, this message translates to:
-  /// **'No stress tests yet'**
+  /// **'No market simulations yet'**
   String get stressTestNoTestsYet;
 
   /// No description provided for @stressTestNoTestsHint.
   ///
   /// In en, this message translates to:
-  /// **'Tap the button above to start your first test'**
+  /// **'Tap the button above to start your first simulation'**
   String get stressTestNoTestsHint;
 
   /// No description provided for @stressTestNewTest.
   ///
   /// In en, this message translates to:
-  /// **'New Stress Test'**
+  /// **'New Market Simulation'**
   String get stressTestNewTest;
 
   /// No description provided for @stressTestActiveCountFree.
@@ -905,13 +905,13 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestLimitReachedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Stress test limit reached'**
+  /// **'Market simulation limit reached'**
   String get stressTestLimitReachedTitle;
 
   /// No description provided for @stressTestMaxSessionsReached.
   ///
   /// In en, this message translates to:
-  /// **'Maximum active test sessions reached'**
+  /// **'Maximum active simulation sessions reached'**
   String get stressTestMaxSessionsReached;
 
   /// No description provided for @stressTestArchiveSummary.
@@ -929,31 +929,31 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestSetupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Stress Test Setup'**
+  /// **'Market Simulation Setup'**
   String get stressTestSetupTitle;
 
   /// No description provided for @stressTestDurationSectionTitle.
   ///
   /// In en, this message translates to:
-  /// **'TEST DURATION'**
+  /// **'SIMULATION DURATION'**
   String get stressTestDurationSectionTitle;
 
   /// No description provided for @stressTestStartButton.
   ///
   /// In en, this message translates to:
-  /// **'START STRESS TEST'**
+  /// **'START MARKET SIMULATION'**
   String get stressTestStartButton;
 
   /// No description provided for @stressTestSlot1Free.
   ///
   /// In en, this message translates to:
-  /// **'Test slot 1/2 free · Upgrade for 5 at once & no ads'**
+  /// **'Simulation slot 1/2 free · Upgrade for 5 at once & no ads'**
   String get stressTestSlot1Free;
 
   /// No description provided for @stressTestSlot2Free.
   ///
   /// In en, this message translates to:
-  /// **'Test slot 2/2 free · Premium = 5 at once, no ads'**
+  /// **'Simulation slot 2/2 free · Premium = 5 at once, no ads'**
   String get stressTestSlot2Free;
 
   /// No description provided for @stressTestAvailableCash.
@@ -989,7 +989,7 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestPremiumFeatureBody.
   ///
   /// In en, this message translates to:
-  /// **'This test duration is available exclusively to Premium subscribers. Upgrade to unlock unlimited possibilities.'**
+  /// **'This simulation duration is available exclusively to Premium subscribers. Upgrade to unlock unlimited possibilities.'**
   String get stressTestPremiumFeatureBody;
 
   /// No description provided for @stressTestUpgradeToPremium.
@@ -1007,13 +1007,13 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestCustomDurationTitle.
   ///
   /// In en, this message translates to:
-  /// **'Custom Test Duration'**
+  /// **'Custom Simulation Duration'**
   String get stressTestCustomDurationTitle;
 
   /// No description provided for @stressTestCustomDurationWarning.
   ///
   /// In en, this message translates to:
-  /// **'Once started, a custom-duration test cannot be interrupted or stopped early. The simulation will run for the full period you select below.'**
+  /// **'Once started, a custom-duration simulation cannot be interrupted or stopped early. It will run for the full period you select below.'**
   String get stressTestCustomDurationWarning;
 
   /// No description provided for @stressTestDaysCount.
@@ -1067,13 +1067,13 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestIAgreeStart.
   ///
   /// In en, this message translates to:
-  /// **'I Agree — Start Test'**
+  /// **'I Agree — Start Simulation'**
   String get stressTestIAgreeStart;
 
   /// No description provided for @stressTestDisclaimerIntro.
   ///
   /// In en, this message translates to:
-  /// **'This stress test uses a specialized algorithmic engine that simulates extreme market scenarios, including prolonged bear trends, systemic crises, and complete financial market collapses.'**
+  /// **'This market simulation uses a specialized algorithmic engine that simulates extreme market scenarios, including prolonged bear trends, systemic crises, and complete financial market collapses.'**
   String get stressTestDisclaimerIntro;
 
   /// No description provided for @stressTestDisclaimerAck.
@@ -1091,7 +1091,7 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestBulletNotAdvice.
   ///
   /// In en, this message translates to:
-  /// **'Not Financial Advice — The final verdict, analytics, and any conclusions drawn from this test are for informational and educational purposes only. They do not constitute personalized investment advice, a recommendation to buy or sell assets, or any form of financial solicitation.'**
+  /// **'Not Financial Advice — The final verdict, analytics, and any conclusions drawn from this simulation are for informational and educational purposes only. They do not constitute personalized investment advice, a recommendation to buy or sell assets, or any form of financial solicitation.'**
   String get stressTestBulletNotAdvice;
 
   /// No description provided for @stressTestBulletObjective.
@@ -1103,7 +1103,7 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestBulletLiability.
   ///
   /// In en, this message translates to:
-  /// **'Limitation of Liability — A positive test result (i.e., your portfolio successfully \"survived\" a simulated market crash) does not guarantee similar real-world performance. The platform and its developers assume no responsibility for your investment decisions, nor for any direct or indirect losses, including but not limited to loss of capital in real markets.'**
+  /// **'Limitation of Liability — A positive simulation result (i.e., your portfolio successfully \"survived\" a simulated market crash) does not guarantee similar real-world performance. The platform and its developers assume no responsibility for your investment decisions, nor for any direct or indirect losses, including but not limited to loss of capital in real markets.'**
   String get stressTestBulletLiability;
 
   /// No description provided for @stressTestBulletPastPerformance.
@@ -1121,19 +1121,19 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestUnlimitedTesting.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited Testing'**
+  /// **'Unlimited Simulation'**
   String get stressTestUnlimitedTesting;
 
   /// No description provided for @stressTestInfiniteUpsellBody.
   ///
   /// In en, this message translates to:
-  /// **'The Infinite duration stress test is available exclusively to Premium subscribers. Upgrade to unlock:'**
+  /// **'The Infinite duration market simulation is available exclusively to Premium subscribers. Upgrade to unlock:'**
   String get stressTestInfiniteUpsellBody;
 
   /// No description provided for @stressTestUpsellUnlimitedDuration.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited test duration'**
+  /// **'Unlimited simulation duration'**
   String get stressTestUpsellUnlimitedDuration;
 
   /// No description provided for @stressTestUpsellFullCrashScenarios.
@@ -1151,25 +1151,25 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestAccessTitle.
   ///
   /// In en, this message translates to:
-  /// **'Stress test access'**
+  /// **'Market simulation access'**
   String get stressTestAccessTitle;
 
   /// No description provided for @stressTestPortfolioTitle.
   ///
   /// In en, this message translates to:
-  /// **'STRESS TEST PORTFOLIO'**
+  /// **'MARKET SIMULATION PORTFOLIO'**
   String get stressTestPortfolioTitle;
 
   /// No description provided for @stressTestNotStartedYet.
   ///
   /// In en, this message translates to:
-  /// **'Test not started yet'**
+  /// **'Simulation not started yet'**
   String get stressTestNotStartedYet;
 
   /// No description provided for @stressTestGoBackToSetup.
   ///
   /// In en, this message translates to:
-  /// **'Go back to setup and start the test'**
+  /// **'Go back to setup and start the simulation'**
   String get stressTestGoBackToSetup;
 
   /// No description provided for @stressTestGoToSetup.
@@ -1229,7 +1229,7 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestTestComplete.
   ///
   /// In en, this message translates to:
-  /// **'Test Complete'**
+  /// **'Simulation Complete'**
   String get stressTestTestComplete;
 
   /// No description provided for @stressTestTimeRemaining.
@@ -1264,19 +1264,19 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestFinishTestButton.
   ///
   /// In en, this message translates to:
-  /// **'FINISH TEST'**
+  /// **'FINISH SIMULATION'**
   String get stressTestFinishTestButton;
 
   /// No description provided for @stressTestFinishTest.
   ///
   /// In en, this message translates to:
-  /// **'Finish Test'**
+  /// **'Finish Simulation'**
   String get stressTestFinishTest;
 
   /// No description provided for @stressTestFinishTestConfirm.
   ///
   /// In en, this message translates to:
-  /// **'End this test now and get your verdict? This can\'t be undone.'**
+  /// **'End this simulation now and get your verdict? This can\'t be undone.'**
   String get stressTestFinishTestConfirm;
 
   /// No description provided for @stressTestFinalBalance.
@@ -1360,7 +1360,7 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestInvestmentDisclaimerBody.
   ///
   /// In en, this message translates to:
-  /// **'This verdict is generated automatically by a mathematical model based solely on your simulated historical behavior within this closed testing environment. It is provided for educational and illustrative purposes only and does NOT constitute personalized investment, legal, or financial advice. Past performance within this simulator does not guarantee, predict, or reflect real-world market outcomes. Final financial decisions, asset purchases, or trading activities in real life carry substantial risk and are made solely at your own discretion and responsibility. The creators of F.O.M.O. Shield accept no liability for financial losses incurred in real-world trading.'**
+  /// **'This verdict is generated automatically by a mathematical model based solely on your simulated historical behavior within this closed simulation environment. It is provided for educational and illustrative purposes only and does NOT constitute personalized investment, legal, or financial advice. Past performance within this simulator does not guarantee, predict, or reflect real-world market outcomes. Final financial decisions, asset purchases, or trading activities in real life carry substantial risk and are made solely at your own discretion and responsibility. The creators of F.O.M.O. Shield accept no liability for financial losses incurred in real-world trading.'**
   String get stressTestInvestmentDisclaimerBody;
 
   /// No description provided for @stressTestIUnderstandAccept.
@@ -2344,7 +2344,7 @@ abstract class AppLocalizations {
   /// No description provided for @verdictTradeBreakdownDisclaimerBody.
   ///
   /// In en, this message translates to:
-  /// **'The results of this stress test are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user\'s own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the stress test is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.'**
+  /// **'The results of this market simulation are solely the results of a computer-generated simulation and are provided for educational and training purposes only. They are based on model-defined scenarios and historical market events and do not represent, predict, or guarantee the performance of any portfolio under real-world market conditions.\n\nActual market behavior, individual companies, and financial assets may differ substantially from the results of the simulation. Past market events and performance do not guarantee similar outcomes in the future.\n\nAny scores, ratings, verdicts, or other indicators presented in the test do not constitute investment, financial, or other professional advice, nor do they constitute a recommendation, offer, or solicitation to buy or sell any financial asset or serve as a basis for making investment decisions.\n\nAny decision made using or taking into account information provided by the application is made solely at the user\'s own discretion and risk. We do not guarantee profits and are not responsible for any financial losses, damages, or lost profits resulting from the use of the simulation or its results.\n\nThe purpose of the market simulation is to help users learn about market scenarios, investment principles, and their own behavior in a simulated environment — not to predict the future.'**
   String get verdictTradeBreakdownDisclaimerBody;
 
   /// No description provided for @verdictCashBufferNoDataTitle.
@@ -4168,7 +4168,7 @@ abstract class AppLocalizations {
   /// No description provided for @verdictGuardianShortText.
   ///
   /// In en, this message translates to:
-  /// **'Your stress test is complete. You experienced different market conditions and saw how your portfolio and decisions responded. Now it\'s time to see what your results reveal about your investment behavior.'**
+  /// **'Your market simulation is complete. You experienced different market conditions and saw how your portfolio and decisions responded. Now it\'s time to see what your results reveal about your investment behavior.'**
   String get verdictGuardianShortText;
 
   /// No description provided for @verdictViewYourAnalysis.
@@ -7558,19 +7558,19 @@ abstract class AppLocalizations {
   /// No description provided for @metricInfoGuardianVerdictSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Congratulations — you have completed your portfolio stress test.'**
+  /// **'Congratulations — you have completed your portfolio market simulation.'**
   String get metricInfoGuardianVerdictSubtitle;
 
   /// No description provided for @metricInfoGuardianVerdictSection1Header.
   ///
   /// In en, this message translates to:
-  /// **'Stress Test Complete'**
+  /// **'Market Simulation Complete'**
   String get metricInfoGuardianVerdictSection1Header;
 
   /// No description provided for @metricInfoGuardianVerdictSection1Body.
   ///
   /// In en, this message translates to:
-  /// **'During the simulation, you experienced different market periods and scenarios based on patterns observed throughout real market history. Events that can unfold over months or even years in the real world were accelerated in the simulation, allowing you to experience their effects in a much shorter period of time.\n\nYou saw how your portfolio could behave under very different conditions:\n\n📈 Market growth\n➖ Sideways markets and uncertainty\n📉 Market declines\n🔄 Recovery after a downturn\n🚀 Market hype\n🎲 Speculative movements\n⚠️ Crisis scenarios\n🦢 Rare extreme events and Black Swan scenarios\n\nEach of these market phases has its own characteristics.\n\nHype is not simply a rising price.\n\nSpeculation is not the same as long-term investing.\n\nA market decline does not automatically mean that a business is becoming weaker.\n\nAnd strong price growth does not automatically mean that an asset has become a better investment.\n\nDuring the test, you have already seen these patterns in action. Some of them you may have recognized immediately. Others may have passed unnoticed. That is why one test may not be enough.\n\nTry running different stress tests again. Change your portfolio and observe how your decisions and portfolio behavior change under different market conditions.\n\nOver time, you may become better at recognizing different market phases and understanding why the same action can have a very different meaning depending on the situation.'**
+  /// **'During the simulation, you experienced different market periods and scenarios based on patterns observed throughout real market history. Events that can unfold over months or even years in the real world were accelerated in the simulation, allowing you to experience their effects in a much shorter period of time.\n\nYou saw how your portfolio could behave under very different conditions:\n\n📈 Market growth\n➖ Sideways markets and uncertainty\n📉 Market declines\n🔄 Recovery after a downturn\n🚀 Market hype\n🎲 Speculative movements\n⚠️ Crisis scenarios\n🦢 Rare extreme events and Black Swan scenarios\n\nEach of these market phases has its own characteristics.\n\nHype is not simply a rising price.\n\nSpeculation is not the same as long-term investing.\n\nA market decline does not automatically mean that a business is becoming weaker.\n\nAnd strong price growth does not automatically mean that an asset has become a better investment.\n\nDuring the simulation, you have already seen these patterns in action. Some of them you may have recognized immediately. Others may have passed unnoticed. That is why one simulation may not be enough.\n\nTry running different market simulations again. Change your portfolio and observe how your decisions and portfolio behavior change under different market conditions.\n\nOver time, you may become better at recognizing different market phases and understanding why the same action can have a very different meaning depending on the situation.'**
   String get metricInfoGuardianVerdictSection1Body;
 
   /// No description provided for @metricInfoGuardianVerdictSection2Header.
@@ -8104,7 +8104,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketClockWindowWeekendClosedStressTestPromoBody.
   ///
   /// In en, this message translates to:
-  /// **'The Stress Test is always available.\n\nPractice building portfolios, reacting to market events, and making investment decisions without risking real money.\n\nThe simulator is designed to help you understand how markets behave and build discipline before investing in live markets.\n\nEvery trade inside Stress Test is completely independent of real market prices, so you can experiment, learn from mistakes, and improve with confidence.'**
+  /// **'The Market Simulation is always available.\n\nPractice building portfolios, reacting to market events, and making investment decisions without risking real money.\n\nThe simulator is designed to help you understand how markets behave and build discipline before investing in live markets.\n\nEvery trade inside Market Simulation is completely independent of real market prices, so you can experiment, learn from mistakes, and improve with confidence.'**
   String get marketClockWindowWeekendClosedStressTestPromoBody;
 
   /// No description provided for @marketClockWindowMarketHolidayShortHeadline.
@@ -8170,7 +8170,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketClockWindowMarketHolidayStressTestPromoBody.
   ///
   /// In en, this message translates to:
-  /// **'Although the live market is closed, the Stress Test remains fully available.\n\nIt\'s the perfect place to practice buying, selling, portfolio management, and emotional discipline without risking real money.\n\nYou can explore different strategies, make mistakes safely, and better understand how markets react in different situations.\n\nWhen the real market opens again, you\'ll return with more experience and greater confidence.'**
+  /// **'Although the live market is closed, the Market Simulation remains fully available.\n\nIt\'s the perfect place to practice buying, selling, portfolio management, and emotional discipline without risking real money.\n\nYou can explore different strategies, make mistakes safely, and better understand how markets react in different situations.\n\nWhen the real market opens again, you\'ll return with more experience and greater confidence.'**
   String get marketClockWindowMarketHolidayStressTestPromoBody;
 
   /// No description provided for @marketClockWindowEarlyCloseSessionShortHeadline.
@@ -8224,7 +8224,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketClockWindowEarlyCloseSessionStressTestPromoBody.
   ///
   /// In en, this message translates to:
-  /// **'A shortened, faster-moving session can feel unfamiliar. Practice it in Stress Test — no real money on the line, just real market conditions to learn from.'**
+  /// **'A shortened, faster-moving session can feel unfamiliar. Practice it in Market Simulation — no real money on the line, just real market conditions to learn from.'**
   String get marketClockWindowEarlyCloseSessionStressTestPromoBody;
 
   /// No description provided for @marketClockRiskEarlyPreMarketWhyNow.
@@ -8332,7 +8332,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketClockRiskEarlyCloseSessionWhatToDo.
   ///
   /// In en, this message translates to:
-  /// **'If you\'re investing for the long term and your decision has already been made, a shortened trading day is not necessarily a reason to avoid investing.\n\nHowever, if your trade isn\'t time-sensitive, waiting until the next full trading session often provides better liquidity and more stable market conditions.\n\nUse the extra time to review your watchlist, read company reports, or practice in Stress Test.\n\nAn early market close isn\'t a reason to rush your decisions. Sometimes the smartest move is simply to wait for the next full trading day, when the market returns to normal conditions.'**
+  /// **'If you\'re investing for the long term and your decision has already been made, a shortened trading day is not necessarily a reason to avoid investing.\n\nHowever, if your trade isn\'t time-sensitive, waiting until the next full trading session often provides better liquidity and more stable market conditions.\n\nUse the extra time to review your watchlist, read company reports, or practice in Market Simulation.\n\nAn early market close isn\'t a reason to rush your decisions. Sometimes the smartest move is simply to wait for the next full trading day, when the market returns to normal conditions.'**
   String get marketClockRiskEarlyCloseSessionWhatToDo;
 
   /// No description provided for @marketClockRiskClosedWhyNow.
@@ -8344,7 +8344,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketClockRiskClosedWhatToDo.
   ///
   /// In en, this message translates to:
-  /// **'Review your portfolio, read company reports, and prepare your plan for the next trading day. You can also practice in Stress Test, where every trade is simulated and completely independent of the live market.'**
+  /// **'Review your portfolio, read company reports, and prepare your plan for the next trading day. You can also practice in Market Simulation, where every trade is simulated and completely independent of the live market.'**
   String get marketClockRiskClosedWhatToDo;
 
   /// No description provided for @marketClockRiskWeekendHolidayWhyNow.
@@ -8356,7 +8356,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketClockRiskWeekendHolidayWhatToDo.
   ///
   /// In en, this message translates to:
-  /// **'Take the opportunity to learn without pressure. Explore new companies, improve your investing knowledge, or practice in Stress Test. It\'s a safe environment where you can build confidence, develop discipline, and test ideas without risking real money.'**
+  /// **'Take the opportunity to learn without pressure. Explore new companies, improve your investing knowledge, or practice in Market Simulation. It\'s a safe environment where you can build confidence, develop discipline, and test ideas without risking real money.'**
   String get marketClockRiskWeekendHolidayWhatToDo;
 
   /// No description provided for @marketClockNewYorkTimeTitle.
@@ -8632,7 +8632,7 @@ abstract class AppLocalizations {
   /// No description provided for @psychologyAuditFreshTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your stress test has just begun!'**
+  /// **'Your market simulation has just begun!'**
   String get psychologyAuditFreshTitle;
 
   /// No description provided for @psychologyAuditFreshTip.
@@ -8818,7 +8818,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketPeriodDetailOpenStressTestButton.
   ///
   /// In en, this message translates to:
-  /// **'Open Stress Test'**
+  /// **'Open Market Simulation'**
   String get marketPeriodDetailOpenStressTestButton;
 
   /// No description provided for @marketPeriodDetailFomoShieldTipLabel.
@@ -9550,7 +9550,7 @@ abstract class AppLocalizations {
   /// No description provided for @disclaimerScreenDataSourcesBody.
   ///
   /// In en, this message translates to:
-  /// **'Market data is provided by Finnhub and Wikipedia APIs. While we strive for accuracy, we cannot guarantee that all data is complete, accurate, or up-to-date. Past performance is not indicative of future results. Stress test scenarios are simulations based on mathematical models and historical patterns.'**
+  /// **'Market data is provided by Finnhub and Wikipedia APIs. While we strive for accuracy, we cannot guarantee that all data is complete, accurate, or up-to-date. Past performance is not indicative of future results. Market simulation scenarios are based on mathematical models and historical patterns.'**
   String get disclaimerScreenDataSourcesBody;
 
   /// No description provided for @disclaimerScreenPrivacyTitle.
@@ -9836,7 +9836,7 @@ abstract class AppLocalizations {
   /// No description provided for @verdictDisclaimerBody.
   ///
   /// In en, this message translates to:
-  /// **'Please note: the stress test results, scores, insights, and written feedback provided by this application are intended for educational and informational purposes only.\n\nAll verdicts are generated automatically by analyzing your decisions within simulated market scenarios inspired by historical market events and generally accepted long-term investing principles. While every effort has been made to create realistic simulations, they cannot account for every factor that may influence real financial markets.\n\nPast market events and historical performance do not guarantee that similar conditions or outcomes will occur in the future. Real-world market behavior may differ significantly from the scenarios presented in this application. Any similarities between the simulations and actual market events should be viewed solely as educational examples and not as predictions or forecasts.\n\nThis application does not provide investment, financial, legal, or tax advice and should not be interpreted as a recommendation to buy, sell, or hold any security, asset, or financial instrument.\n\nAll investment decisions are made solely by the user and remain the user\'s sole responsibility. The developers of this application accept no liability for any financial losses, lost profits, investment outcomes, or any direct, indirect, incidental, or consequential damages resulting from the use of this application, its content, or decisions made based on the information provided.\n\nThe primary purpose of this application is to help users better understand the fundamentals of investing, portfolio diversification, risk management, long-term investing principles, and the psychological aspects of investment decision-making. All content is provided exclusively for educational purposes and should not be considered a substitute for professional financial advice or a guide for making real-world investment decisions.'**
+  /// **'Please note: the market simulation results, scores, insights, and written feedback provided by this application are intended for educational and informational purposes only.\n\nAll verdicts are generated automatically by analyzing your decisions within simulated market scenarios inspired by historical market events and generally accepted long-term investing principles. While every effort has been made to create realistic simulations, they cannot account for every factor that may influence real financial markets.\n\nPast market events and historical performance do not guarantee that similar conditions or outcomes will occur in the future. Real-world market behavior may differ significantly from the scenarios presented in this application. Any similarities between the simulations and actual market events should be viewed solely as educational examples and not as predictions or forecasts.\n\nThis application does not provide investment, financial, legal, or tax advice and should not be interpreted as a recommendation to buy, sell, or hold any security, asset, or financial instrument.\n\nAll investment decisions are made solely by the user and remain the user\'s sole responsibility. The developers of this application accept no liability for any financial losses, lost profits, investment outcomes, or any direct, indirect, incidental, or consequential damages resulting from the use of this application, its content, or decisions made based on the information provided.\n\nThe primary purpose of this application is to help users better understand the fundamentals of investing, portfolio diversification, risk management, long-term investing principles, and the psychological aspects of investment decision-making. All content is provided exclusively for educational purposes and should not be considered a substitute for professional financial advice or a guide for making real-world investment decisions.'**
   String get verdictDisclaimerBody;
 
   /// No description provided for @portfolioBalanceScreenTitle.

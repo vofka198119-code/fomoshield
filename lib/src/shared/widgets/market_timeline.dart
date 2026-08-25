@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/theme/app_palette.dart';
 import '../../features/stress_test/stress_test_models.dart';
 import '../../l10n/gen/app_localizations.dart';
 
@@ -31,12 +32,17 @@ class MarketTimeline extends StatefulWidget {
   /// How many epochs to show when collapsed. Default: 5.
   final int initialLimit;
 
+  /// Null (the default) is a complete no-op — every existing call site is
+  /// unaffected unless it opts in by passing a palette.
+  final AppPalette? palette;
+
   const MarketTimeline({
     super.key,
     required this.epochs,
     this.currentEpochIndex,
     this.activeEpochProgress,
     this.initialLimit = 10,
+    this.palette,
   });
 
   /// Find the current (active) epoch index: the one with endedAt == null.
@@ -145,7 +151,8 @@ class _MarketTimelineState extends State<MarketTimeline> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
-                color: ThemeV2.primary.withValues(alpha: 0.06),
+                color: (widget.palette?.accentPrimary ?? ThemeV2.primary)
+                    .withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -158,7 +165,7 @@ class _MarketTimelineState extends State<MarketTimeline> {
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: ThemeV2.primary,
+                    color: widget.palette?.accentPrimary ?? ThemeV2.primary,
                   ),
                 ),
               ),

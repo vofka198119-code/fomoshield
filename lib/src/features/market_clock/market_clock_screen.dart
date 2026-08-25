@@ -7,6 +7,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_button.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'market_clock_engine.dart';
 import 'market_clock_new_york_time_widget.dart';
@@ -95,6 +96,7 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        leading: themedBackButton(context, palette),
         title: themedHeaderText(
           l10n.marketClockScreenTitle,
           palette,
@@ -124,31 +126,11 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
               const SizedBox(height: 24),
               // Add widgets button
               Center(
-                child: TextButton.icon(
-                  onPressed: _showWidgetsBottomSheet,
-                  icon: Icon(
-                    Icons.add_rounded,
-                    color: palette.accentPrimary,
-                    size: 20,
-                  ),
-                  label: Text(
-                    l10n.marketClockAddWidgetsButton,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: palette.accentPrimary,
-                    ),
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      side: BorderSide(color: palette.accentPrimary, width: 0.5),
-                    ),
-                  ),
+                child: themedAddWidgetsButton(
+                  context,
+                  palette,
+                  label: l10n.marketClockAddWidgetsButton,
+                  onTap: _showWidgetsBottomSheet,
                 ),
               ),
             ],

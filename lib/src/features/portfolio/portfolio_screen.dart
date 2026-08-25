@@ -8,6 +8,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_button.dart';
 import '../../core/router/navigation_history_provider.dart';
 import '../../core/supabase/supabase_providers.dart';
 import 'portfolio_providers.dart';
@@ -172,10 +173,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             Text(
               l10n.portfolioCreateFirstMsg(formatUsd(startingCapital)),
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: palette.textBody,
-              ),
+              style: GoogleFonts.inter(fontSize: 14, color: palette.textBody),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(

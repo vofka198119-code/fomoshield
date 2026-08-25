@@ -72,8 +72,8 @@ class CardFrame extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  FomoShieldTheme.cardTopBarStart.withOpacity(0.12),
-                  FomoShieldTheme.cardTopBarEnd.withOpacity(0.12),
+                  FomoShieldTheme.cardTopBarStart.withValues(alpha: 0.12),
+                  FomoShieldTheme.cardTopBarEnd.withValues(alpha: 0.12),
                 ],
               ),
             ),

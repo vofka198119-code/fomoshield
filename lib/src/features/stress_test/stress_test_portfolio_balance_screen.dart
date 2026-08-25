@@ -15,6 +15,7 @@ import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_button.dart';
 import '../../core/theme/themed_divider.dart';
 import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -93,34 +94,11 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
 
                 // ── Add widgets button ───────────────────────────
                 Center(
-                  child: TextButton.icon(
-                    onPressed: () => _showWidgetSettingsSheet(context, ref),
-                    icon: Icon(
-                      Icons.add_rounded,
-                      color: palette.accentPrimary,
-                      size: 20,
-                    ),
-                    label: Text(
-                      l10n.homeAddWidgets,
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: palette.accentPrimary,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        side: BorderSide(
-                          color: palette.accentPrimary,
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
+                  child: themedAddWidgetsButton(
+                    context,
+                    palette,
+                    label: l10n.homeAddWidgets,
+                    onTap: () => _showWidgetSettingsSheet(context, ref),
                   ),
                 ),
 
@@ -182,8 +160,12 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
   }
 
   // Same centered title+body shape as order_config_section.dart's
-  // Simulated Trading disclaimer ("Company Card style").
+  // Simulated Trading disclaimer ("Company Card style"). Color is the
+  // same fixed muted gray as DisclaimerFooter's reference treatment
+  // (2026-08-25: unify every card-level disclaimer to that one look) —
+  // NOT palette-based (palette param kept for the caller's other uses).
   Widget _educationalDisclaimer(AppLocalizations l10n, AppPalette palette) {
+    final disclaimerColor = ThemeV2.textSecondary.withValues(alpha: 0.5);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
@@ -194,7 +176,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: palette.textHeader,
+              color: disclaimerColor,
             ),
           ),
           const SizedBox(height: 6),
@@ -203,7 +185,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,
-              color: palette.textHeader,
+              color: disclaimerColor,
               height: 1.5,
             ),
           ),
@@ -222,7 +204,10 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
   final StressTestSession session;
   final AppPalette palette;
 
-  const _AssetAllocationBarsCard({required this.session, required this.palette});
+  const _AssetAllocationBarsCard({
+    required this.session,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

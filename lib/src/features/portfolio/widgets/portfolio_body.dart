@@ -123,31 +123,11 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             const SizedBox(height: 24),
             // Add widgets button
             Center(
-              child: TextButton.icon(
-                onPressed: _showWidgetsBottomSheet,
-                icon: Icon(
-                  Icons.add_rounded,
-                  color: palette.accentPrimary,
-                  size: 20,
-                ),
-                label: Text(
-                  AppLocalizations.of(context)!.homeAddWidgets,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: palette.accentPrimary,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: BorderSide(color: palette.accentPrimary, width: 0.5),
-                  ),
-                ),
+              child: themedAddWidgetsButton(
+                context,
+                palette,
+                label: AppLocalizations.of(context)!.homeAddWidgets,
+                onTap: _showWidgetsBottomSheet,
               ),
             ),
             const DisclaimerFooter(),

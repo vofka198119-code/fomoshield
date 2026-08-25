@@ -86,6 +86,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           centerTitle: true,
+          leading: themedBackButton(context, palette),
           title: themedHeaderText(
             l10n.searchTitle,
             palette,

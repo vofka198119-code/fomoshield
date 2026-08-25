@@ -68,6 +68,7 @@ class _MarketPhasesScreenState extends ConsumerState<MarketPhasesScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        leading: themedBackButton(context, palette),
         title: themedHeaderText(
           l10n.marketPhasesScreenTitle,
           palette,

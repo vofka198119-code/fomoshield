@@ -62,6 +62,7 @@ class CompanyListScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        leading: themedBackButton(context, palette),
         title: themedHeaderText(
           title,
           palette,
@@ -173,7 +174,13 @@ class _CompanyRow extends ConsumerWidget {
         subtitle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.inter(fontSize: 11, color: palette.textBody),
+        style: GoogleFonts.inter(
+          fontSize: 11,
+          // Same fix as watchlist_widget.dart's tile — see its comment.
+          color: palette.titleGradient != null
+              ? Colors.white.withValues(alpha: 0.85)
+              : palette.textBody,
+        ),
       ),
       trailing: Icon(
         Icons.chevron_right_rounded,

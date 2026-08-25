@@ -192,9 +192,8 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
   PortfolioNotifier(
     this._supabaseService, {
     this._userId,
-    required double startingCapital,
-  }) : _startingCapital = startingCapital,
-       super([]) {
+    required this._startingCapital,
+  }) : super([]) {
     _load();
   }
 

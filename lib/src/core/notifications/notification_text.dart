@@ -41,11 +41,11 @@ String notificationDetail(AppNotification n, AppLocalizations l10n) {
       n.portfolioLabel != null) {
     final sign = n.priceSwingIsUp! ? '+' : '-';
     final pct = '$sign${n.priceSwingChangePercent!.toStringAsFixed(1)}';
-    // portfolioLabel is always built as 'Stress Test — {duration}' (see
+    // portfolioLabel is always built as 'Market Simulation — {duration}' (see
     // noise_engine.dart et al.) — strip the prefix so {duration} in the
     // template below reads as just "1 Month", not the whole label
     // doubled up with "Stress Test —" already baked into the sentence.
-    const prefix = 'Stress Test — ';
+    const prefix = 'Market Simulation — ';
     final duration = n.portfolioLabel!.startsWith(prefix)
         ? n.portfolioLabel!.substring(prefix.length)
         : n.portfolioLabel!;

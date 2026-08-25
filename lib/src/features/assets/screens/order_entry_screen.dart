@@ -85,7 +85,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
 
   String? _stressTestLabel() {
     final duration = _session?.duration.displayName;
-    return duration == null ? null : 'Stress Test — $duration';
+    return duration == null ? null : 'Market Simulation — $duration';
   }
 
   StressTestHolding? _findHolding(StressTestSession session) {

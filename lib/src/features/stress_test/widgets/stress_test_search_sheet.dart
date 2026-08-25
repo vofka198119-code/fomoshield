@@ -216,7 +216,8 @@ class _StressTestSearchSheetState
             type: AppNotificationType.buy,
             portfolioKind: NotificationPortfolioKind.stressTest,
             portfolioId: widget.sessionId,
-            portfolioLabel: label == null ? null : 'Stress Test — $label',
+            portfolioLabel:
+                label == null ? null : 'Market Simulation — $label',
             symbol: _selectedSymbol,
             companyName: _selectedDescription,
             title: AppLocalizations.of(context)!.orderEntryNotifYouBought,

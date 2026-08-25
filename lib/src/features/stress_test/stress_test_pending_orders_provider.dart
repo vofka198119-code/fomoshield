@@ -157,7 +157,7 @@ class StressTestPendingOrdersNotifier
               type: AppNotificationType.limitOrderFilled,
               portfolioKind: NotificationPortfolioKind.stressTest,
               portfolioId: session.id,
-              portfolioLabel: 'Stress Test — $label',
+              portfolioLabel: 'Market Simulation — $label',
               symbol: order.symbol,
               companyName: stressTestCompanyName(order.symbol),
               title: 'Limit ${order.isBuy ? 'Buy' : 'Sell'} Order Filled',
@@ -181,6 +181,18 @@ final stressTestPendingOrdersProvider =
       List<StressTestPendingOrder>
     >((ref) {
       final notifier = StressTestPendingOrdersNotifier(ref);
+      // Lets the price engine (noise_engine.dart) keep ticking a symbol
+      // in the background while a BUY limit order on it is still pending
+      // — even before it's in session.holdings — via a callback rather
+      // than an import, so stress_test_engine.dart stays unaware of this
+      // pending-order system (see stress_test_pending_order.dart's
+      // isolation comment).
+      ref.read(stressTestProvider.notifier).watchedSymbolsProvider =
+          (sessionId) => notifier
+              .forSession(sessionId)
+              .where((o) => o.isBuy)
+              .map((o) => o.symbol)
+              .toSet();
       // Reacts to every stressTestProvider state change (each 20s price tick
       // included) without needing to touch the existing timer that drives it
       // (stress_test_screen.dart) — deferred to a microtask so a fill's own

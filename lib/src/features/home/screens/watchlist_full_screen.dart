@@ -47,6 +47,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        leading: themedBackButton(context, palette),
         title: themedHeaderText(
           l10n.watchlistTitle,
           palette,
@@ -139,11 +140,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.visibility_off_rounded,
-            color: palette.textBody,
-            size: 48,
-          ),
+          Icon(Icons.visibility_off_rounded, color: palette.textBody, size: 48),
           const SizedBox(height: 12),
           Text(
             l10n.watchlistFullScreenEmptyTitle,
@@ -156,10 +153,7 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
           const SizedBox(height: 4),
           Text(
             l10n.watchlistFullScreenEmptySubtitle,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: palette.textBody,
-            ),
+            style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
@@ -203,81 +197,84 @@ class _WatchlistRow extends ConsumerWidget {
       companyName: logoEntry?.companyName,
     );
 
-    return GestureDetector(
-      onTap: () => context.push('/company/$symbol'),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        // minHeight (not a hard height) so the row can grow instead of
-        // overflowing when the title+sector stack renders taller than
-        // this — confirmed happening on a Redmi Note 9S both from RU font
-        // metrics at a fixed 60px and, separately, from the OS
-        // accessibility text-scale slider, same row style as
-        // company_mini_card.dart.
-        constraints: const BoxConstraints(minHeight: 66),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        decoration: showDivider
-            ? BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    width: 0.5,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () => context.push('/company/$symbol'),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            // minHeight (not a hard height) so the row can grow instead of
+            // overflowing when the title+sector stack renders taller than
+            // this — confirmed happening on a Redmi Note 9S both from RU font
+            // metrics at a fixed 60px and, separately, from the OS
+            // accessibility text-scale slider, same row style as
+            // company_mini_card.dart.
+            constraints: const BoxConstraints(minHeight: 66),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: palette.accentPrimary,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: CompanyLogo(
+                    ticker: symbol,
+                    logoUrl: logoEntry?.logoUrl,
+                    domain: logoEntry?.domain,
+                    radius: 18,
                   ),
                 ),
-              )
-            : null,
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: palette.accentPrimary, width: 1.5),
-              ),
-              child: CompanyLogo(
-                ticker: symbol,
-                logoUrl: logoEntry?.logoUrl,
-                domain: logoEntry?.domain,
-                radius: 18,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: palette.textHeader,
-                    ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: palette.textHeader,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        sector?.localizedLabel(l10n) ?? symbol,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          // Same fix as watchlist_widget.dart's tile — see
+                          // its comment.
+                          color: palette.titleGradient != null
+                              ? Colors.white.withValues(alpha: 0.85)
+                              : palette.textBody,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    sector?.localizedLabel(l10n) ?? symbol,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: palette.textBody,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: palette.textBody,
+                  size: 20,
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: palette.textBody,
-              size: 20,
-            ),
-          ],
+          ),
         ),
-      ),
+        if (showDivider) themedRowDivider(palette),
+      ],
     );
   }
 }

@@ -9,6 +9,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_button.dart';
 import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
@@ -561,41 +562,22 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                     StaggerFadeIn(
                       index: visibleWidgets.length,
                       child: Center(
-                        child: TextButton.icon(
-                          onPressed: _showWidgetsBottomSheet,
-                          icon: Icon(
-                            Icons.add_rounded,
-                            color: palette.accentPrimary,
-                            size: 20,
-                          ),
-                          label: Text(
-                            l10n.homeAddWidgets,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: palette.accentPrimary,
-                            ),
-                          ),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              side: BorderSide(
-                                color: palette.accentPrimary,
-                                width: 0.5,
-                              ),
-                            ),
-                          ),
+                        child: themedAddWidgetsButton(
+                          context,
+                          palette,
+                          label: l10n.homeAddWidgets,
+                          onTap: _showWidgetsBottomSheet,
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
                     // ── Educational Purpose & Legal Disclaimer ──
-                    // Sits directly on the scroll background, no card behind
-                    // it — needs its own palette-aware color (pitfall #3).
+                    // Sits directly on the scroll background, no card
+                    // behind it. Color is the same fixed muted gray as
+                    // DisclaimerFooter's reference treatment (2026-08-25:
+                    // unify every card-level disclaimer to that one look)
+                    // — NOT palette-based, so it's readable regardless of
+                    // backdrop in both themes.
                     StaggerFadeIn(
                       index: visibleWidgets.length + 1,
                       child: Padding(
@@ -608,7 +590,9 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
-                                color: palette.textHeader,
+                                color: ThemeV2.textSecondary.withValues(
+                                  alpha: 0.5,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 6),
@@ -617,7 +601,9 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 9,
-                                color: palette.textBody,
+                                color: ThemeV2.textSecondary.withValues(
+                                  alpha: 0.5,
+                                ),
                                 height: 1.5,
                               ),
                             ),

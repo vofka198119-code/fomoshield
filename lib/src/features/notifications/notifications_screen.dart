@@ -92,6 +92,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        leading: themedBackButton(context, palette),
         title: FittedBox(
           fit: BoxFit.scaleDown,
           child: themedHeaderText(
