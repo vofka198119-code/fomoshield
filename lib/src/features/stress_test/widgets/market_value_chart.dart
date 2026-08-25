@@ -31,6 +31,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
@@ -240,6 +244,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: FomoShieldTheme.cardPadding,
@@ -251,9 +256,10 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Text(
+            child: themedHeaderText(
               AppLocalizations.of(context)!.stressTestPriceChartTitle,
-              style: FomoShieldTheme.cardTitle(),
+              palette,
+              FomoShieldTheme.cardTitle(),
             ),
           ),
           const SizedBox(height: 10),
@@ -261,10 +267,9 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: Divider(
-              height: 1,
-              color: Colors.black.withValues(alpha: 0.06),
-            ),
+            child: palette.dividerGradient != null
+                ? themedDivider(palette, indent: 0, endIndent: 0)
+                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
           ),
           const SizedBox(height: 12),
 
@@ -272,7 +277,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
           // 2px right), same as PriceChart.
           Padding(
             padding: const EdgeInsets.only(left: 1, right: 2),
-            child: SizedBox(height: 220, child: _buildChartArea()),
+            child: SizedBox(height: 220, child: _buildChartArea(palette)),
           ),
 
           const SizedBox(height: 12),
@@ -281,14 +286,14 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             padding: const EdgeInsets.symmetric(
               horizontal: FomoShieldTheme.cardPadding,
             ),
-            child: _buildPeriodSelector(),
+            child: _buildPeriodSelector(palette),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPeriodSelector() {
+  Widget _buildPeriodSelector(AppPalette palette) {
     final l10n = AppLocalizations.of(context)!;
     final available = _availablePeriods(widget.session);
     if (!available.contains(_selected)) {
@@ -306,16 +311,21 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(vertical: 6),
-              decoration: isSelected
-                  ? darkCardDecoration(borderRadius: BorderRadius.circular(6))
-                  : null,
+              decoration: !isSelected
+                  ? null
+                  : palette.windowGradient != null
+                  ? BoxDecoration(
+                      gradient: palette.windowGradient,
+                      borderRadius: BorderRadius.circular(6),
+                    )
+                  : darkCardDecoration(borderRadius: BorderRadius.circular(6)),
               child: Text(
                 _periodLabel(l10n, period),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected ? Colors.white : Colors.black,
+                  color: isSelected ? Colors.white : palette.textBody,
                 ),
               ),
             ),
@@ -325,14 +335,14 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
     );
   }
 
-  Widget _buildChartArea() {
+  Widget _buildChartArea(AppPalette palette) {
     final l10n = AppLocalizations.of(context)!;
     final points = _getPoints();
     if (points.length < 2) {
       return Center(
         child: Text(
           l10n.stressTestChartNotEnoughData,
-          style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+          style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
         ),
       );
     }
@@ -347,7 +357,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
       return Center(
         child: Text(
           l10n.stressTestChartNotEnoughDataForPeriod,
-          style: GoogleFonts.inter(fontSize: 13, color: ThemeV2.textSecondary),
+          style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
         ),
       );
     }
@@ -513,7 +523,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
             ),
           ),
         ),
@@ -525,7 +535,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
             ),
           ),
         ),

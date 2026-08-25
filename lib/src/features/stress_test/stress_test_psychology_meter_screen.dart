@@ -169,7 +169,7 @@ class _FsScoreGaugeCard extends StatelessWidget {
           themedDivider(palette),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
-            child: FsScoreRing(score: score),
+            child: FsScoreRing(score: score, palette: palette),
           ),
         ],
       ),
@@ -205,7 +205,7 @@ class _PsychologyMeterDetailCard extends StatelessWidget {
           themedDivider(palette),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
-            child: PsychologyAnalyticsSection(data: data),
+            child: PsychologyAnalyticsSection(data: data, palette: palette),
           ),
         ],
       ),

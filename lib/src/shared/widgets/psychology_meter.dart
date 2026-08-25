@@ -10,13 +10,18 @@
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../features/stress_test/stress_test_models.dart';
 import '../../features/stress_test/psychology_engine.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
+import 'card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../utils/currency_format.dart';
 
@@ -193,7 +198,7 @@ MarketSector _symbolToSector(String symbol) {
 /// Psychology Meter card: FS Score ring + 4 sub-index progress bars + analytics.
 /// Tappable during active simulation → opens a Live Audit Bottom Sheet
 /// analysing what the user is doing right, wrong, and active risks.
-class PsychologyMeter extends StatelessWidget {
+class PsychologyMeter extends ConsumerWidget {
   final PsychologyMeterData data;
   final String sessionId;
 
@@ -204,11 +209,13 @@ class PsychologyMeter extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    return CardFrame(
+      showTopBar: false,
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
+      palette: palette,
       child: Column(
         children: [
           InkWell(
@@ -218,9 +225,10 @@ class PsychologyMeter extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
               child: Row(
                 children: [
-                  Text(
+                  themedHeaderText(
                     AppLocalizations.of(context)!.stressTestPsychologyMeterTitle,
-                    style: FomoShieldTheme.cardTitle(),
+                    palette,
+                    FomoShieldTheme.cardTitle(),
                   ),
                   const SizedBox(width: 6),
                   GestureDetector(
@@ -233,34 +241,36 @@ class PsychologyMeter extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       alignment: Alignment.center,
-                      child: const Icon(
+                      child: Icon(
                         Icons.help_outline_rounded,
                         size: 13,
-                        color: ThemeV2.textSecondary,
+                        color: palette.textBody,
                       ),
                     ),
                   ),
                   const Spacer(),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                     size: 20,
                   ),
                 ],
               ),
             ),
           ),
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
+          palette.dividerGradient != null
+              ? themedDivider(palette)
+              : Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: Colors.black.withValues(alpha: 0.06),
+                ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
             child: GestureDetector(
               onTap: () => _showAuditSheet(context, data),
-              child: _PsychologyMeterBody(data: data),
+              child: _PsychologyMeterBody(data: data, palette: palette),
             ),
           ),
         ],
@@ -286,8 +296,13 @@ class PsychologyMeter extends StatelessWidget {
 /// (stress_test_psychology_meter_screen.dart).
 class PsychologyAnalyticsSection extends StatelessWidget {
   final PsychologyMeterData data;
+  final AppPalette palette;
 
-  const PsychologyAnalyticsSection({super.key, required this.data});
+  const PsychologyAnalyticsSection({
+    super.key,
+    required this.data,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -333,17 +348,14 @@ class PsychologyAnalyticsSection extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: FomoShieldTheme.textLight,
-            ),
+            style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
           ),
           Text(
             value,
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: valueColor ?? FomoShieldTheme.text,
+              color: valueColor ?? palette.textHeader,
             ),
           ),
         ],
@@ -355,8 +367,9 @@ class PsychologyAnalyticsSection extends StatelessWidget {
 /// Body of Psychology Meter (separated for CardFrame wrapping).
 class _PsychologyMeterBody extends StatelessWidget {
   final PsychologyMeterData data;
+  final AppPalette palette;
 
-  const _PsychologyMeterBody({required this.data});
+  const _PsychologyMeterBody({required this.data, required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -370,16 +383,18 @@ class _PsychologyMeterBody extends StatelessWidget {
 
     return Column(
       children: [
-        FsScoreRing(score: avgScore),
+        FsScoreRing(score: avgScore, palette: palette),
         const SizedBox(height: 20),
         _SubIndexRow(
           label: l10n.stressTestStrategyScore,
           value: data.strategicScore / 100,
+          palette: palette,
         ),
         _SubIndexRow(
           label: l10n.stressTestPsychologyScore,
           value: data.psychologicalScore / 100,
           isLast: true,
+          palette: palette,
         ),
       ],
     );
@@ -394,8 +409,9 @@ class _PsychologyMeterBody extends StatelessWidget {
 /// bottom gap, occluding whatever part of the needle passes behind it.
 class FsScoreRing extends StatelessWidget {
   final double score; // 0-100
+  final AppPalette palette;
 
-  const FsScoreRing({super.key, required this.score});
+  const FsScoreRing({super.key, required this.score, required this.palette});
 
   Color get _color {
     if (score >= 70) return FomoShieldTheme.positive;
@@ -434,7 +450,9 @@ class FsScoreRing extends StatelessWidget {
                 size: Size(width, height),
                 painter: _SpeedometerPainter(
                   score: score,
-                  needleColor: FomoShieldTheme.text,
+                  needleColor: palette.textHeader,
+                  tickColor: palette.textBody,
+                  holeColor: palette.card,
                   accentColor: _color,
                   center: center,
                   radius: radius,
@@ -449,7 +467,10 @@ class FsScoreRing extends StatelessWidget {
                     width: 110,
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     decoration: BoxDecoration(
-                      color: FomoShieldTheme.card,
+                      gradient: palette.windowGradient,
+                      color: palette.windowGradient == null
+                          ? FomoShieldTheme.card
+                          : null,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: FomoShieldTheme.border.withValues(alpha: 0.6),
@@ -464,7 +485,7 @@ class FsScoreRing extends StatelessWidget {
                           style: interNums(
                             fontSize: 26,
                             fontWeight: FontWeight.w900,
-                            color: FomoShieldTheme.text,
+                            color: palette.textHeader,
                             letterSpacing: -1,
                           ),
                         ),
@@ -474,7 +495,7 @@ class FsScoreRing extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: FomoShieldTheme.textLight,
+                            color: palette.textBody,
                             letterSpacing: 0.4,
                           ),
                         ),
@@ -495,6 +516,8 @@ class FsScoreRing extends StatelessWidget {
 class _SpeedometerPainter extends CustomPainter {
   final double score;
   final Color needleColor;
+  final Color tickColor;
+  final Color holeColor;
   final Color accentColor;
   final Offset center;
   final double radius;
@@ -502,6 +525,8 @@ class _SpeedometerPainter extends CustomPainter {
   _SpeedometerPainter({
     required this.score,
     required this.needleColor,
+    required this.tickColor,
+    required this.holeColor,
     required this.accentColor,
     required this.center,
     required this.radius,
@@ -621,7 +646,7 @@ class _SpeedometerPainter extends CustomPainter {
     canvas.drawPath(needlePath, Paint()..color = needleColor);
     canvas.drawCircle(center, 10, Paint()..color = needleColor);
     canvas.drawCircle(center, 6.5, Paint()..color = accentColor);
-    canvas.drawCircle(center, 3, Paint()..color = FomoShieldTheme.card);
+    canvas.drawCircle(center, 3, Paint()..color = holeColor);
   }
 
   /// Draws one tick line at [t] (0.0-1.0 across the dial). Pass [label] for
@@ -637,9 +662,7 @@ class _SpeedometerPainter extends CustomPainter {
     final p1 = Offset(center.dx + innerR * cosA, center.dy + innerR * sinA);
     final p2 = Offset(center.dx + outerR * cosA, center.dy + outerR * sinA);
     final tickPaint = Paint()
-      ..color = FomoShieldTheme.textLight.withValues(
-        alpha: isMajor ? 0.6 : 0.35,
-      )
+      ..color = tickColor.withValues(alpha: isMajor ? 0.6 : 0.35)
       ..strokeWidth = isMajor ? 2 : 1.5;
     canvas.drawLine(p1, p2, tickPaint);
 
@@ -656,7 +679,7 @@ class _SpeedometerPainter extends CustomPainter {
         style: GoogleFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w600,
-          color: FomoShieldTheme.textLight,
+          color: tickColor,
         ),
       ),
       textDirection: TextDirection.ltr,
@@ -668,6 +691,9 @@ class _SpeedometerPainter extends CustomPainter {
   bool shouldRepaint(_SpeedometerPainter old) =>
       old.score != score ||
       old.accentColor != accentColor ||
+      old.needleColor != needleColor ||
+      old.tickColor != tickColor ||
+      old.holeColor != holeColor ||
       old.center != center ||
       old.radius != radius;
 }
@@ -683,11 +709,13 @@ class _SubIndexRow extends StatelessWidget {
   final String label;
   final double value; // 0.0-1.0
   final bool isLast;
+  final AppPalette palette;
 
   const _SubIndexRow({
     required this.label,
     required this.value,
     this.isLast = false,
+    required this.palette,
   });
 
   static const Color _red = Color(0xFFFF3B30);
@@ -718,7 +746,7 @@ class _SubIndexRow extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: FomoShieldTheme.text,
+                color: palette.textHeader,
               ),
             ),
           ),
@@ -730,7 +758,12 @@ class _SubIndexRow extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: FomoShieldTheme.border.withValues(alpha: 0.4),
+                      // Pale bar track — needs a light color on a dark
+                      // Luxury card, same fix as _GaugePainter.trackColor
+                      // in stress_test_portfolio_health_widget.dart.
+                      color: palette.titleGradient != null
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : FomoShieldTheme.border.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -763,7 +796,7 @@ class _SubIndexRow extends StatelessWidget {
               style: interNums(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: FomoShieldTheme.text,
+                color: palette.textHeader,
               ),
             ),
           ),
