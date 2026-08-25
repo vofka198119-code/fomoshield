@@ -9,8 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/stagger_fade_in.dart';
@@ -26,6 +29,7 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.watch(portfoliosProvider);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     Portfolio? portfolio;
     for (final p in portfolios) {
       if (p.id == portfolioId) {
@@ -40,19 +44,19 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           l10n.tradeHistoryTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -64,15 +68,25 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
         right: false,
         child: portfolio == null
             ? Center(
-                child: Text(l10n.portfolioTradeHistoryScreenPortfolioNotFound),
+                child: Text(
+                  l10n.portfolioTradeHistoryScreenPortfolioNotFound,
+                  style: GoogleFonts.inter(color: palette.textBody),
+                ),
               )
             : portfolio.transactions.isEmpty
-            ? Center(child: Text(l10n.portfolioTradeHistoryScreenNoTradesYet))
+            ? Center(
+                child: Text(
+                  l10n.portfolioTradeHistoryScreenNoTradesYet,
+                  style: GoogleFonts.inter(color: palette.textBody),
+                ),
+              )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
-                child: Container(
+                child: CardFrame(
+                  showTopBar: false,
+                  padding: EdgeInsets.zero,
                   decoration: FomoShieldTheme.cardDecoration,
-                  clipBehavior: Clip.antiAlias,
+                  palette: palette,
                   child: Column(
                     children: [
                       for (int i = 0; i < portfolio.transactions.length; i++)
@@ -101,6 +115,7 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
                                 totalValue: tx.shares * tx.price,
                                 showDivider:
                                     i != portfolio.transactions.length - 1,
+                                palette: palette,
                                 onTap: () => context.push(
                                   '/portfolio/$portfolioId/trade-detail',
                                   extra: tx,

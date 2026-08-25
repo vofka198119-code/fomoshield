@@ -14,6 +14,11 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_divider.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
@@ -40,6 +45,7 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
     final order = tx?.orderId == null
         ? null
         : orders.where((o) => o.orderId == tx!.orderId).firstOrNull;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -47,19 +53,19 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           l10n.tradeDetailTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -70,10 +76,15 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
         left: false,
         right: false,
         child: tx == null
-            ? Center(child: Text(l10n.tradeNotFound))
+            ? Center(
+                child: Text(
+                  l10n.tradeNotFound,
+                  style: GoogleFonts.inter(color: palette.textBody),
+                ),
+              )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
-                child: _TradeDetailCard(tx: tx, order: order),
+                child: _TradeDetailCard(tx: tx, order: order, palette: palette),
               ),
       ),
     );
@@ -83,8 +94,13 @@ class PortfolioTradeDetailScreen extends ConsumerWidget {
 class _TradeDetailCard extends ConsumerWidget {
   final Transaction tx;
   final Order? order;
+  final AppPalette palette;
 
-  const _TradeDetailCard({required this.tx, required this.order});
+  const _TradeDetailCard({
+    required this.tx,
+    required this.order,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -95,10 +111,11 @@ class _TradeDetailCard extends ConsumerWidget {
         ref.watch(resolvedCompanyNameProvider(tx.symbol)).valueOrNull ??
         tx.symbol;
 
-    return Container(
+    return CardFrame(
+      showTopBar: false,
       decoration: FomoShieldTheme.cardDecoration,
-      clipBehavior: Clip.antiAlias,
       padding: const EdgeInsets.all(22),
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -150,14 +167,14 @@ class _TradeDetailCard extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
+                        color: palette.textHeader,
                       ),
                     ),
                     Text(
                       tx.symbol,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: ThemeV2.textSecondary,
+                        color: palette.textBody,
                       ),
                     ),
                   ],
@@ -181,37 +198,44 @@ class _TradeDetailCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 20),
-          Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+          themedDivider(palette, indent: 0, endIndent: 0, height: 1),
           const SizedBox(height: 16),
           _DetailRow(
             label: l10n.tradeOrderTypeLabel,
             value: order?.type.label ?? l10n.tradeMarketType,
+            palette: palette,
           ),
           if (order?.limitPrice != null)
             _DetailRow(
               label: l10n.tradeLimitPriceLabel,
               value: formatUsd(order!.limitPrice!),
+              palette: palette,
             ),
           if (order?.stopPrice != null)
             _DetailRow(
               label: l10n.tradeStopPriceLabel,
               value: formatUsd(order!.stopPrice!),
+              palette: palette,
             ),
           _DetailRow(
             label: isBuy ? l10n.tradeSharesBoughtLabel : l10n.tradeSharesSoldLabel,
             value: tx.shares.toStringAsFixed(4),
+            palette: palette,
           ),
           _DetailRow(
             label: l10n.tradePricePerShareLabel,
             value: formatUsd(tx.price),
+            palette: palette,
           ),
           _DetailRow(
             label: l10n.tradeTotalValueLabel,
             value: formatUsd(tx.shares * tx.price),
+            palette: palette,
           ),
           _DetailRow(
             label: l10n.tradeDateLabel,
             value: _formatDate(context, tx.date),
+            palette: palette,
           ),
           if (tx.realizedPnl != null)
             _DetailRow(
@@ -219,6 +243,7 @@ class _TradeDetailCard extends ConsumerWidget {
               value: formatUsdSigned(tx.realizedPnl!),
               valueColor: tx.realizedPnl! >= 0 ? ThemeV2.success : ThemeV2.loss,
               isLast: true,
+              palette: palette,
             ),
         ],
       ),
@@ -236,10 +261,12 @@ class _DetailRow extends StatelessWidget {
   final String value;
   final Color? valueColor;
   final bool isLast;
+  final AppPalette palette;
 
   const _DetailRow({
     required this.label,
     required this.value,
+    required this.palette,
     this.valueColor,
     this.isLast = false,
   });
@@ -253,19 +280,22 @@ class _DetailRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: ThemeV2.textSecondary,
-            ),
+            style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
           ),
-          Text(
-            value,
-            style: interNums(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: valueColor ?? ThemeV2.textPrimary,
-            ),
-          ),
+          valueColor != null
+              ? Text(
+                  value,
+                  style: interNums(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: valueColor,
+                  ),
+                )
+              : themedPriceText(
+                  value,
+                  palette,
+                  interNums(fontSize: 14, fontWeight: FontWeight.w600),
+                ),
         ],
       ),
     );

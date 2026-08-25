@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../stress_test/widgets/verdict/stress_test_verdict_disclaimer.dart';
 import 'metric_info_data.dart';
@@ -12,33 +15,34 @@ import 'metric_info_data.dart';
 // as Market Clock's period detail screen (label+body sections stacked).
 // ---------------------------------------------------------------------------
 
-class MetricInfoScreen extends StatelessWidget {
+class MetricInfoScreen extends ConsumerWidget {
   final MetricInfoContent content;
 
   const MetricInfoScreen({super.key, required this.content});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
             size: 22,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           content.title.toUpperCase(),
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -58,7 +62,7 @@ class MetricInfoScreen extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                 ),
               ),
               const SizedBox(height: 20),
@@ -69,6 +73,7 @@ class MetricInfoScreen extends StatelessWidget {
                       i == content.sections.length - 1 &&
                       !content.showAcademicDisclaimer &&
                       !content.showStressTestDisclaimer,
+                  palette: palette,
                 ),
               if (content.showAcademicDisclaimer) ...[
                 const SizedBox(height: 18),
@@ -77,7 +82,7 @@ class MetricInfoScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -85,7 +90,7 @@ class MetricInfoScreen extends StatelessWidget {
                   l10n.companyDetailAcademicDisclaimerBody,
                   style: GoogleFonts.inter(
                     fontSize: 10,
-                    color: ThemeV2.textSecondary,
+                    color: palette.textBody,
                   ),
                 ),
               ],
@@ -102,7 +107,12 @@ class MetricInfoScreen extends StatelessWidget {
 class _Section extends StatelessWidget {
   final MetricInfoSection section;
   final bool isLast;
-  const _Section({required this.section, this.isLast = false});
+  final AppPalette palette;
+  const _Section({
+    required this.section,
+    required this.palette,
+    this.isLast = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +127,7 @@ class _Section extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
-                color: ThemeV2.primary,
+                color: palette.accentPrimary,
               ),
             ),
             const SizedBox(height: 6),
@@ -126,7 +136,7 @@ class _Section extends StatelessWidget {
             section.body,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: Colors.black,
+              color: palette.textHeader,
               height: 1.5,
             ),
           ),

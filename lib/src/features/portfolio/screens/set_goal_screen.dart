@@ -16,6 +16,9 @@ import '../../../core/models/app_notification.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/typography_helpers.dart';
+import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/numeric_keypad.dart';
@@ -113,26 +116,24 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final minGoal = _minGoal;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(
+        title: themedHeaderText(
           _isEditing
               ? l10n.setGoalScreenTitleChange
               : l10n.setGoalScreenTitleSet,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
-          ),
+          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -150,7 +151,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: ThemeV2.textPrimary,
+                        color: palette.textHeader,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -158,7 +159,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                       l10n.setGoalScreenSubtitle(formatUsd(minGoal)),
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: ThemeV2.textSecondary,
+                        color: palette.textBody,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -172,9 +173,12 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                           vertical: 14,
                         ),
                         decoration: BoxDecoration(
-                          color: ThemeV2.surface,
+                          gradient: palette.windowGradient,
+                          color: palette.windowGradient == null
+                              ? ThemeV2.surface
+                              : null,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: ThemeV2.divider),
+                          border: Border.all(color: palette.border),
                         ),
                         child: Text(
                           _controller.text.isEmpty
@@ -184,8 +188,8 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
                             color: _controller.text.isEmpty
-                                ? ThemeV2.textSecondary
-                                : ThemeV2.textPrimary,
+                                ? palette.textBody
+                                : palette.textHeader,
                           ),
                         ),
                       ),

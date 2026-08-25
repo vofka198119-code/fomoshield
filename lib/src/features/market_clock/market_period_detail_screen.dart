@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../stress_test/stress_test_hub_screen.dart';
 import 'market_clock_engine.dart';
 
-class MarketPeriodDetailScreen extends StatelessWidget {
+class MarketPeriodDetailScreen extends ConsumerWidget {
   final String windowId;
   const MarketPeriodDetailScreen({super.key, required this.windowId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final window = findWindowById(l10n, windowId);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           window?.shortHeadline.toUpperCase() ??
               l10n.marketPeriodDetailFallbackTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -55,7 +60,7 @@ class MarketPeriodDetailScreen extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: ThemeV2.textPrimary,
+                              color: palette.textHeader,
                             ),
                           ),
                         ),
@@ -67,22 +72,25 @@ class MarketPeriodDetailScreen extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.primary,
+                        color: palette.accentPrimary,
                       ),
                     ),
                     const SizedBox(height: 20),
                     _Section(
                       label: l10n.marketPeriodDetailWhatsHappeningLabel,
                       body: window.whatHappens,
+                      palette: palette,
                     ),
                     _Section(
                       label: l10n.marketPeriodDetailWhyDoesItMatterLabel,
                       body: window.whyItMatters,
+                      palette: palette,
                     ),
                     if (window.dangerForBeginner != null)
                       _Section(
                         label: l10n.marketPeriodDetailWhatCanGoWrongLabel,
                         body: window.dangerForBeginner!,
+                        palette: palette,
                       ),
                     _Section(
                       label: l10n.marketPeriodDetailWhatShouldBeginnersDoLabel,
@@ -90,17 +98,19 @@ class MarketPeriodDetailScreen extends StatelessWidget {
                       isLast:
                           window.stressTestPromoTitle == null &&
                           window.fomoShieldTip == null,
+                      palette: palette,
                     ),
                     if (window.stressTestPromoTitle != null &&
                         window.stressTestPromoBody != null) ...[
                       _StressTestPromo(
                         title: window.stressTestPromoTitle!,
                         body: window.stressTestPromoBody!,
+                        palette: palette,
                       ),
                       const SizedBox(height: 18),
                     ],
                     if (window.fomoShieldTip != null)
-                      _TipCallout(body: window.fomoShieldTip!),
+                      _TipCallout(body: window.fomoShieldTip!, palette: palette),
                   ],
                 ),
               ),
@@ -113,9 +123,11 @@ class _Section extends StatelessWidget {
   final String label;
   final String body;
   final bool isLast;
+  final AppPalette palette;
   const _Section({
     required this.label,
     required this.body,
+    required this.palette,
     this.isLast = false,
   });
 
@@ -131,7 +143,7 @@ class _Section extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: ThemeV2.primary,
+              color: palette.accentPrimary,
               letterSpacing: 1,
             ),
           ),
@@ -140,7 +152,7 @@ class _Section extends StatelessWidget {
             body,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
               height: 1.5,
             ),
           ),
@@ -156,7 +168,12 @@ class _Section extends StatelessWidget {
 class _StressTestPromo extends StatelessWidget {
   final String title;
   final String body;
-  const _StressTestPromo({required this.title, required this.body});
+  final AppPalette palette;
+  const _StressTestPromo({
+    required this.title,
+    required this.body,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -165,9 +182,10 @@ class _StressTestPromo extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ThemeV2.surface,
+        gradient: palette.windowGradient,
+        color: palette.windowGradient == null ? ThemeV2.surface : null,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: ThemeV2.divider),
+        border: Border.all(color: palette.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +200,7 @@ class _StressTestPromo extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                   ),
                 ),
               ),
@@ -193,7 +211,7 @@ class _StressTestPromo extends StatelessWidget {
             body,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
               height: 1.5,
             ),
           ),
@@ -232,7 +250,8 @@ class _StressTestPromo extends StatelessWidget {
 /// rather than another explanatory section.
 class _TipCallout extends StatelessWidget {
   final String body;
-  const _TipCallout({required this.body});
+  final AppPalette palette;
+  const _TipCallout({required this.body, required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -241,9 +260,12 @@ class _TipCallout extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ThemeV2.primary.withValues(alpha: 0.08),
+        gradient: palette.windowGradient,
+        color: palette.windowGradient == null
+            ? palette.accentPrimary.withValues(alpha: 0.08)
+            : null,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.25)),
+        border: Border.all(color: palette.accentPrimary.withValues(alpha: 0.25)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,7 +279,7 @@ class _TipCallout extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
-                  color: ThemeV2.primary,
+                  color: palette.accentPrimary,
                   letterSpacing: 1,
                 ),
               ),
@@ -268,7 +290,7 @@ class _TipCallout extends StatelessWidget {
             body,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
               height: 1.5,
             ),
           ),
