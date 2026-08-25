@@ -13,12 +13,17 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/layout/bottom_clearance.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_border.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/widget_container.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../market_clock/market_clock_dial.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
@@ -91,8 +96,15 @@ class StressTestHubScreen extends ConsumerWidget {
                       endIndent: 16,
                       color: Colors.black.withValues(alpha: 0.06),
                     ),
-                    itemBuilder: (_, i) =>
-                        _buildArchiveTile(sheetContext, archive[i]),
+                    itemBuilder: (_, i) => _buildArchiveTile(
+                      sheetContext,
+                      archive[i],
+                      // Sheet is always light/white, unrelated to the
+                      // Luxury Gold rollout (modals stay out of scope) —
+                      // an explicit Standard palette keeps this look
+                      // exactly as before regardless of the active theme.
+                      AppPalette.standard,
+                    ),
                   ),
                 ),
               ],
@@ -111,18 +123,19 @@ class StressTestHubScreen extends ConsumerWidget {
         .toList();
     final archive = ref.watch(verdictArchiveProvider);
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: Text(
+        title: themedHeaderText(
           l10n.stressTestHubTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1.5,
           ),
         ),
@@ -134,7 +147,7 @@ class StressTestHubScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── New Stress Test Button ──────────────────────────────
-            _buildNewTestCard(context, ref),
+            _buildNewTestCard(context, ref, palette),
             const SizedBox(height: 12),
 
             // ── Active Sessions ─────────────────────────────────────
@@ -142,12 +155,18 @@ class StressTestHubScreen extends ConsumerWidget {
               WidgetContainer(
                 title: l10n.stressTestActiveTestsTitle,
                 showFooter: false,
+                palette: palette,
                 children: activeSessions
                     .asMap()
                     .entries
                     .map(
-                      (e) =>
-                          _buildActiveSessionTile(context, ref, e.value, e.key),
+                      (e) => _buildActiveSessionTile(
+                        context,
+                        ref,
+                        e.value,
+                        e.key,
+                        palette,
+                      ),
                     )
                     .toList(),
               ),
@@ -161,10 +180,14 @@ class StressTestHubScreen extends ConsumerWidget {
                   ? () => _showAllArchiveSheet(context, archive)
                   : null,
               showFooter: archive.length > _archivePreviewLimit,
+              palette: palette,
               children: archive.isNotEmpty
                   ? archive
                         .take(_archivePreviewLimit)
-                        .map((entry) => _buildArchiveTile(context, entry))
+                        .map(
+                          (entry) =>
+                              _buildArchiveTile(context, entry, palette),
+                        )
                         .toList()
                   : [
                       Padding(
@@ -177,7 +200,7 @@ class StressTestHubScreen extends ConsumerWidget {
                             l10n.stressTestNoCompletedTestsYet,
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: ThemeV2.textSecondary,
+                              color: palette.textBody,
                             ),
                           ),
                         ),
@@ -186,15 +209,17 @@ class StressTestHubScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // Empty state
+            // Empty state — plain text directly on the (now theme-aware)
+            // screen background, no card underneath it — must resolve its
+            // own color rather than a hardcoded Standard one.
             if (sessions.isEmpty) ...[
               const SizedBox(height: 40),
               Center(
                 child: Column(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.psychology_rounded,
-                      color: ThemeV2.textSecondary,
+                      color: palette.textBody,
                       size: 48,
                     ),
                     const SizedBox(height: 12),
@@ -203,7 +228,7 @@ class StressTestHubScreen extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.textSecondary,
+                        color: palette.textHeader,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -211,7 +236,7 @@ class StressTestHubScreen extends ConsumerWidget {
                       l10n.stressTestNoTestsHint,
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: ThemeV2.textSecondary,
+                        color: palette.textBody,
                       ),
                     ),
                   ],
@@ -228,7 +253,11 @@ class StressTestHubScreen extends ConsumerWidget {
 
   // ── New Test Card ────────────────────────────────────────────────
 
-  Widget _buildNewTestCard(BuildContext context, WidgetRef ref) {
+  Widget _buildNewTestCard(
+    BuildContext context,
+    WidgetRef ref,
+    AppPalette palette,
+  ) {
     final sessions = ref.read(stressTestProvider);
     final activeCount = sessions
         .where((s) => s.status == StressTestStatus.active)
@@ -241,18 +270,21 @@ class StressTestHubScreen extends ConsumerWidget {
     return InkWell(
       onTap: () => _startNewTest(context, ref),
       borderRadius: BorderRadius.circular(16),
-      child: Container(
+      child: CardFrame(
+        showTopBar: false,
         padding: const EdgeInsets.all(20),
-        decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16))
-            .copyWith(
-              boxShadow: [
-                BoxShadow(
-                  color: dialDark.withValues(alpha: 0.35),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+        decoration:
+            darkCardDecoration(borderRadius: BorderRadius.circular(16))
+                .copyWith(
+                  boxShadow: [
+                    BoxShadow(
+                      color: dialDark.withValues(alpha: 0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+        palette: palette,
         child: Row(
           children: [
             Container(
@@ -434,6 +466,7 @@ class StressTestHubScreen extends ConsumerWidget {
     WidgetRef ref,
     StressTestSession session,
     int index,
+    AppPalette palette,
   ) {
     final tierBadge = _tierBadge(ref, context, index);
     // Unrealized, not total-since-start — totalValue right above it
@@ -452,16 +485,25 @@ class StressTestHubScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: darkCardDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                Icons.play_circle_rounded,
-                color: _playIconColor(ref, index),
-                size: 22,
+            themedBorder(
+              palette: palette,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: palette.windowGradient != null
+                    ? BoxDecoration(
+                        gradient: palette.windowGradient,
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                    : darkCardDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                child: Icon(
+                  Icons.play_circle_rounded,
+                  color: _playIconColor(ref, index),
+                  size: 22,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -476,7 +518,7 @@ class StressTestHubScreen extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
+                        color: palette.textHeader,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -491,13 +533,10 @@ class StressTestHubScreen extends ConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
+                themedPriceText(
                   formatUsd(session.totalValue),
-                  style: interNums(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: ThemeV2.textPrimary,
-                  ),
+                  palette,
+                  interNums(fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -518,7 +557,11 @@ class StressTestHubScreen extends ConsumerWidget {
 
   // ── Archive Tile (Verdict Archive — WidgetContainer style) ──────
 
-  Widget _buildArchiveTile(BuildContext context, VerdictArchiveEntry entry) {
+  Widget _buildArchiveTile(
+    BuildContext context,
+    VerdictArchiveEntry entry,
+    AppPalette palette,
+  ) {
     final pnlColor = entry.pnlPercent >= 0 ? ThemeV2.success : ThemeV2.loss;
     final l10n = AppLocalizations.of(context)!;
 
@@ -554,7 +597,7 @@ class StressTestHubScreen extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -564,10 +607,7 @@ class StressTestHubScreen extends ConsumerWidget {
                       entry.holdingCount,
                       entry.totalTrades,
                     ),
-                    style: interNums(
-                      fontSize: 11,
-                      color: ThemeV2.textSecondary,
-                    ),
+                    style: interNums(fontSize: 11, color: palette.textBody),
                   ),
                 ],
               ),

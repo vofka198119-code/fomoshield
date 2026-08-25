@@ -14,9 +14,14 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
+import '../../core/theme/app_palette.dart';
+import '../../core/theme/theme_variant_provider.dart';
+import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_divider.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/company_logo.dart';
+import '../../shared/widgets/card_frame.dart';
 import '../market_clock/market_clock_dial.dart'
     show dialBrassLight, darkCardDecoration;
 import '../../shared/widgets/stagger_fade_in.dart';
@@ -38,6 +43,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
       (e) => e?.sessionId == sessionId,
       orElse: () => null,
     );
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -45,19 +51,19 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: ThemeV2.textPrimary,
+            color: palette.accentPrimary,
             size: 22,
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
+        title: themedHeaderText(
           l10n.verdictTradeBreakdownTitle,
-          style: GoogleFonts.inter(
+          palette,
+          GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            color: ThemeV2.primary,
             letterSpacing: 1,
           ),
         ),
@@ -68,7 +74,12 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
         left: false,
         right: false,
         child: entry == null
-            ? Center(child: Text(l10n.verdictSessionNotFound))
+            ? Center(
+                child: Text(
+                  l10n.verdictSessionNotFound,
+                  style: GoogleFonts.inter(color: palette.textBody),
+                ),
+              )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -78,10 +89,12 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       child: StaggerFadeIn(
                         index: 0,
                         child: _DarkCard(
+                          palette: palette,
                           child: _Row(
                             label: l10n.verdictTestDurationLabel,
                             value: _durationDays(l10n, entry.durationLabel),
                             isLast: true,
+                            palette: palette,
                           ),
                         ),
                       ),
@@ -93,22 +106,26 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                         index: 1,
                         child: _DarkCard(
                           title: l10n.verdictStatisticsTitle,
+                          palette: palette,
                           child: Column(
                             children: [
                               _Row(
                                 label: l10n.verdictTotalTradesLabel,
                                 value: '${entry.totalTrades}',
+                                palette: palette,
                               ),
                               _Row(
                                 label: l10n.verdictBoughtLabel,
                                 value:
                                     '${entry.trades.where((t) => t.isBuy).length}',
+                                palette: palette,
                               ),
                               _Row(
                                 label: l10n.verdictSoldLabel,
                                 value:
                                     '${entry.trades.where((t) => !t.isBuy).length}',
                                 isLast: true,
+                                palette: palette,
                               ),
                             ],
                           ),
@@ -122,16 +139,19 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                         index: 2,
                         child: _DarkCard(
                           title: l10n.verdictTotalAssetsTitle,
+                          palette: palette,
                           child: Column(
                             children: [
                               _Row(
                                 label: l10n.verdictAssetsHeldTotalLabel,
                                 value: '${_totalAssetsEverHeld(entry)}',
+                                palette: palette,
                               ),
                               _Row(
                                 label: l10n.verdictAssetsAtEndLabel,
                                 value: '${entry.holdingCount}',
                                 isLast: true,
+                                palette: palette,
                               ),
                             ],
                           ),
@@ -143,7 +163,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       key: const ValueKey('financialSummary'),
                       child: StaggerFadeIn(
                         index: 3,
-                        child: _financialSummaryCard(l10n, entry),
+                        child: _financialSummaryCard(l10n, entry, palette),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -151,7 +171,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       key: const ValueKey('scenarios'),
                       child: StaggerFadeIn(
                         index: 4,
-                        child: _scenariosCard(l10n, entry),
+                        child: _scenariosCard(l10n, entry, palette),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -159,7 +179,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       key: const ValueKey('companies'),
                       child: StaggerFadeIn(
                         index: 5,
-                        child: _CompaniesCard(entry: entry),
+                        child: _CompaniesCard(entry: entry, palette: palette),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -167,14 +187,17 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       key: const ValueKey('tradeHistory'),
                       child: StaggerFadeIn(
                         index: 6,
-                        child: _TradeHistoryCard(entry: entry),
+                        child: _TradeHistoryCard(
+                          entry: entry,
+                          palette: palette,
+                        ),
                       ),
                     ),
                     KeyedSubtree(
                       key: const ValueKey('breakdownDisclaimer'),
                       child: StaggerFadeIn(
                         index: 7,
-                        child: const _TradeBreakdownDisclaimer(),
+                        child: _TradeBreakdownDisclaimer(palette: palette),
                       ),
                     ),
                   ],
@@ -220,10 +243,15 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
     MarketScenario.crash => l10n.verdictScenarioCrash,
   };
 
-  Widget _scenariosCard(AppLocalizations l10n, VerdictArchiveEntry entry) {
+  Widget _scenariosCard(
+    AppLocalizations l10n,
+    VerdictArchiveEntry entry,
+    AppPalette palette,
+  ) {
     final scenarios = MarketScenario.values;
     return _DarkCard(
       title: l10n.verdictScenariosTitle,
+      palette: palette,
       child: Column(
         children: [
           for (int i = 0; i < scenarios.length; i++)
@@ -231,13 +259,18 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
               label: _scenarioLabel(l10n, scenarios[i]),
               value: '${entry.scenarioCounts[scenarios[i].name] ?? 0}',
               isLast: i == scenarios.length - 1,
+              palette: palette,
             ),
         ],
       ),
     );
   }
 
-  Widget _financialSummaryCard(AppLocalizations l10n, VerdictArchiveEntry entry) {
+  Widget _financialSummaryCard(
+    AppLocalizations l10n,
+    VerdictArchiveEntry entry,
+    AppPalette palette,
+  ) {
     final sells = entry.trades.where((t) => !t.isBuy).toList();
     final profitSells = sells.where((t) => (t.realizedPnl ?? 0) > 0).toList();
     final lossSells = sells.where((t) => (t.realizedPnl ?? 0) < 0).toList();
@@ -253,28 +286,34 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
 
     return _DarkCard(
       title: l10n.verdictFinancialSummaryTitle,
+      palette: palette,
       child: Column(
         children: [
           _Row(
             label: l10n.verdictStartingAmountLabel,
             value: formatUsd(entry.startingCash),
+            palette: palette,
           ),
           _Row(
             label: l10n.verdictTotalPnlLabel,
             value: formatUsdSigned(totalPnl),
+            palette: palette,
           ),
           _Row(
             label: l10n.verdictProfitableSellsLabel(profitSells.length),
             value: formatUsdSigned(totalProfit),
+            palette: palette,
           ),
           _Row(
             label: l10n.verdictLosingSellsLabel(lossSells.length),
             value: formatUsdSigned(totalLoss),
+            palette: palette,
           ),
           _Row(
             label: l10n.verdictFinalBalanceLabel,
             value: formatUsd(entry.finalValue),
             isLast: true,
+            palette: palette,
           ),
         ],
       ),
@@ -290,8 +329,9 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
 /// More(N)/Less toggle, same shape as [market_timeline.dart]'s expand button.
 class _CompaniesCard extends StatefulWidget {
   final VerdictArchiveEntry entry;
+  final AppPalette palette;
 
-  const _CompaniesCard({required this.entry});
+  const _CompaniesCard({required this.entry, required this.palette});
 
   @override
   State<_CompaniesCard> createState() => _CompaniesCardState();
@@ -326,6 +366,7 @@ class _CompaniesCardState extends State<_CompaniesCard> {
 
     return _DarkCard(
       title: l10n.verdictCompaniesTitle,
+      palette: widget.palette,
       child: Column(
         children: [
           if (symbols.isEmpty)
@@ -345,6 +386,7 @@ class _CompaniesCardState extends State<_CompaniesCard> {
                 symbol: visible[i],
                 pnl: pnlBySymbol[visible[i]] ?? 0,
                 isLast: i == visible.length - 1,
+                palette: widget.palette,
               ),
           if (symbols.length > _collapsedCount)
             _MoreLessButton(
@@ -365,8 +407,9 @@ class _CompaniesCardState extends State<_CompaniesCard> {
 /// already the "full detail" destination — there's nowhere further to push).
 class _TradeHistoryCard extends StatefulWidget {
   final VerdictArchiveEntry entry;
+  final AppPalette palette;
 
-  const _TradeHistoryCard({required this.entry});
+  const _TradeHistoryCard({required this.entry, required this.palette});
 
   @override
   State<_TradeHistoryCard> createState() => _TradeHistoryCardState();
@@ -384,6 +427,7 @@ class _TradeHistoryCardState extends State<_TradeHistoryCard> {
 
     return _DarkCard(
       title: l10n.tradeHistoryTitle,
+      palette: widget.palette,
       child: Column(
         children: [
           if (sorted.isEmpty)
@@ -399,7 +443,11 @@ class _TradeHistoryCardState extends State<_TradeHistoryCard> {
             )
           else
             for (int i = 0; i < visible.length; i++)
-              _TradeRow(trade: visible[i], isLast: i == visible.length - 1),
+              _TradeRow(
+                trade: visible[i],
+                isLast: i == visible.length - 1,
+                palette: widget.palette,
+              ),
           if (sorted.length > _collapsedCount)
             _MoreLessButton(
               expanded: _showAll,
@@ -459,22 +507,32 @@ class _MoreLessButton extends StatelessWidget {
 class _DarkCard extends StatelessWidget {
   final String? title;
   final Widget child;
+  final AppPalette palette;
 
-  const _DarkCard({this.title, required this.child});
+  const _DarkCard({this.title, required this.child, required this.palette});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
+    return CardFrame(
+      showTopBar: false,
       decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+      palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (title != null) ...[
-            Text(title!, style: FomoShieldTheme.cardTitle(Colors.white)),
+            themedGoldGradient(
+              Text(title!, style: FomoShieldTheme.cardTitle(Colors.white)),
+              palette,
+            ),
             const SizedBox(height: 12),
-            Divider(height: 1, color: Colors.white.withValues(alpha: 0.12)),
+            palette.dividerGradient != null
+                ? themedDivider(palette, indent: 0, endIndent: 0)
+                : Divider(
+                    height: 1,
+                    color: Colors.white.withValues(alpha: 0.12),
+                  ),
             const SizedBox(height: 4),
           ],
           child,
@@ -488,8 +546,14 @@ class _Row extends StatelessWidget {
   final String label;
   final String value;
   final bool isLast;
+  final AppPalette palette;
 
-  const _Row({required this.label, required this.value, this.isLast = false});
+  const _Row({
+    required this.label,
+    required this.value,
+    this.isLast = false,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -516,13 +580,11 @@ class _Row extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text(
+          themedPriceText(
             value,
-            style: interNums(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: dialBrassLight,
-            ),
+            palette,
+            interNums(fontSize: 15, fontWeight: FontWeight.w700),
+            fallbackColor: dialBrassLight,
           ),
         ],
       ),
@@ -534,11 +596,13 @@ class _CompanyRow extends ConsumerWidget {
   final String symbol;
   final double pnl;
   final bool isLast;
+  final AppPalette palette;
 
   const _CompanyRow({
     required this.symbol,
     required this.pnl,
     this.isLast = false,
+    required this.palette,
   });
 
   @override
@@ -622,8 +686,13 @@ class _CompanyRow extends ConsumerWidget {
 class _TradeRow extends ConsumerWidget {
   final StressTestTrade trade;
   final bool isLast;
+  final AppPalette palette;
 
-  const _TradeRow({required this.trade, this.isLast = false});
+  const _TradeRow({
+    required this.trade,
+    this.isLast = false,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -693,13 +762,11 @@ class _TradeRow extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
+              themedPriceText(
                 formatUsd(totalValue),
-                style: interNums(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: dialBrassLight,
-                ),
+                palette,
+                interNums(fontSize: 14, fontWeight: FontWeight.w700),
+                fallbackColor: dialBrassLight,
               ),
               const SizedBox(height: 3),
               Container(
@@ -726,11 +793,19 @@ class _TradeRow extends ConsumerWidget {
 }
 
 class _TradeBreakdownDisclaimer extends StatelessWidget {
-  const _TradeBreakdownDisclaimer();
+  final AppPalette palette;
+
+  const _TradeBreakdownDisclaimer({required this.palette});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Sits directly on the screen background (no card behind it) — unlike
+    // every other element on this screen, it can't assume a dark backdrop.
+    // Pre-existing bug independent of the Luxury rollout: this was
+    // hardcoded white, nearly invisible on the light Standard background;
+    // fixed here alongside the theming pass since it's the same "plain
+    // text on background" gap (pitfall #3).
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
@@ -741,7 +816,7 @@ class _TradeBreakdownDisclaimer extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: palette.textHeader,
             ),
           ),
           const SizedBox(height: 6),
@@ -750,7 +825,7 @@ class _TradeBreakdownDisclaimer extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 9,
-              color: Colors.white.withValues(alpha: 0.6),
+              color: palette.textBody,
               height: 1.5,
             ),
           ),
