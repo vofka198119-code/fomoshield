@@ -17,13 +17,22 @@ import '../../../shared/widgets/company_logo.dart';
 // scrolling horizontally.
 //
 // Logo/sector resolution: if the caller already has a URL, pass it in
-// directly. Otherwise this reads quickLogoProvider/quickGicsSectorProvider
-// — cache-only (LogoDao), never fetching — falling back to a letter avatar
-// / resolveGicsSector's static table on a miss rather than firing a live
-// Finnhub call. Up to ~10 lanes x 6 preview cards render the instant Search
-// opens; using the live-fetching cachedLogoProvider/cachedGicsSectorProvider
-// here (confirmed bug, fixed 2026-08-22) meant a cold device could fire ~60
-// simultaneous profile fetches with zero taps into any company card.
+// directly. Otherwise this reads cachedLogoProvider/cachedGicsSectorProvider
+// — cache-first, live Finnhub fetch on a miss — falling back to a letter
+// avatar / resolveGicsSector's static table only while that fetch is in
+// flight or genuinely fails. This data is shared across every user (same
+// ticker, same logo/sector for everyone), so a fetch here warms the
+// backend's persistent profile cache once and every other device benefits
+// from it forever — cost scales with the S&P 500 catalog, not with user
+// count (see feedback_finnhub_cost_at_scale memory's shared-list exception).
+// Switched back from the cache-only quickLogoProvider/quickGicsSectorProvider
+// 2026-08-26: that avoided a genuine ~60-simultaneous-fetch burst on 2026-08-22,
+// but left rows stuck showing CompanyLogo's generic ticker-CDN fallback (often
+// a stale/wrong logo) until the user opened that exact company's card. The
+// burst risk it was guarding against is now covered at the network layer —
+// finnhub_service.dart's _ConcurrencyLimiter (max 4 in flight) + in-flight
+// dedup, plus the backend's persistent profileCache (survives restarts) — so
+// there's no need to also block it here.
 //
 // No price here, by design — a lane full of these rows must never trigger
 // a live quote per row (that's what blew through Finnhub's rate limit).
@@ -83,7 +92,7 @@ class CompanyMiniCard extends StatelessWidget {
                       : Consumer(
                           builder: (context, ref, _) {
                             final resolved = ref
-                                .watch(quickLogoProvider(symbol))
+                                .watch(cachedLogoProvider(symbol))
                                 .valueOrNull;
                             return CompanyLogo(
                               ticker: symbol,
@@ -113,7 +122,7 @@ class CompanyMiniCard extends StatelessWidget {
                       Consumer(
                         builder: (context, ref, _) {
                           final cachedSector = ref
-                              .watch(quickGicsSectorProvider(symbol))
+                              .watch(cachedGicsSectorProvider(symbol))
                               .valueOrNull;
                           final sector =
                               cachedSector ??

@@ -22,13 +22,17 @@ import '../top_companies_provider.dart';
 // network concurrency limiter alone). A pushed route replaces the screen
 // instead, same pattern as WatchlistFullScreen's own "see all".
 //
-// Same no-Finnhub-per-row rule as everywhere else on this screen: rows read
-// name from the entry the caller already has (top_companies_provider.dart's
-// backend-ranked list) and logo/sector from the permanent local cache only
-// (quickLogoProvider/quickGicsSectorProvider — cache-only, never fetching;
-// switched from the live-fetching cachedLogoProvider/cachedGicsSectorProvider
-// 2026-08-22, a confirmed bug that contradicted this very comment) — price
-// only shows once the user taps through to Company Detail.
+// Rows read name from the entry the caller already has
+// (top_companies_provider.dart's backend-ranked list) and logo/sector from
+// cachedLogoProvider/cachedGicsSectorProvider — cache-first, live Finnhub
+// fetch on a miss. This list is lazy (ListView.separated builds only
+// visible rows), and the fetch itself is shared/cacheable data (same
+// ticker → same logo/sector for every user, persisted server-side across
+// restarts) rather than per-user cost — see company_mini_card.dart's doc
+// comment for the full reasoning behind reverting off the cache-only
+// quickLogoProvider/quickGicsSectorProvider 2026-08-26. Price still only
+// shows once the user taps through to Company Detail — that's the one
+// per-row cost this screen must never pay.
 // ---------------------------------------------------------------------------
 
 class CompanyListScreen extends ConsumerWidget {
@@ -135,14 +139,14 @@ class _CompanyRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logoUrl = ref.watch(quickLogoProvider(entry.symbol)).valueOrNull;
+    final logoUrl = ref.watch(cachedLogoProvider(entry.symbol)).valueOrNull;
 
     final String subtitle;
     if (suppressSector) {
       subtitle = entry.symbol;
     } else {
       final cachedSector = ref
-          .watch(quickGicsSectorProvider(entry.symbol))
+          .watch(cachedGicsSectorProvider(entry.symbol))
           .valueOrNull;
       final sector =
           cachedSector ??

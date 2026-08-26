@@ -147,9 +147,25 @@ final stressTestStartingCashProvider = Provider<double>((ref) {
 /// base slot) is always tradeable; slots 1+ ("#2"/"#3") only exist for
 /// premium/admin and freeze the instant the tier drops back to free — see
 /// [isStressTestSlotFrozen].
+///
+/// Untouched setup-phase sessions (no holdings bought yet) that AREN'T the
+/// one being asked about are excluded from the count. Abandoning the setup
+/// screen doesn't delete the empty session it created (dispose() has no
+/// cleanup), and creating a new test only gates on the ACTIVE-session count
+/// (see stress_test_hub_screen._startNewTest) — so a free user who backs
+/// out of setup a couple of times before finishing it ends up with several
+/// never-used sessions stacked ahead of their real one, permanently
+/// bumping it to slot 1+ and freezing their very first purchase. Real
+/// slots (active/completed/terminated, or setup with holdings already
+/// bought) still count normally, so a genuinely lapsed #2/#3 stays frozen.
 int stressTestSlotIndex(List<StressTestSession> allSessions, String sessionId) {
-  final ordered = [...allSessions]
-    ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  final counted = allSessions.where(
+    (s) =>
+        s.id == sessionId ||
+        s.status != StressTestStatus.setup ||
+        s.holdings.isNotEmpty,
+  );
+  final ordered = [...counted]..sort((a, b) => a.createdAt.compareTo(b.createdAt));
   return ordered.indexWhere((s) => s.id == sessionId);
 }
 
