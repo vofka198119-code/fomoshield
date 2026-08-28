@@ -1535,35 +1535,6 @@ final verdictArchiveProvider = Provider<List<VerdictArchiveEntry>>((ref) {
   return notifier.verdictArchive;
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Reactive Analytics Engine (Task 2.7)
-// ═══════════════════════════════════════════════════════════════════════════
-// CRITICAL — Design Principle:
-//   Uses ref.watch to react to portfolio changes AUTOMATICALLY.
-//   NEVER mutates a StateProvider/StateNotifier during build().
-//   The analytics are computed as a pure derivation of session state,
-//   marked dirty by Riverpod's dependency tracking whenever the
-//   underlying stressTestProvider changes.
-//
-//   This eliminates the root cause of:
-//     "Tried to modify a provider while the widget tree was building."
-// ═══════════════════════════════════════════════════════════════════════════
-
-/// Reactive analytics for a stress test session by ID (family).
-///
-/// Recomputed automatically whenever:
-///   - The engine updates prices/balance (via [stressTestRefreshProvider])
-///   - A trade is executed
-///
-/// Returns [StressTestAnalytics.empty] when no session is active,
-/// ensuring the UI always has a safe, non-null value to render.
-final stressTestAnalyticsProvider =
-    Provider.family<StressTestAnalytics, String>((ref, sessionId) {
-      final session = ref.watch(stressTestSessionProvider(sessionId));
-      if (session == null) return StressTestAnalytics.empty;
-      return StressTestAnalytics.fromSession(session);
-    });
-
 // ---------------------------------------------------------------------------
 // Chart Data Point
 // ---------------------------------------------------------------------------
