@@ -168,9 +168,12 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// Watchlist Row — logo, name + sector, no live price (see cachedLogoEntryProvider
-// doc comment: no Finnhub call ever happens from this row, by design — price
-// only shows once the user taps through to Company Detail).
+// Watchlist Row — logo, name + sector, no live price (price only shows once
+// the user taps through to Company Detail). Logo/name now live-fetch (see
+// watchlist_widget.dart's _WatchlistTile doc comment) — a per-user
+// watchlist is a bounded list, same reasoning already applied to Portfolio
+// Holdings, and this is the "load the rest" second stage after the Home
+// widget's own 2-item preview.
 // ---------------------------------------------------------------------------
 
 class _WatchlistRow extends ConsumerWidget {
@@ -188,14 +191,10 @@ class _WatchlistRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final logoEntry = ref.watch(cachedLogoEntryProvider(symbol)).valueOrNull;
-    final name = logoEntry?.companyName.isNotEmpty == true
-        ? logoEntry!.companyName
-        : symbol;
-    final sector = resolveGicsSector(
-      symbol,
-      companyName: logoEntry?.companyName,
-    );
+    final logoUrl = ref.watch(cachedLogoProvider(symbol)).valueOrNull;
+    final resolvedName = ref.watch(resolvedCompanyNameProvider(symbol));
+    final name = resolvedName.valueOrNull ?? symbol;
+    final sector = resolveGicsSector(symbol, companyName: name);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -225,9 +224,8 @@ class _WatchlistRow extends ConsumerWidget {
                   ),
                   child: CompanyLogo(
                     ticker: symbol,
-                    logoUrl: logoEntry?.logoUrl,
+                    logoUrl: logoUrl,
                     radius: 18,
-                    resolveIfMissing: false,
                   ),
                 ),
                 const SizedBox(width: 12),

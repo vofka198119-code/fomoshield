@@ -27,8 +27,7 @@ class WatchlistWidget extends ConsumerWidget {
       return _emptyContainer(context, palette);
     }
 
-    // Show only first 2 — no live fetch involved, so no loading/error state
-    // to branch on (see cachedLogoEntryProvider doc comment).
+    // Show only first 2 — small enough to live-fetch (see _WatchlistTile).
     final preview = watchlistSymbols.take(2).toList();
 
     return WidgetContainer(
@@ -54,9 +53,13 @@ class WatchlistWidget extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Watchlist Tile — Compact version (no accordion), no live price (see
-// cachedLogoEntryProvider doc comment: no Finnhub call ever from this tile,
-// by design).
+// Watchlist Tile — Compact version (no accordion), no live price. Only ever
+// renders the first 2 symbols (see WatchlistWidget.build's .take(2)) — a
+// small, bounded, always-visible set, same reasoning that already applies
+// to Portfolio Holdings (see feedback_finnhub_cost_at_scale memory): live
+// icon/name lookups here don't scale with the catalog, just this one
+// user's own list, and /api/v1/icons is cheap and fast (server-side
+// cached, never blocks on a live Finnhub call).
 // ---------------------------------------------------------------------------
 
 class _WatchlistTile extends ConsumerWidget {
@@ -66,14 +69,10 @@ class _WatchlistTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logoEntry = ref.watch(cachedLogoEntryProvider(symbol)).valueOrNull;
-    final name = logoEntry?.companyName.isNotEmpty == true
-        ? logoEntry!.companyName
-        : symbol;
-    final sector = resolveGicsSector(
-      symbol,
-      companyName: logoEntry?.companyName,
-    );
+    final logoUrl = ref.watch(cachedLogoProvider(symbol)).valueOrNull;
+    final resolvedName = ref.watch(resolvedCompanyNameProvider(symbol));
+    final name = resolvedName.valueOrNull ?? symbol;
+    final sector = resolveGicsSector(symbol, companyName: name);
 
     return InkWell(
       onTap: () => context.push('/company/$symbol'),
@@ -88,11 +87,7 @@ class _WatchlistTile extends ConsumerWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: palette.accentPrimary, width: 1.5),
               ),
-              child: CompanyLogo(
-                ticker: symbol,
-                logoUrl: logoEntry?.logoUrl,
-                resolveIfMissing: false,
-              ),
+              child: CompanyLogo(ticker: symbol, logoUrl: logoUrl),
             ),
             const SizedBox(width: 12),
             // Name + Sector
