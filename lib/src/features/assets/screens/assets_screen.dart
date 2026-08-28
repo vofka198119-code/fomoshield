@@ -97,10 +97,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
               letterSpacing: 1.5,
             ),
           ),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
-            onPressed: () => context.pop(),
-          ),
+          leading: themedBackButton(context, palette),
         ),
         body: Center(
           child: Text(
@@ -131,10 +128,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
             letterSpacing: 1.5,
           ),
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
-          onPressed: () => context.pop(),
-        ),
+        leading: themedBackButton(context, palette),
       ),
       body: SafeArea(
         bottom: true,

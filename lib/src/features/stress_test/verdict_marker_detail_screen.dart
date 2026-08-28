@@ -8,7 +8,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
@@ -160,14 +159,7 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: palette.accentPrimary,
-            size: 22,
-          ),
-          onPressed: () => context.pop(),
-        ),
+        leading: themedBackButton(context, palette, size: 22),
         title: themedHeaderText(
           markerLabel.toUpperCase(),
           palette,

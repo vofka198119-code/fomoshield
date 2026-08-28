@@ -7,18 +7,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../stress_test_portfolio_balance_widget_order_provider.dart';
 
 class StressTestPortfolioBalanceWidgetSettingsSheet extends StatefulWidget {
   final List<PortfolioBalanceWidgetConfig> initialConfigs;
   final PortfolioBalanceWidgetsNotifier notifier;
+  final AppPalette palette;
 
   const StressTestPortfolioBalanceWidgetSettingsSheet({
     super.key,
     required this.initialConfigs,
     required this.notifier,
+    required this.palette,
   });
 
   @override
@@ -69,6 +71,8 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
+    final isLuxury = palette.windowGradient != null;
     return Padding(
       padding: EdgeInsets.only(
         bottom:
@@ -86,7 +90,9 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.15),
+                  color: isLuxury
+                      ? Colors.white.withValues(alpha: 0.24)
+                      : Colors.black.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -102,7 +108,7 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   TextButton(
@@ -124,14 +130,19 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.primary,
+                        color: palette.accentPrimary,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE8E5DF)),
+            Divider(
+              height: 1,
+              color: isLuxury
+                  ? palette.border.withValues(alpha: 0.3)
+                  : const Color(0xFFE8E5DF),
+            ),
             const SizedBox(height: 8),
             // ── Reorderable list ──
             Expanded(
@@ -154,8 +165,8 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                 itemBuilder: (context, index) {
                   final config = _configs[index];
                   final isPinned = config.id == _pinnedFirstId;
-                  return ListTile(
-                    key: ValueKey(config.id),
+                  final tile = ListTile(
+                    key: isLuxury ? null : ValueKey(config.id),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 2,
@@ -164,23 +175,23 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         isPinned
-                            ? const Icon(
+                            ? Icon(
                                 Icons.push_pin_rounded,
-                                color: ThemeV2.textSecondary,
+                                color: palette.textBody,
                                 size: 20,
                               )
                             : ReorderableDragStartListener(
                                 index: index,
-                                child: const Icon(
+                                child: Icon(
                                   Icons.drag_handle_rounded,
-                                  color: ThemeV2.textSecondary,
+                                  color: palette.textBody,
                                   size: 24,
                                 ),
                               ),
                         const SizedBox(width: 8),
                         Icon(
                           _widgetIcon(config.id),
-                          color: ThemeV2.textSecondary,
+                          color: palette.textBody,
                           size: 22,
                         ),
                       ],
@@ -190,13 +201,13 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
+                        color: palette.textHeader,
                       ),
                     ),
                     trailing: isPinned
                         ? Icon(
                             Icons.visibility_rounded,
-                            color: ThemeV2.textSecondary.withValues(alpha: 0.4),
+                            color: palette.textBody.withValues(alpha: 0.4),
                             size: 22,
                           )
                         : GestureDetector(
@@ -206,11 +217,30 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                                   ? Icons.visibility_rounded
                                   : Icons.visibility_off_rounded,
                               color: config.visible
-                                  ? ThemeV2.primary
-                                  : ThemeV2.textSecondary,
+                                  ? palette.accentPrimary
+                                  : palette.textBody,
                               size: 22,
                             ),
                           ),
+                  );
+                  if (!isLuxury) return tile;
+                  return Opacity(
+                    key: ValueKey(config.id),
+                    opacity: config.visible ? 1.0 : 0.55,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: palette.windowGradient,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: palette.border.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: tile,
+                    ),
                   );
                 },
               ),

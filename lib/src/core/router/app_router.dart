@@ -52,6 +52,7 @@ import '../../features/assets/screens/why_today_screen.dart';
 import '../../features/assets/screens/order_entry_screen.dart';
 import '../theme/app_palette.dart';
 import '../theme/theme_variant_provider.dart';
+import '../supabase/supabase_providers.dart' show isAdminProvider;
 import 'navigation_history_provider.dart';
 
 /// Bridges a Stream (Supabase's auth-state stream) into a [Listenable] so
@@ -480,6 +481,9 @@ class _AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (ref.watch(isAdminProvider)) {
+      ref.read(themeVariantProvider.notifier).applyAdminDefaultIfUnset();
+    }
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return Scaffold(
       backgroundColor: Colors.transparent,

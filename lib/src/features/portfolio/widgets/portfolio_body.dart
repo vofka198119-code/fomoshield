@@ -49,6 +49,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
   void _showWidgetsBottomSheet() {
     final notifier = ref.read(portfolioWidgetsProvider.notifier);
     final currentConfigs = ref.read(portfolioWidgetsProvider);
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
 
     showModalBottomSheet(
       context: context,
@@ -60,7 +61,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
       // Pushing onto the root Navigator instead gives proper full-screen
       // coverage over the bottom nav bar.
       useRootNavigator: true,
-      backgroundColor: ThemeV2.surface,
+      backgroundColor: palette.card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -69,6 +70,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
         return _PortfolioWidgetsSettingsSheet(
           initialConfigs: currentConfigs,
           notifier: notifier,
+          palette: palette,
         );
       },
     );

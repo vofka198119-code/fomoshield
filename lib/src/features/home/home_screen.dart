@@ -40,6 +40,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _showWidgetsBottomSheet() {
     final notifier = ref.read(homeWidgetsProvider.notifier);
     final currentConfigs = ref.read(homeWidgetsProvider);
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
 
     showModalBottomSheet(
       context: context,
@@ -48,7 +49,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // extendBody Scaffold paints its persistent bottom nav bar on top
       // of the sheet's lower edge instead of the sheet covering it.
       useRootNavigator: true,
-      backgroundColor: ThemeV2.surface,
+      backgroundColor: palette.card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -57,6 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return _WidgetsSettingsSheet(
           initialConfigs: currentConfigs,
           notifier: notifier,
+          palette: palette,
         );
       },
     );
@@ -181,10 +183,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 class _WidgetsSettingsSheet extends StatefulWidget {
   final List<HomeWidgetConfig> initialConfigs;
   final HomeWidgetsNotifier notifier;
+  final AppPalette palette;
 
   const _WidgetsSettingsSheet({
     required this.initialConfigs,
     required this.notifier,
+    required this.palette,
   });
 
   @override
@@ -243,6 +247,8 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
+    final isLuxury = palette.windowGradient != null;
     return Padding(
       padding: EdgeInsets.only(
         bottom:
@@ -258,7 +264,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.black26,
+              color: isLuxury ? Colors.white.withValues(alpha: 0.24) : Colors.black26,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -272,7 +278,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                   ),
                 ),
                 const Spacer(),
@@ -299,7 +305,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                     l10n.homeReset,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -332,67 +338,85 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
               },
               itemBuilder: (context, index) {
                 final config = _configs[index];
+                final rowContent = ListTile(
+                  key: ValueKey('${config.id}_tile'),
+                  leading: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Drag handle
+                      ReorderableDragStartListener(
+                        index: index,
+                        child: Icon(
+                          Icons.drag_handle_rounded,
+                          color: palette.textBody,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        _widgetIcon(config.id),
+                        color: config.visible
+                            ? palette.accentPrimary
+                            : palette.textBody,
+                        size: 22,
+                      ),
+                    ],
+                  ),
+                  title: Text(
+                    config.displayName(l10n),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: config.visible
+                          ? palette.textHeader
+                          : palette.textBody,
+                    ),
+                  ),
+                  trailing: GestureDetector(
+                    onTap: () => _toggleVisibility(config.id),
+                    child: Icon(
+                      config.visible
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_rounded,
+                      color: config.visible
+                          ? palette.accentPrimary
+                          : palette.textBody,
+                      size: 22,
+                    ),
+                  ),
+                );
+                final card = isLuxury
+                    ? Opacity(
+                        opacity: config.visible ? 1.0 : 0.55,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: palette.windowGradient,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: palette.border.withValues(alpha: 0.4),
+                            ),
+                          ),
+                          child: rowContent,
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: config.visible
+                              ? ThemeV2.surfaceDark
+                              : ThemeV2.surfaceDark.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: config.visible
+                                ? Colors.black12
+                                : Colors.black.withValues(alpha: 0.03),
+                          ),
+                        ),
+                        child: rowContent,
+                      );
                 return Container(
                   key: ValueKey(config.id),
                   margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    color: config.visible
-                        ? ThemeV2.surfaceDark
-                        : ThemeV2.surfaceDark.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: config.visible
-                          ? Colors.black12
-                          : Colors.black.withValues(alpha: 0.03),
-                    ),
-                  ),
-                  child: ListTile(
-                    key: ValueKey('${config.id}_tile'),
-                    leading: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Drag handle
-                        ReorderableDragStartListener(
-                          index: index,
-                          child: const Icon(
-                            Icons.drag_handle_rounded,
-                            color: ThemeV2.textSecondary,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          _widgetIcon(config.id),
-                          color: config.visible
-                              ? ThemeV2.primary
-                              : ThemeV2.textSecondary,
-                          size: 22,
-                        ),
-                      ],
-                    ),
-                    title: Text(
-                      config.displayName(l10n),
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: config.visible
-                            ? ThemeV2.textPrimary
-                            : ThemeV2.textSecondary,
-                      ),
-                    ),
-                    trailing: GestureDetector(
-                      onTap: () => _toggleVisibility(config.id),
-                      child: Icon(
-                        config.visible
-                            ? Icons.visibility_rounded
-                            : Icons.visibility_off_rounded,
-                        color: config.visible
-                            ? ThemeV2.primary
-                            : ThemeV2.textSecondary,
-                        size: 22,
-                      ),
-                    ),
-                  ),
+                  child: card,
                 );
               },
             ),

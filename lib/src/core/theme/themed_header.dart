@@ -70,9 +70,10 @@ Widget themedBackButton(
   BuildContext context,
   AppPalette palette, {
   VoidCallback? onPressed,
+  double size = 24,
 }) {
   return IconButton(
-    icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
+    icon: themedHeaderIcon(Icons.arrow_back_rounded, palette, size: size),
     onPressed: onPressed ?? () => context.pop(),
   );
 }

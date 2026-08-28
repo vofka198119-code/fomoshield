@@ -5004,6 +5004,16 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String marketClockDurationHoursMinutes(String hours, String minutes) {
+    return '$hoursч $minutesм';
+  }
+
+  @override
+  String marketClockDurationMinutes(String minutes) {
+    return '$minutesм';
+  }
+
+  @override
   String get marketClockWidgetDisplayNameNyTime => 'Время Нью-Йорка';
 
   @override

@@ -10,7 +10,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/overlay/app_notification_popup.dart';
@@ -132,10 +131,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
             letterSpacing: 1.5,
           ),
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
-          onPressed: () => context.pop(),
-        ),
+        leading: themedBackButton(context, palette),
       ),
       body: SafeArea(
         child: Column(

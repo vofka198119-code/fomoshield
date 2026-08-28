@@ -339,12 +339,10 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             letterSpacing: 1.5,
           ),
         ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: palette.accentPrimary,
-            size: 22,
-          ),
+        leading: themedBackButton(
+          context,
+          palette,
+          size: 22,
           onPressed: () => context.go('/stress-test-hub'),
         ),
         actions: [],
@@ -704,9 +702,11 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         .where((c) => isAdmin || c.id != 'epoch_history')
         .toList();
 
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: ThemeV2.surface,
+      backgroundColor: palette.card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -715,6 +715,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         initialConfigs: currentConfigs,
         notifier: notifier,
         isAdmin: isAdmin,
+        palette: palette,
       ),
     );
   }
@@ -1386,11 +1387,13 @@ class _StressTestWidgetSettingsSheet extends StatefulWidget {
   final List<StressTestWidgetConfig> initialConfigs;
   final StressTestWidgetsNotifier notifier;
   final bool isAdmin;
+  final AppPalette palette;
 
   const _StressTestWidgetSettingsSheet({
     required this.initialConfigs,
     required this.notifier,
     required this.isAdmin,
+    required this.palette,
   });
 
   @override
@@ -1442,6 +1445,8 @@ class _StressTestWidgetSettingsSheetState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
+    final isLuxury = palette.windowGradient != null;
     return Padding(
       padding: EdgeInsets.only(
         bottom:
@@ -1459,7 +1464,9 @@ class _StressTestWidgetSettingsSheetState
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.15),
+                  color: isLuxury
+                      ? Colors.white.withValues(alpha: 0.24)
+                      : Colors.black.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1475,7 +1482,7 @@ class _StressTestWidgetSettingsSheetState
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   TextButton(
@@ -1498,14 +1505,19 @@ class _StressTestWidgetSettingsSheetState
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.primary,
+                        color: palette.accentPrimary,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE8E5DF)),
+            Divider(
+              height: 1,
+              color: isLuxury
+                  ? palette.border.withValues(alpha: 0.3)
+                  : const Color(0xFFE8E5DF),
+            ),
             const SizedBox(height: 8),
             // ── Reorderable list ──
             Expanded(
@@ -1529,8 +1541,8 @@ class _StressTestWidgetSettingsSheetState
                   final config = _configs[index];
                   final isPinned =
                       config.id == _pinnedFirstId || config.id == _pinnedLastId;
-                  return ListTile(
-                    key: ValueKey(config.id),
+                  final tile = ListTile(
+                    key: isLuxury ? null : ValueKey(config.id),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 2,
@@ -1540,23 +1552,23 @@ class _StressTestWidgetSettingsSheetState
                       children: [
                         // Pinned widgets can't be dragged.
                         isPinned
-                            ? const Icon(
+                            ? Icon(
                                 Icons.push_pin_rounded,
-                                color: ThemeV2.textSecondary,
+                                color: palette.textBody,
                                 size: 20,
                               )
                             : ReorderableDragStartListener(
                                 index: index,
-                                child: const Icon(
+                                child: Icon(
                                   Icons.drag_handle_rounded,
-                                  color: ThemeV2.textSecondary,
+                                  color: palette.textBody,
                                   size: 24,
                                 ),
                               ),
                         const SizedBox(width: 8),
                         Icon(
                           _widgetIcon(config.id),
-                          color: ThemeV2.textSecondary,
+                          color: palette.textBody,
                           size: 22,
                         ),
                       ],
@@ -1566,13 +1578,13 @@ class _StressTestWidgetSettingsSheetState
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: ThemeV2.textPrimary,
+                        color: palette.textHeader,
                       ),
                     ),
                     trailing: isPinned
                         ? Icon(
                             Icons.visibility_rounded,
-                            color: ThemeV2.textSecondary.withValues(alpha: 0.4),
+                            color: palette.textBody.withValues(alpha: 0.4),
                             size: 22,
                           )
                         : GestureDetector(
@@ -1582,11 +1594,30 @@ class _StressTestWidgetSettingsSheetState
                                   ? Icons.visibility_rounded
                                   : Icons.visibility_off_rounded,
                               color: config.visible
-                                  ? ThemeV2.primary
-                                  : ThemeV2.textSecondary,
+                                  ? palette.accentPrimary
+                                  : palette.textBody,
                               size: 22,
                             ),
                           ),
+                  );
+                  if (!isLuxury) return tile;
+                  return Opacity(
+                    key: ValueKey(config.id),
+                    opacity: config.visible ? 1.0 : 0.55,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: palette.windowGradient,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: palette.border.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: tile,
+                    ),
                   );
                 },
               ),

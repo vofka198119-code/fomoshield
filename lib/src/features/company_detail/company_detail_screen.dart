@@ -459,13 +459,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Row(
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_rounded,
-                    color: palette.accentPrimary,
-                  ),
-                  onPressed: () => context.pop(),
-                ),
+                themedBackButton(context, palette),
                 Expanded(
                   child: Center(
                     child: themedHeaderText(
@@ -726,10 +720,11 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
   void _showWidgetsBottomSheet() {
     final notifier = ref.read(companyWidgetsProvider.notifier);
     final currentConfigs = ref.read(companyWidgetsProvider);
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: ThemeV2.surface,
+      backgroundColor: palette.card,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -737,6 +732,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
       builder: (_) => CompanyWidgetsSettingsSheet(
         initialConfigs: currentConfigs,
         notifier: notifier,
+        palette: palette,
       ),
     );
   }

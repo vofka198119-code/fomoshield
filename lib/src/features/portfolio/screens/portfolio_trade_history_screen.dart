@@ -43,14 +43,7 @@ class PortfolioTradeHistoryScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: palette.accentPrimary,
-            size: 22,
-          ),
-          onPressed: () => context.pop(),
-        ),
+        leading: themedBackButton(context, palette, size: 22),
         title: themedHeaderText(
           l10n.tradeHistoryTitle,
           palette,

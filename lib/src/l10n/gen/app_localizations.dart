@@ -8401,6 +8401,18 @@ abstract class AppLocalizations {
   /// **'Starts {time}'**
   String marketClockCountdownStarts(String time);
 
+  /// No description provided for @marketClockDurationHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String marketClockDurationHoursMinutes(String hours, String minutes);
+
+  /// No description provided for @marketClockDurationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m'**
+  String marketClockDurationMinutes(String minutes);
+
   /// No description provided for @marketClockWidgetDisplayNameNyTime.
   ///
   /// In en, this message translates to:

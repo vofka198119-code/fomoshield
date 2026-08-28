@@ -13,8 +13,11 @@ const _prefsKey = 'app_theme_variant';
 enum AppThemeVariant { standard, luxuryGold }
 
 class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
+  bool _hasExplicitChoice = false;
+  late final Future<void> _loaded;
+
   ThemeVariantNotifier() : super(AppThemeVariant.standard) {
-    _load();
+    _loaded = _load();
   }
 
   Future<void> _load() async {
@@ -22,14 +25,28 @@ class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
     final name = prefs.getString(_prefsKey);
     final match = AppThemeVariant.values.where((v) => v.name == name);
     if (match.isNotEmpty) {
+      _hasExplicitChoice = true;
       state = match.first;
     }
   }
 
   Future<void> setVariant(AppThemeVariant variant) async {
     state = variant;
+    _hasExplicitChoice = true;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefsKey, variant.name);
+  }
+
+  /// Called on every login for an admin account. A fresh install/reinstall
+  /// wipes SharedPreferences, so with no explicit local choice on record
+  /// this would otherwise silently fall back to Standard every time —
+  /// defaults straight into Luxury Gold instead. A no-op once any explicit
+  /// choice has been made (including switching back to Standard), so it
+  /// never fights a deliberate pick.
+  Future<void> applyAdminDefaultIfUnset() async {
+    await _loaded;
+    if (_hasExplicitChoice) return;
+    state = AppThemeVariant.luxuryGold;
   }
 }
 

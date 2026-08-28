@@ -1404,6 +1404,25 @@
       }
     }
   },
+  "marketClockDurationHoursMinutes": "{hours}ч {minutes}м",
+  "@marketClockDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "marketClockDurationMinutes": "{minutes}м",
+  "@marketClockDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "marketClockWidgetDisplayNameNyTime": "Время Нью-Йорка",
   "marketClockWidgetDisplayNameMarketPhase": "Фаза рынка",
   "marketClockWidgetDisplayNameTimingIndicator": "Статус FOMO Shield",

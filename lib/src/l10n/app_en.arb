@@ -1740,6 +1740,25 @@
       }
     }
   },
+  "marketClockDurationHoursMinutes": "{hours}h {minutes}m",
+  "@marketClockDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "marketClockDurationMinutes": "{minutes}m",
+  "@marketClockDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "marketClockWidgetDisplayNameNyTime": "New York Time",
   "marketClockWidgetDisplayNameMarketPhase": "Market Phase",
   "marketClockWidgetDisplayNameTimingIndicator": "FOMO Shield Status",

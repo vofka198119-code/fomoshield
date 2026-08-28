@@ -163,8 +163,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           palette,
           GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
+        leading: themedBackButton(
+          context,
+          palette,
           onPressed: () => context.go('/stress-test-hub'),
         ),
       ),

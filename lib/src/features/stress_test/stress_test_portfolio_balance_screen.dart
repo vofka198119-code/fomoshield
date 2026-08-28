@@ -52,14 +52,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: palette.accentPrimary,
-            size: 22,
-          ),
-          onPressed: () => context.pop(),
-        ),
+        leading: themedBackButton(context, palette, size: 22),
         title: themedHeaderText(
           l10n.portfolioBalanceScreenTitle,
           palette,
@@ -145,9 +138,11 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
       portfolioBalanceWidgetOrderProvider(sessionId),
     );
 
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: ThemeV2.surface,
+      backgroundColor: palette.card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -155,6 +150,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
       builder: (_) => StressTestPortfolioBalanceWidgetSettingsSheet(
         initialConfigs: currentConfigs,
         notifier: notifier,
+        palette: palette,
       ),
     );
   }

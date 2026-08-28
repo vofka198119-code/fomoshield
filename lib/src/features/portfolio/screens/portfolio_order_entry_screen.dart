@@ -18,7 +18,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -546,13 +545,7 @@ class _PortfolioOrderEntryScreenState
               letterSpacing: 1.5,
             ),
           ),
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: palette.accentPrimary,
-            ),
-            onPressed: () => context.pop(),
-          ),
+          leading: themedBackButton(context, palette),
         ),
         body: Center(
           child: CircularProgressIndicator(color: palette.accentPrimary),
@@ -574,13 +567,7 @@ class _PortfolioOrderEntryScreenState
               letterSpacing: 1.5,
             ),
           ),
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: palette.accentPrimary,
-            ),
-            onPressed: () => context.pop(),
-          ),
+          leading: themedBackButton(context, palette),
         ),
         body: Center(
           child: Padding(

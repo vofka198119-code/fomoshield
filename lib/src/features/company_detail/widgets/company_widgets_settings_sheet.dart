@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../company_widget_order_provider.dart';
 
@@ -11,11 +12,13 @@ import '../company_widget_order_provider.dart';
 class CompanyWidgetsSettingsSheet extends StatefulWidget {
   final List<CompanyWidgetConfig> initialConfigs;
   final CompanyWidgetsNotifier notifier;
+  final AppPalette palette;
 
   const CompanyWidgetsSettingsSheet({
     super.key,
     required this.initialConfigs,
     required this.notifier,
+    required this.palette,
   });
 
   @override
@@ -83,6 +86,8 @@ class _CompanyWidgetsSettingsSheetState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = widget.palette;
+    final isLuxury = palette.windowGradient != null;
     return Padding(
       padding: EdgeInsets.only(
         // viewInsets covers the keyboard; padding.bottom covers the
@@ -100,7 +105,7 @@ class _CompanyWidgetsSettingsSheetState
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.black26,
+              color: isLuxury ? Colors.white.withValues(alpha: 0.24) : Colors.black26,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -114,7 +119,7 @@ class _CompanyWidgetsSettingsSheetState
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: ThemeV2.textPrimary,
+                    color: palette.textHeader,
                   ),
                 ),
                 const Spacer(),
@@ -133,7 +138,7 @@ class _CompanyWidgetsSettingsSheetState
                     l10n.homeReset,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: ThemeV2.primary,
+                      color: palette.accentPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -167,79 +172,97 @@ class _CompanyWidgetsSettingsSheetState
               itemBuilder: (context, index) {
                 final config = _configs[index];
                 final isPinned = config.id == _pinnedFirstId;
+                final rowContent = ListTile(
+                  key: ValueKey('${config.id}_tile'),
+                  leading: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Drag handle — pinned widget can't be dragged.
+                      isPinned
+                          ? Icon(
+                              Icons.push_pin_rounded,
+                              color: palette.textBody,
+                              size: 20,
+                            )
+                          : ReorderableDragStartListener(
+                              index: index,
+                              child: Icon(
+                                Icons.drag_handle_rounded,
+                                color: palette.textBody,
+                                size: 24,
+                              ),
+                            ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        _widgetIcon(config.id),
+                        color: config.visible
+                            ? palette.accentPrimary
+                            : palette.textBody,
+                        size: 22,
+                      ),
+                    ],
+                  ),
+                  title: Text(
+                    config.displayName(l10n),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: config.visible
+                          ? palette.textHeader
+                          : palette.textBody,
+                    ),
+                  ),
+                  trailing: isPinned
+                      ? Icon(
+                          Icons.visibility_rounded,
+                          color: palette.textBody.withValues(alpha: 0.4),
+                          size: 22,
+                        )
+                      : GestureDetector(
+                          onTap: () => _toggleVisibility(config.id),
+                          child: Icon(
+                            config.visible
+                                ? Icons.visibility_rounded
+                                : Icons.visibility_off_rounded,
+                            color: config.visible
+                                ? palette.accentPrimary
+                                : palette.textBody,
+                            size: 22,
+                          ),
+                        ),
+                );
+                final card = isLuxury
+                    ? Opacity(
+                        opacity: config.visible ? 1.0 : 0.55,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: palette.windowGradient,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: palette.border.withValues(alpha: 0.4),
+                            ),
+                          ),
+                          child: rowContent,
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: config.visible
+                              ? ThemeV2.surfaceDark
+                              : ThemeV2.surfaceDark.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: config.visible
+                                ? Colors.black12
+                                : Colors.black.withValues(alpha: 0.03),
+                          ),
+                        ),
+                        child: rowContent,
+                      );
                 return Container(
                   key: ValueKey(config.id),
                   margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    color: config.visible
-                        ? ThemeV2.surfaceDark
-                        : ThemeV2.surfaceDark.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: config.visible
-                          ? Colors.black12
-                          : Colors.black.withValues(alpha: 0.03),
-                    ),
-                  ),
-                  child: ListTile(
-                    key: ValueKey('${config.id}_tile'),
-                    leading: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Drag handle — pinned widget can't be dragged.
-                        isPinned
-                            ? const Icon(
-                                Icons.push_pin_rounded,
-                                color: ThemeV2.textSecondary,
-                                size: 20,
-                              )
-                            : ReorderableDragStartListener(
-                                index: index,
-                                child: const Icon(
-                                  Icons.drag_handle_rounded,
-                                  color: ThemeV2.textSecondary,
-                                  size: 24,
-                                ),
-                              ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          _widgetIcon(config.id),
-                          color: config.visible
-                              ? ThemeV2.primary
-                              : ThemeV2.textSecondary,
-                          size: 22,
-                        ),
-                      ],
-                    ),
-                    title: Text(
-                      config.displayName(l10n),
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: config.visible
-                            ? ThemeV2.textPrimary
-                            : ThemeV2.textSecondary,
-                      ),
-                    ),
-                    trailing: isPinned
-                        ? Icon(
-                            Icons.visibility_rounded,
-                            color: ThemeV2.textSecondary.withValues(alpha: 0.4),
-                            size: 22,
-                          )
-                        : GestureDetector(
-                            onTap: () => _toggleVisibility(config.id),
-                            child: Icon(
-                              config.visible
-                                  ? Icons.visibility_rounded
-                                  : Icons.visibility_off_rounded,
-                              color: config.visible
-                                  ? ThemeV2.primary
-                                  : ThemeV2.textSecondary,
-                              size: 22,
-                            ),
-                          ),
-                  ),
+                  child: card,
                 );
               },
             ),

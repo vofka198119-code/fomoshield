@@ -35,7 +35,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
@@ -273,10 +272,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
             letterSpacing: 1,
           ),
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
-          onPressed: () => context.pop(),
-        ),
+        leading: themedBackButton(context, palette),
       ),
     );
   }

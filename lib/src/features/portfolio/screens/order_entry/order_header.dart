@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../core/theme/typography_helpers.dart';
@@ -50,13 +49,7 @@ class OrderHeader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Row(
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_rounded,
-                    color: palette.accentPrimary,
-                  ),
-                  onPressed: () => context.pop(),
-                ),
+                themedBackButton(context, palette),
                 Expanded(
                   child: Center(
                     child: themedHeaderText(

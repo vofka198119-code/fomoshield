@@ -4991,6 +4991,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String marketClockDurationHoursMinutes(String hours, String minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String marketClockDurationMinutes(String minutes) {
+    return '${minutes}m';
+  }
+
+  @override
   String get marketClockWidgetDisplayNameNyTime => 'New York Time';
 
   @override

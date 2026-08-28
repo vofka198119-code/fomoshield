@@ -52,8 +52,9 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
+        leading: themedBackButton(
+          context,
+          palette,
           onPressed: () => context.go(ref.read(previousTabRouteProvider)),
         ),
         title: themedHeaderText(

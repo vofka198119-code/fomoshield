@@ -143,12 +143,10 @@ class VerdictScreen extends ConsumerWidget {
             letterSpacing: 1,
           ),
         ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: palette.accentPrimary,
-            size: 22,
-          ),
+        leading: themedBackButton(
+          context,
+          palette,
+          size: 22,
           onPressed: () => context.go('/stress-test-hub'),
         ),
       ),

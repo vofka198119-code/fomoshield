@@ -157,11 +157,14 @@ Color _macroPhaseColor(MarketPhase phase) {
   }
 }
 
-String _formatHm(int minutes) {
+String _formatHm(AppLocalizations l10n, int minutes) {
   final h = minutes ~/ 60;
   final m = minutes % 60;
-  if (h == 0) return '${m}m';
-  return '${h}h ${m.toString().padLeft(2, '0')}m';
+  if (h == 0) return l10n.marketClockDurationMinutes('$m');
+  return l10n.marketClockDurationHoursMinutes(
+    '$h',
+    m.toString().padLeft(2, '0'),
+  );
 }
 
 class _MarketClockInstrumentPanel extends StatelessWidget {
@@ -319,8 +322,8 @@ class _CornerPanel extends StatelessWidget {
       color: dialIvory,
     );
     final timerString = active
-        ? l10n.marketClockCountdownEnds(_formatHm(remainingMinutes))
-        : l10n.marketClockCountdownStarts(_formatHm(remainingMinutes));
+        ? l10n.marketClockCountdownEnds(_formatHm(l10n, remainingMinutes))
+        : l10n.marketClockCountdownStarts(_formatHm(l10n, remainingMinutes));
 
     // The notch only bites into the corner nearest the dial, so a thin band
     // along the panel's OUTER edge (top edge for top panels, bottom edge
@@ -328,11 +331,10 @@ class _CornerPanel extends StatelessWidget {
     // most of panelSize as width, as long as the whole block stays short
     // (label line + timer line, each capped to 1 line so neither can ever
     // grow past the box and spill outside the panel).
-    final labelRow = Text(
-      macro.label,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: labelStyle,
+    final labelRow = FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: _rightSide ? Alignment.centerRight : Alignment.centerLeft,
+      child: Text(macro.label, maxLines: 1, style: labelStyle),
     );
     final timerText = Text(
       timerString,

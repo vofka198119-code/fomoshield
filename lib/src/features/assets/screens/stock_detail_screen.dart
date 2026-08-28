@@ -411,10 +411,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: palette.accentPrimary),
-          onPressed: () => context.pop(),
-        ),
+        leading: themedBackButton(context, palette),
       ),
     );
   }
