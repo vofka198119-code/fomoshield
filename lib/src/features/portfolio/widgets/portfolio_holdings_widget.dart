@@ -234,7 +234,7 @@ class _HoldingRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPositive = holding.pnl >= 0;
-    final logoAsync = ref.watch(quickLogoProvider(holding.symbol));
+    final logoAsync = ref.watch(cachedLogoProvider(holding.symbol));
     final logoUrl = logoAsync.valueOrNull;
     final companyName =
         ref.watch(resolvedCompanyNameProvider(holding.symbol)).valueOrNull ??

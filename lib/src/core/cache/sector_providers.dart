@@ -26,7 +26,7 @@ final sectorRepositoryProvider = Provider<SectorRepository>((ref) {
 // кэш, если нет — загружает через Finnhub companyProfile.
 
 final cachedGicsSectorProvider =
-    FutureProvider.family<GicsSector?, String>((ref, ticker) async {
+    FutureProvider.autoDispose.family<GicsSector?, String>((ref, ticker) async {
   final repo = ref.read(sectorRepositoryProvider);
   final cached = await repo.getCachedSector(ticker);
   if (cached != null) return cached;
@@ -44,7 +44,7 @@ final cachedGicsSectorProvider =
 // подменить (обычно resolveGicsSector's static table).
 
 final quickGicsSectorProvider =
-    FutureProvider.family<GicsSector?, String>((ref, ticker) async {
+    FutureProvider.autoDispose.family<GicsSector?, String>((ref, ticker) async {
   final repo = ref.read(sectorRepositoryProvider);
   return repo.getCachedSector(ticker);
 });

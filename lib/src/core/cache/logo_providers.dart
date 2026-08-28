@@ -27,7 +27,8 @@ final logoRepositoryProvider = Provider<LogoRepository>((ref) {
 //    каждый непопавший в кэш тикер, тот самый источник rate-limit'ов при
 //    браузинге Search-лент (см. fomoshield_finnhub_rate_limit_fix_2026_08_22
 //    memory, round 6, 2026-08-27).
-final cachedLogoProvider = FutureProvider.family<String?, String>((ref, ticker) async {
+final cachedLogoProvider =
+    FutureProvider.autoDispose.family<String?, String>((ref, ticker) async {
   final repo = ref.read(logoRepositoryProvider);
   final cached = await repo.getCachedLogo(ticker);
   if (cached != null) return cached;
@@ -45,7 +46,8 @@ final cachedLogoProvider = FutureProvider.family<String?, String>((ref, ticker) 
 // ---------------------------------------------------------------------------
 // Используется в Search, где не нужно вызывать API для каждого результата.
 
-final quickLogoProvider = FutureProvider.family<String?, String>((ref, ticker) async {
+final quickLogoProvider =
+    FutureProvider.autoDispose.family<String?, String>((ref, ticker) async {
   final repo = ref.read(logoRepositoryProvider);
   return repo.getCachedLogo(ticker);
 });
@@ -60,7 +62,10 @@ final quickLogoProvider = FutureProvider.family<String?, String>((ref, ticker) a
 // sync, before the symbol has been opened once on this device.
 
 final cachedLogoEntryProvider =
-    FutureProvider.family<LogoCacheEntry?, String>((ref, ticker) async {
+    FutureProvider.autoDispose.family<LogoCacheEntry?, String>((
+  ref,
+  ticker,
+) async {
   final dao = ref.read(logoDaoProvider);
   return dao.getLogo(ticker);
 });
@@ -79,7 +84,7 @@ final logoDaoProvider = Provider<LogoDao>((ref) => LogoDao());
 // stuck on a fallback — unlike a plain synchronous helper would.
 
 final resolvedCompanyNameProvider =
-    FutureProvider.family<String, String>((ref, ticker) async {
+    FutureProvider.autoDispose.family<String, String>((ref, ticker) async {
   final dao = ref.read(logoDaoProvider);
   final cached = await dao.getLogo(ticker);
   if (cached != null &&

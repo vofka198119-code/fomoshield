@@ -132,6 +132,7 @@ class FinnhubService {
   Future<Map<String, dynamic>> _getFromBackend(
     String path, {
     Map<String, dynamic>? params,
+    bool skipRateLimit = false,
   }) async {
     final cacheKey = 'backend:$path?${params?.toString() ?? ''}';
     final cached = _getCached(cacheKey);
@@ -143,7 +144,12 @@ class FinnhubService {
     final pending = _inFlight[cacheKey];
     if (pending != null) return pending;
 
-    final future = _fetchFromBackend(path, params, cacheKey);
+    final future = _fetchFromBackend(
+      path,
+      params,
+      cacheKey,
+      skipRateLimit: skipRateLimit,
+    );
     _inFlight[cacheKey] = future;
     try {
       return await future;
@@ -155,12 +161,21 @@ class FinnhubService {
   Future<Map<String, dynamic>> _fetchFromBackend(
     String path,
     Map<String, dynamic>? params,
-    String cacheKey,
-  ) async {
+    String cacheKey, {
+    bool skipRateLimit = false,
+  }) async {
     try {
-      final response = await _rateLimiter.run(
-        () => _limiter.run(() => _backendDio.get(path, queryParameters: params)),
-      );
+      // [skipRateLimit] is for /icons only (see icon() below) — every other
+      // path can trigger a real live Finnhub call server-side on a cache
+      // miss, so it still needs [_rateLimiter]'s protection.
+      final response = skipRateLimit
+          ? await _limiter.run(
+              () => _backendDio.get(path, queryParameters: params),
+            )
+          : await _rateLimiter.run(
+              () =>
+                  _limiter.run(() => _backendDio.get(path, queryParameters: params)),
+            );
       if (response.data is! Map) {
         throw Exception(
           'Backend $path: unexpected response type ${response.data.runtimeType}',
@@ -393,8 +408,20 @@ class FinnhubService {
   // scanco-backend's routes/icons.js + iconService.js.
   // ---------------------------------------------------------------------------
 
+  // [skipRateLimit] — /icons/:symbol never blocks on a live Finnhub call
+  // server-side (cache hit or an instant free fallback, see this file's
+  // own doc comment above and scanco-backend's routes/icons.js), so it
+  // doesn't need to share [_rateLimiter]'s conservative 55/60s budget with
+  // endpoints that genuinely can hit Finnhub on a miss (profile/quote/
+  // metrics/etc). That budget existing at all was throttling icon bursts
+  // (Search sector lanes) for no real protective reason — confirmed
+  // 2026-08-28: browsing 2+ cold sector lanes made icons visibly stall for
+  // up to a minute at a time even though the backend itself was never at
+  // risk. Finnhub's real upstream ceiling is now guarded server-side by a
+  // single global limiter shared by every caller (icon warmup included),
+  // so this client-side exemption doesn't reopen that risk.
   Future<Map<String, dynamic>> icon(String symbol) async =>
-      _getFromBackend('/icons/$symbol');
+      _getFromBackend('/icons/$symbol', skipRateLimit: true);
 
   // ---------------------------------------------------------------------------
   // Quote
