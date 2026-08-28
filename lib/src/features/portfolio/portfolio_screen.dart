@@ -9,6 +9,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_button.dart';
+import '../../core/theme/themed_border.dart';
 import '../../core/router/navigation_history_provider.dart';
 import '../../core/supabase/supabase_providers.dart';
 import 'portfolio_providers.dart';

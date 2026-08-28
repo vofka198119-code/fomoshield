@@ -1,7 +1,7 @@
 name: scanco
 description: "F.O.M.O. Shield — Invest with discipline, not emotion"
 publish_to: 'none'
-version: 1.0.0+83
+version: 1.0.0+84
 
 environment:
   sdk: ^3.12.1

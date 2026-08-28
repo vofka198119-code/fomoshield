@@ -7,6 +7,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_button.dart';
+import '../../core/theme/themed_border.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -388,15 +389,16 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                 final card = isLuxury
                     ? Opacity(
                         opacity: config.visible ? 1.0 : 0.55,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: palette.windowGradient,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: palette.border.withValues(alpha: 0.4),
+                        child: themedBorder(
+                          palette: palette,
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: palette.windowGradient,
+                              borderRadius: BorderRadius.circular(14),
                             ),
+                            child: rowContent,
                           ),
-                          child: rowContent,
                         ),
                       )
                     : Container(

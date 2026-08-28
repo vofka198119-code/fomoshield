@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_border.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../company_widget_order_provider.dart';
 
@@ -234,15 +235,16 @@ class _CompanyWidgetsSettingsSheetState
                 final card = isLuxury
                     ? Opacity(
                         opacity: config.visible ? 1.0 : 0.55,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: palette.windowGradient,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: palette.border.withValues(alpha: 0.4),
+                        child: themedBorder(
+                          palette: palette,
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: palette.windowGradient,
+                              borderRadius: BorderRadius.circular(14),
                             ),
+                            child: rowContent,
                           ),
-                          child: rowContent,
                         ),
                       )
                     : Container(

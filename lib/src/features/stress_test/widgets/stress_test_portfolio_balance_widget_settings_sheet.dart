@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_border.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../stress_test_portfolio_balance_widget_order_provider.dart';
 
@@ -227,19 +228,20 @@ class _StressTestPortfolioBalanceWidgetSettingsSheetState
                   return Opacity(
                     key: ValueKey(config.id),
                     opacity: config.visible ? 1.0 : 0.55,
-                    child: Container(
+                    child: themedBorder(
+                      palette: palette,
+                      borderRadius: BorderRadius.circular(14),
                       margin: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 3,
                       ),
-                      decoration: BoxDecoration(
-                        gradient: palette.windowGradient,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: palette.border.withValues(alpha: 0.4),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: palette.windowGradient,
+                          borderRadius: BorderRadius.circular(14),
                         ),
+                        child: tile,
                       ),
-                      child: tile,
                     ),
                   );
                 },
