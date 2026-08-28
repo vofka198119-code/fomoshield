@@ -4683,14 +4683,14 @@ class AppLocalizationsRu extends AppLocalizations {
       'Опытные инвесторы знают: не обязательно реагировать на каждое рыночное событие.\n\nИногда защитить свои деньги — значит просто подождать, пока рынок снова прояснится.';
 
   @override
-  String get marketClockWindowPowerHourShortHeadline => 'Power Hour';
+  String get marketClockWindowPowerHourShortHeadline => 'Час пик';
 
   @override
   String get marketClockWindowPowerHourShortDetail =>
       'Финальный рывок, большие объёмы';
 
   @override
-  String get marketClockWindowPowerHourFullTitle => 'Power Hour';
+  String get marketClockWindowPowerHourFullTitle => 'Час пик';
 
   @override
   String get marketClockWindowPowerHourWhatHappens =>
@@ -4698,7 +4698,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get marketClockWindowPowerHourWhyItMatters =>
-      'Power Hour обычно второй по загруженности период всего торгового дня.\n\nОбъём торгов резко возрастает, а движения цены часто становятся сильнее и увереннее.\n\nАкции, весь день двигавшиеся боком, могут внезапно прорваться в одном направлении.\n\nМногие дневные максимумы и минимумы формируются именно в последний час перед закрытием.';
+      'Час пик обычно второй по загруженности период всего торгового дня.\n\nОбъём торгов резко возрастает, а движения цены часто становятся сильнее и увереннее.\n\nАкции, весь день двигавшиеся боком, могут внезапно прорваться в одном направлении.\n\nМногие дневные максимумы и минимумы формируются именно в последний час перед закрытием.';
 
   @override
   String get marketClockWindowPowerHourDangerForBeginner =>
@@ -5020,8 +5020,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get marketClockWidgetDisplayNameMarketPhase => 'Фаза рынка';
 
   @override
-  String get marketClockWidgetDisplayNameTimingIndicator =>
-      'Статус FOMO Shield';
+  String get marketClockWidgetDisplayNameTimingIndicator => 'Индикатор риска';
 
   @override
   String get portfolioBalanceWidgetDisplayNamePortfolioHealth =>
@@ -5196,7 +5195,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get marketPhaseWidgetDetailsTooltip => 'Подробнее';
 
   @override
-  String get marketClockFomoShieldStatusTitle => 'СТАТУС FOMO SHIELD';
+  String get marketClockFomoShieldStatusTitle => 'ИНДИКАТОР РИСКА';
 
   @override
   String get marketClockRiskDetailWhyNowLabel => 'Почему сейчас?';

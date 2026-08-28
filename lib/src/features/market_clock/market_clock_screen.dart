@@ -30,10 +30,15 @@ class _MarketClockScreenState extends ConsumerState<MarketClockScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_initialized) return;
-    _initialized = true;
+    // Recompute on every call, not just the first — see
+    // home/widgets/market_clock_widget.dart's identical fix for why: only
+    // the timer's own one-time start needs the _initialized guard, not the
+    // state recompute itself (didChangeDependencies legitimately fires
+    // again on a Locale change, and used to be ignored here).
     final l10n = AppLocalizations.of(context)!;
     _state = resolveMarketClockState(l10n, nowInNewYork());
+    if (_initialized) return;
+    _initialized = true;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       final l10n = AppLocalizations.of(context)!;
       setState(() => _state = resolveMarketClockState(l10n, nowInNewYork()));

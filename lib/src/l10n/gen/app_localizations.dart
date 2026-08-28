@@ -8428,7 +8428,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketClockWidgetDisplayNameTimingIndicator.
   ///
   /// In en, this message translates to:
-  /// **'FOMO Shield Status'**
+  /// **'Risk Indicator'**
   String get marketClockWidgetDisplayNameTimingIndicator;
 
   /// No description provided for @portfolioBalanceWidgetDisplayNamePortfolioHealth.
@@ -8704,7 +8704,7 @@ abstract class AppLocalizations {
   /// No description provided for @marketClockFomoShieldStatusTitle.
   ///
   /// In en, this message translates to:
-  /// **'FOMO SHIELD STATUS'**
+  /// **'RISK INDICATOR'**
   String get marketClockFomoShieldStatusTitle;
 
   /// No description provided for @marketClockRiskDetailWhyNowLabel.

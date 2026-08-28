@@ -35,10 +35,18 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_initialized) return;
-    _initialized = true;
+    // Recompute on every call, not just the first — didChangeDependencies
+    // fires again whenever an inherited dependency (the app's Locale
+    // included) changes, and _state bakes the current l10n's strings
+    // straight into MarketWindow. Gating this behind _initialized used to
+    // freeze the active phase's headline at whatever locale was active on
+    // this widget's first build (e.g. a still-settling locale at cold
+    // start) until the timer's own next tick happened to catch up — only
+    // the timer start itself needs the once-only guard.
     final l10n = AppLocalizations.of(context)!;
     _state = resolveMarketClockState(l10n, nowInNewYork());
+    if (_initialized) return;
+    _initialized = true;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       final l10n = AppLocalizations.of(context)!;
       setState(() => _state = resolveMarketClockState(l10n, nowInNewYork()));

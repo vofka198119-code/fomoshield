@@ -286,16 +286,24 @@ class FomoShieldStatusWidget extends StatelessWidget {
     );
   }
 
-  /// All 4 bars now share the brand gold (dialBrassLight) — same accent as
-  /// the clock face's ring — with a soft matching glow underneath, instead
-  /// of the earlier per-metric semantic colors.
+  /// Bars run gold (dialBrassLight) up to the 70% mark, then blend into red
+  /// (ThemeV2.loss) for the 70-100% "danger zone" — see [_barGradient]. The
+  /// gradient is defined over the bar's full conceptual 0-100% width, so a
+  /// value under 70% never shows any red at all, only a value that actually
+  /// crosses the threshold reveals it.
   Widget _metricBar(String label, int value) {
     return Row(
       children: [
         SizedBox(
-          width: 92,
+          // Wide enough for the longest RU label ("Новостной риск") on one
+          // line at this font size — was 92, which wrapped its last letter
+          // onto a second line. Narrower than before on purpose: the bar
+          // itself gives up the width this needed.
+          width: 118,
           child: Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -303,6 +311,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(width: 8),
         Expanded(
           child: Container(
             decoration: BoxDecoration(
@@ -317,16 +326,46 @@ class FomoShieldStatusWidget extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: value / 100,
-                minHeight: 8,
-                backgroundColor: Colors.white.withValues(alpha: 0.12),
-                valueColor: AlwaysStoppedAnimation(dialBrassLight),
+              child: Stack(
+                children: [
+                  Container(
+                    height: 8,
+                    color: Colors.white.withValues(alpha: 0.12),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: (value / 100).clamp(0.0, 1.0),
+                    child: Container(
+                      height: 8,
+                      decoration: BoxDecoration(gradient: _barGradient(value)),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  /// Gold below the 70% mark, blending into red past it — [value] (0-100)
+  /// only ever reveals the slice of this gradient up to its own fraction
+  /// (via the FractionallySizedBox in [_metricBar]), so the transition's
+  /// on-screen position always lines up with the real 70% mark on the
+  /// bar's full track, not with the filled portion's own local width.
+  static LinearGradient _barGradient(int value) {
+    const threshold = 0.70;
+    const blend = 0.05;
+    final fraction = (value / 100).clamp(0.0, 1.0);
+    if (fraction <= threshold || fraction == 0) {
+      return LinearGradient(colors: [dialBrassLight, dialBrassLight]);
+    }
+    final localThreshold = (threshold / fraction).clamp(0.0, 1.0);
+    final start = (localThreshold - blend).clamp(0.0, 1.0);
+    final end = (localThreshold + blend).clamp(0.0, 1.0);
+    return LinearGradient(
+      colors: [dialBrassLight, dialBrassLight, ThemeV2.loss, ThemeV2.loss],
+      stops: [0.0, start, end, 1.0],
     );
   }
 }

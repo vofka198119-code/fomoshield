@@ -92,7 +92,7 @@ class MarketPhaseWidget extends StatelessWidget {
                         window.shortDetail,
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: palette.textBody,
+                          color: palette.textHeader,
                         ),
                       ),
                       const SizedBox(height: 4),

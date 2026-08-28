@@ -230,6 +230,7 @@ class _MarketClockInstrumentPanel extends StatelessWidget {
           macro: macro,
           active: active,
           remainingMinutes: remaining,
+          palette: palette,
         ),
       );
     }
@@ -266,6 +267,7 @@ class _CornerPanel extends StatelessWidget {
   final _MacroPhase macro;
   final bool active;
   final int remainingMinutes;
+  final AppPalette palette;
 
   const _CornerPanel({
     required this.corner,
@@ -276,6 +278,7 @@ class _CornerPanel extends StatelessWidget {
     required this.macro,
     required this.active,
     required this.remainingMinutes,
+    required this.palette,
   });
 
   // The notch circle sits at the true center of the whole instrument-panel
@@ -369,6 +372,11 @@ class _CornerPanel extends StatelessWidget {
               borderColor: active
                   ? _macroPhaseColor(macro.phase).withValues(alpha: 0.7)
                   : dialBrassLight.withValues(alpha: 0.3),
+              // Only the inactive gold outline picks up the theme's window-
+              // border gradient (same recipe themedBorder/CardFrame use
+              // elsewhere) — the active phase keeps its own semantic color
+              // untouched, and Standard (borderGradient == null) is unchanged.
+              borderGradient: active ? null : palette.borderGradient,
               fillColor: active
                   ? _macroPhaseColor(macro.phase).withValues(alpha: 0.1)
                   : dialDark.withValues(alpha: 0.25),
@@ -419,6 +427,7 @@ class _NotchedPanelPainter extends CustomPainter {
   final double notchRadius;
   final double cornerRadius;
   final Color borderColor;
+  final Gradient? borderGradient;
   final Color fillColor;
 
   _NotchedPanelPainter({
@@ -427,6 +436,7 @@ class _NotchedPanelPainter extends CustomPainter {
     required this.notchRadius,
     required this.cornerRadius,
     required this.borderColor,
+    this.borderGradient,
     required this.fillColor,
   });
 
@@ -462,17 +472,23 @@ class _NotchedPanelPainter extends CustomPainter {
         ..color = fillColor
         ..style = PaintingStyle.fill,
     );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = borderColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.4,
-    );
+    final borderPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4;
+    final gradient = borderGradient;
+    if (gradient != null) {
+      borderPaint.shader = gradient.createShader(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+      );
+    } else {
+      borderPaint.color = borderColor;
+    }
+    canvas.drawPath(path, borderPaint);
   }
 
   @override
   bool shouldRepaint(covariant _NotchedPanelPainter oldDelegate) =>
       oldDelegate.borderColor != borderColor ||
+      oldDelegate.borderGradient != borderGradient ||
       oldDelegate.fillColor != fillColor;
 }

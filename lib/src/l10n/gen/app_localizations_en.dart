@@ -5007,8 +5007,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marketClockWidgetDisplayNameMarketPhase => 'Market Phase';
 
   @override
-  String get marketClockWidgetDisplayNameTimingIndicator =>
-      'FOMO Shield Status';
+  String get marketClockWidgetDisplayNameTimingIndicator => 'Risk Indicator';
 
   @override
   String get portfolioBalanceWidgetDisplayNamePortfolioHealth =>
@@ -5183,7 +5182,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marketPhaseWidgetDetailsTooltip => 'Details';
 
   @override
-  String get marketClockFomoShieldStatusTitle => 'FOMO SHIELD STATUS';
+  String get marketClockFomoShieldStatusTitle => 'RISK INDICATOR';
 
   @override
   String get marketClockRiskDetailWhyNowLabel => 'Why Now?';
