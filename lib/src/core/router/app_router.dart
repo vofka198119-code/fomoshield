@@ -50,7 +50,8 @@ import '../../features/assets/screens/assets_screen.dart';
 import '../../features/assets/screens/stock_detail_screen.dart';
 import '../../features/assets/screens/why_today_screen.dart';
 import '../../features/assets/screens/order_entry_screen.dart';
-import '../theme/theme_v2.dart';
+import '../theme/app_palette.dart';
+import '../theme/theme_variant_provider.dart';
 import 'navigation_history_provider.dart';
 
 /// Bridges a Stream (Supabase's auth-state stream) into a [Listenable] so
@@ -479,6 +480,7 @@ class _AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
@@ -487,16 +489,19 @@ class _AppShell extends ConsumerWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         child: Container(
           decoration: BoxDecoration(
-            color: ThemeV2.surface,
-            border: Border(
-              top: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
-            ),
+            color: palette.card,
+            gradient: palette.cardGradient,
+            border: Border(top: BorderSide(color: palette.border)),
           ),
           child: SafeArea(
             top: false,
             child: Padding(
               padding: const EdgeInsets.only(top: 4),
               child: BottomNavigationBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                selectedItemColor: palette.accentPrimary,
+                unselectedItemColor: palette.textBody,
                 // Cyrillic glyphs run visibly wider than Latin at the same
                 // character count — "Стресс-тест" was clipping to
                 // "Стресс-т…" at the default 12/14px label sizes. Shrunk
