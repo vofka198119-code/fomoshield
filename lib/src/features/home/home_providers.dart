@@ -184,23 +184,23 @@ final marketIndicesProvider = FutureProvider<List<MarketIndex>>((ref) async {
   try {
     final api = ref.read(finnhubServiceProvider);
     final results = await Future.wait([
-      api.previousTradingDayQuote('SPY'),
-      api.previousTradingDayQuote('QQQ'),
-      api.previousTradingDayQuote('DIA'),
+      api.indexQuote('^GSPC'),
+      api.indexQuote('^IXIC'),
+      api.indexQuote('^DJI'),
     ]);
     final indices = [
-      MarketIndex.fromQuote('S&P 500', 'SPY', results[0]),
-      MarketIndex.fromQuote('NASDAQ', 'QQQ', results[1]),
-      MarketIndex.fromQuote('DOW JONES', 'DIA', results[2]),
+      MarketIndex.fromQuote('S&P 500', '^GSPC', results[0]),
+      MarketIndex.fromQuote('NASDAQ', '^IXIC', results[1]),
+      MarketIndex.fromQuote('DOW JONES', '^DJI', results[2]),
     ];
     cache.setIndices(indices);
     return indices;
   } catch (e) {
     debugPrint('❌ marketIndicesProvider error: $e');
     return [
-      const MarketIndex(name: 'S&P 500', symbol: 'SPY', price: 0, change: 0),
-      const MarketIndex(name: 'NASDAQ', symbol: 'QQQ', price: 0, change: 0),
-      const MarketIndex(name: 'DOW JONES', symbol: 'DIA', price: 0, change: 0),
+      const MarketIndex(name: 'S&P 500', symbol: '^GSPC', price: 0, change: 0),
+      const MarketIndex(name: 'NASDAQ', symbol: '^IXIC', price: 0, change: 0),
+      const MarketIndex(name: 'DOW JONES', symbol: '^DJI', price: 0, change: 0),
     ];
   }
 });
