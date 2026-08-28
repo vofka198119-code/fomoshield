@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/cache/logo_providers.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/app_palette.dart';
@@ -16,23 +15,21 @@ import '../../../shared/widgets/company_logo.dart';
 // bottom divider between rows. Lanes stack these vertically instead of
 // scrolling horizontally.
 //
-// Logo/sector resolution: if the caller already has a URL, pass it in
-// directly. Otherwise this reads cachedLogoProvider/cachedGicsSectorProvider
-// — cache-first, live Finnhub fetch on a miss — falling back to a letter
-// avatar / resolveGicsSector's static table only while that fetch is in
-// flight or genuinely fails. This data is shared across every user (same
-// ticker, same logo/sector for everyone), so a fetch here warms the
-// backend's persistent profile cache once and every other device benefits
-// from it forever — cost scales with the S&P 500 catalog, not with user
-// count (see feedback_finnhub_cost_at_scale memory's shared-list exception).
-// Switched back from the cache-only quickLogoProvider/quickGicsSectorProvider
-// 2026-08-26: that avoided a genuine ~60-simultaneous-fetch burst on 2026-08-22,
-// but left rows stuck showing CompanyLogo's generic ticker-CDN fallback (often
-// a stale/wrong logo) until the user opened that exact company's card. The
-// burst risk it was guarding against is now covered at the network layer —
-// finnhub_service.dart's _ConcurrencyLimiter (max 4 in flight) + in-flight
-// dedup, plus the backend's persistent profileCache (survives restarts) — so
-// there's no need to also block it here.
+// Logo: CompanyLogo resolves it on its own now (via cachedLogoProvider,
+// which goes through our backend's /icons endpoint — never Finnhub
+// directly from the client) whenever this doesn't pass an explicit
+// logoUrl, so there's nothing to wire up here for it.
+//
+// Sector: cache-only (quickGicsSectorProvider) — falls back to
+// resolveGicsSector's static table on a miss rather than firing a live
+// Finnhub call, since (unlike icons) there's no safe backend endpoint for
+// sector yet. Was briefly switched to the live-fetching
+// cachedGicsSectorProvider 2026-08-26 to fix stale icons, but that
+// provider fetches sector via the exact same Finnhub profile call as the
+// old logo path (SectorRepository.loadSector -> LogoRepository.loadLogo)
+// — reverted back here 2026-08-27 once the icon fix above made that
+// detour unnecessary; see fomoshield_finnhub_rate_limit_fix_2026_08_22
+// memory, round 6.
 //
 // No price here, by design — a lane full of these rows must never trigger
 // a live quote per row (that's what blew through Finnhub's rate limit).
@@ -83,24 +80,11 @@ class CompanyMiniCard extends StatelessWidget {
                       width: 1.5,
                     ),
                   ),
-                  child: logoUrl != null
-                      ? CompanyLogo(
-                          ticker: symbol,
-                          logoUrl: logoUrl,
-                          radius: 18,
-                        )
-                      : Consumer(
-                          builder: (context, ref, _) {
-                            final resolved = ref
-                                .watch(cachedLogoProvider(symbol))
-                                .valueOrNull;
-                            return CompanyLogo(
-                              ticker: symbol,
-                              logoUrl: resolved,
-                              radius: 18,
-                            );
-                          },
-                        ),
+                  child: CompanyLogo(
+                    ticker: symbol,
+                    logoUrl: logoUrl,
+                    radius: 18,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -122,7 +106,7 @@ class CompanyMiniCard extends StatelessWidget {
                       Consumer(
                         builder: (context, ref, _) {
                           final cachedSector = ref
-                              .watch(cachedGicsSectorProvider(symbol))
+                              .watch(quickGicsSectorProvider(symbol))
                               .valueOrNull;
                           final sector =
                               cachedSector ??

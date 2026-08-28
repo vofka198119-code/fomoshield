@@ -7,7 +7,6 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_divider.dart';
-import '../../core/cache/logo_providers.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../home/home_providers.dart';
@@ -256,19 +255,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   width: 1.5,
                                 ),
                               ),
-                              child: Consumer(
-                                builder: (context, ref, _) {
-                                  final logoAsync = ref.watch(
-                                    cachedLogoProvider(symbol),
-                                  );
-                                  final logoUrl = logoAsync.valueOrNull;
-                                  return CompanyLogo(
-                                    ticker: symbol,
-                                    logoUrl: logoUrl,
-                                    radius: 22,
-                                  );
-                                },
-                              ),
+                              child: CompanyLogo(ticker: symbol, radius: 22),
                             ),
                             title: Row(
                               children: [

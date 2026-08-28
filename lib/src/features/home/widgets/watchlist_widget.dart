@@ -91,7 +91,7 @@ class _WatchlistTile extends ConsumerWidget {
               child: CompanyLogo(
                 ticker: symbol,
                 logoUrl: logoEntry?.logoUrl,
-                domain: logoEntry?.domain,
+                resolveIfMissing: false,
               ),
             ),
             const SizedBox(width: 12),

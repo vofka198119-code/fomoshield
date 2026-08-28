@@ -13,19 +13,31 @@ final logoRepositoryProvider = Provider<LogoRepository>((ref) {
 });
 
 // ---------------------------------------------------------------------------
-// Cached Logo Provider — загружает логотип при первом обращении
+// Cached Logo Provider — резолвит логотип, никогда не вызывая Finnhub
+// напрямую с клиента
 // ---------------------------------------------------------------------------
-// Возвращает Future с URL логотипа или null.
-// При первом вызове проверяет кэш, если нет — загружает через Finnhub.
-
+// 1. Локальный кэш (LogoDao) — если тикер уже реально резолвился раньше
+//    (обычно через Company Detail, см. cacheFromProfile), берём оттуда.
+// 2. Промах — идём в НАШ бэкенд (/api/v1/icons/:symbol), а не в Finnhub
+//    напрямую. Тот эндпоинт сам никогда синхронно не бьёт по Finnhub —
+//    отдаёт бесплатный ticker-CDN фоллбэк сразу же, а настоящее лого
+//    подтягивает отдельная фоновая джоба на сервере (throttled, вне
+//    пользовательского запроса). Раньше здесь стоял
+//    repo.loadLogoSymbol(ticker) — прямой Finnhub-вызов с клиента на
+//    каждый непопавший в кэш тикер, тот самый источник rate-limit'ов при
+//    браузинге Search-лент (см. fomoshield_finnhub_rate_limit_fix_2026_08_22
+//    memory, round 6, 2026-08-27).
 final cachedLogoProvider = FutureProvider.family<String?, String>((ref, ticker) async {
   final repo = ref.read(logoRepositoryProvider);
-  // Сначала проверить кэш
   final cached = await repo.getCachedLogo(ticker);
   if (cached != null) return cached;
 
-  // Если нет в кэше — попробовать загрузить
-  return repo.loadLogoSymbol(ticker);
+  try {
+    final data = await ref.read(finnhubServiceProvider).icon(ticker);
+    return data['iconUrl'] as String?;
+  } catch (_) {
+    return null;
+  }
 });
 
 // ---------------------------------------------------------------------------

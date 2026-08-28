@@ -275,6 +275,7 @@ class _HoldingRow extends ConsumerWidget {
                         ticker: holding.symbol,
                         logoUrl: logoUrl,
                         radius: 18,
+                        resolveIfMissing: false,
                       ),
                     ),
                   ),

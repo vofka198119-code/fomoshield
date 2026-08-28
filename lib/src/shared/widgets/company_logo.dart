@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../core/cache/logo_providers.dart';
 import '../../core/theme/theme_v2.dart';
 
 // ---------------------------------------------------------------------------
@@ -10,69 +12,50 @@ import '../../core/theme/theme_v2.dart';
 // Если logoUrl отсутствует — показывает первую букву названия в круге.
 //
 // Приоритет:
-//   1. logoUrl (из LogoCache, если тикер уже реально резолвился)
-//   2. domain → Clearbit (logo.clearbit.com/$domain)
-//   3. FMP image-stock по тикеру напрямую (financialmodelingprep.com/
-//      image-stock/{TICKER}.png) — бесплатный, без ключа, без похода в
-//      Finnhub/наш бэкенд вообще: URL строится из одного тикера, который
-//      у виджета и так уже есть. Это ПОСЛЕДНИЙ уровень именно потому, что
-//      если тикер уже реально резолвился (шаг 1), у нас есть более точный
-//      URL — но пока этого не случилось, каждый виджет везде (ленты,
-//      список секторов, Watchlist, Portfolio) показывает лого сразу, а не
-//      буквенный аватар до первого открытия карточки. CachedNetworkImage
-//      ниже сам подменит его на букву, если конкретный тикер не найдётся
-//      на FMP (редкость — обычные буквенные ошибки не показываются).
-//   4. Ничего не резолвилось — первая буква ticker в CircleAvatar
+//   1. logoUrl, если явно передан вызывающей стороной (обычно из
+//      LogoDao/cachedLogoEntryProvider/quickLogoProvider — тикер уже
+//      реально резолвился раньше).
+//   2. Если resolveIfMissing (default true) — cachedLogoProvider(ticker).
+//      Это НЕ прямой вызов Finnhub/Clearbit/FMP с клиента (раньше был
+//      именно им) — это единственный сервер-бэкенд эндпоинт
+//      /api/v1/icons/:symbol, который сам никогда синхронно не бьёт по
+//      Finnhub (см. cachedLogoProvider's own doc comment и
+//      scanco-backend's routes/icons.js). Ленты, список секторов,
+//      карточки сделок и т.д. идут этим путём.
+//   3. Ничего не резолвилось (или resolveIfMissing: false) — первая
+//      буква ticker в CircleAvatar.
+//
+// resolveIfMissing: false — Watchlist/Portfolio Holdings передают его
+// явно. Это per-user списки: если каждый ряд сам достукивается до
+// нашего бэкенда за иконкой, стоимость масштабируется с числом
+// пользователей, а не с каталогом (см. feedback_finnhub_cost_at_scale
+// memory) — тот же принцип, что уже применён к их провайдерам
+// (cachedLogoEntryProvider/quickLogoProvider остаются cache-only). Раньше
+// это не имело значения, т.к. CompanyLogo сам строил FMP-URL бесплатно;
+// теперь, когда фоллбэк ушёл на бэкенд, эти экраны должны явно
+// отказаться от него.
 // ---------------------------------------------------------------------------
 
-class CompanyLogo extends StatelessWidget {
+class CompanyLogo extends ConsumerWidget {
   final String ticker;
   final String? logoUrl;
-  final String? domain;
   final double radius;
+  final bool resolveIfMissing;
 
   const CompanyLogo({
     super.key,
     required this.ticker,
     this.logoUrl,
-    this.domain,
     this.radius = 16,
+    this.resolveIfMissing = true,
   });
 
-  /// Extracts the host domain from a company URL.
-  /// e.g. "https://www.apple.com" → "apple.com"
-  static String? extractDomain(String? weburl) {
-    if (weburl == null || weburl.isEmpty) return null;
-    try {
-      final uri = Uri.parse(weburl);
-      final host = uri.host;
-      // Remove leading "www." if present
-      if (host.startsWith('www.')) return host.substring(4);
-      return host;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  /// Builds the Clearbit logo URL from a domain or ticker.
-  static String? logoUrlFromDomain(String? domain, String ticker) {
-    final effectiveDomain = domain ?? '${ticker.toLowerCase()}.com';
-    if (effectiveDomain.isEmpty) return null;
-    return 'https://logo.clearbit.com/$effectiveDomain';
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final initial = ticker.isNotEmpty ? ticker[0].toUpperCase() : '?';
-
-    // Приоритет: явный logoUrl > Clearbit по domain > FMP по тикеру
-    // (см. doc comment выше — этот последний уровень не требует сети для
-    // построения URL, только для загрузки самой картинки).
     final url = logoUrl ??
-        (domain != null ? 'https://logo.clearbit.com/$domain' : null) ??
-        (ticker.isNotEmpty
-            ? 'https://financialmodelingprep.com/image-stock/'
-                  '${ticker.toUpperCase()}.png'
+        (resolveIfMissing
+            ? ref.watch(cachedLogoProvider(ticker)).valueOrNull
             : null);
 
     if (url != null) {

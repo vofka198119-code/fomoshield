@@ -226,8 +226,8 @@ class _WatchlistRow extends ConsumerWidget {
                   child: CompanyLogo(
                     ticker: symbol,
                     logoUrl: logoEntry?.logoUrl,
-                    domain: logoEntry?.domain,
                     radius: 18,
+                    resolveIfMissing: false,
                   ),
                 ),
                 const SizedBox(width: 12),

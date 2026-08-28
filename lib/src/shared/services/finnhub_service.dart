@@ -385,6 +385,18 @@ class FinnhubService {
       _getFromBackend('/profile/$symbol');
 
   // ---------------------------------------------------------------------------
+  // Icon — the one endpoint any screen should use for a ticker's logo.
+  // Never falls through to Finnhub/Clearbit/FMP on the client: a cache
+  // miss server-side returns the free ticker-CDN fallback immediately
+  // (no Finnhub call on this path at all), and a background job upgrades
+  // it to the real logo later at its own throttled pace. See
+  // scanco-backend's routes/icons.js + iconService.js.
+  // ---------------------------------------------------------------------------
+
+  Future<Map<String, dynamic>> icon(String symbol) async =>
+      _getFromBackend('/icons/$symbol');
+
+  // ---------------------------------------------------------------------------
   // Quote
   // ---------------------------------------------------------------------------
 
@@ -417,10 +429,10 @@ class FinnhubService {
   /// Avoids `/stock/candle` which is a PAID endpoint.
   Future<Map<String, dynamic>> previousTradingDayQuote(String symbol) async {
     // /quote works on free Finnhub tier — returns real-time price, change, prev close.
-    // Deliberately doesn't catch: callers (e.g. marketIndicesProvider's
-    // Future.wait over SPY/QQQ/DIA) need a failure on ANY one symbol to
-    // fail the whole batch, not silently succeed with a zeroed entry that
-    // then gets cached for hours indistinguishable from a real flat market.
+    // Deliberately doesn't catch: callers need a failure on ANY one symbol
+    // to fail the whole batch, not silently succeed with a zeroed entry
+    // that then gets cached for hours indistinguishable from a real flat
+    // market.
     final q = await quote(symbol);
     final c = (q['c'] as num?)?.toDouble() ?? 0;
     final dp = (q['dp'] as num?)?.toDouble() ?? 0;
@@ -428,6 +440,19 @@ class FinnhubService {
     debugPrint('📊 quote($symbol): c=$c dp=$dp pc=$pc');
     return {'c': c, 'dp': dp, 'pc': pc};
   }
+
+  /// Real index level (e.g. '^GSPC', '^IXIC', '^DJI') — Finnhub's free
+  /// tier refuses these ("Market data subscription required for CFD
+  /// indices", confirmed 2026-08-27), so this goes through the backend's
+  /// Yahoo-backed /market-index/:symbol instead of /quote/:symbol. Used
+  /// by marketIndicesProvider, which used to read SPY/QQQ/DIA (the ETFs)
+  /// through [previousTradingDayQuote] and label them as the indices
+  /// themselves — SPY trades at ~1/10th the S&P 500 level by design, so
+  /// that showed "$771" under the "S&P 500" label instead of the real
+  /// ~7730. Same {c,dp,pc} shape, so callers built on that shape don't
+  /// need to change.
+  Future<Map<String, dynamic>> indexQuote(String symbol) async =>
+      _getFromBackend('/market-index/${Uri.encodeComponent(symbol)}');
 
   // ---------------------------------------------------------------------------
   // Financials / Metrics

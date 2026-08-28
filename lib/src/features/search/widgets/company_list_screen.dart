@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/cache/logo_providers.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../core/theme/app_palette.dart';
@@ -23,14 +22,11 @@ import '../top_companies_provider.dart';
 // instead, same pattern as WatchlistFullScreen's own "see all".
 //
 // Rows read name from the entry the caller already has
-// (top_companies_provider.dart's backend-ranked list) and logo/sector from
-// cachedLogoProvider/cachedGicsSectorProvider — cache-first, live Finnhub
-// fetch on a miss. This list is lazy (ListView.separated builds only
-// visible rows), and the fetch itself is shared/cacheable data (same
-// ticker → same logo/sector for every user, persisted server-side across
-// restarts) rather than per-user cost — see company_mini_card.dart's doc
-// comment for the full reasoning behind reverting off the cache-only
-// quickLogoProvider/quickGicsSectorProvider 2026-08-26. Price still only
+// (top_companies_provider.dart's backend-ranked list). Logo: CompanyLogo
+// resolves it on its own (via cachedLogoProvider -> our backend's /icons
+// endpoint, never Finnhub directly). Sector: quickGicsSectorProvider,
+// cache-only — see company_mini_card.dart's doc comment for why sector
+// stays cache-only even though logo no longer needs to. Price still only
 // shows once the user taps through to Company Detail — that's the one
 // per-row cost this screen must never pay.
 // ---------------------------------------------------------------------------
@@ -139,14 +135,12 @@ class _CompanyRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logoUrl = ref.watch(cachedLogoProvider(entry.symbol)).valueOrNull;
-
     final String subtitle;
     if (suppressSector) {
       subtitle = entry.symbol;
     } else {
       final cachedSector = ref
-          .watch(cachedGicsSectorProvider(entry.symbol))
+          .watch(quickGicsSectorProvider(entry.symbol))
           .valueOrNull;
       final sector =
           cachedSector ??
@@ -162,7 +156,7 @@ class _CompanyRow extends ConsumerWidget {
           shape: BoxShape.circle,
           border: Border.all(color: palette.accentPrimary, width: 1.5),
         ),
-        child: CompanyLogo(ticker: entry.symbol, logoUrl: logoUrl, radius: 18),
+        child: CompanyLogo(ticker: entry.symbol, radius: 18),
       ),
       title: Text(
         entry.name,
