@@ -408,11 +408,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stressTestPremiumLowercase => 'premium';
 
   @override
-  String stressTestActiveLabel(String duration) {
-    return 'Active — $duration';
-  }
-
-  @override
   String get stressTestHubTitle => 'MARKET SIMULATION';
 
   @override
@@ -462,6 +457,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stressTestSetupTitle => 'Market Simulation Setup';
+
+  @override
+  String get stressTestNameSectionTitle => 'TEST NAME (OPTIONAL)';
+
+  @override
+  String get stressTestNameHint => 'e.g. My AI Bet';
+
+  @override
+  String get stressTestRenameDialogTitle => 'Rename Test';
 
   @override
   String get stressTestDurationSectionTitle => 'SIMULATION DURATION';
@@ -833,9 +837,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get portfolioResetMenu => 'Reset Portfolio';
 
   @override
-  String get portfolioDeleteMenu => 'Delete Portfolio';
-
-  @override
   String get portfolioNoPortfoliosYet => 'No portfolios yet';
 
   @override
@@ -858,17 +859,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get portfolioResetDialogBody =>
       'All holdings and history will be cleared.\nBalance will be restored to its original amount.';
-
-  @override
-  String get portfolioDeleteDialogTitle => 'Delete Portfolio?';
-
-  @override
-  String get portfolioDeleteDialogBody =>
-      'All holdings and history will be lost.';
-
-  @override
-  String get portfolioCannotDeleteLast =>
-      'Cannot delete the last portfolio. Create a new one first.';
 
   @override
   String get portfolioNewDialogTitle => 'New Portfolio';

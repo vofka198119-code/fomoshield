@@ -349,8 +349,9 @@ extension NoiseEngine on StressTestNotifier {
                 type: AppNotificationType.news,
                 portfolioKind: NotificationPortfolioKind.stressTest,
                 portfolioId: session.id,
-                portfolioLabel:
-                    'Market Simulation — ${session.duration.displayName}',
+                portfolioLabel: session.displayLabel(
+                  'Market Simulation — ${session.duration.displayName}',
+                ),
                 symbol: newsEvent.symbol,
                 companyName: stressTestCompanyName(newsEvent.symbol),
                 title: newsEvent.headline,
@@ -736,6 +737,46 @@ extension NoiseEngine on StressTestNotifier {
       return (hist, ts);
     }();
 
+    // Daily-bucket history, folded from the SAME raw tick batch (not the
+    // render-downsampled subset above) so a catch-up burst spanning
+    // several real days still gets each day's true last tick, not
+    // whichever 150-of-many sub-ticks happened to survive downsampling.
+    // See _foldIntoDailyHistory's doc comment for why this array exists
+    // at all — raw priceHistory only covers ~27h, so this is what makes
+    // 1W/1M/3M/1Y charts show real day-by-day data instead of the same
+    // ~27h stretched to fill the width.
+    final dailyHistoryUpdate = () {
+      final hist = Map<String, List<double>>.from(session.dailyPriceHistory);
+      final ts = Map<String, List<int>>.from(
+        session.dailyPriceHistoryTimestamps,
+      );
+      final allSymbols = <String>{
+        ...session.holdings.map((h) => h.symbol),
+        ...newPrices.keys,
+      };
+      for (final sym in allSymbols) {
+        final newPts = <double>[];
+        final newTs = <int>[];
+        for (int i = 0; i < tickSnapshots.length; i++) {
+          final p = tickSnapshots[i][sym];
+          if (p != null) {
+            newPts.add(p);
+            newTs.add(tickTimestamps[i]);
+          }
+        }
+        if (newPts.isEmpty) continue;
+        final folded = _foldIntoDailyHistory(
+          existingPrices: hist[sym] ?? const [],
+          existingTimestamps: ts[sym] ?? const [],
+          newPrices: newPts,
+          newTimestamps: newTs,
+        );
+        hist[sym] = folded.$1;
+        ts[sym] = folded.$2;
+      }
+      return (hist, ts);
+    }();
+
     // ── Price-swing radar (notifications) ────────────────────────────
     // Live-tick only (ticks<=1) — same principle as the News notification
     // gate above: a catch-up batch replaying several missed epochs at once
@@ -750,6 +791,7 @@ extension NoiseEngine on StressTestNotifier {
         if (i == idx)
           StressTestSession(
             id: session.id,
+            name: session.name,
             duration: session.duration,
             startingCash: session.startingCash,
             cash: session.cash,
@@ -799,6 +841,8 @@ extension NoiseEngine on StressTestNotifier {
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: priceHistoryUpdate.$1,
             priceHistoryTimestamps: priceHistoryUpdate.$2,
+            dailyPriceHistory: dailyHistoryUpdate.$1,
+            dailyPriceHistoryTimestamps: dailyHistoryUpdate.$2,
             lastTickTimestamp: now,
             // ── Block 5 + 6: Per-company events & casino state ─
             lastEpochRollAt: session.lastEpochRollAt ?? now,
@@ -853,8 +897,9 @@ extension NoiseEngine on StressTestNotifier {
           type: AppNotificationType.priceSwing,
           portfolioKind: NotificationPortfolioKind.stressTest,
           portfolioId: session.id,
-          portfolioLabel:
-              'Market Simulation — ${session.duration.displayName}',
+          portfolioLabel: session.displayLabel(
+            'Market Simulation — ${session.duration.displayName}',
+          ),
           symbol: h.symbol,
           companyName: name,
           title:

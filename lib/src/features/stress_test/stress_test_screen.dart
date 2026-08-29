@@ -244,6 +244,143 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     });
   }
 
+  // Same gold-ring + graphite-window recipe as Portfolio's own rename
+  // dialog (_showRenamePortfolioDialog in portfolio_screen.dart) — lets
+  // an already-started test be told apart from another of the same
+  // duration (e.g. two concurrent "1 Week" tests looked identical in the
+  // Active Simulations list before this existed).
+  void _showRenameSessionDialog(
+    BuildContext context,
+    StressTestSession session,
+    AppPalette palette,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final isLuxury = palette.windowGradient != null;
+    final controller = TextEditingController(text: session.name ?? '');
+    final fieldRadius = BorderRadius.circular(10);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: palette.card,
+        shape: isLuxury
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: palette.accentPrimary, width: 1),
+              )
+            : null,
+        title: SizedBox(
+          width: double.infinity,
+          child: Text(
+            l10n.stressTestRenameDialogTitle,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: palette.textHeader,
+            ),
+          ),
+        ),
+        content: isLuxury
+            ? themedBorder(
+                palette: palette,
+                borderRadius: fieldRadius,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: palette.windowGradient,
+                    borderRadius: fieldRadius,
+                  ),
+                  child: Theme(
+                    data: Theme.of(ctx).copyWith(
+                      textSelectionTheme: TextSelectionThemeData(
+                        cursorColor: palette.accentPrimary,
+                        selectionColor: palette.accentPrimary.withValues(
+                          alpha: 0.3,
+                        ),
+                        selectionHandleColor: palette.accentPrimary,
+                      ),
+                    ),
+                    child: TextField(
+                      controller: controller,
+                      autofocus: true,
+                      maxLength: 40,
+                      cursorColor: palette.accentPrimary,
+                      enableInteractiveSelection: false,
+                      decoration: InputDecoration(
+                        hintText: l10n.stressTestNameHint,
+                        hintStyle: GoogleFonts.inter(
+                          color: palette.textBody,
+                          fontSize: 14,
+                        ),
+                        filled: false,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        counterText: '',
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                      ),
+                      style: GoogleFonts.inter(
+                        color: palette.textHeader,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : TextField(
+                controller: controller,
+                autofocus: true,
+                maxLength: 40,
+                decoration: InputDecoration(
+                  hintText: l10n.stressTestNameHint,
+                  hintStyle: GoogleFonts.inter(
+                    color: palette.textBody,
+                    fontSize: 14,
+                  ),
+                  filled: true,
+                  fillColor: ThemeV2.surfaceDark,
+                  counterText: '',
+                  border: OutlineInputBorder(
+                    borderRadius: fieldRadius,
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                style: GoogleFonts.inter(
+                  color: palette.textHeader,
+                  fontSize: 14,
+                ),
+              ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              l10n.profileCancel,
+              style: GoogleFonts.inter(color: palette.textBody),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              ref
+                  .read(stressTestProvider.notifier)
+                  .renameSession(session.id, controller.text);
+              Navigator.pop(ctx);
+            },
+            child: Text(
+              l10n.portfolioSave,
+              style: GoogleFonts.inter(
+                color: palette.accentPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Called whenever this session might have just completed (either the
   // ref.listen transition below, or right after a manual terminateTest()
   // call from the Finish Test button). Guarded by _handledCompletion so
@@ -331,7 +468,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         toolbarHeight: 64,
         centerTitle: true,
         title: themedHeaderText(
-          l10n.stressTestPortfolioTitle,
+          session.displayLabel(l10n.stressTestPortfolioTitle).toUpperCase(),
           palette,
           GoogleFonts.inter(
             fontSize: 20,
@@ -345,7 +482,29 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           size: 22,
           onPressed: () => context.go('/stress-test-hub'),
         ),
-        actions: [],
+        actions: [
+          IconButton(
+            // Flat accentPrimary before — every other header icon
+            // (back arrow, notification bell) gets the same metallic gold
+            // ShaderMask sheen under Luxury via themedGoldGradient; this
+            // one was missed. Standard is a no-op, exact same gray as
+            // before.
+            icon: themedGoldGradient(
+              Icon(
+                Icons.edit_rounded,
+                color: palette.windowGradient == null
+                    ? ThemeV2.textSecondary
+                    : Colors.white,
+                shadows: palette.titleShadow != null
+                    ? [palette.titleShadow!]
+                    : null,
+              ),
+              palette,
+            ),
+            onPressed: () =>
+                _showRenameSessionDialog(context, session, palette),
+          ),
+        ],
       ),
       body: SafeArea(
         bottom: true,

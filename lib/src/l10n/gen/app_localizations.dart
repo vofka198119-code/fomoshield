@@ -836,12 +836,6 @@ abstract class AppLocalizations {
   /// **'premium'**
   String get stressTestPremiumLowercase;
 
-  /// No description provided for @stressTestActiveLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Active — {duration}'**
-  String stressTestActiveLabel(String duration);
-
   /// No description provided for @stressTestHubTitle.
   ///
   /// In en, this message translates to:
@@ -931,6 +925,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Market Simulation Setup'**
   String get stressTestSetupTitle;
+
+  /// No description provided for @stressTestNameSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TEST NAME (OPTIONAL)'**
+  String get stressTestNameSectionTitle;
+
+  /// No description provided for @stressTestNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. My AI Bet'**
+  String get stressTestNameHint;
+
+  /// No description provided for @stressTestRenameDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Test'**
+  String get stressTestRenameDialogTitle;
 
   /// No description provided for @stressTestDurationSectionTitle.
   ///
@@ -1585,12 +1597,6 @@ abstract class AppLocalizations {
   /// **'Reset Portfolio'**
   String get portfolioResetMenu;
 
-  /// No description provided for @portfolioDeleteMenu.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Portfolio'**
-  String get portfolioDeleteMenu;
-
   /// No description provided for @portfolioNoPortfoliosYet.
   ///
   /// In en, this message translates to:
@@ -1632,24 +1638,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All holdings and history will be cleared.\nBalance will be restored to its original amount.'**
   String get portfolioResetDialogBody;
-
-  /// No description provided for @portfolioDeleteDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Portfolio?'**
-  String get portfolioDeleteDialogTitle;
-
-  /// No description provided for @portfolioDeleteDialogBody.
-  ///
-  /// In en, this message translates to:
-  /// **'All holdings and history will be lost.'**
-  String get portfolioDeleteDialogBody;
-
-  /// No description provided for @portfolioCannotDeleteLast.
-  ///
-  /// In en, this message translates to:
-  /// **'Cannot delete the last portfolio. Create a new one first.'**
-  String get portfolioCannotDeleteLast;
 
   /// No description provided for @portfolioNewDialogTitle.
   ///

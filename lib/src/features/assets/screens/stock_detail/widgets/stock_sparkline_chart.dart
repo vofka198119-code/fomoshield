@@ -97,6 +97,14 @@ class StockSparklineChart extends StatefulWidget {
 
   final AppPalette palette;
 
+  /// Fires with the price at the touched point while the user is holding
+  /// the chart, and with null the instant they let go — lets the parent
+  /// screen's price header mirror the touched value while scrubbing, the
+  /// same "trading app" behavior Company Detail's PriceChart already has
+  /// via chartHoverPriceProvider. Optional — null means the parent hasn't
+  /// wired a price header up to this chart.
+  final ValueChanged<double?>? onTouchedPriceChanged;
+
   const StockSparklineChart({
     super.key,
     required this.ready,
@@ -106,6 +114,7 @@ class StockSparklineChart extends StatefulWidget {
     required this.onPeriodChanged,
     required this.palette,
     this.avgPrice,
+    this.onTouchedPriceChanged,
   });
 
   @override
@@ -125,6 +134,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   bool _touchRevealed = false;
   double? _pendingDx;
   int? _pendingSpotIndex;
+  double? _pendingY;
 
   @override
   void didUpdateWidget(covariant StockSparklineChart oldWidget) {
@@ -139,6 +149,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
       _touchRevealed = false;
       _touchDx = null;
       _touchedSpotIndex = null;
+      widget.onTouchedPriceChanged?.call(null);
     }
   }
 
@@ -161,7 +172,14 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final palette = widget.palette;
-    if (!widget.ready || widget.points.length < 2) {
+    // Only genuinely "still loading" gates the whole card (title/divider/
+    // period tabs included) behind a spinner. Once ready, points.length < 2
+    // is a real state of its own — e.g. a period whose daily-bucket
+    // history hasn't accumulated 2 days yet — and needs the period tabs
+    // to STAY visible so the user can switch to one that has data,
+    // instead of being stuck looking at a spinner forever (that used to
+    // be indistinguishable from "not loaded yet" here).
+    if (!widget.ready) {
       return Container(
         height: 280,
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -430,12 +448,16 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                               touchedSpots.map((_) => null).toList(),
                         ),
                         getTouchedSpotIndicator: (barData, spotIndexes) {
+                          // Was hardcoded black — invisible against Luxury
+                          // Gold's dark background. palette.textHeader
+                          // (cream) reads on both themes' chart canvas.
+                          final indicatorColor = widget.palette.textHeader;
                           return spotIndexes
                               .map(
                                 (_) => TouchedSpotIndicatorData(
                                   _touchRevealed
-                                      ? const FlLine(
-                                          color: Colors.black,
+                                      ? FlLine(
+                                          color: indicatorColor,
                                           strokeWidth: 1.3,
                                         )
                                       : const FlLine(
@@ -459,6 +481,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                             _touchHoldTimer?.cancel();
                             _touchHoldTimer = null;
                             _touchRevealed = false;
+                            widget.onTouchedPriceChanged?.call(null);
                             if (_touchDx != null || _touchedSpotIndex != null) {
                               setState(() {
                                 _touchDx = null;
@@ -470,8 +493,10 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
 
                           _pendingDx = event.localPosition?.dx;
                           _pendingSpotIndex = touched.first.spotIndex;
+                          _pendingY = touched.first.y;
 
                           if (_touchRevealed) {
+                            widget.onTouchedPriceChanged?.call(_pendingY);
                             setState(() {
                               _touchDx = _pendingDx;
                               _touchedSpotIndex = _pendingSpotIndex;
@@ -481,6 +506,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                               _touchHoldTimer = null;
                               if (!mounted) return;
                               _touchRevealed = true;
+                              widget.onTouchedPriceChanged?.call(_pendingY);
                               setState(() {
                                 _touchDx = _pendingDx;
                                 _touchedSpotIndex = _pendingSpotIndex;
@@ -568,7 +594,15 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: ThemeV2.primaryBg,
+                // Was a flat ThemeV2.primaryBg (10%-opacity green) with
+                // hardcoded black text — on Luxury Gold's dark background
+                // that tint reads as barely-there black-on-black. Uses the
+                // same instrument-window fill as everywhere else under
+                // Luxury; Standard keeps the exact original look.
+                color: widget.palette.windowGradient == null
+                    ? ThemeV2.primaryBg
+                    : null,
+                gradient: widget.palette.windowGradient,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -579,7 +613,9 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: widget.palette.windowGradient == null
+                      ? Colors.black
+                      : widget.palette.textHeader,
                 ),
               ),
             ),

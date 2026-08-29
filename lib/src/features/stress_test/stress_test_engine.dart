@@ -91,6 +91,56 @@ List<int> _downsamplePointIndices(int length, int maxPoints) {
   return sorted;
 }
 
+/// Max points kept per symbol in [StressTestSession.dailyPriceHistory] —
+/// one entry per calendar day the symbol has been held, so this only
+/// matters for an Infinite test running for years.
+const int _maxDailyPriceHistoryPoints = 1000;
+
+bool _isSameUtcDay(int aMs, int bMs) {
+  final a = DateTime.fromMillisecondsSinceEpoch(aMs, isUtc: true);
+  final b = DateTime.fromMillisecondsSinceEpoch(bMs, isUtc: true);
+  return a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
+/// Folds a batch of already-chronological (price, timestamp) sub-tick
+/// points into a symbol's running daily-bucket history — one point per
+/// UTC calendar day, holding that day's LAST tick (the same "close"
+/// convention a real daily candle uses). A batch spanning a catch-up gap
+/// of several real days correctly splits across multiple new buckets
+/// instead of collapsing into one, since each point is checked against
+/// the running last-bucket day individually rather than just comparing
+/// the batch's first/last timestamp.
+///
+/// Pure — returns new lists rather than mutating [existingPrices]/
+/// [existingTimestamps] in place, matching this file's existing
+/// [priceHistory] append convention (avoids aliasing the same List
+/// object a reconstructed session's old state still references).
+(List<double>, List<int>) _foldIntoDailyHistory({
+  required List<double> existingPrices,
+  required List<int> existingTimestamps,
+  required List<double> newPrices,
+  required List<int> newTimestamps,
+}) {
+  if (newPrices.isEmpty) return (existingPrices, existingTimestamps);
+  final prices = [...existingPrices];
+  final timestamps = [...existingTimestamps];
+  for (int i = 0; i < newPrices.length; i++) {
+    final ms = newTimestamps[i];
+    if (timestamps.isNotEmpty && _isSameUtcDay(timestamps.last, ms)) {
+      prices[prices.length - 1] = newPrices[i];
+      timestamps[timestamps.length - 1] = ms;
+    } else {
+      prices.add(newPrices[i]);
+      timestamps.add(ms);
+    }
+  }
+  if (prices.length > _maxDailyPriceHistoryPoints) {
+    final drop = prices.length - _maxDailyPriceHistoryPoints;
+    return (prices.sublist(drop), timestamps.sublist(drop));
+  }
+  return (prices, timestamps);
+}
+
 /// Max [TickExplanation]s kept per symbol in [StressTestSession.explanationLog].
 /// Unlike priceHistory, this was never capped at all — Why Today's timeline
 /// only ever displays the last 20 (`why_today_screen.dart`'s `displayTicks`)
@@ -422,6 +472,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   Map<String, dynamic> _sessionToJson(StressTestSession s) {
     return {
       'id': s.id,
+      if (s.name != null) 'name': s.name,
       'duration': s.duration.name,
       'startingCash': s.startingCash,
       'cash': s.cash,
@@ -468,6 +519,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         (k, v) => MapEntry(k, v.map((e) => e).toList()),
       ),
       'priceHistoryTimestamps': s.priceHistoryTimestamps,
+      'dailyPriceHistory': s.dailyPriceHistory,
+      'dailyPriceHistoryTimestamps': s.dailyPriceHistoryTimestamps,
       'status': s.status.name,
       'psychologyProfile': s.psychologyProfile.toJson(),
       'diversificationBonusRecorded': s.diversificationBonusRecorded,
@@ -490,6 +543,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   StressTestSession _sessionFromJson(Map<String, dynamic> json) {
     final s = StressTestSession(
       id: json['id'] as String,
+      name: json['name'] as String?,
       duration: TestDuration.values.firstWhere(
         (d) => d.name == (json['duration'] as String),
       ),
@@ -585,6 +639,25 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             ),
           ) ??
           {},
+      // Absent for sessions persisted before this field existed — chart
+      // periods beyond 1D just have nothing to show for those old
+      // sessions, same "missing means empty" convention as priceHistory.
+      dailyPriceHistory:
+          (json['dailyPriceHistory'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(
+              k,
+              (v as List<dynamic>).map((e) => (e as num).toDouble()).toList(),
+            ),
+          ) ??
+          {},
+      dailyPriceHistoryTimestamps:
+          (json['dailyPriceHistoryTimestamps'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(
+              k,
+              (v as List<dynamic>).map((e) => (e as num).toInt()).toList(),
+            ),
+          ) ??
+          {},
       currentWeights:
           (json['currentWeights'] as Map<String, dynamic>?)?.map(
             (k, v) => MapEntry(k, (v as num).toDouble()),
@@ -647,6 +720,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     double startingCash, {
     int? customDurationDays,
     int? simulationSeed,
+    String? name,
   }) {
     _testCounter++;
     final id =
@@ -655,6 +729,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _sessionRandom[id] = Random(seed);
     final session = StressTestSession(
       id: id,
+      name: name,
       duration: duration,
       startingCash: startingCash,
       customDurationDays: customDurationDays,
@@ -666,6 +741,22 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     _save();
     _syncToSupabase();
     return id;
+  }
+
+  /// Sets or clears (pass null/empty) a session's user-given name. Mutates
+  /// in place (see [StressTestSession.name]'s own doc comment) rather than
+  /// reconstructing the whole session, so it can't accidentally drop any
+  /// of the other ~40 fields the reconstruction sites above have to
+  /// enumerate by hand.
+  void renameSession(String id, String? name) {
+    final idx = state.indexWhere((s) => s.id == id);
+    if (idx < 0) return;
+    state[idx].name = (name == null || name.trim().isEmpty)
+        ? null
+        : name.trim();
+    state = [...state];
+    _save();
+    _syncToSupabase();
   }
 
   /// Whether the user can create a new session given a concurrent-slot cap.
@@ -779,6 +870,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         if (i == idx)
           StressTestSession(
             id: session.id,
+            name: session.name,
             duration: session.duration,
             startingCash: session.startingCash,
             cash: session.cash,
@@ -836,6 +928,26 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
                 DateTime.now().millisecondsSinceEpoch,
               ],
             },
+            dailyPriceHistory: {
+              ...session.dailyPriceHistory,
+              symbol: _foldIntoDailyHistory(
+                existingPrices: session.dailyPriceHistory[symbol] ?? const [],
+                existingTimestamps:
+                    session.dailyPriceHistoryTimestamps[symbol] ?? const [],
+                newPrices: [price],
+                newTimestamps: [DateTime.now().millisecondsSinceEpoch],
+              ).$1,
+            },
+            dailyPriceHistoryTimestamps: {
+              ...session.dailyPriceHistoryTimestamps,
+              symbol: _foldIntoDailyHistory(
+                existingPrices: session.dailyPriceHistory[symbol] ?? const [],
+                existingTimestamps:
+                    session.dailyPriceHistoryTimestamps[symbol] ?? const [],
+                newPrices: [price],
+                newTimestamps: [DateTime.now().millisecondsSinceEpoch],
+              ).$2,
+            },
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -878,6 +990,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         if (i == idx)
           StressTestSession(
             id: session.id,
+            name: session.name,
             duration: duration,
             startingCash: startingCash,
             cash: cash,
@@ -905,6 +1018,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: session.priceHistory,
             priceHistoryTimestamps: session.priceHistoryTimestamps,
+            dailyPriceHistory: session.dailyPriceHistory,
+            dailyPriceHistoryTimestamps: session.dailyPriceHistoryTimestamps,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -986,6 +1101,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
 
     final newSession = StressTestSession(
       id: session.id,
+      name: session.name,
       duration: session.duration,
       startingCash: session.startingCash,
       cash: session.cash,
@@ -1027,6 +1143,24 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         return history;
       }(),
       priceHistoryTimestamps: () {
+        final timestamps = <String, List<int>>{};
+        for (final h in session.holdings) {
+          timestamps[h.symbol] = [now.millisecondsSinceEpoch];
+        }
+        return timestamps;
+      }(),
+      // Fresh start, same lifecycle as priceHistory above — a restarted
+      // test's old daily buckets belong to a previous simulation run and
+      // shouldn't bleed into the new one's 1W/1M/3M/1Y charts.
+      dailyPriceHistory: () {
+        final history = <String, List<double>>{};
+        for (final h in session.holdings) {
+          final p = session.currentPrices[h.symbol] ?? h.entryPrice;
+          history[h.symbol] = [p];
+        }
+        return history;
+      }(),
+      dailyPriceHistoryTimestamps: () {
         final timestamps = <String, List<int>>{};
         for (final h in session.holdings) {
           timestamps[h.symbol] = [now.millisecondsSinceEpoch];
@@ -1075,6 +1209,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         if (i == idx)
           StressTestSession(
             id: session.id,
+            name: session.name,
             duration: session.duration,
             startingCash: session.startingCash,
             cash: session.cash,
@@ -1106,6 +1241,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             lastHypeCheckedEpoch: session.lastHypeCheckedEpoch,
             priceHistory: session.priceHistory,
             priceHistoryTimestamps: session.priceHistoryTimestamps,
+            dailyPriceHistory: session.dailyPriceHistory,
+            dailyPriceHistoryTimestamps: session.dailyPriceHistoryTimestamps,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
             diversificationBonusRecorded: session.diversificationBonusRecorded,
             catastropheSurvivalRecorded: session.catastropheSurvivalRecorded,
@@ -1144,6 +1281,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     };
     final entry = VerdictArchiveEntry(
       sessionId: session.id,
+      name: session.name,
       durationLabel: session.duration.displayName,
       startingCash: session.startingCash,
       finalValue: completed.totalValue,
@@ -1188,7 +1326,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
         type: AppNotificationType.stressTestCompleted,
         portfolioKind: NotificationPortfolioKind.stressTest,
         portfolioId: session.id,
-        portfolioLabel: 'Market Simulation — ${session.duration.displayName}',
+        portfolioLabel: session.displayLabel(
+          'Market Simulation — ${session.duration.displayName}',
+        ),
         title: 'Market Simulation Completed',
         detail:
             '${session.duration.displayName} test finished — '
@@ -1461,6 +1601,52 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       final ticksAgo = minLen - 1 - k;
       final time =
           realTime ?? now.subtract(Duration(seconds: ticksAgo * _tickSeconds));
+      points.add(ChartDataPoint(time, value));
+    }
+    return points;
+  }
+
+  /// Same reconstruction as [computeChartData], but from
+  /// [StressTestSession.dailyPriceHistory] (one point per calendar day)
+  /// instead of the raw per-tick [StressTestSession.priceHistory] (capped
+  /// to ~27h of real span — see `_maxPriceHistoryPoints`'s doc comment).
+  /// Everything beyond the 1D chart period should read from this instead:
+  /// it's the only place real week/month-old data survives at all.
+  List<ChartDataPoint> computeDailyChartData(String sessionId) {
+    final session = getSession(sessionId);
+    if (session == null || session.holdings.isEmpty) return [];
+
+    final histories = <List<double>>[];
+    final timestampHistories = <List<int>?>[];
+    for (final h in session.holdings) {
+      final hist = session.dailyPriceHistory[h.symbol];
+      if (hist == null || hist.isEmpty) return [];
+      histories.add(hist);
+      timestampHistories.add(session.dailyPriceHistoryTimestamps[h.symbol]);
+    }
+    final minLen = histories.map((h) => h.length).reduce(min);
+    if (minLen < 1) return [];
+
+    final now = DateTime.now();
+    final points = <ChartDataPoint>[];
+    for (int k = 0; k < minLen; k++) {
+      double value = session.cash;
+      DateTime? realTime;
+      for (int i = 0; i < session.holdings.length; i++) {
+        final hist = histories[i];
+        final idx = hist.length - minLen + k;
+        value += session.holdings[i].shares * hist[idx];
+        if (realTime == null) {
+          final ts = timestampHistories[i];
+          if (ts != null && ts.length == hist.length) {
+            realTime = DateTime.fromMillisecondsSinceEpoch(ts[idx]);
+          }
+        }
+      }
+      // No timestamp-less fallback needed here — every dailyPriceHistory
+      // entry has always been written alongside its timestamp (unlike
+      // priceHistory, which predates its own timestamp array).
+      final time = realTime ?? now;
       points.add(ChartDataPoint(time, value));
     }
     return points;

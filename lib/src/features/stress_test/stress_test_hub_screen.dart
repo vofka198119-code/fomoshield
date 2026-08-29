@@ -516,16 +516,38 @@ class StressTestHubScreen extends ConsumerWidget {
               child: Row(
                 children: [
                   Flexible(
-                    child: Text(
-                      l10n.stressTestActiveLabel(
-                        session.duration.localizedLabel(l10n),
-                      ),
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: palette.textHeader,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          session.displayLabel(
+                            session.duration.localizedLabel(l10n),
+                          ),
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: palette.textHeader,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (session.name != null &&
+                            session.name!.trim().isNotEmpty) ...[
+                          const SizedBox(height: 1),
+                          Text(
+                            session.duration.localizedLabel(l10n),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: palette.titleGradient != null
+                                  ? Colors.white.withValues(alpha: 0.85)
+                                  : palette.textBody,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                   if (tierBadge != null) ...[
@@ -598,7 +620,9 @@ class StressTestHubScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    entry.durationLabel,
+                    entry.displayLabel(entry.durationLabel),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,

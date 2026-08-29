@@ -158,14 +158,6 @@
   "stressTestStartNewTest": "Start a new simulation from the bottom panel",
   "stressTestGoPremium": "GO PREMIUM",
   "stressTestPremiumLowercase": "premium",
-  "stressTestActiveLabel": "Active — {duration}",
-  "@stressTestActiveLabel": {
-    "placeholders": {
-      "duration": {
-        "type": "String"
-      }
-    }
-  },
   "stressTestHubTitle": "MARKET SIMULATION",
   "stressTestCompletedTestsSheetTitle": "Completed Simulations",
   "stressTestActiveTestsTitle": "ACTIVE SIMULATIONS",
@@ -204,6 +196,9 @@
   },
   "stressTestSessionNotFound": "Session not found",
   "stressTestSetupTitle": "Market Simulation Setup",
+  "stressTestNameSectionTitle": "TEST NAME (OPTIONAL)",
+  "stressTestNameHint": "e.g. My AI Bet",
+  "stressTestRenameDialogTitle": "Rename Test",
   "stressTestDurationSectionTitle": "SIMULATION DURATION",
   "stressTestStartButton": "START MARKET SIMULATION",
   "stressTestSlot1Free": "Simulation slot 1/2 free · Upgrade for 5 at once & no ads",
@@ -356,7 +351,6 @@
   "searchTopCompaniesLoadError": "Couldn't load top companies. Pull to retry shortly.",
   "portfolioRenameMenu": "Rename Portfolio",
   "portfolioResetMenu": "Reset Portfolio",
-  "portfolioDeleteMenu": "Delete Portfolio",
   "portfolioNoPortfoliosYet": "No portfolios yet",
   "portfolioCreateFirstMsg": "Create your first virtual portfolio\nwith {amount} starting balance",
   "@portfolioCreateFirstMsg": {
@@ -371,9 +365,6 @@
   "portfolioSave": "Save",
   "portfolioResetDialogTitle": "Reset Portfolio?",
   "portfolioResetDialogBody": "All holdings and history will be cleared.\nBalance will be restored to its original amount.",
-  "portfolioDeleteDialogTitle": "Delete Portfolio?",
-  "portfolioDeleteDialogBody": "All holdings and history will be lost.",
-  "portfolioCannotDeleteLast": "Cannot delete the last portfolio. Create a new one first.",
   "portfolioNewDialogTitle": "New Portfolio",
   "portfolioFreeLimitOne": "FREE limit: 1 portfolio. Upgrade to Premium (3).",
   "portfolioMaxReached": "Max {max} portfolios reached.",

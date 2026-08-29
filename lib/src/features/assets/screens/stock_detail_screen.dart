@@ -51,6 +51,14 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
   List<ChartDataPoint> _points = [];
   bool _chartReady = false;
 
+  /// Price at the point the user is currently holding on the sparkline
+  /// chart below, or null when they're not touching it — mirrors it into
+  /// the PriceHeader above, same "trading app" scrub behavior Company
+  /// Detail's PriceChart already has via chartHoverPriceProvider. Plain
+  /// State field (not a provider) since both widgets live on this one
+  /// screen already.
+  double? _hoverPrice;
+
   @override
   void initState() {
     super.initState();
@@ -102,25 +110,45 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
       return;
     }
 
+    // 1D reads raw per-tick data (intraday resolution); every longer
+    // period reads the daily-bucket history instead — raw priceHistory
+    // only covers ~27h (see _maxPriceHistoryPoints's doc comment in
+    // stress_test_engine.dart), so it has nothing distinct to show for a
+    // real week/month-old window otherwise. Same split as
+    // StressTestNotifier.computeChartData/computeDailyChartData.
+    final isDaily = _selectedPeriod != StressTestSparkPeriod.d1;
+    final sourceHist = isDaily
+        ? (session.dailyPriceHistory[widget.symbol] ?? const [])
+        : priceHist;
+    final sourceTs = isDaily
+        ? session.dailyPriceHistoryTimestamps[widget.symbol]
+        : session.priceHistoryTimestamps[widget.symbol];
+    if (isDaily && sourceHist.isEmpty) {
+      setState(() {
+        _points = [];
+        _chartReady = true;
+      });
+      return;
+    }
     // Real per-tick timestamps if this symbol has them (see
     // stress_test_engine.dart's priceHistoryTimestamps) — falls back to
     // the old synthetic "nominally tickIntervalSeconds apart" spacing for
     // points recorded before that field existed, same as
-    // StressTestNotifier.computeChartData.
-    final tsHist = session.priceHistoryTimestamps[widget.symbol];
+    // StressTestNotifier.computeChartData. dailyPriceHistory always has
+    // its timestamp counterpart, so this fallback only ever applies to d1.
     final hasRealTimestamps =
-        tsHist != null && tsHist.length == priceHist.length;
+        sourceTs != null && sourceTs.length == sourceHist.length;
     final now = DateTime.now();
     final allPoints = <ChartDataPoint>[];
-    for (int i = 0; i < priceHist.length; i++) {
+    for (int i = 0; i < sourceHist.length; i++) {
       final time = hasRealTimestamps
-          ? DateTime.fromMillisecondsSinceEpoch(tsHist[i])
+          ? DateTime.fromMillisecondsSinceEpoch(sourceTs[i])
           : now.subtract(
               Duration(
-                seconds: (priceHist.length - 1 - i) * tickIntervalSeconds,
+                seconds: (sourceHist.length - 1 - i) * tickIntervalSeconds,
               ),
             );
-      allPoints.add(ChartDataPoint(time, priceHist[i]));
+      allPoints.add(ChartDataPoint(time, sourceHist[i]));
     }
 
     List<ChartDataPoint> filtered;
@@ -289,7 +317,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                         ),
                         symbol: widget.symbol,
                         showFsScore: false,
-                        price: currentPrice,
+                        price: _hoverPrice ?? currentPrice,
                         change: priceChange,
                         changePercent: priceChangePercent,
                         isUp: isPositive,
@@ -310,6 +338,11 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       onPeriodChanged: (p) {
                         setState(() => _selectedPeriod = p);
                         _generateSparkData();
+                      },
+                      onTouchedPriceChanged: (price) {
+                        if (_hoverPrice != price) {
+                          setState(() => _hoverPrice = price);
+                        }
                       },
                     ),
                     if (holding != null)

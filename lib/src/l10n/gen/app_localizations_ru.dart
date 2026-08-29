@@ -408,11 +408,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get stressTestPremiumLowercase => 'премиум';
 
   @override
-  String stressTestActiveLabel(String duration) {
-    return 'Активен — $duration';
-  }
-
-  @override
   String get stressTestHubTitle => 'СИМУЛЯЦИЯ РЫНКА';
 
   @override
@@ -463,6 +458,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get stressTestSetupTitle => 'Настройка симуляции рынка';
+
+  @override
+  String get stressTestNameSectionTitle => 'НАЗВАНИЕ ТЕСТА (НЕОБЯЗАТЕЛЬНО)';
+
+  @override
+  String get stressTestNameHint => 'например, Ставка на ИИ';
+
+  @override
+  String get stressTestRenameDialogTitle => 'Переименовать тест';
 
   @override
   String get stressTestDurationSectionTitle => 'ДЛИТЕЛЬНОСТЬ СИМУЛЯЦИИ';
@@ -835,9 +839,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get portfolioResetMenu => 'Сбросить портфель';
 
   @override
-  String get portfolioDeleteMenu => 'Удалить портфель';
-
-  @override
   String get portfolioNoPortfoliosYet => 'Пока нет портфелей';
 
   @override
@@ -860,17 +861,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get portfolioResetDialogBody =>
       'Все активы и история будут очищены.\nБаланс будет восстановлен до исходной суммы.';
-
-  @override
-  String get portfolioDeleteDialogTitle => 'Удалить портфель?';
-
-  @override
-  String get portfolioDeleteDialogBody =>
-      'Все активы и история будут потеряны.';
-
-  @override
-  String get portfolioCannotDeleteLast =>
-      'Нельзя удалить последний портфель. Сначала создайте новый.';
 
   @override
   String get portfolioNewDialogTitle => 'Новый портфель';

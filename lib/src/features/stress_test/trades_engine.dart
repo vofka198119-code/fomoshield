@@ -71,6 +71,7 @@ extension TradesEngine on StressTestNotifier {
 
     final newSession = StressTestSession(
       id: session.id,
+      name: session.name,
       duration: session.duration,
       startingCash: session.startingCash,
       cash: session.cash - amount,
@@ -104,6 +105,11 @@ extension TradesEngine on StressTestNotifier {
           DateTime.now().millisecondsSinceEpoch,
         ],
       },
+      // Setup-phase price points are pre-test previews — startTest seeds
+      // a fresh dailyPriceHistory of its own once the test actually
+      // begins, so this stays a plain pass-through.
+      dailyPriceHistory: session.dailyPriceHistory,
+      dailyPriceHistoryTimestamps: session.dailyPriceHistoryTimestamps,
       explanationLog: session.explanationLog,
       currentWeights: session.currentWeights,
       soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -158,6 +164,7 @@ extension TradesEngine on StressTestNotifier {
         if (i == idx)
           StressTestSession(
             id: session.id,
+            name: session.name,
             duration: session.duration,
             startingCash: session.startingCash,
             cash: session.cash + refund,
@@ -186,6 +193,11 @@ extension TradesEngine on StressTestNotifier {
             priceHistory: Map.from(session.priceHistory)..remove(symbol),
             priceHistoryTimestamps: Map.from(session.priceHistoryTimestamps)
               ..remove(symbol),
+            dailyPriceHistory: Map.from(session.dailyPriceHistory)
+              ..remove(symbol),
+            dailyPriceHistoryTimestamps:
+                Map.from(session.dailyPriceHistoryTimestamps)
+                  ..remove(symbol),
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
             soldDuringCatastrophe: session.soldDuringCatastrophe,
@@ -505,6 +517,7 @@ extension TradesEngine on StressTestNotifier {
         if (i == idx)
           StressTestSession(
             id: session.id,
+            name: session.name,
             duration: session.duration,
             startingCash: session.startingCash,
             cash: newCash,
@@ -548,6 +561,8 @@ extension TradesEngine on StressTestNotifier {
             currentWeights: session.currentWeights,
             priceHistory: session.priceHistory,
             priceHistoryTimestamps: session.priceHistoryTimestamps,
+            dailyPriceHistory: session.dailyPriceHistory,
+            dailyPriceHistoryTimestamps: session.dailyPriceHistoryTimestamps,
             // lastTickTimestamp drives _catchUp's granular-tick fallback
             // chain (lastTickTimestamp ?? lastEpochRollAt ?? startedAt) —
             // was also silently dropped here, reverting to null and
@@ -569,7 +584,7 @@ extension TradesEngine on StressTestNotifier {
     ];
     _save();
     _syncToSupabase();
-    return TradeResult(success: true, reason: '');
+    return TradeResult(success: true, reason: '', trade: trade);
   }
 
   double _calcAllocation(
@@ -696,5 +711,10 @@ class TradeResult {
   final bool success;
   final String reason;
 
-  const TradeResult({required this.success, required this.reason});
+  /// The trade actually recorded, when [success] is true — lets a caller
+  /// (e.g. a buy/sell notification) reference this exact fill instead of
+  /// re-deriving it later, since [StressTestTrade] has no id of its own.
+  final StressTestTrade? trade;
+
+  const TradeResult({required this.success, required this.reason, this.trade});
 }

@@ -149,7 +149,6 @@ class StressTestPendingOrdersNotifier
             ];
             changed = true;
           }
-          final label = session.duration.displayName;
           pushAppNotification(
             _ref.read(notificationsProvider.notifier),
             AppNotification(
@@ -157,7 +156,9 @@ class StressTestPendingOrdersNotifier
               type: AppNotificationType.limitOrderFilled,
               portfolioKind: NotificationPortfolioKind.stressTest,
               portfolioId: session.id,
-              portfolioLabel: 'Market Simulation — $label',
+              portfolioLabel: session.displayLabel(
+                'Market Simulation — ${session.duration.displayName}',
+              ),
               symbol: order.symbol,
               companyName: stressTestCompanyName(order.symbol),
               title: 'Limit ${order.isBuy ? 'Buy' : 'Sell'} Order Filled',

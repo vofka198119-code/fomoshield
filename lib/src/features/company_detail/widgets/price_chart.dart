@@ -451,12 +451,16 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                         // point — a fixed reference line instead of one that bobs
                         // up and down with the chart's peaks.
                         getTouchedSpotIndicator: (barData, spotIndexes) {
+                          // Was hardcoded black — invisible against Luxury
+                          // Gold's dark background. palette.textHeader
+                          // (cream) reads on both themes' chart canvas.
+                          final indicatorColor = palette.textHeader;
                           return spotIndexes
                               .map(
                                 (_) => TouchedSpotIndicatorData(
                                   _touchRevealed
-                                      ? const FlLine(
-                                          color: Colors.black,
+                                      ? FlLine(
+                                          color: indicatorColor,
                                           strokeWidth: 1.3,
                                         )
                                       : const FlLine(
@@ -596,7 +600,15 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: ThemeV2.primaryBg,
+                // Was a flat ThemeV2.primaryBg (10%-opacity green) with
+                // hardcoded black text — on Luxury Gold's dark background
+                // that tint reads as barely-there black-on-black. Uses the
+                // same instrument-window fill as everywhere else under
+                // Luxury; Standard keeps the exact original look.
+                color: palette.windowGradient == null
+                    ? ThemeV2.primaryBg
+                    : null,
+                gradient: palette.windowGradient,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -607,7 +619,9 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: palette.windowGradient == null
+                      ? Colors.black
+                      : palette.textHeader,
                 ),
               ),
             ),

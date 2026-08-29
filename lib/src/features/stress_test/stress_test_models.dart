@@ -1023,6 +1023,13 @@ const int stabilizationDurationSeconds = 30;
 /// Full state of a single stress test session.
 class StressTestSession {
   final String id;
+
+  /// User-given label, settable on the Setup screen before the test
+  /// starts (see `StressTestNotifier.renameSession`). Null/empty means
+  /// "no custom name" — every display site falls back to a
+  /// duration-based label via [displayLabel]. Mutable (not final) so
+  /// renaming doesn't require a full session reconstruction.
+  String? name;
   final TestDuration duration;
   final double startingCash;
   double cash;
@@ -1098,6 +1105,23 @@ class StressTestSession {
   /// computeChartData falls back to the old synthetic method for those
   /// points rather than crashing/misaligning.
   Map<String, List<int>> priceHistoryTimestamps;
+
+  /// One point per UTC calendar day (holding that day's LAST tick — the
+  /// same "close" convention a real daily candle uses), folded in
+  /// alongside every [priceHistory] append (see `_foldIntoDailyHistory`
+  /// in stress_test_engine.dart). [priceHistory] itself is trimmed to
+  /// ~27h by `_maxPriceHistoryPoints`, so for any chart period longer
+  /// than 1D this is the only place older price history survives at all —
+  /// without it, 1W/1M/3M/1Y charts had nothing to show but the same
+  /// ~27h of raw ticks stretched to fill the width, which is why they all
+  /// used to render identically. Reset to empty whenever [priceHistory]
+  /// itself resets (test start), same lifecycle.
+  Map<String, List<double>> dailyPriceHistory;
+
+  /// Real wall-clock timestamp (epoch millis, UTC midnight of that day)
+  /// for each entry in [dailyPriceHistory] — same lockstep convention as
+  /// [priceHistoryTimestamps].
+  Map<String, List<int>> dailyPriceHistoryTimestamps;
 
   /// Explainable Simulation — лог причин изменения цен (не сохраняется в JSON).
   /// symbol → список объяснений за каждый тик.
@@ -1196,6 +1220,7 @@ class StressTestSession {
 
   StressTestSession({
     required this.id,
+    this.name,
     required this.duration,
     required this.startingCash,
     double? cash,
@@ -1225,6 +1250,8 @@ class StressTestSession {
     this.customDurationDays,
     this.priceHistory = const {},
     this.priceHistoryTimestamps = const {},
+    this.dailyPriceHistory = const {},
+    this.dailyPriceHistoryTimestamps = const {},
     this.explanationLog = const {},
     this.simulationSeed = 0,
     this.enableDeveloperTrace = false,
@@ -1378,6 +1405,12 @@ class StressTestSession {
       duration == TestDuration.infinite &&
       startedAt != null &&
       DateTime.now().difference(startedAt!) >= infiniteMinDuration;
+
+  /// [name] when the user set one, else [fallback] (each call site's own
+  /// existing duration-based label) — the single place every list row /
+  /// notification should go through instead of reading [name] directly.
+  String displayLabel(String fallback) =>
+      (name != null && name!.trim().isNotEmpty) ? name!.trim() : fallback;
 }
 
 // ---------------------------------------------------------------------------
@@ -1439,6 +1472,11 @@ class PsychologicalVerdict {
 /// The full session is discarded — only the verdict + key stats survive.
 class VerdictArchiveEntry {
   final String sessionId;
+
+  /// User-given label snapshotted from [StressTestSession.name] at
+  /// completion (that session object is wiped right after archiving) —
+  /// null/empty means no custom name, same convention as the live session.
+  final String? name;
   final String durationLabel;
   final double startingCash;
   final double finalValue;
@@ -1526,6 +1564,7 @@ class VerdictArchiveEntry {
 
   const VerdictArchiveEntry({
     required this.sessionId,
+    this.name,
     required this.durationLabel,
     required this.startingCash,
     required this.finalValue,
@@ -1555,6 +1594,7 @@ class VerdictArchiveEntry {
 
   Map<String, dynamic> toJson() => {
     'sessionId': sessionId,
+    if (name != null) 'name': name,
     'durationLabel': durationLabel,
     'startingCash': startingCash,
     'finalValue': finalValue,
@@ -1586,6 +1626,7 @@ class VerdictArchiveEntry {
     Map<String, dynamic> json,
   ) => VerdictArchiveEntry(
     sessionId: json['sessionId'] as String,
+    name: json['name'] as String?,
     durationLabel: json['durationLabel'] as String? ?? '',
     startingCash: (json['startingCash'] as num?)?.toDouble() ?? 0,
     finalValue: (json['finalValue'] as num?)?.toDouble() ?? 0,
@@ -1643,6 +1684,11 @@ class VerdictArchiveEntry {
         const {},
     wasPremiumSlot: json['wasPremiumSlot'] as bool? ?? false,
   );
+
+  /// [name] when the user set one, else [fallback] — mirrors
+  /// [StressTestSession.displayLabel].
+  String displayLabel(String fallback) =>
+      (name != null && name!.trim().isNotEmpty) ? name!.trim() : fallback;
 }
 
 /// Bridges the 11 GICS sectors ([GicsSector], resolved live from Finnhub

@@ -155,7 +155,9 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
   // The touch-indicator line's own top stops at the date tooltip's bottom
   // edge (~24px, matching its padding+text height) instead of piercing
   // straight through the box — same as PriceChart.
-  static const _dateTooltipHeight = 24.0;
+  // Bumped from 24 to fit the tooltip's new 2nd line (value, above the
+  // date) without the touch line's top overlapping the text.
+  static const _dateTooltipHeight = 38.0;
   static const _chartHeight = 220.0;
 
   _ValuePeriod _selected = _ValuePeriod.d1;
@@ -174,6 +176,11 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
   // rebuild, so the actual O(holdings × ticks) recompute only fires when
   // there's genuinely new data.
   int? _lastDataSignature;
+  // Which period _cachedPoints was last computed for — a period change
+  // alone (no new tick data) still needs a re-fetch, since d1 vs.
+  // everything-else pulls from two different data sources (see
+  // _getPoints).
+  _ValuePeriod? _lastGeometryPeriod;
 
   // Touch state for the custom date tooltip — fixed vertically at the top
   // of the chart, moves only horizontally with the touch. Mirrors
@@ -198,12 +205,23 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
     var signature = 0;
     for (final h in widget.session.holdings) {
       signature += widget.session.priceHistory[h.symbol]?.length ?? 0;
+      signature += widget.session.dailyPriceHistory[h.symbol]?.length ?? 0;
     }
-    if (_cachedPoints == null || _lastDataSignature != signature) {
-      _cachedPoints = ref
-          .read(stressTestProvider.notifier)
-          .computeChartData(widget.session.id);
+    // 1D reads raw per-tick data (intraday resolution); every longer
+    // period reads the daily-bucket history instead — raw priceHistory
+    // only covers ~27h (see _maxPriceHistoryPoints's doc comment in
+    // stress_test_engine.dart), so it has nothing distinct to show for a
+    // real week/month-old window anyway. Re-fetch (not just re-filter) on
+    // period change since the two are different underlying data sources.
+    if (_cachedPoints == null ||
+        _lastDataSignature != signature ||
+        _lastGeometryPeriod != _selected) {
+      final notifier = ref.read(stressTestProvider.notifier);
+      _cachedPoints = _selected == _ValuePeriod.d1
+          ? notifier.computeChartData(widget.session.id)
+          : notifier.computeDailyChartData(widget.session.id);
       _lastDataSignature = signature;
+      _lastGeometryPeriod = _selected;
     }
     return _cachedPoints!;
   }
@@ -425,12 +443,16 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                               touchedSpots.map((_) => null).toList(),
                         ),
                         getTouchedSpotIndicator: (barData, spotIndexes) {
+                          // Was hardcoded black — invisible against Luxury
+                          // Gold's dark background. palette.textHeader
+                          // (cream) reads on both themes' chart canvas.
+                          final indicatorColor = palette.textHeader;
                           return spotIndexes
                               .map(
                                 (_) => TouchedSpotIndicatorData(
                                   _touchRevealed
-                                      ? const FlLine(
-                                          color: Colors.black,
+                                      ? FlLine(
+                                          color: indicatorColor,
                                           strokeWidth: 1.3,
                                         )
                                       : const FlLine(
@@ -548,21 +570,53 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             top: 0,
             left: _touchDx! - 28,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: ThemeV2.primaryBg,
+                // Was a flat ThemeV2.primaryBg (10%-opacity green) with
+                // hardcoded black text — on Luxury Gold's dark background
+                // that tint reads as barely-there black-on-black. Uses the
+                // same instrument-window fill as everywhere else under
+                // Luxury; Standard keeps the exact original look.
+                color: palette.windowGradient == null
+                    ? ThemeV2.primaryBg
+                    : null,
+                gradient: palette.windowGradient,
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Text(
-                _fmtTouchDate(
-                  filtered[_touchedSpotIndex!].time,
-                  intraday: intraday,
-                ),
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // This chart has no separate "current balance" header of
+                  // its own to mirror the touched value into (unlike
+                  // PriceChart/StockSparklineChart, which sync a price
+                  // header above them) — the value has to live in the
+                  // tooltip itself, or holding the chart would show a date
+                  // but never the balance it corresponds to.
+                  Text(
+                    formatUsd(filtered[_touchedSpotIndex!].value),
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: palette.windowGradient == null
+                          ? Colors.black
+                          : palette.textHeader,
+                    ),
+                  ),
+                  Text(
+                    _fmtTouchDate(
+                      filtered[_touchedSpotIndex!].time,
+                      intraday: intraday,
+                    ),
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: palette.windowGradient == null
+                          ? Colors.black54
+                          : palette.textBody,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
