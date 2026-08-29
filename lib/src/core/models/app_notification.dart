@@ -84,6 +84,13 @@ class AppNotification {
   final double? priceSwingChangePercent;
   final int? priceSwingWindowMinutes;
 
+  /// Set only for [AppNotificationType.weeklyPayout] — the raw credited
+  /// amount, so its detail screen can show a real "Amount" row instead of
+  /// re-parsing it back out of the locale-formatted [detail] string. Null
+  /// for every other type and for payout notifications saved before this
+  /// field existed.
+  final double? payoutAmount;
+
   const AppNotification({
     required this.id,
     required this.type,
@@ -103,6 +110,7 @@ class AppNotification {
     this.priceSwingIsUp,
     this.priceSwingChangePercent,
     this.priceSwingWindowMinutes,
+    this.payoutAmount,
   });
 
   AppNotification copyWith({bool? read}) => AppNotification(
@@ -124,6 +132,7 @@ class AppNotification {
     priceSwingIsUp: priceSwingIsUp,
     priceSwingChangePercent: priceSwingChangePercent,
     priceSwingWindowMinutes: priceSwingWindowMinutes,
+    payoutAmount: payoutAmount,
   );
 
   Map<String, dynamic> toJson() => {
@@ -145,6 +154,7 @@ class AppNotification {
     'priceSwingIsUp': priceSwingIsUp,
     'priceSwingChangePercent': priceSwingChangePercent,
     'priceSwingWindowMinutes': priceSwingWindowMinutes,
+    'payoutAmount': payoutAmount,
   };
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {
@@ -176,6 +186,7 @@ class AppNotification {
       priceSwingChangePercent: (json['priceSwingChangePercent'] as num?)
           ?.toDouble(),
       priceSwingWindowMinutes: json['priceSwingWindowMinutes'] as int?,
+      payoutAmount: (json['payoutAmount'] as num?)?.toDouble(),
     );
   }
 }

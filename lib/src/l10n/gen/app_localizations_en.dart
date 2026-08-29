@@ -1026,6 +1026,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weeklyPayoutPausedTitle => 'Weekly Deposit Paused';
 
   @override
+  String get weeklyPayoutDetailTitle => 'Deposit Details';
+
+  @override
+  String get weeklyPayoutDetailAmountLabel => 'Amount Credited';
+
+  @override
+  String get weeklyPayoutDetailAccountLabel => 'Account';
+
+  @override
   String get weeklyPayoutPausedDetail =>
       'Your premium subscription lapsed, so the weekly deposit is on hold — renew to resume it.';
 
@@ -2661,6 +2670,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get companyWidgetLimitOrders => 'Limit Orders';
+
+  @override
+  String get companyWidgetEncyclopedia => 'Company History';
+
+  @override
+  String get companyEncyclopediaCardTitle => '📖 COMPANY HISTORY';
+
+  @override
+  String get companyEncyclopediaBusinessRow => 'Business History';
+
+  @override
+  String get companyEncyclopediaMarketRow => 'Market History';
+
+  @override
+  String get companyEncyclopediaPresentDayRow => 'Present Day';
+
+  @override
+  String get companyEncyclopediaNoData => 'No data yet';
+
+  @override
+  String get companyEncyclopediaLoadError => 'Couldn\'t load this article';
+
+  @override
+  String get companyEncyclopediaPaywallTitle => 'Unlock This Article';
+
+  @override
+  String get companyEncyclopediaPaywallBody =>
+      'Watch a couple of short ads to read the full company history, or go Premium to read anytime, ad-free.';
+
+  @override
+  String get companyEncyclopediaGoPremiumButton => 'Go Premium';
+
+  @override
+  String get companyEncyclopediaDisclaimerTitle => 'Disclaimer';
+
+  @override
+  String get companyEncyclopediaDisclaimerBody =>
+      'All information in this section is based on public data disclosed by the companies themselves and is provided for educational purposes only. It does not constitute financial advice, an investment recommendation, or a definitive assessment of the business. Before drawing any conclusions about a company, users should independently verify the information provided.';
 
   @override
   String companyDetailCashAvailable(String cash) {

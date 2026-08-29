@@ -489,6 +489,18 @@ class FinnhubService {
       _getFromBackend('/metrics/$symbol');
 
   // ---------------------------------------------------------------------------
+  // Company Encyclopedia (backend-computed, no direct-Finnhub equivalent)
+  // ---------------------------------------------------------------------------
+
+  /// "Company History" long-form text (business + market/exchange history,
+  /// RU+EN) — authored offline and filled in company-by-company, see
+  /// scanco-backend's routes/encyclopedia.js. A symbol with no content yet
+  /// still returns 200 with every text field null, not a 404 — the caller
+  /// treats that as "no data yet", not an error.
+  Future<Map<String, dynamic>> encyclopedia(String symbol) async =>
+      _getFromBackend('/encyclopedia/${Uri.encodeComponent(symbol)}');
+
+  // ---------------------------------------------------------------------------
   // Top Companies (backend-computed, no direct-Finnhub equivalent)
   // ---------------------------------------------------------------------------
 

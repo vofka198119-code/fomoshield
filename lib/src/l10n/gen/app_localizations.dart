@@ -1927,6 +1927,24 @@ abstract class AppLocalizations {
   /// **'Weekly Deposit Paused'**
   String get weeklyPayoutPausedTitle;
 
+  /// No description provided for @weeklyPayoutDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit Details'**
+  String get weeklyPayoutDetailTitle;
+
+  /// No description provided for @weeklyPayoutDetailAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Credited'**
+  String get weeklyPayoutDetailAmountLabel;
+
+  /// No description provided for @weeklyPayoutDetailAccountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get weeklyPayoutDetailAccountLabel;
+
   /// No description provided for @weeklyPayoutPausedDetail.
   ///
   /// In en, this message translates to:
@@ -4704,6 +4722,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Limit Orders'**
   String get companyWidgetLimitOrders;
+
+  /// No description provided for @companyWidgetEncyclopedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Company History'**
+  String get companyWidgetEncyclopedia;
+
+  /// No description provided for @companyEncyclopediaCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'📖 COMPANY HISTORY'**
+  String get companyEncyclopediaCardTitle;
+
+  /// No description provided for @companyEncyclopediaBusinessRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Business History'**
+  String get companyEncyclopediaBusinessRow;
+
+  /// No description provided for @companyEncyclopediaMarketRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Market History'**
+  String get companyEncyclopediaMarketRow;
+
+  /// No description provided for @companyEncyclopediaPresentDayRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Present Day'**
+  String get companyEncyclopediaPresentDayRow;
+
+  /// No description provided for @companyEncyclopediaNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data yet'**
+  String get companyEncyclopediaNoData;
+
+  /// No description provided for @companyEncyclopediaLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load this article'**
+  String get companyEncyclopediaLoadError;
+
+  /// No description provided for @companyEncyclopediaPaywallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock This Article'**
+  String get companyEncyclopediaPaywallTitle;
+
+  /// No description provided for @companyEncyclopediaPaywallBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch a couple of short ads to read the full company history, or go Premium to read anytime, ad-free.'**
+  String get companyEncyclopediaPaywallBody;
+
+  /// No description provided for @companyEncyclopediaGoPremiumButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Premium'**
+  String get companyEncyclopediaGoPremiumButton;
+
+  /// No description provided for @companyEncyclopediaDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer'**
+  String get companyEncyclopediaDisclaimerTitle;
+
+  /// No description provided for @companyEncyclopediaDisclaimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'All information in this section is based on public data disclosed by the companies themselves and is provided for educational purposes only. It does not constitute financial advice, an investment recommendation, or a definitive assessment of the business. Before drawing any conclusions about a company, users should independently verify the information provided.'**
+  String get companyEncyclopediaDisclaimerBody;
 
   /// No description provided for @companyDetailCashAvailable.
   ///

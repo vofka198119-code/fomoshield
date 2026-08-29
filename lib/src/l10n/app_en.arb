@@ -472,6 +472,9 @@
     }
   },
   "weeklyPayoutPausedTitle": "Weekly Deposit Paused",
+  "weeklyPayoutDetailTitle": "Deposit Details",
+  "weeklyPayoutDetailAmountLabel": "Amount Credited",
+  "weeklyPayoutDetailAccountLabel": "Account",
   "weeklyPayoutPausedDetail": "Your premium subscription lapsed, so the weekly deposit is on hold — renew to resume it.",
   "subscriptionUpgradedTitle": "Welcome to Premium",
   "subscriptionUpgradedDetail": "Your account is now Premium — enjoy the extra perks.",
@@ -1061,6 +1064,18 @@
   "companyWidgetFinancialScore": "Financial Score",
   "companyWidgetPosition": "Your Position",
   "companyWidgetLimitOrders": "Limit Orders",
+  "companyWidgetEncyclopedia": "Company History",
+  "companyEncyclopediaCardTitle": "📖 COMPANY HISTORY",
+  "companyEncyclopediaBusinessRow": "Business History",
+  "companyEncyclopediaMarketRow": "Market History",
+  "companyEncyclopediaPresentDayRow": "Present Day",
+  "companyEncyclopediaNoData": "No data yet",
+  "companyEncyclopediaLoadError": "Couldn't load this article",
+  "companyEncyclopediaPaywallTitle": "Unlock This Article",
+  "companyEncyclopediaPaywallBody": "Watch a couple of short ads to read the full company history, or go Premium to read anytime, ad-free.",
+  "companyEncyclopediaGoPremiumButton": "Go Premium",
+  "companyEncyclopediaDisclaimerTitle": "Disclaimer",
+  "companyEncyclopediaDisclaimerBody": "All information in this section is based on public data disclosed by the companies themselves and is provided for educational purposes only. It does not constitute financial advice, an investment recommendation, or a definitive assessment of the business. Before drawing any conclusions about a company, users should independently verify the information provided.",
   "companyDetailCashAvailable": "{cash} available",
   "@companyDetailCashAvailable": {
     "placeholders": {

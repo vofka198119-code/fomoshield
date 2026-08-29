@@ -17,6 +17,7 @@ const List<String> defaultCompanyWidgetOrder = [
   'position',
   'key_metrics',
   'financial_score',
+  'encyclopedia',
   'limit_orders',
 ];
 
@@ -43,6 +44,8 @@ class CompanyWidgetConfig {
         return l10n.companyWidgetKeyMetrics;
       case 'financial_score':
         return l10n.companyWidgetFinancialScore;
+      case 'encyclopedia':
+        return l10n.companyWidgetEncyclopedia;
       case 'position':
         return l10n.companyWidgetPosition;
       case 'limit_orders':

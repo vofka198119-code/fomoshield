@@ -360,3 +360,63 @@ CREATE OR REPLACE TRIGGER protect_subscription_columns_trigger
 
 ALTER TABLE public.users
 ADD COLUMN IF NOT EXISTS deletion_requested_at TIMESTAMPTZ NULL DEFAULT NULL;
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 010
+-- Table: company_encyclopedia
+-- Description: "Company History" long-form text per ticker (business history
+--              + market/exchange history, RU+EN) — the Encyclopedia widget on
+--              Company Detail (2026-08-29). Content is authored offline
+--              (ChatGPT-drafted, human-reviewed) and filled in company-by-
+--              company over time, not a launch-day complete dataset — a
+--              symbol with no row here is expected and the app just shows
+--              "no data yet" for it, not an error.
+--
+--              Read-only from the app's perspective: any signed-in user can
+--              SELECT (the free/premium/admin ad-gate that decides who's
+--              actually allowed to open the read screen is entirely client-
+--              side, same trust model as subscription_tier gating
+--              elsewhere in this app — see scanco-backend's routes/
+--              encyclopedia.js). Writes only ever come from scanco-backend's
+--              scripts/seed-company-encyclopedia.js using the service_role
+--              key, which bypasses RLS entirely — same admin-script pattern
+--              as scripts/set-premium.js. No INSERT/UPDATE/DELETE policy is
+--              defined for normal users on purpose.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS public.company_encyclopedia (
+    symbol                TEXT PRIMARY KEY,
+    business_history_ru   TEXT,
+    business_history_en   TEXT,
+    market_history_ru     TEXT,
+    market_history_en     TEXT,
+    updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.company_encyclopedia ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "company_encyclopedia_select_authenticated" ON public.company_encyclopedia;
+CREATE POLICY "company_encyclopedia_select_authenticated"
+    ON public.company_encyclopedia
+    FOR SELECT
+    TO authenticated
+    USING (true);
+
+CREATE OR REPLACE TRIGGER on_company_encyclopedia_updated
+    BEFORE UPDATE ON public.company_encyclopedia
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 011
+-- Table: company_encyclopedia (COLUMNS)
+-- Description: Third Encyclopedia row, "В наши дни" / "Present Day" (2026-08-
+--              29) — same RU+EN, nullable-until-filled shape as the two
+--              Migration 010 text pairs, no other schema change needed.
+-- =============================================================================
+
+ALTER TABLE public.company_encyclopedia
+ADD COLUMN IF NOT EXISTS present_day_ru TEXT,
+ADD COLUMN IF NOT EXISTS present_day_en TEXT;

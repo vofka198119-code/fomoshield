@@ -86,6 +86,7 @@ Future<void> checkWeeklyPayout(WidgetRef ref, AppLocalizations l10n) async {
             title: l10n.weeklyPayoutTitle,
             detail: l10n.weeklyPayoutDetail(formatUsd(amount)),
             createdAt: DateTime.now(),
+            payoutAmount: amount,
           ),
         );
       }

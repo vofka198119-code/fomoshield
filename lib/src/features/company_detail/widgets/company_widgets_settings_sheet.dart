@@ -75,6 +75,8 @@ class _CompanyWidgetsSettingsSheetState
         return Icons.analytics_rounded;
       case 'financial_score':
         return Icons.shield_rounded;
+      case 'encyclopedia':
+        return Icons.auto_stories_rounded;
       case 'position':
         return Icons.account_balance_wallet_rounded;
       case 'limit_orders':

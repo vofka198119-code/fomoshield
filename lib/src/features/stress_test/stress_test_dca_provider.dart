@@ -133,6 +133,7 @@ Future<void> checkStressTestDcaPayout(
       title: l10n.weeklyPayoutTitle,
       detail: l10n.weeklyPayoutDetail(formatUsd(amount)),
       createdAt: DateTime.now(),
+      payoutAmount: amount,
     ),
   );
 }

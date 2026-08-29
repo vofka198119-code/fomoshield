@@ -14,6 +14,8 @@ import '../../features/disclaimer/disclaimer_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
+import '../../features/notifications/weekly_payout_detail_screen.dart';
+import '../models/app_notification.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/search/top_companies_provider.dart';
 import '../../features/search/widgets/company_list_screen.dart';
@@ -198,6 +200,13 @@ class AppRouter {
         path: '/notifications',
         name: 'notifications',
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/notifications/weekly-payout-detail',
+        name: 'weeklyPayoutDetail',
+        builder: (context, state) => WeeklyPayoutDetailScreen(
+          notification: state.extra as AppNotification?,
+        ),
       ),
 
       // Search — standalone full screen (outside ShellRoute to avoid

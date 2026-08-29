@@ -42,6 +42,7 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../../core/services/gics_sector_mapper.dart';
@@ -55,10 +56,16 @@ const _newsColor = FomoShieldTheme.factorNews;
 const _hypeColor = FomoShieldTheme.factorHype;
 const _noiseColor = FomoShieldTheme.factorNoise;
 
-BoxDecoration get _olivePanel => BoxDecoration(
-  color: ThemeV2.primary.withValues(alpha: 0.08),
+// Was hardcoded to ThemeV2.primary (a fixed olive-green) regardless of
+// theme — read as near-black text on a near-black Luxury Gold backdrop
+// since this whole screen's Scaffold is transparent. accentPrimary is
+// gold under Luxury, so this one swap fixes the panel tint everywhere
+// it's used; AppPalette.standard.accentPrimary == ThemeV2.primary, so
+// Standard's look is unchanged.
+BoxDecoration _olivePanelFor(AppPalette palette) => BoxDecoration(
+  color: palette.accentPrimary.withValues(alpha: 0.08),
   borderRadius: FomoShieldTheme.cardRadius,
-  border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.2)),
+  border: Border.all(color: palette.accentPrimary.withValues(alpha: 0.2)),
 );
 
 class WhyTodayScreen extends ConsumerStatefulWidget {
@@ -150,6 +157,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     _window(
                       index: 0,
                       title: l10n.whyTodayScreenTodaysChangeTitle,
+                      palette: palette,
                       child: Row(
                         children: [
                           Expanded(
@@ -159,6 +167,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                               color: isPositive
                                   ? ThemeV2.success
                                   : ThemeV2.loss,
+                              palette: palette,
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -170,6 +179,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                               color: isPositive
                                   ? ThemeV2.success
                                   : ThemeV2.loss,
+                              palette: palette,
                             ),
                           ),
                         ],
@@ -179,17 +189,20 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                       _window(
                         index: 1,
                         title: l10n.whyTodayScreenThisTickTitle,
-                        child: _factorBars(latest.contributions, l10n),
+                        palette: palette,
+                        child: _factorBars(latest.contributions, l10n, palette),
                       ),
                     if (ticks.isNotEmpty)
                       _window(
                         index: 2,
                         title: l10n.whyTodayScreenWholePeriodTitle,
                         subtitle: wholePeriodSubtitle,
+                        palette: palette,
                         child: _factorBars(
                           diagnostics?.averaged ??
                               _aggregateContributions(ticks),
                           l10n,
+                          palette,
                         ),
                       ),
                     if (latest != null)
@@ -197,27 +210,33 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                         index: 3,
                         title: l10n.whyTodayScreenRawDriftTitle,
                         subtitle: l10n.whyTodayScreenRawDriftSubtitle,
+                        palette: palette,
                         child: Column(
                           children: [
                             _rawRow(
                               l10n.whyTodayScreenRawMarketDrift,
                               latest.marketDriftRaw,
+                              palette,
                             ),
                             _rawRow(
                               l10n.whyTodayScreenRawSectorDrift,
                               latest.sectorDriftRaw,
+                              palette,
                             ),
                             _rawRow(
                               l10n.whyTodayScreenFactorNoise,
                               latest.noiseRaw,
+                              palette,
                             ),
                             _rawRow(
                               l10n.whyTodayScreenFactorNews,
                               latest.newsRaw,
+                              palette,
                             ),
                             _rawRow(
                               l10n.whyTodayScreenRawHype,
                               latest.hypeRaw,
+                              palette,
                             ),
                           ],
                         ),
@@ -225,26 +244,29 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                     _window(
                       index: 4,
                       title: l10n.whyTodayScreenNewsAndHypeTitle,
+                      palette: palette,
                       child: _newsAndHypeSection(
                         session,
                         ticks,
                         diagnostics,
                         l10n,
+                        palette,
                       ),
                     ),
                     if (session.epochHistory.isNotEmpty)
                       _window(
                         index: 5,
                         title: l10n.whyTodayScreenMarketPhaseTitle,
+                        palette: palette,
                         child: Column(
                           children: [
                             for (final e in session.epochHistory.reversed)
-                              _epochRow(e, l10n),
+                              _epochRow(e, l10n, palette),
                           ],
                         ),
                       ),
                     if (displayTicks.isNotEmpty)
-                      _buildTimeline(displayTicks, l10n),
+                      _buildTimeline(displayTicks, l10n, palette),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -283,6 +305,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     required String title,
     String? subtitle,
     required Widget child,
+    required AppPalette palette,
   }) {
     return _FadeSlide(
       index: index,
@@ -290,23 +313,26 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-        decoration: _olivePanel,
+        decoration: _olivePanelFor(palette),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: FomoShieldTheme.cardTitle()),
+            Text(title, style: FomoShieldTheme.cardTitle(palette.accentPrimary)),
             if (subtitle != null) ...[
               const SizedBox(height: 4),
               Text(
                 subtitle,
                 style: GoogleFonts.inter(
                   fontSize: 11,
-                  color: ThemeV2.textSecondary,
+                  color: palette.textBody,
                 ),
               ),
             ],
             const SizedBox(height: 10),
-            Divider(height: 1, color: ThemeV2.primary.withValues(alpha: 0.15)),
+            Divider(
+              height: 1,
+              color: palette.accentPrimary.withValues(alpha: 0.15),
+            ),
             const SizedBox(height: 14),
             child,
           ],
@@ -319,11 +345,12 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     required String label,
     required String value,
     required Color color,
+    required AppPalette palette,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: ThemeV2.primary.withValues(alpha: 0.25)),
+        border: Border.all(color: palette.accentPrimary.withValues(alpha: 0.25)),
         borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
       ),
       child: Column(
@@ -336,7 +363,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.6,
-              color: ThemeV2.textSecondary,
+              color: palette.textBody,
             ),
           ),
           const SizedBox(height: 6),
@@ -389,19 +416,19 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     );
   }
 
-  Widget _factorBars(PriceContribution c, AppLocalizations l10n) {
+  Widget _factorBars(PriceContribution c, AppLocalizations l10n, AppPalette palette) {
     return Column(
       children: [
-        _factorBar(l10n.whyTodayScreenFactorMarketTrends, c.marketPct, _marketColor),
-        _factorBar(l10n.whyTodayScreenFactorSector, c.sectorPct, _sectorColor),
-        _factorBar(l10n.whyTodayScreenFactorNews, c.newsPct, _newsColor),
-        _factorBar(l10n.whyTodayScreenFactorSectorHype, c.hypePct, _hypeColor),
-        _factorBar(l10n.whyTodayScreenFactorNoise, c.noisePct, _noiseColor),
+        _factorBar(l10n.whyTodayScreenFactorMarketTrends, c.marketPct, _marketColor, palette),
+        _factorBar(l10n.whyTodayScreenFactorSector, c.sectorPct, _sectorColor, palette),
+        _factorBar(l10n.whyTodayScreenFactorNews, c.newsPct, _newsColor, palette),
+        _factorBar(l10n.whyTodayScreenFactorSectorHype, c.hypePct, _hypeColor, palette),
+        _factorBar(l10n.whyTodayScreenFactorNoise, c.noisePct, _noiseColor, palette),
       ],
     );
   }
 
-  Widget _factorBar(String label, double percent, Color color) {
+  Widget _factorBar(String label, double percent, Color color, AppPalette palette) {
     final clamped = (percent / 100).clamp(0.0, 1.0);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -418,7 +445,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                 style: GoogleFonts.inter(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: ThemeV2.textPrimary,
+                  color: palette.textHeader,
                 ),
               ),
             ),
@@ -431,7 +458,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: ThemeV2.primary.withValues(alpha: 0.10),
+                      color: palette.accentPrimary.withValues(alpha: 0.10),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -457,7 +484,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               style: interNums(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: ThemeV2.textPrimary,
+                color: palette.textHeader,
               ),
             ),
           ),
@@ -467,20 +494,20 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
   }
 
   // ─── Raw drift values ──────────────────────────────────────────────
-  Widget _rawRow(String label, double? raw) {
+  Widget _rawRow(String label, double? raw, AppPalette palette) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: ThemeV2.caption),
+          Text(label, style: ThemeV2.caption.copyWith(color: palette.textBody)),
           Text(
             raw == null
                 ? '—'
                 : '${raw >= 0 ? '+' : ''}${(raw * 100).toStringAsFixed(3)}%',
             style: ThemeV2.caption.copyWith(
               fontWeight: FontWeight.w700,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
@@ -498,6 +525,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     List<TickExplanation> ticks,
     WhyDiagnosticsAccumulator? diagnostics,
     AppLocalizations l10n,
+    AppPalette palette,
   ) {
     final newsActive = session.activeNewsEvent?.symbol == widget.symbol
         ? session.activeNewsEvent
@@ -533,6 +561,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               newsActive.rampDurationTicks,
               l10n,
             ),
+            palette,
           ),
           const SizedBox(height: 10),
         ],
@@ -548,6 +577,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               hypeActive.rampDurationTicks,
               l10n,
             ),
+            palette,
           ),
           const SizedBox(height: 10),
         ],
@@ -557,14 +587,17 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
             fontSize: 10,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.6,
-            color: ThemeV2.textSecondary,
+            color: palette.textBody,
           ),
         ),
         const SizedBox(height: 6),
         if (newsEpisodes.isEmpty)
-          Text(l10n.whyTodayScreenNoNewsEpisodes, style: ThemeV2.small)
+          Text(
+            l10n.whyTodayScreenNoNewsEpisodes,
+            style: ThemeV2.small.copyWith(color: palette.textBody),
+          )
         else
-          for (final ep in newsEpisodes) _episodeRow(ep, l10n),
+          for (final ep in newsEpisodes) _episodeRow(ep, l10n, palette),
         const SizedBox(height: 14),
         Text(
           l10n.whyTodayScreenSectorHypeHistoryTitle(hypeEpisodes.length),
@@ -572,14 +605,17 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
             fontSize: 10,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.6,
-            color: ThemeV2.textSecondary,
+            color: palette.textBody,
           ),
         ),
         const SizedBox(height: 6),
         if (hypeEpisodes.isEmpty)
-          Text(l10n.whyTodayScreenNoHypeEpisodes, style: ThemeV2.small)
+          Text(
+            l10n.whyTodayScreenNoHypeEpisodes,
+            style: ThemeV2.small.copyWith(color: palette.textBody),
+          )
         else
-          for (final ep in hypeEpisodes) _episodeRow(ep, l10n),
+          for (final ep in hypeEpisodes) _episodeRow(ep, l10n, palette),
       ],
     );
   }
@@ -589,6 +625,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     bool isPositive,
     String detail,
     String countdown,
+    AppPalette palette,
   ) {
     final color = isPositive ? ThemeV2.success : ThemeV2.loss;
     return Container(
@@ -613,7 +650,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: ThemeV2.textPrimary,
+                color: palette.textHeader,
               ),
             ),
           ),
@@ -647,7 +684,11 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     return l10n.whyTodayScreenWrappingUp;
   }
 
-  Widget _episodeRow(WhyDiagnosticsEpisode ep, AppLocalizations l10n) {
+  Widget _episodeRow(
+    WhyDiagnosticsEpisode ep,
+    AppLocalizations l10n,
+    AppPalette palette,
+  ) {
     final color = ep.isUp ? ThemeV2.success : ThemeV2.loss;
     final epochLabel = ep.startEpoch == ep.endEpoch
         ? l10n.whyTodayScreenEpochSingle(ep.startEpoch + 1)
@@ -667,7 +708,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               epochLabel,
               style: GoogleFonts.inter(
                 fontSize: 12.5,
-                color: ThemeV2.textPrimary,
+                color: palette.textHeader,
               ),
             ),
           ),
@@ -685,7 +726,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
   }
 
   // ─── Market phase / epochs ────────────────────────────────────────
-  Widget _epochRow(EpochRecord e, AppLocalizations l10n) {
+  Widget _epochRow(EpochRecord e, AppLocalizations l10n, AppPalette palette) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -697,7 +738,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               shape: BoxShape.circle,
               color: e.isActive
                   ? ThemeV2.success
-                  : ThemeV2.textSecondary.withValues(alpha: 0.4),
+                  : palette.textBody.withValues(alpha: 0.4),
             ),
           ),
           const SizedBox(width: 10),
@@ -707,13 +748,13 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: ThemeV2.textPrimary,
+                color: palette.textHeader,
               ),
             ),
           ),
           Text(
             e.isActive ? l10n.whyTodayScreenActiveLabel : _fmtDuration(e.duration),
-            style: ThemeV2.small.copyWith(color: ThemeV2.textSecondary),
+            style: ThemeV2.small.copyWith(color: palette.textBody),
           ),
         ],
       ),
@@ -727,13 +768,18 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
   }
 
   // ─── Ticks — unchanged per explicit ask ──────────────────────────
-  Widget _buildTimeline(List<TickExplanation> ticks, AppLocalizations l10n) {
+  Widget _buildTimeline(
+    List<TickExplanation> ticks,
+    AppLocalizations l10n,
+    AppPalette palette,
+  ) {
     final reversed = ticks.reversed.toList();
 
     return _FadeSlide(
       index: 6,
       controller: _staggerController,
-      child: Container(
+      child: CardFrame(
+        showTopBar: false,
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -741,25 +787,34 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
           borderRadius: ThemeV2.borderRadiusLarge,
           boxShadow: ThemeV2.cardShadow,
         ),
+        palette: palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.whyTodayScreenTicksTitle, style: ThemeV2.section),
+            Text(
+              l10n.whyTodayScreenTicksTitle,
+              style: ThemeV2.section.copyWith(color: palette.textHeader),
+            ),
             const SizedBox(height: 16),
             for (var i = 0; i < reversed.length; i++)
-              _buildTickCard(reversed[i], i, l10n),
+              _buildTickCard(reversed[i], i, l10n, palette),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTickCard(TickExplanation tick, int index, AppLocalizations l10n) {
+  Widget _buildTickCard(
+    TickExplanation tick,
+    int index,
+    AppLocalizations l10n,
+    AppPalette palette,
+  ) {
     final change = tick.changePercent;
     final isUp = change > 0;
     final isFlat = change.abs() < 0.01;
     final color = isFlat
-        ? ThemeV2.textSecondary
+        ? palette.textBody
         : isUp
         ? ThemeV2.success
         : ThemeV2.loss;
@@ -776,7 +831,8 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: ThemeV2.background,
+          gradient: palette.windowGradient,
+          color: palette.windowGradient == null ? ThemeV2.background : null,
           borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
         ),
         child: Row(
@@ -787,14 +843,17 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
                 timeLabel,
                 style: ThemeV2.small.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: ThemeV2.textSecondary,
+                  color: palette.textBody,
                 ),
               ),
             ),
             Expanded(
               child: Text(
                 _tickEventDescription(tick, l10n),
-                style: ThemeV2.caption.copyWith(fontWeight: FontWeight.w500),
+                style: ThemeV2.caption.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: palette.textHeader,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

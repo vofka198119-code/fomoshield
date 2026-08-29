@@ -126,6 +126,38 @@ class ProfileScreen extends ConsumerWidget {
     final subscriptionTier = ref.watch(subscriptionTierProvider);
     final isAdmin = ref.watch(isAdminProvider);
 
+    // ── Statistics section — was hardcoded '1'/'0'/'0' stub values,
+    // never wired to any real data. Days: since account creation (Supabase
+    // User.createdAt), floored at 1 so a brand-new account still reads "1"
+    // like the old stub did instead of "0". Companies: distinct symbols
+    // currently held in the real Portfolio (single-portfolio system — see
+    // portfolio_limits_provider.dart). Tests: total Stress Test sessions
+    // ever created (any status), not just completed ones.
+    final portfolios = ref.watch(portfoliosProvider);
+    final companiesHeldCount = portfolios.isEmpty
+        ? 0
+        : portfolios.first.holdings.length;
+    // .length alone undercounts — a completed test is removed from the
+    // active `state` list and archived (see stress_test_engine.dart's
+    // _completeTest), so a user with any finished tests would show fewer
+    // than they've actually run. totalSessionsCreated is the notifier's own
+    // lifetime counter, incremented once per session ever created and
+    // never decremented — watching stressTestProvider still gives this
+    // rebuild on every session create/complete (both mutate `state` too),
+    // reading .notifier just picks the current counter value on that
+    // rebuild rather than needing its own reactive stream.
+    ref.watch(stressTestProvider);
+    final testsCount = ref.read(stressTestProvider.notifier).totalSessionsCreated;
+    final accountCreatedAt = user == null
+        ? null
+        : DateTime.tryParse(user.createdAt);
+    final daysActive = accountCreatedAt == null
+        ? 1
+        : (DateTime.now().difference(accountCreatedAt).inDays + 1).clamp(
+            1,
+            1 << 30,
+          );
+
     final email = user?.email ?? l10n.profileNotSignedIn;
     final displayName = email.split('@').first;
     final isPremium = subscriptionTier == SubscriptionTier.premium;
@@ -430,9 +462,13 @@ class ProfileScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _statItem(l10n.profileStatDays, '1', palette),
-                _statItem(l10n.profileStatCompanies, '0', palette),
-                _statItem(l10n.profileStatTests, '0', palette),
+                _statItem(l10n.profileStatDays, '$daysActive', palette),
+                _statItem(
+                  l10n.profileStatCompanies,
+                  '$companiesHeldCount',
+                  palette,
+                ),
+                _statItem(l10n.profileStatTests, '$testsCount', palette),
               ],
             ),
           ),
@@ -493,8 +529,10 @@ class ProfileScreen extends ConsumerWidget {
                     return Text(
                       'v$majorMinor.$build',
                       style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: palette.textBody.withValues(alpha: 0.5),
+                        fontSize: 13,
+                        color: palette.titleGradient != null
+                            ? Colors.white
+                            : palette.textBody.withValues(alpha: 0.5),
                       ),
                     );
                   },

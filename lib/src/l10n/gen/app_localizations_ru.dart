@@ -1030,6 +1030,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get weeklyPayoutPausedTitle => 'Пополнение приостановлено';
 
   @override
+  String get weeklyPayoutDetailTitle => 'Детали пополнения';
+
+  @override
+  String get weeklyPayoutDetailAmountLabel => 'Сумма зачисления';
+
+  @override
+  String get weeklyPayoutDetailAccountLabel => 'Счёт';
+
+  @override
   String get weeklyPayoutPausedDetail =>
       'Подписка Premium истекла, еженедельное пополнение приостановлено — продлите подписку, чтобы возобновить.';
 
@@ -2664,6 +2673,44 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get companyWidgetLimitOrders => 'Лимитные ордера';
+
+  @override
+  String get companyWidgetEncyclopedia => 'История компании';
+
+  @override
+  String get companyEncyclopediaCardTitle => '📖 ИСТОРИЯ КОМПАНИИ';
+
+  @override
+  String get companyEncyclopediaBusinessRow => 'История бизнеса';
+
+  @override
+  String get companyEncyclopediaMarketRow => 'Биржевая история';
+
+  @override
+  String get companyEncyclopediaPresentDayRow => 'В наши дни';
+
+  @override
+  String get companyEncyclopediaNoData => 'Нет данных';
+
+  @override
+  String get companyEncyclopediaLoadError => 'Не удалось загрузить статью';
+
+  @override
+  String get companyEncyclopediaPaywallTitle => 'Разблокировать статью';
+
+  @override
+  String get companyEncyclopediaPaywallBody =>
+      'Посмотрите пару коротких реклам, чтобы прочитать полную историю компании, либо оформите Premium и читайте без рекламы в любое время.';
+
+  @override
+  String get companyEncyclopediaGoPremiumButton => 'Оформить Premium';
+
+  @override
+  String get companyEncyclopediaDisclaimerTitle => 'Дисклеймер';
+
+  @override
+  String get companyEncyclopediaDisclaimerBody =>
+      'Вся информация в этом разделе основана на публичных данных, раскрываемых самими компаниями, и носит исключительно образовательный характер. Она не является финансовой консультацией, инвестиционной рекомендацией или итоговой оценкой бизнеса. Прежде чем делать какие-либо выводы о компании, пользователю следует самостоятельно проверить приведённые сведения.';
 
   @override
   String companyDetailCashAvailable(String cash) {

@@ -28,6 +28,7 @@ import 'widgets/position_section.dart';
 import 'widgets/limit_orders_section.dart';
 import 'widgets/portfolio_option_tile.dart';
 import 'widgets/company_widgets_settings_sheet.dart';
+import 'widgets/company_encyclopedia_widget.dart';
 import 'widgets/company_bottom_bar.dart';
 import 'widgets/company_ad_overlay.dart';
 import '../search/recently_viewed_provider.dart';
@@ -691,6 +692,17 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
         return Column(
           children: [
             FinancialScoreWidget(score: scoreData, palette: palette),
+            const SizedBox(height: 24),
+          ],
+        );
+      case 'encyclopedia':
+        return Column(
+          children: [
+            CompanyEncyclopediaWidget(
+              symbol: symbol,
+              companyName: companyName,
+              palette: palette,
+            ),
             const SizedBox(height: 24),
           ],
         );

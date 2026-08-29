@@ -47,12 +47,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
     if (n.type == AppNotificationType.weeklyPayout ||
         n.type == AppNotificationType.weeklyPayoutPaused) {
-      if (n.portfolioKind == NotificationPortfolioKind.stressTest &&
-          n.portfolioId != null) {
-        context.go('/stress-test/${n.portfolioId}');
-      } else {
-        context.go('/portfolio');
-      }
+      context.push('/notifications/weekly-payout-detail', extra: n);
       return;
     }
     if (n.type == AppNotificationType.subscriptionStatusChanged) {
@@ -371,14 +366,21 @@ class _NotificationRow extends StatelessWidget {
         ),
       );
     }
+    // Fixed navy icon-on-navy-tint — invisible against Luxury Gold's dark
+    // backdrop (this circle has no card of its own behind it, so the
+    // near-transparent 8%-alpha tint reads as basically the same near-
+    // black as the screen background). Swap to the theme's own gold
+    // accent under Luxury; Standard keeps the original navy untouched.
+    final isLuxury = palette.titleGradient != null;
+    final iconColor = isLuxury ? palette.accentPrimary : const Color(0xFF1B365D);
+    final iconBg = isLuxury
+        ? palette.accentPrimary.withValues(alpha: 0.12)
+        : const Color(0x141B365D);
     return Container(
       width: 36,
       height: 36,
-      decoration: const BoxDecoration(
-        color: Color(0x141B365D),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(_icon, size: 18, color: const Color(0xFF1B365D)),
+      decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+      child: Icon(_icon, size: 18, color: iconColor),
     );
   }
 }

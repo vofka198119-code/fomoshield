@@ -14,6 +14,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/theme/themed_divider.dart';
 import '../../features/stress_test/stress_test_models.dart';
 import '../../l10n/gen/app_localizations.dart';
 
@@ -100,7 +101,12 @@ class _MarketTimelineState extends State<MarketTimeline> {
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
           child: Row(
             children: [
-              Text(l10n.marketTimelineTitle, style: FomoShieldTheme.cardTitle()),
+              Text(
+                l10n.marketTimelineTitle,
+                style: FomoShieldTheme.cardTitle(
+                  widget.palette?.accentPrimary,
+                ),
+              ),
               const Spacer(),
               Text(
                 l10n.marketTimelineEpochCount(
@@ -110,18 +116,20 @@ class _MarketTimelineState extends State<MarketTimeline> {
                 style: interNums(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: ThemeV2.textSecondary,
+                  color: widget.palette?.textBody ?? ThemeV2.textSecondary,
                 ),
               ),
             ],
           ),
         ),
-        const Divider(
-          height: 1,
-          indent: 20,
-          endIndent: 20,
-          color: ThemeV2.divider,
-        ),
+        widget.palette != null
+            ? themedDivider(widget.palette!, indent: 20, endIndent: 20)
+            : const Divider(
+                height: 1,
+                indent: 20,
+                endIndent: 20,
+                color: ThemeV2.divider,
+              ),
         // ── Epoch rows (no scroll, natural height) ──
         ...shown.asMap().entries.map((entry) {
           final i = entry.key;
@@ -139,6 +147,7 @@ class _MarketTimelineState extends State<MarketTimeline> {
                 i == shown.length - 1 &&
                 widget.epochs.length <= widget.initialLimit,
             epochProgress: isCurrent ? widget.activeEpochProgress : null,
+            palette: widget.palette,
           );
         }),
         // ── MORE / LESS button ──
@@ -189,6 +198,7 @@ class _TimelineRow extends StatelessWidget {
   /// Override for the progress bar value (0.0–1.0).
   /// When null, falls back to [EpochRecord.progress].
   final double? epochProgress;
+  final AppPalette? palette;
 
   const _TimelineRow({
     required this.epoch,
@@ -198,6 +208,7 @@ class _TimelineRow extends StatelessWidget {
     required this.isFirst,
     required this.isLast,
     this.epochProgress,
+    this.palette,
   });
 
   Color get _phaseColor => FomoShieldTheme.phaseColor(epoch.scenario.name);
@@ -245,7 +256,9 @@ class _TimelineRow extends StatelessWidget {
                   Expanded(
                     child: Container(
                       width: 2,
-                      color: ThemeV2.divider.withValues(alpha: 0.4),
+                      color: (palette?.border ?? ThemeV2.divider).withValues(
+                        alpha: 0.4,
+                      ),
                     ),
                   )
                 else
@@ -276,7 +289,9 @@ class _TimelineRow extends StatelessWidget {
                   Expanded(
                     child: Container(
                       width: 2,
-                      color: ThemeV2.divider.withValues(alpha: 0.4),
+                      color: (palette?.border ?? ThemeV2.divider).withValues(
+                        alpha: 0.4,
+                      ),
                     ),
                   )
                 else
@@ -301,7 +316,8 @@ class _TimelineRow extends StatelessWidget {
                           fontWeight: isCurrent
                               ? FontWeight.w800
                               : FontWeight.w600,
-                          color: ThemeV2.textPrimary.withValues(alpha: opacity),
+                          color: (palette?.textHeader ?? ThemeV2.textPrimary)
+                              .withValues(alpha: opacity),
                         ),
                       ),
                       if (isCurrent) ...[
@@ -337,7 +353,8 @@ class _TimelineRow extends StatelessWidget {
                     style: interNums(
                       fontSize: 11,
                       fontWeight: FontWeight.w400,
-                      color: ThemeV2.textSecondary.withValues(alpha: opacity),
+                      color: (palette?.textBody ?? ThemeV2.textSecondary)
+                          .withValues(alpha: opacity),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -369,9 +386,8 @@ class _TimelineRow extends StatelessWidget {
                       borderRadius: BorderRadius.circular(2),
                       child: LinearProgressIndicator(
                         value: epochProgress ?? epoch.progress,
-                        backgroundColor: ThemeV2.divider.withValues(
-                          alpha: 0.25,
-                        ),
+                        backgroundColor: (palette?.border ?? ThemeV2.divider)
+                            .withValues(alpha: 0.25),
                         valueColor: AlwaysStoppedAnimation<Color>(_phaseColor),
                       ),
                     ),
