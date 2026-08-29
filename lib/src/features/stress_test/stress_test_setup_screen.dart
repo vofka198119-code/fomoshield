@@ -14,6 +14,9 @@ import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_button.dart';
+import '../../core/theme/themed_border.dart';
+import '../../core/theme/themed_divider.dart';
 import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -51,9 +54,22 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   // different duration so a stale DCA choice can't leak into a lump-sum
   // week1/month1/3-months test.
   bool _useDcaFunding = false;
+  late final TextEditingController _nameController;
 
   StressTestSession? get _session =>
       ref.read(stressTestProvider.notifier).getSession(widget.sessionId);
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: _session?.name ?? '');
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
 
   void _startTest() async {
     final tier = ref.read(subscriptionTierProvider);
@@ -73,6 +89,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       builder: (ctx) => _RiskDisclaimerModal(
         isPremium: isPremium,
         selectedDuration: _selectedDuration,
+        palette: resolveAppPalette(ref.read(themeVariantProvider)),
       ),
     );
 
@@ -110,6 +127,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     final useDca = _selectedDuration == TestDuration.custom && _useDcaFunding;
 
     final notifier = ref.read(stressTestProvider.notifier);
+    notifier.renameSession(widget.sessionId, _nameController.text);
     // Apply selected duration before starting
     notifier.setSessionDuration(
       widget.sessionId,
@@ -183,6 +201,20 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               _buildBalanceCard(session, palette),
               const SizedBox(height: 24),
 
+              // ── Name (optional) ──────────────────────────────────
+              Text(
+                l10n.stressTestNameSectionTitle,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: palette.accentPrimary,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 12),
+              _buildNameField(palette, l10n),
+              const SizedBox(height: 24),
+
               // ── Duration Selector ────────────────────────────────
               Text(
                 l10n.stressTestDurationSectionTitle,
@@ -207,8 +239,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 child: Material(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(14),
-                  child: Ink(
-                    decoration: darkCardDecoration(
+                  child: themedDarkCtaButtonShell(
+                    palette: palette,
+                    borderRadius: BorderRadius.circular(14),
+                    standardDecoration: darkCardDecoration(
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: InkWell(
@@ -223,7 +257,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1,
-                              color: Colors.white,
+                              color: themedDarkCtaContentColor(palette),
                             ),
                           ),
                         ),
@@ -300,6 +334,50 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Same gold-ring + graphite-window recipe as the Search field
+  // (search_screen.dart) and the Rename Portfolio dialog
+  // (portfolio_screen.dart) — Standard gets a plain filled box.
+  Widget _buildNameField(AppPalette palette, AppLocalizations l10n) {
+    final isLuxury = palette.windowGradient != null;
+    final radius = BorderRadius.circular(14);
+    final field = TextField(
+      controller: _nameController,
+      maxLength: 40,
+      decoration: InputDecoration(
+        hintText: l10n.stressTestNameHint,
+        hintStyle: GoogleFonts.inter(color: palette.textBody, fontSize: 14),
+        filled: !isLuxury,
+        fillColor: isLuxury ? null : ThemeV2.surface,
+        border: isLuxury
+            ? InputBorder.none
+            : OutlineInputBorder(
+                borderRadius: radius,
+                borderSide: BorderSide.none,
+              ),
+        enabledBorder: isLuxury ? InputBorder.none : null,
+        focusedBorder: isLuxury ? InputBorder.none : null,
+        counterText: '',
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+      ),
+      style: GoogleFonts.inter(color: palette.textHeader, fontSize: 14),
+    );
+    if (!isLuxury) return field;
+    return themedBorder(
+      palette: palette,
+      borderRadius: radius,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: palette.windowGradient,
+          borderRadius: radius,
+        ),
+        child: field,
       ),
     );
   }
@@ -391,138 +469,143 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     // Always show all 5 options; Free gets lock on Infinite & Custom
     final durations = TestDuration.values;
     final l10n = AppLocalizations.of(context)!;
+    final radius = BorderRadius.circular(14);
 
-    return Container(
+    final rows = <Widget>[];
+    for (int i = 0; i < durations.length; i++) {
+      final d = durations[i];
+      if (i > 0) {
+        rows.add(themedRowDivider(palette, indent: 0, endIndent: 0));
+      }
+      final selected = _selectedDuration == d;
+      final isPremiumLocked =
+          !isPremium &&
+          (d == TestDuration.infinite || d == TestDuration.custom);
+      final isCustomRow = d == TestDuration.custom;
+      final isInfiniteRow = d == TestDuration.infinite;
+      final rowColor = isPremium ? const Color(0xFFD4AF37) : accentColor;
+
+      rows.add(
+        InkWell(
+          key: ValueKey(d.name),
+          onTap: () {
+            if (isPremiumLocked) {
+              _showPremiumUpsell();
+            } else if (isCustomRow) {
+              _showCustomDurationPicker();
+            } else {
+              setState(() {
+                _selectedDuration = d;
+                // A DCA choice only ever applies to Custom — picking
+                // any other duration must not carry it forward.
+                _useDcaFunding = false;
+              });
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: selected ? rowColor.withValues(alpha: 0.1) : null,
+            ),
+            child: Row(
+              children: [
+                // Icon: lock for premium-locked, crown for Premium infinite/custom, radio otherwise
+                Icon(
+                  isPremiumLocked
+                      ? Icons.lock_rounded
+                      : (isCustomRow || isInfiniteRow) && isPremium
+                      ? Icons.workspace_premium_rounded
+                      : selected
+                      ? Icons.radio_button_checked_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                  color: isPremiumLocked
+                      ? palette.textBody
+                      : (selected || isCustomRow || isInfiniteRow)
+                      ? rowColor
+                      : palette.textBody,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    isCustomRow && isPremium
+                        ? l10n.stressTestCustomDays(_customDurationDays)
+                        : isInfiniteRow && isPremium
+                        ? l10n.stressTestInfiniteMinWeeks
+                        : d.localizedLabel(l10n),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: isPremiumLocked
+                          ? palette.textBody.withValues(alpha: 0.5)
+                          : selected || isCustomRow || isInfiniteRow
+                          ? rowColor
+                          : palette.textBody,
+                      fontWeight: selected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                  ),
+                ),
+                // Badge or label
+                if (isPremiumLocked)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: darkCardDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      l10n.profilePremiumBadge,
+                      style: GoogleFonts.inter(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: dialBrassLight,
+                        letterSpacing: 1.2,
+                        shadows: _goldGlow(dialBrassLight),
+                      ),
+                    ),
+                  )
+                else if ((isCustomRow || isInfiniteRow) && isPremium)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: darkCardDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      l10n.profilePremiumBadge,
+                      style: GoogleFonts.inter(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: dialBrassLight,
+                        letterSpacing: 1.2,
+                        shadows: _goldGlow(dialBrassLight),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final content = Container(
       decoration: BoxDecoration(
         gradient: palette.windowGradient,
         color: palette.windowGradient == null ? ThemeV2.surface : null,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: radius,
       ),
-      child: Column(
-        children: durations.map((d) {
-          final selected = _selectedDuration == d;
-          final isPremiumLocked =
-              !isPremium &&
-              (d == TestDuration.infinite || d == TestDuration.custom);
-          final isCustomRow = d == TestDuration.custom;
-          final isInfiniteRow = d == TestDuration.infinite;
-          final rowColor = isPremium ? const Color(0xFFD4AF37) : accentColor;
-
-          return InkWell(
-            key: ValueKey(d.name),
-            onTap: () {
-              if (isPremiumLocked) {
-                _showPremiumUpsell();
-              } else if (isCustomRow) {
-                _showCustomDurationPicker();
-              } else {
-                setState(() {
-                  _selectedDuration = d;
-                  // A DCA choice only ever applies to Custom — picking
-                  // any other duration must not carry it forward.
-                  _useDcaFunding = false;
-                });
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: selected
-                    ? rowColor.withValues(alpha: 0.1)
-                    : Colors.transparent,
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.06),
-                  ),
-                ),
-              ),
-              child: Row(
-                children: [
-                  // Icon: lock for premium-locked, crown for Premium infinite/custom, radio otherwise
-                  Icon(
-                    isPremiumLocked
-                        ? Icons.lock_rounded
-                        : (isCustomRow || isInfiniteRow) && isPremium
-                        ? Icons.workspace_premium_rounded
-                        : selected
-                        ? Icons.radio_button_checked_rounded
-                        : Icons.radio_button_unchecked_rounded,
-                    color: isPremiumLocked
-                        ? palette.textBody
-                        : (selected || isCustomRow || isInfiniteRow)
-                        ? rowColor
-                        : palette.textBody,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      isCustomRow && isPremium
-                          ? l10n.stressTestCustomDays(_customDurationDays)
-                          : isInfiniteRow && isPremium
-                          ? l10n.stressTestInfiniteMinWeeks
-                          : d.localizedLabel(l10n),
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: isPremiumLocked
-                            ? palette.textBody.withValues(alpha: 0.5)
-                            : selected || isCustomRow || isInfiniteRow
-                            ? rowColor
-                            : palette.textBody,
-                        fontWeight: selected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                  // Badge or label
-                  if (isPremiumLocked)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: darkCardDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        l10n.profilePremiumBadge,
-                        style: GoogleFonts.inter(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          color: dialBrassLight,
-                          letterSpacing: 1.2,
-                          shadows: _goldGlow(dialBrassLight),
-                        ),
-                      ),
-                    )
-                  else if ((isCustomRow || isInfiniteRow) && isPremium)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: darkCardDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        l10n.profilePremiumBadge,
-                        style: GoogleFonts.inter(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          color: dialBrassLight,
-                          letterSpacing: 1.2,
-                          shadows: _goldGlow(dialBrassLight),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          );
-        }).toList(),
-      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: rows),
     );
+    return palette.windowGradient == null
+        ? content
+        : themedBorder(palette: palette, borderRadius: radius, child: content);
   }
 
   /// Prompts a Free user to subscribe when tapping a locked feature.
@@ -618,11 +701,13 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
     int tempDays = _customDurationDays;
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
+    final isLuxury = palette.windowGradient != null;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: ThemeV2.surface,
+      backgroundColor: palette.card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -653,7 +738,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       width: 36,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.black26,
+                        color: isLuxury
+                            ? Colors.white.withValues(alpha: 0.24)
+                            : Colors.black26,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -665,7 +752,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: ThemeV2.textPrimary,
+                      color: palette.textHeader,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -695,7 +782,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                             l10n.stressTestCustomDurationWarning,
                             style: GoogleFonts.inter(
                               fontSize: 12,
-                              color: ThemeV2.textSecondary,
+                              color: palette.textBody,
                               height: 1.5,
                             ),
                           ),
@@ -743,14 +830,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         l10n.stressTestMinDays,
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: ThemeV2.textSecondary,
+                          color: palette.textBody,
                         ),
                       ),
                       Text(
                         l10n.stressTestMaxDays,
                         style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: ThemeV2.textSecondary,
+                          color: palette.textBody,
                         ),
                       ),
                     ],
@@ -766,9 +853,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                           child: OutlinedButton(
                             onPressed: () => Navigator.of(ctx).pop(),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: ThemeV2.textSecondary,
+                              foregroundColor: palette.textBody,
                               side: BorderSide(
-                                color: ThemeV2.textSecondary.withValues(
+                                color: palette.textBody.withValues(
                                   alpha: 0.3,
                                 ),
                               ),
@@ -807,13 +894,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                               final choice = await showModalBottomSheet<bool>(
                                 context: context,
                                 isScrollControlled: true,
-                                backgroundColor: ThemeV2.surface,
+                                backgroundColor: palette.card,
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.vertical(
                                     top: Radius.circular(20),
                                   ),
                                 ),
-                                builder: (_) => const _FundingModeSheet(),
+                                builder: (_) =>
+                                    _FundingModeSheet(palette: palette),
                               );
                               if (choice != null && mounted) {
                                 setState(() => _useDcaFunding = choice);
@@ -858,10 +946,12 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 class _RiskDisclaimerModal extends StatefulWidget {
   final bool isPremium;
   final TestDuration selectedDuration;
+  final AppPalette palette;
 
   const _RiskDisclaimerModal({
     required this.isPremium,
     required this.selectedDuration,
+    required this.palette,
   });
 
   @override
@@ -919,7 +1009,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
     final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
-      backgroundColor: ThemeV2.surface,
+      backgroundColor: widget.palette.card,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
       child: Padding(
@@ -934,7 +1024,9 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.black26,
+                  color: widget.palette.windowGradient == null
+                      ? Colors.black26
+                      : Colors.white.withValues(alpha: 0.24),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -949,7 +1041,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: isFreeInfinite ? _accentColor : ThemeV2.textPrimary,
+                color: isFreeInfinite ? _accentColor : widget.palette.textHeader,
                 letterSpacing: 0.5,
               ),
             ),
@@ -972,14 +1064,14 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                   Icon(
                     Icons.arrow_downward_rounded,
                     size: 14,
-                    color: ThemeV2.textSecondary,
+                    color: widget.palette.textBody,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     l10n.stressTestScrollToAgree,
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.textSecondary,
+                      color: widget.palette.textBody,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -1016,9 +1108,11 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     child: OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(false),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: ThemeV2.textSecondary,
+                        foregroundColor: widget.palette.textBody,
                         side: BorderSide(
-                          color: ThemeV2.textSecondary.withValues(alpha: 0.3),
+                          color: widget.palette.textBody.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                         backgroundColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
@@ -1048,9 +1142,9 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _hasScrolledToBottom || isFreeInfinite
                             ? _accentColor
-                            : ThemeV2.textSecondary.withValues(alpha: 0.3),
+                            : widget.palette.textBody.withValues(alpha: 0.3),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: ThemeV2.textSecondary
+                        disabledBackgroundColor: widget.palette.textBody
                             .withValues(alpha: 0.2),
                         disabledForegroundColor: Colors.white38,
                         shape: RoundedRectangleBorder(
@@ -1099,7 +1193,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     l10n.stressTestDisclaimerIntro,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: ThemeV2.textPrimary,
+                      color: widget.palette.textHeader,
                       height: 1.6,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1109,7 +1203,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     l10n.stressTestDisclaimerAck,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: ThemeV2.textPrimary,
+                      color: widget.palette.textHeader,
                       height: 1.6,
                     ),
                   ),
@@ -1128,7 +1222,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                     l10n.stressTestEndOfDisclaimer,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: ThemeV2.textSecondary.withValues(alpha: 0.3),
+                      color: widget.palette.textBody.withValues(alpha: 0.3),
                       height: 1.6,
                     ),
                   ),
@@ -1169,7 +1263,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
             l10n.stressTestInfiniteUpsellBody,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: ThemeV2.textSecondary,
+              color: widget.palette.textBody,
               height: 1.6,
             ),
           ),
@@ -1204,7 +1298,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
           text,
           style: GoogleFonts.inter(
             fontSize: 13,
-            color: ThemeV2.textPrimary,
+            color: widget.palette.textHeader,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -1218,14 +1312,17 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
       children: [
         Text(
           '•  ',
-          style: GoogleFonts.inter(color: ThemeV2.textSecondary, fontSize: 13),
+          style: GoogleFonts.inter(
+            color: widget.palette.textBody,
+            fontSize: 13,
+          ),
         ),
         Expanded(
           child: Text(
             text,
             style: GoogleFonts.inter(
               fontSize: 13,
-              color: ThemeV2.textSecondary,
+              color: widget.palette.textBody,
               height: 1.6,
             ),
           ),
@@ -1246,7 +1343,9 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
 // ---------------------------------------------------------------------------
 
 class _FundingModeSheet extends StatelessWidget {
-  const _FundingModeSheet();
+  final AppPalette palette;
+
+  const _FundingModeSheet({required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -1271,7 +1370,9 @@ class _FundingModeSheet extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.black26,
+                color: palette.windowGradient == null
+                    ? Colors.black26
+                    : Colors.white.withValues(alpha: 0.24),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1282,7 +1383,7 @@ class _FundingModeSheet extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: ThemeV2.textPrimary,
+              color: palette.textHeader,
             ),
           ),
           const SizedBox(height: 20),
@@ -1339,7 +1440,7 @@ class _FundingModeSheet extends StatelessWidget {
               detail,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: ThemeV2.textSecondary,
+                color: palette.textBody,
                 height: 1.4,
               ),
             ),

@@ -10,6 +10,7 @@ import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_border.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/segment_gauge_math.dart';
@@ -116,6 +117,7 @@ class TargetWidget extends ConsumerWidget {
             child: _SelectGoalButton(
               portfolioId: portfolioId,
               hasGoal: goalAmount != null,
+              palette: palette,
             ),
           ),
         ],
@@ -147,11 +149,15 @@ class _GoalSummaryRow extends StatelessWidget {
     Color? remainingColor;
     Color remainingBg = ThemeV2.primaryBg;
     if (remaining != null) {
-      remainingText = formatUsdSigned(-remaining!);
       if (remaining! > 0) {
+        // Still short of the goal — a plain amount ("still need $X more"),
+        // not a negative one: a leading "-" here read like a loss, not
+        // "amount left to go".
+        remainingText = formatUsd(remaining!);
         remainingColor = ThemeV2.loss;
         remainingBg = ThemeV2.lossBg;
       } else {
+        remainingText = formatUsdSigned(-remaining!);
         remainingColor = ThemeV2.success;
         remainingBg = ThemeV2.successBg;
       }
@@ -268,22 +274,28 @@ class _GoalSummaryRow extends StatelessWidget {
 class _SelectGoalButton extends StatelessWidget {
   final String portfolioId;
   final bool hasGoal;
+  final AppPalette palette;
 
-  const _SelectGoalButton({required this.portfolioId, required this.hasGoal});
+  const _SelectGoalButton({
+    required this.portfolioId,
+    required this.hasGoal,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(ThemeV2.buttonRadius);
     return SizedBox(
       width: double.infinity,
       height: ThemeV2.buttonHeight,
-      child: DecoratedBox(
-        decoration: darkCardDecoration(
-          borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
-        ),
-        child: Material(
-          type: MaterialType.transparency,
+      child: Material(
+        type: MaterialType.transparency,
+        child: themedDarkCtaButtonShell(
+          palette: palette,
+          borderRadius: radius,
+          standardDecoration: darkCardDecoration(borderRadius: radius),
           child: InkWell(
-            borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
+            borderRadius: radius,
             onTap: () => context.push('/portfolio/$portfolioId/goal'),
             child: Center(
               child: Text(
@@ -293,7 +305,7 @@ class _SelectGoalButton extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: themedDarkCtaContentColor(palette),
                 ),
               ),
             ),

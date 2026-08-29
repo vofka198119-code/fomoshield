@@ -20,6 +20,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_border.dart';
+import '../../core/theme/themed_button.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../market_clock/market_clock_dial.dart'
     show darkCardDecoration, dialDark;
@@ -321,8 +322,10 @@ class VerdictScreen extends ConsumerWidget {
                       child: InkWell(
                         onTap: () => context.go('/stress-test-hub'),
                         borderRadius: BorderRadius.circular(14),
-                        child: Ink(
-                          decoration:
+                        child: themedDarkCtaButtonShell(
+                          palette: palette,
+                          borderRadius: BorderRadius.circular(14),
+                          standardDecoration:
                               darkCardDecoration(
                                 borderRadius: BorderRadius.circular(14),
                               ).copyWith(
@@ -342,7 +345,7 @@ class VerdictScreen extends ConsumerWidget {
                               style: GoogleFonts.inter(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color: themedDarkCtaContentColor(palette),
                               ),
                             ),
                           ),

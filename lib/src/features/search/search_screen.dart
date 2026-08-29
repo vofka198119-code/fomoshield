@@ -7,6 +7,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_divider.dart';
+import '../../core/theme/themed_border.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../home/home_providers.dart';
@@ -105,33 +106,61 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextField(
-                  controller: _controller,
-                  autofocus: true,
-                  onChanged: (q) =>
-                      ref.read(searchProvider.notifier).onSearchInput(q),
-                  decoration: InputDecoration(
-                    hintText: l10n.searchHint,
-                    hintStyle: GoogleFonts.inter(
-                      color: palette.textBody,
-                      fontSize: 14,
+                // The app-wide InputDecorationTheme's focusedBorder is a
+                // hardcoded ThemeV2.primary (green) OutlineInputBorder —
+                // not overridden by the field's own `border:
+                // InputBorder.none` below (Flutter only falls back to
+                // `border` for states that aren't separately specified),
+                // so it showed through whenever this field was focused
+                // (autofocus: true, so immediately on screen open). Under
+                // Luxury Gold, suppress the Material border entirely and
+                // wrap the field in the same gold-ring + graphite-window
+                // treatment every other widget/panel in the app uses
+                // (themedBorder + windowGradient) instead of just
+                // recoloring a plain Material outline.
+                child: themedBorder(
+                  palette: palette,
+                  borderRadius: ThemeV2.borderRadiusMedium,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: palette.windowGradient,
+                      borderRadius: ThemeV2.borderRadiusMedium,
                     ),
-                    border: InputBorder.none,
-                    filled: false,
-                    suffixIcon: state.query.isEmpty
-                        ? null
-                        : IconButton(
-                            icon: Icon(
-                              Icons.close_rounded,
-                              color: palette.textBody,
-                              size: 20,
-                            ),
-                            onPressed: _clear,
-                          ),
-                  ),
-                  style: GoogleFonts.inter(
-                    color: palette.textHeader,
-                    fontSize: 14,
+                    child: TextField(
+                      controller: _controller,
+                      autofocus: true,
+                      onChanged: (q) =>
+                          ref.read(searchProvider.notifier).onSearchInput(q),
+                      decoration: InputDecoration(
+                        hintText: l10n.searchHint,
+                        hintStyle: GoogleFonts.inter(
+                          color: palette.textBody,
+                          fontSize: 14,
+                        ),
+                        border: InputBorder.none,
+                        enabledBorder: palette.windowGradient == null
+                            ? null
+                            : InputBorder.none,
+                        focusedBorder: palette.windowGradient == null
+                            ? null
+                            : InputBorder.none,
+                        filled: false,
+                        suffixIcon: state.query.isEmpty
+                            ? null
+                            : IconButton(
+                                icon: Icon(
+                                  Icons.close_rounded,
+                                  color: palette.textBody,
+                                  size: 20,
+                                ),
+                                onPressed: _clear,
+                              ),
+                      ),
+                      style: GoogleFonts.inter(
+                        color: palette.textHeader,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ),
               ),

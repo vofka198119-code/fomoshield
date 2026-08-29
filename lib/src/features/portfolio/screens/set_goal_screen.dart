@@ -18,6 +18,7 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/numeric_keypad.dart';
@@ -120,6 +121,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        centerTitle: true,
         title: themedHeaderText(
           _isEditing
               ? l10n.setGoalScreenTitleChange
@@ -140,10 +142,11 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(22),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       l10n.setGoalScreenPrompt,
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -153,9 +156,12 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                     const SizedBox(height: 6),
                     Text(
                       l10n.setGoalScreenSubtitle(formatUsd(minGoal)),
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: palette.textBody,
+                        color: palette.windowGradient == null
+                            ? palette.textBody
+                            : Colors.white,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -164,6 +170,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                       onTap: () => setState(() => _keypadOpen = true),
                       child: Container(
                         width: double.infinity,
+                        alignment: Alignment.center,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
@@ -180,6 +187,7 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                           _controller.text.isEmpty
                               ? '\$ ${minGoal.toStringAsFixed(0)}'
                               : '\$ ${_controller.text}',
+                          textAlign: TextAlign.center,
                           style: interNums(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
@@ -199,13 +207,13 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                 controller: _controller,
                 onChanged: () => setState(() {}),
                 onDone: () => setState(() => _keypadOpen = false),
-                header: _saveButton(height: 44),
+                header: _saveButton(height: 44, palette: palette),
                 palette: palette,
               )
             else
               Padding(
                 padding: const EdgeInsets.all(22),
-                child: _saveButton(height: ThemeV2.buttonHeight),
+                child: _saveButton(height: ThemeV2.buttonHeight, palette: palette),
               ),
           ],
         ),
@@ -213,23 +221,34 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
     );
   }
 
-  Widget _saveButton({required double height}) {
+  Widget _saveButton({required double height, required AppPalette palette}) {
+    final radius = BorderRadius.circular(ThemeV2.buttonRadius);
     return SizedBox(
       width: double.infinity,
       height: height,
-      child: ElevatedButton(
-        onPressed: _save,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: ThemeV2.primary,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
+      child: Material(
+        type: MaterialType.transparency,
+        child: themedDarkCtaButtonShell(
+          palette: palette,
+          borderRadius: radius,
+          standardDecoration: BoxDecoration(
+            color: ThemeV2.primary,
+            borderRadius: radius,
           ),
-          elevation: 0,
-        ),
-        child: Text(
-          AppLocalizations.of(context)!.setGoalScreenSaveButton,
-          style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700),
+          child: InkWell(
+            borderRadius: radius,
+            onTap: _save,
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context)!.setGoalScreenSaveButton,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: themedDarkCtaContentColor(palette),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

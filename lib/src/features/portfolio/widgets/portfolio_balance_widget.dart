@@ -170,7 +170,9 @@ class _PortfolioBalanceWidgetState
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: palette.accentPrimary,
+                              color: palette.windowGradient == null
+                                  ? palette.accentPrimary
+                                  : palette.textHeader,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -252,7 +254,9 @@ class _PortfolioBalanceWidgetState
                               style: interNums(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: palette.textBody,
+                                color: palette.windowGradient == null
+                                    ? palette.textBody
+                                    : Colors.white,
                               ),
                             ),
                           ],

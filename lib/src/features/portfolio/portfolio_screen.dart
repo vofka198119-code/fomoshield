@@ -68,74 +68,29 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           ),
         ),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: ThemeV2.textSecondary),
-            color: ThemeV2.surface,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+          IconButton(
+            // Flat accentPrimary before — every other header icon (back
+            // arrow, notification bell) gets the same metallic gold
+            // ShaderMask sheen under Luxury via themedGoldGradient; this
+            // one was missed. Standard is a no-op, exact same gray as
+            // before.
+            icon: themedGoldGradient(
+              Icon(
+                Icons.more_vert,
+                color: palette.windowGradient == null
+                    ? ThemeV2.textSecondary
+                    : Colors.white,
+                shadows: palette.titleShadow != null
+                    ? [palette.titleShadow!]
+                    : null,
+              ),
+              palette,
             ),
-            onSelected: (value) {
+            onPressed: () {
               final pid = effectiveId;
               if (pid == null) return;
-              if (value == 'rename') {
-                final current = portfolios.firstWhere((p) => p.id == pid);
-                _showRenamePortfolioDialog(context, pid, current.name);
-              } else if (value == 'reset') {
-                _showResetPortfolioDialog(context, pid);
-              } else if (value == 'delete') {
-                _showDeletePortfolioDialog(context, pid, portfolios);
-              }
+              _showPortfolioActionsSheet(context, pid, palette);
             },
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: 'rename',
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.edit_rounded,
-                    color: ThemeV2.primary,
-                    size: 20,
-                  ),
-                  title: Text(
-                    l10n.portfolioRenameMenu,
-                    style: const TextStyle(color: ThemeV2.primary),
-                  ),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              PopupMenuItem(
-                value: 'reset',
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.refresh_rounded,
-                    color: ThemeV2.warning,
-                    size: 20,
-                  ),
-                  title: Text(
-                    l10n.portfolioResetMenu,
-                    style: const TextStyle(color: ThemeV2.warning),
-                  ),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.delete_rounded,
-                    color: ThemeV2.loss,
-                    size: 20,
-                  ),
-                  title: Text(
-                    l10n.portfolioDeleteMenu,
-                    style: const TextStyle(color: ThemeV2.loss),
-                  ),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -197,49 +152,244 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     );
   }
 
+  // Bottom sheet for the header's ⋮ actions — matches the "Add Widgets"
+  // sheets' now-canonical recipe (handle bar, themedBorder + windowGradient
+  // rows) instead of a native PopupMenuButton, which has no way to render
+  // this app's gradient border/window fill and always looked out of place
+  // no matter how its flat color/border were tuned.
+  void _showPortfolioActionsSheet(
+    BuildContext context,
+    String portfolioId,
+    AppPalette palette,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final isLuxury = palette.windowGradient != null;
+    final radius = BorderRadius.circular(14);
+
+    Widget row({
+      required IconData icon,
+      required Color color,
+      required String label,
+      required VoidCallback onTap,
+    }) {
+      final content = ListTile(
+        onTap: onTap,
+        leading: Icon(icon, color: color, size: 20),
+        title: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+      );
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: isLuxury
+            ? themedBorder(
+                palette: palette,
+                borderRadius: radius,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: palette.windowGradient,
+                    borderRadius: radius,
+                  ),
+                  child: content,
+                ),
+              )
+            : Container(
+                decoration: BoxDecoration(
+                  color: ThemeV2.surfaceDark,
+                  borderRadius: radius,
+                  border: Border.all(color: Colors.black12),
+                ),
+                child: content,
+              ),
+      );
+    }
+
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      backgroundColor: palette.card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          bottom:
+              MediaQuery.of(sheetContext).viewInsets.bottom +
+              MediaQuery.of(sheetContext).padding.bottom +
+              16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 16),
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isLuxury
+                    ? Colors.white.withValues(alpha: 0.24)
+                    : Colors.black26,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            row(
+              icon: Icons.edit_rounded,
+              color: isLuxury ? palette.accentPrimary : ThemeV2.primary,
+              label: l10n.portfolioRenameMenu,
+              onTap: () {
+                Navigator.pop(sheetContext);
+                final current = ref
+                    .read(portfoliosProvider)
+                    .firstWhere((p) => p.id == portfolioId);
+                _showRenamePortfolioDialog(
+                  context,
+                  portfolioId,
+                  current.displayName(l10n),
+                );
+              },
+            ),
+            row(
+              icon: Icons.refresh_rounded,
+              color: ThemeV2.warning,
+              label: l10n.portfolioResetMenu,
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _showResetPortfolioDialog(context, portfolioId);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showRenamePortfolioDialog(
     BuildContext context,
     String portfolioId,
     String currentName,
   ) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
+    final isLuxury = palette.windowGradient != null;
     final controller = TextEditingController(text: currentName);
+    final fieldRadius = BorderRadius.circular(10);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: ThemeV2.surface,
-        title: Text(
-          l10n.portfolioRenameMenu,
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: ThemeV2.textPrimary,
-          ),
-        ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: l10n.portfolioNameHint,
-            hintStyle: GoogleFonts.inter(
-              color: ThemeV2.textSecondary,
-              fontSize: 14,
-            ),
-            filled: true,
-            fillColor: ThemeV2.surfaceDark,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+        backgroundColor: palette.card,
+        shape: isLuxury
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: palette.accentPrimary, width: 1),
+              )
+            : null,
+        title: SizedBox(
+          width: double.infinity,
+          child: Text(
+            l10n.portfolioRenameMenu,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: palette.textHeader,
             ),
           ),
-          style: GoogleFonts.inter(color: ThemeV2.textPrimary, fontSize: 14),
         ),
+        // Same gold-ring + graphite-window recipe as the Search field
+        // (search_screen.dart) — Standard keeps the original plain filled
+        // box untouched.
+        content: isLuxury
+            ? themedBorder(
+                palette: palette,
+                borderRadius: fieldRadius,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: palette.windowGradient,
+                    borderRadius: fieldRadius,
+                  ),
+                  // Cursor/selection-handle color otherwise falls back to
+                  // the app-wide TextSelectionTheme (green, tied to
+                  // ThemeV2.primary) regardless of this field's own
+                  // palette-aware colors — override locally so it reads as
+                  // gold under Luxury.
+                  child: Theme(
+                    data: Theme.of(ctx).copyWith(
+                      textSelectionTheme: TextSelectionThemeData(
+                        cursorColor: palette.accentPrimary,
+                        selectionColor: palette.accentPrimary.withValues(
+                          alpha: 0.3,
+                        ),
+                        selectionHandleColor: palette.accentPrimary,
+                      ),
+                    ),
+                    child: TextField(
+                      controller: controller,
+                      autofocus: true,
+                      cursorColor: palette.accentPrimary,
+                      // Renaming is a short single-word edit — the
+                      // drag-to-reposition "teardrop" handle just gets in
+                      // the way here, so drop interactive selection
+                      // entirely rather than only recoloring it.
+                      enableInteractiveSelection: false,
+                      decoration: InputDecoration(
+                        hintText: l10n.portfolioNameHint,
+                        hintStyle: GoogleFonts.inter(
+                          color: palette.textBody,
+                          fontSize: 14,
+                        ),
+                        filled: false,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                      ),
+                      style: GoogleFonts.inter(
+                        color: palette.textHeader,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: l10n.portfolioNameHint,
+                  hintStyle: GoogleFonts.inter(
+                    color: palette.textBody,
+                    fontSize: 14,
+                  ),
+                  filled: true,
+                  fillColor: ThemeV2.surfaceDark,
+                  border: OutlineInputBorder(
+                    borderRadius: fieldRadius,
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                style: GoogleFonts.inter(
+                  color: palette.textHeader,
+                  fontSize: 14,
+                ),
+              ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               l10n.profileCancel,
-              style: GoogleFonts.inter(color: ThemeV2.textSecondary),
+              style: GoogleFonts.inter(color: palette.textBody),
             ),
           ),
           TextButton(
@@ -255,7 +405,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             child: Text(
               l10n.portfolioSave,
               style: GoogleFonts.inter(
-                color: ThemeV2.primary,
+                color: palette.accentPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -309,71 +459,6 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     );
   }
 
-  void _showDeletePortfolioDialog(
-    BuildContext context,
-    String portfolioId,
-    List<Portfolio> ps,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-    if (ps.length <= 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.portfolioCannotDeleteLast,
-            style: GoogleFonts.inter(fontSize: 13),
-          ),
-          backgroundColor: ThemeV2.loss,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: ThemeV2.surface,
-        title: Text(
-          l10n.portfolioDeleteDialogTitle,
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: ThemeV2.textPrimary,
-          ),
-        ),
-        content: Text(
-          l10n.portfolioDeleteDialogBody,
-          style: GoogleFonts.inter(fontSize: 14, color: ThemeV2.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              l10n.profileCancel,
-              style: GoogleFonts.inter(color: ThemeV2.textSecondary),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              ref
-                  .read(portfoliosProvider.notifier)
-                  .deletePortfolio(portfolioId);
-              if (ref.read(activePortfolioIdProvider) == portfolioId) {
-                ref.read(activePortfolioIdProvider.notifier).state = null;
-              }
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              l10n.profileDelete,
-              style: GoogleFonts.inter(
-                color: ThemeV2.loss,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // Library-scoped (not a class member) so both PortfolioScreen's empty-state
