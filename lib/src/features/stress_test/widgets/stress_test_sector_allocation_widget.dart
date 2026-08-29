@@ -77,7 +77,7 @@ class StressTestSectorAllocationCard extends StatelessWidget {
                 children: [
                   themedGoldGradient(
                     Text(
-                      'DIVERSIFICATION INDICATOR',
+                      l10n.portfolioBalanceScreenDiversificationIndicatorTitle,
                       style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
                         shadows: palette.titleShadow != null
                             ? [palette.titleShadow!]

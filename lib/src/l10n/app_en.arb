@@ -110,6 +110,12 @@
   "tradePricePerShareLabel": "Price per Share",
   "tradeTotalValueLabel": "Total Value",
   "tradeDateLabel": "Date",
+  "tradeCommissionLabel": "Commission",
+  "tradeSimulationLabel": "Simulation",
+  "orderConfirmTitle": "Confirm Order",
+  "orderConfirmSubtotalLabel": "Order Amount",
+  "orderConfirmTotalLabel": "Total",
+  "orderConfirmCancelButton": "Cancel",
   "tradeRealizedPnlLabel": "Realized P&L",
   "disclaimerFooter": "Disclaimer: F.O.M.O. Shield is for educational and entertainment purposes only. We are not registered investment advisors. All trading decisions are solely your responsibility. Past performance does not guarantee future results.",
   "homeAddWidgets": "Add widgets",
@@ -1129,6 +1135,13 @@
   "orderEntryInfoStopLimit": "Stop-limit orders activate when the stop price is reached, then execute as a limit order.",
   "stressTestOrderInfoMarket": "Market orders execute at the best available simulated price. Execution is guaranteed, but the final price may differ from expectations.",
   "stressTestOrderInfoLimit": "Limit orders execute only once the simulated price reaches your chosen price or better. Execution is not guaranteed.",
+  "stressTestOrderCommissionNotice": "A 0.5% brokerage commission is charged on every buy and sell, just like real brokers.",
+  "stressTestOrderCommissionEstimate": "Estimated commission: {amount}",
+  "@stressTestOrderCommissionEstimate": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
   "orderEntryHoldingsLimitTitle": "Limit Reached",
   "orderEntryHoldingsLimitBody": "You've exceeded the allowed limit on asset purchases for this portfolio ({max} companies).",
   "@orderEntryHoldingsLimitBody": {
@@ -2344,6 +2357,7 @@
   "portfolioBalanceScreenDisclaimerTitle": "Educational Disclaimer",
   "portfolioBalanceScreenDisclaimerBody": "This application is intended to help users learn about investing and portfolio management. All scores, indicators, simulations, and educational content are provided for informational purposes only and should not be interpreted as financial advice or investment recommendations.\n\nThe app does not tell you what to buy, sell, or hold. Its purpose is to explain investment concepts, visualize portfolio characteristics, and support learning through educational tools.\n\nInvesting involves risk, and the value of investments can rise or fall. Past performance and simulated results are not guarantees of future performance. Always perform your own research and, when appropriate, seek advice from a licensed financial professional before making investment decisions.\n\nBy using this application, you acknowledge that all investment decisions remain your sole responsibility.",
   "portfolioBalanceScreenAssetAllocationTitle": "ASSET ALLOCATION %",
+  "portfolioBalanceScreenDiversificationIndicatorTitle": "DIVERSIFICATION INDICATOR",
   "portfolioHealthWidgetTitle": "PORTFOLIO HEALTH",
   "portfolioHealthWidgetDiversification": "Diversification",
   "portfolioHealthWidgetConcentration": "Concentration",

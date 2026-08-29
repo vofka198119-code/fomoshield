@@ -72,7 +72,9 @@ class OrderConfigSection extends StatelessWidget {
         children: [
           Icon(
             Icons.info_outline_rounded,
-            color: palette.textBody,
+            color: palette.titleGradient != null
+                ? Colors.white
+                : palette.textBody,
             size: 16,
           ),
           const SizedBox(width: 10),
@@ -81,7 +83,9 @@ class OrderConfigSection extends StatelessWidget {
               infoText,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: palette.textBody,
+                color: palette.titleGradient != null
+                    ? Colors.white
+                    : palette.textBody,
                 height: 1.5,
               ),
             ),
@@ -137,6 +141,19 @@ class OrderConfigSection extends StatelessWidget {
               value: extendedHours,
               onChanged: onChanged,
               activeTrackColor: palette.accentPrimary,
+              // Off-state + outline only recolored under Luxury Gold
+              // (gated on windowGradient, same as every other themed
+              // toggle) — Standard keeps the plain Material defaults it
+              // always had.
+              inactiveThumbColor: palette.windowGradient != null
+                  ? palette.textBody
+                  : null,
+              inactiveTrackColor: palette.windowGradient != null
+                  ? palette.card
+                  : null,
+              trackOutlineColor: palette.windowGradient != null
+                  ? WidgetStateProperty.all(palette.border)
+                  : null,
             ),
           ],
         ),

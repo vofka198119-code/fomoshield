@@ -364,7 +364,13 @@ class _CornerGauge extends StatelessWidget {
       style: GoogleFonts.inter(
         fontSize: 11,
         fontWeight: FontWeight.w600,
-        color: palette.textBody,
+        // Reads gray on Luxury Gold's dark card — flat white there instead
+        // (user's explicit call, not the usual cream textHeader), same "is
+        // Luxury active" check this file already uses elsewhere. Standard's
+        // light card keeps the original gray.
+        color: palette.titleGradient != null
+            ? Colors.white
+            : palette.textBody,
       ),
     );
     final gauge = SizedBox(

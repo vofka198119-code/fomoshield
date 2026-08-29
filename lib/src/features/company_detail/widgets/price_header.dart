@@ -4,6 +4,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/themed_border.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -95,6 +96,10 @@ class PriceHeader extends StatelessWidget {
     // nearly disappearing into it.
     final sectorBadgeBg = Color.alphaBlend(ThemeV2.primaryBg, Colors.white);
     final sector = resolveGicsSector(symbol, companyName: companyName);
+    // themedBorder no-ops when this is null (Standard theme) — gates the
+    // flat white/mint fills below so they only swap to the gold-ring +
+    // windowGradient "inner panel" look under Luxury Gold.
+    final hasThemedBorder = palette.borderGradient != null;
 
     return Column(
       children: [
@@ -148,21 +153,30 @@ class PriceHeader extends StatelessWidget {
                       ),
                       if (sector != null) ...[
                         const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 1,
-                          ),
-                          decoration: BoxDecoration(
-                            color: sectorBadgeBg,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            sector.localizedLabel(AppLocalizations.of(context)!),
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: palette.accentPrimary,
+                        themedBorder(
+                          palette: palette,
+                          borderRadius: BorderRadius.circular(6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: hasThemedBorder ? null : sectorBadgeBg,
+                              gradient: hasThemedBorder
+                                  ? palette.windowGradient
+                                  : null,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              sector.localizedLabel(
+                                AppLocalizations.of(context)!,
+                              ),
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: palette.accentPrimary,
+                              ),
                             ),
                           ),
                         ),
@@ -192,36 +206,41 @@ class PriceHeader extends StatelessWidget {
                     children: [
                       _priceCell(l10n),
                       const SizedBox(height: 10),
-                      // Change — fill/colors unchanged for now (still the
-                      // olive/success/loss tint used elsewhere), just
-                      // repositioned below the price cell.
-                      _cell(
-                        label: changeLabel,
-                        bgColor: changeCellBg,
-                        valueColor: changeColor,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isUp
-                                  ? Icons.trending_up_rounded
-                                  : Icons.trending_down_rounded,
-                              size: 16,
-                              color: changeColor,
-                            ),
-                            const SizedBox(width: 3),
-                            Flexible(
-                              child: Text(
-                                '${formatUsdSigned(change)} (${isUp ? '+' : ''}${changePercent.toStringAsFixed(2)}%)',
-                                style: interNums(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: changeColor,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                      // Change pill — success/loss icon+text color always
+                      // semantic (unchanged), fill swaps to the gold-ring +
+                      // windowGradient panel under Luxury Gold instead of
+                      // the flat light mint/white tint.
+                      themedBorder(
+                        palette: palette,
+                        borderRadius: BorderRadius.circular(16),
+                        child: _cell(
+                          label: changeLabel,
+                          bgColor: changeCellBg,
+                          valueColor: changeColor,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isUp
+                                    ? Icons.trending_up_rounded
+                                    : Icons.trending_down_rounded,
+                                size: 16,
+                                color: changeColor,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 3),
+                              Flexible(
+                                child: Text(
+                                  '${formatUsdSigned(change)} (${isUp ? '+' : ''}${changePercent.toStringAsFixed(2)}%)',
+                                  style: interNums(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: changeColor,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -441,13 +460,22 @@ class PriceHeader extends StatelessWidget {
     required Color valueColor,
     required Widget child,
   }) {
+    // The themedBorder wrapper at the call site already draws a border
+    // (and, via effectiveGradient below, the fill) when the theme defines
+    // one — don't also draw this flat divider border, or the two would
+    // double up. Same reasoning as Home Portfolio widget's `_cell`.
+    final hasThemedBorder = palette.borderGradient != null;
+    final effectiveGradient = hasThemedBorder ? palette.windowGradient : null;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: effectiveGradient == null ? bgColor : null,
+        gradient: effectiveGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeV2.divider),
+        border: effectiveGradient == null && !hasThemedBorder
+            ? Border.all(color: ThemeV2.divider)
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,7 +486,7 @@ class PriceHeader extends StatelessWidget {
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.6,
-              color: palette.accentPrimary,
+              color: hasThemedBorder ? palette.textHeader : palette.accentPrimary,
             ),
           ),
           const SizedBox(height: 4),

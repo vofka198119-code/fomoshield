@@ -5,6 +5,7 @@ import '../../../../core/theme/typography_helpers.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
+import '../../../../core/theme/themed_border.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import 'order_amount_section.dart' show OrderInputMode;
 
@@ -73,7 +74,7 @@ class OrderBottomButton extends StatelessWidget {
                 ],
               ),
             ),
-          ReviewOrderButton(isBuy: isBuy, onSubmit: onSubmit),
+          ReviewOrderButton(isBuy: isBuy, onSubmit: onSubmit, palette: palette),
         ],
       ),
     );
@@ -89,11 +90,13 @@ class ReviewOrderButton extends StatelessWidget {
   final bool isBuy;
   final VoidCallback? onSubmit;
   final double height;
+  final AppPalette palette;
 
   const ReviewOrderButton({
     super.key,
     required this.isBuy,
     required this.onSubmit,
+    required this.palette,
     this.height = 52,
   });
 
@@ -148,25 +151,31 @@ class ReviewOrderButton extends StatelessWidget {
       );
     }
 
-    return Material(
-      color: Colors.transparent,
+    return themedBorder(
+      palette: palette,
       borderRadius: BorderRadius.circular(18),
-      child: Ink(
-        decoration: darkCardDecoration(borderRadius: BorderRadius.circular(18)),
-        child: InkWell(
-          onTap: onSubmit,
-          borderRadius: BorderRadius.circular(18),
-          child: Container(
-            width: double.infinity,
-            height: height,
-            alignment: Alignment.center,
-            child: Text(
-              l10n.orderEntryPlaceOrder,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-                letterSpacing: 0.5,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
+        child: Ink(
+          decoration: darkCardDecoration(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: InkWell(
+            onTap: onSubmit,
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              width: double.infinity,
+              height: height,
+              alignment: Alignment.center,
+              child: Text(
+                l10n.orderEntryPlaceOrder,
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
           ),

@@ -917,6 +917,14 @@ class HypeEvent {
   );
 }
 
+/// Broker-style commission charged on every Stress Test trade — matches
+/// real brokers' fee structure, 0.5% of trade value on both buys and
+/// sells. Applied in trades_engine.dart's executeTrade, which is the ONE
+/// path both Market fills and Limit fills go through (see
+/// stress_test_pending_orders_provider.dart's comment on reusing
+/// executeTrade unmodified) — so this single constant covers both.
+const double stressTestCommissionRate = 0.005;
+
 /// A single trade executed in a stress test session.
 class StressTestTrade {
   final String symbol;
@@ -927,6 +935,11 @@ class StressTestTrade {
   final bool wasPeak; // bought at top 10% of epoch price curve
   final bool wasBottom; // sold at bottom 10% of epoch price curve
   final double? realizedPnl; // P&L on sell (null for buys)
+  // Brokerage commission charged on this trade (stressTestCommissionRate
+  // of shares*price) — already deducted from/added against cash by
+  // executeTrade, stored here purely for display (Trade Detail card).
+  // Defaults 0 so trades saved before this field existed still decode.
+  final double fee;
 
   const StressTestTrade({
     required this.symbol,
@@ -937,6 +950,7 @@ class StressTestTrade {
     this.wasPeak = false,
     this.wasBottom = false,
     this.realizedPnl, // null for buys
+    this.fee = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -948,6 +962,7 @@ class StressTestTrade {
     'wasPeak': wasPeak,
     'wasBottom': wasBottom,
     'realizedPnl': realizedPnl,
+    'fee': fee,
   };
 
   factory StressTestTrade.fromJson(Map<String, dynamic> json) =>
@@ -960,6 +975,7 @@ class StressTestTrade {
         wasPeak: json['wasPeak'] as bool? ?? false,
         wasBottom: json['wasBottom'] as bool? ?? false,
         realizedPnl: (json['realizedPnl'] as num?)?.toDouble(),
+        fee: (json['fee'] as num?)?.toDouble() ?? 0,
       );
 }
 

@@ -276,6 +276,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tradeDateLabel => 'Дата';
 
   @override
+  String get tradeCommissionLabel => 'Комиссия';
+
+  @override
+  String get tradeSimulationLabel => 'Симуляция';
+
+  @override
+  String get orderConfirmTitle => 'Подтверждение ордера';
+
+  @override
+  String get orderConfirmSubtotalLabel => 'Сумма сделки';
+
+  @override
+  String get orderConfirmTotalLabel => 'Итого';
+
+  @override
+  String get orderConfirmCancelButton => 'Отмена';
+
+  @override
   String get tradeRealizedPnlLabel => 'Реализ. P&L';
 
   @override
@@ -2788,6 +2806,15 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get stressTestOrderInfoLimit =>
       'Лимитные ордера исполняются, только когда симулированная цена достигнет выбранной вами цены или лучше. Исполнение не гарантировано.';
+
+  @override
+  String get stressTestOrderCommissionNotice =>
+      'За каждую покупку и продажу взимается брокерская комиссия 0.5%, как у реальных брокеров.';
+
+  @override
+  String stressTestOrderCommissionEstimate(String amount) {
+    return 'Комиссия: ≈$amount';
+  }
 
   @override
   String get orderEntryHoldingsLimitTitle => 'Достигнут лимит';
@@ -5893,6 +5920,10 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get portfolioBalanceScreenAssetAllocationTitle =>
       'РАСПРЕДЕЛЕНИЕ АКТИВОВ, %';
+
+  @override
+  String get portfolioBalanceScreenDiversificationIndicatorTitle =>
+      'ИНДИКАТОР ДИВЕРСИФИКАЦИИ';
 
   @override
   String get portfolioHealthWidgetTitle => 'ЗДОРОВЬЕ ПОРТФЕЛЯ';

@@ -41,7 +41,12 @@ class AmountKeypad extends StatelessWidget {
       controller: controller,
       onChanged: onChanged,
       onDone: onDone,
-      header: ReviewOrderButton(isBuy: isBuy, onSubmit: onSubmit, height: 44),
+      header: ReviewOrderButton(
+        isBuy: isBuy,
+        onSubmit: onSubmit,
+        palette: palette,
+        height: 44,
+      ),
       palette: palette,
     );
   }

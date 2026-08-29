@@ -14,6 +14,14 @@ import 'portfolio_limits_provider.dart';
 
 enum TransactionType { buy, sell }
 
+/// Broker-style commission charged on every real-Portfolio fill — same
+/// 0.5% rate and rationale as Stress Test's stressTestCommissionRate (see
+/// stress_test_models.dart), kept as a separate constant since the two
+/// trading systems don't share a model layer. Applied once, in
+/// order_execution_service.dart's _fillOrder — the single fill point every
+/// order type (market/limit/stop/stop-limit) funnels through.
+const double brokerCommissionRate = 0.005;
+
 class Transaction {
   final String symbol;
   final TransactionType type;
@@ -29,6 +37,11 @@ class Transaction {
   // of sale (same formula as Portfolio.holdings below). Null for buys and
   // for transactions created before this field existed.
   final double? realizedPnl;
+  // Brokerage commission charged on this fill (brokerCommissionRate of
+  // shares*price) — already reflected in Portfolio.cash below, stored here
+  // purely for display (Trade Detail screen). Defaults 0 so transactions
+  // saved before this field existed still decode correctly.
+  final double fee;
 
   const Transaction({
     required this.symbol,
@@ -38,6 +51,7 @@ class Transaction {
     required this.date,
     this.orderId,
     this.realizedPnl,
+    this.fee = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -48,6 +62,7 @@ class Transaction {
     'date': date.toIso8601String(),
     'orderId': orderId,
     'realizedPnl': realizedPnl,
+    'fee': fee,
   };
 
   factory Transaction.fromJson(Map<String, dynamic> json) => Transaction(
@@ -60,6 +75,7 @@ class Transaction {
     date: DateTime.parse(json['date'] as String),
     orderId: json['orderId'] as String?,
     realizedPnl: (json['realizedPnl'] as num?)?.toDouble(),
+    fee: (json['fee'] as num?)?.toDouble() ?? 0,
   );
 }
 
@@ -111,6 +127,9 @@ class Portfolio {
       } else {
         c += t.shares * t.price;
       }
+      // Commission always comes out of cash, on both legs — same as a
+      // real broker charging on entry AND exit.
+      c -= t.fee;
     }
     return c;
   }

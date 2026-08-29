@@ -471,10 +471,12 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           session.displayLabel(l10n.stressTestPortfolioTitle).toUpperCase(),
           palette,
           GoogleFonts.inter(
-            fontSize: 20,
+            fontSize: 17,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.5,
           ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         leading: themedBackButton(
           context,

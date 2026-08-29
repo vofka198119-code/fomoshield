@@ -328,6 +328,7 @@ class OrderExecutionService {
       price: executionPrice,
       date: DateTime.now(),
       orderId: order.orderId,
+      fee: fillQuantity * executionPrice * brokerCommissionRate,
     );
 
     return OrderExecutionResult(

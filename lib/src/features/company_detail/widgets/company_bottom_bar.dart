@@ -3,15 +3,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
+import '../../../core/theme/themed_border.dart';
 import '../../../l10n/gen/app_localizations.dart';
 
 // ===========================================================================
 // Sticky Bottom Bar: BUY / SELL
 // ===========================================================================
-// BUY/SELL are real filled CTA buttons — out of scope for the Luxury Gold
-// rollout per established precedent (see project memory), so this bar
-// accepts a palette for constructor-shape consistency with every other
-// dispatched widget but doesn't reach for it.
+// BUY/SELL keep their real green/white fills in both themes — deliberately
+// NOT switched to the gold/graphite CTA look every other button gets. Under
+// Luxury Gold they just pick up the shared gold gradient ring (themedBorder,
+// a no-op on Standard since palette.borderGradient is null there).
 
 class CompanyBottomBar extends StatelessWidget {
   final double price;
@@ -58,23 +59,27 @@ class CompanyBottomBar extends StatelessWidget {
                 widthFactor: 0.94,
                 child: SizedBox(
                   height: 47,
-                  child: Material(
-                    color: Colors.transparent,
+                  child: themedBorder(
+                    palette: palette,
                     borderRadius: BorderRadius.circular(18),
-                    child: Ink(
-                      decoration: darkCardDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: InkWell(
-                        onTap: onBuy,
-                        borderRadius: BorderRadius.circular(18),
-                        child: Center(
-                          child: Text(
-                            l10n.tradeBuy,
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(18),
+                      child: Ink(
+                        decoration: darkCardDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: InkWell(
+                          onTap: onBuy,
+                          borderRadius: BorderRadius.circular(18),
+                          child: Center(
+                            child: Text(
+                              l10n.tradeBuy,
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -94,25 +99,29 @@ class CompanyBottomBar extends StatelessWidget {
                 widthFactor: 0.94,
                 child: SizedBox(
                   height: 47,
-                  child: ElevatedButton(
-                    onPressed: onSell,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.alphaBlend(
-                        ThemeV2.primaryBg,
-                        Colors.white,
+                  child: themedBorder(
+                    palette: palette,
+                    borderRadius: BorderRadius.circular(18),
+                    child: ElevatedButton(
+                      onPressed: onSell,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.alphaBlend(
+                          ThemeV2.primaryBg,
+                          Colors.white,
+                        ),
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        elevation: 0,
                       ),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      l10n.tradeSell,
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                      child: Text(
+                        l10n.tradeSell,
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ),

@@ -21,6 +21,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
@@ -30,6 +31,7 @@ import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/utils/currency_format.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../monetization/monetization_modal.dart';
 import '../../monetization/premium_promo_overlay.dart';
@@ -41,6 +43,7 @@ import 'order_entry/order_header.dart';
 import 'order_entry/order_amount_section.dart';
 import 'order_entry/order_config_section.dart';
 import 'order_entry/order_bottom_button.dart';
+import 'order_entry/order_confirmation_sheet.dart';
 import 'order_entry/amount_keypad.dart';
 import 'order_entry/market_closed_dialog.dart';
 
@@ -207,6 +210,67 @@ class _PortfolioOrderEntryScreenState
     return _heldShares;
   }
 
+  // Same shape/placement as Stress Test's own commission notice (see
+  // assets/screens/order_entry_screen.dart) — sits directly under
+  // OrderAmountSection's "available funds" slider card, above the market/
+  // limit info box.
+  Widget _commissionNotice(
+    AppLocalizations l10n,
+    AppPalette palette,
+    double displayAmount,
+  ) {
+    final costEquivalent = _inputMode == OrderInputMode.cost
+        ? displayAmount
+        : displayAmount * _currentPrice;
+    final fee = costEquivalent * brokerCommissionRate;
+    final textColor = palette.titleGradient != null
+        ? Colors.white
+        : palette.textBody;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: CardFrame(
+        showTopBar: false,
+        padding: const EdgeInsets.all(14),
+        decoration: FomoShieldTheme.cardDecoration,
+        palette: palette,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.receipt_long_rounded, color: textColor, size: 16),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.stressTestOrderCommissionNotice,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: textColor,
+                      height: 1.5,
+                    ),
+                  ),
+                  if (fee > 0) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.stressTestOrderCommissionEstimate(formatUsd(fee)),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: palette.accentPrimary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _infoText(AppLocalizations l10n) {
     switch (_selectedOrderType) {
       case _OrderType.market:
@@ -300,7 +364,12 @@ class _PortfolioOrderEntryScreenState
     // spend again — see _availableCash.
     if (_isBuy) {
       final orderCost = shares * (limitPrice ?? _currentPrice);
-      if (orderCost > _availableCash + 0.01) {
+      // Mirrors _fillOrder's own fee stamp (order_execution_service.dart)
+      // — without this margin, an order sized for exactly 100% of
+      // available cash would pass this check but then push cash negative
+      // once the commission comes out on fill.
+      final orderCostWithFee = orderCost * (1 + brokerCommissionRate);
+      if (orderCostWithFee > _availableCash + 0.01) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -340,6 +409,24 @@ class _PortfolioOrderEntryScreenState
         return;
       }
     }
+
+    final orderPrice = limitPrice ?? _currentPrice;
+    final orderFee = shares * orderPrice * brokerCommissionRate;
+    final confirmed = await showOrderConfirmationSheet(
+      context: context,
+      palette: resolveAppPalette(ref.read(themeVariantProvider)),
+      symbol: widget.symbol,
+      companyName: widget.companyName ?? widget.symbol,
+      logoUrl: widget.logo,
+      isBuy: _isBuy,
+      orderTypeLabel: _selectedOrderType == _OrderType.limit
+          ? l10n.orderEntryTabLimit
+          : l10n.orderEntryTabMarket,
+      shares: shares,
+      price: orderPrice,
+      fee: orderFee,
+    );
+    if (confirmed != true || !mounted) return;
 
     _executeOrder(
       orderType: orderType,
@@ -652,6 +739,7 @@ class _PortfolioOrderEntryScreenState
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
                       palette: palette,
                     ),
+                    _commissionNotice(l10n, palette, displayAmount),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
                       limitPriceController: _limitPriceController,

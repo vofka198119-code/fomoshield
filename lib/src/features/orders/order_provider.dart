@@ -162,7 +162,11 @@ class OrderNotifier extends StateNotifier<List<Order>> {
         continue;
       }
       final price = o.limitPrice ?? o.stopPrice ?? o.createdPrice;
-      reserved += price * o.remainingQuantity;
+      // Includes the commission _fillOrder will charge on fill (see
+      // order_execution_service.dart) — without this margin, a pending buy
+      // reserved for exactly 100% of available cash would fall short once
+      // the fee is stamped onto its transaction.
+      reserved += price * o.remainingQuantity * (1 + brokerCommissionRate);
     }
     return reserved;
   }

@@ -21,6 +21,7 @@ import '../../shared/widgets/card_frame.dart';
 import '../../core/cache/logo_providers.dart';
 import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/company_logo.dart';
+import 'stress_test_engine.dart' show stressTestSessionProvider;
 import 'stress_test_models.dart';
 import 'stress_test_naming.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -71,7 +72,11 @@ class StressTestTradeDetailScreen extends ConsumerWidget {
               )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
-                child: _TradeDetailCard(trade: t, palette: palette),
+                child: _TradeDetailCard(
+                  trade: t,
+                  sessionId: sessionId,
+                  palette: palette,
+                ),
               ),
       ),
     );
@@ -80,15 +85,22 @@ class StressTestTradeDetailScreen extends ConsumerWidget {
 
 class _TradeDetailCard extends ConsumerWidget {
   final StressTestTrade trade;
+  final String sessionId;
   final AppPalette palette;
 
-  const _TradeDetailCard({required this.trade, required this.palette});
+  const _TradeDetailCard({
+    required this.trade,
+    required this.sessionId,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final accent = trade.isBuy ? ThemeV2.success : ThemeV2.loss;
     final companyName = resolveStressTestCompanyName(ref, trade.symbol);
+    final session = ref.watch(stressTestSessionProvider(sessionId));
+    final sessionLabel = session?.displayLabel(l10n.stressTestPortfolioTitle);
 
     return CardFrame(
       showTopBar: false,
@@ -177,6 +189,12 @@ class _TradeDetailCard extends ConsumerWidget {
           const SizedBox(height: 20),
           themedDivider(palette, indent: 0, endIndent: 0, height: 1),
           const SizedBox(height: 16),
+          if (sessionLabel != null)
+            _DetailRow(
+              label: l10n.tradeSimulationLabel,
+              value: sessionLabel,
+              palette: palette,
+            ),
           _DetailRow(
             label: l10n.tradeOrderTypeLabel,
             value: l10n.tradeMarketType,
@@ -199,6 +217,12 @@ class _TradeDetailCard extends ConsumerWidget {
             value: formatUsd(trade.shares * trade.price),
             palette: palette,
           ),
+          if (trade.fee > 0)
+            _DetailRow(
+              label: l10n.tradeCommissionLabel,
+              value: formatUsd(trade.fee),
+              palette: palette,
+            ),
           _DetailRow(
             label: l10n.tradeDateLabel,
             value: _formatDate(context, trade.date),
@@ -221,7 +245,7 @@ class _TradeDetailCard extends ConsumerWidget {
 
   String _formatDate(BuildContext context, DateTime d) {
     final locale = Localizations.localeOf(context).languageCode;
-    return DateFormat.yMMMd(locale).format(d);
+    return DateFormat.yMMMd(locale).add_Hm().format(d);
   }
 }
 

@@ -224,6 +224,12 @@ class _TradeDetailCard extends ConsumerWidget {
             value: formatUsd(tx.shares * tx.price),
             palette: palette,
           ),
+          if (tx.fee > 0)
+            _DetailRow(
+              label: l10n.tradeCommissionLabel,
+              value: formatUsd(tx.fee),
+              palette: palette,
+            ),
           _DetailRow(
             label: l10n.tradeDateLabel,
             value: _formatDate(context, tx.date),
@@ -244,7 +250,7 @@ class _TradeDetailCard extends ConsumerWidget {
 
   String _formatDate(BuildContext context, DateTime d) {
     final locale = Localizations.localeOf(context).languageCode;
-    return DateFormat.yMMMd(locale).format(d);
+    return DateFormat.yMMMd(locale).add_Hm().format(d);
   }
 }
 

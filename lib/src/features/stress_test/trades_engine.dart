@@ -286,8 +286,15 @@ extension TradesEngine on StressTestNotifier {
       );
     }
 
+    // Broker-style commission — 0.5% of trade value, same on buys and
+    // sells (real brokers don't discount the exit leg). Shared by both
+    // Market fills (called directly below) and Limit fills (routed
+    // through this same executeTrade — see stress_test_pending_orders_
+    // provider.dart), so this one spot covers both order types.
+    final fee = cost * stressTestCommissionRate;
+
     if (isBuy) {
-      if (cost > session.cash) {
+      if (cost + fee > session.cash) {
         return TradeResult(
           success: false,
           reason: l10n?.tradesEngineInsufficientCash ?? 'Insufficient cash',
@@ -362,6 +369,7 @@ extension TradesEngine on StressTestNotifier {
       wasPeak: wasPeak,
       wasBottom: wasBottom,
       realizedPnl: realizedPnl,
+      fee: fee,
     );
 
     // Update holdings
@@ -415,7 +423,12 @@ extension TradesEngine on StressTestNotifier {
       }
     }
 
-    final newCash = isBuy ? session.cash - cost : session.cash + cost;
+    // Commission comes out of the buyer's cash on top of the trade cost,
+    // and out of the seller's proceeds on the way in — same as a real
+    // broker charging on both legs.
+    final newCash = isBuy
+        ? session.cash - cost - fee
+        : session.cash + cost - fee;
     final newBoughtPeak = wasPeak
         ? session.boughtAtPeakCount + 1
         : session.boughtAtPeakCount;

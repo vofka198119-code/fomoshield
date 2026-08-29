@@ -276,6 +276,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tradeDateLabel => 'Date';
 
   @override
+  String get tradeCommissionLabel => 'Commission';
+
+  @override
+  String get tradeSimulationLabel => 'Simulation';
+
+  @override
+  String get orderConfirmTitle => 'Confirm Order';
+
+  @override
+  String get orderConfirmSubtotalLabel => 'Order Amount';
+
+  @override
+  String get orderConfirmTotalLabel => 'Total';
+
+  @override
+  String get orderConfirmCancelButton => 'Cancel';
+
+  @override
   String get tradeRealizedPnlLabel => 'Realized P&L';
 
   @override
@@ -2784,6 +2802,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get stressTestOrderInfoLimit =>
       'Limit orders execute only once the simulated price reaches your chosen price or better. Execution is not guaranteed.';
+
+  @override
+  String get stressTestOrderCommissionNotice =>
+      'A 0.5% brokerage commission is charged on every buy and sell, just like real brokers.';
+
+  @override
+  String stressTestOrderCommissionEstimate(String amount) {
+    return 'Estimated commission: $amount';
+  }
 
   @override
   String get orderEntryHoldingsLimitTitle => 'Limit Reached';
@@ -5873,6 +5900,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get portfolioBalanceScreenAssetAllocationTitle => 'ASSET ALLOCATION %';
+
+  @override
+  String get portfolioBalanceScreenDiversificationIndicatorTitle =>
+      'DIVERSIFICATION INDICATOR';
 
   @override
   String get portfolioHealthWidgetTitle => 'PORTFOLIO HEALTH';

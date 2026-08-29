@@ -14,15 +14,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/sector_providers.dart';
 import '../../../core/models/app_notification.dart';
 import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../shared/utils/currency_format.dart';
+import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
@@ -31,6 +34,7 @@ import '../../portfolio/screens/order_entry/order_header.dart';
 import '../../portfolio/screens/order_entry/order_amount_section.dart';
 import '../../portfolio/screens/order_entry/order_config_section.dart';
 import '../../portfolio/screens/order_entry/order_bottom_button.dart';
+import '../../portfolio/screens/order_entry/order_confirmation_sheet.dart';
 import '../../portfolio/screens/order_entry/amount_keypad.dart';
 
 enum _OrderType { market, limit }
@@ -125,6 +129,67 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         widget.price;
   }
 
+  // Sits directly under OrderAmountSection's "available funds" slider card
+  // (user's explicit placement call) — same info-box shape as
+  // OrderConfigSection's market/limit notice just below it, so the two
+  // read as one family, plus a live estimate once an amount is entered.
+  Widget _commissionNotice(
+    AppLocalizations l10n,
+    AppPalette palette,
+    double displayAmount,
+  ) {
+    final costEquivalent = _inputMode == OrderInputMode.cost
+        ? displayAmount
+        : displayAmount * _currentPrice;
+    final fee = costEquivalent * stressTestCommissionRate;
+    final textColor = palette.titleGradient != null
+        ? Colors.white
+        : palette.textBody;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: CardFrame(
+        showTopBar: false,
+        padding: const EdgeInsets.all(14),
+        decoration: FomoShieldTheme.cardDecoration,
+        palette: palette,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.receipt_long_rounded, color: textColor, size: 16),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.stressTestOrderCommissionNotice,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: textColor,
+                      height: 1.5,
+                    ),
+                  ),
+                  if (fee > 0) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.stressTestOrderCommissionEstimate(formatUsd(fee)),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: palette.accentPrimary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _infoText(AppLocalizations l10n) {
     switch (_selectedOrderType) {
       case _OrderType.market:
@@ -163,7 +228,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     return _heldShares;
   }
 
-  void _submitOrder() {
+  Future<void> _submitOrder() async {
     final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
@@ -221,7 +286,12 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     // order entry does before placing/executing a buy.
     if (_isBuy) {
       final orderCost = shares * (limitPrice ?? _currentPrice);
-      if (orderCost > _availableCash + 0.01) {
+      // Mirrors executeTrade's own cost+fee<=cash check (trades_engine.dart)
+      // — without this margin here, an order sized for exactly 100% of
+      // available cash would pass this pre-check but then get rejected by
+      // the engine once the commission is added on top.
+      final orderCostWithFee = orderCost * (1 + stressTestCommissionRate);
+      if (orderCostWithFee > _availableCash + 0.01) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -232,6 +302,24 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         return;
       }
     }
+
+    final orderPrice = limitPrice ?? _currentPrice;
+    final orderFee = shares * orderPrice * stressTestCommissionRate;
+    final confirmed = await showOrderConfirmationSheet(
+      context: context,
+      palette: resolveAppPalette(ref.read(themeVariantProvider)),
+      symbol: widget.symbol,
+      companyName: widget.companyName ?? widget.symbol,
+      logoUrl: widget.logo,
+      isBuy: _isBuy,
+      orderTypeLabel: _selectedOrderType == _OrderType.limit
+          ? l10n.orderEntryTabLimit
+          : l10n.orderEntryTabMarket,
+      shares: shares,
+      price: orderPrice,
+      fee: orderFee,
+    );
+    if (confirmed != true || !mounted) return;
 
     if (_selectedOrderType == _OrderType.limit) {
       final confirmedLimitPrice = limitPrice!;
@@ -403,6 +491,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
                       palette: palette,
                     ),
+                    _commissionNotice(l10n, palette, displayAmount),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
                       limitPriceController: _limitPriceController,

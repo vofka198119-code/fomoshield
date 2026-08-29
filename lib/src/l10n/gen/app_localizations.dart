@@ -590,6 +590,42 @@ abstract class AppLocalizations {
   /// **'Date'**
   String get tradeDateLabel;
 
+  /// No description provided for @tradeCommissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission'**
+  String get tradeCommissionLabel;
+
+  /// No description provided for @tradeSimulationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulation'**
+  String get tradeSimulationLabel;
+
+  /// No description provided for @orderConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Order'**
+  String get orderConfirmTitle;
+
+  /// No description provided for @orderConfirmSubtotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Amount'**
+  String get orderConfirmSubtotalLabel;
+
+  /// No description provided for @orderConfirmTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get orderConfirmTotalLabel;
+
+  /// No description provided for @orderConfirmCancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get orderConfirmCancelButton;
+
   /// No description provided for @tradeRealizedPnlLabel.
   ///
   /// In en, this message translates to:
@@ -4902,6 +4938,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Limit orders execute only once the simulated price reaches your chosen price or better. Execution is not guaranteed.'**
   String get stressTestOrderInfoLimit;
+
+  /// No description provided for @stressTestOrderCommissionNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'A 0.5% brokerage commission is charged on every buy and sell, just like real brokers.'**
+  String get stressTestOrderCommissionNotice;
+
+  /// No description provided for @stressTestOrderCommissionEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated commission: {amount}'**
+  String stressTestOrderCommissionEstimate(String amount);
 
   /// No description provided for @orderEntryHoldingsLimitTitle.
   ///
@@ -9862,6 +9910,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ASSET ALLOCATION %'**
   String get portfolioBalanceScreenAssetAllocationTitle;
+
+  /// No description provided for @portfolioBalanceScreenDiversificationIndicatorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DIVERSIFICATION INDICATOR'**
+  String get portfolioBalanceScreenDiversificationIndicatorTitle;
 
   /// No description provided for @portfolioHealthWidgetTitle.
   ///

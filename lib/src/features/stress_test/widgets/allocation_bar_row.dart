@@ -44,7 +44,7 @@ class AllocationBarRow extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 88,
+            width: 130,
             child: Text(
               name,
               maxLines: 1,

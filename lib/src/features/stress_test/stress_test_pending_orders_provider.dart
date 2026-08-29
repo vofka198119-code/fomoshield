@@ -64,7 +64,12 @@ class StressTestPendingOrdersNotifier
     double reserved = 0;
     for (final o in forSession(sessionId)) {
       if (!o.isBuy) continue;
-      reserved += o.limitPrice * o.quantity;
+      // Includes the commission executeTrade will charge on fill (see
+      // trades_engine.dart) — without this margin, a limit buy placed for
+      // 100% of available cash would reserve exactly enough for the
+      // shares and then fail its own cost+fee<=cash check forever once
+      // the price crosses the limit.
+      reserved += o.limitPrice * o.quantity * (1 + stressTestCommissionRate);
     }
     return reserved;
   }
