@@ -84,8 +84,10 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
   }
 
   String? _stressTestLabel() {
-    final duration = _session?.duration.displayName;
-    return duration == null ? null : 'Market Simulation — $duration';
+    final session = _session;
+    return session?.displayLabel(
+      'Market Simulation — ${session.duration.displayName}',
+    );
   }
 
   StressTestHolding? _findHolding(StressTestSession session) {
@@ -309,6 +311,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         symbol: widget.symbol,
         companyName: widget.companyName,
         logoUrl: widget.logo,
+        tradeTimestamp: result.trade?.date,
         title: _isBuy
             ? l10n.orderEntryNotifYouBought
             : l10n.orderEntryNotifYouSold,
@@ -318,6 +321,10 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           formatUsd(_currentPrice),
         ),
         createdAt: DateTime.now(),
+        // Market buy/sell fires and resolves instantly — the user watched
+        // it happen, so it shouldn't sit in the bell as unread the way a
+        // background limit-order fill should.
+        read: true,
       ),
     );
     _resetForm();

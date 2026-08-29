@@ -14,6 +14,8 @@ import '../../core/notifications/notification_text.dart';
 import '../../core/overlay/app_notification_popup.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/company_logo.dart';
+import '../portfolio/portfolio_providers.dart';
+import '../stress_test/stress_test_engine.dart';
 
 // ---------------------------------------------------------------------------
 // Notifications Screen — bell-icon history. One card, compact rows; the
@@ -60,6 +62,53 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (n.type == AppNotificationType.goalUpdated) {
       context.go('/portfolio');
       return;
+    }
+    // A trade confirmation (market buy/sell, immediate — NOT a pending
+    // limit order) should open that exact fill's own detail screen, not
+    // just the company page, so the user can see what actually happened.
+    // Falls through to the company page below if the trade can no longer
+    // be found (e.g. a very old notification outliving its portfolio).
+    if ((n.type == AppNotificationType.buy ||
+            n.type == AppNotificationType.sell) &&
+        n.portfolioId != null) {
+      if (n.portfolioKind == NotificationPortfolioKind.stressTest) {
+        final session = ref
+            .read(stressTestProvider)
+            .where((s) => s.id == n.portfolioId)
+            .firstOrNull;
+        final trade = n.tradeTimestamp == null
+            ? null
+            : session?.trades
+                  .where(
+                    (t) =>
+                        t.date == n.tradeTimestamp && t.symbol == n.symbol,
+                  )
+                  .firstOrNull;
+        if (trade != null) {
+          context.push(
+            '/stress-test/${n.portfolioId}/trade-detail',
+            extra: trade,
+          );
+          return;
+        }
+      } else {
+        final portfolio = ref
+            .read(portfoliosProvider)
+            .where((p) => p.id == n.portfolioId)
+            .firstOrNull;
+        final tx = n.orderId == null
+            ? null
+            : portfolio?.transactions
+                  .where((t) => t.orderId == n.orderId)
+                  .firstOrNull;
+        if (tx != null) {
+          context.push(
+            '/portfolio/${n.portfolioId}/trade-detail',
+            extra: tx,
+          );
+          return;
+        }
+      }
     }
     // Everything else (buy/sell/limit orders, priceSwing, news) points at
     // one specific symbol — jump there. Safe now that the row's own text

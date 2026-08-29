@@ -408,7 +408,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
               (p) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: PortfolioOptionTile(
-                  name: p.name,
+                  name: p.displayName(l10n),
                   cash: p.cash,
                   // Every portfolio is on the same (single-slot) plan now —
                   // "premium" here just reflects the user's own tier, not a

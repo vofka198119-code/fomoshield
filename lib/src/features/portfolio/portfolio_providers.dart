@@ -5,6 +5,7 @@ import '../../core/utils/constants.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/user_data_service.dart';
+import '../../l10n/gen/app_localizations.dart';
 import 'portfolio_limits_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -138,6 +139,15 @@ class Portfolio {
 
   List<String> get symbols => holdings.keys.toList();
 
+  /// [name] as stored, unless it's the empty-string sentinel a freshly
+  /// created portfolio gets (see [PortfolioNotifier._load]/`addPortfolio`)
+  /// — that sentinel exists because portfolio creation has no
+  /// BuildContext to resolve a locale from, so the localized default name
+  /// is resolved here instead, at render time, the same way
+  /// [AppNotification] defers re-localizing engine-fired text.
+  String displayName(AppLocalizations l10n) =>
+      name.isEmpty ? l10n.homeWidgetPortfolio : name;
+
   // ---- Serialization ----
 
   Map<String, dynamic> toJson() => {
@@ -235,7 +245,11 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
       state = [
         Portfolio(
           id: 'default_${DateTime.now().millisecondsSinceEpoch}',
-          name: 'Portfolio',
+          // Empty sentinel, not a hardcoded English literal — resolved to
+          // a localized default by Portfolio.displayName at render time
+          // (this constructor runs with no BuildContext to pull a locale
+          // from).
+          name: '',
           startingBalance: _startingCapital,
         ),
       ];

@@ -49,6 +49,18 @@ class AppNotification {
   final String? companyName;
   final String? logoUrl;
 
+  /// Set only for [AppNotificationType.buy]/[sell] on a real portfolio —
+  /// the fill's [Transaction.orderId], so tapping the notification can
+  /// jump to that exact trade's detail screen instead of just the
+  /// company page.
+  final String? orderId;
+
+  /// Set only for [AppNotificationType.buy]/[sell] on a Stress Test
+  /// session — the fill's own [StressTestTrade.date] (that model has no
+  /// id of its own), so tapping can find that exact trade in the
+  /// session's trade list instead of just jumping to the company page.
+  final DateTime? tradeTimestamp;
+
   /// English fallback text — still what any consumer without richer i18n
   /// support uses as-is (e.g. an OS-level push). Screens with real
   /// AppLocalizations access (notifications screen/popup) prefer the
@@ -81,6 +93,8 @@ class AppNotification {
     this.symbol,
     this.companyName,
     this.logoUrl,
+    this.orderId,
+    this.tradeTimestamp,
     required this.title,
     required this.detail,
     required this.createdAt,
@@ -100,6 +114,8 @@ class AppNotification {
     symbol: symbol,
     companyName: companyName,
     logoUrl: logoUrl,
+    orderId: orderId,
+    tradeTimestamp: tradeTimestamp,
     title: title,
     detail: detail,
     createdAt: createdAt,
@@ -119,6 +135,8 @@ class AppNotification {
     'symbol': symbol,
     'companyName': companyName,
     'logoUrl': logoUrl,
+    'orderId': orderId,
+    'tradeTimestamp': tradeTimestamp?.toIso8601String(),
     'title': title,
     'detail': detail,
     'createdAt': createdAt.toIso8601String(),
@@ -145,6 +163,10 @@ class AppNotification {
       symbol: json['symbol'] as String?,
       companyName: json['companyName'] as String?,
       logoUrl: json['logoUrl'] as String?,
+      orderId: json['orderId'] as String?,
+      tradeTimestamp: json['tradeTimestamp'] == null
+          ? null
+          : DateTime.parse(json['tradeTimestamp'] as String),
       title: json['title'] as String,
       detail: json['detail'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),

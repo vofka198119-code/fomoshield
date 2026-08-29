@@ -208,7 +208,6 @@ class _StressTestSearchSheetState
       );
       success = result.success;
       if (success) {
-        final label = session?.duration.displayName;
         pushAppNotification(
           ref.read(notificationsProvider.notifier),
           AppNotification(
@@ -216,10 +215,12 @@ class _StressTestSearchSheetState
             type: AppNotificationType.buy,
             portfolioKind: NotificationPortfolioKind.stressTest,
             portfolioId: widget.sessionId,
-            portfolioLabel:
-                label == null ? null : 'Market Simulation — $label',
+            portfolioLabel: session?.displayLabel(
+              'Market Simulation — ${session.duration.displayName}',
+            ),
             symbol: _selectedSymbol,
             companyName: _selectedDescription,
+            tradeTimestamp: result.trade?.date,
             title: AppLocalizations.of(context)!.orderEntryNotifYouBought,
             detail: AppLocalizations.of(context)!.orderEntryNotifFilledDetail(
               (_amount / _selectedPrice).toStringAsFixed(4),
@@ -227,6 +228,10 @@ class _StressTestSearchSheetState
               formatUsd(_selectedPrice),
             ),
             createdAt: DateTime.now(),
+            // Market buy fires and resolves instantly — the user watched
+            // it happen, so it shouldn't sit in the bell as unread the
+            // way a background limit-order fill should.
+            read: true,
           ),
         );
       }

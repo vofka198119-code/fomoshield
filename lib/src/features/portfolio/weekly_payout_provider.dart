@@ -82,7 +82,7 @@ Future<void> checkWeeklyPayout(WidgetRef ref, AppLocalizations l10n) async {
             type: AppNotificationType.weeklyPayout,
             portfolioKind: NotificationPortfolioKind.real,
             portfolioId: portfolio.id,
-            portfolioLabel: portfolio.name,
+            portfolioLabel: portfolio.displayName(l10n),
             title: l10n.weeklyPayoutTitle,
             detail: l10n.weeklyPayoutDetail(formatUsd(amount)),
             createdAt: DateTime.now(),

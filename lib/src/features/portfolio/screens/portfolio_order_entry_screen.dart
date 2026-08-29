@@ -435,7 +435,7 @@ class _PortfolioOrderEntryScreenState
           .read(portfoliosProvider)
           .where((p) => p.id == widget.portfolioId)
           .firstOrNull
-          ?.name;
+          ?.displayName(l10n);
 
       if (isImmediate) {
         pushAppNotification(
@@ -449,6 +449,7 @@ class _PortfolioOrderEntryScreenState
             symbol: widget.symbol,
             companyName: widget.companyName,
             logoUrl: widget.logo,
+            orderId: order.orderId,
             title: _isBuy
                 ? l10n.orderEntryNotifYouBought
                 : l10n.orderEntryNotifYouSold,
@@ -458,6 +459,10 @@ class _PortfolioOrderEntryScreenState
               formatUsd(_currentPrice),
             ),
             createdAt: DateTime.now(),
+            // Market buy/sell fires and resolves instantly — the user
+            // watched it happen, so it shouldn't sit in the bell as
+            // unread the way a background limit-order fill should.
+            read: true,
           ),
         );
         _resetForm();

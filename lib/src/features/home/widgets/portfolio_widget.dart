@@ -107,7 +107,9 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
 
     return _shell(
       context,
-      title: portfolios[index].name.toUpperCase(),
+      title: portfolios[index]
+          .displayName(AppLocalizations.of(context)!)
+          .toUpperCase(),
       showPremiumBadge: index > 0,
       palette: palette,
       child: Padding(

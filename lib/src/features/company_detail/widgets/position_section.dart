@@ -90,7 +90,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
       final hasPosition = shares > 0;
       final avgCost = hasPosition ? holding!['cost']! / shares : 0.0;
       positions.add((
-        portfolioName: p.name,
+        portfolioName: p.displayName(l10n),
         shares: hasPosition ? shares : 0,
         avgCost: avgCost,
         totalValue: hasPosition ? shares * widget.price : 0,
