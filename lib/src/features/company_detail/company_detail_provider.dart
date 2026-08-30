@@ -56,24 +56,26 @@ final companyDetailProvider =
       // Check 30-day score cache before full API call (экономия трафика)
       final cachedScore = scoreCache.get(symbol);
       if (cachedScore != null) {
-        // Score актуален — берём только profile + quote
-        // Метрики пробуем из 30-дневного кэша, если нет — запрос к Finnhub
-        final profile = await api.companyProfile(symbol);
-        final quote = await api.quote(symbol);
+        // Score актуален — берём только profile + quote (+ metrics, если
+        // не в 30-дневном кэше) — все три запроса независимы друг от
+        // друга, поэтому запускаем параллельно вместо последовательных
+        // await, чтобы не складывать их сетевые задержки друг на друга.
+        final cachedMetrics = metricsCache.get(symbol);
+        final results = await Future.wait([
+          api.companyProfile(symbol),
+          api.quote(symbol),
+          cachedMetrics != null
+              ? Future.value(cachedMetrics)
+              : api.metrics(symbol).catchError((_) => <String, dynamic>{}),
+        ]);
+        final profile = results[0];
+        final quote = results[1];
+        final metrics = results[2];
 
         cacheCompanyLogo(ref, symbol, profile);
 
-        Map<String, dynamic> metrics = {};
-        final cachedMetrics = metricsCache.get(symbol);
-        if (cachedMetrics != null) {
-          metrics = cachedMetrics;
-        } else {
-          try {
-            metrics = await api.metrics(symbol);
-            metricsCache.set(symbol, metrics);
-          } catch (_) {
-            metrics = {};
-          }
+        if (cachedMetrics == null && metrics.isNotEmpty) {
+          metricsCache.set(symbol, metrics);
         }
 
         final data = {
@@ -88,47 +90,53 @@ final companyDetailProvider =
         return data;
       }
 
-      // Score кэш пуст — полный запрос к Finnhub
-      final profile = await api.companyProfile(symbol);
-      final quote = await api.quote(symbol);
-      final metrics = await api.metrics(symbol);
+      // Score кэш пуст — полный запрос к Finnhub. profile/quote/metrics,
+      // sectorAveragePeProvider (S&P-500 ranking — first-ever call this
+      // session, otherwise instant from cache) и 5-летние недельные
+      // candles друг от друга не зависят, поэтому запускаем всё
+      // параллельно вместо пяти последовательных await — раньше их
+      // задержки складывались друг с другом и превращали первое открытие
+      // карточки компании в сессии в ~20-секундную загрузку.
+      final fiveYearsAgo =
+          DateTime.now()
+              .subtract(const Duration(days: 1825))
+              .millisecondsSinceEpoch ~/
+          1000;
+      final nowSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-      final sectorAverages = await ref.watch(sectorAveragePeProvider.future);
+      final profileFuture = api.companyProfile(symbol);
+      final quoteFuture = api.quote(symbol);
+      final metricsFuture = api.metrics(symbol);
+      final sectorAveragesFuture = ref.watch(sectorAveragePeProvider.future);
+      // 5Y weekly price history for the Historical Trend marker's real
+      // CAGR — same shape of candle call PriceChart makes for
+      // ChartPeriod.year5. Left null (marker stays neutral) if the
+      // fetch fails or the symbol doesn't have 5 years of history yet
+      // (e.g. a recent IPO) — never guess.
+      final candlesFuture = api
+          .candles(symbol, resolution: 'W', from: fiveYearsAgo, to: nowSec)
+          .catchError((_) => <String, dynamic>{});
+
+      final profile = await profileFuture;
+      final quote = await quoteFuture;
+      final metrics = await metricsFuture;
+      final sectorAverages = await sectorAveragesFuture;
+      final candleData = await candlesFuture;
+
       final sector = resolveGicsSector(
         symbol,
         companyName: profile['name'] as String?,
       );
       final sectorPe = sector != null ? sectorAverages[sector] : null;
 
-      // 5Y weekly price history for the Historical Trend marker's real
-      // CAGR — same shape of candle call PriceChart makes for
-      // ChartPeriod.year5. Left null (marker stays neutral) if the
-      // fetch fails or the symbol doesn't have 5 years of history yet
-      // (e.g. a recent IPO) — never guess.
       double? priceCagr5Y;
-      try {
-        final fiveYearsAgo =
-            DateTime.now()
-                .subtract(const Duration(days: 1825))
-                .millisecondsSinceEpoch ~/
-            1000;
-        final nowSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-        final candleData = await api.candles(
-          symbol,
-          resolution: 'W',
-          from: fiveYearsAgo,
-          to: nowSec,
-        );
-        final closes = (candleData['c'] as List<dynamic>?)
-            ?.map((e) => (e as num).toDouble())
-            .toList();
-        if (closes != null && closes.length >= 2 && closes.first > 0) {
-          final totalReturn = closes.last / closes.first;
-          // Percentage-point annualized return (e.g. 12.5 for +12.5%/yr).
-          priceCagr5Y = (math.pow(totalReturn, 1 / 5) - 1) * 100;
-        }
-      } catch (_) {
-        // priceCagr5Y stays null.
+      final closes = (candleData['c'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble())
+          .toList();
+      if (closes != null && closes.length >= 2 && closes.first > 0) {
+        final totalReturn = closes.last / closes.first;
+        // Percentage-point annualized return (e.g. 12.5 for +12.5%/yr).
+        priceCagr5Y = (math.pow(totalReturn, 1 / 5) - 1) * 100;
       }
 
       final score = ScoringEngine.calculate(

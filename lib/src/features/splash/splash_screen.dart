@@ -12,6 +12,7 @@ import '../home/home_providers.dart'
     show watchlistSymbolsProvider, marketIndicesProvider;
 import '../home/widget_order_provider.dart' show homeWidgetsProvider;
 import '../portfolio/portfolio_providers.dart' show portfoliosProvider;
+import '../search/top_companies_provider.dart' show topCompaniesProvider;
 
 // Brand shield-logo palette — matches the reference splash mock, kept local
 // to this file the way every other brand-gradient consumer in the app does
@@ -131,6 +132,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     ref.read(portfoliosProvider);
     ref.read(watchlistSymbolsProvider);
     ref.read(marketIndicesProvider);
+
+    // Same warm-up idea, but for the FIRST Company Detail screen the user
+    // opens this session rather than Home itself: companyDetailProvider's
+    // cache-miss path awaits sectorAveragePeProvider, which awaits this
+    // provider's full ranked S&P-500 fetch — a call that only ever runs
+    // once per app session (plain FutureProvider, not autoDispose) but
+    // otherwise didn't start until the user was already staring at a
+    // loading company card. Reading it here means it's resolving in
+    // parallel with everything else during the splash's display window
+    // instead of adding its own latency on top of the first company open.
+    ref.read(topCompaniesProvider);
   }
 
   void _maybeNavigate() {
