@@ -374,8 +374,10 @@ extension TradesEngine on StressTestNotifier {
 
     // Update holdings
     final newHoldings = [...session.holdings];
+    var isNewHolding = false;
     if (isBuy) {
       final existingIdx = newHoldings.indexWhere((h) => h.symbol == symbol);
+      isNewHolding = existingIdx < 0;
       if (existingIdx >= 0) {
         final existing = newHoldings[existingIdx];
         final totalShares = existing.shares + shares;
@@ -444,11 +446,13 @@ extension TradesEngine on StressTestNotifier {
         : session.realizedPnl;
 
     // ── Stabilization Period ───────────────────────────────────
-    // After buy, freeze price at entryPrice for 30 seconds
+    // Only a brand-new position gets frozen at entryPrice for 30 seconds.
+    // Topping up an existing (possibly already-losing) position must not
+    // mask its real unrealized P&L back to zero.
     final newStabilizationDeadlines = Map<String, DateTime>.from(
       session.stabilizationDeadlines,
     );
-    if (isBuy) {
+    if (isBuy && isNewHolding) {
       newStabilizationDeadlines[symbol] = DateTime.now().add(
         const Duration(seconds: 30),
       );
