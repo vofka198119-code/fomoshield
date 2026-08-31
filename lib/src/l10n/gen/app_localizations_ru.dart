@@ -542,7 +542,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get stressTestMinDays => 'Мин.: 5 дней';
+  String get stressTestMinDays => 'Мин.: 14 дней';
 
   @override
   String get stressTestMaxDays => 'Макс.: 365 дней';
@@ -1017,6 +1017,31 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get fundingModeDcaDetail =>
       'Начать с \$2,500, затем имитация пополнения на \$200 каждую неделю.';
+
+  @override
+  String get dividendSimulationSheetTitle => 'Симулировать выплату дивидендов?';
+
+  @override
+  String get dividendSimulationEnableTitle => 'Да, симулировать дивиденды';
+
+  @override
+  String get dividendSimulationEnableDetail =>
+      'Упрощённая симуляция: REIT выплачивают раз в 2 недели, остальные компании — раз в месяц. Это сжатое приближение, а не точный график конкретной компании. Показанная доходность — это полная годовая ставка, поделённая на количество выплат.';
+
+  @override
+  String get dividendSimulationSkipTitle => 'Нет, только движение цены';
+
+  @override
+  String get dividendSimulationSkipDetail =>
+      'Торговать только на изменении цены, как в остальных режимах теста.';
+
+  @override
+  String get dividendPayoutTitle => 'Выплата дивидендов';
+
+  @override
+  String dividendPayoutDetail(String amount) {
+    return '$amount зачислено от симулированных дивидендов — нажмите, чтобы посмотреть.';
+  }
 
   @override
   String get weeklyPayoutTitle => 'Еженедельное пополнение';

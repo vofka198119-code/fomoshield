@@ -241,7 +241,7 @@
       }
     }
   },
-  "stressTestMinDays": "Min: 5 days",
+  "stressTestMinDays": "Min: 14 days",
   "stressTestMaxDays": "Max: 365 days",
   "commonApply": "Apply",
   "stressTestPremiumFeatureAllCaps": "PREMIUM FEATURE",
@@ -462,6 +462,20 @@
   "fundingModeLumpSumDetail": "Start with the full $15,000 right away.",
   "fundingModeDcaTitle": "Weekly deposits",
   "fundingModeDcaDetail": "Start with $2,500, then simulate adding $200 every week.",
+  "dividendSimulationSheetTitle": "Simulate dividend payouts?",
+  "dividendSimulationEnableTitle": "Yes, simulate dividends",
+  "dividendSimulationEnableDetail": "A simplified simulation: REITs pay out every 2 weeks, other companies once a month — a compressed approximation, not each company's real schedule. The yield shown is the full annual rate split across those payments.",
+  "dividendSimulationSkipTitle": "No, price movement only",
+  "dividendSimulationSkipDetail": "Trade purely on price, like the other test modes.",
+  "dividendPayoutTitle": "Dividend Payout",
+  "dividendPayoutDetail": "{amount} credited from simulated dividends — tap to view.",
+  "@dividendPayoutDetail": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "weeklyPayoutTitle": "Weekly Deposit",
   "weeklyPayoutDetail": "{amount} added to your portfolio — tap to view.",
   "@weeklyPayoutDetail": {

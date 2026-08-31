@@ -43,6 +43,7 @@ import '../../shared/widgets/market_timeline.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_dca_provider.dart';
+import 'stress_test_dividend_provider.dart';
 import 'widgets/market_value_chart.dart';
 import 'stress_test_widget_order_provider.dart';
 import 'widgets/stress_test_allocation_chart.dart';
@@ -128,7 +129,9 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           .read(stressTestProvider.notifier)
           .getSession(widget.sessionId);
       if (session != null) {
-        checkStressTestDcaPayout(ref, session, AppLocalizations.of(context)!);
+        final l10n = AppLocalizations.of(context)!;
+        checkStressTestDcaPayout(ref, session, l10n);
+        checkStressTestDividendPayout(ref, session, l10n);
       }
     });
     _timer = Timer.periodic(const Duration(seconds: 20), (_) {

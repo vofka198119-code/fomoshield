@@ -25,8 +25,10 @@ import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../company_detail/widgets/price_header.dart';
 import '../../company_detail/widgets/company_bottom_bar.dart';
+import '../../company_detail/widgets/key_metrics_section.dart';
 import '../../../shared/widgets/simulated_trading_disclaimer.dart';
 import '../../stress_test/stress_test_naming.dart';
+import '../../stress_test/stress_test_live_metrics.dart';
 import 'stock_detail/widgets/stock_sparkline_chart.dart';
 import 'stock_detail/widgets/stock_position_card.dart';
 import 'stock_detail/widgets/stock_why_today_card.dart';
@@ -345,13 +347,19 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                         }
                       },
                     ),
-                    if (holding != null)
+                    if (holding != null) ...[
                       StockPositionCard(
                         shares: holding.shares,
                         avgPrice: holding.averagePrice,
                         pnl: session.positionPnL[widget.symbol] ?? 0.0,
                         palette: palette,
                       ),
+                      const SizedBox(height: 12),
+                      KeyMetricsSection(
+                        metrics: liveKeyMetrics(holding, currentPrice),
+                        palette: palette,
+                      ),
+                    ],
                     StockWhyTodayCard(
                       sessionId: widget.sessionId,
                       symbol: widget.symbol,

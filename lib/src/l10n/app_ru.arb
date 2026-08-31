@@ -162,7 +162,7 @@
   "stressTestCustomDurationTitle": "Своя длительность симуляции",
   "stressTestCustomDurationWarning": "После запуска симуляция со своей длительностью не может быть прервана или остановлена досрочно. Она будет выполняться весь выбранный ниже период.",
   "stressTestDaysCount": "{days} дн.",
-  "stressTestMinDays": "Мин.: 5 дней",
+  "stressTestMinDays": "Мин.: 14 дней",
   "stressTestMaxDays": "Макс.: 365 дней",
   "commonApply": "Применить",
   "stressTestPremiumFeatureAllCaps": "ПРЕМИУМ-ФУНКЦИЯ",
@@ -301,6 +301,20 @@
   "fundingModeLumpSumDetail": "Начать сразу с полной суммой $15,000.",
   "fundingModeDcaTitle": "Еженедельные пополнения",
   "fundingModeDcaDetail": "Начать с $2,500, затем имитация пополнения на $200 каждую неделю.",
+  "dividendSimulationSheetTitle": "Симулировать выплату дивидендов?",
+  "dividendSimulationEnableTitle": "Да, симулировать дивиденды",
+  "dividendSimulationEnableDetail": "Упрощённая симуляция: REIT выплачивают раз в 2 недели, остальные компании — раз в месяц. Это сжатое приближение, а не точный график конкретной компании. Показанная доходность — это полная годовая ставка, поделённая на количество выплат.",
+  "dividendSimulationSkipTitle": "Нет, только движение цены",
+  "dividendSimulationSkipDetail": "Торговать только на изменении цены, как в остальных режимах теста.",
+  "dividendPayoutTitle": "Выплата дивидендов",
+  "dividendPayoutDetail": "{amount} зачислено от симулированных дивидендов — нажмите, чтобы посмотреть.",
+  "@dividendPayoutDetail": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "weeklyPayoutTitle": "Еженедельное пополнение",
   "weeklyPayoutDetail": "{amount} зачислено на ваш портфель — нажмите, чтобы посмотреть.",
   "weeklyPayoutPausedTitle": "Пополнение приостановлено",

@@ -54,6 +54,13 @@ extension TradesEngine on StressTestNotifier {
         cachedLogoUrl: existing.cachedLogoUrl,
         entryFsScore: existing.entryFsScore,
         isEtf: existing.isEtf,
+        entryPeTTM: existing.entryPeTTM,
+        entryDividendYieldAnnual: existing.entryDividendYieldAnnual,
+        entryNetMargin: existing.entryNetMargin,
+        entryOpMargin: existing.entryOpMargin,
+        entryGrossMargin: existing.entryGrossMargin,
+        entryRoe: existing.entryRoe,
+        entryFundamentalsPrice: existing.entryFundamentalsPrice,
       );
     } else {
       newHoldings.add(
@@ -65,7 +72,7 @@ extension TradesEngine on StressTestNotifier {
           isEtf: isEtf,
         ),
       );
-      _fetchSafetyMarkerScore(sessionId, symbol);
+      _fetchSafetyMarkerScore(sessionId, symbol, price);
       _fetchIsEtfFlag(sessionId, symbol);
     }
 
@@ -390,6 +397,13 @@ extension TradesEngine on StressTestNotifier {
           cachedLogoUrl: existing.cachedLogoUrl,
           entryFsScore: existing.entryFsScore,
           isEtf: existing.isEtf,
+          entryPeTTM: existing.entryPeTTM,
+          entryDividendYieldAnnual: existing.entryDividendYieldAnnual,
+          entryNetMargin: existing.entryNetMargin,
+          entryOpMargin: existing.entryOpMargin,
+          entryGrossMargin: existing.entryGrossMargin,
+          entryRoe: existing.entryRoe,
+          entryFundamentalsPrice: existing.entryFundamentalsPrice,
         );
       } else {
         newHoldings.add(
@@ -401,7 +415,7 @@ extension TradesEngine on StressTestNotifier {
             isEtf: isEtf,
           ),
         );
-        _fetchSafetyMarkerScore(sessionId, symbol);
+        _fetchSafetyMarkerScore(sessionId, symbol, currentPrice);
         _fetchIsEtfFlag(sessionId, symbol);
       }
     } else {
@@ -420,6 +434,13 @@ extension TradesEngine on StressTestNotifier {
             cachedLogoUrl: existing.cachedLogoUrl,
             entryFsScore: existing.entryFsScore,
             isEtf: existing.isEtf,
+            entryPeTTM: existing.entryPeTTM,
+            entryDividendYieldAnnual: existing.entryDividendYieldAnnual,
+            entryNetMargin: existing.entryNetMargin,
+            entryOpMargin: existing.entryOpMargin,
+            entryGrossMargin: existing.entryGrossMargin,
+            entryRoe: existing.entryRoe,
+            entryFundamentalsPrice: existing.entryFundamentalsPrice,
           );
         }
       }
@@ -628,6 +649,16 @@ extension TradesEngine on StressTestNotifier {
   /// symbol. Fire-and-forget: doesn't block the buy that triggered it,
   /// patches the holding's `entryFsScore` in place once resolved.
   ///
+  /// Same call also snapshots the raw fundamentals (`peTTM`,
+  /// `dividendYieldIndicatedAnnual`, margins, ROE) backing the Key Metrics
+  /// card — see stress_test_live_metrics.dart's liveKeyMetrics, which
+  /// derives the live P/E / dividend yield markers from these plus the
+  /// current simulated price. [entryPrice] is the real price this symbol
+  /// was actually bought at (passed in by the caller rather than read back
+  /// from state), stored as `entryFundamentalsPrice` — the anchor these
+  /// fundamentals were priced against, deliberately independent of the
+  /// holding's own `entryPrice` field, which a later top-up resets.
+  ///
   /// Uses the shared `_finnhubService` (threaded in via the provider, same
   /// singleton as `finnhubServiceProvider` — falls back to a fresh
   /// instance only for tests that construct this notifier directly) +
@@ -636,13 +667,33 @@ extension TradesEngine on StressTestNotifier {
   /// scoring_engine.dart) rather than going through `companyDetailProvider`,
   /// since StressTestNotifier isn't constructed with a Riverpod `Ref` to
   /// read that provider.
-  void _fetchSafetyMarkerScore(String sessionId, String symbol) {
+  void _fetchSafetyMarkerScore(
+    String sessionId,
+    String symbol,
+    double entryPrice,
+  ) {
     (_finnhubService ?? FinnhubService())
         .metrics(symbol)
         .then((metrics) {
           final score = ScoringEngine.calculate(metrics);
           final fs = (score?['financial_score'] as num?)?.toDouble();
-          if (fs == null) return;
+          final m = metrics['metric'] as Map<String, dynamic>? ?? {};
+          double? asDouble(dynamic v) => (v is num) ? v.toDouble() : null;
+          final peTTM = asDouble(m['peTTM']);
+          final divYield = asDouble(m['dividendYieldIndicatedAnnual']);
+          final netMargin = asDouble(m['netProfitMarginTTM']);
+          final opMargin = asDouble(m['operatingMarginTTM']);
+          final grossMargin = asDouble(m['grossMarginTTM']);
+          final roe = asDouble(m['roeTTM']);
+          if (fs == null &&
+              peTTM == null &&
+              divYield == null &&
+              netMargin == null &&
+              opMargin == null &&
+              grossMargin == null &&
+              roe == null) {
+            return;
+          }
 
           final i = state.indexWhere((s) => s.id == sessionId);
           if (i < 0) return;
@@ -662,6 +713,13 @@ extension TradesEngine on StressTestNotifier {
                   cachedLogoUrl: existing.cachedLogoUrl,
                   entryFsScore: fs,
                   isEtf: existing.isEtf,
+                  entryPeTTM: peTTM,
+                  entryDividendYieldAnnual: divYield,
+                  entryNetMargin: netMargin,
+                  entryOpMargin: opMargin,
+                  entryGrossMargin: grossMargin,
+                  entryRoe: roe,
+                  entryFundamentalsPrice: entryPrice,
                 )
               else
                 s.holdings[j],
@@ -712,6 +770,13 @@ extension TradesEngine on StressTestNotifier {
                   cachedLogoUrl: existing.cachedLogoUrl,
                   entryFsScore: existing.entryFsScore,
                   isEtf: true,
+                  entryPeTTM: existing.entryPeTTM,
+                  entryDividendYieldAnnual: existing.entryDividendYieldAnnual,
+                  entryNetMargin: existing.entryNetMargin,
+                  entryOpMargin: existing.entryOpMargin,
+                  entryGrossMargin: existing.entryGrossMargin,
+                  entryRoe: existing.entryRoe,
+                  entryFundamentalsPrice: existing.entryFundamentalsPrice,
                 )
               else
                 s.holdings[j],

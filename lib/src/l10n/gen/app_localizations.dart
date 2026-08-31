@@ -1073,7 +1073,7 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestMinDays.
   ///
   /// In en, this message translates to:
-  /// **'Min: 5 days'**
+  /// **'Min: 14 days'**
   String get stressTestMinDays;
 
   /// No description provided for @stressTestMaxDays.
@@ -1908,6 +1908,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start with \$2,500, then simulate adding \$200 every week.'**
   String get fundingModeDcaDetail;
+
+  /// No description provided for @dividendSimulationSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate dividend payouts?'**
+  String get dividendSimulationSheetTitle;
+
+  /// No description provided for @dividendSimulationEnableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, simulate dividends'**
+  String get dividendSimulationEnableTitle;
+
+  /// No description provided for @dividendSimulationEnableDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'A simplified simulation: REITs pay out every 2 weeks, other companies once a month — a compressed approximation, not each company\'s real schedule. The yield shown is the full annual rate split across those payments.'**
+  String get dividendSimulationEnableDetail;
+
+  /// No description provided for @dividendSimulationSkipTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No, price movement only'**
+  String get dividendSimulationSkipTitle;
+
+  /// No description provided for @dividendSimulationSkipDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade purely on price, like the other test modes.'**
+  String get dividendSimulationSkipDetail;
+
+  /// No description provided for @dividendPayoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dividend Payout'**
+  String get dividendPayoutTitle;
+
+  /// No description provided for @dividendPayoutDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} credited from simulated dividends — tap to view.'**
+  String dividendPayoutDetail(String amount);
 
   /// No description provided for @weeklyPayoutTitle.
   ///

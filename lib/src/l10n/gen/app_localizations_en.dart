@@ -541,7 +541,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get stressTestMinDays => 'Min: 5 days';
+  String get stressTestMinDays => 'Min: 14 days';
 
   @override
   String get stressTestMaxDays => 'Max: 365 days';
@@ -1013,6 +1013,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get fundingModeDcaDetail =>
       'Start with \$2,500, then simulate adding \$200 every week.';
+
+  @override
+  String get dividendSimulationSheetTitle => 'Simulate dividend payouts?';
+
+  @override
+  String get dividendSimulationEnableTitle => 'Yes, simulate dividends';
+
+  @override
+  String get dividendSimulationEnableDetail =>
+      'A simplified simulation: REITs pay out every 2 weeks, other companies once a month — a compressed approximation, not each company\'s real schedule. The yield shown is the full annual rate split across those payments.';
+
+  @override
+  String get dividendSimulationSkipTitle => 'No, price movement only';
+
+  @override
+  String get dividendSimulationSkipDetail =>
+      'Trade purely on price, like the other test modes.';
+
+  @override
+  String get dividendPayoutTitle => 'Dividend Payout';
+
+  @override
+  String dividendPayoutDetail(String amount) {
+    return '$amount credited from simulated dividends — tap to view.';
+  }
 
   @override
   String get weeklyPayoutTitle => 'Weekly Deposit';

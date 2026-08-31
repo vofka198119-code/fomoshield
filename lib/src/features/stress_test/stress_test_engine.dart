@@ -486,6 +486,16 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               if (h.cachedLogoUrl != null) 'cachedLogoUrl': h.cachedLogoUrl,
               if (h.entryFsScore != null) 'entryFsScore': h.entryFsScore,
               if (h.isEtf) 'isEtf': h.isEtf,
+              if (h.entryPeTTM != null) 'entryPeTTM': h.entryPeTTM,
+              if (h.entryDividendYieldAnnual != null)
+                'entryDividendYieldAnnual': h.entryDividendYieldAnnual,
+              if (h.entryNetMargin != null) 'entryNetMargin': h.entryNetMargin,
+              if (h.entryOpMargin != null) 'entryOpMargin': h.entryOpMargin,
+              if (h.entryGrossMargin != null)
+                'entryGrossMargin': h.entryGrossMargin,
+              if (h.entryRoe != null) 'entryRoe': h.entryRoe,
+              if (h.entryFundamentalsPrice != null)
+                'entryFundamentalsPrice': h.entryFundamentalsPrice,
             },
           )
           .toList(),
@@ -559,6 +569,15 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
               cachedLogoUrl: h['cachedLogoUrl'] as String?,
               entryFsScore: (h['entryFsScore'] as num?)?.toDouble(),
               isEtf: h['isEtf'] as bool? ?? false,
+              entryPeTTM: (h['entryPeTTM'] as num?)?.toDouble(),
+              entryDividendYieldAnnual:
+                  (h['entryDividendYieldAnnual'] as num?)?.toDouble(),
+              entryNetMargin: (h['entryNetMargin'] as num?)?.toDouble(),
+              entryOpMargin: (h['entryOpMargin'] as num?)?.toDouble(),
+              entryGrossMargin: (h['entryGrossMargin'] as num?)?.toDouble(),
+              entryRoe: (h['entryRoe'] as num?)?.toDouble(),
+              entryFundamentalsPrice:
+                  (h['entryFundamentalsPrice'] as num?)?.toDouble(),
             ),
           )
           .toList(),
@@ -816,6 +835,17 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// about — the reason DCA's own funding-mode/last-payout state lives in
   /// its own separate store instead of on StressTestSession at all).
   void creditDcaPayout(String sessionId, double amount) {
+    state = state.map((s) {
+      if (s.id == sessionId) s.cash += amount;
+      return s;
+    }).toList();
+    _save();
+  }
+
+  /// Credits a simulated dividend payout (see stress_test_dividend_provider
+  /// .dart) directly into cash. Same in-place mutation as [creditDcaPayout]
+  /// and for the same reason.
+  void creditDividendPayout(String sessionId, double amount) {
     state = state.map((s) {
       if (s.id == sessionId) s.cash += amount;
       return s;

@@ -1009,6 +1009,26 @@ class StressTestHolding {
   /// sector-based check, doesn't replace it).
   final bool isEtf;
 
+  /// Fundamentals snapshotted from the SAME `metrics()` call that resolves
+  /// [entryFsScore], right after this symbol's FIRST purchase — never
+  /// re-fetched or touched by later buys/sells/top-ups. [entryPeTTM] and
+  /// [entryDividendYieldAnnual] are the raw Finnhub `peTTM`/
+  /// `dividendYieldIndicatedAnnual` values; [entryNetMargin]/[entryOpMargin]/
+  /// [entryGrossMargin]/[entryRoe] are the matching margin/ROE fields —
+  /// none of these move with price, they're frozen at entry like
+  /// [entryFsScore]. [entryFundamentalsPrice] is the real price at the
+  /// moment these were fetched — deliberately separate from [entryPrice],
+  /// which later top-up buys reset to the top-up's own price; using that
+  /// mutated value as the P/E-ratio anchor would silently miscalibrate the
+  /// live P/E (see stress_test_live_metrics.dart's liveKeyMetrics).
+  final double? entryPeTTM;
+  final double? entryDividendYieldAnnual;
+  final double? entryNetMargin;
+  final double? entryOpMargin;
+  final double? entryGrossMargin;
+  final double? entryRoe;
+  final double? entryFundamentalsPrice;
+
   const StressTestHolding({
     required this.symbol,
     required this.shares,
@@ -1017,6 +1037,13 @@ class StressTestHolding {
     this.cachedLogoUrl,
     this.entryFsScore,
     this.isEtf = false,
+    this.entryPeTTM,
+    this.entryDividendYieldAnnual,
+    this.entryNetMargin,
+    this.entryOpMargin,
+    this.entryGrossMargin,
+    this.entryRoe,
+    this.entryFundamentalsPrice,
   });
 
   /// Alias for [avgCost] — the average purchase price of the position.

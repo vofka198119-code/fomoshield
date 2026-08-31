@@ -28,6 +28,7 @@ import '../market_clock/market_clock_dial.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_dca_provider.dart';
+import 'stress_test_dividend_provider.dart';
 
 // Market Clock ring's gold accent — used for every "PREMIUM" tag on this
 // screen.
@@ -47,13 +48,17 @@ class StressTestSetupScreen extends ConsumerStatefulWidget {
 
 class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   TestDuration _selectedDuration = TestDuration.week1;
-  int _customDurationDays = 5; // Only used when _selectedDuration == custom
+  int _customDurationDays = 14; // Only used when _selectedDuration == custom
   // Set right after the custom-duration picker's Apply, before the risk
   // disclaimer — see _showCustomDurationPicker. Only meaningful while
   // _selectedDuration == custom; reset whenever the user picks a
   // different duration so a stale DCA choice can't leak into a lump-sum
   // week1/month1/3-months test.
   bool _useDcaFunding = false;
+  // Set right after the Funding Mode Sheet's choice, same chained-sheet
+  // flow — only meaningful while _selectedDuration == custom, reset
+  // whenever the user picks a different duration (mirrors _useDcaFunding).
+  bool _enableDividendSimulation = false;
   late final TextEditingController _nameController;
 
   StressTestSession? get _session =>
@@ -139,6 +144,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     );
     if (useDca) {
       await markStressTestDcaFunded(ref, widget.sessionId);
+    }
+    if (_selectedDuration == TestDuration.custom &&
+        _enableDividendSimulation) {
+      await markStressTestDividendSimulationEnabled(ref, widget.sessionId);
     }
     notifier.startTest(widget.sessionId);
 
@@ -496,9 +505,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
             } else {
               setState(() {
                 _selectedDuration = d;
-                // A DCA choice only ever applies to Custom — picking
-                // any other duration must not carry it forward.
+                // A DCA/dividend choice only ever applies to Custom —
+                // picking any other duration must not carry it forward.
                 _useDcaFunding = false;
+                _enableDividendSimulation = false;
               });
             }
           },
@@ -688,7 +698,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     );
   }
 
-  /// Opens a bottom sheet to pick custom duration (5–365 days).
+  /// Opens a bottom sheet to pick custom duration (14–365 days).
   /// Free users are redirected to [_showPremiumUpsell] instead.
   void _showCustomDurationPicker() {
     final isPremium =
@@ -808,9 +818,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                   // Slider
                   Slider(
                     value: tempDays.toDouble(),
-                    min: 5,
+                    min: 14,
                     max: 365,
-                    divisions: 360,
+                    divisions: 351,
                     activeColor: const Color(0xFFD4AF37),
                     inactiveColor: const Color(
                       0xFFD4AF37,
@@ -905,6 +915,30 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                               );
                               if (choice != null && mounted) {
                                 setState(() => _useDcaFunding = choice);
+                              }
+                              if (!mounted) return;
+                              // Dividend simulation opt-in — same chained-
+                              // sheet flow, right after the funding choice.
+                              final dividendChoice =
+                                  await showModalBottomSheet<bool>(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: palette.card,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20),
+                                      ),
+                                    ),
+                                    builder: (_) =>
+                                        _DividendSimulationSheet(
+                                          palette: palette,
+                                        ),
+                                  );
+                              if (dividendChoice != null && mounted) {
+                                setState(
+                                  () => _enableDividendSimulation =
+                                      dividendChoice,
+                                );
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -1406,6 +1440,122 @@ class _FundingModeSheet extends StatelessWidget {
   }
 
   Widget _fundingOption(
+    BuildContext context, {
+    required String title,
+    required String detail,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFD4AF37).withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFFD4AF37),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              detail,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: palette.textBody,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dividend Simulation Sheet — Custom-duration only, opt-in. Same chrome and
+// tappable-two-card shape as _FundingModeSheet immediately above (this
+// screen's own established pattern for a mid-flow binary choice), shown
+// right after the funding-mode choice. Pops true to enable, false to skip,
+// null if dismissed (caller treats null the same as skip).
+// ---------------------------------------------------------------------------
+
+class _DividendSimulationSheet extends StatelessWidget {
+  final AppPalette palette;
+
+  const _DividendSimulationSheet({required this.palette});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom +
+            24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: palette.windowGradient == null
+                    ? Colors.black26
+                    : Colors.white.withValues(alpha: 0.24),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            l10n.dividendSimulationSheetTitle,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: palette.textHeader,
+            ),
+          ),
+          const SizedBox(height: 20),
+          _dividendOption(
+            context,
+            title: l10n.dividendSimulationEnableTitle,
+            detail: l10n.dividendSimulationEnableDetail,
+            onTap: () => Navigator.of(context).pop(true),
+          ),
+          const SizedBox(height: 12),
+          _dividendOption(
+            context,
+            title: l10n.dividendSimulationSkipTitle,
+            detail: l10n.dividendSimulationSkipDetail,
+            onTap: () => Navigator.of(context).pop(false),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dividendOption(
     BuildContext context, {
     required String title,
     required String detail,
