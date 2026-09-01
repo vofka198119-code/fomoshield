@@ -38,3 +38,21 @@ const msGradientLight = Color(0xFF17284A);
 /// Background gradient — dark bottom. "Obsidian" — same tone as Luxury
 /// Gold's `darkObsidian`, reused here as its own named constant.
 const msGradientDark = Color(0xFF0B0C0E);
+
+/// Widget card gradient — light top. REVISED (2026-09-01, was left in a
+/// horizontal layout) — starting molecule on the Home Watchlist widget.
+const msCardGradientTop = Color(0xFF35577D);
+
+/// Widget card gradient — dark bottom. REVISED (2026-09-01, was right).
+const msCardGradientBottom = Color(0xFF141E30);
+
+/// Widget border gradient — light top. LOCKED IN (2026-09-01).
+const msBorderGradientTop = Color(0xFF4EA4CC);
+
+/// Widget border gradient — dark bottom. LOCKED IN (2026-09-01).
+const msBorderGradientBottom = Color(0xFF4E6A9C);
+
+/// Widget border gradient — metallic highlight, a brief pale-blue glint
+/// right at the top edge before falling into [msBorderGradientTop].
+/// LOCKED IN (2026-09-01).
+const msBorderHighlight = Color(0xFFCFE9F7);

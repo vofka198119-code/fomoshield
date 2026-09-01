@@ -173,54 +173,19 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
                     ? palette.background
                     : null,
               ),
-              child: Stack(
-                children: [
-                  // Ambient top-right glow — LOCKED IN (2026-09-01) as the
-                  // reference treatment for Black & White / Light Lime /
-                  // Midnight Sea (tried on Luxury Gold too, didn't read
-                  // well there — deliberately left off): fixed to the
-                  // screen (this layer never scrolls, unlike each
-                  // screen's own content) and painted before the content
-                  // below, so it sits behind every widget instead of
-                  // over it. Only the glow color ([AppPalette.backgroundGlow])
-                  // varies per theme — geometry/opacity here is shared.
-                  if (palette.backgroundGlow != null)
-                    Positioned(
-                      top: -160,
-                      right: -140,
-                      child: IgnorePointer(
-                        child: Container(
-                          width: 420,
-                          height: 420,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                palette.backgroundGlow!.withValues(
-                                  alpha: 0.35,
-                                ),
-                                palette.backgroundGlow!.withValues(alpha: 0),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+              child: Center(
+                child: SizedBox(
+                  width: 430,
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      scaffoldBackgroundColor: Colors.transparent,
+                      canvasColor: Colors.transparent,
                     ),
-                  Center(
-                    child: SizedBox(
-                      width: 430,
-                      child: Theme(
-                        data: Theme.of(context).copyWith(
-                          scaffoldBackgroundColor: Colors.transparent,
-                          canvasColor: Colors.transparent,
-                        ),
-                        child: AppOverlayHost(
-                          child: child ?? const SizedBox.shrink(),
-                        ),
-                      ),
+                    child: AppOverlayHost(
+                      child: child ?? const SizedBox.shrink(),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),

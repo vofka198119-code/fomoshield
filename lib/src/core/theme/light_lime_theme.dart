@@ -24,9 +24,6 @@ abstract final class LightLimeTheme {
     colors: [llGradientLight, llGradientDark],
   );
 
-  /// Ambient top-right glow — brighter lime, echoes the accent.
-  static const backgroundGlow = llLimeBright;
-
   static const card = llCard;
   static const borderStroke = llBorder;
   static const accentPrimary = llLime;

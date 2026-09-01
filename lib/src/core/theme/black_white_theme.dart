@@ -25,10 +25,6 @@ abstract final class BlackWhiteTheme {
     colors: [bwGradientLight, bwGradientDark],
   );
 
-  /// Ambient top-right glow — soft off-white, matches the grayscale
-  /// identity (no color introduced).
-  static const backgroundGlow = bwWhite;
-
   static const card = bwCharcoal;
   static const borderStroke = bwSlate;
   static const accentPrimary = bwWhite;

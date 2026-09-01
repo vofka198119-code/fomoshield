@@ -77,12 +77,6 @@ class AppPalette {
   /// this field existed.
   final Gradient? dividerGradient;
 
-  /// Ambient background glow — a soft radial blob anchored to the
-  /// top-right of the screen, painted once in main.dart (fixed in place,
-  /// behind screen content, unaffected by scrolling — same layer as
-  /// [backgroundGradient]). Null means no glow (Standard, Luxury Gold).
-  final Color? backgroundGlow;
-
   const AppPalette({
     this.background,
     this.backgroundGradient,
@@ -101,7 +95,6 @@ class AppPalette {
     this.cardGlow,
     this.windowGradient,
     this.dividerGradient,
-    this.backgroundGlow,
   });
 
   static const standard = AppPalette(
@@ -137,7 +130,6 @@ class AppPalette {
   static const blackWhite = AppPalette(
     background: BlackWhiteTheme.background,
     backgroundGradient: BlackWhiteTheme.backgroundGradient,
-    backgroundGlow: BlackWhiteTheme.backgroundGlow,
     card: BlackWhiteTheme.card,
     border: BlackWhiteTheme.borderStroke,
     accentPrimary: BlackWhiteTheme.accentPrimary,
@@ -149,7 +141,6 @@ class AppPalette {
   static const lightLime = AppPalette(
     background: LightLimeTheme.background,
     backgroundGradient: LightLimeTheme.backgroundGradient,
-    backgroundGlow: LightLimeTheme.backgroundGlow,
     card: LightLimeTheme.card,
     border: LightLimeTheme.borderStroke,
     accentPrimary: LightLimeTheme.accentPrimary,
@@ -158,16 +149,18 @@ class AppPalette {
     textBody: LightLimeTheme.textBody,
   );
 
-  static const midnightSea = AppPalette(
+  static AppPalette get midnightSea => AppPalette(
     background: MidnightSeaTheme.background,
     backgroundGradient: MidnightSeaTheme.backgroundGradient,
-    backgroundGlow: MidnightSeaTheme.backgroundGlow,
     card: MidnightSeaTheme.card,
+    cardGradient: MidnightSeaTheme.cardGradient,
     border: MidnightSeaTheme.borderStroke,
+    borderGradient: MidnightSeaTheme.borderGradient,
     accentPrimary: MidnightSeaTheme.accentPrimary,
     accentSecondary: MidnightSeaTheme.accentSecondary,
     textHeader: MidnightSeaTheme.textHeader,
     textBody: MidnightSeaTheme.textBody,
+    cardGlow: MidnightSeaTheme.cardGlow(),
   );
 }
 

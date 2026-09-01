@@ -87,6 +87,20 @@ class CardFrame extends StatelessWidget {
       ],
     );
 
+    // Molecule 4 (card background): when the theme defines a cardGradient,
+    // it replaces the card's fill entirely — can't combine `color` and
+    // `gradient` on one BoxDecoration, so this doesn't reuse
+    // effectiveDecoration's color/border/shadow. Computed once so it
+    // applies whether or not the theme also defines a [borderGradient] —
+    // Black & White / Light Lime / Midnight Sea use cardGradient without
+    // one (2026-09-01), unlike Luxury Gold which pairs both.
+    final cardBodyDecoration = palette?.cardGradient != null
+        ? BoxDecoration(
+            gradient: palette!.cardGradient,
+            borderRadius: FomoShieldTheme.cardRadius,
+          )
+        : effectiveDecoration.copyWith(borderRadius: FomoShieldTheme.cardRadius);
+
     final borderGradient = palette?.borderGradient;
     if (borderGradient != null) {
       // Flutter's BoxDecoration.border can't paint a gradient directly —
@@ -105,18 +119,7 @@ class CardFrame extends StatelessWidget {
           boxShadow: [if (palette?.cardGlow != null) palette!.cardGlow!],
         ),
         child: Container(
-          // Molecule 4 (card background): when the theme defines a
-          // cardGradient, it replaces the card's fill entirely — can't
-          // combine `color` and `gradient` on one BoxDecoration, so this
-          // branch doesn't reuse effectiveDecoration's color/border/shadow.
-          decoration: palette?.cardGradient != null
-              ? BoxDecoration(
-                  gradient: palette!.cardGradient,
-                  borderRadius: FomoShieldTheme.cardRadius,
-                )
-              : effectiveDecoration.copyWith(
-                  borderRadius: FomoShieldTheme.cardRadius,
-                ),
+          decoration: cardBodyDecoration,
           clipBehavior: Clip.antiAlias,
           child: body,
         ),
@@ -126,9 +129,7 @@ class CardFrame extends StatelessWidget {
     return Container(
       width: double.infinity,
       margin: margin ?? EdgeInsets.zero,
-      decoration: effectiveDecoration.copyWith(
-        borderRadius: FomoShieldTheme.cardRadius, // ensure radius for clip
-      ),
+      decoration: cardBodyDecoration,
       // Use clipBehavior to ensure top bar respects border radius
       clipBehavior: Clip.antiAlias,
       child: body,
