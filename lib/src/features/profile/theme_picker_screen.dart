@@ -23,6 +23,9 @@ String _themeLabel(AppLocalizations l10n, AppThemeVariant variant) =>
     switch (variant) {
       AppThemeVariant.standard => l10n.themeOptionStandard,
       AppThemeVariant.luxuryGold => l10n.themeOptionLuxuryGold,
+      AppThemeVariant.blackWhite => l10n.themeOptionBlackWhite,
+      AppThemeVariant.lightLime => l10n.themeOptionLightLime,
+      AppThemeVariant.midnightSea => l10n.themeOptionMidnightSea,
     };
 
 class ThemePickerScreen extends ConsumerWidget {

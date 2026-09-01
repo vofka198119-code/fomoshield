@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'theme_v2.dart';
 import 'luxury_gold_theme.dart';
+import 'black_white_theme.dart';
+import 'light_lime_theme.dart';
+import 'midnight_sea_theme.dart';
 import 'theme_variant_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -74,6 +77,12 @@ class AppPalette {
   /// this field existed.
   final Gradient? dividerGradient;
 
+  /// Ambient background glow — a soft radial blob anchored to the
+  /// top-right of the screen, painted once in main.dart (fixed in place,
+  /// behind screen content, unaffected by scrolling — same layer as
+  /// [backgroundGradient]). Null means no glow (Standard, Luxury Gold).
+  final Color? backgroundGlow;
+
   const AppPalette({
     this.background,
     this.backgroundGradient,
@@ -92,6 +101,7 @@ class AppPalette {
     this.cardGlow,
     this.windowGradient,
     this.dividerGradient,
+    this.backgroundGlow,
   });
 
   static const standard = AppPalette(
@@ -123,6 +133,42 @@ class AppPalette {
     windowGradient: LuxuryGoldTheme.windowGradient,
     dividerGradient: LuxuryGoldTheme.dividerGradient,
   );
+
+  static const blackWhite = AppPalette(
+    background: BlackWhiteTheme.background,
+    backgroundGradient: BlackWhiteTheme.backgroundGradient,
+    backgroundGlow: BlackWhiteTheme.backgroundGlow,
+    card: BlackWhiteTheme.card,
+    border: BlackWhiteTheme.borderStroke,
+    accentPrimary: BlackWhiteTheme.accentPrimary,
+    accentSecondary: BlackWhiteTheme.accentSecondary,
+    textHeader: BlackWhiteTheme.textHeader,
+    textBody: BlackWhiteTheme.textBody,
+  );
+
+  static const lightLime = AppPalette(
+    background: LightLimeTheme.background,
+    backgroundGradient: LightLimeTheme.backgroundGradient,
+    backgroundGlow: LightLimeTheme.backgroundGlow,
+    card: LightLimeTheme.card,
+    border: LightLimeTheme.borderStroke,
+    accentPrimary: LightLimeTheme.accentPrimary,
+    accentSecondary: LightLimeTheme.accentSecondary,
+    textHeader: LightLimeTheme.textHeader,
+    textBody: LightLimeTheme.textBody,
+  );
+
+  static const midnightSea = AppPalette(
+    background: MidnightSeaTheme.background,
+    backgroundGradient: MidnightSeaTheme.backgroundGradient,
+    backgroundGlow: MidnightSeaTheme.backgroundGlow,
+    card: MidnightSeaTheme.card,
+    border: MidnightSeaTheme.borderStroke,
+    accentPrimary: MidnightSeaTheme.accentPrimary,
+    accentSecondary: MidnightSeaTheme.accentSecondary,
+    textHeader: MidnightSeaTheme.textHeader,
+    textBody: MidnightSeaTheme.textBody,
+  );
 }
 
 /// The single switch point for adding a new theme — everything else
@@ -130,4 +176,7 @@ class AppPalette {
 AppPalette resolveAppPalette(AppThemeVariant variant) => switch (variant) {
   AppThemeVariant.standard => AppPalette.standard,
   AppThemeVariant.luxuryGold => AppPalette.luxuryGold,
+  AppThemeVariant.blackWhite => AppPalette.blackWhite,
+  AppThemeVariant.lightLime => AppPalette.lightLime,
+  AppThemeVariant.midnightSea => AppPalette.midnightSea,
 };

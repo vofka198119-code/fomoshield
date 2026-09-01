@@ -182,6 +182,24 @@ abstract class AppLocalizations {
   /// **'Luxury Gold'**
   String get themeOptionLuxuryGold;
 
+  /// No description provided for @themeOptionBlackWhite.
+  ///
+  /// In en, this message translates to:
+  /// **'Black & White'**
+  String get themeOptionBlackWhite;
+
+  /// No description provided for @themeOptionLightLime.
+  ///
+  /// In en, this message translates to:
+  /// **'Light Lime'**
+  String get themeOptionLightLime;
+
+  /// No description provided for @themeOptionMidnightSea.
+  ///
+  /// In en, this message translates to:
+  /// **'Midnight Sea'**
+  String get themeOptionMidnightSea;
+
   /// No description provided for @authWelcomeBack.
   ///
   /// In en, this message translates to:
