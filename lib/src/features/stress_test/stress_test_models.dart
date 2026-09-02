@@ -1131,6 +1131,20 @@ class StressTestSession {
   /// Total realized P&L from all sell trades.
   double realizedPnl;
 
+  /// Total simulated dividend payouts credited to [cash] over the session
+  /// (see [creditDividendPayout] in stress_test_engine.dart) — shown as a
+  /// single summary row on the verdict's Trade Breakdown card.
+  double dividendsReceived;
+
+  /// Number of weekly DCA top-up credits applied (see [creditDcaPayout]),
+  /// counted per elapsed week rather than per catch-up call (a catch-up
+  /// spanning 3 missed weeks counts as 3, not 1) — paired with
+  /// [dcaTotalReceived] for the verdict's Trade Breakdown card.
+  int dcaTopUpCount;
+
+  /// Total $ credited via weekly DCA top-ups over the session.
+  double dcaTotalReceived;
+
   /// Custom duration in days (only when [duration] == [TestDuration.custom]).
   int? customDurationDays;
 
@@ -1290,6 +1304,9 @@ class StressTestSession {
     this.preCrashPrices = const {},
     this.recoveryStartPrices = const {},
     this.realizedPnl = 0,
+    this.dividendsReceived = 0,
+    this.dcaTopUpCount = 0,
+    this.dcaTotalReceived = 0,
     this.customDurationDays,
     this.priceHistory = const {},
     this.priceHistoryTimestamps = const {},
@@ -1605,6 +1622,18 @@ class VerdictArchiveEntry {
   /// gate applies to them (same as slot #1 today).
   final bool wasPremiumSlot;
 
+  /// Total simulated dividend payouts credited over the session — snapshot
+  /// of [StressTestSession.dividendsReceived] at completion. Absent (0)
+  /// for verdicts archived before this field existed.
+  final double dividendsReceived;
+
+  /// Number of weekly DCA top-up credits, and their total $ — snapshot of
+  /// [StressTestSession.dcaTopUpCount]/[dcaTotalReceived] at completion.
+  /// Both 0 for a non-DCA-funded session, or for verdicts archived before
+  /// these fields existed.
+  final int dcaTopUpCount;
+  final double dcaTotalReceived;
+
   const VerdictArchiveEntry({
     required this.sessionId,
     this.name,
@@ -1633,6 +1662,9 @@ class VerdictArchiveEntry {
     this.scenarioCounts = const {},
     this.unrealizedPnlBySymbol = const {},
     this.wasPremiumSlot = false,
+    this.dividendsReceived = 0,
+    this.dcaTopUpCount = 0,
+    this.dcaTotalReceived = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -1663,6 +1695,9 @@ class VerdictArchiveEntry {
     'scenarioCounts': scenarioCounts,
     'unrealizedPnlBySymbol': unrealizedPnlBySymbol,
     'wasPremiumSlot': wasPremiumSlot,
+    'dividendsReceived': dividendsReceived,
+    'dcaTopUpCount': dcaTopUpCount,
+    'dcaTotalReceived': dcaTotalReceived,
   };
 
   factory VerdictArchiveEntry.fromJson(
@@ -1726,6 +1761,9 @@ class VerdictArchiveEntry {
         ) ??
         const {},
     wasPremiumSlot: json['wasPremiumSlot'] as bool? ?? false,
+    dividendsReceived: (json['dividendsReceived'] as num?)?.toDouble() ?? 0,
+    dcaTopUpCount: json['dcaTopUpCount'] as int? ?? 0,
+    dcaTotalReceived: (json['dcaTotalReceived'] as num?)?.toDouble() ?? 0,
   );
 
   /// [name] when the user set one, else [fallback] — mirrors

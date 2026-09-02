@@ -91,6 +91,17 @@ class AppNotification {
   /// field existed.
   final double? payoutAmount;
 
+  /// Set only for [AppNotificationType.stressTestCompleted] — the
+  /// session's [TestDuration] enum name (e.g. 'week1', 'month1') rather
+  /// than the enum itself, so this core model doesn't have to import a
+  /// features/stress_test type (same reasoning as [newsScenarioIndex]
+  /// re-deriving text locally instead of importing the news feature's
+  /// scenario model — see news_scenario_l10n.dart). Paired with
+  /// [stressTestPnlPercent] so the render side can rebuild a localized
+  /// title/detail instead of reading the English [title]/[detail] above.
+  final String? stressTestDurationKey;
+  final double? stressTestPnlPercent;
+
   const AppNotification({
     required this.id,
     required this.type,
@@ -111,6 +122,8 @@ class AppNotification {
     this.priceSwingChangePercent,
     this.priceSwingWindowMinutes,
     this.payoutAmount,
+    this.stressTestDurationKey,
+    this.stressTestPnlPercent,
   });
 
   AppNotification copyWith({bool? read}) => AppNotification(
@@ -133,6 +146,8 @@ class AppNotification {
     priceSwingChangePercent: priceSwingChangePercent,
     priceSwingWindowMinutes: priceSwingWindowMinutes,
     payoutAmount: payoutAmount,
+    stressTestDurationKey: stressTestDurationKey,
+    stressTestPnlPercent: stressTestPnlPercent,
   );
 
   Map<String, dynamic> toJson() => {
@@ -155,6 +170,8 @@ class AppNotification {
     'priceSwingChangePercent': priceSwingChangePercent,
     'priceSwingWindowMinutes': priceSwingWindowMinutes,
     'payoutAmount': payoutAmount,
+    'stressTestDurationKey': stressTestDurationKey,
+    'stressTestPnlPercent': stressTestPnlPercent,
   };
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {
@@ -187,6 +204,9 @@ class AppNotification {
           ?.toDouble(),
       priceSwingWindowMinutes: json['priceSwingWindowMinutes'] as int?,
       payoutAmount: (json['payoutAmount'] as num?)?.toDouble(),
+      stressTestDurationKey: json['stressTestDurationKey'] as String?,
+      stressTestPnlPercent: (json['stressTestPnlPercent'] as num?)
+          ?.toDouble(),
     );
   }
 }

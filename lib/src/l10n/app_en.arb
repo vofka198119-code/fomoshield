@@ -944,6 +944,10 @@
   "verdictHoldingsLabel": "Holdings",
   "verdictFinalPnlLabel": "Final P&L",
   "verdictStartingCashLabel": "Starting Cash",
+  "verdictDividendsLabel": "Dividends",
+  "verdictTopUpCountLabel": "Top-ups",
+  "verdictTopUpTotalLabel": "Top-up Total",
+  "verdictCommissionLabel": "Commission",
   "stressTestVerdictNoDataTitle": "No Data",
   "stressTestVerdictNoDataDescription": "Session data not found.",
   "stressTestVerdictPanicTitle": "PANIC — Fear-Driven Investor",
@@ -2559,6 +2563,18 @@
       },
       "minutes": {
         "type": "int"
+      }
+    }
+  },
+  "notificationsStressTestCompletedTitle": "Market Simulation Completed",
+  "notificationsStressTestCompletedDetail": "{duration} test finished — {percent}% — tap to view your verdict.",
+  "@notificationsStressTestCompletedDetail": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
       }
     }
   }

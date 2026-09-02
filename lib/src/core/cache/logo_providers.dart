@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/logo_cache_entry.dart';
 import '../../shared/services/finnhub_service.dart';
@@ -33,12 +34,28 @@ final cachedLogoProvider =
   final cached = await repo.getCachedLogo(ticker);
   if (cached != null) return cached;
 
-  try {
-    final data = await ref.read(finnhubServiceProvider).icon(ticker);
-    return data['iconUrl'] as String?;
-  } catch (_) {
-    return null;
+  final service = ref.read(finnhubServiceProvider);
+  // One retry after a beat: a cold-start burst on Home (quotes, indices,
+  // Shield Signal, portfolio, this fetch, all at once right after a fresh
+  // install) can make the first /icons hit lose the race and throw. Since
+  // this is a FutureProvider.family, a single swallowed failure used to
+  // cache `null` for the provider's whole lifetime — and the Home
+  // Watchlist widget never unmounts (lives in the bottom tab bar), so the
+  // icon stayed dead for the rest of the session. Confirmed report:
+  // "died after reinstall, never came back" 2026-09-02.
+  for (var attempt = 0; attempt < 2; attempt++) {
+    try {
+      final data = await service.icon(ticker);
+      return data['iconUrl'] as String?;
+    } catch (e) {
+      if (attempt == 0) {
+        await Future.delayed(const Duration(milliseconds: 800));
+      } else {
+        debugPrint('🖼️ ❌ cachedLogoProvider($ticker) failed twice: $e');
+      }
+    }
   }
+  return null;
 });
 
 // ---------------------------------------------------------------------------

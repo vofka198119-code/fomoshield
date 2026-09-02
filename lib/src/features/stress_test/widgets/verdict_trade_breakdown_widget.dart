@@ -45,6 +45,34 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final totalPnl = entry.finalValue - entry.startingCash;
+    final totalCommission = entry.trades.fold<double>(
+      0,
+      (sum, t) => sum + t.fee,
+    );
+
+    // Simulated dividends / weekly DCA top-ups / commission — dividends and
+    // top-ups only shown when they actually happened (most sessions have
+    // neither), commission shown whenever there were trades to charge it
+    // on. Built as a list (rather than inline widgets) so the LAST row can
+    // skip its divider regardless of which of these trailing rows ends up
+    // being last. See VerdictArchiveEntry.dividendsReceived/dcaTopUpCount/
+    // dcaTotalReceived doc comments — added 2026-09-02.
+    final rows = <(String, String)>[
+      (l10n.verdictTotalTradesLabel, '${entry.totalTrades}'),
+      (l10n.verdictHoldingsLabel, '${entry.holdingCount}'),
+      (l10n.verdictFinalPnlLabel, formatUsdSigned(totalPnl)),
+      (l10n.verdictFinalBalanceLabel, formatUsd(entry.finalValue)),
+      (l10n.verdictStartingCashLabel, formatUsd(entry.startingCash)),
+      (l10n.verdictTestDurationLabel, entry.durationLabel),
+      if (entry.dividendsReceived > 0)
+        (l10n.verdictDividendsLabel, formatUsd(entry.dividendsReceived)),
+      if (entry.dcaTopUpCount > 0) ...[
+        (l10n.verdictTopUpCountLabel, '${entry.dcaTopUpCount}'),
+        (l10n.verdictTopUpTotalLabel, formatUsd(entry.dcaTotalReceived)),
+      ],
+      if (totalCommission > 0)
+        (l10n.verdictCommissionLabel, formatUsd(totalCommission)),
+    ];
 
     return CardFrame(
       padding: EdgeInsets.zero,
@@ -101,16 +129,12 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _statRow(l10n.verdictTotalTradesLabel, '${entry.totalTrades}'),
-                _statRow(l10n.verdictHoldingsLabel, '${entry.holdingCount}'),
-                _statRow(l10n.verdictFinalPnlLabel, formatUsdSigned(totalPnl)),
-                _statRow(l10n.verdictFinalBalanceLabel, formatUsd(entry.finalValue)),
-                _statRow(l10n.verdictStartingCashLabel, formatUsd(entry.startingCash)),
-                _statRow(
-                  l10n.verdictTestDurationLabel,
-                  entry.durationLabel,
-                  isLast: true,
-                ),
+                for (int i = 0; i < rows.length; i++)
+                  _statRow(
+                    rows[i].$1,
+                    rows[i].$2,
+                    isLast: i == rows.length - 1,
+                  ),
               ],
             ),
           ),

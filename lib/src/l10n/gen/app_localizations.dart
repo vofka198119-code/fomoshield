@@ -4297,6 +4297,30 @@ abstract class AppLocalizations {
   /// **'Starting Cash'**
   String get verdictStartingCashLabel;
 
+  /// No description provided for @verdictDividendsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dividends'**
+  String get verdictDividendsLabel;
+
+  /// No description provided for @verdictTopUpCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Top-ups'**
+  String get verdictTopUpCountLabel;
+
+  /// No description provided for @verdictTopUpTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Top-up Total'**
+  String get verdictTopUpTotalLabel;
+
+  /// No description provided for @verdictCommissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission'**
+  String get verdictCommissionLabel;
+
   /// No description provided for @stressTestVerdictNoDataTitle.
   ///
   /// In en, this message translates to:
@@ -10760,6 +10784,21 @@ abstract class AppLocalizations {
     String symbol,
     String percent,
     int minutes,
+  );
+
+  /// No description provided for @notificationsStressTestCompletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Simulation Completed'**
+  String get notificationsStressTestCompletedTitle;
+
+  /// No description provided for @notificationsStressTestCompletedDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{duration} test finished — {percent}% — tap to view your verdict.'**
+  String notificationsStressTestCompletedDetail(
+    String duration,
+    String percent,
   );
 }
 

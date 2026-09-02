@@ -2432,6 +2432,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get verdictStartingCashLabel => 'Начальные наличные';
 
   @override
+  String get verdictDividendsLabel => 'Дивиденды';
+
+  @override
+  String get verdictTopUpCountLabel => 'Пополнений';
+
+  @override
+  String get verdictTopUpTotalLabel => 'Сумма пополнений';
+
+  @override
+  String get verdictCommissionLabel => 'Комиссия';
+
+  @override
   String get stressTestVerdictNoDataTitle => 'Нет данных';
 
   @override
@@ -6396,5 +6408,17 @@ class AppLocalizationsRu extends AppLocalizations {
     int minutes,
   ) {
     return 'В вашем тесте «$duration»: $symbol изменился на $percent% за последние ~$minutes мин.';
+  }
+
+  @override
+  String get notificationsStressTestCompletedTitle =>
+      'Симуляция рынка завершена';
+
+  @override
+  String notificationsStressTestCompletedDetail(
+    String duration,
+    String percent,
+  ) {
+    return 'Тест «$duration» завершён — $percent% — нажмите, чтобы посмотреть вердикт.';
   }
 }

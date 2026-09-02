@@ -507,6 +507,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       'startedAt': s.startedAt?.toIso8601String(),
       'completedAt': s.completedAt?.toIso8601String(),
       'realizedPnl': s.realizedPnl,
+      'dividendsReceived': s.dividendsReceived,
+      'dcaTopUpCount': s.dcaTopUpCount,
+      'dcaTotalReceived': s.dcaTotalReceived,
       'boughtAtPeakCount': s.boughtAtPeakCount,
       'soldAtBottomCount': s.soldAtBottomCount,
       'maxSingleAssetAllocation': s.maxSingleAssetAllocation,
@@ -595,6 +598,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           ? DateTime.parse(json['completedAt'] as String)
           : null,
       realizedPnl: (json['realizedPnl'] as num?)?.toDouble() ?? 0,
+      dividendsReceived: (json['dividendsReceived'] as num?)?.toDouble() ?? 0,
+      dcaTopUpCount: json['dcaTopUpCount'] as int? ?? 0,
+      dcaTotalReceived: (json['dcaTotalReceived'] as num?)?.toDouble() ?? 0,
       boughtAtPeakCount: json['boughtAtPeakCount'] as int? ?? 0,
       soldAtBottomCount: json['soldAtBottomCount'] as int? ?? 0,
       maxSingleAssetAllocation:
@@ -834,9 +840,17 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// would risk silently dropping any field this method doesn't know
   /// about — the reason DCA's own funding-mode/last-payout state lives in
   /// its own separate store instead of on StressTestSession at all).
-  void creditDcaPayout(String sessionId, double amount) {
+  void creditDcaPayout(
+    String sessionId,
+    double amount, {
+    int weeksCredited = 1,
+  }) {
     state = state.map((s) {
-      if (s.id == sessionId) s.cash += amount;
+      if (s.id == sessionId) {
+        s.cash += amount;
+        s.dcaTopUpCount += weeksCredited;
+        s.dcaTotalReceived += amount;
+      }
       return s;
     }).toList();
     _save();
@@ -847,7 +861,10 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// and for the same reason.
   void creditDividendPayout(String sessionId, double amount) {
     state = state.map((s) {
-      if (s.id == sessionId) s.cash += amount;
+      if (s.id == sessionId) {
+        s.cash += amount;
+        s.dividendsReceived += amount;
+      }
       return s;
     }).toList();
     _save();
@@ -941,6 +958,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             preCrashPrices: session.preCrashPrices,
             recoveryStartPrices: session.recoveryStartPrices,
             realizedPnl: session.realizedPnl,
+            dividendsReceived: session.dividendsReceived,
+            dcaTopUpCount: session.dcaTopUpCount,
+            dcaTotalReceived: session.dcaTotalReceived,
             customDurationDays: session.customDurationDays,
             psychologyProfile: session.psychologyProfile,
             activeNewsEvent: session.activeNewsEvent,
@@ -1264,6 +1284,10 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             simulationSeed: session.simulationSeed,
             explanationLog: session.explanationLog,
             currentWeights: session.currentWeights,
+            realizedPnl: session.realizedPnl,
+            dividendsReceived: session.dividendsReceived,
+            dcaTopUpCount: session.dcaTopUpCount,
+            dcaTotalReceived: session.dcaTotalReceived,
             psychologyProfile: session.psychologyProfile,
             activeNewsEvent: session.activeNewsEvent,
             lastNewsCheckedEpoch: session.lastNewsCheckedEpoch,
@@ -1321,6 +1345,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       completedAt: completed.completedAt ?? DateTime.now(),
       verdict: verdict,
       trades: completed.trades,
+      dividendsReceived: completed.dividendsReceived,
+      dcaTopUpCount: completed.dcaTopUpCount,
+      dcaTotalReceived: completed.dcaTotalReceived,
       discipline: completed.psychologyProfile.discipline,
       panicResistance: completed.psychologyProfile.panicResistance,
       patience: completed.psychologyProfile.patience,
@@ -1365,6 +1392,8 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
             '${entry.pnlPercent >= 0 ? '+' : ''}${entry.pnlPercent.toStringAsFixed(2)}% — '
             'tap to view your verdict.',
         createdAt: DateTime.now(),
+        stressTestDurationKey: session.duration.name,
+        stressTestPnlPercent: entry.pnlPercent,
       ),
     );
 

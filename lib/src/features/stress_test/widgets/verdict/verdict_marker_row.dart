@@ -17,7 +17,6 @@ import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/theme_variant_provider.dart';
 import '../../../../core/theme/themed_header.dart';
 import '../../../../core/theme/themed_divider.dart';
-import '../../../../core/theme/themed_border.dart';
 import '../../../../shared/widgets/card_frame.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../../../market_clock/market_clock_dial.dart' show darkCardDecoration;
@@ -51,20 +50,20 @@ class VerdictMarkerRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final color = _color;
     final radius = BorderRadius.circular(12);
 
-    return themedBorder(
-      palette: palette,
-      borderRadius: radius,
-      child: Container(
+    return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      // Matches financial_score_widget.dart's _MarkerCard — plain
+      // transparent fill + flat white 10% border, no theme gradient/glow.
+      // Used to go through themedBorder() (gold under Luxury Gold), which
+      // read as off; kept unconditional to match the FS Score reference
+      // the user pointed at (2026-09-02).
       decoration: BoxDecoration(
+        color: Colors.transparent,
         borderRadius: radius,
-        border: palette.borderGradient != null
-            ? null
-            : Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -115,7 +114,6 @@ class VerdictMarkerRow extends ConsumerWidget {
             ),
           ),
         ],
-      ),
       ),
     );
   }

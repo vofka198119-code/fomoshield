@@ -2432,6 +2432,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verdictStartingCashLabel => 'Starting Cash';
 
   @override
+  String get verdictDividendsLabel => 'Dividends';
+
+  @override
+  String get verdictTopUpCountLabel => 'Top-ups';
+
+  @override
+  String get verdictTopUpTotalLabel => 'Top-up Total';
+
+  @override
+  String get verdictCommissionLabel => 'Commission';
+
+  @override
   String get stressTestVerdictNoDataTitle => 'No Data';
 
   @override
@@ -6374,5 +6386,17 @@ class AppLocalizationsEn extends AppLocalizations {
     int minutes,
   ) {
     return 'In your $duration test, $symbol moved $percent% over the last ~$minutes min.';
+  }
+
+  @override
+  String get notificationsStressTestCompletedTitle =>
+      'Market Simulation Completed';
+
+  @override
+  String notificationsStressTestCompletedDetail(
+    String duration,
+    String percent,
+  ) {
+    return '$duration test finished — $percent% — tap to view your verdict.';
   }
 }

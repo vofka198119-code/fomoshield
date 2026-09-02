@@ -14,9 +14,35 @@ import 'news_scenario_l10n.dart';
 // functions rather than reading `.title`/`.detail` directly.
 // ---------------------------------------------------------------------------
 
+// [AppNotificationType.stressTestCompleted]'s duration is stored as the
+// [TestDuration] enum's own name (e.g. 'week1') rather than the enum
+// itself — see AppNotification.stressTestDurationKey's doc comment for
+// why. Re-derives the label from the same ARB keys TestDuration.
+// localizedLabel uses (features/stress_test/stress_test_models.dart), so
+// the translated text itself isn't duplicated, just this small mapping.
+String _stressTestDurationLabel(AppLocalizations l10n, String? key) {
+  switch (key) {
+    case 'week1':
+      return l10n.testDuration1Week;
+    case 'month1':
+      return l10n.testDuration1Month;
+    case 'months3':
+      return l10n.testDuration3Months;
+    case 'infinite':
+      return l10n.testDurationInfinite;
+    case 'custom':
+      return l10n.testDurationCustom;
+    default:
+      return key ?? '';
+  }
+}
+
 String notificationTitle(AppNotification n, AppLocalizations l10n) {
   if (n.type == AppNotificationType.news && n.newsScenarioIndex != null) {
     return newsScenarioHeadline(l10n, n.newsScenarioIndex!);
+  }
+  if (n.type == AppNotificationType.stressTestCompleted) {
+    return l10n.notificationsStressTestCompletedTitle;
   }
   if (n.type == AppNotificationType.priceSwing &&
       n.priceSwingIsUp != null &&
@@ -33,6 +59,13 @@ String notificationTitle(AppNotification n, AppLocalizations l10n) {
 String notificationDetail(AppNotification n, AppLocalizations l10n) {
   if (n.type == AppNotificationType.news && n.newsScenarioIndex != null) {
     return newsScenarioDescription(l10n, n.newsScenarioIndex!);
+  }
+  if (n.type == AppNotificationType.stressTestCompleted &&
+      n.stressTestPnlPercent != null) {
+    final sign = n.stressTestPnlPercent! >= 0 ? '+' : '';
+    final pct = '$sign${n.stressTestPnlPercent!.toStringAsFixed(2)}';
+    final duration = _stressTestDurationLabel(l10n, n.stressTestDurationKey);
+    return l10n.notificationsStressTestCompletedDetail(duration, pct);
   }
   if (n.type == AppNotificationType.priceSwing &&
       n.priceSwingIsUp != null &&

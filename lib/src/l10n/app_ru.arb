@@ -706,6 +706,10 @@
   "verdictHoldingsLabel": "Активы",
   "verdictFinalPnlLabel": "Итоговый P&L",
   "verdictStartingCashLabel": "Начальные наличные",
+  "verdictDividendsLabel": "Дивиденды",
+  "verdictTopUpCountLabel": "Пополнений",
+  "verdictTopUpTotalLabel": "Сумма пополнений",
+  "verdictCommissionLabel": "Комиссия",
   "stressTestVerdictNoDataTitle": "Нет данных",
   "stressTestVerdictNoDataDescription": "Данные сессии не найдены.",
   "stressTestVerdictPanicTitle": "ПАНИКА — Инвестор, ведомый страхом",
@@ -1819,5 +1823,7 @@
   "newsScenario24Description": "Компания объявила о масштабной реструктуризации с сокращением персонала.",
   "notificationsPriceSwingTitleUp": "Акции {name} выросли на {percent}%",
   "notificationsPriceSwingTitleDown": "Акции {name} упали на {percent}%",
-  "notificationsPriceSwingDetail": "В вашем тесте «{duration}»: {symbol} изменился на {percent}% за последние ~{minutes} мин."
+  "notificationsPriceSwingDetail": "В вашем тесте «{duration}»: {symbol} изменился на {percent}% за последние ~{minutes} мин.",
+  "notificationsStressTestCompletedTitle": "Симуляция рынка завершена",
+  "notificationsStressTestCompletedDetail": "Тест «{duration}» завершён — {percent}% — нажмите, чтобы посмотреть вердикт."
 }

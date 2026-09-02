@@ -133,10 +133,16 @@ class CompanyEncyclopediaDetailScreen extends ConsumerWidget {
                     // Plain white under Luxury Gold's dark backdrop — the
                     // usual muted textBody read as too low-contrast for a
                     // long article (accessibility ask, not just taste).
-                    // Standard's light backdrop keeps textBody as-is.
+                    // Standard's light backdrop has the same problem in
+                    // reverse (gray textBody on near-white), so it gets
+                    // textHeader (near-black) instead — same fix, opposite
+                    // direction. Other dark-card themes (B&W, Light Lime,
+                    // Midnight Sea) keep textBody as-is.
                     color: palette.titleGradient != null
                         ? Colors.white
-                        : palette.textBody,
+                        : palette.background == null
+                            ? palette.textHeader
+                            : palette.textBody,
                   ),
                 ),
                 const SizedBox(height: 16),

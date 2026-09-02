@@ -116,7 +116,9 @@ Future<void> checkStressTestDcaPayout(
   final amount = elapsedWeeks * dcaWeeklyAmount;
   final creditedThrough = lastPayout.add(Duration(days: elapsedWeeks * 7));
 
-  ref.read(stressTestProvider.notifier).creditDcaPayout(session.id, amount);
+  ref
+      .read(stressTestProvider.notifier)
+      .creditDcaPayout(session.id, amount, weeksCredited: elapsedWeeks);
   store[session.id] = _DcaEntry(lastPayoutAt: creditedThrough);
   await _saveStore(uid, store);
 
