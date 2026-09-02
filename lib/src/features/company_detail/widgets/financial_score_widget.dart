@@ -75,9 +75,14 @@ class FinancialScoreWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: CardFrame(
-        showTopBar: false,
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-        decoration: darkCardDecoration(),
+        decoration: palette.windowGradient != null
+            ? BoxDecoration(
+                gradient: palette.windowGradient,
+                borderRadius: FomoShieldTheme.cardRadius,
+                boxShadow: FomoShieldTheme.shadowSoft,
+              )
+            : darkCardDecoration(),
         palette: palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

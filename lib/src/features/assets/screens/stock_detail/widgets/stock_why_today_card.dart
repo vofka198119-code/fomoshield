@@ -111,10 +111,15 @@ class StockWhyTodayCard extends ConsumerWidget {
     final noisePct = contributions?.noisePct ?? 0;
 
     return CardFrame(
-      showTopBar: false,
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-      decoration: darkCardDecoration(),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: FomoShieldTheme.cardRadius,
+              boxShadow: FomoShieldTheme.shadowSoft,
+            )
+          : darkCardDecoration(),
       palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -89,10 +89,20 @@ BoxDecoration darkCardDecoration({
 /// Card wrapper for anything sitting on the same instrument-panel dial
 /// background — keeps the Market Clock screen and Home widget visually
 /// unified (gradient IS the card background, not a separate surface color).
-/// Now a thin alias over [darkCardDecoration] — kept as its own named
-/// function since Market Clock's own call sites read more clearly this way.
-BoxDecoration marketClockCardDecoration({BorderRadius? borderRadius}) =>
-    darkCardDecoration(borderRadius: borderRadius);
+/// [palette]?.windowGradient, when set, replaces the default green
+/// instrument-panel gradient (same "dark green becomes this theme's own
+/// dark treatment" swap every other `darkCardDecoration()` call site
+/// makes) — null (the default) keeps the original look untouched.
+BoxDecoration marketClockCardDecoration({
+  BorderRadius? borderRadius,
+  AppPalette? palette,
+}) => palette?.windowGradient != null
+    ? BoxDecoration(
+        gradient: palette!.windowGradient,
+        borderRadius: borderRadius ?? FomoShieldTheme.cardRadius,
+        boxShadow: FomoShieldTheme.shadowSoft,
+      )
+    : darkCardDecoration(borderRadius: borderRadius);
 
 class MarketClockDial extends StatelessWidget {
   final MarketClockState state;

@@ -219,7 +219,6 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     final avgCost = _avgCost();
 
     return CardFrame(
-      showTopBar: false,
       padding: const EdgeInsets.symmetric(
         vertical: FomoShieldTheme.cardPadding,
       ),
@@ -621,7 +620,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                   fontWeight: FontWeight.w600,
                   color: palette.windowGradient == null
                       ? Colors.black
-                      : palette.textHeader,
+                      : (palette.onWindow ?? palette.textHeader),
                 ),
               ),
             ),

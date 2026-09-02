@@ -290,7 +290,12 @@ class StressTestWidget extends ConsumerWidget {
   // user. Uses the session's position within the currently-active list,
   // which is a good-enough proxy but isn't authoritative if an earlier
   // session was deleted — flag if a slot ever looks mislabeled.
-  Widget? _tierBadge(WidgetRef ref, BuildContext context, int index) {
+  Widget? _tierBadge(
+    WidgetRef ref,
+    BuildContext context,
+    int index,
+    AppPalette palette,
+  ) {
     if (index == 0) return null;
 
     final tier = ref.watch(subscriptionTierProvider);
@@ -321,7 +326,12 @@ class StressTestWidget extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(5)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(5),
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
         AppLocalizations.of(context)!.stressTestPremiumLowercase,
         style: GoogleFonts.inter(
@@ -342,7 +352,7 @@ class StressTestWidget extends ConsumerWidget {
     int index,
     AppPalette palette,
   ) {
-    final tierBadge = _tierBadge(ref, context, index);
+    final tierBadge = _tierBadge(ref, context, index, palette);
     final l10n = AppLocalizations.of(context)!;
 
     return InkWell(

@@ -98,7 +98,6 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
 
     if (holdings == null) {
       return CardFrame(
-        showTopBar: false,
         padding: EdgeInsets.zero,
         decoration: FomoShieldTheme.cardDecoration,
         palette: palette,
@@ -123,7 +122,6 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
     final display = _showAll ? sorted : sorted.take(_previewLimit).toList();
 
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

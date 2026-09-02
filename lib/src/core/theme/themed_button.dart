@@ -53,10 +53,12 @@ Widget themedDarkCtaButtonShell({
 }
 
 /// Text/icon color for content inside [themedDarkCtaButtonShell] — flat
-/// white on Standard's dark-green fill, cream [AppPalette.textHeader] on
-/// Luxury Gold's graphite window fill.
-Color themedDarkCtaContentColor(AppPalette palette) =>
-    palette.windowGradient == null ? Colors.white : palette.textHeader;
+/// white on Standard's dark-green fill, [AppPalette.onWindow] (falling
+/// back to [AppPalette.textHeader] for a theme that doesn't set it, e.g.
+/// Luxury Gold's cream) on a themed window fill.
+Color themedDarkCtaContentColor(AppPalette palette) => palette.windowGradient == null
+    ? Colors.white
+    : (palette.onWindow ?? palette.textHeader);
 
 // ---------------------------------------------------------------------------
 // Themed "Add Widgets" button — the canonical treatment for every screen's
@@ -102,6 +104,7 @@ Widget themedAddWidgetsButton(
     );
   }
   final radius = BorderRadius.circular(30);
+  final onWindowColor = palette.onWindow ?? palette.textHeader;
   return themedBorder(
     palette: palette,
     borderRadius: radius,
@@ -118,14 +121,14 @@ Widget themedAddWidgetsButton(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.add_rounded, color: palette.textHeader, size: 20),
+              Icon(Icons.add_rounded, color: onWindowColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 label,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: palette.textHeader,
+                  color: onWindowColor,
                 ),
               ),
             ],

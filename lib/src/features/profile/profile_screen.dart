@@ -344,7 +344,13 @@ class ProfileScreen extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: palette.accentPrimary,
+                      // This box's fill switches to the theme's dark
+                      // windowGradient when one is set (see decoration
+                      // above) — plain accentPrimary is near-black for
+                      // Black & White (tuned for its white outer card) and
+                      // would be invisible here, same reasoning as every
+                      // other windowGradient-backed text/icon in the app.
+                      color: palette.onWindow ?? palette.accentPrimary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -621,16 +627,20 @@ class ProfileScreen extends ConsumerWidget {
     required VoidCallback onTap,
     required AppPalette palette,
   }) {
+    // Only ever rendered inside the Admin Sandbox panel above, whose fill
+    // switches to the theme's dark windowGradient when one is set — see
+    // that panel's own comment on why accentPrimary alone isn't safe here.
+    final onDark = palette.onWindow ?? palette.accentPrimary;
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: onTap,
-        icon: Icon(icon, size: 16, color: palette.accentPrimary),
+        icon: Icon(icon, size: 16, color: onDark),
         label: Text(
           label,
           style: GoogleFonts.inter(
             fontSize: 12,
-            color: palette.accentPrimary,
+            color: onDark,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -700,16 +710,23 @@ class _PremiumStatusCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final details = ref.watch(premiumDetailsProvider);
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF002010), Color(0xFF003018), Color(0xFF002010)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        // Same dark-green "instrument panel" role as darkCardGradient()
+        // elsewhere, just hand-rolled here — swap in the theme's own
+        // windowGradient when one is set (e.g. Black & White's
+        // graphite-to-black radial) instead of this hardcoded green.
+        gradient:
+            palette.windowGradient ??
+            const LinearGradient(
+              colors: [Color(0xFF002010), Color(0xFF003018), Color(0xFF002010)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.4)),
         boxShadow: [

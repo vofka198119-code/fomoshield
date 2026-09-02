@@ -600,7 +600,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                       fontWeight: FontWeight.w700,
                       color: palette.windowGradient == null
                           ? Colors.black
-                          : palette.textHeader,
+                          : (palette.onWindow ?? palette.textHeader),
                     ),
                   ),
                   Text(
@@ -613,7 +613,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                       fontWeight: FontWeight.w500,
                       color: palette.windowGradient == null
                           ? Colors.black54
-                          : palette.textBody,
+                          : (palette.onWindow ?? palette.textBody),
                     ),
                   ),
                 ],

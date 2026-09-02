@@ -46,7 +46,6 @@ class CompanyEncyclopediaWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: CardFrame(
-        showTopBar: false,
         decoration: FomoShieldTheme.cardDecoration,
         palette: palette,
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),

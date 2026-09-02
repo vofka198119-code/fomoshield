@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/typography_helpers.dart';
 import '../../../../core/theme/app_palette.dart';
+import '../../../../core/theme/fomo_shield_theme.dart';
 import '../../../../shared/widgets/card_frame.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../../l10n/gen/app_localizations.dart';
@@ -241,9 +242,14 @@ class OrderAmountSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: CardFrame(
-        showTopBar: false,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: darkCardDecoration(),
+        decoration: palette.windowGradient != null
+            ? BoxDecoration(
+                gradient: palette.windowGradient,
+                borderRadius: FomoShieldTheme.cardRadius,
+                boxShadow: FomoShieldTheme.shadowSoft,
+              )
+            : darkCardDecoration(),
         palette: palette,
         child: Column(
           children: [

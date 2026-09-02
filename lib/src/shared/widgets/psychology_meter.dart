@@ -211,7 +211,6 @@ class PsychologyMeter extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

@@ -33,9 +33,13 @@ class PsychologyMarkerCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(20),
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       palette: palette,
       child: Column(
         children: [

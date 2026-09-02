@@ -317,9 +317,12 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: darkCardDecoration(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: palette.windowGradient != null
+                ? BoxDecoration(
+                    gradient: palette.windowGradient,
+                    borderRadius: BorderRadius.circular(12),
+                  )
+                : darkCardDecoration(borderRadius: BorderRadius.circular(12)),
             child: Text(
               l10n.profilePremiumBadge,
               style: GoogleFonts.inter(
@@ -337,7 +340,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               isFirst ? l10n.stressTestSlot1Free : l10n.stressTestSlot2Free,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: palette.accentPrimary,
+                color: palette.windowGradient != null
+                    ? (palette.onWindow ?? palette.accentPrimary)
+                    : palette.accentPrimary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -396,7 +401,6 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     final isPremium = tier.isPremiumOrAdmin;
     final l10n = AppLocalizations.of(context)!;
     return CardFrame(
-      showTopBar: false,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -563,9 +567,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       horizontal: 8,
                       vertical: 3,
                     ),
-                    decoration: darkCardDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    decoration: palette.windowGradient != null
+                        ? BoxDecoration(
+                            gradient: palette.windowGradient,
+                            borderRadius: BorderRadius.circular(8),
+                          )
+                        : darkCardDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                     child: Text(
                       l10n.profilePremiumBadge,
                       style: GoogleFonts.inter(
@@ -583,9 +592,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       horizontal: 8,
                       vertical: 3,
                     ),
-                    decoration: darkCardDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    decoration: palette.windowGradient != null
+                        ? BoxDecoration(
+                            gradient: palette.windowGradient,
+                            borderRadius: BorderRadius.circular(8),
+                          )
+                        : darkCardDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                     child: Text(
                       l10n.profilePremiumBadge,
                       style: GoogleFonts.inter(

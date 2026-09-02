@@ -35,9 +35,14 @@ class PortfolioCashWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: FomoShieldTheme.shadowSoft,
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       palette: palette,
       child: Column(
         children: [

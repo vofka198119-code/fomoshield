@@ -61,7 +61,6 @@ class WidgetContainer extends StatelessWidget {
       letterSpacing: 1.2,
     );
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       palette: palette,
       child: Column(

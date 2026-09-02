@@ -1,18 +1,17 @@
 // ---------------------------------------------------------------------------
-// CardFrame — Wrapper with decorative top bar (Design Bible Part 7)
+// CardFrame — Wrapper with shared card chrome (Design Bible Part 7)
 // ---------------------------------------------------------------------------
 // Единая обёртка для всех карточек:
 // - border-radius: 22px (FomoShieldTheme.radius)
 // - border: 1px solid var(--border)
 // - box-shadow: var(--shadow-soft)
-// - Декоративная верхняя полоса (::before) — 5px градиент #6FA7D6 → #4E6D8D
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/app_palette.dart';
 
-/// Wraps a child widget in a card with decorative top bar.
+/// Wraps a child widget in a card with the app's shared chrome.
 ///
 /// Usage:
 /// ```dart
@@ -27,9 +26,6 @@ class CardFrame extends StatelessWidget {
 
   /// Padding inside the card. Defaults to `EdgeInsets.all(FomoShieldTheme.cardPadding)`.
   final EdgeInsetsGeometry? padding;
-
-  /// Whether to show the decorative top bar. Defaults to true.
-  final bool showTopBar;
 
   /// Optional custom decoration override. Uses [FomoShieldTheme.cardDecoration] by default.
   final BoxDecoration? decoration;
@@ -50,7 +46,6 @@ class CardFrame extends StatelessWidget {
     super.key,
     required this.child,
     this.padding,
-    this.showTopBar = true,
     this.decoration,
     this.margin,
     this.palette,
@@ -58,33 +53,21 @@ class CardFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveDecoration = decoration ?? FomoShieldTheme.cardDecoration;
+    // No explicit decoration override: use the theme's own flat card color
+    // (palette.card) instead of always Standard's off-white — needed for
+    // Black & White's white cards. A caller that passes its own
+    // `decoration` (e.g. Market Clock's instrument-panel look) still wins
+    // untouched.
+    final effectiveDecoration =
+        decoration ??
+        FomoShieldTheme.cardDecoration.copyWith(
+          color: palette?.card ?? FomoShieldTheme.card,
+        );
     final effectivePadding = padding ?? EdgeInsets.all(FomoShieldTheme.cardPadding);
 
-    final body = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // ── Decorative top bar (::before) ──
-        if (showTopBar)
-          Container(
-            height: FomoShieldTheme.cardTopBarHeight,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  FomoShieldTheme.cardTopBarStart.withValues(alpha: 0.12),
-                  FomoShieldTheme.cardTopBarEnd.withValues(alpha: 0.12),
-                ],
-              ),
-            ),
-          ),
-
-        // ── Card body ──
-        Padding(
-          padding: effectivePadding,
-          child: child,
-        ),
-      ],
+    final body = Padding(
+      padding: effectivePadding,
+      child: child,
     );
 
     // Molecule 4 (card background): when the theme defines a cardGradient,
@@ -130,7 +113,6 @@ class CardFrame extends StatelessWidget {
       width: double.infinity,
       margin: margin ?? EdgeInsets.zero,
       decoration: cardBodyDecoration,
-      // Use clipBehavior to ensure top bar respects border radius
       clipBehavior: Clip.antiAlias,
       child: body,
     );

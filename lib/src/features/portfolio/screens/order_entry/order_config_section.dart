@@ -62,7 +62,6 @@ class OrderConfigSection extends StatelessWidget {
 
   Widget _infoBox() {
     return CardFrame(
-      showTopBar: false,
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(14),
       decoration: FomoShieldTheme.cardDecoration,
@@ -103,7 +102,6 @@ class OrderConfigSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: CardFrame(
-        showTopBar: false,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: FomoShieldTheme.cardDecoration,
         palette: palette,

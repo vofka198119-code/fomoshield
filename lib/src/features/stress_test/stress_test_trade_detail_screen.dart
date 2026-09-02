@@ -103,7 +103,6 @@ class _TradeDetailCard extends ConsumerWidget {
     final sessionLabel = session?.displayLabel(l10n.stressTestPortfolioTitle);
 
     return CardFrame(
-      showTopBar: false,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,
       padding: const EdgeInsets.all(22),

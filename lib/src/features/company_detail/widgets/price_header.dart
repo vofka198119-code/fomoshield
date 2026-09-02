@@ -108,9 +108,14 @@ class PriceHeader extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: CardFrame(
-            showTopBar: false,
             padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-            decoration: darkCardDecoration(),
+            decoration: palette.windowGradient != null
+                ? BoxDecoration(
+                    gradient: palette.windowGradient,
+                    borderRadius: FomoShieldTheme.cardRadius,
+                    boxShadow: FomoShieldTheme.shadowSoft,
+                  )
+                : darkCardDecoration(),
             palette: palette,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,6 +304,12 @@ class PriceHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [if (palette.cardGlow != null) palette.cardGlow!],
             )
+          : palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: FomoShieldTheme.shadowSoft,
+            )
           : darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
@@ -376,9 +387,14 @@ class PriceHeader extends StatelessWidget {
         phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
 
     return CardFrame(
-      showTopBar: false,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(16)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: FomoShieldTheme.shadowSoft,
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(16)),
       palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

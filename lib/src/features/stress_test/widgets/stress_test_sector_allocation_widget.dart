@@ -62,9 +62,13 @@ class StressTestSectorAllocationCard extends StatelessWidget {
     final hasData = totalInvested > 0;
 
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(20),
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       palette: palette,
       child: Column(
         children: [

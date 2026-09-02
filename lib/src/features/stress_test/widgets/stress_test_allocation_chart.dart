@@ -85,7 +85,6 @@ class _StressTestAllocationChartState
         : '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
 
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

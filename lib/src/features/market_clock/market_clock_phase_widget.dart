@@ -30,7 +30,6 @@ class MarketPhaseWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

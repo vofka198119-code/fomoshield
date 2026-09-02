@@ -29,7 +29,6 @@ class BrowseLane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CardFrame(
-      showTopBar: false,
       decoration: FomoShieldTheme.cardDecoration,
       padding: const EdgeInsets.fromLTRB(0, 14, 0, 16),
       palette: palette,

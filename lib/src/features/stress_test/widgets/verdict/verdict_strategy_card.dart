@@ -68,9 +68,13 @@ class VerdictStrategyCard extends ConsumerWidget {
     ];
 
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(22)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(22),
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(22)),
       palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

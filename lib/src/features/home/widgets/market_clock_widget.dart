@@ -68,9 +68,8 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
       onTap: () => context.push('/market-clock'),
       borderRadius: FomoShieldTheme.cardRadius,
       child: CardFrame(
-        showTopBar: false,
         padding: EdgeInsets.zero,
-        decoration: marketClockCardDecoration(),
+        decoration: marketClockCardDecoration(palette: palette),
         palette: palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +137,7 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                   fontSize: palette.windowGradient != null ? 10 : 9,
                   fontWeight: FontWeight.w700,
                   color: palette.windowGradient != null
-                      ? palette.accentPrimary
+                      ? (palette.onWindow ?? palette.accentPrimary)
                       : dialBrassLight.withValues(alpha: 0.7),
                   letterSpacing: palette.windowGradient != null ? 0.6 : 0.8,
                 ),

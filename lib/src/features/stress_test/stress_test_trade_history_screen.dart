@@ -69,7 +69,6 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: CardFrame(
-                  showTopBar: false,
                   padding: EdgeInsets.zero,
                   decoration: FomoShieldTheme.cardDecoration,
                   palette: palette,

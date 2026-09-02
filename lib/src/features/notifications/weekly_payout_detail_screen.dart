@@ -100,7 +100,6 @@ class _PayoutDetailCard extends StatelessWidget {
     final amount = _amount;
 
     return CardFrame(
-      showTopBar: false,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,
       padding: const EdgeInsets.all(22),

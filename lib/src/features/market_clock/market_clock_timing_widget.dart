@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_border.dart';
 import '../../core/theme/themed_divider.dart';
@@ -99,9 +100,14 @@ class FomoShieldStatusWidget extends StatelessWidget {
     final style = _tierStylesFor(l10n)[tier]!;
 
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
-      decoration: darkCardDecoration(),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: FomoShieldTheme.cardRadius,
+              boxShadow: FomoShieldTheme.shadowSoft,
+            )
+          : darkCardDecoration(),
       palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

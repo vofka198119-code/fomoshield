@@ -779,7 +779,6 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       index: 6,
       controller: _staggerController,
       child: CardFrame(
-        showTopBar: false,
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(

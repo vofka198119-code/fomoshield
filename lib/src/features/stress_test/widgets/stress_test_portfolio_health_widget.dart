@@ -96,7 +96,6 @@ class StressTestPortfolioHealthCard extends StatelessWidget {
     }
 
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

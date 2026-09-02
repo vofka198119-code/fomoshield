@@ -106,9 +106,14 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: CardFrame(
-        showTopBar: false,
         padding: const EdgeInsets.all(FomoShieldTheme.cardPadding),
-        decoration: darkCardDecoration(),
+        decoration: widget.palette.windowGradient != null
+            ? BoxDecoration(
+                gradient: widget.palette.windowGradient,
+                borderRadius: FomoShieldTheme.cardRadius,
+                boxShadow: FomoShieldTheme.shadowSoft,
+              )
+            : darkCardDecoration(),
         palette: widget.palette,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

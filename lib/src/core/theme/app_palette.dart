@@ -71,6 +71,15 @@ class AppPalette {
   /// this field existed.
   final Gradient? windowGradient;
 
+  /// Text/icon color for content sitting on [windowGradient]. Null means
+  /// "use [accentPrimary]/[textHeader] there too" — correct for a theme
+  /// where the OUTER card is also dark (Luxury Gold: gold accent reads
+  /// fine on both the card and the window). Needed once a theme's outer
+  /// card is LIGHT while its window stays dark (Black & White: near-black
+  /// accent/header text for the white card would vanish against the dark
+  /// window) — set only where that mismatch exists.
+  final Color? onWindow;
+
   /// Header/section divider — a horizontal left-to-right gradient (light
   /// gold → dark gold for Luxury Gold), companion to [borderGradient]'s
   /// vertical version. Null means "plain flat divider," same as before
@@ -94,6 +103,7 @@ class AppPalette {
     this.glowShadow,
     this.cardGlow,
     this.windowGradient,
+    this.onWindow,
     this.dividerGradient,
   });
 
@@ -136,6 +146,8 @@ class AppPalette {
     accentSecondary: BlackWhiteTheme.accentSecondary,
     textHeader: BlackWhiteTheme.textHeader,
     textBody: BlackWhiteTheme.textBody,
+    windowGradient: BlackWhiteTheme.windowGradient,
+    onWindow: BlackWhiteTheme.onWindow,
   );
 
   static const lightLime = AppPalette(

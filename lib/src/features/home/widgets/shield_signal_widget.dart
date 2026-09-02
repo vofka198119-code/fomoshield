@@ -147,7 +147,6 @@ class _ShieldSignalWidgetState extends ConsumerState<ShieldSignalWidget> {
     // make the original dark-on-light title/divider unreadable; the rest
     // of this widget's content is untouched (molecule 3 still deferred).
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       palette: palette,
       child: Column(

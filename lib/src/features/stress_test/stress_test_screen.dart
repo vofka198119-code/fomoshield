@@ -221,7 +221,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     return GestureDetector(
       onTap: _openAddAssetSheet,
       child: CardFrame(
-        showTopBar: false,
         decoration: FomoShieldTheme.cardDecoration,
         palette: palette,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
@@ -896,7 +895,6 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
   }) {
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

@@ -276,19 +276,29 @@ class StressTestHubScreen extends ConsumerWidget {
       onTap: () => _startNewTest(context, ref),
       borderRadius: BorderRadius.circular(16),
       child: CardFrame(
-        showTopBar: false,
         padding: const EdgeInsets.all(20),
-        decoration:
-            darkCardDecoration(borderRadius: BorderRadius.circular(16))
-                .copyWith(
-                  boxShadow: [
-                    BoxShadow(
-                      color: dialDark.withValues(alpha: 0.35),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+        decoration: palette.windowGradient != null
+            ? BoxDecoration(
+                gradient: palette.windowGradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: dialDark.withValues(alpha: 0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              )
+            : darkCardDecoration(borderRadius: BorderRadius.circular(16))
+                  .copyWith(
+                    boxShadow: [
+                      BoxShadow(
+                        color: dialDark.withValues(alpha: 0.35),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
         palette: palette,
         child: Row(
           children: [
@@ -410,7 +420,12 @@ class StressTestHubScreen extends ConsumerWidget {
   // ad-unlockable extra, shown as a "Go Premium" nudge until ad
   // integration exists; slots 3-5 = premium-only, always a premium
   // badge).
-  Widget? _tierBadge(WidgetRef ref, BuildContext context, int index) {
+  Widget? _tierBadge(
+    WidgetRef ref,
+    BuildContext context,
+    int index,
+    AppPalette palette,
+  ) {
     if (index == 0) return null;
 
     final tier = ref.watch(subscriptionTierProvider);
@@ -441,7 +456,12 @@ class StressTestHubScreen extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(5)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(5),
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
         AppLocalizations.of(context)!.stressTestPremiumLowercase,
         style: GoogleFonts.inter(
@@ -473,7 +493,7 @@ class StressTestHubScreen extends ConsumerWidget {
     int index,
     AppPalette palette,
   ) {
-    final tierBadge = _tierBadge(ref, context, index);
+    final tierBadge = _tierBadge(ref, context, index, palette);
     // Unrealized, not total-since-start — totalValue right above it
     // already reflects the whole account (cash + positions, including
     // any realized gains already banked), so this dollar figure shows

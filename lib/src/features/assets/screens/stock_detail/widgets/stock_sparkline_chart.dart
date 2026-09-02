@@ -194,7 +194,6 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
     }
 
     return CardFrame(
-      showTopBar: false,
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.symmetric(
         vertical: FomoShieldTheme.cardPadding,
@@ -615,7 +614,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                   fontWeight: FontWeight.w600,
                   color: widget.palette.windowGradient == null
                       ? Colors.black
-                      : widget.palette.textHeader,
+                      : (widget.palette.onWindow ?? widget.palette.textHeader),
                 ),
               ),
             ),

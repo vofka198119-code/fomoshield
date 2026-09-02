@@ -41,7 +41,6 @@ class MyLimitOrdersWidget extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return CardFrame(
-      showTopBar: false,
       padding: const EdgeInsets.fromLTRB(22, 14, 22, 4),
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

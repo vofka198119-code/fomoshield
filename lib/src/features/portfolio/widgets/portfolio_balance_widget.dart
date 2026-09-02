@@ -59,7 +59,6 @@ class _PortfolioBalanceWidgetState
     final palette = widget.palette;
     if (widget.isLoading || widget.hasError || widget.performance == null) {
       return CardFrame(
-        showTopBar: false,
         padding: EdgeInsets.zero,
         decoration: FomoShieldTheme.cardDecoration,
         palette: palette,
@@ -115,7 +114,6 @@ class _PortfolioBalanceWidgetState
         : '${formatUsdSigned(pnl)} (${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
 
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

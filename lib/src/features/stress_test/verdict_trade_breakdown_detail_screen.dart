@@ -506,8 +506,12 @@ class _DarkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CardFrame(
-      showTopBar: false,
-      decoration: darkCardDecoration(borderRadius: BorderRadius.circular(20)),
+      decoration: palette.windowGradient != null
+          ? BoxDecoration(
+              gradient: palette.windowGradient,
+              borderRadius: BorderRadius.circular(20),
+            )
+          : darkCardDecoration(borderRadius: BorderRadius.circular(20)),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
       palette: palette,
       child: Column(

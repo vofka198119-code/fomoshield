@@ -37,3 +37,8 @@ const bwGradientLight = Color(0xFFF8F6F1);
 /// "Slate". Deliberately its own constant, separate from [bwSlate] (border
 /// stroke) even though both read as slate-toned — different UI role.
 const bwGradientDark = Color(0xFF2E343B);
+
+/// Widget card background — literal white, for every widget Standard
+/// renders light/off-white (2026-09-02 request: this theme's normal cards
+/// read as true white, not the dark [bwCharcoal] placeholder).
+const bwCardWhite = Color(0xFFFFFFFF);

@@ -82,7 +82,6 @@ class TargetWidget extends ConsumerWidget {
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       palette: palette,
       child: Column(
@@ -370,7 +369,7 @@ class _Tick extends StatelessWidget {
         fontSize: 11,
         fontWeight: FontWeight.w600,
         color: palette.windowGradient != null
-            ? palette.textHeader
+            ? (palette.onWindow ?? palette.textHeader)
             : Colors.white.withValues(alpha: 0.5),
       ),
     );
@@ -416,7 +415,7 @@ class _MarkerRow extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: palette.accentPrimary,
+                        color: palette.onWindow ?? palette.accentPrimary,
                       ),
                     ),
                   ),

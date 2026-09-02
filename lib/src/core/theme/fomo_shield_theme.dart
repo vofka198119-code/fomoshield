@@ -388,11 +388,6 @@ abstract final class FomoShieldTheme {
   //  CARD DECORATION
   // ══════════════════════════════════════════════
 
-  /// Decorative top bar gradient (Design Bible Part 7 — ::before).
-  static const Color cardTopBarStart = Color(0xFF6FA7D6);
-  static const Color cardTopBarEnd = Color(0xFF4E6D8D);
-  static const double cardTopBarHeight = 5;
-
   /// Default card decoration: off-white bg, 22px radius, soft shadow, border.
   static BoxDecoration get cardDecoration => BoxDecoration(
         color: card,

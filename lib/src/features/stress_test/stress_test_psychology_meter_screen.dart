@@ -126,7 +126,6 @@ class _FsScoreGaugeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,
@@ -180,7 +179,6 @@ class _PsychologyMeterDetailCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return CardFrame(
-      showTopBar: false,
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,

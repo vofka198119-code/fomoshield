@@ -70,7 +70,6 @@ class _WatchlistFullScreenState extends ConsumerState<WatchlistFullScreen> {
                 child: Column(
                   children: [
                     CardFrame(
-                      showTopBar: false,
                       padding: EdgeInsets.zero,
                       decoration: FomoShieldTheme.cardDecoration,
                       palette: palette,

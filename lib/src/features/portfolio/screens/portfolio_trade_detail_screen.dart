@@ -104,7 +104,6 @@ class _TradeDetailCard extends ConsumerWidget {
         tx.symbol;
 
     return CardFrame(
-      showTopBar: false,
       decoration: FomoShieldTheme.cardDecoration,
       padding: const EdgeInsets.all(22),
       palette: palette,

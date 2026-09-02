@@ -170,7 +170,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             : SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                 child: CardFrame(
-                  showTopBar: false,
                   padding: EdgeInsets.zero,
                   decoration: FomoShieldTheme.cardDecoration,
                   palette: palette,

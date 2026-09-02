@@ -181,7 +181,6 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
       },
       borderRadius: FomoShieldTheme.cardRadius,
       child: CardFrame(
-        showTopBar: false,
         padding: EdgeInsets.zero,
         palette: palette,
         child: Column(
@@ -555,7 +554,7 @@ class _VerticalProgressBar extends StatelessWidget {
                 // this dark gradient); only Luxury Gold's gold accentPrimary
                 // is legible here, matching the BALANCE/CASH cell labels.
                 color: palette.windowGradient != null
-                    ? palette.accentPrimary
+                    ? (palette.onWindow ?? palette.accentPrimary)
                     : Colors.white,
               ),
             ),
@@ -677,7 +676,7 @@ class _VerticalProgressBar extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 10,
             fontWeight: FontWeight.w700,
-            color: palette.accentPrimary,
+            color: palette.onWindow ?? palette.accentPrimary,
           ),
         ),
       ),
@@ -702,7 +701,7 @@ class _VerticalTick extends StatelessWidget {
         // (dark, Standard-theme text) only applies once Luxury Gold makes
         // it a light color; Standard keeps the original translucent white.
         color: palette.windowGradient != null
-            ? palette.textHeader
+            ? (palette.onWindow ?? palette.textHeader)
             : Colors.white.withValues(alpha: 0.5),
       ),
     );
