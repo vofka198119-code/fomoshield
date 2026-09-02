@@ -136,9 +136,14 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                 style: GoogleFonts.inter(
                   fontSize: palette.windowGradient != null ? 10 : 9,
                   fontWeight: FontWeight.w700,
+                  // marketClockAccent != null is Midnight Sea's own signal
+                  // (paired with its re-themed dial) — plain white beats
+                  // the brass label on its now-blue instrument panel.
                   color: palette.windowGradient != null
                       ? (palette.onWindow ?? palette.accentPrimary)
-                      : dialBrassLight.withValues(alpha: 0.7),
+                      : palette.marketClockAccent != null
+                          ? Colors.white
+                          : dialBrassLight.withValues(alpha: 0.7),
                   letterSpacing: palette.windowGradient != null ? 0.6 : 0.8,
                 ),
               ),
@@ -174,7 +179,9 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: dialIvory,
+                                  color: palette.marketClockAccent != null
+                                      ? Colors.white
+                                      : dialIvory,
                                 ),
                               ),
                             ),
@@ -197,7 +204,8 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                           // untouched.
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: palette.windowGradient != null
+                            color: palette.windowGradient != null ||
+                                    palette.marketClockAccent != null
                                 ? Colors.white.withValues(alpha: 0.85)
                                 : dialIvory.withValues(alpha: 0.7),
                           ),
@@ -208,7 +216,9 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: dialBrassLight,
+                            color: palette.marketClockAccent != null
+                                ? Colors.white
+                                : dialBrassLight,
                           ),
                         ),
                       ],

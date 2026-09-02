@@ -66,4 +66,43 @@ abstract final class MidnightSeaTheme {
   static const accentSecondary = msAqua;
   static const textHeader = msHeaderText;
   static const textBody = msBodyText;
+
+  /// Market Clock dial face — same radial shape (light center, dark edge)
+  /// as MarketClockDial's own default green instrument-panel gradient,
+  /// swapped to this theme's card tones (see [cardGradient]'s doc comment
+  /// for why those two specific colors). A 3-stop version with
+  /// [msBorderHighlight] centered here (matching [borderGradient]'s
+  /// metallic glint) was tried first — on a RADIAL gradient a bright
+  /// center stop reads as a distinct glowing disc behind the hands, not a
+  /// directional highlight, so it was dropped (confirmed on-device
+  /// 2026-09-02).
+  static const dialFaceGradient = RadialGradient(
+    center: Alignment(0, -0.16),
+    radius: 0.9,
+    colors: [msCardGradientTop, msCardGradientBottom],
+  );
+
+  /// Market Clock dial ring — vertical, top ([msAqua], a couple shades
+  /// lighter) to bottom ([msTeal], the base accent) — same top-lit
+  /// convention as [borderGradient], applied to the ring's own stroke
+  /// shader instead of a straight edge.
+  static const dialRingGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [msAqua, msTeal],
+  );
+
+  /// Inner "window"/button fill app-wide — radial, light center to dark
+  /// edge, same shape as [cardGradient]'s own light-top/dark-bottom idea
+  /// but radial and in its own teal-tinted tones so windows/buttons read
+  /// as a distinct layer from the outer card. See [AppPalette.windowGradient]
+  /// / [AppPalette.buttonGradient]'s doc comments for the full list of
+  /// call sites this drives (Portfolio/Shield Signal CTA buttons, every
+  /// widget's inner stat/mood window, themedAddWidgetsButton,
+  /// themedDarkCtaButtonShell, etc.).
+  static const windowGradient = RadialGradient(
+    center: Alignment(0, -0.3),
+    radius: 1.2,
+    colors: [msWindowGradientLight, msWindowGradientDark],
+  );
 }

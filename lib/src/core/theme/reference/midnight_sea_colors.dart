@@ -22,11 +22,14 @@ const msTeal = Color(0xFF2FB6A3);
 /// Secondary accent / gradients — brighter aqua.
 const msAqua = Color(0xFF5FD6C6);
 
-/// Headers and accent text.
-const msHeaderText = Color(0xFFE8EEF5);
+/// Headers and accent text. Plain white (was a pale blue-white
+/// 0xFFE8EEF5) — card/widget titles app-wide.
+const msHeaderText = Color(0xFFFFFFFF);
 
-/// Body text.
-const msBodyText = Color(0xFF8CA0B3);
+/// Body text. Plain white (was a muted slate-blue 0xFF8CA0B3, low
+/// contrast on the dark navy backdrop for long-form text — verdict
+/// descriptions, disclaimers, Market Clock detail text, etc.).
+const msBodyText = Color(0xFFFFFFFF);
 
 /// Background gradient — light top. REVISED (2026-09-01): "Navy" (was
 /// "Sapphire"). Deliberately its own constant, separate from [msNavy]
@@ -56,3 +59,14 @@ const msBorderGradientBottom = Color(0xFF4E6A9C);
 /// right at the top edge before falling into [msBorderGradientTop].
 /// LOCKED IN (2026-09-01).
 const msBorderHighlight = Color(0xFFCFE9F7);
+
+/// Inner "window"/button fill — dark edge. The teal-tinted dark tone the
+/// user picked out from the "FOMO SHIELD TIP" callout on Market Period
+/// Detail (2026-09-02) as the standard for every inner window AND button
+/// app-wide (distinct identity from the outer card's blue [msCardGradientTop]/
+/// [msCardGradientBottom] — windows/buttons read teal, cards read blue).
+const msWindowGradientDark = Color(0xFF10262C);
+
+/// Inner "window"/button fill — light center, a couple shades lighter
+/// than [msWindowGradientDark], same family.
+const msWindowGradientLight = Color(0xFF244752);

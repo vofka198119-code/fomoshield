@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/theme_v2.dart';
+import '../../core/theme/themed_border.dart';
 import 'market_clock_engine.dart';
 
 // ---------------------------------------------------------------------------
@@ -139,7 +140,8 @@ class MarketClockDial extends StatelessWidget {
             size: Size(size, size),
             painter: _RingPainter(
               strokeWidth: ringStroke,
-              color: dialBrassLight,
+              color: palette?.marketClockAccent ?? dialBrassLight,
+              gradient: palette?.marketClockRingGradient,
             ),
           ),
           SizedBox(
@@ -147,7 +149,9 @@ class MarketClockDial extends StatelessWidget {
             height: faceSize,
             child: CustomPaint(
               painter: _ClockFaceBackgroundPainter(
-                faceGradient: palette?.windowGradient,
+                faceGradient:
+                    palette?.marketClockFaceGradient ?? palette?.windowGradient,
+                numeralColor: palette?.marketClockAccent,
               ),
             ),
           ),
@@ -158,12 +162,23 @@ class MarketClockDial extends StatelessWidget {
                 nowEt: state.nowEt,
                 phase: state.phase,
                 size: size,
+                palette: palette,
               ),
             ),
           SizedBox(
             width: faceSize,
             height: faceSize,
-            child: CustomPaint(painter: _ClockHandsPainter(state.nowEt)),
+            child: CustomPaint(
+              painter: _ClockHandsPainter(
+                state.nowEt,
+                handColor: palette?.marketClockAccent != null
+                    ? Colors.white
+                    : null,
+                pivotColor: palette?.marketClockAccent,
+                pivotFillColor:
+                    palette?.marketClockAccent != null ? palette!.card : null,
+              ),
+            ),
           ),
         ],
       ),
@@ -179,10 +194,12 @@ class _DigitalReadout extends StatelessWidget {
   final DateTime nowEt;
   final MarketPhase phase;
   final double size;
+  final AppPalette? palette;
   const _DigitalReadout({
     required this.nowEt,
     required this.phase,
     required this.size,
+    this.palette,
   });
 
   static Color _colorForPhase(MarketPhase phase) {
@@ -204,18 +221,30 @@ class _DigitalReadout extends StatelessWidget {
     final mm = nowEt.minute.toString().padLeft(2, '0');
     final color = _colorForPhase(phase);
     final fontSize = size * 0.065;
-    return Container(
+    final radius = BorderRadius.circular(size * 0.025);
+    // marketClockAccent != null is Midnight Sea's own signal (see the
+    // dial face/ring above) — its window gets the theme's dark card tone
+    // + the same gradient border every widget uses (themedBorder no-ops
+    // for other themes that don't set borderGradient, but Luxury Gold
+    // DOES — gate on marketClockAccent specifically so this box stays
+    // exactly as it was for every theme except Midnight Sea).
+    final isThemed = palette?.marketClockAccent != null;
+    final box = Container(
       padding: EdgeInsets.symmetric(
         horizontal: size * 0.035,
         vertical: size * 0.012,
       ),
       decoration: BoxDecoration(
-        color: dialDark.withValues(alpha: 0.55),
-        borderRadius: BorderRadius.circular(size * 0.025),
-        border: Border.all(
-          color: dialBrassLight.withValues(alpha: 0.4),
-          width: size * 0.004,
-        ),
+        color: isThemed
+            ? palette!.card.withValues(alpha: 0.55)
+            : dialDark.withValues(alpha: 0.55),
+        borderRadius: radius,
+        border: isThemed
+            ? null
+            : Border.all(
+                color: dialBrassLight.withValues(alpha: 0.4),
+                width: size * 0.004,
+              ),
       ),
       child: Text(
         '$hh:$mm',
@@ -237,13 +266,31 @@ class _DigitalReadout extends StatelessWidget {
         ),
       ),
     );
+    return isThemed
+        ? themedBorder(palette: palette!, borderRadius: radius, child: box)
+        : box;
   }
 }
 
 class _RingPainter extends CustomPainter {
   final double strokeWidth;
   final Color color;
-  _RingPainter({required this.strokeWidth, required this.color});
+
+  // Optional vertical gradient for the ring itself — top a couple of
+  // shades lighter, bottom the base [color] — same top-lit-metal
+  // convention as the widget border gradients (light top → base tone),
+  // just applied to the ring's stroke shader instead of a straight edge.
+  // Null keeps the flat single-color ring (every theme except Midnight
+  // Sea). (An earlier attempt put the highlight on the FACE's radial
+  // gradient instead — a bright center stop there read as a glowing disc
+  // behind the hands, not a highlight; confirmed on-device 2026-09-02.)
+  final Gradient? gradient;
+
+  _RingPainter({
+    required this.strokeWidth,
+    required this.color,
+    this.gradient,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -258,16 +305,25 @@ class _RingPainter extends CustomPainter {
     canvas.drawCircle(center, radius, glowPaint);
 
     final ringPaint = Paint()
-      ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
+    final g = gradient;
+    if (g != null) {
+      ringPaint.shader = g.createShader(
+        Rect.fromCircle(center: center, radius: radius),
+      );
+    } else {
+      ringPaint.color = color;
+    }
     canvas.drawCircle(center, radius, ringPaint);
   }
 
   @override
   bool shouldRepaint(covariant _RingPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth;
+      oldDelegate.color != color ||
+      oldDelegate.strokeWidth != strokeWidth ||
+      oldDelegate.gradient != gradient;
 }
 
 Offset _polar(Offset center, double radius, double degrees) {
@@ -281,11 +337,18 @@ class _ClockFaceBackgroundPainter extends CustomPainter {
   static const _tickMinor = Color(0xFF5C6E64);
 
   // Null keeps the original green instrument-panel gradient. Non-null
-  // (Luxury Gold's windowGradient) replaces it entirely — this face is
-  // just another "inner window" of the widget by the same rule every
-  // other nested panel follows.
+  // (Luxury Gold's windowGradient, or a theme's own marketClockFaceGradient)
+  // replaces it entirely — this face is just another "inner window" of the
+  // widget by the same rule every other nested panel follows.
   final Gradient? faceGradient;
-  _ClockFaceBackgroundPainter({this.faceGradient});
+
+  // Null keeps the original brass/gold numerals + ticks. Non-null (a
+  // theme's marketClockAccent) recolors the hour numerals, hour ticks, and
+  // minor ticks (at half alpha) to match — everything on the face that
+  // isn't the gradient itself or the hands.
+  final Color? numeralColor;
+
+  _ClockFaceBackgroundPainter({this.faceGradient, this.numeralColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -312,14 +375,16 @@ class _ClockFaceBackgroundPainter extends CustomPainter {
       final p1 = _polar(center, r * (isHour ? 0.86 : 0.90), deg);
       final p2 = _polar(center, r * 0.94, deg);
       final tickPaint = Paint()
-        ..color = isHour ? dialBrassLight : _tickMinor
+        ..color = isHour
+            ? (numeralColor ?? dialBrassLight)
+            : (numeralColor?.withValues(alpha: 0.5) ?? _tickMinor)
         ..strokeWidth = isHour ? r * 0.03 : r * 0.012
         ..strokeCap = StrokeCap.round;
       canvas.drawLine(p1, p2, tickPaint);
     }
 
     final numeralStyle = TextStyle(
-      color: dialIvory,
+      color: numeralColor ?? dialIvory,
       fontSize: r * 0.16,
       fontWeight: FontWeight.w600,
       fontFamily: 'Georgia',
@@ -338,7 +403,8 @@ class _ClockFaceBackgroundPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _ClockFaceBackgroundPainter oldDelegate) =>
-      oldDelegate.faceGradient != faceGradient;
+      oldDelegate.faceGradient != faceGradient ||
+      oldDelegate.numeralColor != numeralColor;
 }
 
 /// Hour/minute hands + center pivot cap only — painted on top of the digital
@@ -346,12 +412,27 @@ class _ClockFaceBackgroundPainter extends CustomPainter {
 /// date-window layering.
 class _ClockHandsPainter extends CustomPainter {
   final DateTime time;
-  _ClockHandsPainter(this.time);
+
+  // Null keeps the original ivory hands / dark-green pivot cap / gold
+  // pivot ring (every theme except Midnight Sea).
+  final Color? handColor;
+  final Color? pivotColor;
+  final Color? pivotFillColor;
+
+  _ClockHandsPainter(
+    this.time, {
+    this.handColor,
+    this.pivotColor,
+    this.pivotFillColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final r = size.width / 2;
+    final hands = handColor ?? dialIvory;
+    final pivot = pivotColor ?? dialBrassLight;
+    final pivotFill = pivotFillColor ?? dialDark;
 
     final hourDeg = (time.hour % 12) * 30.0 + time.minute * 0.5;
     final hourTip = _polar(center, r * 0.42, hourDeg);
@@ -359,7 +440,7 @@ class _ClockHandsPainter extends CustomPainter {
       center,
       hourTip,
       Paint()
-        ..color = dialIvory
+        ..color = hands
         ..strokeWidth = r * 0.045
         ..strokeCap = StrokeCap.round,
     );
@@ -370,17 +451,17 @@ class _ClockHandsPainter extends CustomPainter {
       center,
       minTip,
       Paint()
-        ..color = dialIvory
+        ..color = hands
         ..strokeWidth = r * 0.028
         ..strokeCap = StrokeCap.round,
     );
 
-    canvas.drawCircle(center, r * 0.05, Paint()..color = dialDark);
+    canvas.drawCircle(center, r * 0.05, Paint()..color = pivotFill);
     canvas.drawCircle(
       center,
       r * 0.05,
       Paint()
-        ..color = dialBrassLight
+        ..color = pivot
         ..style = PaintingStyle.stroke
         ..strokeWidth = r * 0.014,
     );
@@ -388,5 +469,8 @@ class _ClockHandsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _ClockHandsPainter oldDelegate) =>
-      oldDelegate.time != time;
+      oldDelegate.time != time ||
+      oldDelegate.handColor != handColor ||
+      oldDelegate.pivotColor != pivotColor ||
+      oldDelegate.pivotFillColor != pivotFillColor;
 }

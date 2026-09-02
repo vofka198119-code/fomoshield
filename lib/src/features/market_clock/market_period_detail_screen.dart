@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
+import '../../core/theme/themed_button.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../stress_test/stress_test_hub_screen.dart';
 import 'market_clock_engine.dart';
@@ -184,7 +184,13 @@ class _StressTestPromo extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: palette.windowGradient,
-        color: palette.windowGradient == null ? ThemeV2.surface : null,
+        // Was a hardcoded ThemeV2.surface (Standard's own light card
+        // color) — invisible under Midnight Sea, whose palette.textHeader/
+        // textBody are plain white: white text on a white box read as an
+        // empty block (confirmed on-device 2026-09-02). palette.card is
+        // the correct per-theme fallback (identical to ThemeV2.surface
+        // for Standard, since that's literally its own value there).
+        color: palette.windowGradient == null ? palette.card : null,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: palette.border),
       ),
@@ -219,23 +225,39 @@ class _StressTestPromo extends StatelessWidget {
           const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.of(context, rootNavigator: true).push(
-                MaterialPageRoute(builder: (_) => const StressTestHubScreen()),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ThemeV2.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            // Was a plain ElevatedButton with a hardcoded ThemeV2.primary
+            // (Standard's own green) fill. Rebuilt on themedDarkCtaButtonShell
+            // — same shell every other "dark CTA" button in the app uses —
+            // so a theme that sets windowGradient/buttonGradient (Midnight
+            // Sea: radial window fill + gradient border + cardGlow shadow,
+            // 2026-09-02) picks that up automatically; standardDecoration
+            // keeps Standard's flat green exactly as it was.
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (_) => const StressTestHubScreen()),
                 ),
-              ),
-              child: Text(
-                l10n.marketPeriodDetailOpenStressTestButton,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+                child: themedDarkCtaButtonShell(
+                  palette: palette,
+                  borderRadius: BorderRadius.circular(12),
+                  standardDecoration: BoxDecoration(
+                    color: palette.accentPrimary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    alignment: Alignment.center,
+                    child: Text(
+                      l10n.marketPeriodDetailOpenStressTestButton,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: themedDarkCtaContentColor(palette),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

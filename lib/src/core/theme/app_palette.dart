@@ -86,6 +86,27 @@ class AppPalette {
   /// this field existed.
   final Gradient? dividerGradient;
 
+  /// Market Clock dial face gradient (MarketClockDial's own instrument-
+  /// panel circle, distinct from [windowGradient] — the dial is a
+  /// CustomPainter shader fill, not a BoxDecoration, and needs its own
+  /// light-center/dark-edge radial rather than reusing another theme's
+  /// window treatment). Null means "keep the original green radial" —
+  /// MarketClockDial's pre-existing default, untouched for every theme
+  /// that doesn't set this.
+  final Gradient? marketClockFaceGradient;
+
+  /// Market Clock dial ring glow + hour numerals color, paired with
+  /// [marketClockFaceGradient]. Null means "keep the original brass/gold"
+  /// — MarketClockDial's pre-existing default, untouched for every theme
+  /// that doesn't set this.
+  final Color? marketClockAccent;
+
+  /// Market Clock dial ring's own vertical gradient (top a couple shades
+  /// lighter than [marketClockAccent], bottom the accent itself) — null
+  /// means "flat [marketClockAccent] (or brass/gold) ring," the default
+  /// for every theme that doesn't set this.
+  final Gradient? marketClockRingGradient;
+
   const AppPalette({
     this.background,
     this.backgroundGradient,
@@ -105,6 +126,9 @@ class AppPalette {
     this.windowGradient,
     this.onWindow,
     this.dividerGradient,
+    this.marketClockFaceGradient,
+    this.marketClockAccent,
+    this.marketClockRingGradient,
   });
 
   static const standard = AppPalette(
@@ -173,6 +197,31 @@ class AppPalette {
     textHeader: MidnightSeaTheme.textHeader,
     textBody: MidnightSeaTheme.textBody,
     cardGlow: MidnightSeaTheme.cardGlow(),
+    // Plain white, not a color sheen (unlike Luxury Gold's actual metallic
+    // gradient) — this palette has no titleGradient of its own set, and
+    // `palette.titleGradient != null` is the app-wide signal (~15 call
+    // sites: widget/card titles + themedHeaderIcon's back/menu/bell/edit
+    // icons, plus verdict/encyclopedia/search/order-entry/notifications
+    // body text) for "dark-backdrop theme, render white" — without this,
+    // every one of those fell through to the Standard-theme branch
+    // (accentPrimary teal for headers/icons, muted textBody for body
+    // text), which is why headers stayed turquoise even after textHeader
+    // itself was whitened. A flat white-to-white gradient flips all of
+    // them to the white branch while being a no-op under the ShaderMask
+    // (BlendMode.modulate against already-white text/icons stays white).
+    titleGradient: const LinearGradient(colors: [Colors.white, Colors.white]),
+    marketClockFaceGradient: MidnightSeaTheme.dialFaceGradient,
+    marketClockAccent: MidnightSeaTheme.accentPrimary,
+    marketClockRingGradient: MidnightSeaTheme.dialRingGradient,
+    // Inner window AND button fill — the SAME radial gradient for both
+    // (user's ask, 2026-09-02: every window/button app-wide gets this one
+    // consistent light-center/dark-edge treatment, distinct from the
+    // outer card's own blue [cardGradient]). [glowShadow]/[cardGlow]
+    // double as the downward shadow every dark panel already uses
+    // (offset (0,3)).
+    windowGradient: MidnightSeaTheme.windowGradient,
+    buttonGradient: MidnightSeaTheme.windowGradient,
+    glowShadow: MidnightSeaTheme.cardGlow(),
   );
 }
 
