@@ -5,6 +5,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../allocation_bar_row.dart';
 import 'psychology_marker_card.dart';
@@ -13,8 +14,13 @@ const double _warningThreshold = 40.0;
 
 class PsychologyPanicCard extends StatelessWidget {
   final double panicResistance; // 0.0-1.0
+  final AppPalette palette;
 
-  const PsychologyPanicCard({super.key, required this.panicResistance});
+  const PsychologyPanicCard({
+    super.key,
+    required this.panicResistance,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +32,7 @@ class PsychologyPanicCard extends StatelessWidget {
       child: AllocationBarRow(
         name: l10n.psychologyPanicWidgetLabel,
         percent: percent,
+        palette: palette,
         warning: percent < _warningThreshold,
         decimals: 0,
         suffix: '',

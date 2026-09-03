@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------
 // Stress Test — Sector Allocation card, lives on the Portfolio Balance
-// detail screen below the per-asset breakdown. Same gold-bar visual, but
-// grouped by sector instead of by holding, and flags concentration risk:
-// any sector at 75%+ of the portfolio switches to a red warning gradient
-// instead of gold.
+// detail screen below the per-asset breakdown. Same themed-accent bar
+// visual as Asset Allocation, but grouped by sector instead of by holding —
+// each bar blends into red past 70% via AllocationBarRow's
+// dangerZoneGradient, same technique as Market Clock's risk-score bars.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
@@ -19,8 +19,6 @@ import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../stress_test_models.dart';
 import '../stress_test_naming.dart';
 import 'allocation_bar_row.dart';
-
-const double _sectorWarningThreshold = 75.0;
 
 // The 11 real GICS sectors (stressTestGicsSector() resolves any real ticker
 // bought via Search into one of these, not just a curated ~50-name
@@ -129,9 +127,8 @@ class StressTestSectorAllocationCard extends StatelessWidget {
                     AllocationBarRow(
                       name: entry.key,
                       percent: entry.value / totalInvested * 100,
-                      warning:
-                          entry.value / totalInvested * 100 >=
-                          _sectorWarningThreshold,
+                      palette: palette,
+                      dangerZoneGradient: true,
                     ),
                 ],
               ),

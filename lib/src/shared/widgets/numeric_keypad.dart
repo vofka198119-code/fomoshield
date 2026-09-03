@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/theme/themed_border.dart';
 
 // ---------------------------------------------------------------------------
 // Numeric Keypad — custom digit input replacing the system Android
@@ -100,48 +101,53 @@ class NumericKeypad extends StatelessWidget {
   }
 
   Widget _key(String label) {
+    final effectivePalette = palette ?? AppPalette.standard;
     return Padding(
       padding: const EdgeInsets.all(4),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () {
-            if (label == '⌫') {
-              _tapBackspace();
-            } else if (label == '.') {
-              _tapDot();
-            } else {
-              _tapDigit(label);
-            }
-          },
-          child: Container(
-            height: 50,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              // A dark "window" tile (not buttonGradient's bright gold —
-              // cream digit glyphs need a dark backdrop to stay legible,
-              // and bright-gold-on-bright-gold would be poor contrast).
-              gradient: palette?.windowGradient,
-              color: palette?.windowGradient == null
-                  ? Color.alphaBlend(ThemeV2.primaryBg, Colors.white)
-                  : null,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: label == '⌫'
-                ? Icon(
-                    Icons.backspace_outlined,
-                    color: palette?.textHeader ?? ThemeV2.textPrimary,
-                    size: 20,
-                  )
-                : Text(
-                    label,
-                    style: GoogleFonts.inter(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+      child: themedBorder(
+        palette: effectivePalette,
+        borderRadius: BorderRadius.circular(14),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () {
+              if (label == '⌫') {
+                _tapBackspace();
+              } else if (label == '.') {
+                _tapDot();
+              } else {
+                _tapDigit(label);
+              }
+            },
+            child: Container(
+              height: 50,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                // A dark "window" tile (not buttonGradient's bright gold —
+                // cream digit glyphs need a dark backdrop to stay legible,
+                // and bright-gold-on-bright-gold would be poor contrast).
+                gradient: palette?.windowGradient,
+                color: palette?.windowGradient == null
+                    ? Color.alphaBlend(ThemeV2.primaryBg, Colors.white)
+                    : null,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: label == '⌫'
+                  ? Icon(
+                      Icons.backspace_outlined,
                       color: palette?.textHeader ?? ThemeV2.textPrimary,
+                      size: 20,
+                    )
+                  : Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: palette?.textHeader ?? ThemeV2.textPrimary,
+                      ),
                     ),
-                  ),
+            ),
           ),
         ),
       ),

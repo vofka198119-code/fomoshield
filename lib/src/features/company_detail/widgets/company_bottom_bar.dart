@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/app_palette.dart';
-import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
+import '../../market_clock/market_clock_dial.dart' show buyButtonDecoration;
 import '../../../core/theme/themed_border.dart';
 import '../../../l10n/gen/app_localizations.dart';
 
@@ -66,7 +66,7 @@ class CompanyBottomBar extends StatelessWidget {
                       color: Colors.transparent,
                       borderRadius: BorderRadius.circular(18),
                       child: Ink(
-                        decoration: darkCardDecoration(
+                        decoration: buyButtonDecoration(
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: InkWell(

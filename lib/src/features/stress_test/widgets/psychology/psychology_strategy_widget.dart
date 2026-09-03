@@ -11,6 +11,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../../psychology_engine.dart';
 import '../../stress_test_models.dart';
@@ -21,8 +22,13 @@ const double _warningThreshold = 40.0;
 
 class PsychologyStrategyCard extends StatelessWidget {
   final StressTestSession session;
+  final AppPalette palette;
 
-  const PsychologyStrategyCard({super.key, required this.session});
+  const PsychologyStrategyCard({
+    super.key,
+    required this.session,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +56,7 @@ class PsychologyStrategyCard extends StatelessWidget {
     return AllocationBarRow(
       name: name,
       percent: percent,
+      palette: palette,
       warning: percent < _warningThreshold,
       decimals: 0,
       suffix: '',

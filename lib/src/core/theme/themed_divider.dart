@@ -17,20 +17,35 @@ Widget themedDivider(
   double height = 1,
 }) {
   final gradient = palette.dividerGradient;
-  if (gradient == null) {
-    return Divider(
+  if (gradient != null) {
+    return Container(
       height: height,
-      indent: indent,
-      endIndent: endIndent,
-      color: Colors.black.withValues(alpha: 0.06),
+      margin: EdgeInsets.only(left: indent, right: endIndent),
+      decoration: BoxDecoration(gradient: gradient),
     );
   }
-  return Container(
+  return Divider(
     height: height,
-    margin: EdgeInsets.only(left: indent, right: endIndent),
-    decoration: BoxDecoration(gradient: gradient),
+    indent: indent,
+    endIndent: endIndent,
+    color: _fallbackColor(palette),
   );
 }
+
+/// A theme with a dark card but no [AppPalette.dividerGradient] of its own
+/// (Midnight Sea) still needs a WHITE-based line — [Colors.black] at low
+/// alpha reads as invisible against a dark card, which is exactly what
+/// made every widget header's underline (and every list's row dividers)
+/// disappear under Midnight Sea (fixed 2026-09-03). Reuses
+/// [AppPalette.cardGradient] as the "this card is dark" signal — set only
+/// by Luxury Gold (which already has its own [AppPalette.dividerGradient],
+/// so never reaches this branch) and Midnight Sea — instead of adding a
+/// new palette field. Same 10%-alpha white used by the Home Market Clock
+/// widget's own always-dark divider (market_clock_widget.dart), the
+/// reference the fix was checked against.
+Color _fallbackColor(AppPalette palette) => palette.cardGradient != null
+    ? Colors.white.withValues(alpha: 0.1)
+    : Colors.black.withValues(alpha: 0.06);
 
 // ---------------------------------------------------------------------------
 // Themed row divider — for the OTHER divider shape found across the app:
@@ -61,6 +76,6 @@ Widget themedRowDivider(
     margin: EdgeInsets.only(left: indent, right: endIndent),
     decoration: gradient != null
         ? BoxDecoration(gradient: gradient)
-        : BoxDecoration(color: Colors.black.withValues(alpha: 0.06)),
+        : BoxDecoration(color: _fallbackColor(palette)),
   );
 }

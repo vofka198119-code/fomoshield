@@ -6,6 +6,7 @@ import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_divider.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'card_frame.dart';
+import 'more_less_pill.dart';
 
 // ---------------------------------------------------------------------------
 // Widget Container — Card wrapper
@@ -103,32 +104,14 @@ class WidgetContainer extends StatelessWidget {
               return children[i ~/ 2];
             }),
 
-          // --- Footer "More" button ---
+          // --- Footer "More" button — pill style matching the Holdings
+          // widget's More/Less button (see portfolio_holdings_widget.dart),
+          // instead of a full-bleed divider + plain text.
           if (children.isNotEmpty && showFooter && hasTap)
-            Column(
-              children: [
-                themedDivider(effectivePalette, indent: 0, endIndent: 0),
-                InkWell(
-                  onTap: onTap,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Center(
-                      child: Text(
-                        resolvedFooterText,
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: palette?.accentPrimary ?? ThemeV2.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            MoreLessPill(
+              label: resolvedFooterText,
+              onTap: onTap!,
+              palette: effectivePalette,
             ),
 
           // --- Empty state fallback ---

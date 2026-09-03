@@ -40,6 +40,7 @@ import '../monetization/monetization_modal.dart';
 import '../monetization/premium_promo_overlay.dart';
 import '../../shared/widgets/psychology_meter.dart';
 import '../../shared/widgets/market_timeline.dart';
+import '../../shared/widgets/more_less_pill.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_dca_provider.dart';
@@ -811,29 +812,13 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
               ),
               if (allTrades.length > 5) ...[
                 const SizedBox(height: 6),
-                GestureDetector(
+                MoreLessPill(
+                  label: l10n.commonMoreCount(allTrades.length - 5),
                   onTap: () => context.push(
                     '/stress-test/${widget.sessionId}/trade-history',
                   ),
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: palette.accentPrimary.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: Text(
-                        l10n.commonMoreCount(allTrades.length - 5),
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: palette.accentPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
+                  palette: palette,
+                  margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 ),
               ],
             ],
@@ -1167,30 +1152,13 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   );
                 }),
                 if (sorted.length > 10)
-                  GestureDetector(
+                  MoreLessPill(
+                    label: _showAllAssets
+                        ? l10n.commonLess
+                        : l10n.commonMoreCount(sorted.length - 10),
                     onTap: () =>
                         setState(() => _showAllAssets = !_showAllAssets),
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(16, 6, 16, 16),
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: palette.accentPrimary.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text(
-                          _showAllAssets
-                              ? l10n.commonLess
-                              : l10n.commonMoreCount(sorted.length - 10),
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: palette.accentPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
+                    palette: palette,
                   ),
               ],
             ),

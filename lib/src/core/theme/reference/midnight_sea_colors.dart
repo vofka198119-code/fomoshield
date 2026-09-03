@@ -59,14 +59,3 @@ const msBorderGradientBottom = Color(0xFF4E6A9C);
 /// right at the top edge before falling into [msBorderGradientTop].
 /// LOCKED IN (2026-09-01).
 const msBorderHighlight = Color(0xFFCFE9F7);
-
-/// Inner "window"/button fill — dark edge. The teal-tinted dark tone the
-/// user picked out from the "FOMO SHIELD TIP" callout on Market Period
-/// Detail (2026-09-02) as the standard for every inner window AND button
-/// app-wide (distinct identity from the outer card's blue [msCardGradientTop]/
-/// [msCardGradientBottom] — windows/buttons read teal, cards read blue).
-const msWindowGradientDark = Color(0xFF10262C);
-
-/// Inner "window"/button fill — light center, a couple shades lighter
-/// than [msWindowGradientDark], same family.
-const msWindowGradientLight = Color(0xFF244752);

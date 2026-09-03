@@ -225,6 +225,19 @@ class AppPalette {
   );
 }
 
+/// Shared fill for the "More/Less" toggle pills scattered across Home/
+/// Portfolio/Stress Test widgets (Holdings, Trade History, allocation
+/// legends, etc.) — a solid [AppPalette.buttonGradient] fill with white
+/// text for a theme that defines one (Luxury Gold, Midnight Sea), else the
+/// original soft [AppPalette.accentPrimary]-tinted pill every theme used
+/// before this existed. Returns (gradient, flat background, text color) —
+/// exactly one of the first two is non-null.
+(Gradient?, Color?, Color) moreLessPillStyle(AppPalette palette) {
+  final gradient = palette.buttonGradient;
+  if (gradient != null) return (gradient, null, Colors.white);
+  return (null, palette.accentPrimary.withValues(alpha: 0.06), palette.accentPrimary);
+}
+
 /// The single switch point for adding a new theme — everything else
 /// (screens, the theme picker) reads through this or [AppThemeVariant.values].
 AppPalette resolveAppPalette(AppThemeVariant variant) => switch (variant) {

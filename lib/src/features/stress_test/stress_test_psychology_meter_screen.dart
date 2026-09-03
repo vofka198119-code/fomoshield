@@ -74,9 +74,12 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
                       palette: palette,
                     ),
                     const SizedBox(height: 16),
-                    PsychologyStrategyCard(session: session),
+                    PsychologyStrategyCard(session: session, palette: palette),
                     const SizedBox(height: 16),
-                    PsychologyDiversificationCard(session: session),
+                    PsychologyDiversificationCard(
+                      session: session,
+                      palette: palette,
+                    ),
                     const SizedBox(height: 24),
                     _FsScoreGaugeCard(
                       score: data.psychologicalScore,
@@ -86,15 +89,18 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                     PsychologyDisciplineCard(
                       discipline: session.psychologyProfile.discipline,
+                      palette: palette,
                     ),
                     const SizedBox(height: 16),
                     PsychologyPanicCard(
                       panicResistance:
                           session.psychologyProfile.panicResistance,
+                      palette: palette,
                     ),
                     const SizedBox(height: 16),
                     PsychologyPatienceCard(
                       patience: session.psychologyProfile.patience,
+                      palette: palette,
                     ),
                     const SizedBox(height: 16),
                     _PsychologyMeterDetailCard(data: data, palette: palette),

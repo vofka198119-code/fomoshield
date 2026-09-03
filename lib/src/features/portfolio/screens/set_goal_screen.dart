@@ -18,6 +18,7 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/themed_border.dart';
 import '../../../core/theme/themed_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
@@ -153,7 +154,47 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                         color: palette.textHeader,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 24),
+                    themedBorder(
+                      palette: palette,
+                      borderRadius: BorderRadius.circular(14),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => setState(() => _keypadOpen = true),
+                        child: Container(
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: palette.windowGradient,
+                            color: palette.windowGradient == null
+                                ? ThemeV2.surface
+                                : null,
+                            borderRadius: BorderRadius.circular(14),
+                            border: palette.borderGradient == null
+                                ? Border.all(color: palette.border)
+                                : null,
+                          ),
+                          child: Text(
+                            _controller.text.isEmpty
+                                ? '\$ ${minGoal.toStringAsFixed(0)}'
+                                : '\$ ${_controller.text}',
+                            textAlign: TextAlign.center,
+                            style: interNums(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              color: _controller.text.isEmpty
+                                  ? palette.textBody
+                                  : palette.textHeader,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     Text(
                       l10n.setGoalScreenSubtitle(formatUsd(minGoal)),
                       textAlign: TextAlign.center,
@@ -162,40 +203,6 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                         color: palette.windowGradient == null
                             ? palette.textBody
                             : Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => setState(() => _keypadOpen = true),
-                      child: Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: palette.windowGradient,
-                          color: palette.windowGradient == null
-                              ? ThemeV2.surface
-                              : null,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: palette.border),
-                        ),
-                        child: Text(
-                          _controller.text.isEmpty
-                              ? '\$ ${minGoal.toStringAsFixed(0)}'
-                              : '\$ ${_controller.text}',
-                          textAlign: TextAlign.center,
-                          style: interNums(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            color: _controller.text.isEmpty
-                                ? palette.textBody
-                                : palette.textHeader,
-                          ),
-                        ),
                       ),
                     ),
                   ],

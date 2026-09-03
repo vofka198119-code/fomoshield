@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/typography_helpers.dart';
 import '../../../../core/theme/app_palette.dart';
+import '../../../../core/theme/themed_border.dart';
 import '../../../../shared/utils/currency_format.dart';
+import '../../../market_clock/market_clock_dial.dart' show darkCardGradient;
 import '../../../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
@@ -131,19 +133,27 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
     );
   }
 
+  // Same recipe as OrderAmountSection's Cost/Shares toggle circle
+  // (order_amount_section.dart's _modeToggle) — windowGradient fill (or
+  // the generic dark-green shell when a theme doesn't define one) with a
+  // white icon, instead of a flat accent-tinted fill.
   Widget _stepperButton(IconData icon, double delta) {
     return GestureDetector(
       onTapDown: (_) => _startHold(delta),
       onTapUp: (_) => _stopHold(),
       onTapCancel: _stopHold,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: widget.palette.accentPrimary.withValues(alpha: 0.12),
-          shape: BoxShape.circle,
+      child: themedBorder(
+        palette: widget.palette,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: widget.palette.windowGradient ?? darkCardGradient(),
+          ),
+          child: Icon(icon, color: Colors.white, size: 18),
         ),
-        child: Icon(icon, color: widget.palette.accentPrimary, size: 20),
       ),
     );
   }

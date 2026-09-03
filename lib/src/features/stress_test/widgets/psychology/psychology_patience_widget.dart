@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../allocation_bar_row.dart';
 import 'psychology_marker_card.dart';
@@ -14,8 +15,13 @@ const double _warningThreshold = 40.0;
 
 class PsychologyPatienceCard extends StatelessWidget {
   final double patience; // 0.0-1.0
+  final AppPalette palette;
 
-  const PsychologyPatienceCard({super.key, required this.patience});
+  const PsychologyPatienceCard({
+    super.key,
+    required this.patience,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +33,7 @@ class PsychologyPatienceCard extends StatelessWidget {
       child: AllocationBarRow(
         name: l10n.psychologyPatienceWidgetLabel,
         percent: percent,
+        palette: palette,
         warning: percent < _warningThreshold,
         decimals: 0,
         suffix: '',

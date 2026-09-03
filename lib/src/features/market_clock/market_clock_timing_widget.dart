@@ -324,7 +324,9 @@ class FomoShieldStatusWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(
-                  color: dialBrassLight.withValues(alpha: 0.35),
+                  color: (palette.marketClockRingGradient?.colors.last ??
+                          dialBrassLight)
+                      .withValues(alpha: 0.35),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -342,7 +344,9 @@ class FomoShieldStatusWidget extends StatelessWidget {
                     widthFactor: (value / 100).clamp(0.0, 1.0),
                     child: Container(
                       height: 8,
-                      decoration: BoxDecoration(gradient: _barGradient(value)),
+                      decoration: BoxDecoration(
+                        gradient: _barGradient(value, palette),
+                      ),
                     ),
                   ),
                 ],
@@ -359,19 +363,28 @@ class FomoShieldStatusWidget extends StatelessWidget {
   /// (via the FractionallySizedBox in [_metricBar]), so the transition's
   /// on-screen position always lines up with the real 70% mark on the
   /// bar's full track, not with the filled portion's own local width.
-  static LinearGradient _barGradient(int value) {
+  ///
+  /// Under Midnight Sea, the flat gold reuses [AppPalette.marketClockRingGradient]'s
+  /// own two stops (light aqua blic → base teal) instead — same left-to-
+  /// right light-to-dark idea as that gradient's top-to-bottom one. Every
+  /// other theme leaves [marketClockRingGradient] null, so [start]/[end]
+  /// both fall back to [dialBrassLight] and this is a no-op there.
+  static LinearGradient _barGradient(int value, AppPalette palette) {
     const threshold = 0.70;
     const blend = 0.05;
+    final ringColors = palette.marketClockRingGradient?.colors;
+    final start = ringColors?.first ?? dialBrassLight;
+    final end = ringColors?.last ?? dialBrassLight;
     final fraction = (value / 100).clamp(0.0, 1.0);
     if (fraction <= threshold || fraction == 0) {
-      return LinearGradient(colors: [dialBrassLight, dialBrassLight]);
+      return LinearGradient(colors: [start, end]);
     }
     final localThreshold = (threshold / fraction).clamp(0.0, 1.0);
-    final start = (localThreshold - blend).clamp(0.0, 1.0);
-    final end = (localThreshold + blend).clamp(0.0, 1.0);
+    final blendStart = (localThreshold - blend).clamp(0.0, 1.0);
+    final blendEnd = (localThreshold + blend).clamp(0.0, 1.0);
     return LinearGradient(
-      colors: [dialBrassLight, dialBrassLight, ThemeV2.loss, ThemeV2.loss],
-      stops: [0.0, start, end, 1.0],
+      colors: [start, end, ThemeV2.loss, ThemeV2.loss],
+      stops: [0.0, blendStart, blendEnd, 1.0],
     );
   }
 }

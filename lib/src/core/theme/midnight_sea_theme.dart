@@ -92,17 +92,20 @@ abstract final class MidnightSeaTheme {
     colors: [msAqua, msTeal],
   );
 
-  /// Inner "window"/button fill app-wide — radial, light center to dark
-  /// edge, same shape as [cardGradient]'s own light-top/dark-bottom idea
-  /// but radial and in its own teal-tinted tones so windows/buttons read
-  /// as a distinct layer from the outer card. See [AppPalette.windowGradient]
-  /// / [AppPalette.buttonGradient]'s doc comments for the full list of
-  /// call sites this drives (Portfolio/Shield Signal CTA buttons, every
-  /// widget's inner stat/mood window, themedAddWidgetsButton,
-  /// themedDarkCtaButtonShell, etc.).
-  static const windowGradient = RadialGradient(
-    center: Alignment(0, -0.3),
-    radius: 1.2,
-    colors: [msWindowGradientLight, msWindowGradientDark],
+  /// Inner "window"/button fill app-wide — REVISED (2026-09-03, was a
+  /// radial teal gradient deliberately distinct from the outer card): the
+  /// user picked out the Language/Theme picker rows (plain [cardGradient]
+  /// showing through, no separate window fill at all) as the look every
+  /// window and button should match instead, so this now reuses
+  /// [cardGradient]'s own vertical, light-top/dark-bottom blue recipe
+  /// rather than a separate teal-tinted radial. See
+  /// [AppPalette.windowGradient] / [AppPalette.buttonGradient]'s doc
+  /// comments for the full list of call sites this drives (Portfolio/
+  /// Shield Signal CTA buttons, every widget's inner stat/mood window,
+  /// themedAddWidgetsButton, themedDarkCtaButtonShell, etc.).
+  static const windowGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [msCardGradientTop, msCardGradientBottom],
   );
 }

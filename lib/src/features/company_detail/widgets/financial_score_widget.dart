@@ -121,7 +121,7 @@ class FinancialScoreWidget extends StatelessWidget {
                 Expanded(
                   child: SizedBox(
                     height: 140,
-                    child: _RadarChart(markers: markers),
+                    child: _RadarChart(markers: markers, palette: palette),
                   ),
                 ),
               ],
@@ -218,18 +218,18 @@ class FinancialScoreWidget extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  border: Border.all(color: dialBrassLight, width: 1),
+                  border: Border.all(color: _accentColor, width: 1),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: dialBrassLight.withValues(alpha: 0.25),
+                      color: _accentColor.withValues(alpha: 0.25),
                       blurRadius: 6,
                     ),
                   ],
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.gavel_rounded, size: 14, color: dialBrassLight),
+                    Icon(Icons.gavel_rounded, size: 14, color: _accentColor),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -237,14 +237,14 @@ class FinancialScoreWidget extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: dialBrassLight,
+                          color: _accentColor,
                         ),
                       ),
                     ),
                     Icon(
                       Icons.chevron_right_rounded,
                       size: 16,
-                      color: dialBrassLight,
+                      color: _accentColor,
                     ),
                   ],
                 ),
@@ -261,6 +261,15 @@ class FinancialScoreWidget extends StatelessWidget {
     if (score >= 40) return ThemeV2.warning;
     return ThemeV2.loss;
   }
+
+  // Theme accent for decorative (non score-semantic) gold elements — the
+  // radar chart and the disclaimer/methodology pill. Reuses
+  // [AppPalette.marketClockAccent] (null under every theme that doesn't
+  // opt in, falling back to the original brass/gold) rather than
+  // [AppPalette.accentPrimary] — Midnight Sea's accentPrimary is already
+  // used all over this card for other purposes, marketClockAccent is the
+  // field specifically meant for "brass/gold decorative accent, themed".
+  Color get _accentColor => palette.marketClockAccent ?? dialBrassLight;
 
   Widget _buildFsScoreGauge(AppLocalizations l10n, int score) {
     final color = _gaugeColor(score);
@@ -316,22 +325,27 @@ class FinancialScoreWidget extends StatelessWidget {
 
 class _RadarChart extends StatelessWidget {
   final Map<String, dynamic> markers;
+  final AppPalette palette;
 
-  const _RadarChart({required this.markers});
+  const _RadarChart({required this.markers, required this.palette});
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: const Size(double.infinity, double.infinity),
-      painter: _RadarChartPainter(markers: markers),
+      painter: _RadarChartPainter(
+        markers: markers,
+        color: palette.marketClockAccent ?? dialBrassLight,
+      ),
     );
   }
 }
 
 class _RadarChartPainter extends CustomPainter {
   final Map<String, dynamic> markers;
+  final Color color;
 
-  _RadarChartPainter({required this.markers});
+  _RadarChartPainter({required this.markers, required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -345,7 +359,7 @@ class _RadarChartPainter extends CustomPainter {
     final dataPath = Path();
     // Paint grid lines
     final gridPaint = Paint()
-      ..color = dialBrassLight.withValues(alpha: 0.35)
+      ..color = color.withValues(alpha: 0.35)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
@@ -391,12 +405,12 @@ class _RadarChartPainter extends CustomPainter {
     dataPath.close();
 
     final dataPaint = Paint()
-      ..color = dialBrassLight.withValues(alpha: 0.25)
+      ..color = color.withValues(alpha: 0.25)
       ..style = PaintingStyle.fill;
     canvas.drawPath(dataPath, dataPaint);
 
     final dataStroke = Paint()
-      ..color = dialBrassLight.withValues(alpha: 0.8)
+      ..color = color.withValues(alpha: 0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawPath(dataPath, dataStroke);
@@ -411,7 +425,7 @@ class _RadarChartPainter extends CustomPainter {
       final y = center.dy + r * math.sin(angle);
 
       // Dot
-      canvas.drawCircle(Offset(x, y), 3.5, Paint()..color = dialBrassLight);
+      canvas.drawCircle(Offset(x, y), 3.5, Paint()..color = color);
 
       // Label at edge
       final labelR = radius + 12;

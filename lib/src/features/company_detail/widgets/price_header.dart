@@ -124,10 +124,10 @@ class PriceHeader extends StatelessWidget {
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: dialBrassLight, width: 1.5),
+                    border: Border.all(color: _accentColor, width: 1.5),
                     boxShadow: [
                       BoxShadow(
-                        color: dialBrassLight.withValues(alpha: 0.35),
+                        color: _accentColor.withValues(alpha: 0.35),
                         blurRadius: 6,
                       ),
                     ],
@@ -285,6 +285,11 @@ class PriceHeader extends StatelessWidget {
     return ThemeV2.loss;
   }
 
+  // Theme accent for decorative (non score-semantic) gold elements — the
+  // logo ring. See financial_score_widget.dart's own _accentColor for why
+  // this reuses marketClockAccent instead of accentPrimary.
+  Color get _accentColor => palette.marketClockAccent ?? dialBrassLight;
+
   // Green-gradient card duplicating FinancialScoreWidget's circular gauge,
   // so the score is visible right at the top without scrolling down.
   Widget _fsScoreCell(AppLocalizations l10n, int score) {
@@ -294,69 +299,77 @@ class PriceHeader extends StatelessWidget {
     // an Expanded (the gauge circle fills the cell's own bounded height),
     // which needs the outer Container to pass tight constraints straight
     // through; CardFrame's own mainAxisSize.min wrapper Column isn't a
-    // safe fit for that here.
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      decoration: palette.borderGradient != null
-          ? BoxDecoration(
-              gradient: palette.cardGradient,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [if (palette.cardGlow != null) palette.cardGlow!],
-            )
-          : palette.windowGradient != null
-          ? BoxDecoration(
-              gradient: palette.windowGradient,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: FomoShieldTheme.shadowSoft,
-            )
-          : darkCardDecoration(borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        children: [
-          Text(
-            l10n.companyDetailFsScoreLabel,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.6,
-              color: Colors.white,
+    // safe fit for that here. themedBorder wraps the whole cell instead —
+    // CardFrame would have supplied this ring for free, so this bypass
+    // needs to ask for it explicitly (fixed 2026-09-03: an earlier attempt
+    // put the ring on the score circle itself instead of the cell's own
+    // edge, which is what was actually missing).
+    return themedBorder(
+      palette: palette,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        decoration: palette.borderGradient != null
+            ? BoxDecoration(
+                gradient: palette.cardGradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [if (palette.cardGlow != null) palette.cardGlow!],
+              )
+            : palette.windowGradient != null
+            ? BoxDecoration(
+                gradient: palette.windowGradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: FomoShieldTheme.shadowSoft,
+              )
+            : darkCardDecoration(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          children: [
+            Text(
+              l10n.companyDetailFsScoreLabel,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+                color: Colors.white,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: Center(
-              child: FractionallySizedBox(
-                widthFactor: 0.9,
-                heightFactor: 0.9,
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: palette.windowGradient,
-                      color: palette.windowGradient == null
-                          ? ThemeV2.surface
-                          : null,
-                      border: Border.all(
-                        color: color.withValues(alpha: 0.3),
-                        width: 3,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          spreadRadius: 3,
+            const SizedBox(height: 8),
+            Expanded(
+              child: Center(
+                child: FractionallySizedBox(
+                  widthFactor: 0.9,
+                  heightFactor: 0.9,
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: palette.windowGradient,
+                        color: palette.windowGradient == null
+                            ? ThemeV2.surface
+                            : null,
+                        border: Border.all(
+                          color: color.withValues(alpha: 0.3),
+                          width: 3,
                         ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        '$score',
-                        style: GoogleFonts.inter(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                          color: color,
-                          letterSpacing: -1,
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withValues(alpha: 0.1),
+                            blurRadius: 20,
+                            spreadRadius: 3,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$score',
+                          style: GoogleFonts.inter(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: color,
+                            letterSpacing: -1,
+                          ),
                         ),
                       ),
                     ),
@@ -364,8 +377,8 @@ class PriceHeader extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -378,13 +391,22 @@ class PriceHeader extends StatelessWidget {
         sessionLabel = phaseLabel!;
         isOpen = phaseGlow;
       } else {
+        // Same DST-aware NYSE resolver Market Clock's own dial uses (see
+        // market_clock_dial.dart's _DigitalReadout) — this label and the
+        // dial always agree on which phase is currently active.
         final phase = resolveMarketPhase(nowInNewYork());
         sessionLabel = _phaseLabel(l10n, phase);
         isOpen = phase == MarketPhase.marketOpen;
       }
     }
+    // Session label only — gold (or this theme's accent) while open,
+    // white otherwise. The price digits below are always white,
+    // regardless of session state (previously shared this same gold-
+    // when-open color, which read as two different pieces of information
+    // sharing one color by coincidence).
     final sessionColor =
-        phaseLabelColor ?? (isOpen ? dialBrassLight : Colors.white);
+        phaseLabelColor ??
+        (isOpen ? (palette.marketClockAccent ?? dialBrassLight) : Colors.white);
 
     return CardFrame(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -422,7 +444,7 @@ class PriceHeader extends StatelessWidget {
                     shadows: isOpen
                         ? [
                             Shadow(
-                              color: dialBrassLight.withValues(alpha: 0.5),
+                              color: sessionColor.withValues(alpha: 0.5),
                               blurRadius: 6,
                             ),
                           ]
@@ -439,25 +461,19 @@ class PriceHeader extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(Icons.attach_money_rounded, size: 26, color: sessionColor),
+                const Icon(
+                  Icons.attach_money_rounded,
+                  size: 26,
+                  color: Colors.white,
+                ),
                 Text(
                   price.toStringAsFixed(2),
-                  style:
-                      interNums(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
-                        color: sessionColor,
-                        height: 1,
-                      ).copyWith(
-                        shadows: isOpen
-                            ? [
-                                Shadow(
-                                  color: dialBrassLight.withValues(alpha: 0.5),
-                                  blurRadius: 6,
-                                ),
-                              ]
-                            : null,
-                      ),
+                  style: interNums(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    height: 1,
+                  ),
                 ),
               ],
             ),

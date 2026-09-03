@@ -14,8 +14,7 @@ import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/utils/currency_format.dart';
-import '../../market_clock/market_clock_dial.dart'
-    show dialBrassLight, darkCardDecoration;
+import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../../../l10n/gen/app_localizations.dart';
 
 class PortfolioCashWidget extends StatelessWidget {
@@ -83,7 +82,7 @@ class PortfolioCashWidget extends StatelessWidget {
                       style: interNums(
                         fontSize: 26,
                         fontWeight: FontWeight.w600,
-                        color: dialBrassLight.withValues(alpha: 0.6),
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                     )
                   : isLoading || cash == null
@@ -93,26 +92,18 @@ class PortfolioCashWidget extends StatelessWidget {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: dialBrassLight,
+                          color: Colors.white,
                         ),
                       ),
                     )
                   : Text(
                       formatUsd(cash!),
                       textAlign: TextAlign.center,
-                      style:
-                          interNums(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w600,
-                            color: dialBrassLight,
-                          ).copyWith(
-                            shadows: [
-                              Shadow(
-                                color: dialBrassLight.withValues(alpha: 0.6),
-                                blurRadius: 8,
-                              ),
-                            ],
-                          ),
+                      style: interNums(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
             ),
           ),

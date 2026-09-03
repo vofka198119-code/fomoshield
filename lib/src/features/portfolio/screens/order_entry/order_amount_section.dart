@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/typography_helpers.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/fomo_shield_theme.dart';
+import '../../../../core/theme/themed_border.dart';
 import '../../../../shared/widgets/card_frame.dart';
 import '../../../../shared/utils/currency_format.dart';
 import '../../../../l10n/gen/app_localizations.dart';
@@ -63,6 +64,11 @@ class OrderAmountSection extends StatelessWidget {
     }
     return heldShares;
   }
+
+  // Theme accent for the "Available" slider window's decorative gold —
+  // turquoise under Midnight Sea, gold elsewhere. Same marketClockAccent
+  // reuse as financial_score_widget.dart's own _accentColor.
+  Color get _accentColor => palette.marketClockAccent ?? dialBrassLight;
 
   @override
   Widget build(BuildContext context) {
@@ -211,18 +217,22 @@ class OrderAmountSection extends StatelessWidget {
             ? OrderInputMode.shares
             : OrderInputMode.cost,
       ),
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: palette.windowGradient ?? darkCardGradient(),
-        ),
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.swap_vert_rounded,
-          color: Colors.white,
-          size: 20,
+      child: themedBorder(
+        palette: palette,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: palette.windowGradient ?? darkCardGradient(),
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.swap_vert_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
         ),
       ),
     );
@@ -260,7 +270,7 @@ class OrderAmountSection extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: dialBrassLight,
+                  color: _accentColor,
                 ),
               ),
               const SizedBox(height: 10),
@@ -269,11 +279,11 @@ class OrderAmountSection extends StatelessWidget {
               data: SliderThemeData(
                 trackHeight: 4,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-                activeTrackColor: dialBrassLight,
-                inactiveTrackColor: dialBrassLight.withValues(alpha: 0.25),
-                thumbColor: dialBrassLight,
-                overlayColor: dialBrassLight.withValues(alpha: 0.2),
-                valueIndicatorColor: dialBrassLight,
+                activeTrackColor: _accentColor,
+                inactiveTrackColor: _accentColor.withValues(alpha: 0.25),
+                thumbColor: _accentColor,
+                overlayColor: _accentColor.withValues(alpha: 0.2),
+                valueIndicatorColor: _accentColor,
                 valueIndicatorTextStyle: GoogleFonts.inter(
                   color: dialDark,
                   fontSize: 12,
@@ -318,7 +328,7 @@ class OrderAmountSection extends StatelessWidget {
       style: GoogleFonts.inter(
         fontSize: 10,
         fontWeight: FontWeight.w600,
-        color: dialBrassLight,
+        color: _accentColor,
       ),
     );
   }

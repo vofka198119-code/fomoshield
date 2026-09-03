@@ -26,6 +26,7 @@ import '../../../core/cache/logo_providers.dart'
     show resolvedCompanyNameProvider;
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
+import '../../../shared/widgets/more_less_pill.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../portfolio_providers.dart';
 
@@ -261,33 +262,15 @@ class _PortfolioBalanceWidgetState
                         ),
                       ),
                     if (holdings.length > _legendPreviewLimit)
-                      GestureDetector(
-                        onTap: () => setState(() => _showAll = !_showAll),
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 6, bottom: 16),
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: palette.accentPrimary.withValues(
-                              alpha: 0.06,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Text(
-                              _showAll
-                                  ? l10n.commonLess
-                                  : l10n.commonMoreCount(
-                                      holdings.length - _legendPreviewLimit,
-                                    ),
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: palette.accentPrimary,
+                      MoreLessPill(
+                        label: _showAll
+                            ? l10n.commonLess
+                            : l10n.commonMoreCount(
+                                holdings.length - _legendPreviewLimit,
                               ),
-                            ),
-                          ),
-                        ),
+                        onTap: () => setState(() => _showAll = !_showAll),
+                        palette: palette,
+                        margin: const EdgeInsets.only(top: 6, bottom: 16),
                       ),
                   ],
                 ),

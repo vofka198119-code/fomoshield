@@ -106,18 +106,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                // The app-wide InputDecorationTheme's focusedBorder is a
-                // hardcoded ThemeV2.primary (green) OutlineInputBorder —
-                // not overridden by the field's own `border:
-                // InputBorder.none` below (Flutter only falls back to
-                // `border` for states that aren't separately specified),
-                // so it showed through whenever this field was focused
-                // (autofocus: true, so immediately on screen open). Under
-                // Luxury Gold, suppress the Material border entirely and
-                // wrap the field in the same gold-ring + graphite-window
-                // treatment every other widget/panel in the app uses
-                // (themedBorder + windowGradient) instead of just
-                // recoloring a plain Material outline.
+                // Same plain filled-box recipe as the Stress Test "Search
+                // Company" field (see stress_test_search_sheet.dart) — a
+                // search icon inline — wrapped in the same themedBorder
+                // ring every widget/window gets (the Language/Theme picker
+                // rows get theirs from CardFrame's own border handling,
+                // this field isn't inside a CardFrame so needs it applied
+                // directly). The app-wide InputDecorationTheme's
+                // focusedBorder is a hardcoded ThemeV2.primary (green)
+                // OutlineInputBorder — not overridden by the field's own
+                // `border: InputBorder.none` below (Flutter only falls
+                // back to `border` for states that aren't separately
+                // specified), so it showed through whenever this field was
+                // focused (autofocus: true, so immediately on screen open)
+                // — still suppressed explicitly whenever [windowGradient]
+                // is set.
                 child: themedBorder(
                   palette: palette,
                   borderRadius: ThemeV2.borderRadiusMedium,
@@ -136,6 +139,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         hintStyle: GoogleFonts.inter(
                           color: palette.textBody,
                           fontSize: 14,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search_rounded,
+                          color: palette.textBody,
                         ),
                         border: InputBorder.none,
                         enabledBorder: palette.windowGradient == null

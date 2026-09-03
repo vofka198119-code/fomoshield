@@ -21,6 +21,7 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../../shared/widgets/more_less_pill.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
@@ -181,29 +182,12 @@ class _PortfolioHoldingsWidgetState extends State<PortfolioHoldingsWidget> {
                 palette: palette,
               ),
             if (sorted.length > _previewLimit)
-              GestureDetector(
+              MoreLessPill(
+                label: _showAll
+                    ? l10n.commonLess
+                    : l10n.commonMoreCount(sorted.length - _previewLimit),
                 onTap: () => setState(() => _showAll = !_showAll),
-                child: Container(
-                  margin: const EdgeInsets.fromLTRB(16, 6, 16, 16),
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: palette.accentPrimary.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _showAll
-                          ? l10n.commonLess
-                          : l10n.commonMoreCount(sorted.length - _previewLimit),
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: palette.accentPrimary,
-                      ),
-                    ),
-                  ),
-                ),
+                palette: palette,
               )
             else
               const SizedBox(height: 8),

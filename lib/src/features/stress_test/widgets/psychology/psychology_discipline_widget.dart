@@ -5,6 +5,7 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 import '../allocation_bar_row.dart';
 import 'psychology_marker_card.dart';
@@ -16,8 +17,13 @@ const double _warningThreshold = 40.0;
 
 class PsychologyDisciplineCard extends StatelessWidget {
   final double discipline; // 0.0-1.0
+  final AppPalette palette;
 
-  const PsychologyDisciplineCard({super.key, required this.discipline});
+  const PsychologyDisciplineCard({
+    super.key,
+    required this.discipline,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +35,7 @@ class PsychologyDisciplineCard extends StatelessWidget {
       child: AllocationBarRow(
         name: l10n.psychologyDisciplineWidgetLabel,
         percent: percent,
+        palette: palette,
         warning: percent < _warningThreshold,
         decimals: 0,
         suffix: '',

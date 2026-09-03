@@ -87,6 +87,29 @@ BoxDecoration darkCardDecoration({
   boxShadow: FomoShieldTheme.shadowSoft,
 );
 
+/// Same brand dark-green colors as [darkCardGradient], but a vertical
+/// linear gradient (light top -> dark bottom) instead of radial — the BUY
+/// / "Place Order" CTA buttons' own look (user's ask, 2026-09-03: keep the
+/// color, just stop using the radial instrument-panel shape there). Not a
+/// replacement for [darkCardGradient] itself, which stays the standard for
+/// every OTHER dark card/button/pill/badge app-wide.
+LinearGradient buyButtonGradient({
+  DarkCardPalette palette = DarkCardPalette.instrumentPanel,
+}) => LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [palette.gradientStart, palette.gradientMid, palette.gradientEnd],
+);
+
+BoxDecoration buyButtonDecoration({
+  BorderRadius? borderRadius,
+  DarkCardPalette palette = DarkCardPalette.instrumentPanel,
+}) => BoxDecoration(
+  gradient: buyButtonGradient(palette: palette),
+  borderRadius: borderRadius ?? FomoShieldTheme.cardRadius,
+  boxShadow: FomoShieldTheme.shadowSoft,
+);
+
 /// Card wrapper for anything sitting on the same instrument-panel dial
 /// background — keeps the Market Clock screen and Home widget visually
 /// unified (gradient IS the card background, not a separate surface color).

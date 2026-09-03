@@ -15,6 +15,7 @@ import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/themed_divider.dart';
+import 'more_less_pill.dart';
 import '../../features/stress_test/stress_test_models.dart';
 import '../../l10n/gen/app_localizations.dart';
 
@@ -153,32 +154,15 @@ class _MarketTimelineState extends State<MarketTimeline> {
         // ── MORE / LESS button ──
         if (widget.epochs.length > widget.initialLimit) ...[
           const SizedBox(height: 6),
-          GestureDetector(
-            onTap: () => setState(() => _expanded = !_expanded),
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: (widget.palette?.accentPrimary ?? ThemeV2.primary)
-                    .withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(
-                  _expanded
-                      ? l10n.commonLess
-                      : l10n.commonMoreCount(
-                          widget.epochs.length - widget.initialLimit,
-                        ),
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: widget.palette?.accentPrimary ?? ThemeV2.primary,
+          MoreLessPill(
+            label: _expanded
+                ? l10n.commonLess
+                : l10n.commonMoreCount(
+                    widget.epochs.length - widget.initialLimit,
                   ),
-                ),
-              ),
-            ),
+            onTap: () => setState(() => _expanded = !_expanded),
+            palette: widget.palette ?? AppPalette.standard,
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
           ),
         ],
       ],

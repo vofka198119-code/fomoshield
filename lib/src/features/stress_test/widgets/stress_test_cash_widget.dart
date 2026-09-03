@@ -14,8 +14,7 @@ import '../../../core/theme/themed_divider.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
-import '../../market_clock/market_clock_dial.dart'
-    show dialBrassLight, darkCardDecoration;
+import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../stress_test_models.dart';
 
 /// Dark-green gradient card (same brand gradient as TARGET / Shield Signal)
@@ -77,19 +76,11 @@ class StressTestCashWidget extends StatelessWidget {
               child: Text(
                 formatUsd(session.cash),
                 textAlign: TextAlign.center,
-                style:
-                    interNums(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w600,
-                      color: dialBrassLight,
-                    ).copyWith(
-                      shadows: [
-                        Shadow(
-                          color: dialBrassLight.withValues(alpha: 0.6),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
+                style: interNums(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),

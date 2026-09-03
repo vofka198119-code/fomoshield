@@ -288,6 +288,8 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
                     AllocationBarRow(
                       name: resolveStressTestCompanyName(ref, item.symbol),
                       percent: item.value / totalInvested * 100,
+                      palette: palette,
+                      dangerZoneGradient: true,
                     ),
                 ],
               ),
