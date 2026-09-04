@@ -145,8 +145,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     if (useDca) {
       await markStressTestDcaFunded(ref, widget.sessionId);
     }
-    if (_selectedDuration == TestDuration.custom &&
-        _enableDividendSimulation) {
+    if (_selectedDuration == TestDuration.custom && _enableDividendSimulation) {
       await markStressTestDividendSimulationEnabled(ref, widget.sessionId);
     }
     notifier.startTest(widget.sessionId);
@@ -328,9 +327,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               style: GoogleFonts.inter(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: dialBrassLight,
+                color: palette.marketClockAccent ?? dialBrassLight,
                 letterSpacing: 1.5,
-                shadows: _goldGlow(dialBrassLight),
+                shadows: _goldGlow(palette.marketClockAccent ?? dialBrassLight),
               ),
             ),
           ),
@@ -443,9 +442,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
-                      color: dialBrassLight,
+                      color: palette.marketClockAccent ?? dialBrassLight,
                       letterSpacing: 1.2,
-                      shadows: _goldGlow(dialBrassLight),
+                      shadows: _goldGlow(
+                        palette.marketClockAccent ?? dialBrassLight,
+                      ),
                     ),
                   ),
                 ),
@@ -476,7 +477,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     final tier = ref.watch(subscriptionTierProvider);
     final isPremium = tier.isPremiumOrAdmin;
     final accentColor = isPremium
-        ? const Color(0xFFD4AF37) // Gold for Premium/Admin
+        ? (palette.marketClockAccent ??
+              const Color(
+                0xFFD4AF37,
+              )) // Gold for Premium/Admin (theme accent under Midnight Sea)
         : ThemeV2.textSecondary; // Gray for Free
 
     // Always show all 5 options; Free gets lock on Infinite & Custom
@@ -496,7 +500,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           (d == TestDuration.infinite || d == TestDuration.custom);
       final isCustomRow = d == TestDuration.custom;
       final isInfiniteRow = d == TestDuration.infinite;
-      final rowColor = isPremium ? const Color(0xFFD4AF37) : accentColor;
+      final rowColor = isPremium
+          ? (palette.marketClockAccent ?? const Color(0xFFD4AF37))
+          : accentColor;
 
       rows.add(
         InkWell(
@@ -554,9 +560,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                           : selected || isCustomRow || isInfiniteRow
                           ? rowColor
                           : palette.textBody,
-                      fontWeight: selected
-                          ? FontWeight.w600
-                          : FontWeight.w400,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
                 ),
@@ -580,9 +584,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
-                        color: dialBrassLight,
+                        color: palette.marketClockAccent ?? dialBrassLight,
                         letterSpacing: 1.2,
-                        shadows: _goldGlow(dialBrassLight),
+                        shadows: _goldGlow(
+                          palette.marketClockAccent ?? dialBrassLight,
+                        ),
                       ),
                     ),
                   )
@@ -605,9 +611,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
-                        color: dialBrassLight,
+                        color: palette.marketClockAccent ?? dialBrassLight,
                         letterSpacing: 1.2,
-                        shadows: _goldGlow(dialBrassLight),
+                        shadows: _goldGlow(
+                          palette.marketClockAccent ?? dialBrassLight,
+                        ),
                       ),
                     ),
                   ),
@@ -635,6 +643,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   /// Prompts a Free user to subscribe when tapping a locked feature.
   void _showPremiumUpsell() {
     final l10n = AppLocalizations.of(context)!;
+    final accentColor =
+        resolveAppPalette(ref.read(themeVariantProvider)).marketClockAccent ??
+        const Color(0xFFD4AF37);
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
@@ -648,7 +659,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               Icon(
                 Icons.workspace_premium_rounded,
                 size: 56,
-                color: const Color(0xFFD4AF37),
+                color: accentColor,
               ),
               const SizedBox(height: 16),
               Text(
@@ -679,7 +690,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     showMonetizationModal(context, ref);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4AF37),
+                    backgroundColor: accentColor,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -727,6 +738,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.read(themeVariantProvider));
     final isLuxury = palette.windowGradient != null;
+    final accentColor = palette.marketClockAccent ?? const Color(0xFFD4AF37);
 
     showModalBottomSheet(
       context: context,
@@ -786,10 +798,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD4AF37).withValues(alpha: 0.1),
+                      color: accentColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+                        color: accentColor.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -798,7 +810,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                         Icon(
                           Icons.warning_amber_rounded,
                           size: 18,
-                          color: const Color(0xFFD4AF37),
+                          color: accentColor,
                         ),
                         const SizedBox(width: 10),
                         Expanded(
@@ -823,7 +835,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       style: interNums(
                         fontSize: 36,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFFD4AF37),
+                        color: accentColor,
                       ),
                     ),
                   ),
@@ -835,10 +847,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     min: 14,
                     max: 365,
                     divisions: 351,
-                    activeColor: const Color(0xFFD4AF37),
-                    inactiveColor: const Color(
-                      0xFFD4AF37,
-                    ).withValues(alpha: 0.2),
+                    activeColor: accentColor,
+                    inactiveColor: accentColor.withValues(alpha: 0.2),
                     label: l10n.stressTestDaysCount(tempDays),
                     onChanged: (v) {
                       setSheetState(() => tempDays = v.round());
@@ -879,9 +889,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                             style: OutlinedButton.styleFrom(
                               foregroundColor: palette.textBody,
                               side: BorderSide(
-                                color: palette.textBody.withValues(
-                                  alpha: 0.3,
-                                ),
+                                color: palette.textBody.withValues(alpha: 0.3),
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -943,10 +951,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                                         top: Radius.circular(20),
                                       ),
                                     ),
-                                    builder: (_) =>
-                                        _DividendSimulationSheet(
-                                          palette: palette,
-                                        ),
+                                    builder: (_) => _DividendSimulationSheet(
+                                      palette: palette,
+                                    ),
                                   );
                               if (dividendChoice != null && mounted) {
                                 setState(
@@ -956,7 +963,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFD4AF37),
+                              backgroundColor: accentColor,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -1010,9 +1017,11 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
   final _scrollController = ScrollController();
   bool _hasScrolledToBottom = false;
 
-  /// Gold for Premium, brand green for Free
-  Color get _accentColor =>
-      widget.isPremium ? const Color(0xFFD4AF37) : ThemeV2.primary;
+  /// Gold (or this theme's accent, e.g. turquoise under Midnight Sea) for
+  /// Premium, brand green for Free.
+  Color get _accentColor => widget.isPremium
+      ? (widget.palette.marketClockAccent ?? const Color(0xFFD4AF37))
+      : ThemeV2.primary;
 
   @override
   void initState() {
@@ -1089,7 +1098,9 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
-                color: isFreeInfinite ? _accentColor : widget.palette.textHeader,
+                color: isFreeInfinite
+                    ? _accentColor
+                    : widget.palette.textHeader,
                 letterSpacing: 0.5,
               ),
             ),
@@ -1158,9 +1169,7 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: widget.palette.textBody,
                         side: BorderSide(
-                          color: widget.palette.textBody.withValues(
-                            alpha: 0.3,
-                          ),
+                          color: widget.palette.textBody.withValues(alpha: 0.3),
                         ),
                         backgroundColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
@@ -1459,6 +1468,7 @@ class _FundingModeSheet extends StatelessWidget {
     required String detail,
     required VoidCallback onTap,
   }) {
+    final accentColor = palette.marketClockAccent ?? const Color(0xFFD4AF37);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
@@ -1466,11 +1476,9 @@ class _FundingModeSheet extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFD4AF37).withValues(alpha: 0.1),
+          color: accentColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: accentColor.withValues(alpha: 0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1480,7 +1488,7 @@ class _FundingModeSheet extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFFD4AF37),
+                color: accentColor,
               ),
             ),
             const SizedBox(height: 4),
@@ -1575,6 +1583,7 @@ class _DividendSimulationSheet extends StatelessWidget {
     required String detail,
     required VoidCallback onTap,
   }) {
+    final accentColor = palette.marketClockAccent ?? const Color(0xFFD4AF37);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
@@ -1582,11 +1591,9 @@ class _DividendSimulationSheet extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFD4AF37).withValues(alpha: 0.1),
+          color: accentColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: accentColor.withValues(alpha: 0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1596,7 +1603,7 @@ class _DividendSimulationSheet extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFFD4AF37),
+                color: accentColor,
               ),
             ),
             const SizedBox(height: 4),

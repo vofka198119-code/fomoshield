@@ -190,8 +190,7 @@ class StressTestHubScreen extends ConsumerWidget {
                   ? archive
                         .take(_archivePreviewLimit)
                         .map(
-                          (entry) =>
-                              _buildArchiveTile(context, entry, palette),
+                          (entry) => _buildArchiveTile(context, entry, palette),
                         )
                         .toList()
                   : [
@@ -289,16 +288,17 @@ class StressTestHubScreen extends ConsumerWidget {
                   ),
                 ],
               )
-            : darkCardDecoration(borderRadius: BorderRadius.circular(16))
-                  .copyWith(
-                    boxShadow: [
-                      BoxShadow(
-                        color: dialDark.withValues(alpha: 0.35),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+            : darkCardDecoration(
+                borderRadius: BorderRadius.circular(16),
+              ).copyWith(
+                boxShadow: [
+                  BoxShadow(
+                    color: dialDark.withValues(alpha: 0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
+                ],
+              ),
         palette: palette,
         child: Row(
           children: [
@@ -463,13 +463,15 @@ class StressTestHubScreen extends ConsumerWidget {
             )
           : darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
-        AppLocalizations.of(context)!.stressTestPremiumLowercase,
+        // Uppercased on purpose — see stress_test_widget.dart's own fix,
+        // same badge, same bug.
+        AppLocalizations.of(context)!.stressTestPremiumLowercase.toUpperCase(),
         style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w700,
-          color: dialBrassLight,
+          color: palette.marketClockAccent ?? dialBrassLight,
           letterSpacing: 0.8,
-          shadows: _goldGlow(dialBrassLight),
+          shadows: _goldGlow(palette.marketClockAccent ?? dialBrassLight),
         ),
       ),
     );
@@ -478,12 +480,13 @@ class StressTestHubScreen extends ConsumerWidget {
   // Play-button icon color, same slot rules as [_tierBadge]: slot 1 is
   // always free (white), slot 2 is white on free tier / gold once premium,
   // slots 3-5 are premium-only so always gold.
-  Color _playIconColor(WidgetRef ref, int index) {
+  Color _playIconColor(WidgetRef ref, int index, AppPalette palette) {
     if (index == 0) return Colors.white;
     final tier = ref.watch(subscriptionTierProvider);
     final isPremiumTier = tier.isPremiumOrAdmin;
-    if (index == 1) return isPremiumTier ? dialBrassLight : Colors.white;
-    return dialBrassLight;
+    final accentColor = palette.marketClockAccent ?? dialBrassLight;
+    if (index == 1) return isPremiumTier ? accentColor : Colors.white;
+    return accentColor;
   }
 
   Widget _buildActiveSessionTile(
@@ -526,7 +529,7 @@ class StressTestHubScreen extends ConsumerWidget {
                       ),
                 child: Icon(
                   Icons.play_circle_rounded,
-                  color: _playIconColor(ref, index),
+                  color: _playIconColor(ref, index, palette),
                   size: 22,
                 ),
               ),

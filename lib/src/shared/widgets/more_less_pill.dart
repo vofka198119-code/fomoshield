@@ -30,27 +30,37 @@ class MoreLessPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final (gradient, background, textColor) = moreLessPillStyle(palette);
     final radius = BorderRadius.circular(10);
-    return GestureDetector(
-      onTap: onTap,
-      child: themedBorder(
-        palette: palette,
-        borderRadius: radius,
-        margin: margin,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            gradient: gradient,
-            color: background,
-            borderRadius: radius,
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: textColor,
+    // The margin lives on this outer Padding, not on themedBorder's own
+    // `margin` param — themedBorder is a no-op for any theme without a
+    // borderGradient (Standard, Black & White, Light Lime), and a no-op
+    // drops whatever margin it was asked to draw along with it. Only
+    // Luxury Gold/Midnight Sea (which do have one) ever saw the margin
+    // that way, which is why the pill sat flush against the card's edges
+    // — no inset at all — under every other theme (confirmed on-device
+    // 2026-09-04).
+    return Padding(
+      padding: margin,
+      child: GestureDetector(
+        onTap: onTap,
+        child: themedBorder(
+          palette: palette,
+          borderRadius: radius,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              gradient: gradient,
+              color: background,
+              borderRadius: radius,
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
               ),
             ),
           ),

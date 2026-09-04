@@ -68,7 +68,8 @@ class MyLimitOrdersWidget extends ConsumerWidget {
               ),
             )
           else ...[
-            for (final order in shown) OrderRowTile(order: order),
+            for (final order in shown)
+              OrderRowTile(order: order, palette: palette),
             if (orders.length > _inlineLimit)
               Padding(
                 padding: const EdgeInsets.only(top: 6, bottom: 10),

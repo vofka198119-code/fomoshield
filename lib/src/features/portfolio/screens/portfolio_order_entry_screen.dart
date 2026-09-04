@@ -212,8 +212,8 @@ class _PortfolioOrderEntryScreenState
 
   // Same shape/placement as Stress Test's own commission notice (see
   // assets/screens/order_entry_screen.dart) — sits directly under
-  // OrderAmountSection's "available funds" slider card, above the market/
-  // limit info box.
+  // OrderConfigSection's price/limit block (moved 2026-09-04, was above it
+  // — user's explicit placement call, again).
   Widget _commissionNotice(
     AppLocalizations l10n,
     AppPalette palette,
@@ -565,7 +565,13 @@ class _PortfolioOrderEntryScreenState
             companyName: widget.companyName,
             logoUrl: widget.logo,
             title: l10n.orderEntryNotifOrderPlacedTitle(
-              orderType.label,
+              // orderType.label is the raw English enum label ('Limit') —
+              // this branch only ever fires for a non-immediate order
+              // (limit), same as Stress Test's own order_entry_screen.dart,
+              // which already uses this localized tab label instead
+              // (confirmed on-device 2026-09-04: this site alone still
+              // showed English "Limit" mid-sentence).
+              l10n.orderEntryTabLimit,
               _isBuy
                   ? l10n.orderEntryNotifBuyWord
                   : l10n.orderEntryNotifSellWord,
@@ -738,7 +744,6 @@ class _PortfolioOrderEntryScreenState
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
                       palette: palette,
                     ),
-                    _commissionNotice(l10n, palette, displayAmount),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
                       limitPriceController: _limitPriceController,
@@ -756,6 +761,7 @@ class _PortfolioOrderEntryScreenState
                       onExtendedHoursChanged: _setExtendedHours,
                       palette: palette,
                     ),
+                    _commissionNotice(l10n, palette, displayAmount),
                   ],
                 ),
               ),

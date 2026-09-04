@@ -7,7 +7,9 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
+import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/company_logo.dart';
+import '../../../shared/widgets/more_less_pill.dart';
 import '../top_companies_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -21,6 +23,13 @@ import '../top_companies_provider.dart';
 // network concurrency limiter alone). A pushed route replaces the screen
 // instead, same pattern as WatchlistFullScreen's own "see all".
 //
+// Revealed 6-at-a-time (2026-09-04) instead of one flat list — a row's
+// CompanyLogo fires its own fetch the moment it's built, and even with
+// ListView's own scroll virtualization every row still eventually gets
+// built (and fetches) just by scrolling down a long sector; a hard reveal
+// count means a row past it never builds — and never fetches — until the
+// user actually asks for more via the MoreLessPill.
+//
 // Rows read name from the entry the caller already has
 // (top_companies_provider.dart's backend-ranked list). Logo: CompanyLogo
 // resolves it on its own (via cachedLogoProvider -> our backend's /icons
@@ -31,7 +40,9 @@ import '../top_companies_provider.dart';
 // per-row cost this screen must never pay.
 // ---------------------------------------------------------------------------
 
-class CompanyListScreen extends ConsumerWidget {
+const int _revealBatchSize = 6;
+
+class CompanyListScreen extends ConsumerStatefulWidget {
   final String title;
   final List<TopCompanyEntry> companies;
   final void Function(String symbol) onTapSymbol;
@@ -55,8 +66,19 @@ class CompanyListScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CompanyListScreen> createState() => _CompanyListScreenState();
+}
+
+class _CompanyListScreenState extends ConsumerState<CompanyListScreen> {
+  int _revealedCount = _revealBatchSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    final revealed = _revealedCount.clamp(0, widget.companies.length);
+    final hasMore = revealed < widget.companies.length;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -64,7 +86,7 @@ class CompanyListScreen extends ConsumerWidget {
         centerTitle: true,
         leading: themedBackButton(context, palette),
         title: themedHeaderText(
-          title,
+          widget.title,
           palette,
           GoogleFonts.inter(
             fontSize: 18,
@@ -82,7 +104,7 @@ class CompanyListScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    '${companies.length}',
+                    '${widget.companies.length}',
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       color: palette.textBody,
@@ -97,20 +119,41 @@ class CompanyListScreen extends ConsumerWidget {
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(vertical: 4),
-                itemCount: companies.length,
-                separatorBuilder: (_, _) => palette.dividerGradient != null
+                // +1 for the trailing MoreLessPill — never built (and
+                // never fetches anything) until the user actually reveals
+                // it, same as every row past `revealed`.
+                itemCount: revealed + (hasMore ? 1 : 0),
+                separatorBuilder: (_, i) => i >= revealed - 1
+                    ? const SizedBox.shrink()
+                    : palette.dividerGradient != null
                     ? themedDivider(palette, indent: 68, endIndent: 0)
                     : const Divider(
                         height: 1,
                         indent: 68,
                         color: Color(0x0F000000),
                       ),
-                itemBuilder: (context, i) => _CompanyRow(
-                  entry: companies[i],
-                  onTapSymbol: onTapSymbol,
-                  suppressSector: suppressSector,
-                  palette: palette,
-                ),
+                itemBuilder: (context, i) {
+                  if (i >= revealed) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: MoreLessPill(
+                        label: l10n.commonMoreCount(
+                          widget.companies.length - revealed,
+                        ),
+                        onTap: () =>
+                            setState(() => _revealedCount += _revealBatchSize),
+                        palette: palette,
+                        margin: EdgeInsets.zero,
+                      ),
+                    );
+                  }
+                  return _CompanyRow(
+                    entry: widget.companies[i],
+                    onTapSymbol: widget.onTapSymbol,
+                    suppressSector: widget.suppressSector,
+                    palette: palette,
+                  );
+                },
               ),
             ),
           ],

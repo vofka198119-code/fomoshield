@@ -1,4 +1,5 @@
 import '../../l10n/gen/app_localizations.dart';
+import '../../shared/utils/currency_format.dart';
 import '../models/app_notification.dart';
 import 'news_scenario_l10n.dart';
 
@@ -41,6 +42,12 @@ String notificationTitle(AppNotification n, AppLocalizations l10n) {
   if (n.type == AppNotificationType.news && n.newsScenarioIndex != null) {
     return newsScenarioHeadline(l10n, n.newsScenarioIndex!);
   }
+  if (n.type == AppNotificationType.limitOrderFilled && n.fillIsBuy != null) {
+    return l10n.orderEntryNotifOrderFilledTitle(
+      l10n.orderEntryTabLimit,
+      n.fillIsBuy! ? l10n.orderEntryNotifBuyWord : l10n.orderEntryNotifSellWord,
+    );
+  }
   if (n.type == AppNotificationType.stressTestCompleted) {
     return l10n.notificationsStressTestCompletedTitle;
   }
@@ -59,6 +66,15 @@ String notificationTitle(AppNotification n, AppLocalizations l10n) {
 String notificationDetail(AppNotification n, AppLocalizations l10n) {
   if (n.type == AppNotificationType.news && n.newsScenarioIndex != null) {
     return newsScenarioDescription(l10n, n.newsScenarioIndex!);
+  }
+  if (n.type == AppNotificationType.limitOrderFilled &&
+      n.fillQuantity != null &&
+      n.fillPrice != null) {
+    return l10n.orderEntryNotifFilledDetail(
+      n.fillQuantity!.toStringAsFixed(4),
+      n.companyName ?? n.symbol ?? '',
+      formatUsd(n.fillPrice!),
+    );
   }
   if (n.type == AppNotificationType.stressTestCompleted &&
       n.stressTestPnlPercent != null) {

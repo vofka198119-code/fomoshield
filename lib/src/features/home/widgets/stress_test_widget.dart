@@ -187,9 +187,11 @@ class StressTestWidget extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 8,
                         fontWeight: FontWeight.w800,
-                        color: dialBrassLight,
+                        color: palette.marketClockAccent ?? dialBrassLight,
                         letterSpacing: 1.2,
-                        shadows: _goldGlow(dialBrassLight),
+                        shadows: _goldGlow(
+                          palette.marketClockAccent ?? dialBrassLight,
+                        ),
                       ),
                     ),
                   ),
@@ -273,12 +275,13 @@ class StressTestWidget extends ConsumerWidget {
   // Play-button icon color, same slot rules as [_tierBadge]: slot 1 is
   // always free (white), slot 2 is white on free tier / gold once premium,
   // slots 3-5 are premium-only so always gold.
-  Color _playIconColor(WidgetRef ref, int index) {
+  Color _playIconColor(WidgetRef ref, int index, AppPalette palette) {
     if (index == 0) return Colors.white;
     final tier = ref.watch(subscriptionTierProvider);
     final isPremiumTier = tier.isPremiumOrAdmin;
-    if (index == 1) return isPremiumTier ? dialBrassLight : Colors.white;
-    return dialBrassLight;
+    final accentColor = palette.marketClockAccent ?? dialBrassLight;
+    if (index == 1) return isPremiumTier ? accentColor : Colors.white;
+    return accentColor;
   }
 
   // Tier badge, keyed by slot position (index) among the user's active
@@ -333,13 +336,17 @@ class StressTestWidget extends ConsumerWidget {
             )
           : darkCardDecoration(borderRadius: BorderRadius.circular(5)),
       child: Text(
-        AppLocalizations.of(context)!.stressTestPremiumLowercase,
+        // Uppercased on purpose — lowercase glyphs sit visibly off-center
+        // in this pill's tight vertical padding (confirmed on-device
+        // 2026-09-04: every OTHER premium badge here is already an
+        // all-caps string and centers fine; only this one wasn't).
+        AppLocalizations.of(context)!.stressTestPremiumLowercase.toUpperCase(),
         style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w700,
-          color: dialBrassLight,
+          color: palette.marketClockAccent ?? dialBrassLight,
           letterSpacing: 0.8,
-          shadows: _goldGlow(dialBrassLight),
+          shadows: _goldGlow(palette.marketClockAccent ?? dialBrassLight),
         ),
       ),
     );
@@ -378,7 +385,7 @@ class StressTestWidget extends ConsumerWidget {
                       ),
                 child: Icon(
                   Icons.play_circle_rounded,
-                  color: _playIconColor(ref, index),
+                  color: _playIconColor(ref, index, palette),
                   size: 22,
                 ),
               ),
@@ -498,9 +505,9 @@ class StressTestWidget extends ConsumerWidget {
                     : darkCardDecoration(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                child: const Icon(
+                child: Icon(
                   Icons.stop_circle_rounded,
-                  color: dialBrassLight,
+                  color: palette.marketClockAccent ?? dialBrassLight,
                   size: 22,
                 ),
               ),

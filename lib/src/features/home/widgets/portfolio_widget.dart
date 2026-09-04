@@ -230,11 +230,13 @@ class _PortfolioWidgetState extends ConsumerState<PortfolioWidget> {
           style: GoogleFonts.inter(
             fontSize: 10,
             fontWeight: FontWeight.w800,
-            color: dialBrassLight,
+            color: palette.marketClockAccent ?? dialBrassLight,
             letterSpacing: 1.5,
             shadows: [
               Shadow(
-                color: dialBrassLight.withValues(alpha: 0.5),
+                color: (palette.marketClockAccent ?? dialBrassLight).withValues(
+                  alpha: 0.5,
+                ),
                 blurRadius: 6,
               ),
             ],

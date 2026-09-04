@@ -2367,6 +2367,17 @@
       }
     }
   },
+  "orderEntryNotifOrderFilledTitle": "{orderType} {buyOrSell} Order Filled",
+  "@orderEntryNotifOrderFilledTitle": {
+    "placeholders": {
+      "orderType": {
+        "type": "String"
+      },
+      "buyOrSell": {
+        "type": "String"
+      }
+    }
+  },
   "orderEntryNotifPendingDetailBase": "{quantity} shares of {companyName}",
   "@orderEntryNotifPendingDetailBase": {
     "placeholders": {

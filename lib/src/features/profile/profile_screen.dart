@@ -147,7 +147,9 @@ class ProfileScreen extends ConsumerWidget {
     // reading .notifier just picks the current counter value on that
     // rebuild rather than needing its own reactive stream.
     ref.watch(stressTestProvider);
-    final testsCount = ref.read(stressTestProvider.notifier).totalSessionsCreated;
+    final testsCount = ref
+        .read(stressTestProvider.notifier)
+        .totalSessionsCreated;
     final accountCreatedAt = user == null
         ? null
         : DateTime.tryParse(user.createdAt);
@@ -251,13 +253,16 @@ class ProfileScreen extends ConsumerWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
-                                    color: dialBrassLight,
+                                    color:
+                                        palette.marketClockAccent ??
+                                        dialBrassLight,
                                     letterSpacing: 1,
                                     shadows: [
                                       Shadow(
-                                        color: dialBrassLight.withValues(
-                                          alpha: 0.5,
-                                        ),
+                                        color:
+                                            (palette.marketClockAccent ??
+                                                    dialBrassLight)
+                                                .withValues(alpha: 0.5),
                                         blurRadius: 6,
                                       ),
                                     ],
@@ -493,10 +498,7 @@ class ProfileScreen extends ConsumerWidget {
                     l10n.profilePrivacyPolicy,
                     style: GoogleFonts.inter(color: palette.textHeader),
                   ),
-                  trailing: Icon(
-                    Icons.chevron_right,
-                    color: palette.textBody,
-                  ),
+                  trailing: Icon(Icons.chevron_right, color: palette.textBody),
                   onTap: () => _openLink('https://fomoshield.app/privacy'),
                 ),
                 palette.dividerGradient != null
@@ -507,10 +509,7 @@ class ProfileScreen extends ConsumerWidget {
                     l10n.profileTermsOfUse,
                     style: GoogleFonts.inter(color: palette.textHeader),
                   ),
-                  trailing: Icon(
-                    Icons.chevron_right,
-                    color: palette.textBody,
-                  ),
+                  trailing: Icon(Icons.chevron_right, color: palette.textBody),
                   onTap: () => _openLink('https://fomoshield.app/terms'),
                 ),
               ],
@@ -711,6 +710,9 @@ class _PremiumStatusCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final details = ref.watch(premiumDetailsProvider);
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    // Gold, or this theme's own accent (turquoise under Midnight Sea) — was
+    // hardcoded ThemeV2.warning everywhere below regardless of theme.
+    final accentColor = palette.marketClockAccent ?? ThemeV2.warning;
 
     return Container(
       width: double.infinity,
@@ -728,24 +730,28 @@ class _PremiumStatusCard extends ConsumerWidget {
               end: Alignment.bottomRight,
             ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeV2.warning.withValues(alpha: 0.4)),
+        border: Border.all(color: accentColor.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: ThemeV2.warning.withValues(alpha: 0.08),
+            color: accentColor.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: details.when(
-        data: (data) => _buildContent(l10n, data),
-        loading: () => _buildShimmer(),
-        error: (_, _) => _buildContent(l10n, null),
+        data: (data) => _buildContent(l10n, data, accentColor),
+        loading: () => _buildShimmer(accentColor),
+        error: (_, _) => _buildContent(l10n, null, accentColor),
       ),
     );
   }
 
-  Widget _buildContent(AppLocalizations l10n, PremiumDetails? details) {
+  Widget _buildContent(
+    AppLocalizations l10n,
+    PremiumDetails? details,
+    Color accentColor,
+  ) {
     final isLifetime = details?.isLifetime ?? false;
     final daysLeft = details?.daysRemaining ?? 0;
     final isExpired = details?.isExpired ?? false;
@@ -759,12 +765,12 @@ class _PremiumStatusCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: ThemeV2.warning.withValues(alpha: 0.15),
+                color: accentColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 Icons.workspace_premium_rounded,
-                color: ThemeV2.warning,
+                color: accentColor,
                 size: 20,
               ),
             ),
@@ -778,7 +784,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: ThemeV2.warning,
+                      color: accentColor,
                     ),
                   ),
                   Text(
@@ -789,7 +795,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                         : l10n.premiumDaysRemaining(daysLeft),
                     style: GoogleFonts.inter(
                       fontSize: 11,
-                      color: ThemeV2.warning.withValues(alpha: 0.7),
+                      color: accentColor.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -805,12 +811,12 @@ class _PremiumStatusCard extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: isExpired
                       ? ThemeV2.loss.withValues(alpha: 0.2)
-                      : ThemeV2.warning.withValues(alpha: 0.15),
+                      : accentColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isExpired
                         ? ThemeV2.loss.withValues(alpha: 0.3)
-                        : ThemeV2.warning.withValues(alpha: 0.3),
+                        : accentColor.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(
@@ -820,7 +826,7 @@ class _PremiumStatusCard extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
-                    color: isExpired ? ThemeV2.loss : ThemeV2.warning,
+                    color: isExpired ? ThemeV2.loss : accentColor,
                   ),
                 ),
               )
@@ -831,15 +837,13 @@ class _PremiumStatusCard extends ConsumerWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: ThemeV2.warning.withValues(alpha: 0.15),
+                  color: accentColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: ThemeV2.warning.withValues(alpha: 0.3),
-                  ),
+                  border: Border.all(color: accentColor.withValues(alpha: 0.3)),
                 ),
                 child: Icon(
                   Icons.all_inclusive_rounded,
-                  color: ThemeV2.warning,
+                  color: accentColor,
                   size: 18,
                 ),
               ),
@@ -847,37 +851,62 @@ class _PremiumStatusCard extends ConsumerWidget {
         ),
         const SizedBox(height: 14),
         // Benefits list
-        _benefitRow(Icons.search_rounded, l10n.premiumBenefitSearches),
+        _benefitRow(
+          Icons.search_rounded,
+          l10n.premiumBenefitSearches,
+          accentColor,
+        ),
         const SizedBox(height: 6),
         _benefitRow(
           Icons.account_balance_rounded,
           l10n.premiumBenefitPortfolios,
+          accentColor,
         ),
         const SizedBox(height: 6),
-        _benefitRow(Icons.monetization_on_rounded, l10n.premiumBenefitCapital),
+        _benefitRow(
+          Icons.monetization_on_rounded,
+          l10n.premiumBenefitCapital,
+          accentColor,
+        ),
         const SizedBox(height: 6),
-        _benefitRow(Icons.psychology_rounded, l10n.premiumBenefitStressTests),
+        _benefitRow(
+          Icons.psychology_rounded,
+          l10n.premiumBenefitStressTests,
+          accentColor,
+        ),
         const SizedBox(height: 6),
-        _benefitRow(Icons.savings_rounded, l10n.premiumBenefitWeeklyPayout),
+        _benefitRow(
+          Icons.savings_rounded,
+          l10n.premiumBenefitWeeklyPayout,
+          accentColor,
+        ),
         const SizedBox(height: 6),
-        _benefitRow(Icons.auto_graph_rounded, l10n.premiumBenefitStressTestDca),
+        _benefitRow(
+          Icons.auto_graph_rounded,
+          l10n.premiumBenefitStressTestDca,
+          accentColor,
+        ),
         const SizedBox(height: 6),
-        _benefitRow(Icons.block_rounded, l10n.premiumBenefitAdFree),
+        _benefitRow(
+          Icons.block_rounded,
+          l10n.premiumBenefitAdFree,
+          accentColor,
+        ),
       ],
     );
   }
 
-  Widget _benefitRow(IconData icon, String text) {
+  Widget _benefitRow(IconData icon, String text, Color accentColor) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: ThemeV2.warning.withValues(alpha: 0.7)),
+        Icon(icon, size: 14, color: accentColor.withValues(alpha: 0.7)),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: GoogleFonts.inter(
               fontSize: 12,
-              color: ThemeV2.warning.withValues(alpha: 0.85),
+              color: accentColor.withValues(alpha: 0.85),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -886,14 +915,14 @@ class _PremiumStatusCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildShimmer() {
+  Widget _buildShimmer(Color accentColor) {
     return Row(
       children: [
         Container(
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: ThemeV2.warning.withValues(alpha: 0.1),
+            color: accentColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
         ),
@@ -905,7 +934,7 @@ class _PremiumStatusCard extends ConsumerWidget {
               width: 120,
               height: 14,
               decoration: BoxDecoration(
-                color: ThemeV2.warning.withValues(alpha: 0.1),
+                color: accentColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -914,7 +943,7 @@ class _PremiumStatusCard extends ConsumerWidget {
               width: 80,
               height: 10,
               decoration: BoxDecoration(
-                color: ThemeV2.warning.withValues(alpha: 0.07),
+                color: accentColor.withValues(alpha: 0.07),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

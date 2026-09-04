@@ -1699,6 +1699,7 @@
   "orderEntryNotifBuyWord": "Покупка",
   "orderEntryNotifSellWord": "Продажа",
   "orderEntryNotifOrderPlacedTitle": "{buyOrSell} ({orderType}): ордер выставлен",
+  "orderEntryNotifOrderFilledTitle": "{buyOrSell} ({orderType}): ордер исполнен",
   "orderEntryNotifPendingDetailBase": "{quantity} акций {companyName}",
   "orderEntryNotifAtPrice": " по цене {price}",
   "orderEntryNotifPendingSuffix": " — в ожидании",

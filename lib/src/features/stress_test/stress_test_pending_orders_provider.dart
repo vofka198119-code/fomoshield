@@ -166,12 +166,26 @@ class StressTestPendingOrdersNotifier
               ),
               symbol: order.symbol,
               companyName: stressTestCompanyName(order.symbol),
+              // Lets a tap on this notification jump straight to this
+              // exact fill's own trade-detail screen (see
+              // notifications_screen.dart's _handleTap) instead of just
+              // the company page — was missing here, unlike the plain
+              // buy/sell notifications, which always set it.
+              tradeTimestamp: result.trade?.date,
               title: 'Limit ${order.isBuy ? 'Buy' : 'Sell'} Order Filled',
               detail:
                   '${order.quantity.toStringAsFixed(4)} shares of '
                   '${stressTestCompanyName(order.symbol)} at '
                   '${formatUsd(order.limitPrice)}',
               createdAt: DateTime.now(),
+              // Structured fields so notification_text.dart can rebuild a
+              // localized title/detail — this fires from a background
+              // price-tick check with no BuildContext, so title/detail
+              // above stay the (unlocalized) English fallback (see
+              // AppNotification's own doc comment).
+              fillIsBuy: order.isBuy,
+              fillQuantity: order.quantity,
+              fillPrice: order.limitPrice,
             ),
           );
         }
@@ -193,12 +207,13 @@ final stressTestPendingOrdersProvider =
       // than an import, so stress_test_engine.dart stays unaware of this
       // pending-order system (see stress_test_pending_order.dart's
       // isolation comment).
-      ref.read(stressTestProvider.notifier).watchedSymbolsProvider =
-          (sessionId) => notifier
-              .forSession(sessionId)
-              .where((o) => o.isBuy)
-              .map((o) => o.symbol)
-              .toSet();
+      ref
+          .read(stressTestProvider.notifier)
+          .watchedSymbolsProvider = (sessionId) => notifier
+          .forSession(sessionId)
+          .where((o) => o.isBuy)
+          .map((o) => o.symbol)
+          .toSet();
       // Reacts to every stressTestProvider state change (each 20s price tick
       // included) without needing to touch the existing timer that drives it
       // (stress_test_screen.dart) — deferred to a microtask so a fill's own

@@ -14,8 +14,16 @@ import '../../core/notifications/notification_text.dart';
 import '../../core/overlay/app_notification_popup.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/company_logo.dart';
+import '../../shared/widgets/more_less_pill.dart';
 import '../portfolio/portfolio_providers.dart';
 import '../stress_test/stress_test_engine.dart';
+
+// Rows are revealed 6 at a time (MoreLessPill below the list) instead of
+// all at once — every row's CompanyLogo fires its own fetch the moment
+// it's built, and a long history otherwise fires all of them in one
+// SingleChildScrollView build (same reasoning as
+// search/widgets/company_list_screen.dart's own reveal cap).
+const int _revealBatchSize = 6;
 
 // ---------------------------------------------------------------------------
 // Notifications Screen — bell-icon history. One card, compact rows; the
@@ -37,6 +45,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  int _revealedCount = _revealBatchSize;
+
   void _handleTap(AppNotification n) {
     ref.read(notificationsProvider.notifier).markRead(n.id);
 
@@ -58,13 +68,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       context.go('/portfolio');
       return;
     }
-    // A trade confirmation (market buy/sell, immediate — NOT a pending
-    // limit order) should open that exact fill's own detail screen, not
-    // just the company page, so the user can see what actually happened.
-    // Falls through to the company page below if the trade can no longer
-    // be found (e.g. a very old notification outliving its portfolio).
+    // A trade confirmation (market buy/sell, immediate, OR a limit order
+    // that just filled) should open that exact fill's own detail screen,
+    // not just the company page, so the user can see what actually
+    // happened. Falls through to the company page below if the trade can
+    // no longer be found (e.g. a very old notification outliving its
+    // portfolio).
     if ((n.type == AppNotificationType.buy ||
-            n.type == AppNotificationType.sell) &&
+            n.type == AppNotificationType.sell ||
+            n.type == AppNotificationType.limitOrderFilled) &&
         n.portfolioId != null) {
       if (n.portfolioKind == NotificationPortfolioKind.stressTest) {
         final session = ref
@@ -75,8 +87,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             ? null
             : session?.trades
                   .where(
-                    (t) =>
-                        t.date == n.tradeTimestamp && t.symbol == n.symbol,
+                    (t) => t.date == n.tradeTimestamp && t.symbol == n.symbol,
                   )
                   .firstOrNull;
         if (trade != null) {
@@ -97,10 +108,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   .where((t) => t.orderId == n.orderId)
                   .firstOrNull;
         if (tx != null) {
-          context.push(
-            '/portfolio/${n.portfolioId}/trade-detail',
-            extra: tx,
-          );
+          context.push('/portfolio/${n.portfolioId}/trade-detail', extra: tx);
           return;
         }
       }
@@ -176,7 +184,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      for (int i = 0; i < notifications.length; i++) ...[
+                      for (
+                        int i = 0;
+                        i < _revealedCount.clamp(0, notifications.length);
+                        i++
+                      ) ...[
                         if (i > 0)
                           palette.dividerGradient != null
                               ? themedDivider(palette, indent: 68, endIndent: 0)
@@ -191,6 +203,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           palette: palette,
                         ),
                       ],
+                      if (_revealedCount < notifications.length)
+                        MoreLessPill(
+                          label: l10n.commonMoreCount(
+                            notifications.length - _revealedCount,
+                          ),
+                          onTap: () => setState(
+                            () => _revealedCount += _revealBatchSize,
+                          ),
+                          palette: palette,
+                        ),
                     ],
                   ),
                 ),
@@ -295,7 +317,13 @@ class _NotificationRow extends StatelessWidget {
                           Expanded(
                             child: Text(
                               notificationTitle(notification, l10n),
-                              maxLines: 1,
+                              // 2 lines, not 1 — the limit-order titles
+                              // ("Покупка (Лимитная): ордер выставлен")
+                              // run noticeably longer in Russian than the
+                              // plain "Вы купили" ones and were getting
+                              // cut off mid-word (confirmed on-device
+                              // 2026-09-04).
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.inter(
                                 fontSize: 14,
@@ -371,7 +399,9 @@ class _NotificationRow extends StatelessWidget {
     // black as the screen background). Swap to the theme's own gold
     // accent under Luxury; Standard keeps the original navy untouched.
     final isLuxury = palette.titleGradient != null;
-    final iconColor = isLuxury ? palette.accentPrimary : const Color(0xFF1B365D);
+    final iconColor = isLuxury
+        ? palette.accentPrimary
+        : const Color(0xFF1B365D);
     final iconBg = isLuxury
         ? palette.accentPrimary.withValues(alpha: 0.12)
         : const Color(0x141B365D);

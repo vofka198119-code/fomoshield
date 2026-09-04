@@ -5980,6 +5980,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String orderEntryNotifOrderFilledTitle(String orderType, String buyOrSell) {
+    return '$buyOrSell ($orderType): ордер исполнен';
+  }
+
+  @override
   String orderEntryNotifPendingDetailBase(String quantity, String companyName) {
     return '$quantity акций $companyName';
   }

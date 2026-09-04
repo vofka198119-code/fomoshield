@@ -227,14 +227,25 @@ class AppPalette {
 
 /// Shared fill for the "More/Less" toggle pills scattered across Home/
 /// Portfolio/Stress Test widgets (Holdings, Trade History, allocation
-/// legends, etc.) — a solid [AppPalette.buttonGradient] fill with white
-/// text for a theme that defines one (Luxury Gold, Midnight Sea), else the
-/// original soft [AppPalette.accentPrimary]-tinted pill every theme used
-/// before this existed. Returns (gradient, flat background, text color) —
-/// exactly one of the first two is non-null.
+/// legends, etc.) — the same [AppPalette.windowGradient] + text-color
+/// recipe every other "window" in the app uses (paired with a
+/// [themedBorder] ring at the call site) for a theme that defines one,
+/// else the original soft [AppPalette.accentPrimary]-tinted pill every
+/// theme used before this existed.
+///
+/// Reuses [AppPalette.windowGradient] rather than [AppPalette.buttonGradient]
+/// — Luxury Gold's buttonGradient is its bright, saturated gold (meant for
+/// a real brand CTA), which read as a jarring solid-gold pill here
+/// (confirmed on-device 2026-09-04); windowGradient is Luxury Gold's own
+/// graphite "inner panel" fill, the same one every stat tile/mood window/
+/// CTA shell (see themedDarkCtaButtonShell) already uses. Returns
+/// (gradient, flat background, text color) — exactly one of the first two
+/// is non-null.
 (Gradient?, Color?, Color) moreLessPillStyle(AppPalette palette) {
-  final gradient = palette.buttonGradient;
-  if (gradient != null) return (gradient, null, Colors.white);
+  final gradient = palette.windowGradient;
+  if (gradient != null) {
+    return (gradient, null, palette.onWindow ?? palette.textHeader);
+  }
   return (null, palette.accentPrimary.withValues(alpha: 0.06), palette.accentPrimary);
 }
 

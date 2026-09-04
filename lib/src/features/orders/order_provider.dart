@@ -448,6 +448,12 @@ final ordersProvider = StateNotifierProvider<OrderNotifier, List<Order>>((ref) {
         portfolioLabel: portfolioName,
         symbol: order.assetSymbol,
         companyName: order.companyName,
+        // Lets a tap on this notification jump straight to this exact
+        // fill's own trade-detail screen (see notifications_screen.dart's
+        // _handleTap) instead of just the company page — was missing
+        // here, unlike the plain buy/sell notifications, which always
+        // set it.
+        orderId: order.orderId,
         title:
             '${order.type.label} ${order.side == OrderSide.buy ? 'Buy' : 'Sell'} '
             'Order Filled',
@@ -455,6 +461,14 @@ final ordersProvider = StateNotifierProvider<OrderNotifier, List<Order>>((ref) {
             '${tx.shares.toStringAsFixed(4)} shares of '
             '${order.companyName ?? order.assetSymbol} at ${formatUsd(tx.price)}',
         createdAt: DateTime.now(),
+        // Structured fields so notification_text.dart can rebuild a
+        // localized title/detail — this callback fires from a background
+        // price-tick check with no BuildContext, so title/detail above
+        // stay the (unlocalized) English fallback (see AppNotification's
+        // own doc comment).
+        fillIsBuy: order.side == OrderSide.buy,
+        fillQuantity: tx.shares,
+        fillPrice: tx.price,
       ),
     );
   };

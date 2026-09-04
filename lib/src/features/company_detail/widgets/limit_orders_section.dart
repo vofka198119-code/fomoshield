@@ -71,6 +71,7 @@ class LimitOrdersSection extends ConsumerWidget {
             OrderRowTile(
               order: order,
               subtitle: portfolioNameFor(order.portfolioId),
+              palette: palette,
             ),
           if (orders.length > _inlineLimit)
             Padding(

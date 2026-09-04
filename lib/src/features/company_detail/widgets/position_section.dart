@@ -128,7 +128,10 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             const SizedBox(height: 10),
             widget.palette.dividerGradient != null
                 ? themedDivider(widget.palette, indent: 0, endIndent: 0)
-                : Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+                : Divider(
+                    height: 1,
+                    color: Colors.white.withValues(alpha: 0.15),
+                  ),
             if (positions.length > 1) ...[
               const SizedBox(height: 10),
               Row(
@@ -141,7 +144,10 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: safeIndex > 0 ? dialBrassLight : Colors.white,
+                        color: safeIndex > 0
+                            ? (widget.palette.marketClockAccent ??
+                                  dialBrassLight)
+                            : Colors.white,
                       ),
                     ),
                   ),
@@ -310,16 +316,14 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
   // the same dialLight/dialDark gradient would disappear into this card's
   // own background.
   Widget _premiumBadge(AppLocalizations l10n) {
+    final accentColor = widget.palette.marketClockAccent ?? dialBrassLight;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        border: Border.all(color: dialBrassLight, width: 1),
+        border: Border.all(color: accentColor, width: 1),
         borderRadius: BorderRadius.circular(6),
         boxShadow: [
-          BoxShadow(
-            color: dialBrassLight.withValues(alpha: 0.35),
-            blurRadius: 4,
-          ),
+          BoxShadow(color: accentColor.withValues(alpha: 0.35), blurRadius: 4),
         ],
       ),
       child: Text(
@@ -327,7 +331,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
         style: GoogleFonts.inter(
           fontSize: 9,
           fontWeight: FontWeight.w800,
-          color: dialBrassLight,
+          color: accentColor,
           letterSpacing: 0.8,
         ),
       ),

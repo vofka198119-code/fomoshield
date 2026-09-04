@@ -10031,6 +10031,12 @@ abstract class AppLocalizations {
   /// **'{orderType} {buyOrSell} Order Placed'**
   String orderEntryNotifOrderPlacedTitle(String orderType, String buyOrSell);
 
+  /// No description provided for @orderEntryNotifOrderFilledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{orderType} {buyOrSell} Order Filled'**
+  String orderEntryNotifOrderFilledTitle(String orderType, String buyOrSell);
+
   /// No description provided for @orderEntryNotifPendingDetailBase.
   ///
   /// In en, this message translates to:

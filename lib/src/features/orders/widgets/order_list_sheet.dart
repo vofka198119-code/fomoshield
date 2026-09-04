@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/app_palette.dart';
 import '../order_model.dart';
 import 'order_row_tile.dart';
 
@@ -57,6 +58,12 @@ void showOrderListSheet(
                 itemBuilder: (_, i) => OrderRowTile(
                   order: orders[i],
                   subtitle: subtitleFor(orders[i]),
+                  // This sheet is always light regardless of the active
+                  // theme (see its hardcoded ThemeV2.surface background
+                  // above) — Standard keeps the row tile's look consistent
+                  // with that fixed chrome instead of picking up the real
+                  // theme's dark window styling.
+                  palette: AppPalette.standard,
                 ),
               ),
             ),

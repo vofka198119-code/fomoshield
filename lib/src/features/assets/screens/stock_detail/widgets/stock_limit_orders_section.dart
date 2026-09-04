@@ -61,7 +61,8 @@ class StockLimitOrdersSection extends ConsumerWidget {
           palette.dividerGradient != null
               ? themedDivider(palette, indent: 0, endIndent: 0)
               : const Divider(height: 20, color: Color(0x0F000000)),
-          for (final order in shown) StressTestOrderRowTile(order: order),
+          for (final order in shown)
+            StressTestOrderRowTile(order: order, palette: palette),
           if (orders.length > _inlineLimit)
             Padding(
               padding: const EdgeInsets.only(top: 6, bottom: 10),
@@ -137,8 +138,12 @@ class StockLimitOrdersSection extends ConsumerWidget {
                     return ListView.builder(
                       controller: scrollController,
                       itemCount: liveOrders.length,
-                      itemBuilder: (_, i) =>
-                          StressTestOrderRowTile(order: liveOrders[i]),
+                      itemBuilder: (_, i) => StressTestOrderRowTile(
+                        order: liveOrders[i],
+                        // This sheet is always light regardless of the
+                        // active theme (hardcoded ThemeV2.surface above).
+                        palette: AppPalette.standard,
+                      ),
                     );
                   },
                 ),

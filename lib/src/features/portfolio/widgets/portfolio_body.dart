@@ -34,9 +34,17 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
     // InheritedWidget, which Flutter forbids reading before initState()
     // itself has returned (see project memory: this exact call crashed
     // Market Clock's home card the same way when it was placed directly
-    // in initState instead of deferred).
+    // in initState instead of deferred). checkPendingOrders was missing
+    // from this immediate check entirely (confirmed on-device 2026-09-04:
+    // a limit order placed right at the current price sat unfilled for
+    // up to 5 minutes, until the periodic timer's first tick) — it has no
+    // BuildContext dependency, but stayed grouped with checkWeeklyPayout
+    // here anyway since both are meant to run at the same two moments.
     Future.microtask(() {
-      if (mounted) checkWeeklyPayout(ref, AppLocalizations.of(context)!);
+      if (mounted) {
+        checkPendingOrders(ref);
+        checkWeeklyPayout(ref, AppLocalizations.of(context)!);
+      }
     });
   }
 

@@ -14,21 +14,36 @@ import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../shared/widgets/card_frame.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../shared/widgets/more_less_pill.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import '../../shared/widgets/trade_history_tile.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_naming.dart';
 
-class StressTestTradeHistoryScreen extends ConsumerWidget {
+// Rows are revealed 6 at a time (MoreLessPill below the list) instead of
+// all at once — same reasoning as the Portfolio counterpart
+// (portfolio_trade_history_screen.dart) and search/widgets/company_list_screen.dart.
+const int _revealBatchSize = 6;
+
+class StressTestTradeHistoryScreen extends ConsumerStatefulWidget {
   final String sessionId;
 
   const StressTestTradeHistoryScreen({super.key, required this.sessionId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StressTestTradeHistoryScreen> createState() =>
+      _StressTestTradeHistoryScreenState();
+}
+
+class _StressTestTradeHistoryScreenState
+    extends ConsumerState<StressTestTradeHistoryScreen> {
+  int _revealedCount = _revealBatchSize;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     ref.watch(stressTestRefreshProvider);
-    final session = ref.watch(stressTestSessionProvider(sessionId));
+    final session = ref.watch(stressTestSessionProvider(widget.sessionId));
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Scaffold(
@@ -74,7 +89,15 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
                   palette: palette,
                   child: Column(
                     children: [
-                      for (int i = 0; i < session.trades.length; i++)
+                      for (
+                        int i = 0,
+                            revealed = _revealedCount.clamp(
+                              0,
+                              session.trades.length,
+                            );
+                        i < revealed;
+                        i++
+                      )
                         Builder(
                           builder: (context) {
                             final trade =
@@ -89,15 +112,25 @@ class StressTestTradeHistoryScreen extends ConsumerWidget {
                                 ),
                                 isBuy: trade.isBuy,
                                 totalValue: trade.shares * trade.price,
-                                showDivider: i != session.trades.length - 1,
+                                showDivider: i != revealed - 1,
                                 palette: palette,
                                 onTap: () => context.push(
-                                  '/stress-test/$sessionId/trade-detail',
+                                  '/stress-test/${widget.sessionId}/trade-detail',
                                   extra: trade,
                                 ),
                               ),
                             );
                           },
+                        ),
+                      if (_revealedCount < session.trades.length)
+                        MoreLessPill(
+                          label: l10n.commonMoreCount(
+                            session.trades.length - _revealedCount,
+                          ),
+                          onTap: () => setState(
+                            () => _revealedCount += _revealBatchSize,
+                          ),
+                          palette: palette,
                         ),
                     ],
                   ),

@@ -102,6 +102,17 @@ class AppNotification {
   final String? stressTestDurationKey;
   final double? stressTestPnlPercent;
 
+  /// Set only for [AppNotificationType.limitOrderFilled] — lets the render
+  /// side rebuild a localized title/detail instead of reading the English
+  /// [title]/[detail] above. Needed because both fire sites (order_provider.dart's
+  /// onFill, stress_test_pending_orders_provider.dart's fill check) are
+  /// background price-tick callbacks with no BuildContext to localize
+  /// through at the moment the order actually fills — unlike
+  /// limitOrderPlaced, which always fires from a screen that has one.
+  final bool? fillIsBuy;
+  final double? fillQuantity;
+  final double? fillPrice;
+
   const AppNotification({
     required this.id,
     required this.type,
@@ -124,6 +135,9 @@ class AppNotification {
     this.payoutAmount,
     this.stressTestDurationKey,
     this.stressTestPnlPercent,
+    this.fillIsBuy,
+    this.fillQuantity,
+    this.fillPrice,
   });
 
   AppNotification copyWith({bool? read}) => AppNotification(
@@ -148,6 +162,9 @@ class AppNotification {
     payoutAmount: payoutAmount,
     stressTestDurationKey: stressTestDurationKey,
     stressTestPnlPercent: stressTestPnlPercent,
+    fillIsBuy: fillIsBuy,
+    fillQuantity: fillQuantity,
+    fillPrice: fillPrice,
   );
 
   Map<String, dynamic> toJson() => {
@@ -172,6 +189,9 @@ class AppNotification {
     'payoutAmount': payoutAmount,
     'stressTestDurationKey': stressTestDurationKey,
     'stressTestPnlPercent': stressTestPnlPercent,
+    'fillIsBuy': fillIsBuy,
+    'fillQuantity': fillQuantity,
+    'fillPrice': fillPrice,
   };
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {
@@ -205,8 +225,10 @@ class AppNotification {
       priceSwingWindowMinutes: json['priceSwingWindowMinutes'] as int?,
       payoutAmount: (json['payoutAmount'] as num?)?.toDouble(),
       stressTestDurationKey: json['stressTestDurationKey'] as String?,
-      stressTestPnlPercent: (json['stressTestPnlPercent'] as num?)
-          ?.toDouble(),
+      stressTestPnlPercent: (json['stressTestPnlPercent'] as num?)?.toDouble(),
+      fillIsBuy: json['fillIsBuy'] as bool?,
+      fillQuantity: (json['fillQuantity'] as num?)?.toDouble(),
+      fillPrice: (json['fillPrice'] as num?)?.toDouble(),
     );
   }
 }

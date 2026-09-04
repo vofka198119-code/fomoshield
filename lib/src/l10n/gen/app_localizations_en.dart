@@ -5962,6 +5962,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String orderEntryNotifOrderFilledTitle(String orderType, String buyOrSell) {
+    return '$orderType $buyOrSell Order Filled';
+  }
+
+  @override
   String orderEntryNotifPendingDetailBase(String quantity, String companyName) {
     return '$quantity shares of $companyName';
   }

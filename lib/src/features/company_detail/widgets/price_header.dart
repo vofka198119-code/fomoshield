@@ -518,7 +518,9 @@ class PriceHeader extends StatelessWidget {
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.6,
-              color: hasThemedBorder ? palette.textHeader : palette.accentPrimary,
+              color: hasThemedBorder
+                  ? palette.textHeader
+                  : palette.accentPrimary,
             ),
           ),
           const SizedBox(height: 4),
