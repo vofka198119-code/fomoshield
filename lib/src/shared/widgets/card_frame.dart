@@ -74,10 +74,45 @@ class CardFrame extends StatelessWidget {
     // it replaces the card's fill entirely — can't combine `color` and
     // `gradient` on one BoxDecoration, so this doesn't reuse
     // effectiveDecoration's color/border/shadow. Computed once so it
-    // applies whether or not the theme also defines a [borderGradient] —
-    // Black & White / Light Lime / Midnight Sea use cardGradient without
-    // one (2026-09-01), unlike Luxury Gold which pairs both.
-    var cardBodyDecoration = palette?.cardGradient != null
+    // applies regardless of whether the theme also defines a
+    // [borderGradient] — every current theme happens to pair both by now,
+    // but this check is intentionally independent of that so a future
+    // theme with only one of the two still works.
+    //
+    // Gated on `decoration == null` OR `decoration == FomoShieldTheme
+    // .cardDecoration` (2026-09-06 fix, found live on Black & White's
+    // Stress Test setup screen, refined same day after the first cut of
+    // this fix broke a DIFFERENT set of screens). A caller's own explicit
+    // `decoration` is documented above as always winning ("A caller that
+    // passes its own `decoration` ... still wins untouched"), but this
+    // branch previously ignored that entirely whenever the active theme
+    // had a cardGradient — silently replacing a caller's own hardcoded
+    // card look (e.g. the Stress Test balance card's fixed green/blue
+    // gradient, paired with its own hardcoded white text) with the
+    // theme's card fill, while the caller's hardcoded text stayed
+    // untouched — white-on-white under Black & White's now-light
+    // cardGradient.
+    //
+    // First attempt at this fix treated ANY non-null `decoration` as a
+    // deliberate override — wrong: many pre-theming call sites
+    // (Psychology Meter, Stress Test main screen, Trade Detail/History,
+    // Allocation/Portfolio Health/My Limit Orders widgets, Verdict marker
+    // "coming soon" fallback) explicitly pass `FomoShieldTheme
+    // .cardDecoration` out of habit, not as a real "stay Standard-styled"
+    // request — they RELIED on the old (buggy) cardGradient-always-wins
+    // behavior to get themed at all, and the naive fix broke them (flat
+    // Standard white/off-white under every dark theme). `BoxDecoration`
+    // has structural `==`, so this equality check reliably catches every
+    // one of those (a fresh `BoxDecoration(color: card, ...)` instance
+    // each call, but with identical field values) while still letting a
+    // genuinely distinct custom decoration (the balance card's own
+    // gradient) win. Every call site that instead branches on
+    // `palette.windowGradient`/`cardGradient` itself before passing
+    // `decoration` was never affected either way (its own conditional
+    // already resolves to the same themed look).
+    final isDefaultDecoration =
+        decoration == null || decoration == FomoShieldTheme.cardDecoration;
+    var cardBodyDecoration = isDefaultDecoration && palette?.cardGradient != null
         ? BoxDecoration(
             gradient: palette!.cardGradient,
             borderRadius: FomoShieldTheme.cardRadius,

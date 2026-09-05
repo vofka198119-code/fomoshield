@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'theme_v2.dart';
 import 'luxury_gold_theme.dart';
 import 'black_white_theme.dart';
-import 'light_lime_theme.dart';
+import 'graphite_theme.dart';
 import 'midnight_sea_theme.dart';
 import 'theme_variant_provider.dart';
 
@@ -107,6 +107,16 @@ class AppPalette {
   /// for every theme that doesn't set this.
   final Gradient? marketClockRingGradient;
 
+  /// Market Clock hour/minute hands' own gradient — deliberately separate
+  /// from [marketClockRingGradient] even though Graphite sets both to the
+  /// same white-steel gradient: Midnight Sea/Black & White already set a
+  /// ring gradient and are CLOSED/device-confirmed with flat hands, so
+  /// reusing that field for hands too would have silently changed their
+  /// already-shipped look. Null (every theme but Graphite) keeps the flat
+  /// [marketClockAccent]-derived hand color MarketClockDial used before
+  /// this field existed.
+  final Gradient? marketClockHandGradient;
+
   /// Text/icon color for content inside [themedDarkCtaButtonShell] /
   /// [themedAddWidgetsButton] when they resolve to [buttonGradient] rather
   /// than [windowGradient]. Null means "use [onWindow] ?? [textHeader]
@@ -161,6 +171,7 @@ class AppPalette {
     this.marketClockFaceGradient,
     this.marketClockAccent,
     this.marketClockRingGradient,
+    this.marketClockHandGradient,
     this.onButton,
     this.disclaimerColor,
     this.glowOpacity,
@@ -232,15 +243,38 @@ class AppPalette {
     glowOpacity: 0.0,
   );
 
-  static const lightLime = AppPalette(
-    background: LightLimeTheme.background,
-    backgroundGradient: LightLimeTheme.backgroundGradient,
-    card: LightLimeTheme.card,
-    border: LightLimeTheme.borderStroke,
-    accentPrimary: LightLimeTheme.accentPrimary,
-    accentSecondary: LightLimeTheme.accentSecondary,
-    textHeader: LightLimeTheme.textHeader,
-    textBody: LightLimeTheme.textBody,
+  static AppPalette get graphite => AppPalette(
+    background: GraphiteTheme.background,
+    backgroundGradient: GraphiteTheme.backgroundGradient,
+    card: GraphiteTheme.card,
+    cardGradient: GraphiteTheme.cardGradient,
+    border: GraphiteTheme.borderStroke,
+    borderGradient: GraphiteTheme.borderGradient,
+    accentPrimary: GraphiteTheme.accentPrimary,
+    accentSecondary: GraphiteTheme.accentSecondary,
+    textHeader: GraphiteTheme.textHeader,
+    textBody: GraphiteTheme.textBody,
+    // Real white→steel gradient (not a flat signal-flag one) — see
+    // GraphiteTheme.titleGradient's own doc comment. Non-null here is also
+    // this app's "dark-card theme, render white" flag app-wide.
+    titleGradient: GraphiteTheme.titleGradient,
+    // Every window AND button gets the same graphite fill as the outer
+    // card — same "one consistent treatment app-wide" precedent as Black &
+    // White/Midnight Sea.
+    windowGradient: GraphiteTheme.cardGradient,
+    buttonGradient: GraphiteTheme.cardGradient,
+    onWindow: GraphiteTheme.onWindow,
+    onButton: GraphiteTheme.onButton,
+    disclaimerColor: GraphiteTheme.disclaimerColor,
+    cardGlow: GraphiteTheme.cardGlow(),
+    // Market Clock dial re-theme: ring, hour ticks/numerals, and the
+    // digital-readout accent all go white/steel; hands reuse the same ring
+    // gradient (see market_clock_dial.dart's [MarketClockDial]) rather than
+    // a separate field — one white-steel "metallic hardware" look for both.
+    marketClockFaceGradient: GraphiteTheme.dialFaceGradient,
+    marketClockAccent: GraphiteTheme.accentPrimary,
+    marketClockRingGradient: GraphiteTheme.dialRingGradient,
+    marketClockHandGradient: GraphiteTheme.dialRingGradient,
   );
 
   static AppPalette get midnightSea => AppPalette(
@@ -313,6 +347,6 @@ AppPalette resolveAppPalette(AppThemeVariant variant) => switch (variant) {
   AppThemeVariant.standard => AppPalette.standard,
   AppThemeVariant.luxuryGold => AppPalette.luxuryGold,
   AppThemeVariant.blackWhite => AppPalette.blackWhite,
-  AppThemeVariant.lightLime => AppPalette.lightLime,
+  AppThemeVariant.graphite => AppPalette.graphite,
   AppThemeVariant.midnightSea => AppPalette.midnightSea,
 };

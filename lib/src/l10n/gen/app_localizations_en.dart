@@ -56,7 +56,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeOptionBlackWhite => 'Black & White';
 
   @override
-  String get themeOptionLightLime => 'Light Lime';
+  String get themeOptionGraphite => 'Graphite';
 
   @override
   String get themeOptionMidnightSea => 'Midnight Sea';

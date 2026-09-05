@@ -47,7 +47,8 @@ class OrderRowTile extends ConsumerWidget {
 
     // The margin lives on this outer Padding, not on themedBorder's own
     // `margin` param — themedBorder is a no-op for any theme without a
-    // borderGradient (Standard, Black & White, Light Lime), and a no-op
+    // borderGradient (Standard is the only one left without one as of
+    // 2026-09-06 — every admin preview theme now sets one), and a no-op
     // drops whatever margin it was asked to draw along with it (see
     // more_less_pill.dart's own fix, same bug, 2026-09-04).
     return Padding(

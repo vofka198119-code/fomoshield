@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _prefsKey = 'app_theme_variant';
 
-enum AppThemeVariant { standard, luxuryGold, blackWhite, lightLime, midnightSea }
+enum AppThemeVariant { standard, luxuryGold, blackWhite, graphite, midnightSea }
 
 class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
   bool _hasExplicitChoice = false;

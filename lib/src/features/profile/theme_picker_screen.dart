@@ -24,7 +24,7 @@ String _themeLabel(AppLocalizations l10n, AppThemeVariant variant) =>
       AppThemeVariant.standard => l10n.themeOptionStandard,
       AppThemeVariant.luxuryGold => l10n.themeOptionLuxuryGold,
       AppThemeVariant.blackWhite => l10n.themeOptionBlackWhite,
-      AppThemeVariant.lightLime => l10n.themeOptionLightLime,
+      AppThemeVariant.graphite => l10n.themeOptionGraphite,
       AppThemeVariant.midnightSea => l10n.themeOptionMidnightSea,
     };
 

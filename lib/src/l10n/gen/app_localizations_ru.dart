@@ -55,7 +55,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get themeOptionBlackWhite => 'Black & White';
 
   @override
-  String get themeOptionLightLime => 'Light Lime';
+  String get themeOptionGraphite => 'Графит';
 
   @override
   String get themeOptionMidnightSea => 'Midnight Sea';

@@ -198,6 +198,13 @@ class MarketClockDial extends StatelessWidget {
                 handColor: palette?.marketClockAccent != null
                     ? (palette?.onWindow ?? Colors.white)
                     : null,
+                // Null for every theme except Graphite (deliberately a
+                // SEPARATE field from [marketClockRingGradient], even
+                // though Graphite sets both to the same gradient — Midnight
+                // Sea/Black & White also set a ring gradient and are
+                // already CLOSED/device-confirmed, so reusing that field
+                // here would have silently changed their hands too).
+                handGradient: palette?.marketClockHandGradient,
                 pivotColor: palette?.marketClockAccent,
                 pivotFillColor:
                     palette?.marketClockAccent != null ? palette!.card : null,
@@ -463,21 +470,40 @@ class _ClockHandsPainter extends CustomPainter {
   // Null keeps the original ivory hands / dark-green pivot cap / gold
   // pivot ring (every theme except Midnight Sea).
   final Color? handColor;
+
+  // Non-null (Graphite only, see AppPalette.marketClockHandGradient's doc
+  // comment) paints each hand with a shader across its own center-to-tip
+  // bounding rect instead of a flat [handColor] — takes priority over
+  // [handColor] when set.
+  final Gradient? handGradient;
   final Color? pivotColor;
   final Color? pivotFillColor;
 
   _ClockHandsPainter(
     this.time, {
     this.handColor,
+    this.handGradient,
     this.pivotColor,
     this.pivotFillColor,
   });
+
+  Paint _handPaint(Offset center, Offset tip, double strokeWidth) {
+    final paint = Paint()
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+    final gradient = handGradient;
+    if (gradient != null) {
+      paint.shader = gradient.createShader(Rect.fromPoints(center, tip));
+    } else {
+      paint.color = handColor ?? dialIvory;
+    }
+    return paint;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final r = size.width / 2;
-    final hands = handColor ?? dialIvory;
     final pivot = pivotColor ?? dialBrassLight;
     final pivotFill = pivotFillColor ?? dialDark;
 
@@ -486,10 +512,7 @@ class _ClockHandsPainter extends CustomPainter {
     canvas.drawLine(
       center,
       hourTip,
-      Paint()
-        ..color = hands
-        ..strokeWidth = r * 0.045
-        ..strokeCap = StrokeCap.round,
+      _handPaint(center, hourTip, r * 0.045),
     );
 
     final minDeg = time.minute * 6.0 + time.second * 0.1;
@@ -497,10 +520,7 @@ class _ClockHandsPainter extends CustomPainter {
     canvas.drawLine(
       center,
       minTip,
-      Paint()
-        ..color = hands
-        ..strokeWidth = r * 0.028
-        ..strokeCap = StrokeCap.round,
+      _handPaint(center, minTip, r * 0.028),
     );
 
     canvas.drawCircle(center, r * 0.05, Paint()..color = pivotFill);
@@ -518,6 +538,7 @@ class _ClockHandsPainter extends CustomPainter {
   bool shouldRepaint(covariant _ClockHandsPainter oldDelegate) =>
       oldDelegate.time != time ||
       oldDelegate.handColor != handColor ||
+      oldDelegate.handGradient != handGradient ||
       oldDelegate.pivotColor != pivotColor ||
       oldDelegate.pivotFillColor != pivotFillColor;
 }

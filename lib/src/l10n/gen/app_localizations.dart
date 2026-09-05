@@ -188,11 +188,11 @@ abstract class AppLocalizations {
   /// **'Black & White'**
   String get themeOptionBlackWhite;
 
-  /// No description provided for @themeOptionLightLime.
+  /// No description provided for @themeOptionGraphite.
   ///
   /// In en, this message translates to:
-  /// **'Light Lime'**
-  String get themeOptionLightLime;
+  /// **'Graphite'**
+  String get themeOptionGraphite;
 
   /// No description provided for @themeOptionMidnightSea.
   ///

@@ -32,12 +32,13 @@ class MoreLessPill extends StatelessWidget {
     final radius = BorderRadius.circular(10);
     // The margin lives on this outer Padding, not on themedBorder's own
     // `margin` param — themedBorder is a no-op for any theme without a
-    // borderGradient (Standard, Black & White, Light Lime), and a no-op
-    // drops whatever margin it was asked to draw along with it. Only
-    // Luxury Gold/Midnight Sea (which do have one) ever saw the margin
-    // that way, which is why the pill sat flush against the card's edges
-    // — no inset at all — under every other theme (confirmed on-device
-    // 2026-09-04).
+    // borderGradient (Standard is the only one left without one as of
+    // 2026-09-06 — every admin preview theme now sets one), and a no-op
+    // drops whatever margin it was asked to draw along with it. Originally
+    // only Luxury Gold/Midnight Sea (which had one at the time) ever saw
+    // the margin that way, which is why the pill sat flush against the
+    // card's edges — no inset at all — under every other theme (confirmed
+    // on-device 2026-09-04).
     return Padding(
       padding: margin,
       child: GestureDetector(

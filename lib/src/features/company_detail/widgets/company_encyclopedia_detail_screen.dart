@@ -136,8 +136,16 @@ class CompanyEncyclopediaDetailScreen extends ConsumerWidget {
                     // Standard's light backdrop has the same problem in
                     // reverse (gray textBody on near-white), so it gets
                     // textHeader (near-black) instead — same fix, opposite
-                    // direction. Other dark-card themes (B&W, Light Lime,
-                    // Midnight Sea) keep textBody as-is.
+                    // direction. Black & White (light, no titleGradient)
+                    // correctly falls through to plain textBody. The old
+                    // Light Lime placeholder this theme's replacement
+                    // (Graphite) supersedes ALSO fell through to textBody
+                    // despite being effectively dark at the bottom of its
+                    // backgroundGradient — a real contrast bug found in the
+                    // 2026-09-05 audit (~2.5:1, below the 4.5:1 AA floor).
+                    // Graphite fixes this by setting a real titleGradient
+                    // (see GraphiteTheme's own doc comment), so it now hits
+                    // the white branch above instead of textBody.
                     color: palette.titleGradient != null
                         ? Colors.white
                         : palette.background == null
