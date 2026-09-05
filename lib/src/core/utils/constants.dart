@@ -1,5 +1,3 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class AppConstants {
   AppConstants._();
 
@@ -14,13 +12,23 @@ class AppConstants {
   /// to this exclusively, sharing one rate-limited Finnhub connection
   /// instead of each device hitting Finnhub directly with an embedded
   /// key (removed 2026-07-31 — see FinnhubService's doc comment).
-  static String get backendBaseUrl =>
-      dotenv.env['BACKEND_BASE_URL'] ?? 'http://localhost:3000';
+  ///
+  /// Compile-time constant (`--dart-define-from-file=.env`), not a bundled
+  /// runtime asset (2026-09-05) — the previous flutter_dotenv setup shipped
+  /// the whole .env file as plaintext inside the APK's asset bundle, so
+  /// anyone could unzip a release build and read it directly. This isn't a
+  /// real secret either way (any static value the client presents to its
+  /// own backend is inherently extractable from the binary), but it raises
+  /// the bar from "open a text file" to "decompile the app".
+  static const String backendBaseUrl = String.fromEnvironment(
+    'BACKEND_BASE_URL',
+    defaultValue: 'http://localhost:3000',
+  );
 
   /// Shared secret sent as the X-API-Key header on every backend call —
   /// must match the server's API_KEY. Empty until the server enables
   /// enforcement (see scanco-backend's apiKeyAuth middleware).
-  static String get backendApiKey => dotenv.env['BACKEND_API_KEY'] ?? '';
+  static const String backendApiKey = String.fromEnvironment('BACKEND_API_KEY');
 
   // Wikipedia
   static const String wikiBaseEN = 'https://en.wikipedia.org/api/rest_v1/page/summary';

@@ -188,9 +188,14 @@ void main() {
       );
 
       // Pump a couple frames to let WatchlistNotifier._load() and the
-      // per-tile cachedLogoEntryProvider reads settle.
+      // per-tile cachedLogoEntryProvider reads settle. The backend isn't
+      // reachable in a test environment, so cachedLogoProvider's own
+      // one-retry-after-800ms logic (logo_providers.dart) always runs its
+      // course — pump past that too, or the retry's pending Timer trips
+      // "A Timer is still pending" once the widget tree is disposed below.
       await tester.pump(const Duration(milliseconds: 50));
       await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 900));
 
       // Each _WatchlistTile renders exactly one CircleAvatar (via
       // CompanyLogo's letter-fallback, since no logo is cached in tests).

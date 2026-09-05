@@ -420,3 +420,86 @@ CREATE OR REPLACE TRIGGER on_company_encyclopedia_updated
 ALTER TABLE public.company_encyclopedia
 ADD COLUMN IF NOT EXISTS present_day_ru TEXT,
 ADD COLUMN IF NOT EXISTS present_day_en TEXT;
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 012
+-- Table: user_data (TRIGGER)
+-- Description: Blunt anti-cheat ceiling on user_data, found in the 2026-09-05
+--              pre-release audit. Unlike subscription_tier (Migration 008 —
+--              two flat columns the client never legitimately writes, so that
+--              trigger can just revert any client-side change outright),
+--              portfolios/stress_test_sessions/stress_test_verdicts are JSONB
+--              blobs the client is SUPPOSED to keep rewriting on every trade,
+--              tick, and session deletion — a normal Postgres RLS/trigger
+--              can't tell a legitimate save from a client that PATCHed its
+--              own row via the REST API with a fabricated transaction history
+--              (both use nothing but the user's own JWT + the public anon
+--              key). Properly closing that hole means the backend
+--              re-deriving balances from an authoritative trade log server-
+--              side instead of trusting the client's JSON wholesale — too
+--              large a change to bundle here, and out of proportion for a
+--              small closed beta where the only stake is fake money (i.e.
+--              beta-leaderboard/test-integrity, not real funds).
+--
+--              This trigger instead only rejects the crudest version of the
+--              exploit: a starting-balance field set absurdly high. Every
+--              tier's real starting balance tops out at $15,000 (see
+--              portfolio_limits_provider.dart / stress test tier setup), so
+--              $1,000,000 is a ceiling no legitimate write can ever reach.
+--              It deliberately does NOT touch `cash`, `price`, `avgCost`,
+--              `finalValue`, or similar — those can plausibly grow large
+--              over many trades/compounding, and stress_test_sessions also
+--              stores genuine large numbers unrelated to money (epoch-
+--              millisecond price-history timestamps), which a naive "any
+--              number anywhere" check would have falsely rejected. A patient
+--              cheater who leaves startingBalance/startingCash alone and
+--              fabricates a smaller, plausible-looking gain elsewhere still
+--              gets through — this only stops someone typing themselves a
+--              blatant, lazy number.
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION public.guard_user_data_sanity_ceiling()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = ''
+AS $$
+DECLARE
+    max_starting_balance CONSTANT numeric := 1000000; -- $1,000,000 — real tier caps top out at $15k
+    vars CONSTANT jsonb := jsonb_build_object('ceiling', max_starting_balance);
+BEGIN
+    -- Admin/service scripts (set-premium.js-style, service_role key) bypass —
+    -- same precedent as Migration 008's protect_subscription_columns.
+    IF auth.role() = 'service_role' THEN
+        RETURN NEW;
+    END IF;
+
+    IF jsonb_path_exists(
+           NEW.portfolios,
+           '$.**.startingBalance ? (@.type() == "number" && @ > $ceiling)',
+           vars
+       )
+       OR jsonb_path_exists(
+           NEW.stress_test_sessions,
+           '$.**.startingCash ? (@.type() == "number" && @ > $ceiling)',
+           vars
+       )
+       OR jsonb_path_exists(
+           NEW.stress_test_verdicts,
+           '$.**.startingCash ? (@.type() == "number" && @ > $ceiling)',
+           vars
+       )
+    THEN
+        RAISE EXCEPTION
+            'user_data write rejected: a startingBalance/startingCash field exceeds the $% sanity ceiling (Migration 012 — blunt anti-cheat guard, see its comment)',
+            max_starting_balance;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER guard_user_data_sanity_ceiling_trigger
+    BEFORE INSERT OR UPDATE ON public.user_data
+    FOR EACH ROW
+    EXECUTE FUNCTION public.guard_user_data_sanity_ceiling();
