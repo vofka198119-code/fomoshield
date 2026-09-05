@@ -44,7 +44,10 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final totalPnl = entry.finalValue - entry.startingCash;
+    // Excludes dcaTotalReceived from the baseline — DCA top-ups are
+    // deposits, not investment return (see StressTestSession.profitLoss).
+    final totalPnl =
+        entry.finalValue - (entry.startingCash + entry.dcaTotalReceived);
     final totalCommission = entry.trades.fold<double>(
       0,
       (sum, t) => sum + t.fee,
@@ -160,14 +163,17 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: palette.onWindow ?? Colors.white,
+          Expanded(
+            child: Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: palette.onWindow ?? Colors.white,
+              ),
             ),
           ),
+          const SizedBox(width: 12),
           themedPriceText(
             value,
             palette,

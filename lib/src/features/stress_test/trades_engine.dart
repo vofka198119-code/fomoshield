@@ -232,6 +232,11 @@ extension TradesEngine on StressTestNotifier {
     bool isEtf = false,
     AppLocalizations? l10n,
     SubscriptionTier? tier,
+    // Pins a triggered limit order's fill near its limit price instead of
+    // whatever the market happens to be at whenever the background checker
+    // next runs — see stress_test_pending_orders_provider.dart. Null for a
+    // market order (the default), which fills at the live tick price.
+    double? executionPriceOverride,
   }) {
     final idx = state.indexWhere((s) => s.id == sessionId);
     if (idx < 0) {
@@ -270,6 +275,15 @@ extension TradesEngine on StressTestNotifier {
       );
     }
 
+    // The price this trade actually executes at — the live tick for a
+    // market order, or the realistic limit-fill price for a triggered
+    // limit order. Everything below that records/prices THIS trade (cost,
+    // avgCost, the trade log entry, realized P&L, peak/bottom detection)
+    // uses this, not the raw tick — a limit order that crossed its limit
+    // during a large catch-up jump must not be priced as if it filled at
+    // whatever the market drifted to by the time this got checked.
+    final executionPrice = executionPriceOverride ?? currentPrice;
+
     // Check ad counter for free users
     // (ad checking is done by the UI)
 
@@ -278,12 +292,12 @@ extension TradesEngine on StressTestNotifier {
 
     if (useShares) {
       shares = amountOrShares;
-      cost = shares * currentPrice;
+      cost = shares * executionPrice;
     } else {
       cost = amountOrShares;
       // High-precision double division — full IEEE 754 precision preserved
       // (15+ significant digits), NEVER round to int or .00 here.
-      shares = currentPrice > 0 ? cost / currentPrice : 0;
+      shares = executionPrice > 0 ? cost / executionPrice : 0;
     }
 
     if (shares <= 0 || cost <= 0) {
@@ -342,8 +356,8 @@ extension TradesEngine on StressTestNotifier {
       final peakPrice = range.max;
       final bottomPrice = range.min;
       final threshold = (range.max - range.min) * 0.10;
-      wasPeak = isBuy && (currentPrice >= peakPrice - threshold);
-      wasBottom = !isBuy && (currentPrice <= bottomPrice + threshold);
+      wasPeak = isBuy && (executionPrice >= peakPrice - threshold);
+      wasBottom = !isBuy && (executionPrice <= bottomPrice + threshold);
     }
 
     // ── Calculate realized P&L on sell ───────────────────────────────
@@ -362,7 +376,7 @@ extension TradesEngine on StressTestNotifier {
       );
       if (held.shares > 0) {
         final soldShares = shares.clamp(0, held.shares);
-        realizedPnl = (currentPrice - held.avgCost) * soldShares;
+        realizedPnl = (executionPrice - held.avgCost) * soldShares;
         realizedCostBasis = held.avgCost * soldShares;
       }
     }
@@ -371,7 +385,7 @@ extension TradesEngine on StressTestNotifier {
       symbol: symbol,
       isBuy: isBuy,
       shares: shares,
-      price: currentPrice,
+      price: executionPrice,
       date: DateTime.now(),
       wasPeak: wasPeak,
       wasBottom: wasBottom,
@@ -393,7 +407,7 @@ extension TradesEngine on StressTestNotifier {
           symbol: symbol,
           shares: totalShares,
           avgCost: totalCost / totalShares,
-          entryPrice: currentPrice,
+          entryPrice: executionPrice,
           cachedLogoUrl: existing.cachedLogoUrl,
           entryFsScore: existing.entryFsScore,
           isEtf: existing.isEtf,
@@ -410,12 +424,12 @@ extension TradesEngine on StressTestNotifier {
           StressTestHolding(
             symbol: symbol,
             shares: shares,
-            avgCost: currentPrice,
-            entryPrice: currentPrice,
+            avgCost: executionPrice,
+            entryPrice: executionPrice,
             isEtf: isEtf,
           ),
         );
-        _fetchSafetyMarkerScore(sessionId, symbol, currentPrice);
+        _fetchSafetyMarkerScore(sessionId, symbol, executionPrice);
         _fetchIsEtfFlag(sessionId, symbol);
       }
     } else {
@@ -498,7 +512,7 @@ extension TradesEngine on StressTestNotifier {
         profile: session.psychologyProfile,
         session: session,
         symbol: symbol,
-        sellPrice: currentPrice,
+        sellPrice: executionPrice,
         realizedPnl: realizedPnl,
         realizedCostBasis: realizedCostBasis,
       );

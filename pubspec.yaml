@@ -1,7 +1,7 @@
 name: scanco
 description: "F.O.M.O. Shield — Invest with discipline, not emotion"
 publish_to: 'none'
-version: 1.0.0+102
+version: 1.0.0+103
 
 environment:
   sdk: ^3.12.1
@@ -24,7 +24,6 @@ dependencies:
   dio: ^5.8.0+1
 
   # Environment
-  flutter_dotenv: ^5.2.1
 
   # Storage
   shared_preferences: ^2.3.0
@@ -63,7 +62,6 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-    - .env
 
 flutter_launcher_icons:
   android: true

@@ -82,8 +82,11 @@ class UserDataService {
         'portfolios': portfolios.map((p) => p.toJson()).toList(),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
-    } catch (_) {
-      // Silent fail — local cache will be used on next load
+    } catch (e) {
+      // Best-effort sync — local cache will be used on next load, but log
+      // it so a real outage leaves a trace instead of silent cross-device
+      // desync with nothing to debug from (same pattern as loadAll above).
+      debugPrint('🔄 userDataService.savePortfolios($userId) failed: $e');
     }
   }
 
@@ -96,7 +99,9 @@ class UserDataService {
         'watchlist': symbols,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('🔄 userDataService.saveWatchlist($userId) failed: $e');
+    }
   }
 
   // ── Save orders ───────────────────────────────────────────────────
@@ -108,7 +113,9 @@ class UserDataService {
         'orders': orders,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('🔄 userDataService.saveOrders($userId) failed: $e');
+    }
   }
 
   // ── Save stress-test sessions ─────────────────────────────────────
@@ -123,7 +130,9 @@ class UserDataService {
         'stress_test_sessions': sessions,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('🔄 userDataService.saveStressTestSessions($userId) failed: $e');
+    }
   }
 
   // ── Save stress-test verdict archive ──────────────────────────────
@@ -140,7 +149,9 @@ class UserDataService {
         'stress_test_verdicts': archive,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('🔄 userDataService.saveVerdictArchive($userId) failed: $e');
+    }
   }
 
   // ── Save widget order ─────────────────────────────────────────────
@@ -156,7 +167,9 @@ class UserDataService {
         'widget_order': data,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('🔄 userDataService.saveWidgetOrder($userId) failed: $e');
+    }
   }
 
   // ── Helpers ───────────────────────────────────────────────────────

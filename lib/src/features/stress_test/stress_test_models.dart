@@ -1361,12 +1361,28 @@ class StressTestSession {
     return value;
   }
 
-  /// Profit/loss in dollars (realized + unrealized).
-  double get profitLoss => totalValue - startingCash;
+  /// Total cash the user actually put at risk: [startingCash] plus every
+  /// DCA top-up credited via [dcaTotalReceived]. DCA top-ups are deposits
+  /// (see `creditDcaPayout` in stress_test_engine.dart) — free cash added
+  /// to fund a Custom-duration test, not investment return — so they must
+  /// be added to the baseline rather than counted as profit. Dividends are
+  /// NOT included here: they're income earned from a held position (a real
+  /// investment outcome), so they correctly stay part of [profitLoss].
+  double get totalContributedCapital => startingCash + dcaTotalReceived;
 
-  /// Profit/loss as percentage of starting cash.
-  double get profitLossPercent =>
-      startingCash > 0 ? (profitLoss / startingCash) * 100 : 0;
+  /// Profit/loss in dollars (realized + unrealized), measured against
+  /// [totalContributedCapital] rather than the raw [startingCash]. Without
+  /// this, a zero-trade Custom-duration DCA test could show a large
+  /// "profit" purely from weekly top-ups sitting in cash — which also fed
+  /// straight into [calculateVerdict]'s pnl-based Panic/Patient Shield
+  /// gates, letting deposited cash mask real panic-selling or falsely
+  /// reward an untraded session. Fixed 2026-09-05.
+  double get profitLoss => totalValue - totalContributedCapital;
+
+  /// Profit/loss as percentage of [totalContributedCapital].
+  double get profitLossPercent => totalContributedCapital > 0
+      ? (profitLoss / totalContributedCapital) * 100
+      : 0;
 
   /// Total unrealized (paper) profit/loss.
   double get unrealizedPnl => profitLoss - realizedPnl;

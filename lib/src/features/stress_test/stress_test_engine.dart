@@ -330,7 +330,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           .toList();
       _catchUpAll();
       _save();
-    } catch (_) {}
+    } catch (e) {
+      // A malformed Supabase payload would otherwise be dropped with no
+      // trace — local sessions silently stay whatever they were before
+      // this call, which looks like data loss with nothing to debug from.
+      debugPrint('🔄 StressTestNotifier.loadFromSupabase failed: $e');
+    }
   }
 
   /// Load the verdict archive (completed test results) from Supabase —
@@ -343,7 +348,9 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
           .map((e) => VerdictArchiveEntry.fromJson(e as Map<String, dynamic>))
           .toList();
       _save();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('🔄 StressTestNotifier.loadVerdictArchiveFromSupabase failed: $e');
+    }
   }
 
   /// Pushes the current active sessions AND the verdict archive to

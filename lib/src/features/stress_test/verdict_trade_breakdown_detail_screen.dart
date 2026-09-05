@@ -274,7 +274,10 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
       0,
       (sum, t) => sum + (t.realizedPnl ?? 0),
     );
-    final totalPnl = entry.finalValue - entry.startingCash;
+    // Excludes dcaTotalReceived from the baseline — DCA top-ups are
+    // deposits, not investment return (see StressTestSession.profitLoss).
+    final totalPnl =
+        entry.finalValue - (entry.startingCash + entry.dcaTotalReceived);
 
     return _DarkCard(
       title: l10n.verdictFinancialSummaryTitle,

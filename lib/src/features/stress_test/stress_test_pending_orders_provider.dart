@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/models/app_notification.dart';
@@ -24,9 +25,24 @@ const String _prefsKey = 'stress_test_pending_orders';
 class StressTestPendingOrdersNotifier
     extends StateNotifier<List<StressTestPendingOrder>> {
   final Ref _ref;
+  final Random _random = Random();
 
   StressTestPendingOrdersNotifier(this._ref) : super([]) {
     _load();
+  }
+
+  /// Fill price for a triggered limit order: the limit itself, improved by
+  /// a small random amount (0-10¢) in the user's favor — mirrors the real
+  /// Portfolio's OrderExecutionService._realisticLimitFill. Without this,
+  /// a limit order that crossed its limit during a large catch-up price
+  /// jump (this engine's epochs can move ~29% in one jump) would fill at
+  /// whatever the market drifted to by the time this background checker
+  /// ran, handing the user an unrealistically good execution instead of
+  /// the fill a real broker would give right around the limit.
+  double _realisticLimitFill(double limit, bool isBuy) {
+    final slippage = _random.nextDouble() * 0.10;
+    final price = isBuy ? limit - slippage : limit + slippage;
+    return (price * 100).round() / 100;
   }
 
   Future<void> _load() async {
@@ -132,6 +148,7 @@ class StressTestPendingOrdersNotifier
             : price >= order.limitPrice;
         if (!shouldFill) continue;
 
+        final fillPrice = _realisticLimitFill(order.limitPrice, order.isBuy);
         final result = _ref
             .read(stressTestProvider.notifier)
             .executeTrade(
@@ -141,6 +158,7 @@ class StressTestPendingOrdersNotifier
               order.quantity,
               useShares: true,
               tier: _ref.read(subscriptionTierProvider),
+              executionPriceOverride: fillPrice,
             );
         if (result.success) {
           final idx = state.indexWhere((o) => o.id == order.id);
@@ -176,16 +194,19 @@ class StressTestPendingOrdersNotifier
               detail:
                   '${order.quantity.toStringAsFixed(4)} shares of '
                   '${stressTestCompanyName(order.symbol)} at '
-                  '${formatUsd(order.limitPrice)}',
+                  '${formatUsd(fillPrice)}',
               createdAt: DateTime.now(),
               // Structured fields so notification_text.dart can rebuild a
               // localized title/detail — this fires from a background
               // price-tick check with no BuildContext, so title/detail
               // above stay the (unlocalized) English fallback (see
-              // AppNotification's own doc comment).
+              // AppNotification's own doc comment). fillPrice is the real
+              // execution price (limit ± small favorable slippage), not
+              // the bare limit — was previously mislabeled as the limit
+              // price even when the actual fill differed.
               fillIsBuy: order.isBuy,
               fillQuantity: order.quantity,
-              fillPrice: order.limitPrice,
+              fillPrice: fillPrice,
             ),
           );
         }
