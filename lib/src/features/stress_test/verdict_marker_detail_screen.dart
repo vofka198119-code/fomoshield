@@ -281,7 +281,7 @@ class _MarkerDetailBody extends StatelessWidget {
               ),
             ),
           ),
-        const StressTestVerdictDisclaimer(),
+        StressTestVerdictDisclaimer(palette: palette),
       ],
     );
   }

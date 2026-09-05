@@ -106,13 +106,10 @@ class MarketPhaseWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () =>
+                themedHelpIcon(
+                  palette: palette,
+                  onTap: () =>
                       context.push('/market-clock/period/${window.id}'),
-                  icon: Icon(
-                    Icons.help_outline_rounded,
-                    color: palette.accentPrimary,
-                  ),
                   tooltip: l10n.marketPhaseWidgetDetailsTooltip,
                 ),
               ],

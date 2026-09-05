@@ -150,7 +150,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onTap: _showWidgetsBottomSheet,
                 ),
               ),
-              const DisclaimerFooter(),
+              DisclaimerFooter(palette: palette),
               SizedBox(height: shellBottomClearance(context)),
             ],
           ),

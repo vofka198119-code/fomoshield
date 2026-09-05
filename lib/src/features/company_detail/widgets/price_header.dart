@@ -144,7 +144,7 @@ class PriceHeader extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: palette.onWindow ?? Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -153,7 +153,7 @@ class PriceHeader extends StatelessWidget {
                         symbol,
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: Colors.white,
+                          color: palette.onWindow ?? Colors.white,
                         ),
                       ),
                       if (sector != null) ...[
@@ -331,7 +331,7 @@ class PriceHeader extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.6,
-                color: Colors.white,
+                color: palette.onWindow ?? Colors.white,
               ),
             ),
             const SizedBox(height: 8),
@@ -406,7 +406,9 @@ class PriceHeader extends StatelessWidget {
     // sharing one color by coincidence).
     final sessionColor =
         phaseLabelColor ??
-        (isOpen ? (palette.marketClockAccent ?? dialBrassLight) : Colors.white);
+        (isOpen
+            ? (palette.marketClockAccent ?? dialBrassLight)
+            : (palette.onWindow ?? Colors.white));
 
     return CardFrame(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -429,7 +431,7 @@ class PriceHeader extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.6,
-                  color: Colors.white,
+                  color: palette.onWindow ?? Colors.white,
                 ),
               ),
               if (showSessionLabel) ...[
@@ -461,17 +463,17 @@ class PriceHeader extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.attach_money_rounded,
                   size: 26,
-                  color: Colors.white,
+                  color: palette.onWindow ?? Colors.white,
                 ),
                 Text(
                   price.toStringAsFixed(2),
                   style: interNums(
                     fontSize: 32,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: palette.onWindow ?? Colors.white,
                     height: 1,
                   ),
                 ),

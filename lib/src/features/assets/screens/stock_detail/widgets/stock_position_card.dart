@@ -61,14 +61,19 @@ class StockPositionCard extends StatelessWidget {
           themedGoldGradient(
             Text(
               l10n.stockPositionCardTitle,
-              style: FomoShieldTheme.cardTitle(Colors.white),
+              style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white),
             ),
             palette,
           ),
           const SizedBox(height: 10),
           palette.dividerGradient != null
               ? themedDivider(palette, indent: 0, endIndent: 0)
-              : Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+              : Divider(
+                  height: 1,
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.15,
+                  ),
+                ),
           const SizedBox(height: 12),
           _row(l10n.stockPositionCardAssetValueLabel, formatUsd(positionValue)),
           const SizedBox(height: 8),
@@ -96,14 +101,14 @@ class StockPositionCard extends StatelessWidget {
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: palette.onWindow ?? Colors.white,
         ),
       ),
       themedPriceText(
         value,
         palette,
         interNums(fontSize: 14, fontWeight: FontWeight.w600),
-        fallbackColor: Colors.white,
+        fallbackColor: palette.onWindow ?? Colors.white,
       ),
     ],
   );
@@ -122,7 +127,7 @@ class StockPositionCard extends StatelessWidget {
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: palette.onWindow ?? Colors.white,
         ),
       ),
       Row(

@@ -55,7 +55,7 @@ class OrderConfigSection extends StatelessWidget {
         _infoBox(),
         if (extendedHours != null && onExtendedHoursChanged != null)
           _extendedHoursToggle(l10n, extendedHours!, onExtendedHoursChanged!),
-        const SimulatedTradingDisclaimer(),
+        SimulatedTradingDisclaimer(palette: palette),
       ],
     );
   }

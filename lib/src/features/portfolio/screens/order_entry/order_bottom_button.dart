@@ -110,7 +110,7 @@ class ReviewOrderButton extends StatelessWidget {
         width: double.infinity,
         height: height,
         decoration: BoxDecoration(
-          color: ThemeV2.textSecondary.withValues(alpha: 0.15),
+          color: palette.textBody.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(18),
         ),
         alignment: Alignment.center,
@@ -119,7 +119,7 @@ class ReviewOrderButton extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: ThemeV2.textSecondary,
+            color: palette.textBody,
             letterSpacing: 0.5,
           ),
         ),

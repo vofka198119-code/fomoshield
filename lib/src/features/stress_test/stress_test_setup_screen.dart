@@ -277,7 +277,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               const SizedBox(height: 24),
 
               // ── Disclaimer ─────────────────────────────────────
-              const DisclaimerFooter(),
+              DisclaimerFooter(palette: palette),
               const SizedBox(height: 8),
             ],
           ),

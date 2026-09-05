@@ -613,7 +613,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
-          const DisclaimerFooter(),
+          DisclaimerFooter(palette: palette),
           SizedBox(height: shellBottomClearance(context)),
         ],
       ),

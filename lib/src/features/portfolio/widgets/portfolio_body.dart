@@ -140,7 +140,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                 onTap: _showWidgetsBottomSheet,
               ),
             ),
-            const DisclaimerFooter(),
+            DisclaimerFooter(palette: palette),
             SizedBox(height: shellBottomClearance(context)),
           ],
         ),

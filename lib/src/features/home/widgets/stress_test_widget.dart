@@ -276,11 +276,13 @@ class StressTestWidget extends ConsumerWidget {
   // always free (white), slot 2 is white on free tier / gold once premium,
   // slots 3-5 are premium-only so always gold.
   Color _playIconColor(WidgetRef ref, int index, AppPalette palette) {
-    if (index == 0) return Colors.white;
+    if (index == 0) return palette.onWindow ?? Colors.white;
     final tier = ref.watch(subscriptionTierProvider);
     final isPremiumTier = tier.isPremiumOrAdmin;
     final accentColor = palette.marketClockAccent ?? dialBrassLight;
-    if (index == 1) return isPremiumTier ? accentColor : Colors.white;
+    if (index == 1) {
+      return isPremiumTier ? accentColor : (palette.onWindow ?? Colors.white);
+    }
     return accentColor;
   }
 

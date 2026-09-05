@@ -298,7 +298,9 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected ? Colors.white : palette.textBody,
+                  color: isSelected
+                      ? (palette.onWindow ?? Colors.white)
+                      : palette.textBody,
                 ),
               ),
             ),
@@ -366,7 +368,6 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     final showAvgLine =
         avgCost != null && avgCost >= chartMinY && avgCost <= chartMaxY;
     final horizontalLines = [
-      HorizontalLine(y: chartMinY, color: ThemeV2.surfaceDark, strokeWidth: 1),
       if (showAvgLine)
         HorizontalLine(
           y: avgCost,

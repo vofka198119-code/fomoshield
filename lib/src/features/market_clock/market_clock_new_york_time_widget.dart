@@ -30,22 +30,25 @@ class NewYorkTimeWidget extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return CardFrame(
       padding: EdgeInsets.zero,
-      decoration: marketClockCardDecoration(),
+      decoration: marketClockCardDecoration(palette: palette),
       palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-            // Always-dark panel in both themes — same reasoning as the
-            // Home Market Clock widget's own title.
+            // Always-dark panel in both other themes — same reasoning as
+            // the Home Market Clock widget's own title. Black & White's
+            // card is light now (windowGradient/cardGradient unified,
+            // 2026-09-05), so its title needs palette.onWindow instead of
+            // the flat white this used unconditionally before.
             child: themedGoldGradient(
               Text(
                 l10n.marketClockNewYorkTimeTitle,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: palette.onWindow ?? Colors.white,
                   letterSpacing: 1.2,
                   shadows: palette.titleShadow != null
                       ? [palette.titleShadow!]
@@ -61,7 +64,7 @@ class NewYorkTimeWidget extends StatelessWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.1),
                 ),
           Padding(
             padding: const EdgeInsets.all(16),
@@ -143,16 +146,23 @@ List<_MacroPhase> _macroPhasesFor(AppLocalizations l10n) => [
   ),
 ];
 
-Color _macroPhaseColor(MarketPhase phase) {
+// preMarket/closed were flat dialBrassLight (gold) / Colors.white,
+// unconditionally — correct while this panel was always dark in every
+// theme, but Black & White's panel backdrop is light now (2026-09-05), so
+// gold reads as unwanted "sandy" color and white is invisible.
+// palette?.onWindow (only set for Black & White) swaps both to near-
+// black; every other theme keeps the original two colors via the null
+// fallback.
+Color _macroPhaseColor(MarketPhase phase, AppPalette? palette) {
   switch (phase) {
     case MarketPhase.preMarket:
-      return dialBrassLight;
+      return palette?.onWindow ?? dialBrassLight;
     case MarketPhase.marketOpen:
       return ThemeV2.success;
     case MarketPhase.afterHours:
       return const Color(0xFF5DA9E0);
     case MarketPhase.closed:
-      return Colors.white;
+      return palette?.onWindow ?? Colors.white;
   }
 }
 
@@ -309,8 +319,8 @@ class _CornerPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final accent = active
-        ? _macroPhaseColor(macro.phase)
-        : Colors.white.withValues(alpha: 0.4);
+        ? _macroPhaseColor(macro.phase, palette)
+        : (palette.onWindow ?? Colors.white).withValues(alpha: 0.4);
 
     final labelStyle = GoogleFonts.inter(
       fontSize: panelSize * 0.072,
@@ -321,7 +331,7 @@ class _CornerPanel extends StatelessWidget {
     final timerStyle = GoogleFonts.inter(
       fontSize: panelSize * 0.078,
       fontWeight: FontWeight.w700,
-      color: dialIvory,
+      color: palette.onWindow ?? dialIvory,
     );
     final timerString = active
         ? l10n.marketClockCountdownEnds(_formatHm(l10n, remainingMinutes))
@@ -369,7 +379,7 @@ class _CornerPanel extends StatelessWidget {
               notchRadius: notchRadius,
               cornerRadius: panelSize * 0.16,
               borderColor: active
-                  ? _macroPhaseColor(macro.phase).withValues(alpha: 0.7)
+                  ? _macroPhaseColor(macro.phase, palette).withValues(alpha: 0.7)
                   : dialBrassLight.withValues(alpha: 0.3),
               // Only the inactive gold outline picks up the theme's window-
               // border gradient (same recipe themedBorder/CardFrame use
@@ -377,8 +387,8 @@ class _CornerPanel extends StatelessWidget {
               // untouched, and Standard (borderGradient == null) is unchanged.
               borderGradient: active ? null : palette.borderGradient,
               fillColor: active
-                  ? _macroPhaseColor(macro.phase).withValues(alpha: 0.1)
-                  : dialDark.withValues(alpha: 0.25),
+                  ? _macroPhaseColor(macro.phase, palette).withValues(alpha: 0.1)
+                  : (palette.onWindow ?? dialDark).withValues(alpha: 0.25),
             ),
           ),
           Padding(

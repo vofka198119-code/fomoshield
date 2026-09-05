@@ -53,7 +53,9 @@ class PortfolioCashWidget extends StatelessWidget {
               child: themedGoldGradient(
                 Text(
                   AppLocalizations.of(context)!.portfolioCashLabel,
-                  style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                  style: FomoShieldTheme.cardTitle(
+                    palette.onWindow ?? Colors.white,
+                  ).copyWith(
                     shadows: palette.titleShadow != null
                         ? [palette.titleShadow!]
                         : null,
@@ -69,7 +71,9 @@ class PortfolioCashWidget extends StatelessWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.12,
+                  ),
                 ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
@@ -82,17 +86,19 @@ class PortfolioCashWidget extends StatelessWidget {
                       style: interNums(
                         fontSize: 26,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: (palette.onWindow ?? Colors.white).withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     )
                   : isLoading || cash == null
-                  ? const Center(
+                  ? Center(
                       child: SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: palette.onWindow ?? Colors.white,
                         ),
                       ),
                     )
@@ -102,7 +108,7 @@ class PortfolioCashWidget extends StatelessWidget {
                       style: interNums(
                         fontSize: 26,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: palette.onWindow ?? Colors.white,
                       ),
                     ),
             ),

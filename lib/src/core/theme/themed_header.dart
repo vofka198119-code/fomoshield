@@ -130,3 +130,53 @@ Widget themedPriceText(
       : (fallbackColor ?? palette.textHeader);
   return Text(text, style: baseStyle.copyWith(color: color));
 }
+
+// ---------------------------------------------------------------------------
+// Themed help/info icon — the canonical "?" circle button used next to a
+// card/window header or a per-marker label to open its explainer screen.
+// UNIFIED 2026-09-05: 13 near-identical hand-rolled copies had drifted —
+// three different fill alphas (0.06/0.08/0.1/0.12), two different border
+// radii (10 vs ThemeV2.radiusSmall), and one file (psychology_meter.dart /
+// stress_test_psychology_meter_screen.dart) used a flat unthemed
+// `Colors.black.withValues(alpha: 0.06)` fill + `palette.textBody` icon —
+// invisible on a dark-card theme (Luxury Gold/Midnight Sea). One shape/size
+// everywhere now: 20×20 circle, 10px radius, 13px glyph.
+// ---------------------------------------------------------------------------
+
+/// [onWindow]: true when this icon sits on an inner "window"/instrument-
+/// panel surface (i.e. wherever the surrounding content uses
+/// [AppPalette.windowGradient]/[AppPalette.onWindow]) — false (the
+/// default) for one sitting directly on the outer card, which uses
+/// [AppPalette.accentPrimary] instead (the same token
+/// [themedHeaderIcon]-style card icons already use).
+Widget themedHelpIcon({
+  required AppPalette palette,
+  required VoidCallback onTap,
+  bool onWindow = false,
+  String? tooltip,
+}) {
+  // Luxury Gold explicitly wants this icon gold even inside dark windows
+  // (user, 2026-09-05: "часть золотая часть белые" → picked "сделать все
+  // золотыми") — `titleShadow` is set only by Luxury Gold among the
+  // themes that leave `onWindow` null, so it's a safe way to special-case
+  // just that theme without touching Midnight Sea's white (unchanged) or
+  // Black & White's `onWindow` (still wins, checked first).
+  final color = onWindow
+      ? (palette.onWindow ??
+            (palette.titleShadow != null ? palette.accentPrimary : Colors.white))
+      : palette.accentPrimary;
+  final icon = Container(
+    width: 20,
+    height: 20,
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: onWindow ? 0.12 : 0.1),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    alignment: Alignment.center,
+    child: Icon(Icons.help_outline_rounded, size: 13, color: color),
+  );
+  return GestureDetector(
+    onTap: onTap,
+    child: tooltip != null ? Tooltip(message: tooltip, child: icon) : icon,
+  );
+}

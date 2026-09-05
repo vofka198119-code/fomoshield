@@ -343,7 +343,9 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected ? Colors.white : palette.textBody,
+                  color: isSelected
+                      ? (palette.onWindow ?? Colors.white)
+                      : palette.textBody,
                 ),
               ),
             ),

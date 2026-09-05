@@ -103,7 +103,7 @@ class AllocationBarRow extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: palette.onWindow ?? Colors.white,
               ),
             ),
           ),
@@ -115,7 +115,9 @@ class AllocationBarRow extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.10),
+                      color: (palette.onWindow ?? Colors.white).withValues(
+                        alpha: 0.10,
+                      ),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -125,13 +127,15 @@ class AllocationBarRow extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: fillGradient,
                         borderRadius: BorderRadius.circular(4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: glowColor.withValues(alpha: 0.6),
-                            blurRadius: 6,
-                            spreadRadius: 0.5,
-                          ),
-                        ],
+                        boxShadow: (palette.glowOpacity ?? 1.0) > 0
+                            ? [
+                                BoxShadow(
+                                  color: glowColor.withValues(alpha: 0.6),
+                                  blurRadius: 6,
+                                  spreadRadius: 0.5,
+                                ),
+                              ]
+                            : null,
                       ),
                     ),
                   ),
@@ -151,7 +155,7 @@ class AllocationBarRow extends StatelessWidget {
               style: interNums(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: palette.onWindow ?? Colors.white,
               ),
             ),
           ),

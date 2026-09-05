@@ -165,6 +165,7 @@ class MarketClockDial extends StatelessWidget {
               strokeWidth: ringStroke,
               color: palette?.marketClockAccent ?? dialBrassLight,
               gradient: palette?.marketClockRingGradient,
+              glowOpacity: palette?.glowOpacity ?? 0.35,
             ),
           ),
           SizedBox(
@@ -195,7 +196,7 @@ class MarketClockDial extends StatelessWidget {
               painter: _ClockHandsPainter(
                 state.nowEt,
                 handColor: palette?.marketClockAccent != null
-                    ? Colors.white
+                    ? (palette?.onWindow ?? Colors.white)
                     : null,
                 pivotColor: palette?.marketClockAccent,
                 pivotFillColor:
@@ -225,16 +226,22 @@ class _DigitalReadout extends StatelessWidget {
     this.palette,
   });
 
-  static Color _colorForPhase(MarketPhase phase) {
+  // preMarket/closed were flat dialBrassLight (gold) / Colors.white,
+  // unconditionally — fine while this box was always dark, but now that a
+  // themed palette (Black & White) makes it light via `isThemed` below,
+  // gold reads as unwanted "sandy" color and white is invisible. Themed
+  // callers get marketClockAccent (black for B&W) / onWindow instead; an
+  // untheemed palette keeps the original two colors exactly.
+  static Color _colorForPhase(MarketPhase phase, AppPalette? palette) {
     switch (phase) {
       case MarketPhase.preMarket:
-        return dialBrassLight;
+        return palette?.marketClockAccent ?? dialBrassLight;
       case MarketPhase.marketOpen:
         return ThemeV2.success;
       case MarketPhase.afterHours:
         return const Color(0xFF5DA9E0);
       case MarketPhase.closed:
-        return Colors.white;
+        return palette?.onWindow ?? Colors.white;
     }
   }
 
@@ -242,7 +249,7 @@ class _DigitalReadout extends StatelessWidget {
   Widget build(BuildContext context) {
     final hh = nowEt.hour.toString().padLeft(2, '0');
     final mm = nowEt.minute.toString().padLeft(2, '0');
-    final color = _colorForPhase(phase);
+    final color = _colorForPhase(phase, palette);
     final fontSize = size * 0.065;
     final radius = BorderRadius.circular(size * 0.025);
     // marketClockAccent != null is Midnight Sea's own signal (see the
@@ -276,16 +283,22 @@ class _DigitalReadout extends StatelessWidget {
           fontWeight: FontWeight.w700,
           color: color,
           letterSpacing: 1.0,
-          shadows: [
-            Shadow(
-              color: color.withValues(alpha: 0.8),
-              blurRadius: fontSize * 0.35,
-            ),
-            Shadow(
-              color: color.withValues(alpha: 0.5),
-              blurRadius: fontSize * 0.7,
-            ),
-          ],
+          // Glow disabled per palette.glowOpacity (Black & White, 2026-09-
+          // 05): a black-tinted blur behind black digits on this theme's
+          // now-light readout box read as a dirty smudge, not a glow —
+          // same fix as the dial ring's glow.
+          shadows: (palette?.glowOpacity ?? 1.0) > 0
+              ? [
+                  Shadow(
+                    color: color.withValues(alpha: 0.8),
+                    blurRadius: fontSize * 0.35,
+                  ),
+                  Shadow(
+                    color: color.withValues(alpha: 0.5),
+                    blurRadius: fontSize * 0.7,
+                  ),
+                ]
+              : null,
         ),
       ),
     );
@@ -309,10 +322,18 @@ class _RingPainter extends CustomPainter {
   // behind the hands, not a highlight; confirmed on-device 2026-09-02.)
   final Gradient? gradient;
 
+  // Blurred halo behind the ring stroke — flattering as a colored glow on
+  // a dark card (Luxury Gold's gold, Midnight Sea's teal), but a BLACK
+  // blur on Black & White's now-light card reads as a dirty smudge, not a
+  // glow (user: "грязь сверху вылезла", 2026-09-05). 0.0 fully suppresses
+  // it; every other theme keeps the original 0.35 via the default.
+  final double glowOpacity;
+
   _RingPainter({
     required this.strokeWidth,
     required this.color,
     this.gradient,
+    this.glowOpacity = 0.35,
   });
 
   @override
@@ -320,12 +341,14 @@ class _RingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.shortestSide - strokeWidth) / 2;
 
-    final glowPaint = Paint()
-      ..color = color.withValues(alpha: 0.35)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth * 2.2
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, strokeWidth * 1.1);
-    canvas.drawCircle(center, radius, glowPaint);
+    if (glowOpacity > 0) {
+      final glowPaint = Paint()
+        ..color = color.withValues(alpha: glowOpacity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth * 2.2
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, strokeWidth * 1.1);
+      canvas.drawCircle(center, radius, glowPaint);
+    }
 
     final ringPaint = Paint()
       ..style = PaintingStyle.stroke
@@ -346,7 +369,8 @@ class _RingPainter extends CustomPainter {
   bool shouldRepaint(covariant _RingPainter oldDelegate) =>
       oldDelegate.color != color ||
       oldDelegate.strokeWidth != strokeWidth ||
-      oldDelegate.gradient != gradient;
+      oldDelegate.gradient != gradient ||
+      oldDelegate.glowOpacity != glowOpacity;
 }
 
 Offset _polar(Offset center, double radius, double degrees) {

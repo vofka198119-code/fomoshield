@@ -95,7 +95,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
                 themedGoldGradient(
                   Text(
                     l10n.verdictTradeBreakdownTitle,
-                    style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                    style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white).copyWith(
                       shadows: palette.titleShadow != null
                           ? [palette.titleShadow!]
                           : null,
@@ -109,7 +109,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.chevron_right_rounded,
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
                     size: 22,
                   ),
                 ),
@@ -122,7 +122,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
                 ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
@@ -154,7 +154,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                bottom: BorderSide(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12)),
               ),
             ),
       child: Row(
@@ -165,7 +165,7 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Colors.white,
+              color: palette.onWindow ?? Colors.white,
             ),
           ),
           themedPriceText(

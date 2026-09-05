@@ -305,7 +305,7 @@ class VerdictScreen extends ConsumerWidget {
                 key: const ValueKey('disclaimer'),
                 child: StaggerFadeIn(
                   index: 9,
-                  child: const StressTestVerdictDisclaimer(),
+                  child: StressTestVerdictDisclaimer(palette: palette),
                 ),
               ),
               const SizedBox(height: 24),

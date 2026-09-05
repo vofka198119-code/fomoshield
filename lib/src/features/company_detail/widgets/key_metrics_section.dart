@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/app_palette.dart';
@@ -135,22 +134,9 @@ class KeyMetricsSection extends StatelessWidget {
             ),
             if (infoId != null) ...[
               const SizedBox(width: 6),
-              GestureDetector(
+              themedHelpIcon(
+                palette: palette,
                 onTap: () => context.push('/metric-info/$infoId'),
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: palette.accentPrimary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.help_outline_rounded,
-                    size: 13,
-                    color: palette.accentPrimary,
-                  ),
-                ),
               ),
             ],
           ],

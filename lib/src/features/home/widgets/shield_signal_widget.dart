@@ -251,7 +251,7 @@ class _IndexView extends StatelessWidget {
             labelFontSize: 14,
             gradient: palette.windowGradient ?? darkCardGradient(),
             labelColor: changeColor,
-            valueColor: Colors.white,
+            valueColor: palette.onWindow ?? Colors.white,
             goldValue: true,
             leadingIcon: isUp ? Icons.trending_up : Icons.trending_down,
             leadingIconColor: changeColor,
@@ -318,7 +318,7 @@ class _IndexView extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: palette.onWindow ?? Colors.white,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -326,7 +326,7 @@ class _IndexView extends StatelessWidget {
                   mood.body,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.85),
                     height: 1.5,
                   ),
                 ),

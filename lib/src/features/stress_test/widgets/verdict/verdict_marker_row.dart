@@ -50,6 +50,7 @@ class VerdictMarkerRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final color = _color;
     final radius = BorderRadius.circular(12);
 
@@ -59,11 +60,14 @@ class VerdictMarkerRow extends ConsumerWidget {
       // transparent fill + flat white 10% border, no theme gradient/glow.
       // Used to go through themedBorder() (gold under Luxury Gold), which
       // read as off; kept unconditional to match the FS Score reference
-      // the user pointed at (2026-09-02).
+      // the user pointed at (2026-09-02). Nested inside a windowGradient
+      // parent card (VerdictDiversificationCard/VerdictStrategyCard/
+      // VerdictSingleMarkerCard), so its "white" text/border still needs
+      // [palette.onWindow] once that parent's window goes light.
       decoration: BoxDecoration(
         color: Colors.transparent,
         borderRadius: radius,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -84,7 +88,7 @@ class VerdictMarkerRow extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: palette.onWindow ?? Colors.white,
               ),
             ),
           ),
@@ -161,7 +165,7 @@ class VerdictSingleMarkerCard extends ConsumerWidget {
                 themedGoldGradient(
                   Text(
                     title,
-                    style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                    style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white).copyWith(
                       shadows: palette.titleShadow != null
                           ? [palette.titleShadow!]
                           : null,
@@ -169,23 +173,11 @@ class VerdictSingleMarkerCard extends ConsumerWidget {
                   ),
                   palette,
                 ),
-                GestureDetector(
+                themedHelpIcon(
+                  palette: palette,
+                  onWindow: true,
                   onTap: () =>
                       context.push('/metric-info/psychology-$markerId'),
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.help_outline_rounded,
-                      size: 13,
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -196,7 +188,7 @@ class VerdictSingleMarkerCard extends ConsumerWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
                 ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show MethodChannel;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/splash/splash_screen.dart';
@@ -488,78 +489,98 @@ class _AppShell extends ConsumerWidget {
     context.push('/stress-test-hub');
   }
 
+  // System back at the bottom-nav root (nothing left for the root
+  // navigator to pop — a pushed screen on top, e.g. Company Detail, pops
+  // via that navigator and never reaches here) used to fall through to
+  // Flutter's default SystemNavigator.pop(), which finish()es the
+  // Activity — killing the Flutter engine, so reopening from Recents was
+  // a full cold start every time (2026-09-05 bug report; pressing the
+  // Recents/overview button instead, which only backgrounds the task,
+  // was always fine). moveTaskToBack mirrors that Recents behavior
+  // instead — see MainActivity.kt's "app/lifecycle" channel.
+  static const _lifecycleChannel = MethodChannel('app/lifecycle');
+
+  Future<void> _onPopInvoked(bool didPop, Object? result) async {
+    if (didPop) return;
+    await _lifecycleChannel.invokeMethod('moveTaskToBack');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (ref.watch(isAdminProvider)) {
       ref.read(themeVariantProvider.notifier).applyAdminDefaultIfUnset();
     }
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBody: true,
-      body: child,
-      bottomNavigationBar: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        child: Container(
-          decoration: BoxDecoration(
-            color: palette.card,
-            gradient: palette.cardGradient,
-            border: Border(top: BorderSide(color: palette.border)),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: BottomNavigationBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                selectedItemColor: palette.accentPrimary,
-                unselectedItemColor: palette.textBody,
-                // Cyrillic glyphs run visibly wider than Latin at the same
-                // character count — "Стресс-тест" was clipping to
-                // "Стресс-т…" at the default 12/14px label sizes. Shrunk
-                // a couple px so every language's longest label fits.
-                selectedFontSize: 12,
-                unselectedFontSize: 10,
-                currentIndex: _currentIndex(context),
-                onTap: (index) {
-                  ref.read(previousTabRouteProvider.notifier).state =
-                      GoRouterState.of(context).uri.toString();
-                  switch (index) {
-                    case 0:
-                      context.go('/home');
-                    case 1:
-                      context.push('/search');
-                    case 2:
-                      context.go('/portfolio');
-                    case 3:
-                      _onStressTestTap(context, ref);
-                    case 4:
-                      context.go('/profile');
-                  }
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.shield_rounded),
-                    label: AppLocalizations.of(context)!.navHome,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.search_rounded),
-                    label: AppLocalizations.of(context)!.navSearch,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.account_balance_rounded),
-                    label: AppLocalizations.of(context)!.navPortfolio,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.psychology_rounded),
-                    label: AppLocalizations.of(context)!.navStressTest,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.person_rounded),
-                    label: AppLocalizations.of(context)!.navProfile,
-                  ),
-                ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: _onPopInvoked,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        extendBody: true,
+        body: child,
+        bottomNavigationBar: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: Container(
+            decoration: BoxDecoration(
+              color: palette.card,
+              gradient: palette.cardGradient,
+              border: Border(top: BorderSide(color: palette.border)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: BottomNavigationBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  selectedItemColor: palette.accentPrimary,
+                  unselectedItemColor: palette.textBody,
+                  // Cyrillic glyphs run visibly wider than Latin at the same
+                  // character count — "Стресс-тест" was clipping to
+                  // "Стресс-т…" at the default 12/14px label sizes. Shrunk
+                  // a couple px so every language's longest label fits.
+                  selectedFontSize: 12,
+                  unselectedFontSize: 10,
+                  currentIndex: _currentIndex(context),
+                  onTap: (index) {
+                    ref.read(previousTabRouteProvider.notifier).state =
+                        GoRouterState.of(context).uri.toString();
+                    switch (index) {
+                      case 0:
+                        context.go('/home');
+                      case 1:
+                        context.push('/search');
+                      case 2:
+                        context.go('/portfolio');
+                      case 3:
+                        _onStressTestTap(context, ref);
+                      case 4:
+                        context.go('/profile');
+                    }
+                  },
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: const Icon(Icons.shield_rounded),
+                      label: AppLocalizations.of(context)!.navHome,
+                    ),
+                    BottomNavigationBarItem(
+                      icon: const Icon(Icons.search_rounded),
+                      label: AppLocalizations.of(context)!.navSearch,
+                    ),
+                    BottomNavigationBarItem(
+                      icon: const Icon(Icons.account_balance_rounded),
+                      label: AppLocalizations.of(context)!.navPortfolio,
+                    ),
+                    BottomNavigationBarItem(
+                      icon: const Icon(Icons.psychology_rounded),
+                      label: AppLocalizations.of(context)!.navStressTest,
+                    ),
+                    BottomNavigationBarItem(
+                      icon: const Icon(Icons.person_rounded),
+                      label: AppLocalizations.of(context)!.navProfile,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

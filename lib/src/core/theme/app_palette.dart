@@ -107,6 +107,38 @@ class AppPalette {
   /// for every theme that doesn't set this.
   final Gradient? marketClockRingGradient;
 
+  /// Text/icon color for content inside [themedDarkCtaButtonShell] /
+  /// [themedAddWidgetsButton] when they resolve to [buttonGradient] rather
+  /// than [windowGradient]. Null means "use [onWindow] ?? [textHeader]
+  /// there instead," exactly the behavior before this field existed —
+  /// needed only for a theme like Black & White, whose CTA buttons sit on
+  /// a LIGHT [buttonGradient] (needs near-black text) while its inner
+  /// instrument-panel windows stay dark (needs [onWindow]'s white).
+  final Color? onButton;
+
+  /// Opacity of the decorative blurred glow behind accent-colored
+  /// elements — the Market Clock dial's ring stroke, its digital-readout
+  /// text, and the accent-tinted glow under filled progress bars
+  /// (Market Clock's risk-metric bars, Stress Test's allocation bars).
+  /// Null means "use each call site's own original opacity" (Luxury
+  /// Gold's gold glow, Midnight Sea's teal glow, and Standard's brass
+  /// glow are all unaffected). Only Black & White sets this, to 0.0: a
+  /// colored glow looks flattering on a dark card, but a near-black glow
+  /// blurred against this theme's now-light cards/bars reads as a dirty
+  /// smudge, not a halo (user, 2026-09-05: "грязь сверху вылезла" for the
+  /// ring, then the same complaint for the digital clock + bar glows).
+  final double? glowOpacity;
+
+  /// Disclaimer/fine-print text color (DisclaimerFooter,
+  /// SimulatedTradingDisclaimer, StressTestVerdictDisclaimer, and the
+  /// inline Company Card / Trade Breakdown disclaimers). Null means "keep
+  /// the shared `ThemeV2.textSecondary` @ 50% alpha every theme used
+  /// before this field existed" — that muted gray already reads fine on
+  /// Luxury Gold/Midnight Sea's dark backdrops (2026-08-23/25 decision,
+  /// left un-themed on purpose). Only Black & White sets this, to near-
+  /// black — its white cards made the same muted gray read too faint.
+  final Color? disclaimerColor;
+
   const AppPalette({
     this.background,
     this.backgroundGradient,
@@ -129,6 +161,9 @@ class AppPalette {
     this.marketClockFaceGradient,
     this.marketClockAccent,
     this.marketClockRingGradient,
+    this.onButton,
+    this.disclaimerColor,
+    this.glowOpacity,
   });
 
   static const standard = AppPalette(
@@ -161,17 +196,40 @@ class AppPalette {
     dividerGradient: LuxuryGoldTheme.dividerGradient,
   );
 
-  static const blackWhite = AppPalette(
+  static AppPalette get blackWhite => AppPalette(
     background: BlackWhiteTheme.background,
     backgroundGradient: BlackWhiteTheme.backgroundGradient,
     card: BlackWhiteTheme.card,
+    cardGradient: BlackWhiteTheme.cardGradient,
     border: BlackWhiteTheme.borderStroke,
+    borderGradient: BlackWhiteTheme.borderGradient,
     accentPrimary: BlackWhiteTheme.accentPrimary,
     accentSecondary: BlackWhiteTheme.accentSecondary,
     textHeader: BlackWhiteTheme.textHeader,
     textBody: BlackWhiteTheme.textBody,
+    // Buttons get the same light [cardGradient] (white top → light-graphite
+    // bottom) instead of the dark instrument-panel [windowGradient] — 2026-
+    // 09-05 request: every button should read as white/light, not dark,
+    // even though the nested "instrument panel" windows (stat tiles, mood
+    // boxes) stay dark. [onButton] carries the matching near-black text.
+    buttonGradient: BlackWhiteTheme.cardGradient,
+    onButton: BlackWhiteTheme.onButton,
+    cardGlow: BlackWhiteTheme.cardGlow(),
     windowGradient: BlackWhiteTheme.windowGradient,
     onWindow: BlackWhiteTheme.onWindow,
+    disclaimerColor: BlackWhiteTheme.disclaimerColor,
+    // Market Clock dial re-theme (2026-09-05, explicit request): ring +
+    // hour ticks/numerals + digital-readout accents go from gold/brass to
+    // this theme's own near-black; the ring's flat color is replaced by
+    // marketClockRingGradient below wherever a gradient shader applies
+    // (the ring stroke itself, and the risk-metric bars in
+    // market_clock_timing_widget.dart, which reuse this gradient's
+    // first/last colors in place of gold). Face gradient deliberately left
+    // unset — it already falls back to windowGradient (this theme's light
+    // card gradient), which is correct as-is.
+    marketClockAccent: BlackWhiteTheme.accentPrimary,
+    marketClockRingGradient: BlackWhiteTheme.borderGradient,
+    glowOpacity: 0.0,
   );
 
   static const lightLime = AppPalette(

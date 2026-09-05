@@ -152,7 +152,7 @@ class _LimitPriceInputState extends State<LimitPriceInput> {
             shape: BoxShape.circle,
             gradient: widget.palette.windowGradient ?? darkCardGradient(),
           ),
-          child: Icon(icon, color: Colors.white, size: 18),
+          child: Icon(icon, color: widget.palette.onWindow ?? Colors.white, size: 18),
         ),
       ),
     );

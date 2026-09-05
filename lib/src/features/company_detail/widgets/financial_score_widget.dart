@@ -99,7 +99,9 @@ class FinancialScoreWidget extends StatelessWidget {
                 themedGoldGradient(
                   Text(
                     l10n.companyDetailFsScoreLabel,
-                    style: FomoShieldTheme.cardTitle(Colors.white),
+                    style: FomoShieldTheme.cardTitle(
+                      palette.onWindow ?? Colors.white,
+                    ),
                   ),
                   palette,
                 ),
@@ -108,7 +110,11 @@ class FinancialScoreWidget extends StatelessWidget {
             const SizedBox(height: 10),
             palette.dividerGradient != null
                 ? themedDivider(palette, indent: 0, endIndent: 0)
-                : Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+                : Divider(
+                    height: 1,
+                    color: (palette.onWindow ?? Colors.white)
+                        .withValues(alpha: 0.15),
+                  ),
             const SizedBox(height: 16),
 
             // ── Gauge + Radar row ──
@@ -205,7 +211,7 @@ class FinancialScoreWidget extends StatelessWidget {
             // ── 6 Marker cards ──
             ...markers.entries.map((entry) {
               final marker = entry.value as Map<String, dynamic>;
-              return _MarkerCard(marker: marker);
+              return _MarkerCard(marker: marker, palette: palette);
             }),
 
             const SizedBox(height: 4),
@@ -220,12 +226,14 @@ class FinancialScoreWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border.all(color: _accentColor, width: 1),
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _accentColor.withValues(alpha: 0.25),
-                      blurRadius: 6,
-                    ),
-                  ],
+                  boxShadow: (palette.glowOpacity ?? 1.0) > 0
+                      ? [
+                          BoxShadow(
+                            color: _accentColor.withValues(alpha: 0.25),
+                            blurRadius: 6,
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Row(
                   children: [
@@ -336,6 +344,7 @@ class _RadarChart extends StatelessWidget {
       painter: _RadarChartPainter(
         markers: markers,
         color: palette.marketClockAccent ?? dialBrassLight,
+        labelColor: palette.onWindow ?? Colors.white,
       ),
     );
   }
@@ -344,8 +353,13 @@ class _RadarChart extends StatelessWidget {
 class _RadarChartPainter extends CustomPainter {
   final Map<String, dynamic> markers;
   final Color color;
+  final Color labelColor;
 
-  _RadarChartPainter({required this.markers, required this.color});
+  _RadarChartPainter({
+    required this.markers,
+    required this.color,
+    required this.labelColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -464,7 +478,7 @@ class _RadarChartPainter extends CustomPainter {
       text: TextSpan(
         text: text,
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.7),
+          color: labelColor.withValues(alpha: 0.7),
           fontSize: 9,
           fontWeight: FontWeight.w600,
         ),
@@ -487,8 +501,9 @@ class _RadarChartPainter extends CustomPainter {
 
 class _MarkerCard extends StatelessWidget {
   final Map<String, dynamic> marker;
+  final AppPalette palette;
 
-  const _MarkerCard({required this.marker});
+  const _MarkerCard({required this.marker, required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -520,7 +535,9 @@ class _MarkerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.1),
+        ),
       ),
       child: Row(
         children: [
@@ -549,30 +566,16 @@ class _MarkerCard extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: palette.onWindow ?? Colors.white,
                         ),
                       ),
                     ),
                     if (infoId != null) ...[
                       const SizedBox(width: 6),
-                      GestureDetector(
+                      themedHelpIcon(
+                        palette: palette,
+                        onWindow: true,
                         onTap: () => context.push('/metric-info/$infoId'),
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(
-                              ThemeV2.radiusSmall,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.help_outline_rounded,
-                            size: 13,
-                            color: Colors.white,
-                          ),
-                        ),
                       ),
                     ],
                   ],
@@ -582,7 +585,8 @@ class _MarkerCard extends StatelessWidget {
                   _markerDisplayDescription(l10n, name),
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: (palette.onWindow ?? Colors.white)
+                        .withValues(alpha: 0.7),
                   ),
                 ),
               ],

@@ -35,7 +35,7 @@ class TierStyle {
   const TierStyle({required this.color, required this.label});
 }
 
-Map<RiskTier, TierStyle> _tierStylesFor(AppLocalizations l10n) => {
+Map<RiskTier, TierStyle> _tierStylesFor(AppLocalizations l10n, {AppPalette? palette}) => {
   RiskTier.low: TierStyle(
     color: ThemeV2.success,
     label: l10n.marketClockRiskTierLowLabel,
@@ -49,15 +49,19 @@ Map<RiskTier, TierStyle> _tierStylesFor(AppLocalizations l10n) => {
     label: l10n.marketClockRiskTierHighLabel,
   ),
   RiskTier.closed: TierStyle(
-    color: Colors.white70,
+    // Neutral/grayish for "market closed" — was a flat Colors.white70,
+    // invisible once the window it's rendered on turned light for Black &
+    // White (2026-09-05). palette?.onWindow carries that theme's near-
+    // black text color; every other theme keeps the original white70.
+    color: palette?.onWindow ?? Colors.white70,
     label: l10n.marketClockRiskTierClosedLabel,
   ),
 };
 
 /// Public accessor so market_clock_risk_detail_screen.dart can show the
 /// same label/color the widget uses, without exposing the whole map.
-TierStyle tierStyleFor(AppLocalizations l10n, RiskTier tier) =>
-    _tierStylesFor(l10n)[tier]!;
+TierStyle tierStyleFor(AppLocalizations l10n, RiskTier tier, {AppPalette? palette}) =>
+    _tierStylesFor(l10n, palette: palette)[tier]!;
 
 /// Thin gold-bordered "window" — same instrument-panel language as the
 /// clock's digital readout / corner panels (dialBrassLight border on a
@@ -97,7 +101,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final metrics = window.riskMetricsFor(l10n);
     final tier = window.riskTierFor(l10n);
-    final style = _tierStylesFor(l10n)[tier]!;
+    final style = _tierStylesFor(l10n, palette: palette)[tier]!;
 
     return CardFrame(
       padding: EdgeInsets.zero,
@@ -117,7 +121,11 @@ class FomoShieldStatusWidget extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
             child: Row(
               children: [
-                Icon(Icons.shield_rounded, color: dialBrassLight, size: 20),
+                Icon(
+                  Icons.shield_rounded,
+                  color: palette.onWindow ?? dialBrassLight,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 // Always-dark panel in both themes — same reasoning as the
                 // Home Market Clock widget's title.
@@ -128,7 +136,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
-                      color: Colors.white,
+                      color: palette.onWindow ?? Colors.white,
                       shadows: palette.titleShadow != null
                           ? [palette.titleShadow!]
                           : null,
@@ -145,7 +153,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                   height: 1,
                   indent: 20,
                   endIndent: 20,
-                  color: dialBrassLight.withValues(alpha: 0.3),
+                  color: (palette.onWindow ?? dialBrassLight).withValues(alpha: 0.3),
                 ),
 
           Padding(
@@ -207,7 +215,8 @@ class FomoShieldStatusWidget extends StatelessWidget {
                                       Icon(
                                         Icons.chevron_right_rounded,
                                         size: 16,
-                                        color: Colors.white70,
+                                        color: (palette.onWindow ?? Colors.white)
+                                            .withValues(alpha: 0.7),
                                       ),
                                     ],
                                   ),
@@ -218,7 +227,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
-                                      color: Colors.white,
+                                      color: palette.onWindow ?? Colors.white,
                                       height: 1.35,
                                     ),
                                   ),
@@ -247,7 +256,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                                   fontSize: 9,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 0.8,
-                                  color: Colors.white,
+                                  color: palette.onWindow ?? Colors.white,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -271,7 +280,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                                         style: GoogleFonts.inter(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.white,
+                                          color: palette.onWindow ?? Colors.white,
                                         ),
                                       ),
                                   ],
@@ -313,7 +322,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Colors.white,
+              color: palette.onWindow ?? Colors.white,
             ),
           ),
         ),
@@ -322,15 +331,17 @@ class FomoShieldStatusWidget extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(4),
-              boxShadow: [
-                BoxShadow(
-                  color: (palette.marketClockRingGradient?.colors.last ??
-                          dialBrassLight)
-                      .withValues(alpha: 0.35),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              boxShadow: (palette.glowOpacity ?? 1.0) > 0
+                  ? [
+                      BoxShadow(
+                        color: (palette.marketClockRingGradient?.colors.last ??
+                                dialBrassLight)
+                            .withValues(alpha: 0.35),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
@@ -338,7 +349,7 @@ class FomoShieldStatusWidget extends StatelessWidget {
                 children: [
                   Container(
                     height: 8,
-                    color: Colors.white.withValues(alpha: 0.12),
+                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
                   ),
                   FractionallySizedBox(
                     widthFactor: (value / 100).clamp(0.0, 1.0),

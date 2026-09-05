@@ -129,12 +129,13 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         widget.price;
   }
 
-  // Sits directly under OrderConfigSection's price/limit block (moved
-  // 2026-09-04, was directly under OrderAmountSection's "available funds"
-  // slider card — user's explicit placement call, again) — same info-box
-  // shape as OrderConfigSection's market/limit notice just above it, so
-  // the two read as one family, plus a live estimate once an amount is
-  // entered.
+  // Sits directly under OrderAmountSection's "available funds" slider card,
+  // ABOVE OrderConfigSection (REVISED 2026-09-05, reverting the 2026-09-04
+  // move to "under OrderConfigSection's price/limit block": that placement
+  // actually rendered after OrderConfigSection's own trailing disclaimer
+  // too, since the disclaimer is the last thing inside that widget — this
+  // notice ended up much further down the screen than intended. User's
+  // explicit placement call, again — don't re-derive.)
   Widget _commissionNotice(
     AppLocalizations l10n,
     AppPalette palette,
@@ -492,6 +493,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
                       palette: palette,
                     ),
+                    _commissionNotice(l10n, palette, displayAmount),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
                       limitPriceController: _limitPriceController,
@@ -506,7 +508,6 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
                       palette: palette,
                       // No Extended Hours — simulated market is always open.
                     ),
-                    _commissionNotice(l10n, palette, displayAmount),
                   ],
                 ),
               ),

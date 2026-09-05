@@ -94,7 +94,7 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: palette.onWindow ?? Colors.white,
                         letterSpacing: 1.2,
                         shadows: palette.titleShadow != null
                             ? [palette.titleShadow!]
@@ -106,7 +106,7 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                   const Spacer(),
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.7),
                     size: 20,
                   ),
                 ],
@@ -121,7 +121,7 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                     height: 1,
                     indent: 16,
                     endIndent: 16,
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.1),
                   ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -180,7 +180,7 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   color: palette.marketClockAccent != null
-                                      ? Colors.white
+                                      ? (palette.onWindow ?? Colors.white)
                                       : dialIvory,
                                 ),
                               ),
@@ -206,7 +206,8 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                             fontSize: 12,
                             color: palette.windowGradient != null ||
                                     palette.marketClockAccent != null
-                                ? Colors.white.withValues(alpha: 0.85)
+                                ? (palette.onWindow ?? Colors.white)
+                                    .withValues(alpha: 0.85)
                                 : dialIvory.withValues(alpha: 0.7),
                           ),
                         ),
@@ -217,7 +218,7 @@ class _MarketClockWidgetState extends ConsumerState<MarketClockWidget> {
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: palette.marketClockAccent != null
-                                ? Colors.white
+                                ? (palette.onWindow ?? Colors.white)
                                 : dialBrassLight,
                           ),
                         ),

@@ -93,7 +93,7 @@ class VerdictDiversificationCard extends ConsumerWidget {
                 themedGoldGradient(
                   Text(
                     l10n.verdictDiversificationCardTitle,
-                    style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                    style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white).copyWith(
                       shadows: palette.titleShadow != null
                           ? [palette.titleShadow!]
                           : null,
@@ -101,23 +101,11 @@ class VerdictDiversificationCard extends ConsumerWidget {
                   ),
                   palette,
                 ),
-                GestureDetector(
+                themedHelpIcon(
+                  palette: palette,
+                  onWindow: true,
                   onTap: () =>
                       context.push('/metric-info/psychology-diversification'),
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.help_outline_rounded,
-                      size: 13,
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -128,7 +116,7 @@ class VerdictDiversificationCard extends ConsumerWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
                 ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),

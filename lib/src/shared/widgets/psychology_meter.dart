@@ -229,22 +229,9 @@ class PsychologyMeter extends ConsumerWidget {
                     FomoShieldTheme.cardTitle(),
                   ),
                   const SizedBox(width: 6),
-                  GestureDetector(
+                  themedHelpIcon(
+                    palette: palette,
                     onTap: () => context.push('/metric-info/investor-score'),
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.help_outline_rounded,
-                        size: 13,
-                        color: palette.textBody,
-                      ),
-                    ),
                   ),
                   const Spacer(),
                   Icon(

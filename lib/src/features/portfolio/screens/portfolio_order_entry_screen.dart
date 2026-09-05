@@ -212,8 +212,12 @@ class _PortfolioOrderEntryScreenState
 
   // Same shape/placement as Stress Test's own commission notice (see
   // assets/screens/order_entry_screen.dart) — sits directly under
-  // OrderConfigSection's price/limit block (moved 2026-09-04, was above it
-  // — user's explicit placement call, again).
+  // OrderAmountSection (the "Available funds" card), ABOVE OrderConfigSection
+  // (REVISED 2026-09-05: the 2026-09-04 placement "under OrderConfigSection's
+  // price/limit block" actually rendered after OrderConfigSection's own
+  // trailing disclaimer too, since disclaimer is the last thing inside that
+  // widget — pushed this notice much further down than intended. User's
+  // explicit placement call, again — don't re-derive.)
   Widget _commissionNotice(
     AppLocalizations l10n,
     AppPalette palette,
@@ -744,6 +748,7 @@ class _PortfolioOrderEntryScreenState
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
                       palette: palette,
                     ),
+                    _commissionNotice(l10n, palette, displayAmount),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
                       limitPriceController: _limitPriceController,
@@ -761,7 +766,6 @@ class _PortfolioOrderEntryScreenState
                       onExtendedHoursChanged: _setExtendedHours,
                       palette: palette,
                     ),
-                    _commissionNotice(l10n, palette, displayAmount),
                   ],
                 ),
               ),

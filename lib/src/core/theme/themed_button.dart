@@ -33,7 +33,20 @@ Widget themedDarkCtaButtonShell({
   required BoxDecoration standardDecoration,
   required Widget child,
 }) {
-  if (palette.windowGradient == null) {
+  // REVERTED (2026-09-05): a same-day attempt to prefer [buttonGradient]
+  // here broke Luxury Gold's "Add Widgets"/CTA buttons — LuxuryGoldTheme
+  // sets its OWN distinct buttonGradient (a bright gold linear gradient,
+  // its real CTA brand color) separate from windowGradient (the radial
+  // graphite-gold instrument-panel fill this button is deliberately
+  // themed to match instead, per the doc comment above) — so buttonGradient
+  // silently took over and the button went solid bright gold instead of
+  // the intended panel look (user: "сломал кнопку адд виджет"). Black &
+  // White doesn't need the override either: its windowGradient is already
+  // the same light card gradient buttonGradient would have pointed at
+  // (unified 2026-09-05), so plain windowGradient is correct for every
+  // theme here.
+  final gradient = palette.windowGradient;
+  if (gradient == null) {
     return DecoratedBox(decoration: standardDecoration, child: child);
   }
   return themedBorder(
@@ -42,10 +55,7 @@ Widget themedDarkCtaButtonShell({
     child: Material(
       color: Colors.transparent,
       child: Ink(
-        decoration: BoxDecoration(
-          gradient: palette.windowGradient,
-          borderRadius: borderRadius,
-        ),
+        decoration: BoxDecoration(gradient: gradient, borderRadius: borderRadius),
         child: child,
       ),
     ),
@@ -53,12 +63,14 @@ Widget themedDarkCtaButtonShell({
 }
 
 /// Text/icon color for content inside [themedDarkCtaButtonShell] — flat
-/// white on Standard's dark-green fill, [AppPalette.onWindow] (falling
-/// back to [AppPalette.textHeader] for a theme that doesn't set it, e.g.
-/// Luxury Gold's cream) on a themed window fill.
-Color themedDarkCtaContentColor(AppPalette palette) => palette.windowGradient == null
-    ? Colors.white
-    : (palette.onWindow ?? palette.textHeader);
+/// white on Standard's dark-green fill, else [AppPalette.onButton] ??
+/// [AppPalette.onWindow] ?? [AppPalette.textHeader] (falling back through
+/// in that order; Luxury Gold's cream comes from textHeader, Black &
+/// White's near-black button text from onButton).
+Color themedDarkCtaContentColor(AppPalette palette) {
+  if (palette.windowGradient == null) return Colors.white;
+  return palette.onButton ?? palette.onWindow ?? palette.textHeader;
+}
 
 // ---------------------------------------------------------------------------
 // Themed "Add Widgets" button — the canonical treatment for every screen's
@@ -82,7 +94,8 @@ Widget themedAddWidgetsButton(
   required String label,
   required VoidCallback onTap,
 }) {
-  if (palette.windowGradient == null) {
+  final gradient = palette.windowGradient;
+  if (gradient == null) {
     return TextButton.icon(
       onPressed: onTap,
       icon: Icon(Icons.add_rounded, color: palette.accentPrimary, size: 20),
@@ -104,7 +117,7 @@ Widget themedAddWidgetsButton(
     );
   }
   final radius = BorderRadius.circular(30);
-  final onWindowColor = palette.onWindow ?? palette.textHeader;
+  final onWindowColor = palette.onButton ?? palette.onWindow ?? palette.textHeader;
   return themedBorder(
     palette: palette,
     borderRadius: radius,
@@ -113,10 +126,7 @@ Widget themedAddWidgetsButton(
       child: InkWell(
         onTap: onTap,
         child: Ink(
-          decoration: BoxDecoration(
-            gradient: palette.windowGradient,
-            borderRadius: radius,
-          ),
+          decoration: BoxDecoration(gradient: gradient, borderRadius: radius),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           child: Row(
             mainAxisSize: MainAxisSize.min,

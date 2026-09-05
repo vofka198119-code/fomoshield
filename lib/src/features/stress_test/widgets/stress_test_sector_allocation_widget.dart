@@ -80,7 +80,7 @@ class StressTestSectorAllocationCard extends StatelessWidget {
                   themedGoldGradient(
                     Text(
                       l10n.portfolioBalanceScreenDiversificationIndicatorTitle,
-                      style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                      style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white).copyWith(
                         shadows: palette.titleShadow != null
                             ? [palette.titleShadow!]
                             : null,
@@ -88,23 +88,11 @@ class StressTestSectorAllocationCard extends StatelessWidget {
                     ),
                     palette,
                   ),
-                  GestureDetector(
+                  themedHelpIcon(
+                    palette: palette,
+                    onWindow: true,
                     onTap: () =>
                         context.push('/metric-info/diversification-indicator'),
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Icon(
-                        Icons.help_outline_rounded,
-                        size: 13,
-                        color: Colors.white,
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -116,7 +104,7 @@ class StressTestSectorAllocationCard extends StatelessWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
                 ),
           if (hasData)
             Padding(

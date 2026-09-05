@@ -390,7 +390,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       symbol: widget.symbol,
                       palette: palette,
                     ),
-                    const SimulatedTradingDisclaimer(),
+                    SimulatedTradingDisclaimer(palette: palette),
                     const SizedBox(height: 80),
                   ],
                 ),

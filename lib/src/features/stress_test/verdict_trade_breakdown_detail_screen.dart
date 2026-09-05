@@ -189,7 +189,7 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
                       key: const ValueKey('breakdownDisclaimer'),
                       child: StaggerFadeIn(
                         index: 7,
-                        child: const _TradeBreakdownDisclaimer(),
+                        child: _TradeBreakdownDisclaimer(palette: palette),
                       ),
                     ),
                   ],
@@ -368,7 +368,7 @@ class _CompaniesCardState extends State<_CompaniesCard> {
                 l10n.verdictNoCompaniesTraded,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: (widget.palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
                 ),
               ),
             )
@@ -385,6 +385,7 @@ class _CompaniesCardState extends State<_CompaniesCard> {
               expanded: _showAll,
               hiddenCount: symbols.length - _collapsedCount,
               onTap: () => setState(() => _showAll = !_showAll),
+              palette: widget.palette,
             ),
         ],
       ),
@@ -429,7 +430,7 @@ class _TradeHistoryCardState extends State<_TradeHistoryCard> {
                 l10n.verdictNoTradesYet,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: (widget.palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
                 ),
               ),
             )
@@ -445,6 +446,7 @@ class _TradeHistoryCardState extends State<_TradeHistoryCard> {
               expanded: _showAll,
               hiddenCount: sorted.length - _collapsedCount,
               onTap: () => setState(() => _showAll = !_showAll),
+              palette: widget.palette,
             ),
         ],
       ),
@@ -459,11 +461,13 @@ class _MoreLessButton extends StatelessWidget {
   final bool expanded;
   final int hiddenCount;
   final VoidCallback onTap;
+  final AppPalette palette;
 
   const _MoreLessButton({
     required this.expanded,
     required this.hiddenCount,
     required this.onTap,
+    required this.palette,
   });
 
   @override
@@ -477,7 +481,7 @@ class _MoreLessButton extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
@@ -519,7 +523,7 @@ class _DarkCard extends StatelessWidget {
         children: [
           if (title != null) ...[
             themedGoldGradient(
-              Text(title!, style: FomoShieldTheme.cardTitle(Colors.white)),
+              Text(title!, style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white)),
               palette,
             ),
             const SizedBox(height: 12),
@@ -527,7 +531,7 @@ class _DarkCard extends StatelessWidget {
                 ? themedDivider(palette, indent: 0, endIndent: 0)
                 : Divider(
                     height: 1,
-                    color: Colors.white.withValues(alpha: 0.12),
+                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
                   ),
             const SizedBox(height: 4),
           ],
@@ -559,7 +563,7 @@ class _Row extends StatelessWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                bottom: BorderSide(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12)),
               ),
             ),
       child: Row(
@@ -571,7 +575,7 @@ class _Row extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.white,
+                color: palette.onWindow ?? Colors.white,
               ),
             ),
           ),
@@ -614,7 +618,7 @@ class _CompanyRow extends ConsumerWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                bottom: BorderSide(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12)),
               ),
             ),
       child: Row(
@@ -650,7 +654,7 @@ class _CompanyRow extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: palette.onWindow ?? Colors.white,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -658,7 +662,7 @@ class _CompanyRow extends ConsumerWidget {
                   symbol,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -704,7 +708,7 @@ class _TradeRow extends ConsumerWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                bottom: BorderSide(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12)),
               ),
             ),
       child: Row(
@@ -740,7 +744,7 @@ class _TradeRow extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: palette.onWindow ?? Colors.white,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -748,7 +752,7 @@ class _TradeRow extends ConsumerWidget {
                   trade.symbol,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -789,18 +793,22 @@ class _TradeRow extends ConsumerWidget {
 }
 
 class _TradeBreakdownDisclaimer extends StatelessWidget {
-  const _TradeBreakdownDisclaimer();
+  final AppPalette palette;
+
+  const _TradeBreakdownDisclaimer({required this.palette});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     // Sits directly on the screen background (no card behind it). Color is
     // the same fixed muted gray as DisclaimerFooter's reference treatment
-    // (2026-08-25: unify every card-level disclaimer to that one look) —
-    // NOT palette-based, so it's readable regardless of backdrop in both
-    // themes without needing the "always-dark panel" gating this file's
-    // other elements require.
-    final disclaimerColor = ThemeV2.textSecondary.withValues(alpha: 0.5);
+    // (2026-08-25: unify every card-level disclaimer to that one look),
+    // overridden per [AppPalette.disclaimerColor] (only Black & White sets
+    // it, 2026-09-05) — readable regardless of backdrop in both themes
+    // without needing the "always-dark panel" gating this file's other
+    // elements require.
+    final disclaimerColor =
+        palette.disclaimerColor ?? ThemeV2.textSecondary.withValues(alpha: 0.5);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(

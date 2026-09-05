@@ -159,9 +159,11 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
   // Simulated Trading disclaimer ("Company Card style"). Color is the
   // same fixed muted gray as DisclaimerFooter's reference treatment
   // (2026-08-25: unify every card-level disclaimer to that one look) —
-  // NOT palette-based (palette param kept for the caller's other uses).
+  // overridden per [AppPalette.disclaimerColor] (only Black & White sets
+  // it, 2026-09-05).
   Widget _educationalDisclaimer(AppLocalizations l10n, AppPalette palette) {
-    final disclaimerColor = ThemeV2.textSecondary.withValues(alpha: 0.5);
+    final disclaimerColor =
+        palette.disclaimerColor ?? ThemeV2.textSecondary.withValues(alpha: 0.5);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
@@ -241,7 +243,7 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
                   themedGoldGradient(
                     Text(
                       l10n.portfolioBalanceScreenAssetAllocationTitle,
-                      style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                      style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white).copyWith(
                         shadows: palette.titleShadow != null
                             ? [palette.titleShadow!]
                             : null,
@@ -249,23 +251,11 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
                     ),
                     palette,
                   ),
-                  GestureDetector(
+                  themedHelpIcon(
+                    palette: palette,
+                    onWindow: true,
                     onTap: () =>
                         context.push('/metric-info/asset-allocation-pct'),
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Icon(
-                        Icons.help_outline_rounded,
-                        size: 13,
-                        color: Colors.white,
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -277,7 +267,7 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
                 ),
           if (hasData)
             Padding(

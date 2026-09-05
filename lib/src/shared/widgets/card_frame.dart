@@ -77,12 +77,22 @@ class CardFrame extends StatelessWidget {
     // applies whether or not the theme also defines a [borderGradient] —
     // Black & White / Light Lime / Midnight Sea use cardGradient without
     // one (2026-09-01), unlike Luxury Gold which pairs both.
-    final cardBodyDecoration = palette?.cardGradient != null
+    var cardBodyDecoration = palette?.cardGradient != null
         ? BoxDecoration(
             gradient: palette!.cardGradient,
             borderRadius: FomoShieldTheme.cardRadius,
           )
         : effectiveDecoration.copyWith(borderRadius: FomoShieldTheme.cardRadius);
+
+    // [cardGlow] previously only ever painted on the [borderGradient]
+    // branch below (an outer Container it owns) — a theme with cardGlow
+    // but no borderGradient (Black & White, 2026-09-05) had it silently
+    // dropped. Applied here too so it reaches this plain-Container branch.
+    if (palette?.borderGradient == null && palette?.cardGlow != null) {
+      cardBodyDecoration = cardBodyDecoration.copyWith(
+        boxShadow: [palette!.cardGlow!],
+      );
+    }
 
     final borderGradient = palette?.borderGradient;
     if (borderGradient != null) {

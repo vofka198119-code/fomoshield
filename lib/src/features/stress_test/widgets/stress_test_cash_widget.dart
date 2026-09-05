@@ -51,7 +51,7 @@ class StressTestCashWidget extends StatelessWidget {
               child: themedGoldGradient(
                 Text(
                   AppLocalizations.of(context)!.portfolioCashLabel,
-                  style: FomoShieldTheme.cardTitle(Colors.white).copyWith(
+                  style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white).copyWith(
                     shadows: palette.titleShadow != null
                         ? [palette.titleShadow!]
                         : null,
@@ -67,7 +67,7 @@ class StressTestCashWidget extends StatelessWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
                 ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
@@ -79,7 +79,7 @@ class StressTestCashWidget extends StatelessWidget {
                 style: interNums(
                   fontSize: 26,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: palette.onWindow ?? Colors.white,
                 ),
               ),
             ),

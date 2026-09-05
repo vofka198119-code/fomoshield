@@ -228,9 +228,9 @@ class OrderAmountSection extends StatelessWidget {
             gradient: palette.windowGradient ?? darkCardGradient(),
           ),
           alignment: Alignment.center,
-          child: const Icon(
+          child: Icon(
             Icons.swap_vert_rounded,
-            color: Colors.white,
+            color: palette.onWindow ?? Colors.white,
             size: 20,
           ),
         ),

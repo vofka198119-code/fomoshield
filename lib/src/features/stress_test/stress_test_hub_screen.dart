@@ -306,12 +306,12 @@ class StressTestHubScreen extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.add_rounded,
-                color: Colors.white,
+                color: palette.onWindow ?? Colors.white,
                 size: 28,
               ),
             ),
@@ -325,7 +325,7 @@ class StressTestHubScreen extends ConsumerWidget {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: palette.onWindow ?? Colors.white,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -338,7 +338,7 @@ class StressTestHubScreen extends ConsumerWidget {
                         : l10n.stressTestEmotionalResilience,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: Colors.white70,
+                      color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -363,9 +363,9 @@ class StressTestHubScreen extends ConsumerWidget {
                 ),
               )
             else
-              const Icon(
+              Icon(
                 Icons.arrow_forward_rounded,
-                color: Colors.white,
+                color: palette.onWindow ?? Colors.white,
                 size: 24,
               ),
           ],
@@ -481,11 +481,11 @@ class StressTestHubScreen extends ConsumerWidget {
   // always free (white), slot 2 is white on free tier / gold once premium,
   // slots 3-5 are premium-only so always gold.
   Color _playIconColor(WidgetRef ref, int index, AppPalette palette) {
-    if (index == 0) return Colors.white;
+    if (index == 0) return palette.onWindow ?? Colors.white;
     final tier = ref.watch(subscriptionTierProvider);
     final isPremiumTier = tier.isPremiumOrAdmin;
     final accentColor = palette.marketClockAccent ?? dialBrassLight;
-    if (index == 1) return isPremiumTier ? accentColor : Colors.white;
+    if (index == 1) return isPremiumTier ? accentColor : (palette.onWindow ?? Colors.white);
     return accentColor;
   }
 

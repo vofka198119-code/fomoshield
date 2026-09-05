@@ -121,7 +121,9 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             themedGoldGradient(
               Text(
                 l10n.companyDetailPositionTitle,
-                style: FomoShieldTheme.cardTitle(Colors.white),
+                style: FomoShieldTheme.cardTitle(
+                  widget.palette.onWindow ?? Colors.white,
+                ),
               ),
               widget.palette,
             ),
@@ -130,7 +132,8 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
                 ? themedDivider(widget.palette, indent: 0, endIndent: 0)
                 : Divider(
                     height: 1,
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: (widget.palette.onWindow ?? Colors.white)
+                        .withValues(alpha: 0.15),
                   ),
             if (positions.length > 1) ...[
               const SizedBox(height: 10),
@@ -147,7 +150,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
                         color: safeIndex > 0
                             ? (widget.palette.marketClockAccent ??
                                   dialBrassLight)
-                            : Colors.white,
+                            : (widget.palette.onWindow ?? Colors.white),
                       ),
                     ),
                   ),
@@ -249,14 +252,14 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: widget.palette.onWindow ?? Colors.white,
         ),
       ),
       themedPriceText(
         value,
         widget.palette,
         interNums(fontSize: 14, fontWeight: FontWeight.w600),
-        fallbackColor: Colors.white,
+        fallbackColor: widget.palette.onWindow ?? Colors.white,
       ),
     ],
   );
@@ -276,7 +279,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: widget.palette.onWindow ?? Colors.white,
         ),
       ),
       if (!pos.hasPosition)
@@ -285,7 +288,7 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
           style: interNums(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: widget.palette.onWindow ?? Colors.white,
           ),
         )
       else
@@ -322,9 +325,14 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
       decoration: BoxDecoration(
         border: Border.all(color: accentColor, width: 1),
         borderRadius: BorderRadius.circular(6),
-        boxShadow: [
-          BoxShadow(color: accentColor.withValues(alpha: 0.35), blurRadius: 4),
-        ],
+        boxShadow: (widget.palette.glowOpacity ?? 1.0) > 0
+            ? [
+                BoxShadow(
+                  color: accentColor.withValues(alpha: 0.35),
+                  blurRadius: 4,
+                ),
+              ]
+            : null,
       ),
       child: Text(
         l10n.profilePremiumBadge,
@@ -356,8 +364,9 @@ class _PositionSectionState extends ConsumerState<PositionSection> {
             height: 6,
             decoration: BoxDecoration(
               color: isActive
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.3),
+                  ? (widget.palette.onWindow ?? Colors.white)
+                  : (widget.palette.onWindow ?? Colors.white)
+                        .withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(3),
             ),
           ),

@@ -17,16 +17,22 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/theme_v2.dart';
 import '../../../../l10n/gen/app_localizations.dart';
 
 class StressTestVerdictDisclaimer extends StatelessWidget {
-  const StressTestVerdictDisclaimer({super.key});
+  /// Optional theme palette — see [AppPalette.disclaimerColor]'s doc
+  /// comment (only Black & White sets it, 2026-09-05); null is a no-op.
+  final AppPalette? palette;
+
+  const StressTestVerdictDisclaimer({super.key, this.palette});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final disclaimerColor = ThemeV2.textSecondary.withValues(alpha: 0.5);
+    final disclaimerColor =
+        palette?.disclaimerColor ?? ThemeV2.textSecondary.withValues(alpha: 0.5);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(

@@ -61,6 +61,7 @@ class RiskStatusDetailScreen extends ConsumerWidget {
                         final style = tierStyleFor(
                           l10n,
                           window.riskTierFor(l10n),
+                          palette: palette,
                         );
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

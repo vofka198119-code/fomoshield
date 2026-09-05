@@ -130,7 +130,9 @@ class StockWhyTodayCard extends ConsumerWidget {
               themedGoldGradient(
                 Text(
                   l10n.whyTodayCardTitle,
-                  style: FomoShieldTheme.cardTitle(Colors.white),
+                  style: FomoShieldTheme.cardTitle(
+                    palette.onWindow ?? Colors.white,
+                  ),
                 ),
                 palette,
               ),
@@ -147,16 +149,18 @@ class StockWhyTodayCard extends ConsumerWidget {
                       vertical: 7,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.12),
+                      color: (palette.onWindow ?? Colors.white).withValues(
+                        alpha: 0.12,
+                      ),
                       borderRadius: BorderRadius.circular(ThemeV2.radiusSmall),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.lightbulb_outline_rounded,
                           size: 14,
-                          color: Colors.white,
+                          color: palette.onWindow ?? Colors.white,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -164,7 +168,7 @@ class StockWhyTodayCard extends ConsumerWidget {
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: palette.onWindow ?? Colors.white,
                           ),
                         ),
                       ],
@@ -176,7 +180,12 @@ class StockWhyTodayCard extends ConsumerWidget {
           const SizedBox(height: 10),
           palette.dividerGradient != null
               ? themedDivider(palette, indent: 0, endIndent: 0)
-              : Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
+              : Divider(
+                  height: 1,
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.15,
+                  ),
+                ),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -239,7 +248,7 @@ class StockWhyTodayCard extends ConsumerWidget {
             style: GoogleFonts.inter(
               fontSize: 13,
               height: 1.5,
-              color: Colors.white.withValues(alpha: 0.8),
+              color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.8),
             ),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
@@ -292,7 +301,9 @@ class StockWhyTodayCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.2),
+        ),
         borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
       ),
       child: Column(
@@ -305,7 +316,7 @@ class StockWhyTodayCard extends ConsumerWidget {
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.6,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 6),
@@ -338,7 +349,7 @@ class StockWhyTodayCard extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: palette.onWindow ?? Colors.white,
               ),
             ),
           ),
@@ -351,7 +362,9 @@ class StockWhyTodayCard extends ConsumerWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.10),
+                    color: (palette.onWindow ?? Colors.white).withValues(
+                      alpha: 0.10,
+                    ),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -389,7 +402,7 @@ class StockWhyTodayCard extends ConsumerWidget {
             style: interNums(
               fontSize: 12.5,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: palette.onWindow ?? Colors.white,
             ),
           ),
         ),

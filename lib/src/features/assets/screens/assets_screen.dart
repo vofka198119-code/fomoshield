@@ -160,7 +160,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
             // ── Divider ──────────────────────────────────────────
             palette.dividerGradient != null
                 ? themedDivider(palette, indent: 0, endIndent: 0)
-                : const Divider(height: 1, color: ThemeV2.divider),
+                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
 
             // ── Assets List ──────────────────────────────────────
             Expanded(
