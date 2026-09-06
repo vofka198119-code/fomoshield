@@ -54,7 +54,15 @@ final iconsBatchWarmProvider = FutureProvider.autoDispose<void>((ref) async {
   final missing = <String>[];
   for (final c in companies) {
     if (c.symbol.isEmpty) continue;
-    if (await dao.getLogo(c.symbol) == null) missing.add(c.symbol);
+    final cached = await dao.getLogo(c.symbol);
+    // Retry a ticker that's only ever gotten the generic fallback icon,
+    // not just one with no entry at all — the backend's warmup sweep used
+    // to skip a ticker forever the instant any request wrote that
+    // fallback (see iconService.hasRealIcon's own doc comment), so a
+    // fallback-tagged entry isn't "done", it's "not resolved yet". Older
+    // entries with no `source` at all (written before this field existed)
+    // are left alone — see LogoCacheEntry.source's doc comment.
+    if (cached == null || cached.source == 'fallback') missing.add(c.symbol);
   }
   if (missing.isEmpty) return;
 

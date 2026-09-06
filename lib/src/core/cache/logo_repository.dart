@@ -143,25 +143,35 @@ class LogoRepository {
   Future<bool> hasLogo(String ticker) async => _dao.hasLogo(ticker);
 
   /// Bulk-writes icon URLs resolved via FinnhubService.iconsBatch into the
-  /// persistent cache. Skips any ticker that already has a cached entry —
-  /// this never clobbers a real name/sector already resolved by Company
-  /// Detail's own loadLogo()/cacheFromProfile with a placeholder. The
-  /// companyName written here is just the ticker itself (same convention
-  /// loadLogo() already treats as "not a real name yet" via its own
-  /// cachedNameUseless check), so opening the real Company Detail screen
-  /// later still self-corrects it — this only ever needs to make
-  /// getCachedLogo (the logo URL alone) return instantly instead of
-  /// falling through to a per-ticker network call.
-  Future<void> cacheIconsBatch(Map<String, String> icons) async {
+  /// persistent cache. Skips a ticker only if it already has a REAL
+  /// (source == 'finnhub') cached entry — never clobbers a real name/
+  /// sector already resolved by Company Detail's own loadLogo()/
+  /// cacheFromProfile. A ticker still stuck on the generic fallback gets
+  /// overwritten with whatever this batch call just got, so a symbol the
+  /// backend has since upgraded (see iconWarmupService's hasRealIcon fix,
+  /// 2026-09-06) actually reaches this device instead of being stuck
+  /// behind the old "any cached entry, even a placeholder, is final"
+  /// assumption — that assumption is exactly what caused CSCO/AMAT/AKAM/
+  /// ANET/CDNS/CDW to render the wrong icon forever, confirmed live the
+  /// same day. The companyName written here is just the ticker itself
+  /// (same convention loadLogo() already treats as "not a real name yet"
+  /// via its own cachedNameUseless check), so opening the real Company
+  /// Detail screen later still self-corrects it.
+  Future<void> cacheIconsBatch(Map<String, MapEntry<String, String>> icons) async {
     for (final entry in icons.entries) {
       final ticker = entry.key.toUpperCase();
-      if (await _dao.getLogo(ticker) != null) continue;
+      final existing = await _dao.getLogo(ticker);
+      if (existing != null && existing.source == 'finnhub') continue;
       await _dao.saveLogo(
         LogoCacheEntry(
           ticker: ticker,
-          companyName: ticker,
-          logoUrl: entry.value,
+          companyName: existing?.companyName ?? ticker,
+          domain: existing?.domain,
+          logoUrl: entry.value.key,
           createdAt: DateTime.now(),
+          gicsSector: existing?.gicsSector,
+          finnhubIndustry: existing?.finnhubIndustry,
+          source: entry.value.value,
         ),
       );
     }

@@ -26,6 +26,16 @@ class LogoCacheEntry {
   final String? gicsSector;
   final String? finnhubIndustry;
 
+  /// 'finnhub' (real logo) or 'fallback' (generic ticker-CDN placeholder —
+  /// see scanco-backend's iconService.getOrCreateIcon). Null for any entry
+  /// written before this field existed; treated as "assume real" rather
+  /// than retried, so upgrading the app doesn't mass-refetch the whole
+  /// existing cache at once — only entries tagged 'fallback' going forward
+  /// get retried by iconsBatchWarmProvider until the backend's warmup
+  /// sweep (see fomoshield_backend's hasRealIcon fix, 2026-09-06) actually
+  /// resolves a real one.
+  final String? source;
+
   const LogoCacheEntry({
     required this.ticker,
     required this.companyName,
@@ -34,6 +44,7 @@ class LogoCacheEntry {
     required this.createdAt,
     this.gicsSector,
     this.finnhubIndustry,
+    this.source,
   });
 
   Map<String, dynamic> toJson() => {
@@ -44,6 +55,7 @@ class LogoCacheEntry {
         'createdAt': createdAt.toIso8601String(),
         if (gicsSector != null) 'gicsSector': gicsSector,
         if (finnhubIndustry != null) 'finnhubIndustry': finnhubIndustry,
+        if (source != null) 'source': source,
       };
 
   factory LogoCacheEntry.fromJson(Map<String, dynamic> json) {
@@ -57,6 +69,7 @@ class LogoCacheEntry {
           : DateTime.now(),
       gicsSector: json['gicsSector'] as String?,
       finnhubIndustry: json['finnhubIndustry'] as String?,
+      source: json['source'] as String?,
     );
   }
 }
