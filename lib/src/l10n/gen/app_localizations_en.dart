@@ -6519,6 +6519,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'A fund with this name already exists';
 
   @override
+  String get etfFundsSearchHint => 'Search funds by name or ticker...';
+
+  @override
   String get etfFundsTabLabel => 'Funds';
 
   @override

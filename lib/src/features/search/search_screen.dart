@@ -78,6 +78,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final portfolioId = routeExtra?['portfolioId'] as String?;
     final stressTestSource = routeExtra?['source'] as String?;
     final stressTestSessionId = routeExtra?['sessionId'] as String?;
+    // Stress Test is a fully separate pricing mechanic (synthetic
+    // per-session GBM simulation, see stress_test_engine.dart) from ETF
+    // funds (real multi-investor, real-market-priced — see
+    // docs/ETF_FUND_EMULATION.md). Deliberately keeping the Funds tab out
+    // of Search entirely when opened from Stress Test's stock picker,
+    // rather than trying to make "buying a fund inside a Stress Test
+    // session" mean something — the author's own words: "залезем в такие
+    // дебри что мы сами забудем что и как работает" (2026-09-06).
+    final isStressTestEntry = stressTestSource == 'stress-test';
 
     // First back press while a query is active just clears search (back to
     // the browse lanes); only a second press with no query actually leaves
@@ -110,360 +119,367 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           right: false,
           child: Column(
             children: [
-              _buildTabHeader(l10n, palette),
+              if (!isStressTestEntry) _buildTabHeader(l10n, palette),
               Expanded(
-                child: IndexedStack(
-                  index: _tabIndex,
-                  children: [
-                    FundsTabList(palette: palette),
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                // Same plain filled-box recipe as the Stress Test "Search
-                // Company" field (see stress_test_search_sheet.dart) — a
-                // search icon inline — wrapped in the same themedBorder
-                // ring every widget/window gets (the Language/Theme picker
-                // rows get theirs from CardFrame's own border handling,
-                // this field isn't inside a CardFrame so needs it applied
-                // directly). The app-wide InputDecorationTheme's
-                // focusedBorder is a hardcoded ThemeV2.primary (green)
-                // OutlineInputBorder — not overridden by the field's own
-                // `border: InputBorder.none` below (Flutter only falls
-                // back to `border` for states that aren't separately
-                // specified), so it showed through whenever this field was
-                // focused (autofocus: true, so immediately on screen open)
-                // — still suppressed explicitly whenever [windowGradient]
-                // is set.
-                child: themedBorder(
-                  palette: palette,
-                  borderRadius: ThemeV2.borderRadiusMedium,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: palette.windowGradient,
-                      borderRadius: ThemeV2.borderRadiusMedium,
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      autofocus: true,
-                      onChanged: (q) =>
-                          ref.read(searchProvider.notifier).onSearchInput(q),
-                      decoration: InputDecoration(
-                        hintText: l10n.searchHint,
-                        hintStyle: GoogleFonts.inter(
-                          color: palette.textBody,
-                          fontSize: 14,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.search_rounded,
-                          color: palette.textBody,
-                        ),
-                        border: InputBorder.none,
-                        enabledBorder: palette.windowGradient == null
-                            ? null
-                            : InputBorder.none,
-                        focusedBorder: palette.windowGradient == null
-                            ? null
-                            : InputBorder.none,
-                        filled: false,
-                        suffixIcon: state.query.isEmpty
-                            ? null
-                            : IconButton(
-                                icon: Icon(
-                                  Icons.close_rounded,
-                                  color: palette.textBody,
-                                  size: 20,
-                                ),
-                                onPressed: _clear,
-                              ),
+                child: isStressTestEntry
+                    ? _buildCompaniesTab(
+                        l10n,
+                        state,
+                        palette,
+                        portfolioId,
+                        stressTestSource,
+                        stressTestSessionId,
+                      )
+                    : IndexedStack(
+                        index: _tabIndex,
+                        children: [
+                          FundsTabList(palette: palette),
+                          _buildCompaniesTab(
+                            l10n,
+                            state,
+                            palette,
+                            portfolioId,
+                            stressTestSource,
+                            stressTestSessionId,
+                          ),
+                        ],
                       ),
-                      style: GoogleFonts.inter(
-                        color: palette.textHeader,
-                        fontSize: 14,
-                      ),
-                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompaniesTab(
+    AppLocalizations l10n,
+    SearchNotifier state,
+    AppPalette palette,
+    String? portfolioId,
+    String? stressTestSource,
+    String? stressTestSessionId,
+  ) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          // Same plain filled-box recipe as the Stress Test "Search
+          // Company" field (see stress_test_search_sheet.dart) — a
+          // search icon inline — wrapped in the same themedBorder
+          // ring every widget/window gets (the Language/Theme picker
+          // rows get theirs from CardFrame's own border handling,
+          // this field isn't inside a CardFrame so needs it applied
+          // directly). The app-wide InputDecorationTheme's
+          // focusedBorder is a hardcoded ThemeV2.primary (green)
+          // OutlineInputBorder — not overridden by the field's own
+          // `border: InputBorder.none` below (Flutter only falls
+          // back to `border` for states that aren't separately
+          // specified), so it showed through whenever this field was
+          // focused (autofocus: true, so immediately on screen open)
+          // — still suppressed explicitly whenever [windowGradient]
+          // is set.
+          child: themedBorder(
+            palette: palette,
+            borderRadius: ThemeV2.borderRadiusMedium,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: palette.windowGradient,
+                borderRadius: ThemeV2.borderRadiusMedium,
+              ),
+              child: TextField(
+                controller: _controller,
+                autofocus: true,
+                onChanged: (q) =>
+                    ref.read(searchProvider.notifier).onSearchInput(q),
+                decoration: InputDecoration(
+                  hintText: l10n.searchHint,
+                  hintStyle: GoogleFonts.inter(
+                    color: palette.textBody,
+                    fontSize: 14,
                   ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: palette.textBody,
+                  ),
+                  border: InputBorder.none,
+                  enabledBorder: palette.windowGradient == null
+                      ? null
+                      : InputBorder.none,
+                  focusedBorder: palette.windowGradient == null
+                      ? null
+                      : InputBorder.none,
+                  filled: false,
+                  suffixIcon: state.query.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: Icon(
+                            Icons.close_rounded,
+                            color: palette.textBody,
+                            size: 20,
+                          ),
+                          onPressed: _clear,
+                        ),
+                ),
+                style: GoogleFonts.inter(
+                  color: palette.textHeader,
+                  fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: state.isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: palette.accentPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: state.isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: palette.accentPrimary,
+                  ),
+                )
+              : state.query.isEmpty
+              ? SearchBrowseLanes(
+                  palette: palette,
+                  onTapSymbol: (symbol) {
+                    // Same check+consume+navigate-inside-debounce
+                    // sequence as the typed-result ListTile below —
+                    // browsing a lane counts as a search too, so it
+                    // shares the same counter and double-tap guard.
+                    ref.read(debouncerProvider).run(() async {
+                      final tier = ref.read(subscriptionTierProvider);
+                      final canSearch =
+                          tier == SubscriptionTier.premium ||
+                          tier == SubscriptionTier.admin ||
+                          ref.read(searchCounterProvider) > 0;
+
+                      if (!canSearch) {
+                        if (context.mounted) {
+                          showMonetizationModal(context, ref);
+                        }
+                        return;
+                      }
+
+                      if (tier != SubscriptionTier.premium &&
+                          tier != SubscriptionTier.admin) {
+                        await ref
+                            .read(searchCounterProvider.notifier)
+                            .consumeSearch();
+                      }
+
+                      if (!context.mounted) return;
+
+                      if (stressTestSource == 'stress-test' &&
+                          stressTestSessionId != null) {
+                        context.push(
+                          '/stress-test/$stressTestSessionId/stock/$symbol',
+                        );
+                        return;
+                      }
+                      context.push(
+                        '/company/$symbol',
+                        extra: portfolioId != null
+                            ? {'portfolioId': portfolioId}
+                            : null,
+                      );
+                    });
+                  },
+                )
+              : state.query.length < 2
+              ? const SizedBox.shrink()
+              : state.results.isEmpty && state.query.isNotEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          state.errorType != null
+                              ? Icons.cloud_off_rounded
+                              : Icons.search_off_rounded,
+                          color: palette.textBody,
+                          size: 48,
                         ),
-                      )
-                    : state.query.isEmpty
-                    ? SearchBrowseLanes(
-                        palette: palette,
-                        onTapSymbol: (symbol) {
-                          // Same check+consume+navigate-inside-debounce
-                          // sequence as the typed-result ListTile below —
-                          // browsing a lane counts as a search too, so it
-                          // shares the same counter and double-tap guard.
-                          ref.read(debouncerProvider).run(() async {
-                            final tier = ref.read(subscriptionTierProvider);
-                            final canSearch =
-                                tier == SubscriptionTier.premium ||
-                                tier == SubscriptionTier.admin ||
-                                ref.read(searchCounterProvider) > 0;
+                        const SizedBox(height: 12),
+                        Text(
+                          state.errorType != null
+                              ? _searchErrorText(l10n, state.errorType!)
+                              : l10n.searchNoResults,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            color: palette.textBody,
+                            fontSize: 14,
+                          ),
+                        ),
+                        if (state.errorType != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.searchApiExhausted,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              color: palette.textBody,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: state.results.length,
+                  separatorBuilder: (_, _) => palette.dividerGradient != null
+                      ? themedDivider(palette, indent: 0, endIndent: 0)
+                      : const Divider(),
+                  itemBuilder: (context, i) {
+                    final item = state.results[i];
+                    final symbol = item['symbol'] as String? ?? '';
+                    final name = item['description'] as String? ?? '';
+                    final type = item['type'] as String? ?? '';
 
-                            if (!canSearch) {
-                              if (context.mounted) {
-                                showMonetizationModal(context, ref);
-                              }
-                              return;
-                            }
-
-                            if (tier != SubscriptionTier.premium &&
-                                tier != SubscriptionTier.admin) {
-                              await ref
-                                  .read(searchCounterProvider.notifier)
-                                  .consumeSearch();
-                            }
-
-                            if (!context.mounted) return;
-
-                            if (stressTestSource == 'stress-test' &&
-                                stressTestSessionId != null) {
-                              context.push(
-                                '/stress-test/$stressTestSessionId/stock/$symbol',
+                    return ListTile(
+                      key: ValueKey(symbol),
+                      leading: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: palette.accentPrimary,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: CompanyLogo(ticker: symbol, radius: 22),
+                      ),
+                      title: Row(
+                        children: [
+                          Text(
+                            symbol,
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: palette.textHeader,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          ExchangeBadge(symbol: symbol, type: type),
+                        ],
+                      ),
+                      subtitle: Text(
+                        name,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: palette.textBody,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Consumer(
+                            builder: (context, ref, _) {
+                              final inWatchlist = ref
+                                  .watch(watchlistSymbolsProvider)
+                                  .contains(symbol);
+                              return IconButton(
+                                icon: Icon(
+                                  inWatchlist
+                                      ? Icons.bookmark
+                                      : Icons.bookmark_border,
+                                  size: 20,
+                                  color: inWatchlist
+                                      ? palette.accentPrimary
+                                      : palette.textBody,
+                                ),
+                                onPressed: () {
+                                  if (inWatchlist) {
+                                    ref
+                                        .read(watchlistSymbolsProvider.notifier)
+                                        .remove(symbol);
+                                    return;
+                                  }
+                                  final maxW = ref.read(maxWatchlistProvider);
+                                  final current = ref.read(
+                                    watchlistSymbolsProvider,
+                                  );
+                                  if (current.length >= maxW) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          maxW == 30
+                                              ? l10n.watchlistLimitFree
+                                              : l10n.watchlistLimitMax(maxW),
+                                          style: GoogleFonts.inter(
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        backgroundColor: ThemeV2.primary,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  ref
+                                      .read(watchlistSymbolsProvider.notifier)
+                                      .add(symbol);
+                                },
                               );
-                              return;
+                            },
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        // Whole check+consume+navigate sequence runs
+                        // inside the debounce so a fast double-tap only
+                        // executes it once — previously the counter
+                        // check/consume ran synchronously on every tap
+                        // while only navigation was debounced, so a
+                        // double-tap could burn 2 searches for 1 visit.
+                        ref.read(debouncerProvider).run(() async {
+                          final tier = ref.read(subscriptionTierProvider);
+                          final canSearch =
+                              tier == SubscriptionTier.premium ||
+                              tier == SubscriptionTier.admin ||
+                              ref.read(searchCounterProvider) > 0;
+
+                          if (!canSearch) {
+                            if (context.mounted) {
+                              showMonetizationModal(context, ref);
                             }
+                            return;
+                          }
+
+                          // Consume one search (no-op for premium)
+                          if (tier != SubscriptionTier.premium &&
+                              tier != SubscriptionTier.admin) {
+                            await ref
+                                .read(searchCounterProvider.notifier)
+                                .consumeSearch();
+                          }
+
+                          if (!context.mounted) return;
+
+                          if (stressTestSource == 'stress-test' &&
+                              stressTestSessionId != null) {
+                            context.push(
+                              '/stress-test/$stressTestSessionId/stock/$symbol',
+                            );
+                          } else {
                             context.push(
                               '/company/$symbol',
                               extra: portfolioId != null
                                   ? {'portfolioId': portfolioId}
                                   : null,
                             );
-                          });
-                        },
-                      )
-                    : state.query.length < 2
-                    ? const SizedBox.shrink()
-                    : state.results.isEmpty && state.query.isNotEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                state.errorType != null
-                                    ? Icons.cloud_off_rounded
-                                    : Icons.search_off_rounded,
-                                color: palette.textBody,
-                                size: 48,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                state.errorType != null
-                                    ? _searchErrorText(l10n, state.errorType!)
-                                    : l10n.searchNoResults,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.inter(
-                                  color: palette.textBody,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              if (state.errorType != null) ...[
-                                const SizedBox(height: 8),
-                                Text(
-                                  l10n.searchApiExhausted,
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.inter(
-                                    color: palette.textBody,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: state.results.length,
-                        separatorBuilder: (_, _) => palette.dividerGradient != null
-                            ? themedDivider(palette, indent: 0, endIndent: 0)
-                            : const Divider(),
-                        itemBuilder: (context, i) {
-                          final item = state.results[i];
-                          final symbol = item['symbol'] as String? ?? '';
-                          final name = item['description'] as String? ?? '';
-                          final type = item['type'] as String? ?? '';
-
-                          return ListTile(
-                            key: ValueKey(symbol),
-                            leading: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: palette.accentPrimary,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: CompanyLogo(ticker: symbol, radius: 22),
-                            ),
-                            title: Row(
-                              children: [
-                                Text(
-                                  symbol,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: palette.textHeader,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                ExchangeBadge(symbol: symbol, type: type),
-                              ],
-                            ),
-                            subtitle: Text(
-                              name,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                color: palette.textBody,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Consumer(
-                                  builder: (context, ref, _) {
-                                    final inWatchlist = ref
-                                        .watch(watchlistSymbolsProvider)
-                                        .contains(symbol);
-                                    return IconButton(
-                                      icon: Icon(
-                                        inWatchlist
-                                            ? Icons.bookmark
-                                            : Icons.bookmark_border,
-                                        size: 20,
-                                        color: inWatchlist
-                                            ? palette.accentPrimary
-                                            : palette.textBody,
-                                      ),
-                                      onPressed: () {
-                                        if (inWatchlist) {
-                                          ref
-                                              .read(
-                                                watchlistSymbolsProvider
-                                                    .notifier,
-                                              )
-                                              .remove(symbol);
-                                          return;
-                                        }
-                                        final maxW = ref.read(
-                                          maxWatchlistProvider,
-                                        );
-                                        final current = ref.read(
-                                          watchlistSymbolsProvider,
-                                        );
-                                        if (current.length >= maxW) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                maxW == 30
-                                                    ? l10n.watchlistLimitFree
-                                                    : l10n.watchlistLimitMax(
-                                                        maxW,
-                                                      ),
-                                                style: GoogleFonts.inter(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                              backgroundColor: ThemeV2.primary,
-                                              behavior:
-                                                  SnackBarBehavior.floating,
-                                            ),
-                                          );
-                                          return;
-                                        }
-                                        ref
-                                            .read(
-                                              watchlistSymbolsProvider.notifier,
-                                            )
-                                            .add(symbol);
-                                      },
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              // Whole check+consume+navigate sequence runs
-                              // inside the debounce so a fast double-tap only
-                              // executes it once — previously the counter
-                              // check/consume ran synchronously on every tap
-                              // while only navigation was debounced, so a
-                              // double-tap could burn 2 searches for 1 visit.
-                              ref.read(debouncerProvider).run(() async {
-                                final tier = ref.read(subscriptionTierProvider);
-                                final canSearch =
-                                    tier == SubscriptionTier.premium ||
-                                    tier == SubscriptionTier.admin ||
-                                    ref.read(searchCounterProvider) > 0;
-
-                                if (!canSearch) {
-                                  if (context.mounted) {
-                                    showMonetizationModal(context, ref);
-                                  }
-                                  return;
-                                }
-
-                                // Consume one search (no-op for premium)
-                                if (tier != SubscriptionTier.premium &&
-                                    tier != SubscriptionTier.admin) {
-                                  await ref
-                                      .read(searchCounterProvider.notifier)
-                                      .consumeSearch();
-                                }
-
-                                if (!context.mounted) return;
-
-                                // Check if navigating from stress-test context
-                                final extra =
-                                    GoRouterState.of(context).extra
-                                        as Map<String, dynamic>?;
-                                final source = extra?['source'] as String?;
-                                final sessionId =
-                                    extra?['sessionId'] as String?;
-
-                                if (source == 'stress-test' &&
-                                    sessionId != null) {
-                                  context.push(
-                                    '/stress-test/$sessionId/stock/$symbol',
-                                  );
-                                } else {
-                                  context.push(
-                                    '/company/$symbol',
-                                    extra: portfolioId != null
-                                        ? {'portfolioId': portfolioId}
-                                        : null,
-                                  );
-                                }
-                              });
-                            },
-                          );
-                        },
-                      ),
-              ),
-                      ],
-                    ),
-                  ],
+                          }
+                        });
+                      },
+                    );
+                  },
                 ),
-              ),
-            ],
-          ),
         ),
-      ),
+      ],
     );
   }
 

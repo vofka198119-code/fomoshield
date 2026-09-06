@@ -11011,6 +11011,12 @@ abstract class AppLocalizations {
   /// **'A fund with this name already exists'**
   String get etfCreateFundNameTakenError;
 
+  /// No description provided for @etfFundsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search funds by name or ticker...'**
+  String get etfFundsSearchHint;
+
   /// No description provided for @etfFundsTabLabel.
   ///
   /// In en, this message translates to:

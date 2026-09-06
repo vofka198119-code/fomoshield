@@ -1865,6 +1865,7 @@
   "etfCreateFundNameEnglishOnlyError": "Название фонда должно быть на английском (только буквы, цифры и базовая пунктуация)",
   "etfCreateFundNameTakenError": "Фонд с таким названием уже существует",
 
+  "etfFundsSearchHint": "Поиск фондов по названию или тикеру...",
   "etfFundsTabLabel": "Фонды",
   "etfCompaniesTabLabel": "Компании",
   "etfFundsEmptyState": "Пока нет фондов — создайте первый!",
