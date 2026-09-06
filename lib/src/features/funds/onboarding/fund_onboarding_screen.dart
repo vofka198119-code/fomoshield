@@ -5,6 +5,7 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_button.dart';
+import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import 'fund_onboarding_providers.dart';
 
@@ -44,6 +45,17 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOut,
       );
+    }
+  }
+
+  void _back() {
+    if (_page > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+    } else {
+      Navigator.of(context).pop(false);
     }
   }
 
@@ -96,6 +108,14 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: themedHeaderIcon(Icons.arrow_back_rounded, palette),
+          onPressed: _back,
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -128,7 +148,14 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 15,
                             height: 1.5,
-                            color: palette.textBody,
+                            // textHeader, not textBody — this paragraph is
+                            // the primary reading content of the screen,
+                            // not a secondary caption. textBody resolves to
+                            // a deliberately muted tone in some themes
+                            // (Luxury Gold's mutedSilver) that reads fine
+                            // for short labels but too low-contrast for a
+                            // full paragraph (found live 2026-09-06).
+                            color: palette.textHeader,
                           ),
                         ),
                       ],
