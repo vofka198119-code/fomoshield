@@ -60,7 +60,9 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
 
     setState(() => _submitting = true);
     try {
-      final fund = await ref.read(fundApiServiceProvider).createFund(
+      final fund = await ref
+          .read(fundApiServiceProvider)
+          .createFund(
             name: _nameController.text.trim(),
             description: _descriptionController.text.trim().isEmpty
                 ? null
@@ -73,16 +75,18 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
           );
       ref.invalidate(fundsListProvider);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.etfCreateFundSuccessMessage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.etfCreateFundSuccessMessage)));
       context.pushReplacement('/funds/${fund.id}');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            e is Exception ? e.toString().replaceFirst('Exception: ', '') : l10n.etfCreateFundErrorGeneric,
+            e is Exception
+                ? e.toString().replaceFirst('Exception: ', '')
+                : l10n.etfCreateFundErrorGeneric,
           ),
           backgroundColor: ThemeV2.loss,
         ),
@@ -92,12 +96,26 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
     }
   }
 
-  InputDecoration _decoration(AppPalette palette, String label, {String? hint}) {
+  // filled: false is required here — the app-wide InputDecorationTheme
+  // (theme_v2.dart) defaults every text field to filled:true with an
+  // opaque WHITE fillColor. Without this override, that white fill paints
+  // straight over _fieldWrapper's own themed Container background,
+  // making every field look flat white regardless of theme (found live
+  // 2026-09-06 on Luxury Gold — fields looked "very white").
+  InputDecoration _decoration(
+    AppPalette palette,
+    String label, {
+    String? hint,
+  }) {
     return InputDecoration(
+      filled: false,
       labelText: label,
       hintText: hint,
-      labelStyle: GoogleFonts.inter(color: palette.textBody, fontSize: 13),
-      hintStyle: GoogleFonts.inter(color: palette.textBody.withValues(alpha: 0.6), fontSize: 13),
+      labelStyle: GoogleFonts.inter(color: palette.textHeader, fontSize: 13),
+      hintStyle: GoogleFonts.inter(
+        color: palette.textHeader.withValues(alpha: 0.5),
+        fontSize: 13,
+      ),
       border: InputBorder.none,
       enabledBorder: InputBorder.none,
       focusedBorder: InputBorder.none,
@@ -123,119 +141,157 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
     );
   }
 
+  // Back should feel soft, not abrupt: if a field is focused (keyboard
+  // open), the first back press only dismisses the keyboard — a second
+  // press (nothing focused) actually leaves the screen. Without this, an
+  // instinctive back-tap while typing (to lower the keyboard) instead blew
+  // straight past the form back to Home (found live 2026-09-06).
+  void _handleBackPress(BuildContext context) {
+    final focusScope = FocusScope.of(context);
+    if (focusScope.focusedChild != null) {
+      focusScope.unfocus();
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final sectorsAsync = ref.watch(fundSectorsProvider);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _handleBackPress(context);
+      },
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        centerTitle: true,
-        leading: themedBackButton(context, palette),
-        title: themedHeaderText(
-          l10n.etfCreateFundTitle,
-          palette,
-          GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          centerTitle: true,
+          leading: themedBackButton(
+            context,
+            palette,
+            onPressed: () => _handleBackPress(context),
+          ),
+          title: themedHeaderText(
+            l10n.etfCreateFundTitle,
+            palette,
+            GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              _fieldWrapper(
-                palette,
-                TextFormField(
-                  controller: _nameController,
-                  maxLength: 60,
-                  style: GoogleFonts.inter(color: palette.textHeader),
-                  decoration: _decoration(
-                    palette,
-                    l10n.etfCreateFundNameLabel,
-                    hint: l10n.etfCreateFundNameHint,
+        body: SafeArea(
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: const EdgeInsets.all(20),
+              children: [
+                _fieldWrapper(
+                  palette,
+                  TextFormField(
+                    controller: _nameController,
+                    maxLength: 60,
+                    style: GoogleFonts.inter(color: palette.textHeader),
+                    decoration: _decoration(
+                      palette,
+                      l10n.etfCreateFundNameLabel,
+                      hint: l10n.etfCreateFundNameHint,
+                    ),
+                    validator: (value) {
+                      final v = (value ?? '').trim();
+                      if (v.isEmpty) return l10n.etfCreateFundNameLabel;
+                      if (!_nameEnglishOnly.hasMatch(v)) {
+                        return l10n.etfCreateFundNameEnglishOnlyError;
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    final v = (value ?? '').trim();
-                    if (v.isEmpty) return l10n.etfCreateFundNameLabel;
-                    if (!_nameEnglishOnly.hasMatch(v)) {
-                      return l10n.etfCreateFundNameEnglishOnlyError;
-                    }
-                    return null;
-                  },
                 ),
-              ),
-              _fieldWrapper(
-                palette,
-                TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 3,
-                  maxLength: 500,
-                  style: GoogleFonts.inter(color: palette.textHeader),
-                  decoration: _decoration(palette, l10n.etfCreateFundDescriptionLabel),
+                _fieldWrapper(
+                  palette,
+                  TextFormField(
+                    controller: _descriptionController,
+                    maxLines: 3,
+                    maxLength: 500,
+                    style: GoogleFonts.inter(color: palette.textHeader),
+                    decoration: _decoration(
+                      palette,
+                      l10n.etfCreateFundDescriptionLabel,
+                    ),
+                  ),
                 ),
-              ),
-              _fieldWrapper(
-                palette,
-                TextFormField(
-                  controller: _strategyController,
-                  maxLines: 3,
-                  maxLength: 500,
-                  style: GoogleFonts.inter(color: palette.textHeader),
-                  decoration: _decoration(palette, l10n.etfCreateFundStrategyLabel),
+                _fieldWrapper(
+                  palette,
+                  TextFormField(
+                    controller: _strategyController,
+                    maxLines: 3,
+                    maxLength: 500,
+                    style: GoogleFonts.inter(color: palette.textHeader),
+                    decoration: _decoration(
+                      palette,
+                      l10n.etfCreateFundStrategyLabel,
+                    ),
+                  ),
                 ),
-              ),
-              _fieldWrapper(
-                palette,
-                TextFormField(
-                  controller: _capitalController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: GoogleFonts.inter(color: palette.textHeader),
-                  decoration: _decoration(palette, l10n.etfCreateFundCapitalLabel),
-                  validator: (value) {
-                    final v = double.tryParse(value ?? '');
-                    if (v == null || v <= 0 || v > _maxStartingCapital) {
-                      return l10n.etfCreateFundCapitalLabel;
-                    }
-                    return null;
-                  },
+                _fieldWrapper(
+                  palette,
+                  TextFormField(
+                    controller: _capitalController,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: false,
+                    ),
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    style: GoogleFonts.inter(color: palette.textHeader),
+                    decoration: _decoration(
+                      palette,
+                      l10n.etfCreateFundCapitalLabel,
+                    ),
+                    validator: (value) {
+                      final v = double.tryParse(value ?? '');
+                      if (v == null || v <= 0 || v > _maxStartingCapital) {
+                        return l10n.etfCreateFundCapitalLabel;
+                      }
+                      return null;
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l10n.etfCreateFundSectorsLabel,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: palette.textBody,
+                const SizedBox(height: 4),
+                Text(
+                  l10n.etfCreateFundSectorsLabel,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textBody,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              sectorsAsync.when(
-                loading: () => Center(
-                  child: CircularProgressIndicator(color: palette.accentPrimary),
+                const SizedBox(height: 8),
+                sectorsAsync.when(
+                  loading: () => Center(
+                    child: CircularProgressIndicator(
+                      color: palette.accentPrimary,
+                    ),
+                  ),
+                  error: (_, _) => Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: allowedSectorCodes(
+                      l10n,
+                    ).map((code) => _sectorChip(palette, l10n, code)).toList(),
+                  ),
+                  data: (codes) => Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: codes
+                        .map((code) => _sectorChip(palette, l10n, code))
+                        .toList(),
+                  ),
                 ),
-                error: (_, _) => Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: allowedSectorCodes(l10n)
-                      .map((code) => _sectorChip(palette, l10n, code))
-                      .toList(),
-                ),
-                data: (codes) => Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children:
-                      codes.map((code) => _sectorChip(palette, l10n, code)).toList(),
-                ),
-              ),
-              const SizedBox(height: 28),
-              _submitButton(palette, l10n),
-            ],
+                const SizedBox(height: 28),
+                _submitButton(palette, l10n),
+              ],
+            ),
           ),
         ),
       ),
@@ -256,7 +312,10 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
         child: themedDarkCtaButtonShell(
           palette: palette,
           borderRadius: radius,
-          standardDecoration: BoxDecoration(color: ThemeV2.primary, borderRadius: radius),
+          standardDecoration: BoxDecoration(
+            color: ThemeV2.primary,
+            borderRadius: radius,
+          ),
           child: InkWell(
             borderRadius: radius,
             onTap: _submitting ? null : _submit,

@@ -586,7 +586,21 @@ CREATE POLICY fund_nav_snapshots_select_authenticated ON public.fund_nav_snapsho
 
 
 -- =============================================================================
--- F.O.M.O. Shield — Supabase Migration 014+ (RESERVED)
+-- F.O.M.O. Shield — Supabase Migration 014
+-- Table: funds (INDEX)
+-- Feature: ETF Fund Emulation, Phase 1 — fund names must be unique
+-- (case-insensitive), not just tickers. fundService.js's assertNameAvailable
+-- is the fast-path check; this unique index is the real backstop against a
+-- race between two concurrent fund-creation requests both passing that
+-- check before either has inserted (caught as Postgres error 23505 in
+-- fundService.js's createFund and turned into a clean validation error).
+-- =============================================================================
+
+CREATE UNIQUE INDEX funds_name_unique_ci_idx ON public.funds (lower(name));
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 015+ (RESERVED)
 -- Feature: ETF Fund Emulation, Phases 2-8 — see docs/ETF_FUND_EMULATION.md.
 -- Remaining tables (fund_investor_positions, fund_investor_transactions,
 -- employee_profiles, fund_team_members, fund_invitations,
