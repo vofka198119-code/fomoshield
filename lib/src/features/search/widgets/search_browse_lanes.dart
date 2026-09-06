@@ -103,6 +103,11 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
     final l10n = AppLocalizations.of(context)!;
     final recentlyViewed = ref.watch(recentlyViewedProvider);
     final topCompanies = ref.watch(topCompaniesProvider);
+    // Side-effect only — see iconsBatchWarmProvider's doc comment. Not
+    // rendered off of; individual CompanyLogo rows below still read
+    // through cachedLogoProvider as before, they just hit local cache
+    // instead of the network once this finishes.
+    ref.watch(iconsBatchWarmProvider);
     final persistedOverrides =
         ref.watch(_persistedSectorOverridesProvider).valueOrNull ?? const {};
 

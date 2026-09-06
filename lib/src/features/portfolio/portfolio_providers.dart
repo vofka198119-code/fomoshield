@@ -238,9 +238,45 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
     _loadedFromSupabase = true;
     // Same migration as _load() below — a Supabase-synced account from
     // before "one portfolio for everyone" can still hand back several.
-    state = portfolios.length > 1 ? [_oldestOf(portfolios)] : portfolios;
+    final incoming = portfolios.length > 1 ? [_oldestOf(portfolios)] : portfolios;
+
+    // savePortfolios() (see _syncToSupabase) is fire-and-forget best-effort
+    // — a creditWeeklyPayout() can save locally and then the app gets
+    // killed/restarted before that write reaches Supabase. This load then
+    // runs against the OLDER server row, which still has the pre-credit
+    // lastWeeklyPayoutAt. Blindly trusting it here would make the next
+    // checkWeeklyPayout() see that same week as still unpaid and credit
+    // the +$180 a second time — confirmed live 2026-09-06 ("вторая
+    // выплата за неделю"). Every other field still comes from the server
+    // (source of truth for everything actually synced); only this one
+    // clock is compared and kept if the local copy is strictly newer.
+    var correctedClock = false;
+    for (final p in incoming) {
+      Portfolio? local;
+      for (final s in state) {
+        if (s.id == p.id) {
+          local = s;
+          break;
+        }
+      }
+      final localClock = local?.lastWeeklyPayoutAt;
+      final serverClock = p.lastWeeklyPayoutAt;
+      if (localClock != null &&
+          (serverClock == null || localClock.isAfter(serverClock))) {
+        p.lastWeeklyPayoutAt = localClock;
+        correctedClock = true;
+      }
+    }
+
+    state = incoming;
     _saveLocal(); // Cache locally
-    if (portfolios.length > 1) _syncToSupabase();
+    // Push the merge back to Supabase whenever this load either trimmed a
+    // multi-portfolio account (pre-existing behavior) or pulled the payout
+    // clock forward above — otherwise the server row stays on its stale
+    // clock until the next unrelated write happens to touch it, and a
+    // second app restart in between would re-trigger the same duplicate
+    // credit this merge exists to prevent.
+    if (portfolios.length > 1 || correctedClock) _syncToSupabase();
   }
 
   Portfolio _oldestOf(List<Portfolio> portfolios) =>
