@@ -428,7 +428,9 @@ class FinnhubService {
   /// backend down) — callers should treat that the same as any other
   /// resolution failure (see [_ConcurrencyLimiter]/callers' own retry, if
   /// any) rather than needing bespoke handling here.
-  Future<Map<String, String>> iconsBatch(List<String> symbols) async {
+  Future<Map<String, MapEntry<String, String>>> iconsBatch(
+    List<String> symbols,
+  ) async {
     if (symbols.isEmpty) return {};
     final response = await _rateLimiter.run(
       () => _limiter.run(
@@ -438,10 +440,18 @@ class FinnhubService {
     final icons = response.data is Map
         ? Map<String, dynamic>.from(response.data['icons'] as Map? ?? {})
         : <String, dynamic>{};
-    final result = <String, String>{};
+    // Value is (iconUrl, source) — source is 'finnhub' (real) or 'fallback'
+    // (generic placeholder), used by cacheIconsBatch to decide whether an
+    // already-cached ticker is still worth retrying later instead of
+    // trusting it forever. See LogoCacheEntry.source's own doc comment.
+    final result = <String, MapEntry<String, String>>{};
     for (final entry in icons.entries) {
-      final url = (entry.value as Map?)?['iconUrl'] as String?;
-      if (url != null && url.isNotEmpty) result[entry.key] = url;
+      final map = entry.value as Map?;
+      final url = map?['iconUrl'] as String?;
+      final source = map?['source'] as String? ?? 'fallback';
+      if (url != null && url.isNotEmpty) {
+        result[entry.key] = MapEntry(url, source);
+      }
     }
     return result;
   }
