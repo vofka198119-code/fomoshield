@@ -142,6 +142,31 @@ class LogoRepository {
   /// Проверяет, есть ли логотип в кэше.
   Future<bool> hasLogo(String ticker) async => _dao.hasLogo(ticker);
 
+  /// Bulk-writes icon URLs resolved via FinnhubService.iconsBatch into the
+  /// persistent cache. Skips any ticker that already has a cached entry —
+  /// this never clobbers a real name/sector already resolved by Company
+  /// Detail's own loadLogo()/cacheFromProfile with a placeholder. The
+  /// companyName written here is just the ticker itself (same convention
+  /// loadLogo() already treats as "not a real name yet" via its own
+  /// cachedNameUseless check), so opening the real Company Detail screen
+  /// later still self-corrects it — this only ever needs to make
+  /// getCachedLogo (the logo URL alone) return instantly instead of
+  /// falling through to a per-ticker network call.
+  Future<void> cacheIconsBatch(Map<String, String> icons) async {
+    for (final entry in icons.entries) {
+      final ticker = entry.key.toUpperCase();
+      if (await _dao.getLogo(ticker) != null) continue;
+      await _dao.saveLogo(
+        LogoCacheEntry(
+          ticker: ticker,
+          companyName: ticker,
+          logoUrl: entry.value,
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
+  }
+
   /// Записывает логотип+сектор из уже загруженного profile-ответа —
   /// для вызывающих сторон, у которых profile и так уже под рукой
   /// (Company Detail: тот же самый /profile/:symbol, что и её price

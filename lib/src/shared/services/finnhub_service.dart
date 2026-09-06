@@ -412,6 +412,40 @@ class FinnhubService {
   Future<Map<String, dynamic>> icon(String symbol) async =>
       _getFromBackend('/icons/$symbol');
 
+  /// Resolves many tickers' icons in ONE backend round trip instead of one
+  /// per ticker. [icon] above is correct for a single ad-hoc lookup, but a
+  /// screen that already knows its whole symbol list upfront (e.g.
+  /// SearchBrowseLanes' ~500-name top-companies roster) used to fire that
+  /// many individual `icon()` calls, each queued behind [_limiter]'s
+  /// maxConcurrent:8 cap — cheap per-call, but visibly staggered ("old"
+  /// already-locally-cached icons render instantly, "new" ones trickle in
+  /// wave by wave) even though the backend itself has long since cached
+  /// the real logo for every one of them. Still goes through both
+  /// [_rateLimiter] and [_limiter], same as any other single request —
+  /// this just collapses N requests into 1, it doesn't bypass the budget.
+  /// Returns `{symbol: iconUrl}`, silently dropping any symbol the backend
+  /// didn't return a usable URL for. Throws on total failure (network/
+  /// backend down) — callers should treat that the same as any other
+  /// resolution failure (see [_ConcurrencyLimiter]/callers' own retry, if
+  /// any) rather than needing bespoke handling here.
+  Future<Map<String, String>> iconsBatch(List<String> symbols) async {
+    if (symbols.isEmpty) return {};
+    final response = await _rateLimiter.run(
+      () => _limiter.run(
+        () => _backendDio.post('/icons/batch', data: {'symbols': symbols}),
+      ),
+    );
+    final icons = response.data is Map
+        ? Map<String, dynamic>.from(response.data['icons'] as Map? ?? {})
+        : <String, dynamic>{};
+    final result = <String, String>{};
+    for (final entry in icons.entries) {
+      final url = (entry.value as Map?)?['iconUrl'] as String?;
+      if (url != null && url.isNotEmpty) result[entry.key] = url;
+    }
+    return result;
+  }
+
   // ---------------------------------------------------------------------------
   // Quote
   // ---------------------------------------------------------------------------
