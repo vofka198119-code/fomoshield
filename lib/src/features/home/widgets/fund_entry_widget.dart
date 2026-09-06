@@ -8,6 +8,7 @@ import '../../../core/supabase/supabase_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../funds/onboarding/fund_onboarding_providers.dart';
+import '../../monetization/monetization_modal.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Entry Widget — Home mini card, sits directly under Market Clock (see
@@ -21,6 +22,11 @@ class FundEntryWidget extends ConsumerWidget {
   const FundEntryWidget({super.key});
 
   Future<void> _handleHeadTap(BuildContext context, WidgetRef ref) async {
+    final tier = ref.read(subscriptionTierProvider);
+    if (!tier.isPremiumOrAdmin) {
+      await showMonetizationModal(context, ref);
+      return;
+    }
     final seen = ref.read(fundOnboardingSeenProvider(FundOnboardingBranch.head));
     if (!seen) {
       final accepted = await context.push<bool>(
