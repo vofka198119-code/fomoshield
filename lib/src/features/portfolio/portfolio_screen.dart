@@ -74,12 +74,21 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             // ShaderMask sheen under Luxury via themedGoldGradient; this
             // one was missed. Standard is a no-op, exact same gray as
             // before.
+            //
+            // `windowGradient == null` was used as a "this theme is dark"
+            // proxy — wrong for Black & White, which DOES set windowGradient
+            // (its own light card gradient) but is a LIGHT theme, so the
+            // hardcoded Colors.white branch rendered an invisible white icon
+            // on a white AppBar (found live 2026-09-06). The sheet's own
+            // "Rename" icon a few taps deeper already gets this right with
+            // `palette.accentPrimary` (bwBlack for Black & White, correctly
+            // dark) — matching that instead of re-deriving a new rule.
             icon: themedGoldGradient(
               Icon(
                 Icons.more_vert,
                 color: palette.windowGradient == null
                     ? ThemeV2.textSecondary
-                    : Colors.white,
+                    : palette.accentPrimary,
                 shadows: palette.titleShadow != null
                     ? [palette.titleShadow!]
                     : null,
