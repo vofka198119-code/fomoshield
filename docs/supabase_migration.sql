@@ -503,3 +503,25 @@ CREATE OR REPLACE TRIGGER guard_user_data_sanity_ceiling_trigger
     BEFORE INSERT OR UPDATE ON public.user_data
     FOR EACH ROW
     EXECUTE FUNCTION public.guard_user_data_sanity_ceiling();
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 013+ (RESERVED)
+-- Feature: ETF Fund Emulation (see docs/ETF_FUND_EMULATION.md, and the phased
+--          implementation plan in that design doc's own git history)
+-- Status: reserved on branch feature/etf-fund-emulation, not yet written.
+--
+-- All new tables for this feature (funds, fund_holdings, fund_nav_snapshots,
+-- fund_investor_positions, fund_investor_transactions, employee_profiles,
+-- fund_team_members, fund_invitations, fund_trade_proposals, fund_transactions,
+-- fund_chat_messages, fund_meetings, fund_meeting_invites, bot_investor_profiles,
+-- bot_investor_state, fund_fee_ledger, manager_earnings_balance,
+-- fund_succession_events, added across Phases 1-8) are deliberately NEW,
+-- STANDALONE tables — none of them touch `user_data`. This is intentional:
+-- Migration 012's $1,000,000 ceiling trigger above only inspects
+-- portfolios/stress_test_sessions/stress_test_verdicts inside `user_data`, so
+-- it never applies to fund state by construction. If a future change ever
+-- moves any fund data into a `user_data` column instead, Migration 012 MUST
+-- be revisited first (either its ceiling raised or the new path excluded) —
+-- see open question #9 in docs/ETF_FUND_EMULATION.md.
+-- =============================================================================
