@@ -8,6 +8,7 @@ import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_border.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../providers/fund_providers.dart';
 import '../sector_labels.dart';
@@ -233,37 +234,51 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                 ),
               ),
               const SizedBox(height: 28),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: _submitting ? null : _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: palette.accentPrimary,
-                    foregroundColor: palette.onButton ?? Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: _submitting
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          l10n.etfCreateFundSubmitButton,
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                ),
-              ),
+              _submitButton(palette, l10n),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Same recipe as set_goal_screen.dart's _saveButton / the onboarding
+  // screen's _ctaButton — never paint a CTA with palette.accentPrimary as a
+  // flat fill (Graphite/Black & White collapse accentPrimary and onButton
+  // to the same color, making the label invisible; found live 2026-09-06).
+  Widget _submitButton(AppPalette palette, AppLocalizations l10n) {
+    final radius = BorderRadius.circular(ThemeV2.buttonRadius);
+    return SizedBox(
+      width: double.infinity,
+      height: ThemeV2.buttonHeight,
+      child: Material(
+        type: MaterialType.transparency,
+        child: themedDarkCtaButtonShell(
+          palette: palette,
+          borderRadius: radius,
+          standardDecoration: BoxDecoration(color: ThemeV2.primary, borderRadius: radius),
+          child: InkWell(
+            borderRadius: radius,
+            onTap: _submitting ? null : _submit,
+            child: Center(
+              child: _submitting
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: themedDarkCtaContentColor(palette),
+                      ),
+                    )
+                  : Text(
+                      l10n.etfCreateFundSubmitButton,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: themedDarkCtaContentColor(palette),
+                      ),
+                    ),
+            ),
           ),
         ),
       ),

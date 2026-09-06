@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import 'fund_onboarding_providers.dart';
 
@@ -144,31 +146,55 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
                     }),
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: isLast ? _accept : _next,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: palette.accentPrimary,
-                        foregroundColor: palette.onButton ?? Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Text(
-                        isLast ? l10n.etfOnboardingAccept : l10n.etfOnboardingNext,
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                  _ctaButton(
+                    palette: palette,
+                    label: isLast ? l10n.etfOnboardingAccept : l10n.etfOnboardingNext,
+                    onTap: isLast ? _accept : _next,
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // Same recipe as set_goal_screen.dart's _saveButton — NEVER paint a CTA
+  // button with palette.accentPrimary as a flat fill: under Graphite,
+  // accentPrimary AND onButton are both grWhite (white text on a white
+  // button); under Black & White both are bwBlack (black on black) — found
+  // live 2026-09-06 on a real device, invisible button label. This shell
+  // picks the right fill/text combo per theme automatically.
+  Widget _ctaButton({
+    required AppPalette palette,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    final radius = BorderRadius.circular(ThemeV2.buttonRadius);
+    return SizedBox(
+      width: double.infinity,
+      height: ThemeV2.buttonHeight,
+      child: Material(
+        type: MaterialType.transparency,
+        child: themedDarkCtaButtonShell(
+          palette: palette,
+          borderRadius: radius,
+          standardDecoration: BoxDecoration(color: ThemeV2.primary, borderRadius: radius),
+          child: InkWell(
+            borderRadius: radius,
+            onTap: onTap,
+            child: Center(
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: themedDarkCtaContentColor(palette),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
