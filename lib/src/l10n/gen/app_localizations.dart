@@ -10834,49 +10834,49 @@ abstract class AppLocalizations {
   /// No description provided for @etfOnboardingStep1TitleHead.
   ///
   /// In en, this message translates to:
-  /// **'What Is an ETF Fund?'**
+  /// **'Who Is a Fund Manager?'**
   String get etfOnboardingStep1TitleHead;
 
   /// No description provided for @etfOnboardingStep1BodyHead.
   ///
   /// In en, this message translates to:
-  /// **'Create your own virtual investment fund. Other players invest their own virtual capital into it, you and your hired analysts manage its holdings, and its unit price tracks real market prices — hands-on practice at real portfolio management.'**
+  /// **'Create your own investment fund and take on the role of its manager.\n\nInside the fund, you set the strategy, choose the assets, make buy and sell decisions, and manage investors\' capital.\n\nThe fund works like an ETF: a pooled portfolio of assets managed according to a chosen strategy. Other users will be able to invest in your fund, and its performance will depend on your team\'s decisions and market behavior.\n\nReady to create your own fund?'**
   String get etfOnboardingStep1BodyHead;
 
   /// No description provided for @etfOnboardingStep2TitleHead.
   ///
   /// In en, this message translates to:
-  /// **'What You\'ll Need'**
+  /// **'What You Need to Create a Fund'**
   String get etfOnboardingStep2TitleHead;
 
   /// No description provided for @etfOnboardingStep2BodyHead.
   ///
   /// In en, this message translates to:
-  /// **'Creating a fund requires a Premium subscription and up to \$150,000 of virtual starting capital. You\'ll choose a fund name (English only — a ticker is generated automatically) and the sectors your fund focuses on.'**
+  /// **'Opening your own fund requires a Premium subscription.\n\nDuring setup, you\'ll create your fund\'s profile: name, logo, description, strategy, and team.\n\nYour fund starts with \$150,000 in virtual capital. These funds are used exclusively inside the simulator and become your fund\'s starting capital.\n\nCreate your fund. Build your team. See how far your decisions can take you.'**
   String get etfOnboardingStep2BodyHead;
 
   /// No description provided for @etfOnboardingStep1TitleAnalyst.
   ///
   /// In en, this message translates to:
-  /// **'What Is an Investment Assistant?'**
+  /// **'Who Is a Fund Employee?'**
   String get etfOnboardingStep1TitleAnalyst;
 
   /// No description provided for @etfOnboardingStep1BodyAnalyst.
   ///
   /// In en, this message translates to:
-  /// **'Join a fund\'s team and propose real trades with your own reasoning — the fund\'s head reviews and approves them. A practical way to build a track record before working with real money.'**
+  /// **'Don\'t want to manage a fund on your own? Join an existing team instead.\n\nFunds need analysts, traders, risk managers, and other specialists. You\'ll be able to browse open positions on the marketplace, submit applications, and work inside a fund\'s team.\n\nThere are two ways to join: apply to an open position, or get invited directly by a friend who manages a fund.\n\nYour decisions and proposals can become part of a real virtual fund\'s actual strategy.'**
   String get etfOnboardingStep1BodyAnalyst;
 
   /// No description provided for @etfOnboardingStep2TitleAnalyst.
   ///
   /// In en, this message translates to:
-  /// **'What You\'ll Need'**
+  /// **'How to Join a Team'**
   String get etfOnboardingStep2TitleAnalyst;
 
   /// No description provided for @etfOnboardingStep2BodyAnalyst.
   ///
   /// In en, this message translates to:
-  /// **'Becoming an assistant is free. You\'ll create a public profile — just a nickname and avatar, no personal information — so fund heads can find and hire you from the jobs marketplace.'**
+  /// **'Working as an employee doesn\'t require Premium.\n\nFirst, create your professional profile: choose a role, list your skills and experience, and add some information about yourself.\n\nOnce that\'s done, you can list your profile on the jobs marketplace and wait for invitations from funds.\n\nOr join directly — if a friend who manages a fund invites you.\n\nFind your role. Join a team. Help shape a fund\'s decisions.'**
   String get etfOnboardingStep2BodyAnalyst;
 
   /// No description provided for @etfOnboardingStep3Title.
@@ -10888,14 +10888,26 @@ abstract class AppLocalizations {
   /// No description provided for @etfOnboardingStep3Body.
   ///
   /// In en, this message translates to:
-  /// **'Premium unlocks access to this training simulator. All money inside funds is fictional and can never be exchanged for real money. No statistic or rating is financial advice or a guarantee of return. When there aren\'t enough real players yet, virtual assistant-investors may take part to keep the simulation liquid.'**
+  /// **'FOMO Shield is a fund-management simulator.\n\nAll money, assets, trades, and results inside funds are virtual and have no real monetary value. They cannot be withdrawn, exchanged, or used outside the app.\n\nWhen there aren\'t enough real participants, or to keep the simulation liquid, the system may use synthetic investors. Their actions are generated by the system and are not the actions of real users.\n\nNo statistic, return, rating, or simulation result is financial advice, a guarantee of income, or a promise of future results.'**
   String get etfOnboardingStep3Body;
 
-  /// No description provided for @etfOnboardingNext.
+  /// No description provided for @etfOnboardingContinueButton.
   ///
   /// In en, this message translates to:
-  /// **'Next'**
-  String get etfOnboardingNext;
+  /// **'Continue'**
+  String get etfOnboardingContinueButton;
+
+  /// No description provided for @etfOnboardingStep2ButtonHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Fund'**
+  String get etfOnboardingStep2ButtonHead;
+
+  /// No description provided for @etfOnboardingStep2ButtonAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Profile'**
+  String get etfOnboardingStep2ButtonAnalyst;
 
   /// No description provided for @etfOnboardingAccept.
   ///

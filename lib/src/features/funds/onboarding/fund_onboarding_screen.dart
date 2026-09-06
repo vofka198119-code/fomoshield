@@ -55,22 +55,35 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
     Navigator.of(context).pop(true);
   }
 
-  List<(String, String)> _steps(AppLocalizations l10n) {
+  // (title, body, button label) per step — button label is per-step/per-
+  // branch on purpose (e.g. head's step 2 says "Create Fund", analyst's
+  // says "Create Profile"), not a generic "Next", per the author's copy.
+  List<(String, String, String)> _steps(AppLocalizations l10n) {
     final isHead = widget.branch == FundOnboardingBranch.head;
     return [
       isHead
-          ? (l10n.etfOnboardingStep1TitleHead, l10n.etfOnboardingStep1BodyHead)
+          ? (
+              l10n.etfOnboardingStep1TitleHead,
+              l10n.etfOnboardingStep1BodyHead,
+              l10n.etfOnboardingContinueButton,
+            )
           : (
               l10n.etfOnboardingStep1TitleAnalyst,
               l10n.etfOnboardingStep1BodyAnalyst,
+              l10n.etfOnboardingContinueButton,
             ),
       isHead
-          ? (l10n.etfOnboardingStep2TitleHead, l10n.etfOnboardingStep2BodyHead)
+          ? (
+              l10n.etfOnboardingStep2TitleHead,
+              l10n.etfOnboardingStep2BodyHead,
+              l10n.etfOnboardingStep2ButtonHead,
+            )
           : (
               l10n.etfOnboardingStep2TitleAnalyst,
               l10n.etfOnboardingStep2BodyAnalyst,
+              l10n.etfOnboardingStep2ButtonAnalyst,
             ),
-      (l10n.etfOnboardingStep3Title, l10n.etfOnboardingStep3Body),
+      (l10n.etfOnboardingStep3Title, l10n.etfOnboardingStep3Body, l10n.etfOnboardingAccept),
     ];
   }
 
@@ -89,14 +102,16 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
+                // Sequential, button-driven navigation only — swiping
+                // between steps is intentionally disabled, per the author.
+                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (i) => setState(() => _page = i),
                 itemCount: _stepCount,
                 itemBuilder: (context, index) {
-                  final (title, body) = steps[index];
-                  return Padding(
+                  final (title, body, _) = steps[index];
+                  return SingleChildScrollView(
                     padding: const EdgeInsets.all(28),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -148,7 +163,7 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
                   const SizedBox(height: 20),
                   _ctaButton(
                     palette: palette,
-                    label: isLast ? l10n.etfOnboardingAccept : l10n.etfOnboardingNext,
+                    label: steps[_page].$3,
                     onTap: isLast ? _accept : _next,
                   ),
                 ],
