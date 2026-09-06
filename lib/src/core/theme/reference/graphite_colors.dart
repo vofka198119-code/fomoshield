@@ -36,3 +36,32 @@ const grSteel = Color(0xFFAEB4BD);
 /// Deeper steel gray — border gradient's base (bottom) stop, so the
 /// white→steel glint at the top doesn't wash out over the whole border.
 const grSteelDark = Color(0xFF6B7078);
+
+// ---------------------------------------------------------------------------
+// Chart/bar accent — amber/orange, extracted by eye from a user-supplied
+// reference image (a dark dashboard mockup: area-chart price lines +
+// horizontal progress bars, both in this warm orange family). Deliberately
+// a DIFFERENT hue family from the white-steel used for borders/titles/
+// Market Clock chrome above — this is a data-visualization accent, not part
+// of the theme's structural palette. Not pixel-sampled (no tool access to
+// the source image's raw pixels), so treat as a first pass pending the
+// user's on-device look.
+// ---------------------------------------------------------------------------
+
+/// Bright amber-orange — chart line stroke, bar fill's "hot" end, glow tint.
+const grChartAmber = Color(0xFFFFA53D);
+
+/// Deeper orange — chart area fill's near-line stop, bar fill's "cool" end.
+const grChartOrange = Color(0xFFFF7A1A);
+
+/// Same hue as [grChartOrange] at zero alpha — the area fill's fade-to-
+/// nothing stop at the chart's baseline (matches the reference's "cloud
+/// fading into the dark background" look).
+const grChartOrangeFade = Color(0x00FF7A1A);
+
+/// Area-fill-only, reduced-alpha versions of [grChartAmber]/[grChartOrange]
+/// — the line stroke ([chartLineGradient] in graphite_theme.dart) stays
+/// fully opaque; only the fill under it was asked to be lighter (2026-09-06,
+/// "уменьшить непрозрачность под линией графика а саму линию не трогаем").
+const grChartAreaTop = Color(0x73FFA53D); // ~45% alpha
+const grChartAreaMid = Color(0x33FF7A1A); // ~20% alpha

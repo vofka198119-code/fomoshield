@@ -359,6 +359,11 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     // Determine color: green if last close >= first close
     final isUp = closes.last >= closes.first;
     final lineColor = isUp ? ThemeV2.success : ThemeV2.loss;
+    // Graphite deliberately overrides the up/down signal with one fixed
+    // amber gradient — see AppPalette.chartLineGradient's doc comment.
+    final lineGradient = widget.palette.chartLineGradient;
+    final lineGlowColor = lineGradient?.colors.last ?? lineColor;
+    final areaGradient = widget.palette.chartAreaGradient;
 
     final spots = <FlSpot>[];
     for (int i = 0; i < closes.length; i++) {
@@ -411,7 +416,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                     size: Size(plotWidth, 220),
                     painter: ChartLineGlowPainter(
                       pixelPoints: pixelPoints,
-                      color: lineColor,
+                      color: lineGlowColor,
                     ),
                   ),
                   LineChart(
@@ -525,9 +530,14 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                         LineChartBarData(
                           spots: spots,
                           isCurved: false,
-                          color: lineColor,
+                          color: lineGradient == null ? lineColor : null,
+                          gradient: lineGradient,
                           barWidth: 1.7,
                           isStrokeCapRound: true,
+                          belowBarData: BarAreaData(
+                            show: areaGradient != null,
+                            gradient: areaGradient,
+                          ),
                           // A small dot on the very last point only — anchors the
                           // eye to where the line currently ends, especially when
                           // there's empty space after it (1D stops at "now").
@@ -538,7 +548,7 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                             getDotPainter: (spot, percent, barData, index) =>
                                 FlDotCirclePainter(
                                   radius: 3,
-                                  color: lineColor,
+                                  color: lineGlowColor,
                                   strokeWidth: 0,
                                 ),
                           ),

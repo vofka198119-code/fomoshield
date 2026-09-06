@@ -334,7 +334,8 @@ class FomoShieldStatusWidget extends StatelessWidget {
               boxShadow: (palette.glowOpacity ?? 1.0) > 0
                   ? [
                       BoxShadow(
-                        color: (palette.marketClockRingGradient?.colors.last ??
+                        color: (palette.barFillGradient?.colors.last ??
+                                palette.marketClockRingGradient?.colors.last ??
                                 dialBrassLight)
                             .withValues(alpha: 0.35),
                         blurRadius: 6,
@@ -383,9 +384,10 @@ class FomoShieldStatusWidget extends StatelessWidget {
   static LinearGradient _barGradient(int value, AppPalette palette) {
     const threshold = 0.70;
     const blend = 0.05;
-    final ringColors = palette.marketClockRingGradient?.colors;
-    final start = ringColors?.first ?? dialBrassLight;
-    final end = ringColors?.last ?? dialBrassLight;
+    final baseColors =
+        palette.barFillGradient?.colors ?? palette.marketClockRingGradient?.colors;
+    final start = baseColors?.first ?? dialBrassLight;
+    final end = baseColors?.last ?? dialBrassLight;
     final fraction = (value / 100).clamp(0.0, 1.0);
     if (fraction <= threshold || fraction == 0) {
       return LinearGradient(colors: [start, end]);

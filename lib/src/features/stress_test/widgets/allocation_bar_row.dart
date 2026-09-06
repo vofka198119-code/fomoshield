@@ -61,9 +61,10 @@ class AllocationBarRow extends StatelessWidget {
   LinearGradient _dangerZoneGradient() {
     const threshold = 0.70;
     const blend = 0.05;
-    final ringColors = palette.marketClockRingGradient?.colors;
-    final start = ringColors?.first ?? dialBrassLight;
-    final end = ringColors?.last ?? dialBrassLight;
+    final baseColors =
+        palette.barFillGradient?.colors ?? palette.marketClockRingGradient?.colors;
+    final start = baseColors?.first ?? dialBrassLight;
+    final end = baseColors?.last ?? dialBrassLight;
     final fraction = (percent / 100).clamp(0.0, 1.0);
     if (fraction <= threshold || fraction == 0) {
       return LinearGradient(colors: [start, end]);
@@ -81,14 +82,19 @@ class AllocationBarRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final fraction = (percent / 100).clamp(0.0, 1.0);
     final inDangerZone = dangerZoneGradient && fraction > 0.70;
+    // barFillGradient's brighter (last) color for the glow when set —
+    // matches the fill it's actually glowing under instead of the
+    // marketClockAccent-derived flat color.
+    final normalGlowColor = palette.barFillGradient?.colors.last ?? _accentColor;
     final glowColor = inDangerZone
         ? ThemeV2.loss
-        : (!dangerZoneGradient && warning ? _warningGlow : _accentColor);
+        : (!dangerZoneGradient && warning ? _warningGlow : normalGlowColor);
     final fillGradient = dangerZoneGradient
         ? _dangerZoneGradient()
         : (warning
               ? _warningGradient
-              : LinearGradient(colors: [_accentColor, _accentColor]));
+              : (palette.barFillGradient ??
+                    LinearGradient(colors: [_accentColor, _accentColor])));
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),

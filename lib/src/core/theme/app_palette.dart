@@ -149,6 +149,28 @@ class AppPalette {
   /// black — its white cards made the same muted gray read too faint.
   final Color? disclaimerColor;
 
+  /// Price-chart line stroke (LineChartBarData.gradient in the sparkline/
+  /// market-value/price-chart trio) — null (every theme but Graphite) keeps
+  /// the app-wide green/red up-down convention (same signal as BUY/SELL
+  /// buttons). Non-null DELIBERATELY overrides that per-direction signal
+  /// with one fixed color — an explicit user request for Graphite
+  /// (2026-09-06), self-checked and confirmed knowing it drops the up/down
+  /// read on those specific charts. Do not set this for a future theme
+  /// without the same explicit trade-off being asked for again.
+  final Gradient? chartLineGradient;
+
+  /// Price-chart area fill under the line (BarAreaData.gradient), paired
+  /// with [chartLineGradient] — null (every theme but Graphite) keeps the
+  /// existing no-fill thin-line chart style.
+  final Gradient? chartAreaGradient;
+
+  /// Horizontal progress/allocation bar fill (AllocationBarRow, Market
+  /// Clock's risk-metric bars) — null (every theme but Graphite) keeps the
+  /// existing flat [marketClockAccent] fill. The red "danger zone" blend
+  /// past 70% (over-concentration / high risk) is untouched either way —
+  /// same real-signal exception as BUY/SELL colors, not cosmetic.
+  final Gradient? barFillGradient;
+
   const AppPalette({
     this.background,
     this.backgroundGradient,
@@ -175,6 +197,9 @@ class AppPalette {
     this.onButton,
     this.disclaimerColor,
     this.glowOpacity,
+    this.chartLineGradient,
+    this.chartAreaGradient,
+    this.barFillGradient,
   });
 
   static const standard = AppPalette(
@@ -275,6 +300,9 @@ class AppPalette {
     marketClockAccent: GraphiteTheme.accentPrimary,
     marketClockRingGradient: GraphiteTheme.dialRingGradient,
     marketClockHandGradient: GraphiteTheme.dialRingGradient,
+    chartLineGradient: GraphiteTheme.chartLineGradient,
+    chartAreaGradient: GraphiteTheme.chartAreaGradient,
+    barFillGradient: GraphiteTheme.barFillGradient,
   );
 
   static AppPalette get midnightSea => AppPalette(

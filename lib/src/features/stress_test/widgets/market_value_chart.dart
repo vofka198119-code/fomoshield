@@ -384,6 +384,11 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
     final filtered = geometry.filtered;
     final spots = geometry.spots;
     final lineColor = geometry.lineColor;
+    // Graphite deliberately overrides the up/down signal with one fixed
+    // amber gradient — see AppPalette.chartLineGradient's doc comment.
+    final lineGradient = palette.chartLineGradient;
+    final lineGlowColor = lineGradient?.colors.last ?? lineColor;
+    final areaGradient = palette.chartAreaGradient;
     final minValue = geometry.minValue;
     final maxValue = geometry.maxValue;
     final chartMinY = geometry.chartMinY;
@@ -412,7 +417,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                     size: Size(plotWidth, chartHeight),
                     painter: ChartLineGlowPainter(
                       pixelPoints: pixelPoints,
-                      color: lineColor,
+                      color: lineGlowColor,
                     ),
                   ),
                   LineChart(
@@ -512,9 +517,14 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                         LineChartBarData(
                           spots: spots,
                           isCurved: false,
-                          color: lineColor,
+                          color: lineGradient == null ? lineColor : null,
+                          gradient: lineGradient,
                           barWidth: 1.7,
                           isStrokeCapRound: true,
+                          belowBarData: BarAreaData(
+                            show: areaGradient != null,
+                            gradient: areaGradient,
+                          ),
                           // A small dot on the very last point only — anchors the
                           // eye to where the line currently ends, especially when
                           // there's empty space after it (1D stops at "now").
@@ -525,7 +535,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                             getDotPainter: (spot, percent, barData, index) =>
                                 FlDotCirclePainter(
                                   radius: 3,
-                                  color: lineColor,
+                                  color: lineGlowColor,
                                   strokeWidth: 0,
                                 ),
                           ),

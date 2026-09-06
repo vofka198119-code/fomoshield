@@ -354,6 +354,13 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
 
     final isUp = spots.last.y >= spots.first.y;
     final lineColor = isUp ? ThemeV2.success : ThemeV2.loss;
+    // Graphite deliberately overrides the up/down signal with one fixed
+    // amber gradient — see AppPalette.chartLineGradient's doc comment for
+    // why (explicit, self-checked user trade-off, 2026-09-06). Null for
+    // every other theme — lineColor above is untouched.
+    final lineGradient = widget.palette.chartLineGradient;
+    final lineGlowColor = lineGradient?.colors.last ?? lineColor;
+    final areaGradient = widget.palette.chartAreaGradient;
 
     final values = points.map((p) => p.value);
     final minValue = values.reduce(min);
@@ -414,7 +421,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                     size: Size(plotWidth, chartHeight),
                     painter: ChartLineGlowPainter(
                       pixelPoints: pixelPoints,
-                      color: lineColor,
+                      color: lineGlowColor,
                     ),
                   ),
                   LineChart(
@@ -519,9 +526,14 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                         LineChartBarData(
                           spots: spots,
                           isCurved: false,
-                          color: lineColor,
+                          color: lineGradient == null ? lineColor : null,
+                          gradient: lineGradient,
                           barWidth: 1.7,
                           isStrokeCapRound: true,
+                          belowBarData: BarAreaData(
+                            show: areaGradient != null,
+                            gradient: areaGradient,
+                          ),
                           // A small dot on the very last point only — anchors the
                           // eye to where the line currently ends, especially when
                           // there's empty space after it (1D stops at "now").
@@ -532,7 +544,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                             getDotPainter: (spot, percent, barData, index) =>
                                 FlDotCirclePainter(
                                   radius: 3,
-                                  color: lineColor,
+                                  color: lineGlowColor,
                                   strokeWidth: 0,
                                 ),
                           ),

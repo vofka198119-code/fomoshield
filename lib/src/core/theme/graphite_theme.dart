@@ -109,4 +109,30 @@ abstract final class GraphiteTheme {
     end: Alignment.bottomCenter,
     colors: [grWhite, grSteel],
   );
+
+  /// Price-chart line stroke — see [AppPalette.chartLineGradient]'s doc
+  /// comment for why this deliberately overrides the app-wide green/red
+  /// up-down convention (explicit user request, 2026-09-06).
+  static const chartLineGradient = LinearGradient(
+    colors: [grChartAmber, grChartOrange],
+  );
+
+  /// Price-chart area fill under the line — vertical, lightly tinted near
+  /// the line fading to fully transparent at the chart's baseline (the
+  /// reference image's "glowing cloud" look). Deliberately lower-alpha than
+  /// [chartLineGradient] itself (reduced 2026-09-06 per explicit request —
+  /// the line stays fully opaque, only the fill was too heavy).
+  static const chartAreaGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [grChartAreaTop, grChartAreaMid, grChartOrangeFade],
+    stops: [0.0, 0.5, 1.0],
+  );
+
+  /// Horizontal progress/allocation bar fill — deep orange at the track's
+  /// start, brighter amber toward the filled end (matches the reference
+  /// image's slider bars). See [AppPalette.barFillGradient].
+  static const barFillGradient = LinearGradient(
+    colors: [grChartOrange, grChartAmber],
+  );
 }
