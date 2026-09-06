@@ -6431,6 +6431,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeWidgetEtfFunds => 'ETF-фонды';
 
   @override
+  String get etfPremiumRequiredTitle => 'Нужна подписка Premium';
+
+  @override
+  String get etfPremiumRequiredDescription =>
+      'Для создания и управления собственным фондом нужна подписка Premium.';
+
+  @override
   String get etfHomeCardTitleHead => 'Стать управляющим фонда';
 
   @override

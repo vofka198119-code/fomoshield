@@ -1829,6 +1829,8 @@
   "notificationsStressTestCompletedDetail": "Тест «{duration}» завершён — {percent}% — нажмите, чтобы посмотреть вердикт.",
 
   "homeWidgetEtfFunds": "ETF-фонды",
+  "etfPremiumRequiredTitle": "Нужна подписка Premium",
+  "etfPremiumRequiredDescription": "Для создания и управления собственным фондом нужна подписка Premium.",
   "etfHomeCardTitleHead": "Стать управляющим фонда",
   "etfHomeCardTitleAnalyst": "Стать инвестиционным помощником",
   "etfHomeCardPremiumTag": "Premium",

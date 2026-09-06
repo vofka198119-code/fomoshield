@@ -2591,6 +2591,8 @@
   },
 
   "homeWidgetEtfFunds": "ETF Funds",
+  "etfPremiumRequiredTitle": "Premium Required",
+  "etfPremiumRequiredDescription": "Creating and managing your own fund requires a Premium subscription.",
   "etfHomeCardTitleHead": "Become a Fund Manager",
   "etfHomeCardTitleAnalyst": "Become an Investment Assistant",
   "etfHomeCardPremiumTag": "Premium",

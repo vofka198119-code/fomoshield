@@ -8,7 +8,7 @@ import '../../../core/supabase/supabase_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../funds/onboarding/fund_onboarding_providers.dart';
-import '../../monetization/monetization_modal.dart';
+import '../../funds/widgets/etf_premium_required_sheet.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Entry Widget — Home mini card, sits directly under Market Clock (see
@@ -16,17 +16,17 @@ import '../../monetization/monetization_modal.dart';
 // become a fund head (Premium-gated) or an investment assistant (free).
 // Each routes through the one-time onboarding stepper the first time it's
 // tapped (see fund_onboarding_providers.dart), then to its real destination.
+//
+// Premium gate is checked AFTER onboarding, not before (2026-09-06 change,
+// per the author): a non-Premium user still gets to read what the feature
+// is and what it requires first — the paywall only shows once they'd
+// actually try to create a fund, not as the very first thing they see.
 // ---------------------------------------------------------------------------
 
 class FundEntryWidget extends ConsumerWidget {
   const FundEntryWidget({super.key});
 
   Future<void> _handleHeadTap(BuildContext context, WidgetRef ref) async {
-    final tier = ref.read(subscriptionTierProvider);
-    if (!tier.isPremiumOrAdmin) {
-      await showMonetizationModal(context, ref);
-      return;
-    }
     final seen = ref.read(fundOnboardingSeenProvider(FundOnboardingBranch.head));
     if (!seen) {
       final accepted = await context.push<bool>(
@@ -34,6 +34,11 @@ class FundEntryWidget extends ConsumerWidget {
         extra: FundOnboardingBranch.head,
       );
       if (accepted != true || !context.mounted) return;
+    }
+    final tier = ref.read(subscriptionTierProvider);
+    if (!tier.isPremiumOrAdmin) {
+      if (context.mounted) await showEtfPremiumRequiredSheet(context, ref);
+      return;
     }
     if (context.mounted) context.push('/funds/create');
   }

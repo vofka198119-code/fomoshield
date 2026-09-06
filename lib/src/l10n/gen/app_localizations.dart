@@ -10813,6 +10813,18 @@ abstract class AppLocalizations {
   /// **'ETF Funds'**
   String get homeWidgetEtfFunds;
 
+  /// No description provided for @etfPremiumRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Required'**
+  String get etfPremiumRequiredTitle;
+
+  /// No description provided for @etfPremiumRequiredDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating and managing your own fund requires a Premium subscription.'**
+  String get etfPremiumRequiredDescription;
+
   /// No description provided for @etfHomeCardTitleHead.
   ///
   /// In en, this message translates to:
