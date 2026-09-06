@@ -200,9 +200,14 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 13,
+                        // Was hardcoded Colors.white for every themed
+                        // variant — invisible on Black & White's light
+                        // screen background (this text sits on the plain
+                        // screen, not a dark panel). textHeader is the
+                        // theme's own high-contrast color either way.
                         color: palette.windowGradient == null
                             ? palette.textBody
-                            : Colors.white,
+                            : palette.textHeader,
                       ),
                     ),
                   ],

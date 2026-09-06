@@ -749,7 +749,6 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     int tempDays = _customDurationDays;
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.read(themeVariantProvider));
-    final isLuxury = palette.windowGradient != null;
     final accentColor = palette.marketClockAccent ?? const Color(0xFFD4AF37);
 
     showModalBottomSheet(
@@ -786,9 +785,13 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                       width: 36,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: isLuxury
-                            ? Colors.white.withValues(alpha: 0.24)
-                            : Colors.black26,
+                        // Was isLuxury ? white@0.24 : black26 — a binary
+                        // light/dark assumption that breaks for Black &
+                        // White (isLuxury-equivalent true, but a LIGHT
+                        // theme, so white@0.24 vanished on its light sheet).
+                        // A theme-derived neutral reads as a subtle handle
+                        // against any card fill, light or dark.
+                        color: palette.textBody.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -1093,9 +1096,9 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: widget.palette.windowGradient == null
-                      ? Colors.black26
-                      : Colors.white.withValues(alpha: 0.24),
+                  // Same theme-neutral handle color fix as the other
+                  // sheets in this file — see the comment on the first one.
+                  color: widget.palette.textBody.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1448,9 +1451,9 @@ class _FundingModeSheet extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: palette.windowGradient == null
-                    ? Colors.black26
-                    : Colors.white.withValues(alpha: 0.24),
+                // Same theme-neutral handle color fix as the other sheets
+                // in this file — see the comment on the first one.
+                color: palette.textBody.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1563,9 +1566,9 @@ class _DividendSimulationSheet extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: palette.windowGradient == null
-                    ? Colors.black26
-                    : Colors.white.withValues(alpha: 0.24),
+                // Same theme-neutral handle color fix as the other sheets
+                // in this file — see the comment on the first one.
+                color: palette.textBody.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

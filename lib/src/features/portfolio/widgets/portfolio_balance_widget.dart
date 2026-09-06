@@ -253,9 +253,12 @@ class _PortfolioBalanceWidgetState
                               style: interNums(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: palette.windowGradient == null
-                                    ? palette.textBody
-                                    : Colors.white,
+                                // Was hardcoded Colors.white for every
+                                // themed variant — invisible on Black &
+                                // White. Matches the company-name label
+                                // right next to it, which already
+                                // correctly uses textHeader unconditionally.
+                                color: palette.textHeader,
                               ),
                             ),
                           ],
