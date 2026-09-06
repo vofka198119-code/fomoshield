@@ -53,6 +53,10 @@ import '../../features/assets/screens/assets_screen.dart';
 import '../../features/assets/screens/stock_detail_screen.dart';
 import '../../features/assets/screens/why_today_screen.dart';
 import '../../features/assets/screens/order_entry_screen.dart';
+import '../../features/funds/onboarding/fund_onboarding_providers.dart';
+import '../../features/funds/onboarding/fund_onboarding_screen.dart';
+import '../../features/funds/screens/create_fund_screen.dart';
+import '../../features/funds/screens/fund_detail_screen.dart';
 import '../theme/app_palette.dart';
 import '../theme/theme_variant_provider.dart';
 import '../supabase/supabase_providers.dart' show isAdminProvider;
@@ -411,6 +415,28 @@ class AppRouter {
             companyName: extra['companyName'] as String?,
             logo: extra['logo'] as String?,
           );
+        },
+      ),
+      GoRoute(
+        path: '/funds/onboarding',
+        name: 'fundOnboarding',
+        builder: (context, state) {
+          final branch = state.extra as FundOnboardingBranch? ??
+              FundOnboardingBranch.head;
+          return FundOnboardingScreen(branch: branch);
+        },
+      ),
+      GoRoute(
+        path: '/funds/create',
+        name: 'fundCreate',
+        builder: (context, state) => const CreateFundScreen(),
+      ),
+      GoRoute(
+        path: '/funds/:id',
+        name: 'fundDetail',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundDetailScreen(fundId: id);
         },
       ),
       GoRoute(

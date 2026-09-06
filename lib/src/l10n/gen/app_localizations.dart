@@ -10806,6 +10806,324 @@ abstract class AppLocalizations {
     String duration,
     String percent,
   );
+
+  /// No description provided for @homeWidgetEtfFunds.
+  ///
+  /// In en, this message translates to:
+  /// **'ETF Funds'**
+  String get homeWidgetEtfFunds;
+
+  /// No description provided for @etfHomeCardTitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Become a Fund Manager'**
+  String get etfHomeCardTitleHead;
+
+  /// No description provided for @etfHomeCardTitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Become an Investment Assistant'**
+  String get etfHomeCardTitleAnalyst;
+
+  /// No description provided for @etfHomeCardPremiumTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get etfHomeCardPremiumTag;
+
+  /// No description provided for @etfOnboardingStep1TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'What Is an ETF Fund?'**
+  String get etfOnboardingStep1TitleHead;
+
+  /// No description provided for @etfOnboardingStep1BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your own virtual investment fund. Other players invest their own virtual capital into it, you and your hired analysts manage its holdings, and its unit price tracks real market prices — hands-on practice at real portfolio management.'**
+  String get etfOnboardingStep1BodyHead;
+
+  /// No description provided for @etfOnboardingStep2TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'What You\'ll Need'**
+  String get etfOnboardingStep2TitleHead;
+
+  /// No description provided for @etfOnboardingStep2BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating a fund requires a Premium subscription and up to \$150,000 of virtual starting capital. You\'ll choose a fund name (English only — a ticker is generated automatically) and the sectors your fund focuses on.'**
+  String get etfOnboardingStep2BodyHead;
+
+  /// No description provided for @etfOnboardingStep1TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'What Is an Investment Assistant?'**
+  String get etfOnboardingStep1TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep1BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Join a fund\'s team and propose real trades with your own reasoning — the fund\'s head reviews and approves them. A practical way to build a track record before working with real money.'**
+  String get etfOnboardingStep1BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep2TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'What You\'ll Need'**
+  String get etfOnboardingStep2TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep2BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Becoming an assistant is free. You\'ll create a public profile — just a nickname and avatar, no personal information — so fund heads can find and hire you from the jobs marketplace.'**
+  String get etfOnboardingStep2BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'This Is a Simulator'**
+  String get etfOnboardingStep3Title;
+
+  /// No description provided for @etfOnboardingStep3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium unlocks access to this training simulator. All money inside funds is fictional and can never be exchanged for real money. No statistic or rating is financial advice or a guarantee of return. When there aren\'t enough real players yet, virtual assistant-investors may take part to keep the simulation liquid.'**
+  String get etfOnboardingStep3Body;
+
+  /// No description provided for @etfOnboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get etfOnboardingNext;
+
+  /// No description provided for @etfOnboardingAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept & Continue'**
+  String get etfOnboardingAccept;
+
+  /// No description provided for @etfOnboardingComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment assistant features are coming in a future update.'**
+  String get etfOnboardingComingSoon;
+
+  /// No description provided for @etfCreateFundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Fund'**
+  String get etfCreateFundTitle;
+
+  /// No description provided for @etfCreateFundNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund Name'**
+  String get etfCreateFundNameLabel;
+
+  /// No description provided for @etfCreateFundNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'English letters and numbers only'**
+  String get etfCreateFundNameHint;
+
+  /// No description provided for @etfCreateFundDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get etfCreateFundDescriptionLabel;
+
+  /// No description provided for @etfCreateFundStrategyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment Strategy'**
+  String get etfCreateFundStrategyLabel;
+
+  /// No description provided for @etfCreateFundSectorsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sectors'**
+  String get etfCreateFundSectorsLabel;
+
+  /// No description provided for @etfCreateFundCapitalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting Capital (up to \$150,000)'**
+  String get etfCreateFundCapitalLabel;
+
+  /// No description provided for @etfCreateFundSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Fund'**
+  String get etfCreateFundSubmitButton;
+
+  /// No description provided for @etfCreateFundSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund created!'**
+  String get etfCreateFundSuccessMessage;
+
+  /// No description provided for @etfCreateFundErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create fund. Please try again.'**
+  String get etfCreateFundErrorGeneric;
+
+  /// No description provided for @etfCreateFundSelectAtLeastOneSector.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one sector'**
+  String get etfCreateFundSelectAtLeastOneSector;
+
+  /// No description provided for @etfCreateFundNameEnglishOnlyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund name must be in English (letters, numbers, basic punctuation only)'**
+  String get etfCreateFundNameEnglishOnlyError;
+
+  /// No description provided for @etfFundsTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds'**
+  String get etfFundsTabLabel;
+
+  /// No description provided for @etfCompaniesTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Companies'**
+  String get etfCompaniesTabLabel;
+
+  /// No description provided for @etfFundsEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No funds yet — be the first to create one!'**
+  String get etfFundsEmptyState;
+
+  /// No description provided for @etfFundsListErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load funds. Pull to refresh.'**
+  String get etfFundsListErrorMessage;
+
+  /// No description provided for @etfFundDetailNavLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NAV / Unit'**
+  String get etfFundDetailNavLabel;
+
+  /// No description provided for @etfFundDetailAumLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AUM'**
+  String get etfFundDetailAumLabel;
+
+  /// No description provided for @etfFundDetailUnitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Units Outstanding'**
+  String get etfFundDetailUnitsLabel;
+
+  /// No description provided for @etfFundDetailHoldingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Holdings'**
+  String get etfFundDetailHoldingsTitle;
+
+  /// No description provided for @etfFundDetailHoldingsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No holdings yet'**
+  String get etfFundDetailHoldingsEmpty;
+
+  /// No description provided for @etfFundDetailSectorsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sectors'**
+  String get etfFundDetailSectorsTitle;
+
+  /// No description provided for @etfFundDetailStrategyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategy'**
+  String get etfFundDetailStrategyTitle;
+
+  /// No description provided for @etfFundDetailDescriptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get etfFundDetailDescriptionTitle;
+
+  /// No description provided for @etfFundDetailNavHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NAV History'**
+  String get etfFundDetailNavHistoryTitle;
+
+  /// No description provided for @etfSectorTechnology.
+  ///
+  /// In en, this message translates to:
+  /// **'Technology'**
+  String get etfSectorTechnology;
+
+  /// No description provided for @etfSectorHealthcare.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthcare'**
+  String get etfSectorHealthcare;
+
+  /// No description provided for @etfSectorFinancials.
+  ///
+  /// In en, this message translates to:
+  /// **'Financials'**
+  String get etfSectorFinancials;
+
+  /// No description provided for @etfSectorConsumerDiscretionary.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumer Discretionary'**
+  String get etfSectorConsumerDiscretionary;
+
+  /// No description provided for @etfSectorConsumerStaples.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumer Staples'**
+  String get etfSectorConsumerStaples;
+
+  /// No description provided for @etfSectorEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get etfSectorEnergy;
+
+  /// No description provided for @etfSectorIndustrials.
+  ///
+  /// In en, this message translates to:
+  /// **'Industrials'**
+  String get etfSectorIndustrials;
+
+  /// No description provided for @etfSectorMaterials.
+  ///
+  /// In en, this message translates to:
+  /// **'Materials'**
+  String get etfSectorMaterials;
+
+  /// No description provided for @etfSectorUtilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Utilities'**
+  String get etfSectorUtilities;
+
+  /// No description provided for @etfSectorRealEstate.
+  ///
+  /// In en, this message translates to:
+  /// **'Real Estate'**
+  String get etfSectorRealEstate;
+
+  /// No description provided for @etfSectorCommunicationServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Communication Services'**
+  String get etfSectorCommunicationServices;
 }
 
 class _AppLocalizationsDelegate

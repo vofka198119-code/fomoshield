@@ -6426,4 +6426,174 @@ class AppLocalizationsRu extends AppLocalizations {
   ) {
     return 'Тест «$duration» завершён — $percent% — нажмите, чтобы посмотреть вердикт.';
   }
+
+  @override
+  String get homeWidgetEtfFunds => 'ETF-фонды';
+
+  @override
+  String get etfHomeCardTitleHead => 'Стать управляющим фонда';
+
+  @override
+  String get etfHomeCardTitleAnalyst => 'Стать инвестиционным помощником';
+
+  @override
+  String get etfHomeCardPremiumTag => 'Premium';
+
+  @override
+  String get etfOnboardingStep1TitleHead => 'Что такое ETF-фонд?';
+
+  @override
+  String get etfOnboardingStep1BodyHead =>
+      'Создайте собственный виртуальный инвестиционный фонд. Другие игроки вкладывают в него свой виртуальный капитал, вы и нанятые вами аналитики управляете составом активов, а цена пая двигается по реальным рыночным котировкам — практика реального управления портфелем.';
+
+  @override
+  String get etfOnboardingStep2TitleHead => 'Что для этого нужно';
+
+  @override
+  String get etfOnboardingStep2BodyHead =>
+      'Для создания фонда нужна подписка Premium и стартовый капитал до \$150 000 (виртуальных). Вы выберете название фонда (только на английском — тикер создаётся автоматически) и секторы, в которых будет работать фонд.';
+
+  @override
+  String get etfOnboardingStep1TitleAnalyst =>
+      'Кто такой инвестиционный помощник?';
+
+  @override
+  String get etfOnboardingStep1BodyAnalyst =>
+      'Присоединяйтесь к команде фонда и предлагайте реальные сделки со своим обоснованием — глава фонда рассматривает и утверждает их. Практический способ наработать опыт до того, как начнёте работать с реальными деньгами.';
+
+  @override
+  String get etfOnboardingStep2TitleAnalyst => 'Что для этого нужно';
+
+  @override
+  String get etfOnboardingStep2BodyAnalyst =>
+      'Стать помощником можно бесплатно. Вы создадите публичный профиль — только никнейм и аватарка, без личных данных — чтобы главы фондов могли найти и нанять вас на бирже вакансий.';
+
+  @override
+  String get etfOnboardingStep3Title => 'Это симулятор';
+
+  @override
+  String get etfOnboardingStep3Body =>
+      'Premium открывает доступ к обучающему симулятору. Все деньги в фондах — вымышленные, их нельзя обменять на настоящие. Никакая статистика или рейтинг не является финансовым советом или гарантией дохода. Во время нехватки живых пользователей в работе фонда могут участвовать виртуальные инвесторы-помощники, обеспечивающие ликвидность симуляции.';
+
+  @override
+  String get etfOnboardingNext => 'Далее';
+
+  @override
+  String get etfOnboardingAccept => 'Принять и продолжить';
+
+  @override
+  String get etfOnboardingComingSoon =>
+      'Функции инвестиционного помощника появятся в одном из следующих обновлений.';
+
+  @override
+  String get etfCreateFundTitle => 'Создание фонда';
+
+  @override
+  String get etfCreateFundNameLabel => 'Название фонда';
+
+  @override
+  String get etfCreateFundNameHint => 'Только английские буквы и цифры';
+
+  @override
+  String get etfCreateFundDescriptionLabel => 'Описание';
+
+  @override
+  String get etfCreateFundStrategyLabel => 'Инвестиционная стратегия';
+
+  @override
+  String get etfCreateFundSectorsLabel => 'Секторы';
+
+  @override
+  String get etfCreateFundCapitalLabel => 'Стартовый капитал (до \$150 000)';
+
+  @override
+  String get etfCreateFundSubmitButton => 'Создать фонд';
+
+  @override
+  String get etfCreateFundSuccessMessage => 'Фонд создан!';
+
+  @override
+  String get etfCreateFundErrorGeneric =>
+      'Не удалось создать фонд. Попробуйте ещё раз.';
+
+  @override
+  String get etfCreateFundSelectAtLeastOneSector =>
+      'Выберите хотя бы один сектор';
+
+  @override
+  String get etfCreateFundNameEnglishOnlyError =>
+      'Название фонда должно быть на английском (только буквы, цифры и базовая пунктуация)';
+
+  @override
+  String get etfFundsTabLabel => 'Фонды';
+
+  @override
+  String get etfCompaniesTabLabel => 'Компании';
+
+  @override
+  String get etfFundsEmptyState => 'Пока нет фондов — создайте первый!';
+
+  @override
+  String get etfFundsListErrorMessage =>
+      'Не удалось загрузить фонды. Потяните, чтобы обновить.';
+
+  @override
+  String get etfFundDetailNavLabel => 'NAV / пай';
+
+  @override
+  String get etfFundDetailAumLabel => 'AUM';
+
+  @override
+  String get etfFundDetailUnitsLabel => 'Паёв в обращении';
+
+  @override
+  String get etfFundDetailHoldingsTitle => 'Активы';
+
+  @override
+  String get etfFundDetailHoldingsEmpty => 'Пока нет активов';
+
+  @override
+  String get etfFundDetailSectorsTitle => 'Секторы';
+
+  @override
+  String get etfFundDetailStrategyTitle => 'Стратегия';
+
+  @override
+  String get etfFundDetailDescriptionTitle => 'О фонде';
+
+  @override
+  String get etfFundDetailNavHistoryTitle => 'История NAV';
+
+  @override
+  String get etfSectorTechnology => 'Технологии';
+
+  @override
+  String get etfSectorHealthcare => 'Здравоохранение';
+
+  @override
+  String get etfSectorFinancials => 'Финансы';
+
+  @override
+  String get etfSectorConsumerDiscretionary => 'Товары вторичной необходимости';
+
+  @override
+  String get etfSectorConsumerStaples => 'Товары первой необходимости';
+
+  @override
+  String get etfSectorEnergy => 'Энергетика';
+
+  @override
+  String get etfSectorIndustrials => 'Промышленность';
+
+  @override
+  String get etfSectorMaterials => 'Материалы';
+
+  @override
+  String get etfSectorUtilities => 'Коммунальные услуги';
+
+  @override
+  String get etfSectorRealEstate => 'Недвижимость';
+
+  @override
+  String get etfSectorCommunicationServices => 'Услуги связи';
 }

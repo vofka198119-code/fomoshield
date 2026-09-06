@@ -10,6 +10,7 @@ import '../../core/theme/themed_divider.dart';
 import '../../core/theme/themed_border.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/company_logo.dart';
+import '../funds/widgets/funds_tab_list.dart';
 import '../home/home_providers.dart';
 import '../home/watchlist_limits_provider.dart';
 import '../monetization/monetization_modal.dart';
@@ -47,6 +48,11 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
+  // 1 (Companies) is the default — preserves the screen's existing
+  // autofocus-search-field entry behavior; Funds (0) is an explicit tap
+  // away, per docs/ETF_FUND_EMULATION.md's "embed into Search, no new
+  // bottom-nav item" decision.
+  int _tabIndex = 1;
 
   @override
   void dispose() {
@@ -104,8 +110,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           right: false,
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              _buildTabHeader(l10n, palette),
+              Expanded(
+                child: IndexedStack(
+                  index: _tabIndex,
+                  children: [
+                    FundsTabList(palette: palette),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                 // Same plain filled-box recipe as the Stress Test "Search
                 // Company" field (see stress_test_search_sheet.dart) — a
                 // search icon inline — wrapped in the same themedBorder
@@ -441,8 +455,56 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         },
                       ),
               ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabHeader(AppLocalizations l10n, AppPalette palette) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      child: Row(
+        children: [
+          _tabButton(l10n.etfFundsTabLabel, 0, palette),
+          const SizedBox(width: 20),
+          _tabButton(l10n.etfCompaniesTabLabel, 1, palette),
+        ],
+      ),
+    );
+  }
+
+  Widget _tabButton(String label, int index, AppPalette palette) {
+    final active = _tabIndex == index;
+    return InkWell(
+      onTap: () => setState(() => _tabIndex = index),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                color: active ? palette.textHeader : palette.textBody,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              height: 2,
+              width: 28,
+              color: active ? palette.accentPrimary : Colors.transparent,
+            ),
+          ],
         ),
       ),
     );

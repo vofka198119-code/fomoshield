@@ -6404,4 +6404,174 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return '$duration test finished — $percent% — tap to view your verdict.';
   }
+
+  @override
+  String get homeWidgetEtfFunds => 'ETF Funds';
+
+  @override
+  String get etfHomeCardTitleHead => 'Become a Fund Manager';
+
+  @override
+  String get etfHomeCardTitleAnalyst => 'Become an Investment Assistant';
+
+  @override
+  String get etfHomeCardPremiumTag => 'Premium';
+
+  @override
+  String get etfOnboardingStep1TitleHead => 'What Is an ETF Fund?';
+
+  @override
+  String get etfOnboardingStep1BodyHead =>
+      'Create your own virtual investment fund. Other players invest their own virtual capital into it, you and your hired analysts manage its holdings, and its unit price tracks real market prices — hands-on practice at real portfolio management.';
+
+  @override
+  String get etfOnboardingStep2TitleHead => 'What You\'ll Need';
+
+  @override
+  String get etfOnboardingStep2BodyHead =>
+      'Creating a fund requires a Premium subscription and up to \$150,000 of virtual starting capital. You\'ll choose a fund name (English only — a ticker is generated automatically) and the sectors your fund focuses on.';
+
+  @override
+  String get etfOnboardingStep1TitleAnalyst =>
+      'What Is an Investment Assistant?';
+
+  @override
+  String get etfOnboardingStep1BodyAnalyst =>
+      'Join a fund\'s team and propose real trades with your own reasoning — the fund\'s head reviews and approves them. A practical way to build a track record before working with real money.';
+
+  @override
+  String get etfOnboardingStep2TitleAnalyst => 'What You\'ll Need';
+
+  @override
+  String get etfOnboardingStep2BodyAnalyst =>
+      'Becoming an assistant is free. You\'ll create a public profile — just a nickname and avatar, no personal information — so fund heads can find and hire you from the jobs marketplace.';
+
+  @override
+  String get etfOnboardingStep3Title => 'This Is a Simulator';
+
+  @override
+  String get etfOnboardingStep3Body =>
+      'Premium unlocks access to this training simulator. All money inside funds is fictional and can never be exchanged for real money. No statistic or rating is financial advice or a guarantee of return. When there aren\'t enough real players yet, virtual assistant-investors may take part to keep the simulation liquid.';
+
+  @override
+  String get etfOnboardingNext => 'Next';
+
+  @override
+  String get etfOnboardingAccept => 'Accept & Continue';
+
+  @override
+  String get etfOnboardingComingSoon =>
+      'Investment assistant features are coming in a future update.';
+
+  @override
+  String get etfCreateFundTitle => 'Create Fund';
+
+  @override
+  String get etfCreateFundNameLabel => 'Fund Name';
+
+  @override
+  String get etfCreateFundNameHint => 'English letters and numbers only';
+
+  @override
+  String get etfCreateFundDescriptionLabel => 'Description';
+
+  @override
+  String get etfCreateFundStrategyLabel => 'Investment Strategy';
+
+  @override
+  String get etfCreateFundSectorsLabel => 'Sectors';
+
+  @override
+  String get etfCreateFundCapitalLabel => 'Starting Capital (up to \$150,000)';
+
+  @override
+  String get etfCreateFundSubmitButton => 'Create Fund';
+
+  @override
+  String get etfCreateFundSuccessMessage => 'Fund created!';
+
+  @override
+  String get etfCreateFundErrorGeneric =>
+      'Failed to create fund. Please try again.';
+
+  @override
+  String get etfCreateFundSelectAtLeastOneSector =>
+      'Select at least one sector';
+
+  @override
+  String get etfCreateFundNameEnglishOnlyError =>
+      'Fund name must be in English (letters, numbers, basic punctuation only)';
+
+  @override
+  String get etfFundsTabLabel => 'Funds';
+
+  @override
+  String get etfCompaniesTabLabel => 'Companies';
+
+  @override
+  String get etfFundsEmptyState => 'No funds yet — be the first to create one!';
+
+  @override
+  String get etfFundsListErrorMessage =>
+      'Couldn\'t load funds. Pull to refresh.';
+
+  @override
+  String get etfFundDetailNavLabel => 'NAV / Unit';
+
+  @override
+  String get etfFundDetailAumLabel => 'AUM';
+
+  @override
+  String get etfFundDetailUnitsLabel => 'Units Outstanding';
+
+  @override
+  String get etfFundDetailHoldingsTitle => 'Holdings';
+
+  @override
+  String get etfFundDetailHoldingsEmpty => 'No holdings yet';
+
+  @override
+  String get etfFundDetailSectorsTitle => 'Sectors';
+
+  @override
+  String get etfFundDetailStrategyTitle => 'Strategy';
+
+  @override
+  String get etfFundDetailDescriptionTitle => 'About';
+
+  @override
+  String get etfFundDetailNavHistoryTitle => 'NAV History';
+
+  @override
+  String get etfSectorTechnology => 'Technology';
+
+  @override
+  String get etfSectorHealthcare => 'Healthcare';
+
+  @override
+  String get etfSectorFinancials => 'Financials';
+
+  @override
+  String get etfSectorConsumerDiscretionary => 'Consumer Discretionary';
+
+  @override
+  String get etfSectorConsumerStaples => 'Consumer Staples';
+
+  @override
+  String get etfSectorEnergy => 'Energy';
+
+  @override
+  String get etfSectorIndustrials => 'Industrials';
+
+  @override
+  String get etfSectorMaterials => 'Materials';
+
+  @override
+  String get etfSectorUtilities => 'Utilities';
+
+  @override
+  String get etfSectorRealEstate => 'Real Estate';
+
+  @override
+  String get etfSectorCommunicationServices => 'Communication Services';
 }

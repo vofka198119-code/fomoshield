@@ -16,6 +16,7 @@ import 'widget_order_provider.dart';
 import 'widgets/shield_signal_widget.dart';
 import 'widgets/watchlist_widget.dart';
 import 'widgets/market_clock_widget.dart';
+import 'widgets/fund_entry_widget.dart';
 import 'widgets/portfolio_widget.dart';
 import 'widgets/stress_test_widget.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
@@ -167,6 +168,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return const WatchlistWidget();
       case 'news':
         return const MarketClockWidget();
+      case 'etf_funds':
+        return const FundEntryWidget();
       case 'portfolio':
         return const PortfolioWidget();
       case 'stress_test':
@@ -236,6 +239,8 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
         return Icons.bookmark_rounded;
       case 'news':
         return Icons.access_time_filled_rounded;
+      case 'etf_funds':
+        return Icons.account_balance_rounded;
       case 'portfolio':
         return Icons.account_balance_rounded;
       case 'stress_test':
@@ -289,6 +294,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                     setState(() {
                       _configs = [
                         const HomeWidgetConfig(id: 'news', visible: true),
+                        const HomeWidgetConfig(id: 'etf_funds', visible: true),
                         const HomeWidgetConfig(id: 'portfolio', visible: true),
                         const HomeWidgetConfig(
                           id: 'shield_signal',

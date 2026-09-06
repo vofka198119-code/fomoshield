@@ -506,22 +506,92 @@ CREATE OR REPLACE TRIGGER guard_user_data_sanity_ceiling_trigger
 
 
 -- =============================================================================
--- F.O.M.O. Shield — Supabase Migration 013+ (RESERVED)
--- Feature: ETF Fund Emulation (see docs/ETF_FUND_EMULATION.md, and the phased
---          implementation plan in that design doc's own git history)
--- Status: reserved on branch feature/etf-fund-emulation, not yet written.
+-- F.O.M.O. Shield — Supabase Migration 013
+-- Tables: funds, fund_holdings, fund_nav_snapshots
+-- Feature: ETF Fund Emulation, Phase 1 (see docs/ETF_FUND_EMULATION.md and the
+--          phased implementation plan referenced from that doc).
 --
--- All new tables for this feature (funds, fund_holdings, fund_nav_snapshots,
--- fund_investor_positions, fund_investor_transactions, employee_profiles,
--- fund_team_members, fund_invitations, fund_trade_proposals, fund_transactions,
--- fund_chat_messages, fund_meetings, fund_meeting_invites, bot_investor_profiles,
--- bot_investor_state, fund_fee_ledger, manager_earnings_balance,
--- fund_succession_events, added across Phases 1-8) are deliberately NEW,
--- STANDALONE tables — none of them touch `user_data`. This is intentional:
--- Migration 012's $1,000,000 ceiling trigger above only inspects
--- portfolios/stress_test_sessions/stress_test_verdicts inside `user_data`, so
--- it never applies to fund state by construction. If a future change ever
--- moves any fund data into a `user_data` column instead, Migration 012 MUST
--- be revisited first (either its ceiling raised or the new path excluded) —
+-- These are deliberately NEW, STANDALONE tables — none of them touch
+-- `user_data`. Migration 012's $1,000,000 ceiling trigger above only
+-- inspects portfolios/stress_test_sessions/stress_test_verdicts inside
+-- `user_data`, so it never applies to fund state by construction. If a
+-- future change ever moves any fund data into a `user_data` column instead,
+-- Migration 012 MUST be revisited first (ceiling raised or path excluded) —
 -- see open question #9 in docs/ETF_FUND_EMULATION.md.
+--
+-- Server-authoritative by design (unlike user_data, which the Flutter app
+-- writes directly): RLS grants SELECT to `authenticated` only — every
+-- INSERT/UPDATE/DELETE goes through the backend's service-role client
+-- (supabaseAdmin.js in scanco-backend-work), never directly from the app via
+-- the anon/authenticated key. This is the app's first server-authoritative
+-- financial state (Portfolio/Stress Test are entirely client-authoritative).
+-- =============================================================================
+
+CREATE TABLE public.funds (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    head_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name text NOT NULL,
+    ticker text NOT NULL UNIQUE,
+    description text,
+    strategy text,
+    sectors text[] NOT NULL DEFAULT '{}',
+    starting_capital numeric NOT NULL CHECK (starting_capital > 0 AND starting_capital <= 150000),
+    -- Cash on hand (part of AUM alongside fund_holdings' market value). Starts
+    -- equal to starting_capital; moves with Phase 2's subscribe/redeem flow
+    -- and Phase 4's trade execution, neither of which exists yet in Phase 1.
+    cash numeric NOT NULL,
+    units_outstanding numeric NOT NULL DEFAULT 0,
+    -- 'active' is the only status Phase 1 uses; Phase 8 (succession/
+    -- bankruptcy) adds 'frozen'/'bankrupt' and the ownership-transfer columns.
+    status text NOT NULL DEFAULT 'active',
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.fund_holdings (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    fund_id uuid NOT NULL REFERENCES public.funds(id) ON DELETE CASCADE,
+    symbol text NOT NULL,
+    quantity numeric NOT NULL DEFAULT 0,
+    UNIQUE (fund_id, symbol)
+);
+
+CREATE TABLE public.fund_nav_snapshots (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    fund_id uuid NOT NULL REFERENCES public.funds(id) ON DELETE CASCADE,
+    nav_per_unit numeric NOT NULL,
+    aum numeric NOT NULL,
+    units_outstanding numeric NOT NULL,
+    snapshot_date date NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    -- One snapshot per fund per day — the daily batched job (Phase 1's
+    -- fundNavSnapshotService.js) upserts on conflict rather than duplicating.
+    UNIQUE (fund_id, snapshot_date)
+);
+
+ALTER TABLE public.funds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fund_holdings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fund_nav_snapshots ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY funds_select_authenticated ON public.funds
+    FOR SELECT TO authenticated USING (true);
+CREATE POLICY fund_holdings_select_authenticated ON public.fund_holdings
+    FOR SELECT TO authenticated USING (true);
+CREATE POLICY fund_nav_snapshots_select_authenticated ON public.fund_nav_snapshots
+    FOR SELECT TO authenticated USING (true);
+
+-- No INSERT/UPDATE/DELETE policies for `authenticated` on any of the three
+-- tables above, intentionally — only the backend's service_role client can
+-- write (RLS is bypassed entirely for service_role, same precedent as
+-- company_encyclopedia in Migration 010/011).
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 014+ (RESERVED)
+-- Feature: ETF Fund Emulation, Phases 2-8 — see docs/ETF_FUND_EMULATION.md.
+-- Remaining tables (fund_investor_positions, fund_investor_transactions,
+-- employee_profiles, fund_team_members, fund_invitations,
+-- fund_trade_proposals, fund_transactions, fund_chat_messages, fund_meetings,
+-- fund_meeting_invites, bot_investor_profiles, bot_investor_state,
+-- fund_fee_ledger, manager_earnings_balance, fund_succession_events) are
+-- written phase-by-phase as each phase is implemented, not upfront.
 -- =============================================================================

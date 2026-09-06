@@ -15,6 +15,7 @@ import '../../l10n/gen/app_localizations.dart';
 const List<String> _defaultOrder = [
   // Bible Part 2 — Main Screen Sections (in order)
   'news', // Market Clock
+  'etf_funds', // Directly under Market Clock, per docs/ETF_FUND_EMULATION.md
   'portfolio',
   'shield_signal',
   'stress_test',
@@ -41,6 +42,8 @@ class HomeWidgetConfig {
         return l10n.homeWidgetWatchlist;
       case 'news':
         return l10n.homeWidgetMarketClock;
+      case 'etf_funds':
+        return l10n.homeWidgetEtfFunds;
       case 'stress_test':
         return l10n.navStressTest;
       case 'portfolio':

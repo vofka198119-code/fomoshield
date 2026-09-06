@@ -2588,5 +2588,64 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "homeWidgetEtfFunds": "ETF Funds",
+  "etfHomeCardTitleHead": "Become a Fund Manager",
+  "etfHomeCardTitleAnalyst": "Become an Investment Assistant",
+  "etfHomeCardPremiumTag": "Premium",
+
+  "etfOnboardingStep1TitleHead": "What Is an ETF Fund?",
+  "etfOnboardingStep1BodyHead": "Create your own virtual investment fund. Other players invest their own virtual capital into it, you and your hired analysts manage its holdings, and its unit price tracks real market prices — hands-on practice at real portfolio management.",
+  "etfOnboardingStep2TitleHead": "What You'll Need",
+  "etfOnboardingStep2BodyHead": "Creating a fund requires a Premium subscription and up to $150,000 of virtual starting capital. You'll choose a fund name (English only — a ticker is generated automatically) and the sectors your fund focuses on.",
+  "etfOnboardingStep1TitleAnalyst": "What Is an Investment Assistant?",
+  "etfOnboardingStep1BodyAnalyst": "Join a fund's team and propose real trades with your own reasoning — the fund's head reviews and approves them. A practical way to build a track record before working with real money.",
+  "etfOnboardingStep2TitleAnalyst": "What You'll Need",
+  "etfOnboardingStep2BodyAnalyst": "Becoming an assistant is free. You'll create a public profile — just a nickname and avatar, no personal information — so fund heads can find and hire you from the jobs marketplace.",
+  "etfOnboardingStep3Title": "This Is a Simulator",
+  "etfOnboardingStep3Body": "Premium unlocks access to this training simulator. All money inside funds is fictional and can never be exchanged for real money. No statistic or rating is financial advice or a guarantee of return. When there aren't enough real players yet, virtual assistant-investors may take part to keep the simulation liquid.",
+  "etfOnboardingNext": "Next",
+  "etfOnboardingAccept": "Accept & Continue",
+  "etfOnboardingComingSoon": "Investment assistant features are coming in a future update.",
+
+  "etfCreateFundTitle": "Create Fund",
+  "etfCreateFundNameLabel": "Fund Name",
+  "etfCreateFundNameHint": "English letters and numbers only",
+  "etfCreateFundDescriptionLabel": "Description",
+  "etfCreateFundStrategyLabel": "Investment Strategy",
+  "etfCreateFundSectorsLabel": "Sectors",
+  "etfCreateFundCapitalLabel": "Starting Capital (up to $150,000)",
+  "etfCreateFundSubmitButton": "Create Fund",
+  "etfCreateFundSuccessMessage": "Fund created!",
+  "etfCreateFundErrorGeneric": "Failed to create fund. Please try again.",
+  "etfCreateFundSelectAtLeastOneSector": "Select at least one sector",
+  "etfCreateFundNameEnglishOnlyError": "Fund name must be in English (letters, numbers, basic punctuation only)",
+
+  "etfFundsTabLabel": "Funds",
+  "etfCompaniesTabLabel": "Companies",
+  "etfFundsEmptyState": "No funds yet — be the first to create one!",
+  "etfFundsListErrorMessage": "Couldn't load funds. Pull to refresh.",
+
+  "etfFundDetailNavLabel": "NAV / Unit",
+  "etfFundDetailAumLabel": "AUM",
+  "etfFundDetailUnitsLabel": "Units Outstanding",
+  "etfFundDetailHoldingsTitle": "Holdings",
+  "etfFundDetailHoldingsEmpty": "No holdings yet",
+  "etfFundDetailSectorsTitle": "Sectors",
+  "etfFundDetailStrategyTitle": "Strategy",
+  "etfFundDetailDescriptionTitle": "About",
+  "etfFundDetailNavHistoryTitle": "NAV History",
+
+  "etfSectorTechnology": "Technology",
+  "etfSectorHealthcare": "Healthcare",
+  "etfSectorFinancials": "Financials",
+  "etfSectorConsumerDiscretionary": "Consumer Discretionary",
+  "etfSectorConsumerStaples": "Consumer Staples",
+  "etfSectorEnergy": "Energy",
+  "etfSectorIndustrials": "Industrials",
+  "etfSectorMaterials": "Materials",
+  "etfSectorUtilities": "Utilities",
+  "etfSectorRealEstate": "Real Estate",
+  "etfSectorCommunicationServices": "Communication Services"
 }
