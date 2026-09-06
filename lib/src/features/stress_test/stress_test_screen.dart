@@ -494,12 +494,18 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
             // ShaderMask sheen under Luxury via themedGoldGradient; this
             // one was missed. Standard is a no-op, exact same gray as
             // before.
+            //
+            // Same bug as portfolio_screen.dart's "⋮" icon (fixed
+            // 2026-09-06): `windowGradient == null` was used as a "dark
+            // theme" proxy, wrong for Black & White (light, but does set
+            // windowGradient) — hardcoded Colors.white vanished on its
+            // white AppBar. Switched to palette.accentPrimary.
             icon: themedGoldGradient(
               Icon(
                 Icons.edit_rounded,
                 color: palette.windowGradient == null
                     ? ThemeV2.textSecondary
-                    : Colors.white,
+                    : palette.accentPrimary,
                 shadows: palette.titleShadow != null
                     ? [palette.titleShadow!]
                     : null,
