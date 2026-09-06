@@ -399,16 +399,28 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     final tier = ref.watch(subscriptionTierProvider);
     final isPremium = tier.isPremiumOrAdmin;
     final l10n = AppLocalizations.of(context)!;
+    // This card previously ignored `palette` entirely — always the same
+    // hardcoded green/navy gradient with hardcoded white text, in every
+    // theme. That's the intended Standard look, but reads as a jarring,
+    // out-of-place solid-green box under a light theme like Black & White
+    // (found live 2026-09-06). Themed variants (windowGradient != null —
+    // Luxury Gold/Graphite/Black & White/Midnight Sea) now use the same
+    // instrument-panel fill every other themed card uses, with text color
+    // derived from the palette instead of assumed-always-white.
+    final isThemed = palette.windowGradient != null;
+    final onCard = isThemed ? (palette.onWindow ?? palette.textHeader) : Colors.white;
     return CardFrame(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isPremium
-              ? [ThemeV2.primary, const Color(0xFF002E18)]
-              : [ThemeV2.primary, const Color(0xFF0F2440)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: isThemed
+            ? palette.windowGradient
+            : LinearGradient(
+                colors: isPremium
+                    ? [ThemeV2.primary, const Color(0xFF002E18)]
+                    : [ThemeV2.primary, const Color(0xFF0F2440)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.black12),
       ),
@@ -422,7 +434,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 l10n.stressTestAvailableCash,
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  color: Colors.white70,
+                  color: onCard.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -434,7 +446,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: onCard.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -459,14 +471,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
             style: interNums(
               fontSize: 32,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: onCard,
               letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             l10n.stressTestOfTotal(formatUsd(session.startingCash)),
-            style: interNums(fontSize: 12, color: Colors.white60),
+            style: interNums(fontSize: 12, color: onCard.withValues(alpha: 0.6)),
           ),
         ],
       ),
@@ -1201,9 +1213,18 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                             ? _accentColor
                             : widget.palette.textBody.withValues(alpha: 0.3),
                         foregroundColor: Colors.white,
+                        // Was textBody@0.2 fill + hardcoded white38 text —
+                        // tuned assuming an always-dark card, so it inverted
+                        // into a near-white button with near-invisible
+                        // whitish text under a light-card theme like
+                        // Black & White (found live 2026-09-06). textHeader
+                        // is the theme's own high-contrast color (dark on
+                        // light themes, light on dark ones), so a translucent
+                        // version of it stays "muted but legible" everywhere.
                         disabledBackgroundColor: widget.palette.textBody
-                            .withValues(alpha: 0.2),
-                        disabledForegroundColor: Colors.white38,
+                            .withValues(alpha: 0.15),
+                        disabledForegroundColor: widget.palette.textHeader
+                            .withValues(alpha: 0.4),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
