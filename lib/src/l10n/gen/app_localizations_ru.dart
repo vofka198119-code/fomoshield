@@ -6537,6 +6537,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Название фонда должно быть на английском (только буквы, цифры и базовая пунктуация)';
 
   @override
+  String get etfCreateFundNameTakenError =>
+      'Фонд с таким названием уже существует';
+
+  @override
   String get etfFundsTabLabel => 'Фонды';
 
   @override

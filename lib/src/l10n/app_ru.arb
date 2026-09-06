@@ -1863,6 +1863,7 @@
   "etfCreateFundErrorGeneric": "Не удалось создать фонд. Попробуйте ещё раз.",
   "etfCreateFundSelectAtLeastOneSector": "Выберите хотя бы один сектор",
   "etfCreateFundNameEnglishOnlyError": "Название фонда должно быть на английском (только буквы, цифры и базовая пунктуация)",
+  "etfCreateFundNameTakenError": "Фонд с таким названием уже существует",
 
   "etfFundsTabLabel": "Фонды",
   "etfCompaniesTabLabel": "Компании",

@@ -2625,6 +2625,7 @@
   "etfCreateFundErrorGeneric": "Failed to create fund. Please try again.",
   "etfCreateFundSelectAtLeastOneSector": "Select at least one sector",
   "etfCreateFundNameEnglishOnlyError": "Fund name must be in English (letters, numbers, basic punctuation only)",
+  "etfCreateFundNameTakenError": "A fund with this name already exists",
 
   "etfFundsTabLabel": "Funds",
   "etfCompaniesTabLabel": "Companies",

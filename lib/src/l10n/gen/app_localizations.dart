@@ -11005,6 +11005,12 @@ abstract class AppLocalizations {
   /// **'Fund name must be in English (letters, numbers, basic punctuation only)'**
   String get etfCreateFundNameEnglishOnlyError;
 
+  /// No description provided for @etfCreateFundNameTakenError.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund with this name already exists'**
+  String get etfCreateFundNameTakenError;
+
   /// No description provided for @etfFundsTabLabel.
   ///
   /// In en, this message translates to:

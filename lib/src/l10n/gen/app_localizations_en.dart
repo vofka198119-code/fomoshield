@@ -6515,6 +6515,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Fund name must be in English (letters, numbers, basic punctuation only)';
 
   @override
+  String get etfCreateFundNameTakenError =>
+      'A fund with this name already exists';
+
+  @override
   String get etfFundsTabLabel => 'Funds';
 
   @override

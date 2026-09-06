@@ -12,6 +12,7 @@ import '../../../core/theme/themed_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../providers/fund_providers.dart';
 import '../sector_labels.dart';
+import '../services/fund_api_service.dart';
 
 // ---------------------------------------------------------------------------
 // Create Fund — ETF Fund Emulation, Phase 1. Ticker generation/uniqueness
@@ -38,6 +39,11 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
   final _capitalController = TextEditingController(text: '150000');
   final Set<String> _selectedSectors = {};
   bool _submitting = false;
+  // Server-only validation errors (things a client-side validator can't
+  // know, like name uniqueness) — fed into the name field's own validator
+  // below so Flutter highlights it exactly like any other invalid field,
+  // rather than a plain SnackBar with no indication of which input is wrong.
+  String? _serverNameError;
 
   @override
   void dispose() {
@@ -79,15 +85,38 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.etfCreateFundSuccessMessage)));
       context.pushReplacement('/funds/${fund.id}');
+    } on FundApiException catch (e) {
+      if (!mounted) return;
+      switch (e.code) {
+        case 'name_taken':
+          setState(() => _serverNameError = l10n.etfCreateFundNameTakenError);
+          _formKey.currentState!.validate();
+          break;
+        case 'name_not_english':
+          setState(
+            () => _serverNameError = l10n.etfCreateFundNameEnglishOnlyError,
+          );
+          _formKey.currentState!.validate();
+          break;
+        case 'sectors_empty':
+        case 'sectors_invalid':
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.etfCreateFundSelectAtLeastOneSector)),
+          );
+          break;
+        default:
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.etfCreateFundErrorGeneric),
+              backgroundColor: ThemeV2.loss,
+            ),
+          );
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            e is Exception
-                ? e.toString().replaceFirst('Exception: ', '')
-                : l10n.etfCreateFundErrorGeneric,
-          ),
+          content: Text(l10n.etfCreateFundErrorGeneric),
           backgroundColor: ThemeV2.loss,
         ),
       );
@@ -122,34 +151,54 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
     );
   }
 
-  Widget _fieldWrapper(AppPalette palette, Widget child) {
+  // hasError draws a plain red border instead of the theme's gradient one —
+  // TextFormField's OWN border is intentionally InputBorder.none in every
+  // state (see _decoration above, so the themed Container below is the only
+  // border anyone sees), which means Flutter's usual automatic red
+  // error-border never had anywhere to paint. Without this override, a
+  // server-side error (e.g. name taken) only ever showed as red helper text
+  // underneath with no visible highlight on the field itself — the app
+  // convention "как в приложениях" of highlighting the invalid field
+  // outright (found live 2026-09-06).
+  Widget _fieldWrapper(
+    AppPalette palette,
+    Widget child, {
+    bool hasError = false,
+  }) {
+    final content = Container(
+      decoration: BoxDecoration(
+        gradient: palette.windowGradient,
+        color: palette.windowGradient == null ? palette.card : null,
+        borderRadius: ThemeV2.borderRadiusMedium,
+        border: hasError ? Border.all(color: ThemeV2.loss, width: 1.5) : null,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      child: child,
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: themedBorder(
-        palette: palette,
-        borderRadius: ThemeV2.borderRadiusMedium,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: palette.windowGradient,
-            color: palette.windowGradient == null ? palette.card : null,
-            borderRadius: ThemeV2.borderRadiusMedium,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-          child: child,
-        ),
-      ),
+      child: hasError
+          ? content
+          : themedBorder(
+              palette: palette,
+              borderRadius: ThemeV2.borderRadiusMedium,
+              child: content,
+            ),
     );
   }
 
-  // Back should feel soft, not abrupt: if a field is focused (keyboard
-  // open), the first back press only dismisses the keyboard — a second
-  // press (nothing focused) actually leaves the screen. Without this, an
-  // instinctive back-tap while typing (to lower the keyboard) instead blew
-  // straight past the form back to Home (found live 2026-09-06).
+  // Back should feel soft, not abrupt: if the keyboard is open, the first
+  // back press only dismisses it — a second press (keyboard already
+  // closed) actually leaves the screen. Checks the KEYBOARD'S actual
+  // on-screen presence (viewInsets.bottom), not FocusScope.focusedChild —
+  // that field can stay non-null even after the keyboard visibly closes
+  // (no other widget claims focus), which made back permanently a no-op
+  // after the first use (found live 2026-09-06, second real device bug in
+  // this same fix).
   void _handleBackPress(BuildContext context) {
-    final focusScope = FocusScope.of(context);
-    if (focusScope.focusedChild != null) {
-      focusScope.unfocus();
+    final keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    if (keyboardVisible) {
+      FocusScope.of(context).unfocus();
     } else {
       Navigator.of(context).pop();
     }
@@ -190,10 +239,19 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
               children: [
                 _fieldWrapper(
                   palette,
+                  hasError: _serverNameError != null,
                   TextFormField(
                     controller: _nameController,
                     maxLength: 60,
                     style: GoogleFonts.inter(color: palette.textHeader),
+                    // Clears a stale server-side error (e.g. "name taken")
+                    // the moment the user edits the name — otherwise it'd
+                    // linger and show as still-invalid even after a fix.
+                    onChanged: (_) {
+                      if (_serverNameError != null) {
+                        setState(() => _serverNameError = null);
+                      }
+                    },
                     decoration: _decoration(
                       palette,
                       l10n.etfCreateFundNameLabel,
@@ -205,6 +263,7 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                       if (!_nameEnglishOnly.hasMatch(v)) {
                         return l10n.etfCreateFundNameEnglishOnlyError;
                       }
+                      if (_serverNameError != null) return _serverNameError;
                       return null;
                     },
                   ),

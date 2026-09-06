@@ -3,6 +3,22 @@ import '../../../core/utils/constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../models/fund.dart';
 
+/// A fund-creation/validation error from the backend, carrying the stable
+/// `code` field (e.g. "name_taken") alongside the raw (English, log-only)
+/// `message` — callers switch on [code] to show a localized string and
+/// highlight the right form field, instead of surfacing [message] directly
+/// (that used to happen and shipped an untranslated error with no field
+/// highlighted — found live 2026-09-06).
+class FundApiException implements Exception {
+  final String message;
+  final String? code;
+
+  FundApiException(this.message, {this.code});
+
+  @override
+  String toString() => message;
+}
+
 // ---------------------------------------------------------------------------
 // Fund API Service — talks to scanco-backend's /api/v1/funds routes
 // (ETF Fund Emulation, Phase 1). A separate, lean Dio client rather than
@@ -17,16 +33,16 @@ class FundApiService {
   final Dio _dio;
 
   FundApiService()
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: '${AppConstants.backendBaseUrl}/api/v1',
-            connectTimeout: const Duration(seconds: 8),
-            receiveTimeout: const Duration(seconds: 8),
-            headers: AppConstants.backendApiKey.isEmpty
-                ? null
-                : {'X-API-Key': AppConstants.backendApiKey},
-          ),
-        ) {
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: '${AppConstants.backendBaseUrl}/api/v1',
+          connectTimeout: const Duration(seconds: 8),
+          receiveTimeout: const Duration(seconds: 8),
+          headers: AppConstants.backendApiKey.isEmpty
+              ? null
+              : {'X-API-Key': AppConstants.backendApiKey},
+        ),
+      ) {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
@@ -80,7 +96,12 @@ class FundApiService {
       );
       return Fund.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw Exception(_errorMessage(e, 'Failed to create fund'));
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to create fund'),
+        code: code,
+      );
     }
   }
 
