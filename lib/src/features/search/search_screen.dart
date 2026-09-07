@@ -162,20 +162,32 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     : PageView(
                         controller: _pageController,
                         onPageChanged: (i) => setState(() => _tabIndex = i),
-                        // Fixed 2-item list (not .builder), so both pages
-                        // stay built the whole time — same "never lose
-                        // FundsTabList's fetched data / Companies' typed
-                        // query by unmounting it" requirement the old
-                        // IndexedStack met.
+                        // Each child wrapped in _KeepAlivePage — PageView
+                        // doesn't keep an off-viewport page's own subtree
+                        // alive on its own (unlike the old IndexedStack,
+                        // which always fully built both branches). Without
+                        // this, SearchBrowseLanes' State got torn down and
+                        // rebuilt fresh every swipe, which replayed its
+                        // list rows' StaggerFadeIn entrance animation (a
+                        // slide-up-into-place) on every single swipe into
+                        // Companies instead of just the screen's first
+                        // open — confirmed live 2026-09-07.
                         children: [
-                          FundsTabList(palette: palette, query: _fundsQuery),
-                          _buildCompaniesResults(
-                            l10n,
-                            state,
-                            palette,
-                            portfolioId,
-                            stressTestSource,
-                            stressTestSessionId,
+                          _KeepAlivePage(
+                            child: FundsTabList(
+                              palette: palette,
+                              query: _fundsQuery,
+                            ),
+                          ),
+                          _KeepAlivePage(
+                            child: _buildCompaniesResults(
+                              l10n,
+                              state,
+                              palette,
+                              portfolioId,
+                              stressTestSource,
+                              stressTestSessionId,
+                            ),
                           ),
                         ],
                       ),
@@ -605,5 +617,32 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       ),
     );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Keeps a PageView child's subtree alive while scrolled off-screen — see
+// the PageView's own doc comment above for why this is needed (Search's
+// Funds/Companies swipe was replaying SearchBrowseLanes' entrance
+// animation on every swipe without it).
+// ---------------------------------------------------------------------------
+class _KeepAlivePage extends StatefulWidget {
+  final Widget child;
+
+  const _KeepAlivePage({required this.child});
+
+  @override
+  State<_KeepAlivePage> createState() => _KeepAlivePageState();
+}
+
+class _KeepAlivePageState extends State<_KeepAlivePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
   }
 }
