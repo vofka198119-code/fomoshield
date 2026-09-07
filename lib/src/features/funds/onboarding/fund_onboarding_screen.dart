@@ -95,7 +95,11 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
               l10n.etfOnboardingStep2BodyAnalyst,
               l10n.etfOnboardingStep2ButtonAnalyst,
             ),
-      (l10n.etfOnboardingStep3Title, l10n.etfOnboardingStep3Body, l10n.etfOnboardingAccept),
+      (
+        l10n.etfOnboardingStep3Title,
+        l10n.etfOnboardingStep3Body,
+        l10n.etfOnboardingAccept,
+      ),
     ];
   }
 
@@ -222,7 +226,10 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
         child: themedDarkCtaButtonShell(
           palette: palette,
           borderRadius: radius,
-          standardDecoration: BoxDecoration(color: ThemeV2.primary, borderRadius: radius),
+          standardDecoration: BoxDecoration(
+            color: ThemeV2.primary,
+            borderRadius: radius,
+          ),
           child: InkWell(
             borderRadius: radius,
             onTap: onTap,

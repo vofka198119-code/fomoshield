@@ -1870,6 +1870,8 @@
   "etfCompaniesTabLabel": "Компании",
   "etfFundsEmptyState": "Пока нет фондов — создайте первый!",
   "etfFundsListErrorMessage": "Не удалось загрузить фонды. Потяните, чтобы обновить.",
+  "etfFundsTopByCap": "ПО КАПИТАЛИЗАЦИИ",
+  "etfFundsNewThisWeek": "НОВЫЕ ЗА НЕДЕЛЮ",
 
   "etfFundDetailNavLabel": "NAV / пай",
   "etfFundDetailAumLabel": "AUM",

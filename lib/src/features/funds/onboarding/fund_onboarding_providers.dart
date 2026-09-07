@@ -12,9 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum FundOnboardingBranch { head, analyst }
 
 String _prefsKey(FundOnboardingBranch branch) => switch (branch) {
-      FundOnboardingBranch.head => 'etf_onboarding_seen_head',
-      FundOnboardingBranch.analyst => 'etf_onboarding_seen_analyst',
-    };
+  FundOnboardingBranch.head => 'etf_onboarding_seen_head',
+  FundOnboardingBranch.analyst => 'etf_onboarding_seen_analyst',
+};
 
 class FundOnboardingSeenNotifier extends StateNotifier<bool> {
   final FundOnboardingBranch branch;
@@ -35,7 +35,11 @@ class FundOnboardingSeenNotifier extends StateNotifier<bool> {
   }
 }
 
-final fundOnboardingSeenProvider = StateNotifierProvider.family<
-    FundOnboardingSeenNotifier, bool, FundOnboardingBranch>((ref, branch) {
-  return FundOnboardingSeenNotifier(branch);
-});
+final fundOnboardingSeenProvider =
+    StateNotifierProvider.family<
+      FundOnboardingSeenNotifier,
+      bool,
+      FundOnboardingBranch
+    >((ref, branch) {
+      return FundOnboardingSeenNotifier(branch);
+    });

@@ -4,17 +4,19 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../shared/widgets/card_frame.dart';
-import 'company_mini_card.dart';
 
 // ---------------------------------------------------------------------------
-// BrowseLane — titled card containing a vertical stack of CompanyMiniCard
-// rows (Watchlist-style). Shared by all Search-screen browse widgets (Top
-// S&P 500, per-sector tops, Recently Viewed).
+// BrowseLane — titled card containing a vertical stack of row widgets
+// (Watchlist-style). Shared by every browse-lane surface in the app: Search
+// screen's Companies tab (Top S&P 500, per-sector tops, Recently Viewed —
+// CompanyMiniCard rows) and Funds tab (fund_browse_lanes.dart's
+// FundMiniCard rows). `items` is untyped Widget on purpose so both can
+// share this one shell instead of each screen rolling its own card chrome.
 // ---------------------------------------------------------------------------
 
 class BrowseLane extends StatelessWidget {
   final String title;
-  final List<CompanyMiniCard> items;
+  final List<Widget> items;
   final VoidCallback? onSeeAll;
   final AppPalette palette;
 

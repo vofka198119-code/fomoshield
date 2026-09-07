@@ -7,18 +7,20 @@ import '../../../core/theme/themed_divider.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../models/fund.dart';
 import '../providers/fund_providers.dart';
+import 'fund_browse_lanes.dart';
 
 // ---------------------------------------------------------------------------
-// Funds Tab List — the Search screen's "Funds" tab (ETF Fund Emulation,
-// Phase 1). Flat list ordered by creation date for now; New/Popular/Top-
-// by-Capitalization rankings (design doc section 4) are a later phase.
+// Funds Tab List — the Search screen's "Funds" tab (ETF Fund Emulation).
+// Empty query: FundBrowseLanes (top-by-cap / new-this-week / per-sector
+// lanes — see its own doc comment, and the Companies tab's identical
+// empty-vs-typed split in search_screen.dart's _buildCompaniesResults).
+// Non-empty query: flat client-side filtered list — fund counts are small
+// enough that a dedicated backend search endpoint isn't worth it yet.
 //
-// The search FIELD itself now lives in search_screen.dart (rendered above
-// the Funds/Companies tab labels, alongside the Companies tab's own field —
+// The search FIELD itself lives in search_screen.dart (rendered above the
+// Funds/Companies tab labels, alongside the Companies tab's own field —
 // see its own doc comment for why), which owns the query string and passes
-// it down here as [query]. This widget is results-only: filters client-side
-// over the already-fetched list — Phase 1's fund counts are small enough
-// that a dedicated backend search endpoint isn't worth it yet.
+// it down here as [query].
 // ---------------------------------------------------------------------------
 
 class FundsTabList extends ConsumerWidget {
@@ -69,6 +71,13 @@ class FundsTabList extends ConsumerWidget {
                 style: GoogleFonts.inter(color: palette.textBody, fontSize: 14),
               ),
             ),
+          );
+        }
+        if (query.isEmpty) {
+          return FundBrowseLanes(
+            funds: allFunds,
+            palette: palette,
+            onTapFund: (fund) => context.push('/funds/${fund.id}'),
           );
         }
         final funds = _filter(allFunds);

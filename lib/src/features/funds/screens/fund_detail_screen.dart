@@ -68,7 +68,8 @@ class FundDetailScreen extends ConsumerWidget {
                   _NavHistoryCard(fund: fund, palette: palette, l10n: l10n),
                   const SizedBox(height: 16),
                 ],
-                if (fund.description != null && fund.description!.isNotEmpty) ...[
+                if (fund.description != null &&
+                    fund.description!.isNotEmpty) ...[
                   _TextCard(
                     title: l10n.etfFundDetailDescriptionTitle,
                     body: fund.description!,
@@ -109,8 +110,8 @@ class FundDetailScreen extends ConsumerWidget {
                                   fontSize: 11,
                                   color: palette.textHeader,
                                 ),
-                                backgroundColor:
-                                    palette.accentPrimary.withValues(alpha: 0.12),
+                                backgroundColor: palette.accentPrimary
+                                    .withValues(alpha: 0.12),
                                 side: BorderSide.none,
                               ),
                             )
@@ -159,7 +160,9 @@ class FundDetailScreen extends ConsumerWidget {
                                 ),
                                 Text(
                                   '\$${h.value.toStringAsFixed(2)}',
-                                  style: GoogleFonts.inter(color: palette.textBody),
+                                  style: GoogleFonts.inter(
+                                    color: palette.textBody,
+                                  ),
                                 ),
                               ],
                             ),
@@ -182,7 +185,11 @@ class _HeroCard extends StatelessWidget {
   final AppPalette palette;
   final AppLocalizations l10n;
 
-  const _HeroCard({required this.fund, required this.palette, required this.l10n});
+  const _HeroCard({
+    required this.fund,
+    required this.palette,
+    required this.l10n,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -202,8 +209,14 @@ class _HeroCard extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              _statColumn(l10n.etfFundDetailNavLabel, '\$${fund.navPerUnit.toStringAsFixed(2)}'),
-              _statColumn(l10n.etfFundDetailAumLabel, '\$${fund.aum.toStringAsFixed(0)}'),
+              _statColumn(
+                l10n.etfFundDetailNavLabel,
+                '\$${fund.navPerUnit.toStringAsFixed(2)}',
+              ),
+              _statColumn(
+                l10n.etfFundDetailAumLabel,
+                '\$${fund.aum.toStringAsFixed(0)}',
+              ),
               _statColumn(
                 l10n.etfFundDetailUnitsLabel,
                 fund.unitsOutstanding.toStringAsFixed(0),
@@ -244,7 +257,11 @@ class _NavHistoryCard extends StatelessWidget {
   final AppPalette palette;
   final AppLocalizations l10n;
 
-  const _NavHistoryCard({required this.fund, required this.palette, required this.l10n});
+  const _NavHistoryCard({
+    required this.fund,
+    required this.palette,
+    required this.l10n,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +308,9 @@ class _NavHistoryCard extends StatelessWidget {
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: (up ? ThemeV2.success : ThemeV2.loss).withValues(alpha: 0.12),
+                      color: (up ? ThemeV2.success : ThemeV2.loss).withValues(
+                        alpha: 0.12,
+                      ),
                     ),
                   ),
                 ],
@@ -309,7 +328,11 @@ class _TextCard extends StatelessWidget {
   final String body;
   final AppPalette palette;
 
-  const _TextCard({required this.title, required this.body, required this.palette});
+  const _TextCard({
+    required this.title,
+    required this.body,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {

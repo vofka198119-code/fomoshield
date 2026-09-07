@@ -53,10 +53,12 @@ import '../../features/assets/screens/assets_screen.dart';
 import '../../features/assets/screens/stock_detail_screen.dart';
 import '../../features/assets/screens/why_today_screen.dart';
 import '../../features/assets/screens/order_entry_screen.dart';
+import '../../features/funds/models/fund.dart';
 import '../../features/funds/onboarding/fund_onboarding_providers.dart';
 import '../../features/funds/onboarding/fund_onboarding_screen.dart';
 import '../../features/funds/screens/create_fund_screen.dart';
 import '../../features/funds/screens/fund_detail_screen.dart';
+import '../../features/funds/widgets/fund_list_screen.dart';
 import '../theme/app_palette.dart';
 import '../theme/theme_variant_provider.dart';
 import '../supabase/supabase_providers.dart' show isAdminProvider;
@@ -421,8 +423,8 @@ class AppRouter {
         path: '/funds/onboarding',
         name: 'fundOnboarding',
         builder: (context, state) {
-          final branch = state.extra as FundOnboardingBranch? ??
-              FundOnboardingBranch.head;
+          final branch =
+              state.extra as FundOnboardingBranch? ?? FundOnboardingBranch.head;
           return FundOnboardingScreen(branch: branch);
         },
       ),
@@ -430,6 +432,24 @@ class AppRouter {
         path: '/funds/create',
         name: 'fundCreate',
         builder: (context, state) => const CreateFundScreen(),
+      ),
+      // Funds browse lane "see all" — same real-pushed-route + extra Map
+      // pattern as '/search/company-list' (see its own doc comment on this
+      // route list for why extra doesn't survive a killed-process restore).
+      // Registered before '/funds/:id' so this literal path wins the match.
+      GoRoute(
+        path: '/funds/list',
+        name: 'fundsList',
+        redirect: (context, state) =>
+            state.extra is Map<String, dynamic> ? null : '/search',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return FundListScreen(
+            title: extra['title'] as String,
+            funds: extra['funds'] as List<Fund>,
+            onTapFund: extra['onTapFund'] as void Function(Fund),
+          );
+        },
       ),
       GoRoute(
         path: '/funds/:id',

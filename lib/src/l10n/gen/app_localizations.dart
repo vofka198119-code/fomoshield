@@ -11041,6 +11041,18 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load funds. Pull to refresh.'**
   String get etfFundsListErrorMessage;
 
+  /// No description provided for @etfFundsTopByCap.
+  ///
+  /// In en, this message translates to:
+  /// **'TOP BY CAPITALIZATION'**
+  String get etfFundsTopByCap;
+
+  /// No description provided for @etfFundsNewThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW THIS WEEK'**
+  String get etfFundsNewThisWeek;
+
   /// No description provided for @etfFundDetailNavLabel.
   ///
   /// In en, this message translates to:

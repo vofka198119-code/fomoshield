@@ -2632,6 +2632,8 @@
   "etfCompaniesTabLabel": "Companies",
   "etfFundsEmptyState": "No funds yet — be the first to create one!",
   "etfFundsListErrorMessage": "Couldn't load funds. Pull to refresh.",
+  "etfFundsTopByCap": "TOP BY CAPITALIZATION",
+  "etfFundsNewThisWeek": "NEW THIS WEEK",
 
   "etfFundDetailNavLabel": "NAV / Unit",
   "etfFundDetailAumLabel": "AUM",

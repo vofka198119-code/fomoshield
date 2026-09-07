@@ -85,7 +85,11 @@ class _EtfPremiumRequiredSheet extends StatelessWidget {
           Text(
             l10n.etfPremiumRequiredDescription,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(fontSize: 14, color: palette.textHeader, height: 1.5),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: palette.textHeader,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 28),
           _sheetButton(
@@ -110,7 +114,10 @@ class _EtfPremiumRequiredSheet extends StatelessWidget {
               style: TextButton.styleFrom(foregroundColor: palette.textBody),
               child: Text(
                 l10n.verdictBackToHome,
-                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -134,7 +141,10 @@ class _EtfPremiumRequiredSheet extends StatelessWidget {
         child: themedDarkCtaButtonShell(
           palette: palette,
           borderRadius: radius,
-          standardDecoration: BoxDecoration(color: ThemeV2.primary, borderRadius: radius),
+          standardDecoration: BoxDecoration(
+            color: ThemeV2.primary,
+            borderRadius: radius,
+          ),
           child: InkWell(
             borderRadius: radius,
             onTap: onTap,

@@ -70,11 +70,11 @@ class FundHolding {
   });
 
   factory FundHolding.fromJson(Map<String, dynamic> json) => FundHolding(
-        symbol: json['symbol'] as String,
-        quantity: (json['quantity'] as num).toDouble(),
-        price: (json['price'] as num).toDouble(),
-        value: (json['value'] as num).toDouble(),
-      );
+    symbol: json['symbol'] as String,
+    quantity: (json['quantity'] as num).toDouble(),
+    price: (json['price'] as num).toDouble(),
+    value: (json['value'] as num).toDouble(),
+  );
 }
 
 class FundNavPoint {
@@ -84,9 +84,9 @@ class FundNavPoint {
   const FundNavPoint({required this.date, required this.navPerUnit});
 
   factory FundNavPoint.fromJson(Map<String, dynamic> json) => FundNavPoint(
-        date: DateTime.parse(json['date'] as String),
-        navPerUnit: (json['navPerUnit'] as num).toDouble(),
-      );
+    date: DateTime.parse(json['date'] as String),
+    navPerUnit: (json['navPerUnit'] as num).toDouble(),
+  );
 }
 
 /// The fund detail endpoint returns every [Fund] field flattened alongside

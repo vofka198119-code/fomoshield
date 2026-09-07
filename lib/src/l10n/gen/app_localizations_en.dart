@@ -6535,6 +6535,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t load funds. Pull to refresh.';
 
   @override
+  String get etfFundsTopByCap => 'TOP BY CAPITALIZATION';
+
+  @override
+  String get etfFundsNewThisWeek => 'NEW THIS WEEK';
+
+  @override
   String get etfFundDetailNavLabel => 'NAV / Unit';
 
   @override

@@ -6557,6 +6557,12 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось загрузить фонды. Потяните, чтобы обновить.';
 
   @override
+  String get etfFundsTopByCap => 'ПО КАПИТАЛИЗАЦИИ';
+
+  @override
+  String get etfFundsNewThisWeek => 'НОВЫЕ ЗА НЕДЕЛЮ';
+
+  @override
   String get etfFundDetailNavLabel => 'NAV / пай';
 
   @override

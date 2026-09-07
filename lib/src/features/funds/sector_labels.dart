@@ -5,18 +5,18 @@ import '../../l10n/gen/app_localizations.dart';
 // this only localizes the DISPLAY label, same split as fund tickers/names
 // staying English while everything else in the UI is localized.
 List<String> allowedSectorCodes(AppLocalizations l10n) => const [
-      'Technology',
-      'Healthcare',
-      'Financials',
-      'Consumer Discretionary',
-      'Consumer Staples',
-      'Energy',
-      'Industrials',
-      'Materials',
-      'Utilities',
-      'Real Estate',
-      'Communication Services',
-    ];
+  'Technology',
+  'Healthcare',
+  'Financials',
+  'Consumer Discretionary',
+  'Consumer Staples',
+  'Energy',
+  'Industrials',
+  'Materials',
+  'Utilities',
+  'Real Estate',
+  'Communication Services',
+];
 
 String sectorLabel(AppLocalizations l10n, String code) {
   switch (code) {

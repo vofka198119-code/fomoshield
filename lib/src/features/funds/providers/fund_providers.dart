@@ -17,7 +17,7 @@ final fundsListProvider = FutureProvider.autoDispose<List<Fund>>((ref) {
   return ref.watch(fundApiServiceProvider).listFunds();
 });
 
-final fundDetailProvider =
-    FutureProvider.autoDispose.family<FundDetail, String>((ref, fundId) {
-  return ref.watch(fundApiServiceProvider).getFundDetail(fundId);
-});
+final fundDetailProvider = FutureProvider.autoDispose
+    .family<FundDetail, String>((ref, fundId) {
+      return ref.watch(fundApiServiceProvider).getFundDetail(fundId);
+    });
