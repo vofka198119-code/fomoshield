@@ -6522,7 +6522,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundsSearchHint => 'Search funds by name or ticker...';
 
   @override
-  String get etfFundsTabLabel => 'Funds';
+  String get etfFundsTabLabel => 'ETF Funds';
 
   @override
   String get etfCompaniesTabLabel => 'Companies';

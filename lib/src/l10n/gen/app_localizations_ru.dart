@@ -6544,7 +6544,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfFundsSearchHint => 'Поиск фондов по названию или тикеру...';
 
   @override
-  String get etfFundsTabLabel => 'Фонды';
+  String get etfFundsTabLabel => 'Фонды ETF';
 
   @override
   String get etfCompaniesTabLabel => 'Компании';

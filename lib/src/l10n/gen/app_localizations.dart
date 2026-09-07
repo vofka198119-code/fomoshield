@@ -11020,7 +11020,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfFundsTabLabel.
   ///
   /// In en, this message translates to:
-  /// **'Funds'**
+  /// **'ETF Funds'**
   String get etfFundsTabLabel;
 
   /// No description provided for @etfCompaniesTabLabel.
