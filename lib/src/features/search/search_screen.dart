@@ -63,6 +63,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   // other swipeable surface (home/widgets/portfolio_widget.dart's
   // multi-portfolio PageView), just with tab labels standing in for dots.
   late final _pageController = PageController(initialPage: _tabIndex);
+  // Consumed by _buildCompaniesSearchField — see its own doc comment.
+  bool _companiesAutofocusConsumed = false;
 
   @override
   void dispose() {
@@ -201,6 +203,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     SearchNotifier state,
     AppPalette palette,
   ) {
+    // Only the very first time this field is built (screen's initial open,
+    // Companies being the default tab) — not every time the PageView swipes
+    // back onto Companies. This field only exists in the tree while
+    // Companies is the active tab (built fresh from scratch each time,
+    // unlike the old always-mounted IndexedStack version), so a permanent
+    // `autofocus: true` re-opened the keyboard on every swipe INTO this
+    // tab, which read as a vertical snap/jump right after the horizontal
+    // swipe settled — confirmed live 2026-09-07.
+    final autofocus = !_companiesAutofocusConsumed;
+    _companiesAutofocusConsumed = true;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       child: themedBorder(
@@ -213,7 +225,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           child: TextField(
             controller: _controller,
-            autofocus: true,
+            autofocus: autofocus,
             onChanged: (q) =>
                 ref.read(searchProvider.notifier).onSearchInput(q),
             decoration: InputDecoration(
