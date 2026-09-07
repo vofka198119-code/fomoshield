@@ -2628,7 +2628,7 @@
   "etfCreateFundNameTakenError": "A fund with this name already exists",
 
   "etfFundsSearchHint": "Search funds by name or ticker...",
-  "etfFundsTabLabel": "Funds",
+  "etfFundsTabLabel": "ETF Funds",
   "etfCompaniesTabLabel": "Companies",
   "etfFundsEmptyState": "No funds yet — be the first to create one!",
   "etfFundsListErrorMessage": "Couldn't load funds. Pull to refresh.",

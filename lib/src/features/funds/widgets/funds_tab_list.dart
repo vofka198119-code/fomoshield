@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
-import '../../../core/theme/theme_v2.dart';
-import '../../../core/theme/themed_border.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../models/fund.dart';
@@ -15,33 +13,23 @@ import '../providers/fund_providers.dart';
 // Phase 1). Flat list ordered by creation date for now; New/Popular/Top-
 // by-Capitalization rankings (design doc section 4) are a later phase.
 //
-// Search box filters client-side over the already-fetched list — Phase 1's
-// fund counts are small enough that a dedicated backend search endpoint
-// isn't worth it yet; add one if/when the funds table actually grows large.
+// The search FIELD itself now lives in search_screen.dart (rendered above
+// the Funds/Companies tab labels, alongside the Companies tab's own field —
+// see its own doc comment for why), which owns the query string and passes
+// it down here as [query]. This widget is results-only: filters client-side
+// over the already-fetched list — Phase 1's fund counts are small enough
+// that a dedicated backend search endpoint isn't worth it yet.
 // ---------------------------------------------------------------------------
 
-class FundsTabList extends ConsumerStatefulWidget {
+class FundsTabList extends ConsumerWidget {
   final AppPalette palette;
+  final String query;
 
-  const FundsTabList({super.key, required this.palette});
-
-  @override
-  ConsumerState<FundsTabList> createState() => _FundsTabListState();
-}
-
-class _FundsTabListState extends ConsumerState<FundsTabList> {
-  final _controller = TextEditingController();
-  String _query = '';
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const FundsTabList({super.key, required this.palette, required this.query});
 
   List<Fund> _filter(List<Fund> funds) {
-    if (_query.isEmpty) return funds;
-    final q = _query.toLowerCase();
+    if (query.isEmpty) return funds;
+    final q = query.toLowerCase();
     return funds
         .where(
           (f) =>
@@ -52,131 +40,64 @@ class _FundsTabListState extends ConsumerState<FundsTabList> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final palette = widget.palette;
     final fundsAsync = ref.watch(fundsListProvider);
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          // Same recipe as the Companies tab's search field (search_screen.dart)
-          // for visual consistency between the two tabs.
-          child: themedBorder(
-            palette: palette,
-            borderRadius: ThemeV2.borderRadiusMedium,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: palette.windowGradient,
-                borderRadius: ThemeV2.borderRadiusMedium,
-              ),
-              child: TextField(
-                controller: _controller,
-                onChanged: (q) => setState(() => _query = q.trim()),
-                decoration: InputDecoration(
-                  filled: false,
-                  hintText: l10n.etfFundsSearchHint,
-                  hintStyle: GoogleFonts.inter(
-                    color: palette.textBody,
-                    fontSize: 14,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search_rounded,
-                    color: palette.textBody,
-                  ),
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  suffixIcon: _query.isEmpty
-                      ? null
-                      : IconButton(
-                          icon: Icon(
-                            Icons.close_rounded,
-                            color: palette.textBody,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            _controller.clear();
-                            setState(() => _query = '');
-                          },
-                        ),
-                ),
-                style: GoogleFonts.inter(
-                  color: palette.textHeader,
-                  fontSize: 14,
-                ),
-              ),
-            ),
+    return fundsAsync.when(
+      loading: () => Center(
+        child: CircularProgressIndicator(color: palette.accentPrimary),
+      ),
+      error: (_, _) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            l10n.etfFundsListErrorMessage,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(color: palette.textBody, fontSize: 14),
           ),
         ),
-        Expanded(
-          child: fundsAsync.when(
-            loading: () => Center(
-              child: CircularProgressIndicator(color: palette.accentPrimary),
-            ),
-            error: (_, _) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  l10n.etfFundsListErrorMessage,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: palette.textBody,
-                    fontSize: 14,
-                  ),
-                ),
+      ),
+      data: (allFunds) {
+        if (allFunds.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                l10n.etfFundsEmptyState,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(color: palette.textBody, fontSize: 14),
               ),
             ),
-            data: (allFunds) {
-              if (allFunds.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      l10n.etfFundsEmptyState,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        color: palette.textBody,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                );
-              }
-              final funds = _filter(allFunds);
-              if (funds.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      l10n.searchNoResults,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        color: palette.textBody,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                );
-              }
-              return RefreshIndicator(
-                color: palette.accentPrimary,
-                onRefresh: () async => ref.invalidate(fundsListProvider),
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: funds.length,
-                  separatorBuilder: (_, _) => palette.dividerGradient != null
-                      ? themedDivider(palette, indent: 0, endIndent: 0)
-                      : const Divider(),
-                  itemBuilder: (context, i) =>
-                      _FundRow(fund: funds[i], palette: palette),
-                ),
-              );
-            },
+          );
+        }
+        final funds = _filter(allFunds);
+        if (funds.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                l10n.searchNoResults,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(color: palette.textBody, fontSize: 14),
+              ),
+            ),
+          );
+        }
+        return RefreshIndicator(
+          color: palette.accentPrimary,
+          onRefresh: () async => ref.invalidate(fundsListProvider),
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: funds.length,
+            separatorBuilder: (_, _) => palette.dividerGradient != null
+                ? themedDivider(palette, indent: 0, endIndent: 0)
+                : const Divider(),
+            itemBuilder: (context, i) =>
+                _FundRow(fund: funds[i], palette: palette),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

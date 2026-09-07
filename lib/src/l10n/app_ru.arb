@@ -1866,7 +1866,7 @@
   "etfCreateFundNameTakenError": "Фонд с таким названием уже существует",
 
   "etfFundsSearchHint": "Поиск фондов по названию или тикеру...",
-  "etfFundsTabLabel": "Фонды",
+  "etfFundsTabLabel": "Фонды ETF",
   "etfCompaniesTabLabel": "Компании",
   "etfFundsEmptyState": "Пока нет фондов — создайте первый!",
   "etfFundsListErrorMessage": "Не удалось загрузить фонды. Потяните, чтобы обновить.",
