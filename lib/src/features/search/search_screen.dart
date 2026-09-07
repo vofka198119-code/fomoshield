@@ -58,11 +58,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   // away, per docs/ETF_FUND_EMULATION.md's "embed into Search, no new
   // bottom-nav item" decision.
   int _tabIndex = 1;
+  // Drives the swipe between Funds/Companies (see the PageView in build()
+  // below) — same controller-driven page+dots pattern as the app's one
+  // other swipeable surface (home/widgets/portfolio_widget.dart's
+  // multi-portfolio PageView), just with tab labels standing in for dots.
+  late final _pageController = PageController(initialPage: _tabIndex);
 
   @override
   void dispose() {
     _controller.dispose();
     _fundsController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -151,8 +157,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         stressTestSource,
                         stressTestSessionId,
                       )
-                    : IndexedStack(
-                        index: _tabIndex,
+                    : PageView(
+                        controller: _pageController,
+                        onPageChanged: (i) => setState(() => _tabIndex = i),
+                        // Fixed 2-item list (not .builder), so both pages
+                        // stay built the whole time — same "never lose
+                        // FundsTabList's fetched data / Companies' typed
+                        // query by unmounting it" requirement the old
+                        // IndexedStack met.
                         children: [
                           FundsTabList(palette: palette, query: _fundsQuery),
                           _buildCompaniesResults(
@@ -552,7 +564,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget _tabButton(String label, int index, AppPalette palette) {
     final active = _tabIndex == index;
     return InkWell(
-      onTap: () => setState(() => _tabIndex = index),
+      onTap: () => _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      ),
       borderRadius: BorderRadius.circular(8),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
