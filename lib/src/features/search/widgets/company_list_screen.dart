@@ -76,6 +76,12 @@ class _CompanyListScreenState extends ConsumerState<CompanyListScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    // Same shared, non-family provider search_browse_lanes.dart already
+    // triggers for this same top-companies roster — watching it here just
+    // reads its already-resolved map (or joins its in-flight future), no
+    // duplicate network call. See its own doc comment for why rows must
+    // take this explicit logoUrl instead of self-resolving.
+    final iconMap = ref.watch(iconsBatchWarmProvider).valueOrNull ?? const {};
     final revealed = _revealedCount.clamp(0, widget.companies.length);
     final hasMore = revealed < widget.companies.length;
 
@@ -149,6 +155,7 @@ class _CompanyListScreenState extends ConsumerState<CompanyListScreen> {
                   }
                   return _CompanyRow(
                     entry: widget.companies[i],
+                    logoUrl: iconMap[widget.companies[i].symbol],
                     onTapSymbol: widget.onTapSymbol,
                     suppressSector: widget.suppressSector,
                     palette: palette,
@@ -165,12 +172,14 @@ class _CompanyListScreenState extends ConsumerState<CompanyListScreen> {
 
 class _CompanyRow extends ConsumerWidget {
   final TopCompanyEntry entry;
+  final String? logoUrl;
   final void Function(String symbol) onTapSymbol;
   final bool suppressSector;
   final AppPalette palette;
 
   const _CompanyRow({
     required this.entry,
+    this.logoUrl,
     required this.onTapSymbol,
     required this.suppressSector,
     required this.palette,
@@ -199,7 +208,7 @@ class _CompanyRow extends ConsumerWidget {
           shape: BoxShape.circle,
           border: Border.all(color: palette.accentPrimary, width: 1.5),
         ),
-        child: CompanyLogo(ticker: entry.symbol, radius: 18),
+        child: CompanyLogo(ticker: entry.symbol, logoUrl: logoUrl, radius: 18),
       ),
       title: Text(
         entry.name,

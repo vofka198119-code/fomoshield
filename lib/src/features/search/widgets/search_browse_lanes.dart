@@ -103,11 +103,12 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
     final l10n = AppLocalizations.of(context)!;
     final recentlyViewed = ref.watch(recentlyViewedProvider);
     final topCompanies = ref.watch(topCompaniesProvider);
-    // Side-effect only — see iconsBatchWarmProvider's doc comment. Not
-    // rendered off of; individual CompanyLogo rows below still read
-    // through cachedLogoProvider as before, they just hit local cache
-    // instead of the network once this finishes.
-    ref.watch(iconsBatchWarmProvider);
+    // See iconsBatchWarmProvider's own doc comment — its resolved map is
+    // passed into _cards() below as each row's explicit logoUrl, which is
+    // what actually bypasses each row's own racy self-resolve. Empty map
+    // while still loading is fine: _cards() just falls through to the old
+    // per-row behavior for that first moment, same as before this existed.
+    final iconMap = ref.watch(iconsBatchWarmProvider).valueOrNull ?? const {};
     final persistedOverrides =
         ref.watch(_persistedSectorOverridesProvider).valueOrNull ?? const {};
 
@@ -185,7 +186,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
         final lanes = <BrowseLane>[
           BrowseLane(
             title: l10n.searchTopSp500,
-            items: _cards(companies.take(_lanePreviewCount).toList()),
+            items: _cards(companies.take(_lanePreviewCount).toList(), iconMap),
             palette: widget.palette,
             onSeeAll: () => _openList(
               context,
@@ -199,6 +200,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                 title: sector.localizedLabel(l10n).toUpperCase(),
                 items: _cards(
                   bySector[sector]!.take(_lanePreviewCount).toList(),
+                  iconMap,
                 ),
                 palette: widget.palette,
                 onSeeAll: () => _openList(
@@ -210,7 +212,10 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
           if (unclassified.isNotEmpty)
             BrowseLane(
               title: l10n.searchOtherSector,
-              items: _cards(unclassified.take(_lanePreviewCount).toList()),
+              items: _cards(
+                unclassified.take(_lanePreviewCount).toList(),
+                iconMap,
+              ),
               palette: widget.palette,
               onSeeAll: () => _openList(
                 context,
@@ -234,6 +239,7 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                       ),
                     )
                     .toList(),
+                iconMap,
               ),
               onSeeAll: recentlyViewed.length > _lanePreviewCount
                   ? () => _openList(
@@ -286,12 +292,16 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
     );
   }
 
-  List<CompanyMiniCard> _cards(List<TopCompanyEntry> data) {
+  List<CompanyMiniCard> _cards(
+    List<TopCompanyEntry> data,
+    Map<String, String> iconMap,
+  ) {
     return [
       for (int i = 0; i < data.length; i++)
         CompanyMiniCard(
           symbol: data[i].symbol,
           name: data[i].name,
+          logoUrl: iconMap[data[i].symbol],
           onTap: () => widget.onTapSymbol(data[i].symbol),
           showDivider: i < data.length - 1,
           palette: widget.palette,
