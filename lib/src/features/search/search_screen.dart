@@ -300,8 +300,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               prefixIcon: Icon(Icons.search_rounded, color: palette.textBody),
               border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
+              // Same conditional as _buildCompaniesSearchField: on Standard
+              // (windowGradient == null), fall through to null so the
+              // app-wide InputDecorationTheme's own default outline shows
+              // instead of no border at all — hardcoding InputBorder.none
+              // unconditionally here (as this field's old standalone
+              // FundsTabList version did) left Standard with no outline at
+              // all, while every themed variant (which sets windowGradient)
+              // still got its Container fill instead. Confirmed live
+              // 2026-09-07.
+              enabledBorder: palette.windowGradient == null
+                  ? null
+                  : InputBorder.none,
+              focusedBorder: palette.windowGradient == null
+                  ? null
+                  : InputBorder.none,
               suffixIcon: _fundsQuery.isEmpty
                   ? null
                   : IconButton(
@@ -604,7 +617,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               style: GoogleFonts.inter(
                 fontSize: 15,
                 fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                color: active ? palette.textHeader : palette.textBody,
+                // Active label now matches the underline's accent color
+                // (was textHeader, which on Standard is a plain dark
+                // gray/black — didn't read as "selected" clearly; every
+                // themed variant's accentPrimary already reads fine as a
+                // header color too). Confirmed live 2026-09-07.
+                color: active ? palette.accentPrimary : palette.textBody,
               ),
             ),
             const SizedBox(height: 4),
