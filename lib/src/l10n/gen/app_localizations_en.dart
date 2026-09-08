@@ -6565,7 +6565,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundDetailUnitsLabel => 'Units Outstanding';
 
   @override
-  String get etfFundDetailHoldingsTitle => 'Holdings';
+  String get etfFundDetailHoldingsTitle => 'HOLDINGS';
 
   @override
   String get etfFundDetailHoldingsEmpty => 'No holdings yet';
@@ -6597,16 +6597,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfCreateFundLimitReachedError => 'You already have a fund';
 
   @override
-  String get etfFundDetailSectorsTitle => 'Sectors';
+  String get etfFundDetailSectorsTitle => 'SECTORS';
 
   @override
-  String get etfFundDetailStrategyTitle => 'Strategy';
+  String get etfFundDetailStrategyTitle => 'STRATEGY';
 
   @override
-  String get etfFundDetailDescriptionTitle => 'About';
+  String get etfFundDetailDescriptionTitle => 'ABOUT';
 
   @override
-  String get etfFundDetailNavHistoryTitle => 'NAV History';
+  String get etfFundDetailNavHistoryTitle => 'NAV HISTORY';
+
+  @override
+  String get etfFundDetailHoldingsCountLabel => 'Companies in Fund';
+
+  @override
+  String get etfFundDetailInvestmentsStubNote =>
+      'Fund investing is coming soon';
+
+  @override
+  String get etfFundDetailInfoTitle => 'FUND INFO';
+
+  @override
+  String get etfFundDetailCreatedLabel => 'Created';
+
+  @override
+  String get etfFundDetailCreatorLabel => 'Fund Manager';
+
+  @override
+  String get etfFundDetailEmployeesLabel => 'Team';
+
+  @override
+  String get etfFundDetailEmployeesStub => 'No team members yet';
 
   @override
   String get etfSectorTechnology => 'Technology';

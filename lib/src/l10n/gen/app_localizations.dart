@@ -11098,7 +11098,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfFundDetailHoldingsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Holdings'**
+  /// **'HOLDINGS'**
   String get etfFundDetailHoldingsTitle;
 
   /// No description provided for @etfFundDetailHoldingsEmpty.
@@ -11158,26 +11158,68 @@ abstract class AppLocalizations {
   /// No description provided for @etfFundDetailSectorsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sectors'**
+  /// **'SECTORS'**
   String get etfFundDetailSectorsTitle;
 
   /// No description provided for @etfFundDetailStrategyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Strategy'**
+  /// **'STRATEGY'**
   String get etfFundDetailStrategyTitle;
 
   /// No description provided for @etfFundDetailDescriptionTitle.
   ///
   /// In en, this message translates to:
-  /// **'About'**
+  /// **'ABOUT'**
   String get etfFundDetailDescriptionTitle;
 
   /// No description provided for @etfFundDetailNavHistoryTitle.
   ///
   /// In en, this message translates to:
-  /// **'NAV History'**
+  /// **'NAV HISTORY'**
   String get etfFundDetailNavHistoryTitle;
+
+  /// No description provided for @etfFundDetailHoldingsCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Companies in Fund'**
+  String get etfFundDetailHoldingsCountLabel;
+
+  /// No description provided for @etfFundDetailInvestmentsStubNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund investing is coming soon'**
+  String get etfFundDetailInvestmentsStubNote;
+
+  /// No description provided for @etfFundDetailInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FUND INFO'**
+  String get etfFundDetailInfoTitle;
+
+  /// No description provided for @etfFundDetailCreatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get etfFundDetailCreatedLabel;
+
+  /// No description provided for @etfFundDetailCreatorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund Manager'**
+  String get etfFundDetailCreatorLabel;
+
+  /// No description provided for @etfFundDetailEmployeesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get etfFundDetailEmployeesLabel;
+
+  /// No description provided for @etfFundDetailEmployeesStub.
+  ///
+  /// In en, this message translates to:
+  /// **'No team members yet'**
+  String get etfFundDetailEmployeesStub;
 
   /// No description provided for @etfSectorTechnology.
   ///

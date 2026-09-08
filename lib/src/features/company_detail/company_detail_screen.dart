@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../core/cache/security_type_cache.dart';
+import '../../shared/services/finnhub_service.dart' show isEtfSecurityType;
 import '../../core/cache/sector_providers.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
@@ -666,6 +668,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                   : l10n.companyDetailChangeLabel,
               fsScore: scoreData['financial_score'] as int?,
               palette: palette,
+              isEtf: isEtfSecurityType(securityTypeCache[symbol]),
             ),
             const SizedBox(height: 16),
           ],

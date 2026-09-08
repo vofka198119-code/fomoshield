@@ -59,6 +59,10 @@ class PriceHeader extends StatelessWidget {
   // instead of showing something fake or misleadingly real.
   final bool showSessionLabel;
   final AppPalette palette;
+  // True for a symbol the user reached with a known ETF/ETP type (see
+  // core/cache/security_type_cache.dart) — shows "ETF" in the sector
+  // badge's slot instead, since resolveGicsSector never classifies these.
+  final bool isEtf;
 
   const PriceHeader({
     super.key,
@@ -77,6 +81,7 @@ class PriceHeader extends StatelessWidget {
     this.phaseGlow = false,
     this.showSessionLabel = true,
     required this.palette,
+    this.isEtf = false,
   });
 
   @override
@@ -156,7 +161,7 @@ class PriceHeader extends StatelessWidget {
                           color: palette.onWindow ?? Colors.white,
                         ),
                       ),
-                      if (sector != null) ...[
+                      if (sector != null || isEtf) ...[
                         const SizedBox(height: 6),
                         themedBorder(
                           palette: palette,
@@ -174,9 +179,11 @@ class PriceHeader extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              sector.localizedLabel(
-                                AppLocalizations.of(context)!,
-                              ),
+                              isEtf
+                                  ? 'ETF'
+                                  : sector!.localizedLabel(
+                                      AppLocalizations.of(context)!,
+                                    ),
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
@@ -255,21 +262,7 @@ class PriceHeader extends StatelessWidget {
                   const SizedBox(width: 10),
                   // FS Score gauge — duplicates FinancialScoreWidget's
                   // circle so the score is visible without scrolling down.
-                  Expanded(
-                    flex: 3,
-                    child: fsScore == null
-                        ? Container(
-                            decoration: BoxDecoration(
-                              gradient: palette.windowGradient,
-                              color: palette.windowGradient == null
-                                  ? Colors.white
-                                  : null,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: ThemeV2.divider),
-                            ),
-                          )
-                        : _fsScoreCell(l10n, fsScore!),
-                  ),
+                  Expanded(flex: 3, child: _fsScoreCell(l10n, fsScore)),
                 ],
               ],
             ),
@@ -291,9 +284,15 @@ class PriceHeader extends StatelessWidget {
   Color get _accentColor => palette.marketClockAccent ?? dialBrassLight;
 
   // Green-gradient card duplicating FinancialScoreWidget's circular gauge,
-  // so the score is visible right at the top without scrolling down.
-  Widget _fsScoreCell(AppLocalizations l10n, int score) {
-    final color = _gaugeColor(score);
+  // so the score is visible right at the top without scrolling down. Null
+  // renders a muted dash in the same frame instead of an empty box — Fund
+  // Detail passes null permanently (FS Score has no meaning for a fund
+  // yet), so this needs to read as a deliberate placeholder, not a blank
+  // loading state.
+  Widget _fsScoreCell(AppLocalizations l10n, int? score) {
+    final color = score == null
+        ? (palette.onWindow ?? Colors.white).withValues(alpha: 0.5)
+        : _gaugeColor(score);
 
     // Manually gated rather than CardFrame — this cell's inner Column has
     // an Expanded (the gauge circle fills the cell's own bounded height),
@@ -363,7 +362,7 @@ class PriceHeader extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          '$score',
+                          score == null ? '—' : '$score',
                           style: GoogleFonts.inter(
                             fontSize: 24,
                             fontWeight: FontWeight.w900,

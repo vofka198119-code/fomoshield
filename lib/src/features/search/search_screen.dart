@@ -460,28 +460,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ),
                   child: CompanyLogo(ticker: symbol, radius: 22),
                 ),
-                title: Row(
+                title: Text(
+                  name,
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textHeader,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Row(
                   children: [
                     Text(
                       symbol,
                       style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: palette.textHeader,
+                        fontSize: 12,
+                        color: palette.textBody,
                       ),
                     ),
                     const SizedBox(width: 6),
                     ExchangeBadge(symbol: symbol, type: type),
                   ],
-                ),
-                subtitle: Text(
-                  name,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: palette.textBody,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
