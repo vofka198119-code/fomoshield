@@ -46,8 +46,11 @@ extension ChartPeriodExt on ChartPeriod {
     final now = DateTime.now();
     switch (this) {
       case ChartPeriod.day1:
+        // Widened past a literal 24h so weekends/holidays still reach
+        // back to the last actual trading session — _trimToLastSession
+        // then cuts this down to just that session's points.
         return (
-          now.subtract(const Duration(days: 1)).millisecondsSinceEpoch ~/ 1000,
+          now.subtract(const Duration(days: 5)).millisecondsSinceEpoch ~/ 1000,
           '5',
         );
       case ChartPeriod.week1:
@@ -164,12 +167,16 @@ class _PriceChartState extends ConsumerState<PriceChart> {
         return;
       }
 
+      final trimmed = _selectedPeriod == ChartPeriod.day1
+          ? _trimToLastSession(data)
+          : data;
+
       setState(() {
-        _candleData = data;
+        _candleData = trimmed;
         _isLoading = false;
       });
 
-      final closes = _parseCloses(data);
+      final closes = _parseCloses(trimmed);
       if (closes.length >= 2) {
         final periodChange = closes.last - closes.first;
         final periodChangePercent = closes.first != 0
@@ -662,5 +669,40 @@ class _PriceChartState extends ConsumerState<PriceChart> {
     final t = data['t'];
     if (t is List) return t.map((e) => (e as num).toInt()).toList();
     return [];
+  }
+
+  /// The "1D" request window is widened to 5 days so it still reaches the
+  /// last trading session across weekends/holidays (see toApiParams) — this
+  /// then cuts the result back down to just the points that share the last
+  /// point's local calendar date, so the chart shows one session, not a
+  /// blurred mix of today's partial session plus a prior day's.
+  Map<String, dynamic> _trimToLastSession(Map<String, dynamic> data) {
+    final t = data['t'];
+    if (t is! List || t.isEmpty) return data;
+    final timestamps = t.map((e) => (e as num).toInt()).toList();
+    final lastDate = DateTime.fromMillisecondsSinceEpoch(
+      timestamps.last * 1000,
+    );
+    bool sameDay(int unixSeconds) {
+      final d = DateTime.fromMillisecondsSinceEpoch(unixSeconds * 1000);
+      return d.year == lastDate.year &&
+          d.month == lastDate.month &&
+          d.day == lastDate.day;
+    }
+
+    final keepIndices = <int>[
+      for (var i = 0; i < timestamps.length; i++)
+        if (sameDay(timestamps[i])) i,
+    ];
+    if (keepIndices.length == timestamps.length) return data;
+
+    final result = Map<String, dynamic>.from(data);
+    for (final key in ['t', 'c', 'o', 'h', 'l', 'v']) {
+      final list = data[key];
+      if (list is List) {
+        result[key] = [for (final i in keepIndices) list[i]];
+      }
+    }
+    return result;
   }
 }
