@@ -10972,8 +10972,26 @@ abstract class AppLocalizations {
   /// No description provided for @etfCreateFundCapitalLabel.
   ///
   /// In en, this message translates to:
-  /// **'Starting Capital (up to \$150,000)'**
+  /// **'Starting Capital'**
   String get etfCreateFundCapitalLabel;
+
+  /// No description provided for @etfCreateFundCapitalFixedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This amount is credited to your fund automatically when it\'s created.'**
+  String get etfCreateFundCapitalFixedNote;
+
+  /// No description provided for @etfCreateFundTickerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticker'**
+  String get etfCreateFundTickerLabel;
+
+  /// No description provided for @etfCreateFundTickerPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Appears once you enter a fund name'**
+  String get etfCreateFundTickerPlaceholder;
 
   /// No description provided for @etfCreateFundSubmitButton.
   ///

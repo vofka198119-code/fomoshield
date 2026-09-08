@@ -21,8 +21,54 @@ import '../services/fund_api_service.dart';
 // immediate feedback, the server is still the source of truth.
 // ---------------------------------------------------------------------------
 
-const double _maxStartingCapital = 150000;
+// Starting capital is a flat rule for every fund now, not a user choice —
+// see _CreateFundScreenState's own doc note above the capital section.
+const double _fixedStartingCapital = 150000;
 final _nameEnglishOnly = RegExp(r"^[A-Za-z0-9 .,&'-]+$");
+// Same character class as _nameEnglishOnly but unanchored, for a
+// character-level TextInputFormatter — silently drops anything outside it
+// (Cyrillic included) the instant it's typed, rather than letting it in
+// and only complaining on submit. Belt-and-suspenders with the
+// TextInputType.visiblePassword hint below (which nudges most on-screen
+// keyboards, Gboard included, to a plain Latin layout with no IME
+// suggestions) — neither alone is a real guarantee across every keyboard,
+// together they are for the actual character stream.
+final _nameAllowedChars = RegExp(r"[A-Za-z0-9 .,&'-]");
+
+// ---------------------------------------------------------------------------
+// Ticker preview — mirrors scanco-backend's fundService.js exactly
+// (TICKER_PREFIX + abbreviateName), so what the user sees while typing the
+// name is the real base ticker the server will assign. The server is still
+// the only source of truth for the FINAL ticker: generateUniqueTicker()
+// there appends a numeric suffix on collision (rare — same-initials name),
+// which this preview can't know about without a network round trip per
+// keystroke. That's fine — the user lands on the fund's own detail screen
+// immediately after creation and sees whatever ticker actually got
+// assigned. This is a preview, not a reservation.
+// ---------------------------------------------------------------------------
+const _tickerPrefix = 'FS';
+const _maxTickerAbbreviationLength = 6;
+
+String _previewTicker(String name) {
+  final initials = name
+      .split(RegExp(r'\s+'))
+      .map((word) {
+        final letters = word.replaceAll(RegExp(r'[^A-Za-z]'), '');
+        return letters.isEmpty ? '' : letters[0];
+      })
+      .where((c) => c.isNotEmpty)
+      .join()
+      .toUpperCase();
+  final abbreviation = initials.isEmpty
+      ? 'FUND'
+      : initials.substring(
+          0,
+          initials.length > _maxTickerAbbreviationLength
+              ? _maxTickerAbbreviationLength
+              : initials.length,
+        );
+  return '$_tickerPrefix$abbreviation';
+}
 
 class CreateFundScreen extends ConsumerStatefulWidget {
   const CreateFundScreen({super.key});
@@ -36,7 +82,6 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _strategyController = TextEditingController();
-  final _capitalController = TextEditingController(text: '150000');
   final Set<String> _selectedSectors = {};
   bool _submitting = false;
   // Server-only validation errors (things a client-side validator can't
@@ -50,7 +95,6 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _strategyController.dispose();
-    _capitalController.dispose();
     super.dispose();
   }
 
@@ -77,7 +121,7 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                 ? null
                 : _strategyController.text.trim(),
             sectors: _selectedSectors.toList(),
-            startingCapital: double.parse(_capitalController.text),
+            startingCapital: _fixedStartingCapital,
           );
       ref.invalidate(fundsListProvider);
       if (!mounted) return;
@@ -125,22 +169,35 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
     }
   }
 
+  // A real header above each field, not a floating labelText shrunk into
+  // the field itself — the small floating label read as unclear/hard to
+  // read at a glance (found live 2026-09-08). Same weight/size as the
+  // Sectors section's own label further down, so every field in this form
+  // now shares one header style.
+  Widget _fieldHeader(AppPalette palette, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: palette.textHeader,
+        ),
+      ),
+    );
+  }
+
   // filled: false is required here — the app-wide InputDecorationTheme
   // (theme_v2.dart) defaults every text field to filled:true with an
   // opaque WHITE fillColor. Without this override, that white fill paints
   // straight over _fieldWrapper's own themed Container background,
   // making every field look flat white regardless of theme (found live
   // 2026-09-06 on Luxury Gold — fields looked "very white").
-  InputDecoration _decoration(
-    AppPalette palette,
-    String label, {
-    String? hint,
-  }) {
+  InputDecoration _decoration(AppPalette palette, {String? hint}) {
     return InputDecoration(
       filled: false,
-      labelText: label,
       hintText: hint,
-      labelStyle: GoogleFonts.inter(color: palette.textHeader, fontSize: 13),
       hintStyle: GoogleFonts.inter(
         color: palette.textHeader.withValues(alpha: 0.5),
         fontSize: 13,
@@ -237,6 +294,7 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
             child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
+                _fieldHeader(palette, l10n.etfCreateFundNameLabel),
                 _fieldWrapper(
                   palette,
                   hasError: _serverNameError != null,
@@ -244,9 +302,24 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                     controller: _nameController,
                     maxLength: 60,
                     style: GoogleFonts.inter(color: palette.textHeader),
+                    // visiblePassword nudges most on-screen keyboards
+                    // (Gboard included) to a plain Latin layout with no
+                    // IME word suggestions — combined with the
+                    // character-level inputFormatters below (the real
+                    // guarantee), a Cyrillic keypress never actually lands
+                    // in this field instead of being typed and only
+                    // rejected on submit. Found live 2026-09-08: nothing
+                    // stopped Russian input before this.
+                    keyboardType: TextInputType.visiblePassword,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(_nameAllowedChars),
+                    ],
                     // Clears a stale server-side error (e.g. "name taken")
                     // the moment the user edits the name — otherwise it'd
                     // linger and show as still-invalid even after a fix.
+                    // Also drives the ticker preview below via
+                    // ValueListenableBuilder on the same controller, so no
+                    // separate setState wiring is needed for that.
                     onChanged: (_) {
                       if (_serverNameError != null) {
                         setState(() => _serverNameError = null);
@@ -254,7 +327,6 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                     },
                     decoration: _decoration(
                       palette,
-                      l10n.etfCreateFundNameLabel,
                       hint: l10n.etfCreateFundNameHint,
                     ),
                     validator: (value) {
@@ -268,6 +340,35 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                     },
                   ),
                 ),
+                _fieldHeader(palette, l10n.etfCreateFundTickerLabel),
+                _fieldWrapper(
+                  palette,
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _nameController,
+                    builder: (context, value, _) {
+                      final name = value.text.trim();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          name.isEmpty
+                              ? l10n.etfCreateFundTickerPlaceholder
+                              : _previewTicker(name),
+                          style: GoogleFonts.inter(
+                            color: name.isEmpty
+                                ? palette.textHeader.withValues(alpha: 0.5)
+                                : palette.accentPrimary,
+                            fontWeight: name.isEmpty
+                                ? FontWeight.w400
+                                : FontWeight.w800,
+                            fontSize: name.isEmpty ? 13 : 15,
+                            letterSpacing: name.isEmpty ? 0 : 1,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                _fieldHeader(palette, l10n.etfCreateFundDescriptionLabel),
                 _fieldWrapper(
                   palette,
                   TextFormField(
@@ -275,12 +376,10 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                     maxLines: 3,
                     maxLength: 500,
                     style: GoogleFonts.inter(color: palette.textHeader),
-                    decoration: _decoration(
-                      palette,
-                      l10n.etfCreateFundDescriptionLabel,
-                    ),
+                    decoration: _decoration(palette),
                   ),
                 ),
+                _fieldHeader(palette, l10n.etfCreateFundStrategyLabel),
                 _fieldWrapper(
                   palette,
                   TextFormField(
@@ -288,32 +387,39 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                     maxLines: 3,
                     maxLength: 500,
                     style: GoogleFonts.inter(color: palette.textHeader),
-                    decoration: _decoration(
-                      palette,
-                      l10n.etfCreateFundStrategyLabel,
-                    ),
+                    decoration: _decoration(palette),
                   ),
                 ),
+                _fieldHeader(palette, l10n.etfCreateFundCapitalLabel),
                 _fieldWrapper(
                   palette,
-                  TextFormField(
-                    controller: _capitalController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: false,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      children: [
+                        Text(
+                          // Fixed value, formatted as a literal rather than
+                          // computed — not worth pulling in intl's
+                          // NumberFormat for one constant.
+                          '\$150,000',
+                          style: GoogleFonts.inter(
+                            color: palette.textHeader,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            l10n.etfCreateFundCapitalFixedNote,
+                            style: GoogleFonts.inter(
+                              color: palette.textHeader.withValues(alpha: 0.6),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    style: GoogleFonts.inter(color: palette.textHeader),
-                    decoration: _decoration(
-                      palette,
-                      l10n.etfCreateFundCapitalLabel,
-                    ),
-                    validator: (value) {
-                      final v = double.tryParse(value ?? '');
-                      if (v == null || v <= 0 || v > _maxStartingCapital) {
-                        return l10n.etfCreateFundCapitalLabel;
-                      }
-                      return null;
-                    },
                   ),
                 ),
                 const SizedBox(height: 4),

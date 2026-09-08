@@ -6494,7 +6494,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfCreateFundSectorsLabel => 'Sectors';
 
   @override
-  String get etfCreateFundCapitalLabel => 'Starting Capital (up to \$150,000)';
+  String get etfCreateFundCapitalLabel => 'Starting Capital';
+
+  @override
+  String get etfCreateFundCapitalFixedNote =>
+      'This amount is credited to your fund automatically when it\'s created.';
+
+  @override
+  String get etfCreateFundTickerLabel => 'Ticker';
+
+  @override
+  String get etfCreateFundTickerPlaceholder =>
+      'Appears once you enter a fund name';
 
   @override
   String get etfCreateFundSubmitButton => 'Create Fund';

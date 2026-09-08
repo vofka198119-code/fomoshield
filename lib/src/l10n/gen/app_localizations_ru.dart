@@ -6516,7 +6516,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfCreateFundSectorsLabel => 'Секторы';
 
   @override
-  String get etfCreateFundCapitalLabel => 'Стартовый капитал (до \$150 000)';
+  String get etfCreateFundCapitalLabel => 'Стартовый капитал';
+
+  @override
+  String get etfCreateFundCapitalFixedNote =>
+      'Эта сумма автоматически зачисляется на счёт фонда при создании.';
+
+  @override
+  String get etfCreateFundTickerLabel => 'Тикер';
+
+  @override
+  String get etfCreateFundTickerPlaceholder =>
+      'Появится после ввода названия фонда';
 
   @override
   String get etfCreateFundSubmitButton => 'Создать фонд';
