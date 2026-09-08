@@ -6526,8 +6526,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfCreateFundTickerLabel => 'Тикер';
 
   @override
-  String get etfCreateFundTickerPlaceholder =>
-      'Появится после ввода названия фонда';
+  String get etfCreateFundTickerTakenError =>
+      'Фонд с таким тикером уже существует';
+
+  @override
+  String get etfCreateFundTickerInvalidError =>
+      'Тикер должен быть от 1 до 5 букв после FS';
 
   @override
   String get etfCreateFundSubmitButton => 'Создать фонд';

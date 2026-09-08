@@ -6504,8 +6504,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfCreateFundTickerLabel => 'Ticker';
 
   @override
-  String get etfCreateFundTickerPlaceholder =>
-      'Appears once you enter a fund name';
+  String get etfCreateFundTickerTakenError =>
+      'A fund with this ticker already exists';
+
+  @override
+  String get etfCreateFundTickerInvalidError =>
+      'Ticker must be 1-5 letters after FS';
 
   @override
   String get etfCreateFundSubmitButton => 'Create Fund';

@@ -78,6 +78,7 @@ class FundApiService {
 
   Future<Fund> createFund({
     required String name,
+    required String ticker,
     String? description,
     String? strategy,
     required List<String> sectors,
@@ -88,6 +89,7 @@ class FundApiService {
         '/funds',
         data: {
           'name': name,
+          'ticker': ticker,
           'description': description,
           'strategy': strategy,
           'sectors': sectors,

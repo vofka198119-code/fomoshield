@@ -36,20 +36,27 @@ final _nameEnglishOnly = RegExp(r"^[A-Za-z0-9 .,&'-]+$");
 final _nameAllowedChars = RegExp(r"[A-Za-z0-9 .,&'-]");
 
 // ---------------------------------------------------------------------------
-// Ticker preview — mirrors scanco-backend's fundService.js exactly
-// (TICKER_PREFIX + abbreviateName), so what the user sees while typing the
-// name is the real base ticker the server will assign. The server is still
-// the only source of truth for the FINAL ticker: generateUniqueTicker()
-// there appends a numeric suffix on collision (rare — same-initials name),
-// which this preview can't know about without a network round trip per
-// keystroke. That's fine — the user lands on the fund's own detail screen
-// immediately after creation and sees whatever ticker actually got
-// assigned. This is a preview, not a reservation.
+// Ticker — user-chosen, not auto-generated. FS is a fixed, non-editable
+// prefix (locked in the UI, re-checked server-side); the user types 1-5
+// more uppercase letters. Was auto-generated from the name with a numeric
+// suffix tacked on for any collision (e.g. a second "FSTGF" silently
+// became "FSTGF2") — confirmed live 2026-09-08 that landing an unexpected
+// digit on a ticker the user didn't choose read as broken, not helpful.
+// Same "taken" rejection the name field already uses instead: server
+// checks uniqueness and returns 'ticker_taken' rather than ever mutating
+// what was typed.
+//
+// Still auto-SUGGESTS a starting point from the name (initials, same
+// algorithm fundService.js's old auto-generator used) so most funds don't
+// need to think one up from scratch — but only until the user actually
+// edits the ticker field themselves (_tickerManuallyEdited below), same
+// "auto-fill a slug until touched" pattern common in web forms.
 // ---------------------------------------------------------------------------
 const _tickerPrefix = 'FS';
-const _maxTickerAbbreviationLength = 6;
+const _maxTickerSuffixLength = 5;
+final _tickerSuffixAllowedChars = RegExp('[A-Za-z]');
 
-String _previewTicker(String name) {
+String _suggestedTickerSuffix(String name) {
   final initials = name
       .split(RegExp(r'\s+'))
       .map((word) {
@@ -59,15 +66,10 @@ String _previewTicker(String name) {
       .where((c) => c.isNotEmpty)
       .join()
       .toUpperCase();
-  final abbreviation = initials.isEmpty
-      ? 'FUND'
-      : initials.substring(
-          0,
-          initials.length > _maxTickerAbbreviationLength
-              ? _maxTickerAbbreviationLength
-              : initials.length,
-        );
-  return '$_tickerPrefix$abbreviation';
+  if (initials.isEmpty) return '';
+  return initials.length > _maxTickerSuffixLength
+      ? initials.substring(0, _maxTickerSuffixLength)
+      : initials;
 }
 
 class CreateFundScreen extends ConsumerStatefulWidget {
@@ -80,19 +82,26 @@ class CreateFundScreen extends ConsumerStatefulWidget {
 class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _tickerSuffixController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _strategyController = TextEditingController();
   final Set<String> _selectedSectors = {};
   bool _submitting = false;
+  // Stops the name->ticker auto-suggest once the user has typed into the
+  // ticker field themselves — see _suggestedTickerSuffix's own doc comment.
+  bool _tickerManuallyEdited = false;
   // Server-only validation errors (things a client-side validator can't
-  // know, like name uniqueness) — fed into the name field's own validator
-  // below so Flutter highlights it exactly like any other invalid field,
-  // rather than a plain SnackBar with no indication of which input is wrong.
+  // know, like name/ticker uniqueness) — fed into each field's own
+  // validator below so Flutter highlights it exactly like any other
+  // invalid field, rather than a plain SnackBar with no indication of
+  // which input is wrong.
   String? _serverNameError;
+  String? _serverTickerError;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _tickerSuffixController.dispose();
     _descriptionController.dispose();
     _strategyController.dispose();
     super.dispose();
@@ -114,6 +123,7 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
           .read(fundApiServiceProvider)
           .createFund(
             name: _nameController.text.trim(),
+            ticker: '$_tickerPrefix${_tickerSuffixController.text.trim()}',
             description: _descriptionController.text.trim().isEmpty
                 ? null
                 : _descriptionController.text.trim(),
@@ -139,6 +149,19 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
         case 'name_not_english':
           setState(
             () => _serverNameError = l10n.etfCreateFundNameEnglishOnlyError,
+          );
+          _formKey.currentState!.validate();
+          break;
+        case 'ticker_taken':
+          setState(
+            () => _serverTickerError = l10n.etfCreateFundTickerTakenError,
+          );
+          _formKey.currentState!.validate();
+          break;
+        case 'ticker_invalid':
+        case 'ticker_required':
+          setState(
+            () => _serverTickerError = l10n.etfCreateFundTickerInvalidError,
           );
           _formKey.currentState!.validate();
           break;
@@ -317,12 +340,17 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                     // Clears a stale server-side error (e.g. "name taken")
                     // the moment the user edits the name — otherwise it'd
                     // linger and show as still-invalid even after a fix.
-                    // Also drives the ticker preview below via
-                    // ValueListenableBuilder on the same controller, so no
-                    // separate setState wiring is needed for that.
-                    onChanged: (_) {
+                    // Also re-suggests the ticker suffix, but only until
+                    // the user has edited that field themselves — see
+                    // _suggestedTickerSuffix's own doc comment.
+                    onChanged: (value) {
                       if (_serverNameError != null) {
                         setState(() => _serverNameError = null);
+                      }
+                      if (!_tickerManuallyEdited) {
+                        _tickerSuffixController.text = _suggestedTickerSuffix(
+                          value,
+                        );
                       }
                     },
                     decoration: _decoration(
@@ -343,29 +371,67 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
                 _fieldHeader(palette, l10n.etfCreateFundTickerLabel),
                 _fieldWrapper(
                   palette,
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: _nameController,
-                    builder: (context, value, _) {
-                      final name = value.text.trim();
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(
-                          name.isEmpty
-                              ? l10n.etfCreateFundTickerPlaceholder
-                              : _previewTicker(name),
-                          style: GoogleFonts.inter(
-                            color: name.isEmpty
-                                ? palette.textHeader.withValues(alpha: 0.5)
-                                : palette.accentPrimary,
-                            fontWeight: name.isEmpty
-                                ? FontWeight.w400
-                                : FontWeight.w800,
-                            fontSize: name.isEmpty ? 13 : 15,
-                            letterSpacing: name.isEmpty ? 0 : 1,
-                          ),
+                  hasError: _serverTickerError != null,
+                  Row(
+                    children: [
+                      // FS is fixed — shown inline, never editable. Server
+                      // re-validates this prefix regardless (see
+                      // fundService.js's TICKER_PATTERN), this is just the
+                      // UI reflecting that it's not a real choice.
+                      Text(
+                        _tickerPrefix,
+                        style: GoogleFonts.inter(
+                          color: palette.textHeader.withValues(alpha: 0.5),
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          letterSpacing: 1,
                         ),
-                      );
-                    },
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _tickerSuffixController,
+                          maxLength: _maxTickerSuffixLength,
+                          style: GoogleFonts.inter(
+                            color: palette.accentPrimary,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                            letterSpacing: 1,
+                          ),
+                          textCapitalization: TextCapitalization.characters,
+                          keyboardType: TextInputType.visiblePassword,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                              _tickerSuffixAllowedChars,
+                            ),
+                            TextInputFormatter.withFunction(
+                              (oldValue, newValue) => newValue.copyWith(
+                                text: newValue.text.toUpperCase(),
+                              ),
+                            ),
+                          ],
+                          onChanged: (_) {
+                            _tickerManuallyEdited = true;
+                            if (_serverTickerError != null) {
+                              setState(() => _serverTickerError = null);
+                            }
+                          },
+                          decoration: _decoration(
+                            palette,
+                            hint: 'TGF',
+                          ).copyWith(counterText: ''),
+                          validator: (value) {
+                            final v = (value ?? '').trim();
+                            if (v.isEmpty) {
+                              return l10n.etfCreateFundTickerInvalidError;
+                            }
+                            if (_serverTickerError != null) {
+                              return _serverTickerError;
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 _fieldHeader(palette, l10n.etfCreateFundDescriptionLabel),

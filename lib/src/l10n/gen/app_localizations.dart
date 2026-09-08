@@ -10987,11 +10987,17 @@ abstract class AppLocalizations {
   /// **'Ticker'**
   String get etfCreateFundTickerLabel;
 
-  /// No description provided for @etfCreateFundTickerPlaceholder.
+  /// No description provided for @etfCreateFundTickerTakenError.
   ///
   /// In en, this message translates to:
-  /// **'Appears once you enter a fund name'**
-  String get etfCreateFundTickerPlaceholder;
+  /// **'A fund with this ticker already exists'**
+  String get etfCreateFundTickerTakenError;
+
+  /// No description provided for @etfCreateFundTickerInvalidError.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticker must be 1-5 letters after FS'**
+  String get etfCreateFundTickerInvalidError;
 
   /// No description provided for @etfCreateFundSubmitButton.
   ///
