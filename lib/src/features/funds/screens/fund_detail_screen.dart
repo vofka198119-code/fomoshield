@@ -6,11 +6,13 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
+import '../../../core/supabase/supabase_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/fund.dart';
 import '../providers/fund_providers.dart';
 import '../sector_labels.dart';
+import '../widgets/fund_delete_dialog.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Detail — ETF Fund Emulation, Phase 1. Live on-demand NAV/holdings via
@@ -44,6 +46,19 @@ class FundDetailScreen extends ConsumerWidget {
           ),
           orElse: () => const SizedBox.shrink(),
         ),
+        actions: [
+          fundAsync.maybeWhen(
+            data: (fund) =>
+                fund.headUserId == ref.watch(currentUserProvider)?.id
+                ? IconButton(
+                    icon: Icon(Icons.delete_outline, color: palette.textBody),
+                    onPressed: () =>
+                        showFundDeleteFlow(context, ref, fund.id, palette),
+                  )
+                : const SizedBox.shrink(),
+            orElse: () => const SizedBox.shrink(),
+          ),
+        ],
       ),
       body: SafeArea(
         child: fundAsync.when(

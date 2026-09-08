@@ -118,6 +118,14 @@ class FundApiService {
     }
   }
 
+  Future<void> deleteFund(String id) async {
+    try {
+      await _dio.delete('/funds/$id');
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to delete fund'));
+    }
+  }
+
   Future<FundDetail> getFundDetail(String id) async {
     try {
       final response = await _dio.get('/funds/$id');

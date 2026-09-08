@@ -11107,6 +11107,54 @@ abstract class AppLocalizations {
   /// **'No holdings yet'**
   String get etfFundDetailHoldingsEmpty;
 
+  /// No description provided for @etfFundDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this fund?'**
+  String get etfFundDeleteConfirmTitle;
+
+  /// No description provided for @etfFundDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This starts the fund deletion process.'**
+  String get etfFundDeleteConfirmBody;
+
+  /// No description provided for @etfFundDeleteConfirmYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, continue'**
+  String get etfFundDeleteConfirmYes;
+
+  /// No description provided for @etfFundDeleteFinalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure?'**
+  String get etfFundDeleteFinalTitle;
+
+  /// No description provided for @etfFundDeleteFinalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes the fund and all its data. This cannot be undone. You can create a new fund afterward.'**
+  String get etfFundDeleteFinalBody;
+
+  /// No description provided for @etfFundDeleteFinalConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete fund'**
+  String get etfFundDeleteFinalConfirm;
+
+  /// No description provided for @etfFundDeleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund deleted'**
+  String get etfFundDeleteSuccess;
+
+  /// No description provided for @etfCreateFundLimitReachedError.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have a fund'**
+  String get etfCreateFundLimitReachedError;
+
   /// No description provided for @etfFundDetailSectorsTitle.
   ///
   /// In en, this message translates to:

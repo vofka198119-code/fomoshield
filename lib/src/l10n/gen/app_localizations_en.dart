@@ -6571,6 +6571,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundDetailHoldingsEmpty => 'No holdings yet';
 
   @override
+  String get etfFundDeleteConfirmTitle => 'Delete this fund?';
+
+  @override
+  String get etfFundDeleteConfirmBody =>
+      'This starts the fund deletion process.';
+
+  @override
+  String get etfFundDeleteConfirmYes => 'Yes, continue';
+
+  @override
+  String get etfFundDeleteFinalTitle => 'Are you sure?';
+
+  @override
+  String get etfFundDeleteFinalBody =>
+      'This permanently deletes the fund and all its data. This cannot be undone. You can create a new fund afterward.';
+
+  @override
+  String get etfFundDeleteFinalConfirm => 'Delete fund';
+
+  @override
+  String get etfFundDeleteSuccess => 'Fund deleted';
+
+  @override
+  String get etfCreateFundLimitReachedError => 'You already have a fund';
+
+  @override
   String get etfFundDetailSectorsTitle => 'Sectors';
 
   @override

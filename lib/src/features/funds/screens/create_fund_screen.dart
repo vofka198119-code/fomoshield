@@ -171,6 +171,11 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
             SnackBar(content: Text(l10n.etfCreateFundSelectAtLeastOneSector)),
           );
           break;
+        case 'fund_limit_reached':
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.etfCreateFundLimitReachedError)),
+          );
+          break;
         default:
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

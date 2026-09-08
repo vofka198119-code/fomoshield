@@ -6593,6 +6593,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfFundDetailHoldingsEmpty => 'Пока нет активов';
 
   @override
+  String get etfFundDeleteConfirmTitle => 'Удалить этот фонд?';
+
+  @override
+  String get etfFundDeleteConfirmBody => 'Это запустит процесс удаления фонда.';
+
+  @override
+  String get etfFundDeleteConfirmYes => 'Да, продолжить';
+
+  @override
+  String get etfFundDeleteFinalTitle => 'Вы уверены?';
+
+  @override
+  String get etfFundDeleteFinalBody =>
+      'Фонд и все его данные будут удалены навсегда. Это нельзя отменить. Позже вы сможете создать новый фонд.';
+
+  @override
+  String get etfFundDeleteFinalConfirm => 'Удалить фонд';
+
+  @override
+  String get etfFundDeleteSuccess => 'Фонд удалён';
+
+  @override
+  String get etfCreateFundLimitReachedError => 'У вас уже есть фонд';
+
+  @override
   String get etfFundDetailSectorsTitle => 'Секторы';
 
   @override
