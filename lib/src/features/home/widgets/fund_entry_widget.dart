@@ -8,6 +8,8 @@ import '../../../core/supabase/supabase_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../funds/onboarding/fund_onboarding_providers.dart';
+import '../../funds/providers/employee_providers.dart';
+import '../../funds/providers/fund_providers.dart';
 import '../../funds/widgets/etf_premium_required_sheet.dart';
 
 // ---------------------------------------------------------------------------
@@ -21,12 +23,29 @@ import '../../funds/widgets/etf_premium_required_sheet.dart';
 // per the author): a non-Premium user still gets to read what the feature
 // is and what it requires first — the paywall only shows once they'd
 // actually try to create a fund, not as the very first thing they see.
+//
+// Once a fund/profile already exists, both halves become a shortcut BACK
+// to it instead of the create/onboarding flow (fixed 2026-09-09 — before
+// this, tapping "Become a Fund Manager" a second time always pushed
+// '/funds/create', which the server would just reject with
+// 'fund_limit_reached' since the 1-fund-per-user cap was already hit; the
+// user had no other way to find their own fund again except digging
+// through the Search screen's Funds tab). Labels flip to match (see
+// _FundEntryPanel's title param below).
 // ---------------------------------------------------------------------------
 
 class FundEntryWidget extends ConsumerWidget {
   const FundEntryWidget({super.key});
 
-  Future<void> _handleHeadTap(BuildContext context, WidgetRef ref) async {
+  Future<void> _handleHeadTap(
+    BuildContext context,
+    WidgetRef ref,
+    String? myFundId,
+  ) async {
+    if (myFundId != null) {
+      context.push('/funds/$myFundId');
+      return;
+    }
     final seen = ref.read(fundOnboardingSeenProvider(FundOnboardingBranch.head));
     if (!seen) {
       final accepted = await context.push<bool>(
@@ -43,7 +62,21 @@ class FundEntryWidget extends ConsumerWidget {
     if (context.mounted) context.push('/funds/create');
   }
 
-  Future<void> _handleAnalystTap(BuildContext context, WidgetRef ref) async {
+  // Once a profile exists, this tile's daily job is "did anyone invite
+  // me" — not re-editing the profile (moved to Portfolio's own ⋮ menu,
+  // per the design doc's original "edited from the Portfolio card" call
+  // and the author's 2026-09-09 request). First-time-ever tap (no profile
+  // yet) still goes through onboarding into the create form, same as
+  // before.
+  Future<void> _handleAnalystTap(
+    BuildContext context,
+    WidgetRef ref,
+    bool hasProfile,
+  ) async {
+    if (hasProfile) {
+      context.push('/funds/invitations');
+      return;
+    }
     final seen =
         ref.read(fundOnboardingSeenProvider(FundOnboardingBranch.analyst));
     if (!seen) {
@@ -61,6 +94,15 @@ class FundEntryWidget extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final tier = ref.watch(subscriptionTierProvider);
+    final userId = ref.watch(currentUserProvider)?.id;
+    final myFundId = ref
+        .watch(fundsListProvider)
+        .valueOrNull
+        ?.where((f) => f.headUserId == userId)
+        .firstOrNull
+        ?.id;
+    final hasProfile =
+        ref.watch(myEmployeeProfileProvider).valueOrNull != null;
 
     return CardFrame(
       padding: const EdgeInsets.all(4),
@@ -71,11 +113,13 @@ class FundEntryWidget extends ConsumerWidget {
             Expanded(
               child: _FundEntryPanel(
                 icon: Icons.account_balance_rounded,
-                title: l10n.etfHomeCardTitleHead,
-                premiumTag: !tier.isPremiumOrAdmin,
+                title: myFundId != null
+                    ? l10n.etfHomeCardTitleMyFund
+                    : l10n.etfHomeCardTitleHead,
+                premiumTag: myFundId == null && !tier.isPremiumOrAdmin,
                 palette: palette,
                 l10n: l10n,
-                onTap: () => _handleHeadTap(context, ref),
+                onTap: () => _handleHeadTap(context, ref, myFundId),
               ),
             ),
             Container(
@@ -86,11 +130,13 @@ class FundEntryWidget extends ConsumerWidget {
             Expanded(
               child: _FundEntryPanel(
                 icon: Icons.badge_rounded,
-                title: l10n.etfHomeCardTitleAnalyst,
+                title: hasProfile
+                    ? l10n.etfHomeCardTitleVacancies
+                    : l10n.etfHomeCardTitleAnalyst,
                 premiumTag: false,
                 palette: palette,
                 l10n: l10n,
-                onTap: () => _handleAnalystTap(context, ref),
+                onTap: () => _handleAnalystTap(context, ref, hasProfile),
               ),
             ),
           ],

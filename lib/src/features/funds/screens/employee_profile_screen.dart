@@ -41,6 +41,14 @@ class _EmployeeProfileScreenState
   bool _availableForHire = true;
   bool _submitting = false;
   bool _loadedOnce = false;
+  // The form's own source of truth once loaded — a successful save updates
+  // this directly from saveMyProfile's response instead of relying on
+  // ref.invalidate(myEmployeeProfileProvider) to re-render the screen:
+  // invalidating alone would flash the whole screen back to a full-page
+  // loading spinner on every save (AsyncValue.when's loading branch has no
+  // memory of the data it just had), wiping the form and reading as
+  // "did my save even work?" — confirmed live 2026-09-09.
+  EmployeeProfile? _profile;
   String? _serverNicknameError;
   String? _serverBioError;
 
@@ -65,7 +73,7 @@ class _EmployeeProfileScreenState
 
     setState(() => _submitting = true);
     try {
-      await ref
+      final saved = await ref
           .read(employeeApiServiceProvider)
           .saveMyProfile(
             nickname: _nicknameController.text.trim(),
@@ -77,8 +85,15 @@ class _EmployeeProfileScreenState
                 : _languageController.text.trim(),
             availableForHire: _availableForHire,
           );
+      // Keeps the provider's cache correct for the next screen that reads
+      // it (e.g. reopening this screen later) without forcing a refetch
+      // right now — this screen already has the freshest data (`saved`).
       ref.invalidate(myEmployeeProfileProvider);
       if (!mounted) return;
+      setState(() {
+        _profile = saved;
+        _loadedOnce = true;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.etfEmployeeProfileSavedSnackbar)),
       );
@@ -352,6 +367,12 @@ class _EmployeeProfileScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    // Only consulted for the very FIRST load — once _loadedOnce flips true
+    // (either from this provider's own data arriving, or from a save),
+    // the form renders straight from local state below and never goes
+    // through AsyncValue.when's loading branch again, so a save (which
+    // does invalidate this provider, just for cache correctness) can never
+    // flash the whole screen back to a spinner.
     final profileAsync = ref.watch(myEmployeeProfileProvider);
 
     return Scaffold(
@@ -367,19 +388,24 @@ class _EmployeeProfileScreenState
         ),
       ),
       body: SafeArea(
-        child: profileAsync.when(
-          loading: () => Center(
-            child: CircularProgressIndicator(color: palette.accentPrimary),
-          ),
-          error: (_, _) => _buildForm(context, palette, l10n, null),
-          data: (profile) {
-            if (profile != null && !_loadedOnce) {
-              _loadedOnce = true;
-              _applyProfile(profile);
-            }
-            return _buildForm(context, palette, l10n, profile);
-          },
-        ),
+        child: _loadedOnce
+            ? _buildForm(context, palette, l10n, _profile)
+            : profileAsync.when(
+                loading: () => Center(
+                  child: CircularProgressIndicator(
+                    color: palette.accentPrimary,
+                  ),
+                ),
+                error: (_, _) => _buildForm(context, palette, l10n, null),
+                data: (profile) {
+                  _loadedOnce = true;
+                  if (profile != null) {
+                    _profile = profile;
+                    _applyProfile(profile);
+                  }
+                  return _buildForm(context, palette, l10n, _profile);
+                },
+              ),
       ),
     );
   }

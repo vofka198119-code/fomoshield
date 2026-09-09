@@ -1832,7 +1832,9 @@
   "etfPremiumRequiredTitle": "Нужна подписка Premium",
   "etfPremiumRequiredDescription": "Для создания и управления собственным фондом нужна подписка Premium.",
   "etfHomeCardTitleHead": "Стать управляющим фонда",
+  "etfHomeCardTitleMyFund": "Мой фонд",
   "etfHomeCardTitleAnalyst": "Стать инвестиционным помощником",
+  "etfHomeCardTitleVacancies": "Вакансии",
   "etfHomeCardPremiumTag": "Premium",
 
   "etfOnboardingStep1TitleHead": "Кто такой глава фонда?",

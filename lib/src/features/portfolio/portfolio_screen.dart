@@ -274,6 +274,21 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                 _showResetPortfolioDialog(context, portfolioId);
               },
             ),
+            // ETF Fund Emulation, Phase 3 — the design doc's own placement
+            // call ("анкета... редактируется из карточки Portfolio"),
+            // moved here from the Home entry tile (2026-09-09): once a
+            // profile already exists, that tile's practical daily use is
+            // checking invitations, not re-editing the profile — see
+            // fund_entry_widget.dart's own note on the same change.
+            row(
+              icon: Icons.badge_rounded,
+              color: isLuxury ? palette.accentPrimary : ThemeV2.primary,
+              label: l10n.etfEmployeeProfileTitle,
+              onTap: () {
+                Navigator.pop(sheetContext);
+                context.push('/funds/employee-profile');
+              },
+            ),
           ],
         ),
       ),

@@ -2594,7 +2594,9 @@
   "etfPremiumRequiredTitle": "Premium Required",
   "etfPremiumRequiredDescription": "Creating and managing your own fund requires a Premium subscription.",
   "etfHomeCardTitleHead": "Become a Fund Manager",
+  "etfHomeCardTitleMyFund": "My Fund",
   "etfHomeCardTitleAnalyst": "Become an Investment Assistant",
+  "etfHomeCardTitleVacancies": "Job Offers",
   "etfHomeCardPremiumTag": "Premium",
 
   "etfOnboardingStep1TitleHead": "Who Is a Fund Manager?",

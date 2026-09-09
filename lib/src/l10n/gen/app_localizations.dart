@@ -10831,11 +10831,23 @@ abstract class AppLocalizations {
   /// **'Become a Fund Manager'**
   String get etfHomeCardTitleHead;
 
+  /// No description provided for @etfHomeCardTitleMyFund.
+  ///
+  /// In en, this message translates to:
+  /// **'My Fund'**
+  String get etfHomeCardTitleMyFund;
+
   /// No description provided for @etfHomeCardTitleAnalyst.
   ///
   /// In en, this message translates to:
   /// **'Become an Investment Assistant'**
   String get etfHomeCardTitleAnalyst;
+
+  /// No description provided for @etfHomeCardTitleVacancies.
+  ///
+  /// In en, this message translates to:
+  /// **'Job Offers'**
+  String get etfHomeCardTitleVacancies;
 
   /// No description provided for @etfHomeCardPremiumTag.
   ///

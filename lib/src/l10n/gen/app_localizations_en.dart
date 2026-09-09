@@ -6419,7 +6419,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfHomeCardTitleHead => 'Become a Fund Manager';
 
   @override
+  String get etfHomeCardTitleMyFund => 'My Fund';
+
+  @override
   String get etfHomeCardTitleAnalyst => 'Become an Investment Assistant';
+
+  @override
+  String get etfHomeCardTitleVacancies => 'Job Offers';
 
   @override
   String get etfHomeCardPremiumTag => 'Premium';

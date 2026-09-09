@@ -6441,7 +6441,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfHomeCardTitleHead => 'Стать управляющим фонда';
 
   @override
+  String get etfHomeCardTitleMyFund => 'Мой фонд';
+
+  @override
   String get etfHomeCardTitleAnalyst => 'Стать инвестиционным помощником';
+
+  @override
+  String get etfHomeCardTitleVacancies => 'Вакансии';
 
   @override
   String get etfHomeCardPremiumTag => 'Premium';
