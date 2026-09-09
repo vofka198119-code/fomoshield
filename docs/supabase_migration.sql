@@ -794,11 +794,115 @@ $$;
 
 
 -- =============================================================================
--- F.O.M.O. Shield — Supabase Migration 016+ (RESERVED)
--- Feature: ETF Fund Emulation, Phases 3-8 — see docs/ETF_FUND_EMULATION.md.
--- Remaining tables (employee_profiles, fund_team_members, fund_invitations,
--- fund_trade_proposals, fund_transactions, fund_chat_messages, fund_meetings,
--- fund_meeting_invites, bot_investor_profiles, bot_investor_state,
--- fund_fee_ledger, manager_earnings_balance, fund_succession_events) are
--- written phase-by-phase as each phase is implemented, not upfront.
+-- F.O.M.O. Shield — Supabase Migration 016
+-- Tables: employee_profiles, fund_team_members, fund_invitations
+-- Column: funds.last_invite_message
+-- Feature: ETF Fund Emulation, Phase 3 — hiring marketplace, roles, résumé.
+-- See docs/ETF_FUND_EMULATION.md, "Ветка «Инвестиционный помощник»" /
+-- "Ветка «Глава фонда»" / "Роли и права сотрудников" sections.
+--
+-- employee_profiles is one row per user who has ever created an analyst
+-- profile (nickname/bio/language/availability, editable by the user) plus
+-- career-stats columns the ALGORITHM writes (approved/rejected proposal
+-- counts, funds-changed count, 1-10 rating) — these all start at zero/null
+-- here because Phase 4 (trade proposals) is what actually produces
+-- approved/rejected counts to compute a rating from; this migration only
+-- reserves the columns.
+--
+-- fund_team_members is the roster: one row per (fund, user) currently
+-- employed there. `role` is a starting permissions TEMPLATE, not a fixed
+-- restriction — the head can freely edit `permissions` per employee
+-- (fundTeamService.js's ROLE_PERMISSION_TEMPLATES seeds it at hire time).
+-- `status`/`termination_notice_at` implement the doc's 5-day termination
+-- notice (a head fires someone → status flips to pending_termination,
+-- notice period elapses → a periodic sweep job actually removes the row —
+-- never an instant DELETE).
+--
+-- fund_invitations is the envelope-invite flow: head sends one (with a
+-- role + message) to a specific user found via the employee marketplace,
+-- invitee accepts/declines. The partial unique index blocks a second
+-- pending invite to the same person from the same fund without blocking a
+-- new one after the first was resolved (accepted/declined/cancelled).
+--
+-- Public readability mirrors funds/fund_holdings (Migration 013): a fund's
+-- roster is meant to be visible to its own investors (insider-holding
+-- transparency, per the design doc's anti-self-dealing compensating
+-- control) and employee_profiles are the public "resume" the marketplace
+-- browses. fund_invitations is the one exception — private between the
+-- fund's head and the invitee, never publicly readable.
+-- =============================================================================
+
+CREATE TABLE public.employee_profiles (
+    user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    nickname text NOT NULL,
+    bio text,
+    language text,
+    available_for_hire boolean NOT NULL DEFAULT true,
+    approved_proposals_count integer NOT NULL DEFAULT 0,
+    rejected_proposals_count integer NOT NULL DEFAULT 0,
+    funds_changed_count integer NOT NULL DEFAULT 0,
+    rating numeric,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.fund_team_members (
+    fund_id uuid NOT NULL REFERENCES public.funds(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    role text NOT NULL CHECK (role IN ('analyst', 'co_manager', 'trader', 'risk_manager')),
+    permissions jsonb NOT NULL DEFAULT '{}'::jsonb,
+    treasurer_limit_amount numeric,
+    status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'pending_termination')),
+    termination_notice_at timestamptz,
+    joined_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (fund_id, user_id)
+);
+
+CREATE TABLE public.fund_invitations (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    fund_id uuid NOT NULL REFERENCES public.funds(id) ON DELETE CASCADE,
+    invitee_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    role text NOT NULL CHECK (role IN ('analyst', 'co_manager', 'trader', 'risk_manager')),
+    message text NOT NULL,
+    status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'cancelled')),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    responded_at timestamptz
+);
+
+-- Blocks a second pending invite to the same person from the same fund;
+-- a fresh invite is fine once the earlier one is no longer pending.
+CREATE UNIQUE INDEX fund_invitations_pending_unique_idx
+    ON public.fund_invitations (fund_id, invitee_user_id) WHERE status = 'pending';
+CREATE INDEX fund_invitations_invitee_idx ON public.fund_invitations (invitee_user_id);
+
+-- Head types the invite message once; the app pre-fills it next time.
+ALTER TABLE public.funds ADD COLUMN last_invite_message text;
+
+ALTER TABLE public.employee_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fund_team_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fund_invitations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY employee_profiles_select_authenticated ON public.employee_profiles
+    FOR SELECT TO authenticated USING (true);
+CREATE POLICY fund_team_members_select_authenticated ON public.fund_team_members
+    FOR SELECT TO authenticated USING (true);
+CREATE POLICY fund_invitations_select_own ON public.fund_invitations
+    FOR SELECT TO authenticated USING (
+        invitee_user_id = auth.uid()
+        OR fund_id IN (SELECT id FROM public.funds WHERE head_user_id = auth.uid())
+    );
+
+-- No INSERT/UPDATE/DELETE policies for `authenticated` on any of the three
+-- tables — only the backend's service-role client writes, same precedent
+-- as every prior fund-related migration.
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 017+ (RESERVED)
+-- Feature: ETF Fund Emulation, Phases 4-8 — see docs/ETF_FUND_EMULATION.md.
+-- Remaining tables (fund_trade_proposals, fund_transactions,
+-- fund_chat_messages, fund_meetings, fund_meeting_invites,
+-- bot_investor_profiles, bot_investor_state, fund_fee_ledger,
+-- manager_earnings_balance, fund_succession_events) are written
+-- phase-by-phase as each phase is implemented, not upfront.
 -- =============================================================================
