@@ -139,6 +139,19 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
       if (mounted) {
         ref.read(stressTestProvider.notifier).refreshPrices(widget.sessionId);
         ref.read(stressTestRefreshProvider.notifier).state++;
+        // Re-run the DCA/dividend catch-up on every tick, not just at
+        // initState — otherwise a payout that becomes due while the user
+        // is simply sitting on this screen never gets credited until the
+        // screen is unmounted and remounted (matches the pattern in
+        // portfolio_body.dart's periodic checkWeeklyPayout call).
+        final session = ref
+            .read(stressTestProvider.notifier)
+            .getSession(widget.sessionId);
+        if (session != null) {
+          final l10n = AppLocalizations.of(context)!;
+          checkStressTestDcaPayout(ref, session, l10n);
+          checkStressTestDividendPayout(ref, session, l10n);
+        }
       }
     });
     // 1-second tick for real-time countdown
