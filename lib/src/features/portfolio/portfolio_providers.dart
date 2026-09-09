@@ -6,6 +6,8 @@ import '../../core/supabase/supabase_providers.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../../shared/services/user_data_service.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../funds/models/fund.dart';
+import '../funds/providers/fund_providers.dart';
 import 'portfolio_limits_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -532,12 +534,41 @@ final portfolioPerformanceProvider =
         );
       }
 
+      final entries = holdings.entries.toList();
+
+      // Fund units aren't a real Finnhub symbol — Finnhub returns a
+      // "successful" quote of all zeros for an unknown ticker rather than
+      // an error, so without this branch a fund holding priced itself at
+      // $0 (100% loss) instead of its actual NAV. Only pays for the
+      // funds-list round trip when a holding could plausibly be one; cross-
+      // checked against the real ticker list (not just the pattern) so an
+      // ordinary stock whose ticker happens to match "FS" + letters (e.g.
+      // FSLR, a real S&P 500 member) is never mistaken for a fund.
+      final candidateFundSymbols = entries
+          .map((e) => e.key)
+          .where(fundTickerPattern.hasMatch)
+          .toSet();
+      var fundsByTicker = <String, Fund>{};
+      if (candidateFundSymbols.isNotEmpty) {
+        try {
+          final funds = await ref.read(fundApiServiceProvider).listFunds();
+          fundsByTicker = {
+            for (final f in funds)
+              if (candidateFundSymbols.contains(f.ticker)) f.ticker: f,
+          };
+        } catch (_) {
+          // Leave empty — any matching symbol just falls through to the
+          // Finnhub path below (its pre-existing, if wrong, behavior).
+        }
+      }
+
       // Quotes fetched in parallel (used to be a sequential await-in-loop —
       // one round-trip's latency per holding, stacked). A failed quote falls
-      // back to null and is priced at avgCost below, same as before.
-      final entries = holdings.entries.toList();
+      // back to null and is priced at avgCost below, same as before. Fund
+      // symbols (already resolved above) skip this call entirely.
       final quotes = await Future.wait(
         entries.map((entry) async {
+          if (fundsByTicker.containsKey(entry.key)) return null;
           try {
             return await api.quote(entry.key);
           } catch (_) {
@@ -556,10 +587,13 @@ final portfolioPerformanceProvider =
         final totalCost = entry.value['cost']!;
         final avgCost = totalCost / shares;
 
+        final fund = fundsByTicker[symbol];
         final quote = quotes[i];
-        final currentPrice = quote != null
-            ? ((quote['c'] as num?)?.toDouble() ?? avgCost)
-            : avgCost;
+        final currentPrice = fund != null
+            ? fund.navPerUnit
+            : (quote != null
+                  ? ((quote['c'] as num?)?.toDouble() ?? avgCost)
+                  : avgCost);
         final currentValue = shares * currentPrice;
         totalCurrentValue += currentValue;
 

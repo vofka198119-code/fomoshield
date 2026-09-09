@@ -22,12 +22,11 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../shared/widgets/card_frame.dart';
-import '../../../core/cache/logo_providers.dart'
-    show resolvedCompanyNameProvider;
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
 import '../../../shared/widgets/more_less_pill.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../funds/providers/fund_providers.dart';
 import '../portfolio_providers.dart';
 
 class PortfolioBalanceWidget extends ConsumerStatefulWidget {
@@ -233,7 +232,7 @@ class _PortfolioBalanceWidgetState
                               child: Text(
                                 ref
                                         .watch(
-                                          resolvedCompanyNameProvider(
+                                          resolvedAssetNameProvider(
                                             holdings[i].symbol,
                                           ),
                                         )

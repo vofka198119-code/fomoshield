@@ -29,6 +29,32 @@ class FundApiException implements Exception {
 // URL/auth-header/JWT-interceptor setup as FinnhubService for consistency.
 // ---------------------------------------------------------------------------
 
+class FundSubscribeResult {
+  final double navPerUnit;
+  final double unitsIssued;
+
+  const FundSubscribeResult({required this.navPerUnit, required this.unitsIssued});
+
+  factory FundSubscribeResult.fromJson(Map<String, dynamic> json) =>
+      FundSubscribeResult(
+        navPerUnit: (json['navPerUnit'] as num).toDouble(),
+        unitsIssued: (json['unitsIssued'] as num).toDouble(),
+      );
+}
+
+class FundRedeemResult {
+  final double navPerUnit;
+  final double payout;
+
+  const FundRedeemResult({required this.navPerUnit, required this.payout});
+
+  factory FundRedeemResult.fromJson(Map<String, dynamic> json) =>
+      FundRedeemResult(
+        navPerUnit: (json['navPerUnit'] as num).toDouble(),
+        payout: (json['payout'] as num).toDouble(),
+      );
+}
+
 class FundApiService {
   final Dio _dio;
 
@@ -132,6 +158,49 @@ class FundApiService {
       return FundDetail.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw Exception(_errorMessage(e, 'Failed to load fund'));
+    }
+  }
+
+  /// Buy fund units with real money straight out of the caller's own
+  /// Portfolio cash (Phase 2 — no separate "Fund Investing" balance). The
+  /// backend computes live NAV and atomically credits the fund's own cash/
+  /// units_outstanding; the returned nav/units are the authoritative fill,
+  /// which may drift a hair from whatever NAV was last shown on-screen.
+  Future<FundSubscribeResult> subscribe(String fundId, double amount) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/subscribe',
+        data: {'amount': amount},
+      );
+      return FundSubscribeResult.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to buy fund units'),
+        code: code,
+      );
+    }
+  }
+
+  /// Sell fund units back for cash, credited to the caller's own Portfolio
+  /// cash client-side. Always instant, in full, at the current NAV.
+  Future<FundRedeemResult> redeem(String fundId, double units) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/redeem',
+        data: {'units': units},
+      );
+      return FundRedeemResult.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to sell fund units'),
+        code: code,
+      );
     }
   }
 }

@@ -600,10 +600,203 @@ CREATE UNIQUE INDEX funds_name_unique_ci_idx ON public.funds (lower(name));
 
 
 -- =============================================================================
--- F.O.M.O. Shield — Supabase Migration 015+ (RESERVED)
--- Feature: ETF Fund Emulation, Phases 2-8 — see docs/ETF_FUND_EMULATION.md.
--- Remaining tables (fund_investor_positions, fund_investor_transactions,
--- employee_profiles, fund_team_members, fund_invitations,
+-- F.O.M.O. Shield — Supabase Migration 015
+-- Tables: fund_investor_positions, fund_investor_transactions
+-- Functions: fund_subscribe, fund_redeem
+-- Feature: ETF Fund Emulation, Phase 2 — buy/sell fund units. Money flow is
+-- direct-cash, not a real-world AP/creation-redemption basket: subscribing
+-- adds the invested amount straight onto `funds.cash` (the fund's own
+-- spendable balance, so a head/analyst can actually deploy it), redeeming
+-- subtracts the payout from it. There is deliberately NO separate "Fund
+-- Investing" balance — the money comes straight out of the investor's real
+-- Portfolio cash on the Flutter side; these two tables only track the
+-- FUND's side of the ledger (server-authoritative, same as Migration 013).
+--
+-- fund_investor_positions is the current-state cap table (units held per
+-- user per fund) — needed for redeem's "can't sell more than you hold"
+-- check and for Phase 3+'s Management Room cap table.
+-- fund_investor_transactions is the append-only ledger — doubles as the
+-- source for the "distinct holders" popularity metric (count distinct
+-- user_id, not summed inflow — see design doc's anti-abuse resolution) and
+-- future audit trail.
+--
+-- Concurrency: fund_subscribe/fund_redeem are plpgsql functions, not plain
+-- app-level read-then-write — each takes a `SELECT ... FOR UPDATE` row lock
+-- on the contested `funds` row (and, for redeem, the investor's position
+-- row) before computing NAV and mutating cash/units_outstanding, so two
+-- concurrent buys/sells against the same fund can't race each other. The
+-- holdings' market value (which needs a live external quote, impossible
+-- inside a plain SQL function) is computed by the Node layer just before
+-- calling in and passed as `p_holdings_value` — that number doesn't need
+-- locking since it isn't a contested column, only cash/units_outstanding
+-- are.
+--
+-- Both functions lock `funds` BEFORE `fund_investor_positions` (redeem
+-- locks the position row second, after the funds row) — same order in
+-- both, deliberately, so a subscribe and a redeem racing on the same
+-- fund+user pair can't deadlock from acquiring the two locks in opposite
+-- orders.
+--
+-- No cash floor enforced on redeem — per the design doc's explicit
+-- decision, sell liquidity is always instant and guaranteed regardless of
+-- the fund's cash reserve (a head who invested all the cash and faces a
+-- big redemption is a textual onboarding warning, not a hard failure).
+-- =============================================================================
+
+CREATE TABLE public.fund_investor_positions (
+    fund_id uuid NOT NULL REFERENCES public.funds(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    units_held numeric NOT NULL DEFAULT 0 CHECK (units_held >= 0),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (fund_id, user_id)
+);
+
+CREATE TABLE public.fund_investor_transactions (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    fund_id uuid NOT NULL REFERENCES public.funds(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    type text NOT NULL CHECK (type IN ('subscribe', 'redeem')),
+    units numeric NOT NULL CHECK (units > 0),
+    nav_per_unit numeric NOT NULL CHECK (nav_per_unit > 0),
+    amount numeric NOT NULL CHECK (amount > 0),
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX fund_investor_transactions_fund_id_idx ON public.fund_investor_transactions (fund_id);
+CREATE INDEX fund_investor_transactions_user_id_idx ON public.fund_investor_transactions (user_id);
+
+ALTER TABLE public.fund_investor_positions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fund_investor_transactions ENABLE ROW LEVEL SECURITY;
+
+-- Unlike funds/fund_holdings (intentionally public-readable), a user's own
+-- position/transactions are private — scoped to auth.uid(). Aggregate
+-- numbers derived from these tables (holder counts, popularity) are
+-- computed server-side via the service-role client, never through a
+-- broad SELECT-all policy here.
+CREATE POLICY fund_investor_positions_select_own ON public.fund_investor_positions
+    FOR SELECT TO authenticated USING (user_id = auth.uid());
+CREATE POLICY fund_investor_transactions_select_own ON public.fund_investor_transactions
+    FOR SELECT TO authenticated USING (user_id = auth.uid());
+
+-- No INSERT/UPDATE/DELETE policies for `authenticated` — only the backend's
+-- service-role client writes, exclusively through the two functions below.
+
+CREATE OR REPLACE FUNCTION public.fund_subscribe(
+    p_fund_id uuid,
+    p_user_id uuid,
+    p_amount numeric,
+    p_holdings_value numeric
+) RETURNS TABLE (nav_per_unit numeric, units_issued numeric, new_cash numeric, new_units_outstanding numeric)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_cash numeric;
+    v_units_outstanding numeric;
+    v_nav numeric;
+    v_units_issued numeric;
+BEGIN
+    IF p_amount <= 0 THEN
+        RAISE EXCEPTION 'amount must be positive';
+    END IF;
+
+    SELECT cash, units_outstanding INTO v_cash, v_units_outstanding
+    FROM public.funds WHERE id = p_fund_id FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'fund not found';
+    END IF;
+
+    v_nav := CASE WHEN v_units_outstanding > 0
+                  THEN (v_cash + p_holdings_value) / v_units_outstanding
+                  ELSE 10.0 END;
+    v_units_issued := p_amount / v_nav;
+
+    UPDATE public.funds
+    SET cash = cash + p_amount,
+        units_outstanding = units_outstanding + v_units_issued
+    WHERE id = p_fund_id
+    RETURNING cash, units_outstanding INTO v_cash, v_units_outstanding;
+
+    INSERT INTO public.fund_investor_positions (fund_id, user_id, units_held, updated_at)
+    VALUES (p_fund_id, p_user_id, v_units_issued, now())
+    ON CONFLICT (fund_id, user_id)
+    DO UPDATE SET units_held = fund_investor_positions.units_held + v_units_issued,
+                  updated_at = now();
+
+    INSERT INTO public.fund_investor_transactions (fund_id, user_id, type, units, nav_per_unit, amount)
+    VALUES (p_fund_id, p_user_id, 'subscribe', v_units_issued, v_nav, p_amount);
+
+    RETURN QUERY SELECT v_nav, v_units_issued, v_cash, v_units_outstanding;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.fund_redeem(
+    p_fund_id uuid,
+    p_user_id uuid,
+    p_units numeric,
+    p_holdings_value numeric
+) RETURNS TABLE (nav_per_unit numeric, payout numeric, new_cash numeric, new_units_outstanding numeric)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_cash numeric;
+    v_units_outstanding numeric;
+    v_nav numeric;
+    v_payout numeric;
+    v_units_held numeric;
+BEGIN
+    IF p_units <= 0 THEN
+        RAISE EXCEPTION 'units must be positive';
+    END IF;
+
+    -- Locks `funds` first, `fund_investor_positions` second — same order
+    -- fund_subscribe uses, see this migration's header comment on why.
+    SELECT cash, units_outstanding INTO v_cash, v_units_outstanding
+    FROM public.funds WHERE id = p_fund_id FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'fund not found';
+    END IF;
+
+    SELECT units_held INTO v_units_held
+    FROM public.fund_investor_positions
+    WHERE fund_id = p_fund_id AND user_id = p_user_id
+    FOR UPDATE;
+
+    IF NOT FOUND OR v_units_held < p_units THEN
+        RAISE EXCEPTION 'insufficient_units';
+    END IF;
+
+    v_nav := CASE WHEN v_units_outstanding > 0
+                  THEN (v_cash + p_holdings_value) / v_units_outstanding
+                  ELSE 10.0 END;
+    v_payout := p_units * v_nav;
+
+    UPDATE public.funds
+    SET cash = cash - v_payout,
+        units_outstanding = units_outstanding - p_units
+    WHERE id = p_fund_id
+    RETURNING cash, units_outstanding INTO v_cash, v_units_outstanding;
+
+    UPDATE public.fund_investor_positions
+    SET units_held = units_held - p_units, updated_at = now()
+    WHERE fund_id = p_fund_id AND user_id = p_user_id;
+
+    DELETE FROM public.fund_investor_positions
+    WHERE fund_id = p_fund_id AND user_id = p_user_id AND units_held <= 0;
+
+    INSERT INTO public.fund_investor_transactions (fund_id, user_id, type, units, nav_per_unit, amount)
+    VALUES (p_fund_id, p_user_id, 'redeem', p_units, v_nav, v_payout);
+
+    RETURN QUERY SELECT v_nav, v_payout, v_cash, v_units_outstanding;
+END;
+$$;
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 016+ (RESERVED)
+-- Feature: ETF Fund Emulation, Phases 3-8 — see docs/ETF_FUND_EMULATION.md.
+-- Remaining tables (employee_profiles, fund_team_members, fund_invitations,
 -- fund_trade_proposals, fund_transactions, fund_chat_messages, fund_meetings,
 -- fund_meeting_invites, bot_investor_profiles, bot_investor_state,
 -- fund_fee_ledger, manager_earnings_balance, fund_succession_events) are

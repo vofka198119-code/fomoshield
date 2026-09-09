@@ -11185,12 +11185,6 @@ abstract class AppLocalizations {
   /// **'Companies in Fund'**
   String get etfFundDetailHoldingsCountLabel;
 
-  /// No description provided for @etfFundDetailInvestmentsStubNote.
-  ///
-  /// In en, this message translates to:
-  /// **'Fund investing is coming soon'**
-  String get etfFundDetailInvestmentsStubNote;
-
   /// No description provided for @etfFundDetailInfoTitle.
   ///
   /// In en, this message translates to:

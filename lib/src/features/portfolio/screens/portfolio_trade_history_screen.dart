@@ -14,15 +14,15 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../shared/widgets/card_frame.dart';
-import '../../../core/cache/logo_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/more_less_pill.dart';
 import '../../../shared/widgets/stagger_fade_in.dart';
 import '../../../shared/widgets/trade_history_tile.dart';
+import '../../funds/providers/fund_providers.dart';
 import '../portfolio_providers.dart';
 
 // Rows are revealed 6 at a time (MoreLessPill below the list) instead of
-// all at once — every row watches resolvedCompanyNameProvider the moment
+// all at once — every row watches resolvedAssetNameProvider the moment
 // it's built, and a long history otherwise resolves every symbol in one
 // SingleChildScrollView build (same reasoning as
 // search/widgets/company_list_screen.dart's own reveal cap).
@@ -122,7 +122,7 @@ class _PortfolioTradeHistoryScreenState
                                 companyName:
                                     ref
                                         .watch(
-                                          resolvedCompanyNameProvider(
+                                          resolvedAssetNameProvider(
                                             tx.symbol,
                                           ),
                                         )

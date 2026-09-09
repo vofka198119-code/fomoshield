@@ -6633,10 +6633,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfFundDetailHoldingsCountLabel => 'Компаний в фонде';
 
   @override
-  String get etfFundDetailInvestmentsStubNote =>
-      'Инвестирование в фонды скоро появится';
-
-  @override
   String get etfFundDetailInfoTitle => 'ИНФОРМАЦИЯ О ФОНДЕ';
 
   @override

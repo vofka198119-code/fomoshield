@@ -15,6 +15,7 @@ import '../../core/overlay/app_notification_popup.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../../shared/widgets/more_less_pill.dart';
+import '../funds/providers/fund_providers.dart';
 import '../portfolio/portfolio_providers.dart';
 import '../stress_test/stress_test_engine.dart';
 
@@ -125,10 +126,26 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         context.go('/stress-test/${n.portfolioId}');
       }
     } else if (n.symbol != null) {
-      context.push(
-        '/company/${n.symbol}',
-        extra: {'portfolioId': n.portfolioId},
-      );
+      // A fund's units aren't a real company — Company Detail has no idea
+      // what to do with one (see PortfolioHoldingsWidget's own version of
+      // this same check). Only reachable here for a fund symbol when the
+      // trade-detail lookup above already fell through (a stale/orphaned
+      // notification), so this is the rare path, not the common one.
+      final matchingFund = fundTickerPattern.hasMatch(n.symbol!)
+          ? ref
+                .read(fundsListProvider)
+                .valueOrNull
+                ?.where((f) => f.ticker == n.symbol)
+                .firstOrNull
+          : null;
+      if (matchingFund != null) {
+        context.push('/funds/${matchingFund.id}');
+      } else {
+        context.push(
+          '/company/${n.symbol}',
+          extra: {'portfolioId': n.portfolioId},
+        );
+      }
     }
   }
 

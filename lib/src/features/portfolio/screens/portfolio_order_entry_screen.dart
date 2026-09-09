@@ -39,6 +39,7 @@ import '../portfolio_limits_provider.dart';
 import '../portfolio_providers.dart';
 import '../../orders/order_model.dart' as orders;
 import '../../orders/order_provider.dart';
+import '../../funds/providers/fund_providers.dart';
 import 'order_entry/order_header.dart';
 import 'order_entry/order_amount_section.dart';
 import 'order_entry/order_config_section.dart';
@@ -69,6 +70,13 @@ class PortfolioOrderEntryScreen extends ConsumerStatefulWidget {
   final double? initialPrice;
   final String? companyName;
   final String? logo;
+  // Non-null when this order is for fund units, not a real stock — see
+  // FundDetailScreen's buy/sell buttons. Routes execution through
+  // FundApiService.subscribe/redeem (which settles the fund's own cash/
+  // units_outstanding ledger) instead of Portfolio's plain client-side
+  // Transaction log, and forces Market-only (NAV is computed on-demand,
+  // not ticking, so a Limit order against it wouldn't mean anything).
+  final String? fundId;
 
   const PortfolioOrderEntryScreen({
     super.key,
@@ -78,6 +86,7 @@ class PortfolioOrderEntryScreen extends ConsumerStatefulWidget {
     this.initialPrice,
     this.companyName,
     this.logo,
+    this.fundId,
   });
 
   @override
@@ -431,7 +440,7 @@ class _PortfolioOrderEntryScreenState
     );
     if (confirmed != true || !mounted) return;
 
-    _executeOrder(
+    await _executeOrder(
       orderType: orderType,
       session: session,
       side: side,
@@ -493,16 +502,52 @@ class _PortfolioOrderEntryScreenState
     }
   }
 
-  /// Central order execution logic (called directly or after confirmation)
-  void _executeOrder({
+  /// Central order execution logic (called directly or after confirmation).
+  /// For a fund order (widget.fundId != null), this first settles the
+  /// fund's own side of the ledger via FundApiService.subscribe/redeem —
+  /// that call is the authoritative source of the actual fill (units for a
+  /// buy, NAV for either side), since Fund state is server-authoritative
+  /// unlike the rest of Portfolio. The locally-computed [shares]/
+  /// [_currentPrice] are only ever a same-order-of-magnitude estimate used
+  /// for the confirmation sheet and cash/shares limit checks above.
+  Future<void> _executeOrder({
     required orders.OrderType orderType,
     required orders.MarketSession session,
     required orders.OrderSide side,
     required double shares,
     required double amount,
     double? limitPrice,
-  }) {
+  }) async {
     final l10n = AppLocalizations.of(context)!;
+
+    double executionShares = shares;
+    double executionPrice = _currentPrice;
+
+    if (widget.fundId != null) {
+      try {
+        if (_isBuy) {
+          final result = await ref
+              .read(fundApiServiceProvider)
+              .subscribe(widget.fundId!, amount);
+          executionShares = result.unitsIssued;
+          executionPrice = result.navPerUnit;
+        } else {
+          final result = await ref
+              .read(fundApiServiceProvider)
+              .redeem(widget.fundId!, shares);
+          executionPrice = result.navPerUnit;
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.toString())));
+        }
+        return;
+      }
+      if (!mounted) return;
+    }
+
     final order = ref
         .read(ordersProvider.notifier)
         .placeOrder(
@@ -511,8 +556,8 @@ class _PortfolioOrderEntryScreenState
           companyName: widget.companyName ?? widget.symbol,
           side: side,
           type: orderType,
-          quantity: shares,
-          createdPrice: _currentPrice,
+          quantity: executionShares,
+          createdPrice: executionPrice,
           limitPrice: limitPrice,
           stopPrice: null,
           session: session,
@@ -544,9 +589,9 @@ class _PortfolioOrderEntryScreenState
                 ? l10n.orderEntryNotifYouBought
                 : l10n.orderEntryNotifYouSold,
             detail: l10n.orderEntryNotifFilledDetail(
-              shares.toStringAsFixed(4),
+              executionShares.toStringAsFixed(4),
               companyName,
-              formatUsd(_currentPrice),
+              formatUsd(executionPrice),
             ),
             createdAt: DateTime.now(),
             // Market buy/sell fires and resolves instantly — the user
@@ -723,11 +768,12 @@ class _PortfolioOrderEntryScreenState
               price: _currentPrice,
               palette: palette,
             ),
-            OrderTypeTabs(
-              isLimit: _selectedOrderType == _OrderType.limit,
-              onChanged: _onOrderTypeChanged,
-              palette: palette,
-            ),
+            if (widget.fundId == null)
+              OrderTypeTabs(
+                isLimit: _selectedOrderType == _OrderType.limit,
+                onChanged: _onOrderTypeChanged,
+                palette: palette,
+              ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.only(bottom: 100),

@@ -27,6 +27,7 @@ import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../shared/widgets/donut_ring_painter.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../funds/providers/fund_providers.dart';
 import '../portfolio_providers.dart';
 
 class PortfolioHoldingsWidget extends StatefulWidget {
@@ -218,7 +219,25 @@ class _HoldingRow extends ConsumerWidget {
     final isPositive = holding.pnl >= 0;
     final logoAsync = ref.watch(cachedLogoProvider(holding.symbol));
     final logoUrl = logoAsync.valueOrNull;
+
+    // A fund's units aren't a real company — Company Detail has no idea
+    // what to do with one, and resolvedCompanyNameProvider has no fund in
+    // its own lookup table either (falls back to the raw ticker, which is
+    // why the row used to show "FSFOF" in both the name and ticker slots).
+    // Route to Fund Detail and show the fund's real name instead, whenever
+    // this holding's symbol actually matches a fund that exists (not just
+    // the ticker shape — see fundTickerPattern's own comment on why a real
+    // stock like FSLR must never be caught by this).
+    final isFundCandidate = fundTickerPattern.hasMatch(holding.symbol);
+    final matchingFund = isFundCandidate
+        ? ref
+              .watch(fundsListProvider)
+              .valueOrNull
+              ?.where((f) => f.ticker == holding.symbol)
+              .firstOrNull
+        : null;
     final companyName =
+        matchingFund?.name ??
         ref.watch(resolvedCompanyNameProvider(holding.symbol)).valueOrNull ??
         holding.symbol;
 
@@ -226,10 +245,12 @@ class _HoldingRow extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
-          onTap: () => context.push(
-            '/company/${holding.symbol}',
-            extra: {'portfolioId': portfolioId},
-          ),
+          onTap: () => matchingFund != null
+              ? context.push('/funds/${matchingFund.id}')
+              : context.push(
+                  '/company/${holding.symbol}',
+                  extra: {'portfolioId': portfolioId},
+                ),
           behavior: HitTestBehavior.opaque,
           child: Container(
             constraints: const BoxConstraints(minHeight: 72),

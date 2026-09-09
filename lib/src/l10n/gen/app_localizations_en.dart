@@ -6612,10 +6612,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundDetailHoldingsCountLabel => 'Companies in Fund';
 
   @override
-  String get etfFundDetailInvestmentsStubNote =>
-      'Fund investing is coming soon';
-
-  @override
   String get etfFundDetailInfoTitle => 'FUND INFO';
 
   @override

@@ -416,6 +416,7 @@ class AppRouter {
             initialPrice: (extra['price'] as num?)?.toDouble(),
             companyName: extra['companyName'] as String?,
             logo: extra['logo'] as String?,
+            fundId: extra['fundId'] as String?,
           );
         },
       ),
