@@ -6648,6 +6648,187 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfFundDetailEmployeesStub => 'Пока нет сотрудников';
 
   @override
+  String get etfFundDetailHireButton => 'Нанять';
+
+  @override
+  String get etfRoleAnalyst => 'Аналитик';
+
+  @override
+  String get etfRoleCoManager => 'Зам. управляющего';
+
+  @override
+  String get etfRoleTrader => 'Трейдер';
+
+  @override
+  String get etfRoleRiskManager => 'Риск-менеджер';
+
+  @override
+  String get etfEmployeeProfileTitle => 'Анкета сотрудника';
+
+  @override
+  String get etfEmployeeProfileNicknameLabel => 'Никнейм';
+
+  @override
+  String get etfEmployeeProfileNicknameHint => 'Так тебя увидят главы фондов';
+
+  @override
+  String get etfEmployeeProfileBioLabel => 'О себе';
+
+  @override
+  String get etfEmployeeProfileBioHint => 'Навыки, опыт, что ищешь';
+
+  @override
+  String get etfEmployeeProfileLanguageLabel => 'Язык';
+
+  @override
+  String get etfEmployeeProfileLanguageHint =>
+      'На каком языке удобнее работать';
+
+  @override
+  String get etfEmployeeProfileAvailableLabel => 'Открыт для найма';
+
+  @override
+  String get etfEmployeeProfileAvailableBody =>
+      'Виден на бирже вакансий любому главе фонда';
+
+  @override
+  String get etfEmployeeProfileSaveButton => 'Сохранить анкету';
+
+  @override
+  String get etfEmployeeProfileSavedSnackbar => 'Анкета сохранена';
+
+  @override
+  String get etfEmployeeProfileNicknameRequired => 'Никнейм обязателен';
+
+  @override
+  String get etfEmployeeProfileNicknameNoEmail =>
+      'Никнейм не может содержать email';
+
+  @override
+  String get etfEmployeeProfileBioNoEmail =>
+      'Описание не может содержать email';
+
+  @override
+  String get etfEmployeeProfileStatsTitle => 'КАРЬЕРНАЯ СТАТИСТИКА';
+
+  @override
+  String get etfEmployeeProfileStatsApproved => 'Одобренных предложений';
+
+  @override
+  String get etfEmployeeProfileStatsRejected => 'Отклонённых предложений';
+
+  @override
+  String get etfEmployeeProfileStatsFundsChanged => 'Смен фондов';
+
+  @override
+  String get etfEmployeeProfileStatsRating => 'Рейтинг';
+
+  @override
+  String get etfEmployeeProfileRatingPending => 'Пока недостаточно активности';
+
+  @override
+  String etfEmployeeProfileInvitationsButton(int count) {
+    return 'Приглашения ($count)';
+  }
+
+  @override
+  String get etfMarketplaceTitle => 'Биржа вакансий';
+
+  @override
+  String get etfMarketplaceEmpty => 'Пока никто не ищет работу';
+
+  @override
+  String get etfMarketplaceErrorMessage => 'Не удалось загрузить биржу';
+
+  @override
+  String get etfMarketplaceInviteButton => 'Пригласить';
+
+  @override
+  String get etfMarketplaceBioFallback => 'Пока нет описания';
+
+  @override
+  String get etfSendInviteTitle => 'Отправить приглашение';
+
+  @override
+  String get etfSendInviteRoleLabel => 'Должность';
+
+  @override
+  String get etfSendInviteMessageLabel => 'Сообщение';
+
+  @override
+  String get etfSendInviteMessageHint => 'Расскажи о должности и своём фонде';
+
+  @override
+  String get etfSendInviteMessageRequired => 'Сообщение обязательно';
+
+  @override
+  String get etfSendInviteSubmitButton => 'Отправить приглашение';
+
+  @override
+  String get etfSendInviteSuccessSnackbar => 'Приглашение отправлено';
+
+  @override
+  String get etfSendInviteTeamFullError =>
+      'У твоей команды уже максимум 5 сотрудников';
+
+  @override
+  String get etfSendInviteAlreadyMemberError => 'Уже в твоей команде';
+
+  @override
+  String get etfSendInviteAlreadyPendingError =>
+      'У этого человека уже есть приглашение от тебя';
+
+  @override
+  String get etfInvitationsTitle => 'Мои приглашения';
+
+  @override
+  String get etfInvitationsEmpty => 'Нет входящих приглашений';
+
+  @override
+  String get etfInvitationsErrorMessage => 'Не удалось загрузить приглашения';
+
+  @override
+  String get etfInvitationDetailRoleLabel => 'Предложенная должность';
+
+  @override
+  String get etfInvitationDetailMessageLabel => 'Сообщение';
+
+  @override
+  String get etfInvitationJoinButton => 'Присоединиться';
+
+  @override
+  String get etfInvitationDeclineButton => 'Отказаться';
+
+  @override
+  String get etfInvitationAcceptedSnackbar => 'Ты присоединился к команде';
+
+  @override
+  String get etfInvitationDeclinedSnackbar => 'Приглашение отклонено';
+
+  @override
+  String get etfInvitationTeamFullError => 'Команда этого фонда уже заполнена';
+
+  @override
+  String get etfTeamMemberTerminateButton => 'Убрать';
+
+  @override
+  String get etfTeamMemberTerminateConfirmTitle => 'Убрать сотрудника?';
+
+  @override
+  String get etfTeamMemberTerminateConfirmBody =>
+      'Он получит уведомление за 5 дней до реальной потери доступа — до этого можно отменить.';
+
+  @override
+  String get etfTeamMemberTerminateConfirmAction =>
+      'Начать 5-дневное уведомление';
+
+  @override
+  String get etfTeamMemberPendingTerminationLabel => 'Скоро покинет команду';
+
+  @override
+  String get etfTeamMemberCancelTerminationButton => 'Отменить увольнение';
+
+  @override
   String get etfSectorTechnology => 'Технологии';
 
   @override

@@ -11215,6 +11215,348 @@ abstract class AppLocalizations {
   /// **'No team members yet'**
   String get etfFundDetailEmployeesStub;
 
+  /// No description provided for @etfFundDetailHireButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Hire'**
+  String get etfFundDetailHireButton;
+
+  /// No description provided for @etfRoleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyst'**
+  String get etfRoleAnalyst;
+
+  /// No description provided for @etfRoleCoManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Co-Manager'**
+  String get etfRoleCoManager;
+
+  /// No description provided for @etfRoleTrader.
+  ///
+  /// In en, this message translates to:
+  /// **'Trader'**
+  String get etfRoleTrader;
+
+  /// No description provided for @etfRoleRiskManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Risk Manager'**
+  String get etfRoleRiskManager;
+
+  /// No description provided for @etfEmployeeProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee Profile'**
+  String get etfEmployeeProfileTitle;
+
+  /// No description provided for @etfEmployeeProfileNicknameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get etfEmployeeProfileNicknameLabel;
+
+  /// No description provided for @etfEmployeeProfileNicknameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'How fund heads will see you'**
+  String get etfEmployeeProfileNicknameHint;
+
+  /// No description provided for @etfEmployeeProfileBioLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio'**
+  String get etfEmployeeProfileBioLabel;
+
+  /// No description provided for @etfEmployeeProfileBioHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your skills, experience, what you\'re looking for'**
+  String get etfEmployeeProfileBioHint;
+
+  /// No description provided for @etfEmployeeProfileLanguageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get etfEmployeeProfileLanguageLabel;
+
+  /// No description provided for @etfEmployeeProfileLanguageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Language you prefer to work in'**
+  String get etfEmployeeProfileLanguageHint;
+
+  /// No description provided for @etfEmployeeProfileAvailableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Available for hire'**
+  String get etfEmployeeProfileAvailableLabel;
+
+  /// No description provided for @etfEmployeeProfileAvailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible on the hiring marketplace to any fund head'**
+  String get etfEmployeeProfileAvailableBody;
+
+  /// No description provided for @etfEmployeeProfileSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Profile'**
+  String get etfEmployeeProfileSaveButton;
+
+  /// No description provided for @etfEmployeeProfileSavedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved'**
+  String get etfEmployeeProfileSavedSnackbar;
+
+  /// No description provided for @etfEmployeeProfileNicknameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname is required'**
+  String get etfEmployeeProfileNicknameRequired;
+
+  /// No description provided for @etfEmployeeProfileNicknameNoEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname can\'t contain an email address'**
+  String get etfEmployeeProfileNicknameNoEmail;
+
+  /// No description provided for @etfEmployeeProfileBioNoEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio can\'t contain an email address'**
+  String get etfEmployeeProfileBioNoEmail;
+
+  /// No description provided for @etfEmployeeProfileStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CAREER RECORD'**
+  String get etfEmployeeProfileStatsTitle;
+
+  /// No description provided for @etfEmployeeProfileStatsApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved proposals'**
+  String get etfEmployeeProfileStatsApproved;
+
+  /// No description provided for @etfEmployeeProfileStatsRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected proposals'**
+  String get etfEmployeeProfileStatsRejected;
+
+  /// No description provided for @etfEmployeeProfileStatsFundsChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds changed'**
+  String get etfEmployeeProfileStatsFundsChanged;
+
+  /// No description provided for @etfEmployeeProfileStatsRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get etfEmployeeProfileStatsRating;
+
+  /// No description provided for @etfEmployeeProfileRatingPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough activity yet'**
+  String get etfEmployeeProfileRatingPending;
+
+  /// No description provided for @etfEmployeeProfileInvitationsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations ({count})'**
+  String etfEmployeeProfileInvitationsButton(int count);
+
+  /// No description provided for @etfMarketplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hiring Marketplace'**
+  String get etfMarketplaceTitle;
+
+  /// No description provided for @etfMarketplaceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No one is available for hire right now'**
+  String get etfMarketplaceEmpty;
+
+  /// No description provided for @etfMarketplaceErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the marketplace'**
+  String get etfMarketplaceErrorMessage;
+
+  /// No description provided for @etfMarketplaceInviteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get etfMarketplaceInviteButton;
+
+  /// No description provided for @etfMarketplaceBioFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'No bio yet'**
+  String get etfMarketplaceBioFallback;
+
+  /// No description provided for @etfSendInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Invitation'**
+  String get etfSendInviteTitle;
+
+  /// No description provided for @etfSendInviteRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get etfSendInviteRoleLabel;
+
+  /// No description provided for @etfSendInviteMessageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get etfSendInviteMessageLabel;
+
+  /// No description provided for @etfSendInviteMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell them about the role and your fund'**
+  String get etfSendInviteMessageHint;
+
+  /// No description provided for @etfSendInviteMessageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A message is required'**
+  String get etfSendInviteMessageRequired;
+
+  /// No description provided for @etfSendInviteSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Invitation'**
+  String get etfSendInviteSubmitButton;
+
+  /// No description provided for @etfSendInviteSuccessSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation sent'**
+  String get etfSendInviteSuccessSnackbar;
+
+  /// No description provided for @etfSendInviteTeamFullError.
+  ///
+  /// In en, this message translates to:
+  /// **'Your team is already at its 5-member limit'**
+  String get etfSendInviteTeamFullError;
+
+  /// No description provided for @etfSendInviteAlreadyMemberError.
+  ///
+  /// In en, this message translates to:
+  /// **'Already on your team'**
+  String get etfSendInviteAlreadyMemberError;
+
+  /// No description provided for @etfSendInviteAlreadyPendingError.
+  ///
+  /// In en, this message translates to:
+  /// **'That person already has a pending invite from you'**
+  String get etfSendInviteAlreadyPendingError;
+
+  /// No description provided for @etfInvitationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Invitations'**
+  String get etfInvitationsTitle;
+
+  /// No description provided for @etfInvitationsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending invitations'**
+  String get etfInvitationsEmpty;
+
+  /// No description provided for @etfInvitationsErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your invitations'**
+  String get etfInvitationsErrorMessage;
+
+  /// No description provided for @etfInvitationDetailRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role offered'**
+  String get etfInvitationDetailRoleLabel;
+
+  /// No description provided for @etfInvitationDetailMessageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get etfInvitationDetailMessageLabel;
+
+  /// No description provided for @etfInvitationJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get etfInvitationJoinButton;
+
+  /// No description provided for @etfInvitationDeclineButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get etfInvitationDeclineButton;
+
+  /// No description provided for @etfInvitationAcceptedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'You joined the team'**
+  String get etfInvitationAcceptedSnackbar;
+
+  /// No description provided for @etfInvitationDeclinedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation declined'**
+  String get etfInvitationDeclinedSnackbar;
+
+  /// No description provided for @etfInvitationTeamFullError.
+  ///
+  /// In en, this message translates to:
+  /// **'That fund\'s team is already full'**
+  String get etfInvitationTeamFullError;
+
+  /// No description provided for @etfTeamMemberTerminateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get etfTeamMemberTerminateButton;
+
+  /// No description provided for @etfTeamMemberTerminateConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove team member?'**
+  String get etfTeamMemberTerminateConfirmTitle;
+
+  /// No description provided for @etfTeamMemberTerminateConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They\'ll get a 5-day notice before actually losing access — you can cancel it any time before then.'**
+  String get etfTeamMemberTerminateConfirmBody;
+
+  /// No description provided for @etfTeamMemberTerminateConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start 5-Day Notice'**
+  String get etfTeamMemberTerminateConfirmAction;
+
+  /// No description provided for @etfTeamMemberPendingTerminationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaving soon'**
+  String get etfTeamMemberPendingTerminationLabel;
+
+  /// No description provided for @etfTeamMemberCancelTerminationButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Removal'**
+  String get etfTeamMemberCancelTerminationButton;
+
   /// No description provided for @etfSectorTechnology.
   ///
   /// In en, this message translates to:

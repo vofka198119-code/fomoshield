@@ -18,6 +18,7 @@ class Fund {
   final DateTime createdAt;
   final double navPerUnit;
   final double aum;
+  final String? lastInviteMessage;
 
   const Fund({
     required this.id,
@@ -33,6 +34,7 @@ class Fund {
     required this.createdAt,
     required this.navPerUnit,
     required this.aum,
+    this.lastInviteMessage,
   });
 
   factory Fund.fromJson(Map<String, dynamic> json) {
@@ -52,6 +54,7 @@ class Fund {
       createdAt: DateTime.parse(json['createdAt'] as String),
       navPerUnit: (json['navPerUnit'] as num).toDouble(),
       aum: (json['aum'] as num).toDouble(),
+      lastInviteMessage: json['lastInviteMessage'] as String?,
     );
   }
 }
@@ -111,6 +114,7 @@ class FundDetail extends Fund {
     required super.createdAt,
     required super.navPerUnit,
     required super.aum,
+    super.lastInviteMessage,
     required this.cash,
     required this.holdings,
     required this.navHistory,
@@ -132,6 +136,7 @@ class FundDetail extends Fund {
       createdAt: base.createdAt,
       navPerUnit: base.navPerUnit,
       aum: base.aum,
+      lastInviteMessage: base.lastInviteMessage,
       cash: (json['cash'] as num).toDouble(),
       holdings: (json['holdings'] as List<dynamic>? ?? const [])
           .map((e) => FundHolding.fromJson(e as Map<String, dynamic>))

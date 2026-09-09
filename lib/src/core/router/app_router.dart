@@ -57,7 +57,10 @@ import '../../features/funds/models/fund.dart';
 import '../../features/funds/onboarding/fund_onboarding_providers.dart';
 import '../../features/funds/onboarding/fund_onboarding_screen.dart';
 import '../../features/funds/screens/create_fund_screen.dart';
+import '../../features/funds/screens/employee_marketplace_screen.dart';
+import '../../features/funds/screens/employee_profile_screen.dart';
 import '../../features/funds/screens/fund_detail_screen.dart';
+import '../../features/funds/screens/my_invitations_screen.dart';
 import '../../features/funds/widgets/fund_list_screen.dart';
 import '../theme/app_palette.dart';
 import '../theme/theme_variant_provider.dart';
@@ -452,12 +455,32 @@ class AppRouter {
           );
         },
       ),
+      // Phase 3 — registered before '/funds/:id' so these literal paths
+      // win the match, same reasoning as '/funds/list' above.
+      GoRoute(
+        path: '/funds/employee-profile',
+        name: 'employeeProfile',
+        builder: (context, state) => const EmployeeProfileScreen(),
+      ),
+      GoRoute(
+        path: '/funds/invitations',
+        name: 'myInvitations',
+        builder: (context, state) => const MyInvitationsScreen(),
+      ),
       GoRoute(
         path: '/funds/:id',
         name: 'fundDetail',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return FundDetailScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/marketplace',
+        name: 'employeeMarketplace',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return EmployeeMarketplaceScreen(fundId: id);
         },
       ),
       GoRoute(

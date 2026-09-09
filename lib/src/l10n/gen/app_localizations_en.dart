@@ -6627,6 +6627,187 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundDetailEmployeesStub => 'No team members yet';
 
   @override
+  String get etfFundDetailHireButton => 'Hire';
+
+  @override
+  String get etfRoleAnalyst => 'Analyst';
+
+  @override
+  String get etfRoleCoManager => 'Co-Manager';
+
+  @override
+  String get etfRoleTrader => 'Trader';
+
+  @override
+  String get etfRoleRiskManager => 'Risk Manager';
+
+  @override
+  String get etfEmployeeProfileTitle => 'Employee Profile';
+
+  @override
+  String get etfEmployeeProfileNicknameLabel => 'Nickname';
+
+  @override
+  String get etfEmployeeProfileNicknameHint => 'How fund heads will see you';
+
+  @override
+  String get etfEmployeeProfileBioLabel => 'Bio';
+
+  @override
+  String get etfEmployeeProfileBioHint =>
+      'Your skills, experience, what you\'re looking for';
+
+  @override
+  String get etfEmployeeProfileLanguageLabel => 'Language';
+
+  @override
+  String get etfEmployeeProfileLanguageHint => 'Language you prefer to work in';
+
+  @override
+  String get etfEmployeeProfileAvailableLabel => 'Available for hire';
+
+  @override
+  String get etfEmployeeProfileAvailableBody =>
+      'Visible on the hiring marketplace to any fund head';
+
+  @override
+  String get etfEmployeeProfileSaveButton => 'Save Profile';
+
+  @override
+  String get etfEmployeeProfileSavedSnackbar => 'Profile saved';
+
+  @override
+  String get etfEmployeeProfileNicknameRequired => 'Nickname is required';
+
+  @override
+  String get etfEmployeeProfileNicknameNoEmail =>
+      'Nickname can\'t contain an email address';
+
+  @override
+  String get etfEmployeeProfileBioNoEmail =>
+      'Bio can\'t contain an email address';
+
+  @override
+  String get etfEmployeeProfileStatsTitle => 'CAREER RECORD';
+
+  @override
+  String get etfEmployeeProfileStatsApproved => 'Approved proposals';
+
+  @override
+  String get etfEmployeeProfileStatsRejected => 'Rejected proposals';
+
+  @override
+  String get etfEmployeeProfileStatsFundsChanged => 'Funds changed';
+
+  @override
+  String get etfEmployeeProfileStatsRating => 'Rating';
+
+  @override
+  String get etfEmployeeProfileRatingPending => 'Not enough activity yet';
+
+  @override
+  String etfEmployeeProfileInvitationsButton(int count) {
+    return 'Invitations ($count)';
+  }
+
+  @override
+  String get etfMarketplaceTitle => 'Hiring Marketplace';
+
+  @override
+  String get etfMarketplaceEmpty => 'No one is available for hire right now';
+
+  @override
+  String get etfMarketplaceErrorMessage => 'Couldn\'t load the marketplace';
+
+  @override
+  String get etfMarketplaceInviteButton => 'Invite';
+
+  @override
+  String get etfMarketplaceBioFallback => 'No bio yet';
+
+  @override
+  String get etfSendInviteTitle => 'Send Invitation';
+
+  @override
+  String get etfSendInviteRoleLabel => 'Role';
+
+  @override
+  String get etfSendInviteMessageLabel => 'Message';
+
+  @override
+  String get etfSendInviteMessageHint =>
+      'Tell them about the role and your fund';
+
+  @override
+  String get etfSendInviteMessageRequired => 'A message is required';
+
+  @override
+  String get etfSendInviteSubmitButton => 'Send Invitation';
+
+  @override
+  String get etfSendInviteSuccessSnackbar => 'Invitation sent';
+
+  @override
+  String get etfSendInviteTeamFullError =>
+      'Your team is already at its 5-member limit';
+
+  @override
+  String get etfSendInviteAlreadyMemberError => 'Already on your team';
+
+  @override
+  String get etfSendInviteAlreadyPendingError =>
+      'That person already has a pending invite from you';
+
+  @override
+  String get etfInvitationsTitle => 'My Invitations';
+
+  @override
+  String get etfInvitationsEmpty => 'No pending invitations';
+
+  @override
+  String get etfInvitationsErrorMessage => 'Couldn\'t load your invitations';
+
+  @override
+  String get etfInvitationDetailRoleLabel => 'Role offered';
+
+  @override
+  String get etfInvitationDetailMessageLabel => 'Message';
+
+  @override
+  String get etfInvitationJoinButton => 'Join';
+
+  @override
+  String get etfInvitationDeclineButton => 'Decline';
+
+  @override
+  String get etfInvitationAcceptedSnackbar => 'You joined the team';
+
+  @override
+  String get etfInvitationDeclinedSnackbar => 'Invitation declined';
+
+  @override
+  String get etfInvitationTeamFullError => 'That fund\'s team is already full';
+
+  @override
+  String get etfTeamMemberTerminateButton => 'Remove';
+
+  @override
+  String get etfTeamMemberTerminateConfirmTitle => 'Remove team member?';
+
+  @override
+  String get etfTeamMemberTerminateConfirmBody =>
+      'They\'ll get a 5-day notice before actually losing access — you can cancel it any time before then.';
+
+  @override
+  String get etfTeamMemberTerminateConfirmAction => 'Start 5-Day Notice';
+
+  @override
+  String get etfTeamMemberPendingTerminationLabel => 'Leaving soon';
+
+  @override
+  String get etfTeamMemberCancelTerminationButton => 'Cancel Removal';
+
+  @override
   String get etfSectorTechnology => 'Technology';
 
   @override

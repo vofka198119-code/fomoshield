@@ -20,6 +20,7 @@ import '../widgets/fund_sector_allocation_card.dart';
 import '../widgets/fund_holdings_card.dart';
 import '../widgets/fund_text_card.dart';
 import '../widgets/fund_info_card.dart';
+import '../widgets/fund_team_card.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Detail — investor-facing view, styled to mirror Company Detail's
@@ -28,7 +29,7 @@ import '../widgets/fund_info_card.dart';
 // CompanyBottomBar/PositionSection widgets directly — a fund ticker is just
 // a regular Portfolio symbol from the client's point of view (see
 // PortfolioOrderEntryScreen's fundId branch for where the money actually
-// settles). Hiring (Phase 3) isn't built yet.
+// settles). Team roster + hiring (Phase 3) is FundTeamCard below.
 // ---------------------------------------------------------------------------
 
 class FundDetailScreen extends ConsumerWidget {
@@ -144,6 +145,16 @@ class FundDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       _padded(FundHoldingsCard(fund: fund, palette: palette)),
+                      const SizedBox(height: 16),
+                      _padded(
+                        FundTeamCard(
+                          fundId: fund.id,
+                          isHead:
+                              fund.headUserId ==
+                              ref.watch(currentUserProvider)?.id,
+                          palette: palette,
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       if (fund.strategy != null &&
                           fund.strategy!.isNotEmpty) ...[

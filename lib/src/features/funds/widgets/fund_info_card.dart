@@ -9,8 +9,12 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/fund.dart';
 
-// Creation date is real; creator/employee nicknames are stubs until the
-// hiring mechanic (Phase 3) exists to populate them.
+// Creation date is real. Employee roster now lives in its own FundTeamCard
+// (Phase 3, real fund_team_members data) instead of a stub count here —
+// this card only keeps the Creator row, still a stub: showing the head's
+// real nickname needs a "get employee_profile by arbitrary userId" lookup
+// that doesn't exist yet (the head isn't a fund_team_members row, unlike
+// every other employee, whose nickname the roster already joins in).
 class FundInfoCard extends StatelessWidget {
   final FundDetail fund;
   final AppPalette palette;
@@ -40,11 +44,6 @@ class FundInfoCard extends StatelessWidget {
           _row(l10n.etfFundDetailCreatedLabel, created),
           const SizedBox(height: 8),
           _row(l10n.etfFundDetailCreatorLabel, '—'),
-          const SizedBox(height: 8),
-          _row(
-            l10n.etfFundDetailEmployeesLabel,
-            l10n.etfFundDetailEmployeesStub,
-          ),
         ],
       ),
     );

@@ -53,13 +53,7 @@ class FundEntryWidget extends ConsumerWidget {
       );
       if (accepted != true || !context.mounted) return;
     }
-    // Phase 3 (hiring marketplace/analyst profile) isn't built yet — see
-    // docs/ETF_FUND_EMULATION.md's phased plan. Nothing to route to yet.
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.etfOnboardingComingSoon)),
-      );
-    }
+    if (context.mounted) context.push('/funds/employee-profile');
   }
 
   @override
