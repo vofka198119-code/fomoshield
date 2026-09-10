@@ -64,7 +64,11 @@ class EmployeeMarketplaceScreen extends ConsumerWidget {
         title: themedHeaderText(
           l10n.etfMarketplaceTitle,
           palette,
-          GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
+          GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+          ),
         ),
       ),
       body: SafeArea(

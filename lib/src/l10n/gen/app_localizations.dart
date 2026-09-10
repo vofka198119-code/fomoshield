@@ -9829,6 +9829,54 @@ abstract class AppLocalizations {
   /// **'I Accept'**
   String get disclaimerScreenAcceptButton;
 
+  /// No description provided for @chooseNicknameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your nickname'**
+  String get chooseNicknameTitle;
+
+  /// No description provided for @chooseNicknameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This is how other users will see you — on a fund\'s team roster, in the hiring marketplace, and anywhere else your activity is shown publicly. Your email is never shown. Choose carefully: it cannot be changed later.'**
+  String get chooseNicknameSubtitle;
+
+  /// No description provided for @chooseNicknameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get chooseNicknameHint;
+
+  /// No description provided for @chooseNicknameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a nickname'**
+  String get chooseNicknameRequired;
+
+  /// No description provided for @chooseNicknameInvalidChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Latin letters, numbers and underscore only, up to 25 characters'**
+  String get chooseNicknameInvalidChars;
+
+  /// No description provided for @chooseNicknameTakenError.
+  ///
+  /// In en, this message translates to:
+  /// **'This nickname is already taken'**
+  String get chooseNicknameTakenError;
+
+  /// No description provided for @chooseNicknameGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save your nickname — try again'**
+  String get chooseNicknameGenericError;
+
+  /// No description provided for @chooseNicknameContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get chooseNicknameContinueButton;
+
   /// No description provided for @disclaimerScreenLinkFailed.
   ///
   /// In en, this message translates to:
@@ -10849,6 +10897,36 @@ abstract class AppLocalizations {
   /// **'Job Offers'**
   String get etfHomeCardTitleVacancies;
 
+  /// No description provided for @etfEmployeeHubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EMPLOYEE'**
+  String get etfEmployeeHubTitle;
+
+  /// No description provided for @etfEmployeeHubInvitationsRow.
+  ///
+  /// In en, this message translates to:
+  /// **'My Invitations'**
+  String get etfEmployeeHubInvitationsRow;
+
+  /// No description provided for @etfEmployeeHubApplicationsRow.
+  ///
+  /// In en, this message translates to:
+  /// **'My Applications'**
+  String get etfEmployeeHubApplicationsRow;
+
+  /// No description provided for @etfComingSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get etfComingSoonTitle;
+
+  /// No description provided for @etfComingSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is coming in a future update.'**
+  String get etfComingSoonBody;
+
   /// No description provided for @etfHomeCardPremiumTag.
   ///
   /// In en, this message translates to:
@@ -10948,7 +11026,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfCreateFundTitle.
   ///
   /// In en, this message translates to:
-  /// **'Create Fund'**
+  /// **'CREATE FUND'**
   String get etfCreateFundTitle;
 
   /// No description provided for @etfCreateFundNameLabel.
@@ -11260,8 +11338,20 @@ abstract class AppLocalizations {
   /// No description provided for @etfEmployeeProfileTitle.
   ///
   /// In en, this message translates to:
-  /// **'Employee Profile'**
+  /// **'MY PROFILE'**
   String get etfEmployeeProfileTitle;
+
+  /// No description provided for @etfEmployeeProfileButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get etfEmployeeProfileButtonLabel;
+
+  /// No description provided for @etfEmployeeProfileSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save your profile — try again'**
+  String get etfEmployeeProfileSaveError;
 
   /// No description provided for @etfEmployeeProfileNicknameLabel.
   ///
@@ -11386,7 +11476,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfMarketplaceTitle.
   ///
   /// In en, this message translates to:
-  /// **'Hiring Marketplace'**
+  /// **'HIRING MARKETPLACE'**
   String get etfMarketplaceTitle;
 
   /// No description provided for @etfMarketplaceEmpty.
@@ -11473,10 +11563,28 @@ abstract class AppLocalizations {
   /// **'That person already has a pending invite from you'**
   String get etfSendInviteAlreadyPendingError;
 
+  /// No description provided for @etfFundDetailManageTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage fund'**
+  String get etfFundDetailManageTooltip;
+
+  /// No description provided for @etfFundManagementViewPublicButton.
+  ///
+  /// In en, this message translates to:
+  /// **'View public page'**
+  String get etfFundManagementViewPublicButton;
+
+  /// No description provided for @etfFundManagementAccessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have access to manage this fund'**
+  String get etfFundManagementAccessDenied;
+
   /// No description provided for @etfInvitationsTitle.
   ///
   /// In en, this message translates to:
-  /// **'My Invitations'**
+  /// **'MY INVITATIONS'**
   String get etfInvitationsTitle;
 
   /// No description provided for @etfInvitationsEmpty.

@@ -9,11 +9,13 @@ import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_border.dart';
 import '../../../core/theme/themed_button.dart';
+import '../../../core/supabase/supabase_providers.dart' show myNicknameProvider;
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
+import '../widgets/employee_identity_card.dart';
 
 // ---------------------------------------------------------------------------
 // Employee Profile — ETF Fund Emulation, Phase 3. The analyst's public
@@ -35,7 +37,6 @@ class EmployeeProfileScreen extends ConsumerStatefulWidget {
 class _EmployeeProfileScreenState
     extends ConsumerState<EmployeeProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nicknameController = TextEditingController();
   final _bioController = TextEditingController();
   final _languageController = TextEditingController();
   bool _availableForHire = true;
@@ -49,19 +50,16 @@ class _EmployeeProfileScreenState
   // memory of the data it just had), wiping the form and reading as
   // "did my save even work?" — confirmed live 2026-09-09.
   EmployeeProfile? _profile;
-  String? _serverNicknameError;
   String? _serverBioError;
 
   @override
   void dispose() {
-    _nicknameController.dispose();
     _bioController.dispose();
     _languageController.dispose();
     super.dispose();
   }
 
   void _applyProfile(EmployeeProfile profile) {
-    _nicknameController.text = profile.nickname;
     _bioController.text = profile.bio ?? '';
     _languageController.text = profile.language ?? '';
     _availableForHire = profile.availableForHire;
@@ -73,10 +71,14 @@ class _EmployeeProfileScreenState
 
     setState(() => _submitting = true);
     try {
+      // Account nickname (Migration 017) is guaranteed set by this point —
+      // ChooseNicknameScreen gates every screen behind it before /home is
+      // ever reachable.
+      final nickname = ref.read(myNicknameProvider).valueOrNull ?? '';
       final saved = await ref
           .read(employeeApiServiceProvider)
           .saveMyProfile(
-            nickname: _nicknameController.text.trim(),
+            nickname: nickname,
             bio: _bioController.text.trim().isEmpty
                 ? null
                 : _bioController.text.trim(),
@@ -100,18 +102,6 @@ class _EmployeeProfileScreenState
     } on FundApiException catch (e) {
       if (!mounted) return;
       switch (e.code) {
-        case 'nickname_required':
-          setState(
-            () => _serverNicknameError = l10n.etfEmployeeProfileNicknameRequired,
-          );
-          _formKey.currentState!.validate();
-          break;
-        case 'nickname_no_email':
-          setState(
-            () => _serverNicknameError = l10n.etfEmployeeProfileNicknameNoEmail,
-          );
-          _formKey.currentState!.validate();
-          break;
         case 'bio_no_email':
           setState(() => _serverBioError = l10n.etfEmployeeProfileBioNoEmail);
           _formKey.currentState!.validate();
@@ -125,7 +115,7 @@ class _EmployeeProfileScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.etfEmployeeProfileSavedSnackbar),
+          content: Text(l10n.etfEmployeeProfileSaveError),
           backgroundColor: ThemeV2.loss,
         ),
       );
@@ -384,7 +374,11 @@ class _EmployeeProfileScreenState
         title: themedHeaderText(
           l10n.etfEmployeeProfileTitle,
           palette,
-          GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
+          GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+          ),
         ),
       ),
       body: SafeArea(
@@ -421,34 +415,23 @@ class _EmployeeProfileScreenState
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          EmployeeIdentityCard(palette: palette),
           if (profile != null) ...[
             _statsCard(palette, l10n, profile),
             _invitationsButton(palette, l10n),
           ],
           _fieldHeader(palette, l10n.etfEmployeeProfileNicknameLabel),
+          // Read-only — this is the global account nickname (Migration
+          // 017), chosen once at ChooseNicknameScreen and never editable
+          // again, not a per-profile free-text field anymore.
           _fieldWrapper(
             palette,
-            hasError: _serverNicknameError != null,
-            TextFormField(
-              controller: _nicknameController,
-              maxLength: 30,
-              style: GoogleFonts.inter(color: palette.textHeader),
-              onChanged: (_) {
-                if (_serverNicknameError != null) {
-                  setState(() => _serverNicknameError = null);
-                }
-              },
-              decoration: _decoration(
-                palette,
-                hint: l10n.etfEmployeeProfileNicknameHint,
+            Text(
+              ref.watch(myNicknameProvider).valueOrNull ?? '—',
+              style: GoogleFonts.inter(
+                color: palette.textHeader,
+                fontWeight: FontWeight.w600,
               ),
-              validator: (value) {
-                final v = (value ?? '').trim();
-                if (v.isEmpty) {
-                  return l10n.etfEmployeeProfileNicknameRequired;
-                }
-                return _serverNicknameError;
-              },
             ),
           ),
           _fieldHeader(palette, l10n.etfEmployeeProfileBioLabel),

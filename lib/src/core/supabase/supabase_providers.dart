@@ -205,3 +205,49 @@ final isSetupCompleteProvider = FutureProvider<bool>((ref) async {
     return false;
   }
 });
+
+// ---------------------------------------------------------------------------
+// Global account nickname (Migration 017) — one persistent handle per user,
+// chosen once via ChooseNicknameScreen and never editable after. Stored on
+// public.users so it survives a reinstall (unlike anything in
+// SharedPreferences) — see that screen's own doc comment for the full flow.
+// ---------------------------------------------------------------------------
+
+/// The current user's chosen nickname, or null if they haven't set one yet.
+final myNicknameProvider = FutureProvider<String?>((ref) async {
+  final user = SupabaseConfig.client.auth.currentUser;
+  if (user == null) return null;
+
+  final response = await SupabaseConfig.client
+      .from('users')
+      .select('nickname')
+      .eq('id', user.id)
+      .maybeSingle();
+  return response?['nickname'] as String?;
+});
+
+/// Regex enforced both here (client-side, for instant feedback) and by the
+/// `users_nickname_format` CHECK constraint in Migration 017 — Latin
+/// letters/digits/underscore only, 1-25 chars.
+final RegExp nicknamePattern = RegExp(r'^[A-Za-z0-9_]{1,25}$');
+
+/// Attempts to set the current user's nickname. Throws
+/// [NicknameTakenException] on a uniqueness conflict (Postgres 23505 from
+/// the `users_nickname_unique_idx` case-insensitive index) — checked by
+/// attempting the write and reading the error back, not a separate
+/// pre-check call, so there's no check-then-write race.
+Future<void> setMyNickname(String nickname) async {
+  final user = SupabaseConfig.client.auth.currentUser;
+  if (user == null) return;
+  try {
+    await SupabaseConfig.client
+        .from('users')
+        .update({'nickname': nickname})
+        .eq('id', user.id);
+  } on PostgrestException catch (e) {
+    if (e.code == '23505') throw NicknameTakenException();
+    rethrow;
+  }
+}
+
+class NicknameTakenException implements Exception {}

@@ -283,7 +283,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             row(
               icon: Icons.badge_rounded,
               color: isLuxury ? palette.accentPrimary : ThemeV2.primary,
-              label: l10n.etfEmployeeProfileTitle,
+              label: l10n.etfEmployeeProfileButtonLabel,
               onTap: () {
                 Navigator.pop(sheetContext);
                 context.push('/funds/employee-profile');

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../core/supabase/supabase_providers.dart' show myNicknameProvider;
 import '../../shared/services/finnhub_service.dart';
 import '../disclaimer/disclaimer_providers.dart';
 
@@ -90,5 +91,13 @@ Future<({String route, Object? extra})> resolvePostAuthRoute(
   final disclaimerAccepted = await ref.read(
     isDisclaimerAcceptedProvider.future,
   );
-  return (route: disclaimerAccepted ? '/home' : '/disclaimer', extra: null);
+  if (!disclaimerAccepted) return (route: '/disclaimer', extra: null);
+
+  // Catches both a brand-new signup and any already-existing account that
+  // doesn't have a nickname yet (Migration 017) — this resolver runs on
+  // every splash/login, not just first-ever signup.
+  final nickname = await ref.read(myNicknameProvider.future);
+  if (nickname == null) return (route: '/choose-nickname', extra: null);
+
+  return (route: '/home', extra: null);
 }

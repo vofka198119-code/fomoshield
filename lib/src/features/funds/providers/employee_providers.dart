@@ -7,12 +7,15 @@ final employeeApiServiceProvider = Provider<EmployeeApiService>((ref) {
 });
 
 /// The caller's own analyst profile — null (not an error) when they've
-/// never created one yet. autoDispose, same reasoning as every other fund
-/// provider: no point keeping this warm once nothing's watching it.
-final myEmployeeProfileProvider =
-    FutureProvider.autoDispose<EmployeeProfile?>((ref) {
-      return ref.watch(employeeApiServiceProvider).getMyProfile();
-    });
+/// never created one yet. Deliberately NOT autoDispose — same reasoning as
+/// fundsListProvider (see its doc comment): Home's FundEntryWidget remounts
+/// on every return to Home, and autoDispose meant it always restarted from
+/// `loading` (no value) for a frame, flashing the pre-profile label before
+/// flipping to the real one. employee_profile_screen.dart already
+/// ref.invalidates this after a successful save.
+final myEmployeeProfileProvider = FutureProvider<EmployeeProfile?>((ref) {
+  return ref.watch(employeeApiServiceProvider).getMyProfile();
+});
 
 /// The hiring marketplace — pass a fundId to also drop that fund's current
 /// roster from the results (no point showing a head someone already

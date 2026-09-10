@@ -898,7 +898,48 @@ CREATE POLICY fund_invitations_select_own ON public.fund_invitations
 
 
 -- =============================================================================
--- F.O.M.O. Shield — Supabase Migration 017+ (RESERVED)
+-- F.O.M.O. Shield — Supabase Migration 017
+-- Column: users.nickname
+-- Feature: global account nickname — one persistent handle per user, shown
+-- instead of email anywhere another user can see who's involved (fund team
+-- roster, hiring marketplace, employee profile). Replaces
+-- employee_profiles.nickname (Migration 016), which was a free-text field
+-- re-typed per profile — this is one identity per account instead.
+--
+-- Chosen once via a mandatory screen slotted into resolvePostAuthRoute()
+-- (auth_providers.dart) right after the disclaimer gate — catches both a
+-- brand-new signup and any already-existing account that doesn't have one
+-- yet, since that resolver runs on every splash/login, not just first-ever
+-- signup. Immutable after that — enforced app-side (the screen only shows
+-- when nickname IS NULL), not by a DB trigger, consistent with how this
+-- app handles its other "set once" fields.
+--
+-- Latin letters/digits/underscore only, 1-25 chars, enforced by the CHECK
+-- below AND client-side before submit (belt-and-suspenders, same as fund
+-- ticker validation). Case-insensitive uniqueness via the functional index
+-- below — the client checks availability by attempting the update and
+-- reading the resulting unique-violation (Postgres error 23505) rather
+-- than a separate pre-check call, avoiding a check-then-write race; same
+-- "attempt, map the error code" pattern as fund name/ticker uniqueness.
+--
+-- No new RLS policy needed: `users_select_own`/`users_update_own` (defined
+-- above) already let a user read/set their OWN nickname, which is all the
+-- client ever needs directly. Cross-user display (fund team roster,
+-- marketplace) is read by the backend's service-role client, which
+-- already bypasses RLS entirely — adding a blanket public SELECT policy
+-- on this table would leak email/subscription_tier/other private columns
+-- to any authenticated user, so deliberately not doing that.
+-- =============================================================================
+
+ALTER TABLE public.users ADD COLUMN nickname text
+    CONSTRAINT users_nickname_format CHECK (nickname ~ '^[A-Za-z0-9_]{1,25}$');
+
+CREATE UNIQUE INDEX users_nickname_unique_idx
+    ON public.users (lower(nickname)) WHERE nickname IS NOT NULL;
+
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 018+ (RESERVED)
 -- Feature: ETF Fund Emulation, Phases 4-8 — see docs/ETF_FUND_EMULATION.md.
 -- Remaining tables (fund_trade_proposals, fund_transactions,
 -- fund_chat_messages, fund_meetings, fund_meeting_invites,

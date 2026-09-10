@@ -161,7 +161,13 @@ class ProfileScreen extends ConsumerWidget {
           );
 
     final email = user?.email ?? l10n.profileNotSignedIn;
-    final displayName = email.split('@').first;
+    // Global account nickname (Migration 017) once set — every signed-in
+    // user has one by the time they can reach this screen (the
+    // ChooseNicknameScreen gate runs before /home is ever reachable).
+    // Email-local-part fallback covers the brief window before that
+    // provider resolves and any pre-migration edge case.
+    final displayName = ref.watch(myNicknameProvider).valueOrNull ??
+        email.split('@').first;
     final isPremium = subscriptionTier == SubscriptionTier.premium;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 

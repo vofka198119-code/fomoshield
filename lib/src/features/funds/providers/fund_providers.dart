@@ -20,10 +20,17 @@ final fundSectorsProvider = FutureProvider.autoDispose<List<String>>((ref) {
   return ref.watch(fundApiServiceProvider).getSectors();
 });
 
-/// The Search screen's Funds tab. autoDispose — same reasoning as
-/// Portfolio Holdings/Watchlist (see fomoshield_finnhub_rate_limit_fix
-/// memory): no point keeping a fund list warm once nothing's watching it.
-final fundsListProvider = FutureProvider.autoDispose<List<Fund>>((ref) {
+/// The Search screen's Funds tab, and Home's own-fund lookup
+/// (FundEntryWidget). Deliberately NOT autoDispose — unlike Watchlist/
+/// Portfolio Holdings (fomoshield_finnhub_rate_limit_fix memory), this hits
+/// our own backend, not Finnhub, so there's no rate-limit cost to keeping
+/// it warm. Home's own-fund shortcut relies on that: it remounts on every
+/// return to Home (no persistent shell around the bottom-nav screens), and
+/// autoDispose meant that remount always restarted from `loading` (no
+/// value) for a frame, flashing the pre-fund label before flipping to the
+/// real one — confirmed live 2026-09-10. Mutation sites already
+/// ref.invalidate this after creating/deleting a fund.
+final fundsListProvider = FutureProvider<List<Fund>>((ref) {
   return ref.watch(fundApiServiceProvider).listFunds();
 });
 

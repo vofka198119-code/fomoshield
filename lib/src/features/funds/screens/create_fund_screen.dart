@@ -138,7 +138,7 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.etfCreateFundSuccessMessage)));
-      context.pushReplacement('/funds/${fund.id}');
+      context.pushReplacement('/funds/${fund.id}/manage');
     } on FundApiException catch (e) {
       if (!mounted) return;
       switch (e.code) {
@@ -313,7 +313,11 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
           title: themedHeaderText(
             l10n.etfCreateFundTitle,
             palette,
-            GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
+            GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+          ),
           ),
         ),
         body: SafeArea(

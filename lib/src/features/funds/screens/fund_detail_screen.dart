@@ -12,7 +12,6 @@ import '../../company_detail/widgets/company_bottom_bar.dart';
 import '../../company_detail/widgets/position_section.dart';
 import '../models/fund.dart';
 import '../providers/fund_providers.dart';
-import '../widgets/fund_delete_dialog.dart';
 import '../widgets/fund_price_header.dart';
 import '../widgets/fund_nav_chart.dart';
 import '../widgets/fund_key_metrics_card.dart';
@@ -23,13 +22,19 @@ import '../widgets/fund_info_card.dart';
 import '../widgets/fund_team_card.dart';
 
 // ---------------------------------------------------------------------------
-// Fund Detail — investor-facing view, styled to mirror Company Detail's
-// composition/skins (see widgets/ for each card). Live on-demand NAV/holdings
-// via fundDetailProvider. Buy/Sell (Phase 2) reuses Company Detail's own
-// CompanyBottomBar/PositionSection widgets directly — a fund ticker is just
-// a regular Portfolio symbol from the client's point of view (see
+// Fund Detail — the PUBLIC card: what anyone browsing Search's Funds tab
+// sees, styled to mirror Company Detail's composition/skins (see widgets/
+// for each card). Live on-demand NAV/holdings via fundDetailProvider.
+// Buy/Sell (Phase 2) reuses Company Detail's own CompanyBottomBar/
+// PositionSection widgets directly — a fund ticker is just a regular
+// Portfolio symbol from the client's point of view (see
 // PortfolioOrderEntryScreen's fundId branch for where the money actually
-// settles). Team roster + hiring (Phase 3) is FundTeamCard below.
+// settles). The team roster is shown read-only here (insider-holding
+// transparency) — Hire/Terminate and delete live only on
+// FundManagementScreen (fund_management_screen.dart), reached via the
+// AppBar icon below when the viewer is the fund's head. Don't put
+// head-only controls back on this screen — that's the exact mixing the
+// split undid (2026-09-10).
 // ---------------------------------------------------------------------------
 
 class FundDetailScreen extends ConsumerWidget {
@@ -82,7 +87,11 @@ class FundDetailScreen extends ConsumerWidget {
           data: (fund) => themedHeaderText(
             fund.ticker,
             palette,
-            GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
+            GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+          ),
           ),
           orElse: () => const SizedBox.shrink(),
         ),
@@ -91,9 +100,12 @@ class FundDetailScreen extends ConsumerWidget {
             data: (fund) =>
                 fund.headUserId == ref.watch(currentUserProvider)?.id
                 ? IconButton(
-                    icon: Icon(Icons.delete_outline, color: palette.textBody),
-                    onPressed: () =>
-                        showFundDeleteFlow(context, ref, fund.id, palette),
+                    icon: Icon(
+                      Icons.admin_panel_settings_outlined,
+                      color: palette.textBody,
+                    ),
+                    tooltip: l10n.etfFundDetailManageTooltip,
+                    onPressed: () => context.push('/funds/${fund.id}/manage'),
                   )
                 : const SizedBox.shrink(),
             orElse: () => const SizedBox.shrink(),
@@ -146,12 +158,14 @@ class FundDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       _padded(FundHoldingsCard(fund: fund, palette: palette)),
                       const SizedBox(height: 16),
+                      // Read-only here (insider-holding transparency for
+                      // any viewer); Hire/Terminate only exist on
+                      // FundManagementScreen — isHead is deliberately
+                      // false on this screen regardless of the viewer.
                       _padded(
                         FundTeamCard(
                           fundId: fund.id,
-                          isHead:
-                              fund.headUserId ==
-                              ref.watch(currentUserProvider)?.id,
+                          isHead: false,
                           palette: palette,
                         ),
                       ),

@@ -31,7 +31,11 @@ import '../../funds/widgets/etf_premium_required_sheet.dart';
 // 'fund_limit_reached' since the 1-fund-per-user cap was already hit; the
 // user had no other way to find their own fund again except digging
 // through the Search screen's Funds tab). Labels flip to match (see
-// _FundEntryPanel's title param below).
+// _FundEntryPanel's title param below) — the analyst side uses
+// etfHomeCardTitleMyProfile once a profile exists, NOT
+// etfHomeCardTitleVacancies (renamed 2026-09-10): that string is reserved
+// for a future open-positions browse screen, a different feature from this
+// "did anyone invite me" shortcut.
 // ---------------------------------------------------------------------------
 
 class FundEntryWidget extends ConsumerWidget {
@@ -43,7 +47,7 @@ class FundEntryWidget extends ConsumerWidget {
     String? myFundId,
   ) async {
     if (myFundId != null) {
-      context.push('/funds/$myFundId');
+      context.push('/funds/$myFundId/manage');
       return;
     }
     final seen = ref.read(fundOnboardingSeenProvider(FundOnboardingBranch.head));
@@ -62,19 +66,22 @@ class FundEntryWidget extends ConsumerWidget {
     if (context.mounted) context.push('/funds/create');
   }
 
-  // Once a profile exists, this tile's daily job is "did anyone invite
-  // me" — not re-editing the profile (moved to Portfolio's own ⋮ menu,
-  // per the design doc's original "edited from the Portfolio card" call
-  // and the author's 2026-09-09 request). First-time-ever tap (no profile
-  // yet) still goes through onboarding into the create form, same as
-  // before.
+  // Once a profile exists, the tile is labeled "My Profile"
+  // (etfEmployeeProfileButtonLabel) and opens EmployeeHubScreen — a
+  // landing point with a shortcut row to the profile form, invitations,
+  // vacancies, and applications (2026-09-10), not the profile form
+  // directly. Portfolio's own ⋮ menu still links straight to the profile
+  // form itself, not the hub — that's a quick-edit shortcut for someone
+  // already elsewhere in the app, not a first stop. First-time-ever tap
+  // (no profile yet) still goes through onboarding into the create form,
+  // same as before.
   Future<void> _handleAnalystTap(
     BuildContext context,
     WidgetRef ref,
     bool hasProfile,
   ) async {
     if (hasProfile) {
-      context.push('/funds/invitations');
+      context.push('/funds/employee-hub');
       return;
     }
     final seen =
@@ -95,15 +102,20 @@ class FundEntryWidget extends ConsumerWidget {
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final tier = ref.watch(subscriptionTierProvider);
     final userId = ref.watch(currentUserProvider)?.id;
-    final myFundId = ref
-        .watch(fundsListProvider)
-        .valueOrNull
+    final fundsAsync = ref.watch(fundsListProvider);
+    final myFundId = fundsAsync.valueOrNull
         ?.where((f) => f.headUserId == userId)
         .firstOrNull
         ?.id;
-    final hasProfile =
-        ref.watch(myEmployeeProfileProvider).valueOrNull != null;
+    final profileAsync = ref.watch(myEmployeeProfileProvider);
+    final hasProfile = profileAsync.valueOrNull != null;
 
+    // Neither provider is autoDispose anymore (fixed 2026-09-10), so this
+    // `!hasValue` branch only fires once — the very first fetch of a cold
+    // app start, never again on a return trip to Home. Rather than
+    // guessing "Become a Fund Manager"/"Become an Investment Assistant"
+    // and possibly having to snap to the opposite (real) label a moment
+    // later, show a neutral placeholder until the real answer is in.
     return CardFrame(
       padding: const EdgeInsets.all(4),
       palette: palette,
@@ -113,13 +125,17 @@ class FundEntryWidget extends ConsumerWidget {
             Expanded(
               child: _FundEntryPanel(
                 icon: Icons.account_balance_rounded,
-                title: myFundId != null
+                title: !fundsAsync.hasValue
+                    ? null
+                    : myFundId != null
                     ? l10n.etfHomeCardTitleMyFund
                     : l10n.etfHomeCardTitleHead,
                 premiumTag: myFundId == null && !tier.isPremiumOrAdmin,
                 palette: palette,
                 l10n: l10n,
-                onTap: () => _handleHeadTap(context, ref, myFundId),
+                onTap: fundsAsync.hasValue
+                    ? () => _handleHeadTap(context, ref, myFundId)
+                    : null,
               ),
             ),
             Container(
@@ -130,13 +146,17 @@ class FundEntryWidget extends ConsumerWidget {
             Expanded(
               child: _FundEntryPanel(
                 icon: Icons.badge_rounded,
-                title: hasProfile
-                    ? l10n.etfHomeCardTitleVacancies
+                title: !profileAsync.hasValue
+                    ? null
+                    : hasProfile
+                    ? l10n.etfEmployeeProfileButtonLabel
                     : l10n.etfHomeCardTitleAnalyst,
                 premiumTag: false,
                 palette: palette,
                 l10n: l10n,
-                onTap: () => _handleAnalystTap(context, ref, hasProfile),
+                onTap: profileAsync.hasValue
+                    ? () => _handleAnalystTap(context, ref, hasProfile)
+                    : null,
               ),
             ),
           ],
@@ -148,11 +168,14 @@ class FundEntryWidget extends ConsumerWidget {
 
 class _FundEntryPanel extends StatelessWidget {
   final IconData icon;
-  final String title;
+  // Null while the tile's own data hasn't resolved yet (first cold-start
+  // fetch only) — renders a neutral placeholder bar instead of a guess
+  // that might have to flip to the opposite label a moment later.
+  final String? title;
   final bool premiumTag;
   final AppPalette palette;
   final AppLocalizations l10n;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const _FundEntryPanel({
     required this.icon,
@@ -175,16 +198,25 @@ class _FundEntryPanel extends StatelessWidget {
           children: [
             Icon(icon, color: palette.accentPrimary, size: 28),
             const SizedBox(height: 10),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: palette.textHeader,
-                height: 1.3,
-              ),
-            ),
+            title == null
+                ? Container(
+                    width: 64,
+                    height: 13 * 1.3,
+                    decoration: BoxDecoration(
+                      color: palette.textBody.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  )
+                : Text(
+                    title!,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: palette.textHeader,
+                      height: 1.3,
+                    ),
+                  ),
             if (premiumTag) ...[
               const SizedBox(height: 6),
               Text(

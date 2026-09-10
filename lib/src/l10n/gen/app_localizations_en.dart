@@ -5828,6 +5828,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disclaimerScreenAcceptButton => 'I Accept';
 
   @override
+  String get chooseNicknameTitle => 'Choose your nickname';
+
+  @override
+  String get chooseNicknameSubtitle =>
+      'This is how other users will see you — on a fund\'s team roster, in the hiring marketplace, and anywhere else your activity is shown publicly. Your email is never shown. Choose carefully: it cannot be changed later.';
+
+  @override
+  String get chooseNicknameHint => 'Nickname';
+
+  @override
+  String get chooseNicknameRequired => 'Enter a nickname';
+
+  @override
+  String get chooseNicknameInvalidChars =>
+      'Latin letters, numbers and underscore only, up to 25 characters';
+
+  @override
+  String get chooseNicknameTakenError => 'This nickname is already taken';
+
+  @override
+  String get chooseNicknameGenericError =>
+      'Couldn\'t save your nickname — try again';
+
+  @override
+  String get chooseNicknameContinueButton => 'Continue';
+
+  @override
   String get disclaimerScreenLinkFailed =>
       'Couldn\'t open the link. Please check your internet connection.';
 
@@ -6428,6 +6455,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfHomeCardTitleVacancies => 'Job Offers';
 
   @override
+  String get etfEmployeeHubTitle => 'EMPLOYEE';
+
+  @override
+  String get etfEmployeeHubInvitationsRow => 'My Invitations';
+
+  @override
+  String get etfEmployeeHubApplicationsRow => 'My Applications';
+
+  @override
+  String get etfComingSoonTitle => 'Coming Soon';
+
+  @override
+  String get etfComingSoonBody => 'This feature is coming in a future update.';
+
+  @override
   String get etfHomeCardPremiumTag => 'Premium';
 
   @override
@@ -6482,7 +6524,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Investment assistant features are coming in a future update.';
 
   @override
-  String get etfCreateFundTitle => 'Create Fund';
+  String get etfCreateFundTitle => 'CREATE FUND';
 
   @override
   String get etfCreateFundNameLabel => 'Fund Name';
@@ -6648,7 +6690,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfRoleRiskManager => 'Risk Manager';
 
   @override
-  String get etfEmployeeProfileTitle => 'Employee Profile';
+  String get etfEmployeeProfileTitle => 'MY PROFILE';
+
+  @override
+  String get etfEmployeeProfileButtonLabel => 'My Profile';
+
+  @override
+  String get etfEmployeeProfileSaveError =>
+      'Couldn\'t save your profile — try again';
 
   @override
   String get etfEmployeeProfileNicknameLabel => 'Nickname';
@@ -6717,7 +6766,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get etfMarketplaceTitle => 'Hiring Marketplace';
+  String get etfMarketplaceTitle => 'HIRING MARKETPLACE';
 
   @override
   String get etfMarketplaceEmpty => 'No one is available for hire right now';
@@ -6765,7 +6814,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'That person already has a pending invite from you';
 
   @override
-  String get etfInvitationsTitle => 'My Invitations';
+  String get etfFundDetailManageTooltip => 'Manage fund';
+
+  @override
+  String get etfFundManagementViewPublicButton => 'View public page';
+
+  @override
+  String get etfFundManagementAccessDenied =>
+      'You don\'t have access to manage this fund';
+
+  @override
+  String get etfInvitationsTitle => 'MY INVITATIONS';
 
   @override
   String get etfInvitationsEmpty => 'No pending invitations';

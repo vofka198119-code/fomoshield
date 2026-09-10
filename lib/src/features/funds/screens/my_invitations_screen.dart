@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
@@ -40,8 +41,19 @@ class MyInvitationsScreen extends ConsumerWidget {
         title: themedHeaderText(
           l10n.etfInvitationsTitle,
           palette,
-          GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800),
+          GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+          ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.badge_outlined, color: palette.textHeader),
+            tooltip: l10n.etfEmployeeProfileButtonLabel,
+            onPressed: () => context.push('/funds/employee-profile'),
+          ),
+        ],
       ),
       body: SafeArea(
         child: invitationsAsync.when(
@@ -57,9 +69,33 @@ class MyInvitationsScreen extends ConsumerWidget {
           data: (invitations) {
             if (invitations.isEmpty) {
               return Center(
-                child: Text(
-                  l10n.etfInvitationsEmpty,
-                  style: GoogleFonts.inter(color: palette.textBody),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l10n.etfInvitationsEmpty,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(color: palette.textBody),
+                      ),
+                      const SizedBox(height: 16),
+                      OutlinedButton(
+                        onPressed: () =>
+                            context.push('/funds/employee-profile'),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: palette.accentPrimary),
+                        ),
+                        child: Text(
+                          l10n.etfEmployeeProfileButtonLabel,
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            color: palette.accentPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }

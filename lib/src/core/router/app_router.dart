@@ -12,6 +12,7 @@ import '../supabase/supabase_client.dart';
 import '../../features/auth/account_restore_screen.dart';
 import '../../shared/services/finnhub_service.dart' show AccountDeletionStatus;
 import '../../features/disclaimer/disclaimer_screen.dart';
+import '../../features/nickname/choose_nickname_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
@@ -58,8 +59,11 @@ import '../../features/funds/onboarding/fund_onboarding_providers.dart';
 import '../../features/funds/onboarding/fund_onboarding_screen.dart';
 import '../../features/funds/screens/create_fund_screen.dart';
 import '../../features/funds/screens/employee_marketplace_screen.dart';
+import '../../features/funds/screens/coming_soon_screen.dart';
+import '../../features/funds/screens/employee_hub_screen.dart';
 import '../../features/funds/screens/employee_profile_screen.dart';
 import '../../features/funds/screens/fund_detail_screen.dart';
+import '../../features/funds/screens/fund_management_screen.dart';
 import '../../features/funds/screens/my_invitations_screen.dart';
 import '../../features/funds/widgets/fund_list_screen.dart';
 import '../theme/app_palette.dart';
@@ -88,7 +92,13 @@ class _GoRouterRefreshStream extends ChangeNotifier {
 // Routes that manage their own auth/session logic — never redirected away
 // from by the session guard below (Splash resolves the real destination
 // itself; Auth/forgot-password/disclaimer are the destinations).
-const _authExemptPaths = {'/', '/auth', '/forgot-password', '/disclaimer'};
+const _authExemptPaths = {
+  '/',
+  '/auth',
+  '/forgot-password',
+  '/disclaimer',
+  '/choose-nickname',
+};
 
 class AppRouter {
   AppRouter._();
@@ -135,6 +145,12 @@ class AppRouter {
         path: '/disclaimer',
         name: 'disclaimer',
         builder: (context, state) => const DisclaimerScreen(),
+      ),
+
+      GoRoute(
+        path: '/choose-nickname',
+        name: 'chooseNickname',
+        builder: (context, state) => const ChooseNicknameScreen(),
       ),
 
       GoRoute(
@@ -458,6 +474,11 @@ class AppRouter {
       // Phase 3 — registered before '/funds/:id' so these literal paths
       // win the match, same reasoning as '/funds/list' above.
       GoRoute(
+        path: '/funds/employee-hub',
+        name: 'employeeHub',
+        builder: (context, state) => const EmployeeHubScreen(),
+      ),
+      GoRoute(
         path: '/funds/employee-profile',
         name: 'employeeProfile',
         builder: (context, state) => const EmployeeProfileScreen(),
@@ -466,6 +487,22 @@ class AppRouter {
         path: '/funds/invitations',
         name: 'myInvitations',
         builder: (context, state) => const MyInvitationsScreen(),
+      ),
+      GoRoute(
+        path: '/funds/vacancies',
+        name: 'vacancies',
+        builder: (context, state) => ComingSoonScreen(
+          title: AppLocalizations.of(context)!.etfHomeCardTitleVacancies,
+          icon: Icons.work_outline_rounded,
+        ),
+      ),
+      GoRoute(
+        path: '/funds/my-applications',
+        name: 'myApplications',
+        builder: (context, state) => ComingSoonScreen(
+          title: AppLocalizations.of(context)!.etfEmployeeHubApplicationsRow,
+          icon: Icons.assignment_outlined,
+        ),
       ),
       GoRoute(
         path: '/funds/:id',
@@ -481,6 +518,14 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return EmployeeMarketplaceScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/manage',
+        name: 'fundManagement',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundManagementScreen(fundId: id);
         },
       ),
       GoRoute(

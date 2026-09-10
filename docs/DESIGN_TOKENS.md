@@ -256,9 +256,19 @@ count, not literally the same 7 files): `portfolio/widgets/target_widget.dart` (
 
 | Use | Style |
 |---|---|
-| Card title (section header) | `FomoShieldTheme.cardTitle()` — Inter 13px, w700, letterSpacing 1.2, color `ThemeV2.primary` (light card) or `Colors.white` (dark card, override manually) |
+| **Screen/AppBar title** (a pushed or tab-root screen's own header — NOT a card section header) | ALL CAPS in the `.arb` string itself, `themedHeaderText(text, palette, GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: 1.5))`, `centerTitle: true`, `leading: themedBackButton(...)`. Confirmed 2026-09-10 against `portfolio_screen.dart` (`ПОРТФЕЛЬ`) and `set_goal_screen.dart` (`УСТАНОВИТЬ ЦЕЛЬ`/`ИЗМЕНИТЬ ЦЕЛЬ`) — **not** the smaller 18px/no-letterSpacing/sentence-case style the ETF Fund Emulation screens shipped with first (fund/employee/invitation/marketplace/create-fund screens), which was a mismatch fixed on that date. A dynamic (non-.arb) title needs `.toUpperCase()` at the call site instead — same reasoning as `cardTitle()` below. |
+| Card title (section header) | `FomoShieldTheme.cardTitle()` — Inter 13px, w700, letterSpacing 1.2, color `ThemeV2.primary` (light card) or `Colors.white` (dark card, override manually). Static labels are typed in caps directly in the `.arb`; dynamic content gets `.toUpperCase()` at the call site (e.g. `stress_test_screen.dart`'s session title) — `cardTitle()` itself does no case transformation. |
 | Body text | Inter, size varies by context (13–16px seen in practice — no single enforced body style) |
 | **Any numeric value** (price, P&L, %, balance, score) | `FontWeight.w600` (Semibold) — **never** `w800`/bold. See `interNums()` helper in `typography_helpers.dart`. |
+
+> **Before styling any new screen's title, button label, or menu item**: check every existing call
+> site of the exact same `.arb` key, not just the one you're adding — a key shared across an AppBar
+> title AND a button/menu label (different conventions) will silently apply the wrong casing to
+> whichever site you didn't look at. This bit a same-day ETF fix on 2026-09-10: `etfEmployeeProfileTitle`
+> was reused for a Home tile button, a Portfolio menu item, AND the actual screen's AppBar title;
+> caps-ing it for the AppBar leaked caps onto the other two. Fixed by splitting into
+> `etfEmployeeProfileTitle` (AppBar, caps) and `etfEmployeeProfileButtonLabel` (button/menu, sentence
+> case) — one key per UI role, even when the English text is identical.
 
 ---
 

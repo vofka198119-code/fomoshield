@@ -5845,6 +5845,33 @@ class AppLocalizationsRu extends AppLocalizations {
   String get disclaimerScreenAcceptButton => 'Принимаю';
 
   @override
+  String get chooseNicknameTitle => 'Выбери свой никнейм';
+
+  @override
+  String get chooseNicknameSubtitle =>
+      'Именно так тебя увидят другие пользователи — в составе команды фонда, на бирже вакансий и везде, где твоя активность видна публично. Почта нигде не показывается. Выбирай внимательно: сменить ник потом будет нельзя.';
+
+  @override
+  String get chooseNicknameHint => 'Никнейм';
+
+  @override
+  String get chooseNicknameRequired => 'Введи никнейм';
+
+  @override
+  String get chooseNicknameInvalidChars =>
+      'Только латинские буквы, цифры и подчёркивание, до 25 символов';
+
+  @override
+  String get chooseNicknameTakenError => 'Этот никнейм уже занят';
+
+  @override
+  String get chooseNicknameGenericError =>
+      'Не удалось сохранить никнейм — попробуй ещё раз';
+
+  @override
+  String get chooseNicknameContinueButton => 'Продолжить';
+
+  @override
   String get disclaimerScreenLinkFailed =>
       'Не удалось открыть ссылку. Проверьте подключение к интернету.';
 
@@ -6450,6 +6477,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfHomeCardTitleVacancies => 'Вакансии';
 
   @override
+  String get etfEmployeeHubTitle => 'СОТРУДНИК';
+
+  @override
+  String get etfEmployeeHubInvitationsRow => 'Мои приглашения';
+
+  @override
+  String get etfEmployeeHubApplicationsRow => 'Мои заявки';
+
+  @override
+  String get etfComingSoonTitle => 'Скоро';
+
+  @override
+  String get etfComingSoonBody =>
+      'Эта функция появится в одном из следующих обновлений.';
+
+  @override
   String get etfHomeCardPremiumTag => 'Premium';
 
   @override
@@ -6504,7 +6547,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Функции инвестиционного помощника появятся в одном из следующих обновлений.';
 
   @override
-  String get etfCreateFundTitle => 'Создание фонда';
+  String get etfCreateFundTitle => 'СОЗДАНИЕ ФОНДА';
 
   @override
   String get etfCreateFundNameLabel => 'Название фонда';
@@ -6669,7 +6712,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfRoleRiskManager => 'Риск-менеджер';
 
   @override
-  String get etfEmployeeProfileTitle => 'Анкета сотрудника';
+  String get etfEmployeeProfileTitle => 'МОЙ ПРОФИЛЬ';
+
+  @override
+  String get etfEmployeeProfileButtonLabel => 'Мой профиль';
+
+  @override
+  String get etfEmployeeProfileSaveError =>
+      'Не удалось сохранить анкету — попробуй ещё раз';
 
   @override
   String get etfEmployeeProfileNicknameLabel => 'Никнейм';
@@ -6738,7 +6788,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get etfMarketplaceTitle => 'Биржа вакансий';
+  String get etfMarketplaceTitle => 'БИРЖА ВАКАНСИЙ';
 
   @override
   String get etfMarketplaceEmpty => 'Пока никто не ищет работу';
@@ -6785,7 +6835,17 @@ class AppLocalizationsRu extends AppLocalizations {
       'У этого человека уже есть приглашение от тебя';
 
   @override
-  String get etfInvitationsTitle => 'Мои приглашения';
+  String get etfFundDetailManageTooltip => 'Управление фондом';
+
+  @override
+  String get etfFundManagementViewPublicButton => 'Открыть публичную карточку';
+
+  @override
+  String get etfFundManagementAccessDenied =>
+      'У тебя нет доступа к управлению этим фондом';
+
+  @override
+  String get etfInvitationsTitle => 'МОИ ПРИГЛАШЕНИЯ';
 
   @override
   String get etfInvitationsEmpty => 'Нет входящих приглашений';
