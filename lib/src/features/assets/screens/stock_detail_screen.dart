@@ -302,15 +302,21 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
 
     // Right after the first purchase the engine hasn't ticked yet — only
     // the one real-price entry _generateSparkData's fallback draws as a
-    // flat 2-point line, and dailyPriceHistory is still empty outright
-    // (blank chart for any non-1D period). Show the real company's actual
-    // historical chart (same widget/data Company Detail uses) instead
-    // until the engine has produced enough synthetic ticks of its own —
-    // once it has, this falls back to the existing StockSparklineChart
-    // path unchanged.
+    // flat 2-point line (or nothing at all outside the 1D view). Show the
+    // real company's actual historical chart (same widget/data Company
+    // Detail uses) instead until the engine has produced its own
+    // synthetic ticks — once it has, this falls back to the existing
+    // StockSparklineChart path unchanged. Deliberately NOT also checking
+    // dailyPriceHistory here: opening this screen for ANY not-yet-held
+    // symbol seeds both priceHistory AND a single dailyPriceHistory
+    // bucket via _ensurePriceForNewAsset -> setExternalPrice (see
+    // stress_test_engine.dart), so dailyPriceHistory is never actually
+    // empty by the time this builds — priceHistory's length is the only
+    // signal that distinguishes "just the one seeded price" from "the
+    // engine has ticked since," since only the periodic simulation tick
+    // (noise_engine.dart) ever appends a 2nd+ entry to it.
     final hasSyntheticHistory =
-        (session.priceHistory[widget.symbol]?.length ?? 0) > 1 ||
-        (session.dailyPriceHistory[widget.symbol]?.isNotEmpty ?? false);
+        (session.priceHistory[widget.symbol]?.length ?? 0) > 1;
     final hoverPrice = hasSyntheticHistory
         ? _hoverPrice
         : ref.watch(chartHoverPriceProvider(widget.symbol));
@@ -327,25 +333,30 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                 physics: const BouncingScrollPhysics(),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: PriceHeader(
-                        logo: logoAsync.valueOrNull,
-                        companyName: resolveStressTestCompanyName(
-                          ref,
-                          widget.symbol,
-                        ),
-                        symbol: widget.symbol,
-                        showFsScore: false,
-                        price: hoverPrice ?? currentPrice,
-                        change: priceChange,
-                        changePercent: priceChangePercent,
-                        isUp: isPositive,
-                        // Simulated market has no real session concept —
-                        // no label, no glow, plain price color throughout.
-                        showSessionLabel: false,
-                        palette: palette,
+                    // PriceHeader pads its own two cards horizontally by
+                    // 16px internally (see price_header.dart) — the same
+                    // convention Company Detail relies on by placing it
+                    // directly in a Column with no wrapper of its own.
+                    // Wrapping it in another 16px Padding here used to
+                    // double that to 32px, making its cards visibly
+                    // narrower than StockSparklineChart/PriceChart below
+                    // (each margined by only 16px).
+                    PriceHeader(
+                      logo: logoAsync.valueOrNull,
+                      companyName: resolveStressTestCompanyName(
+                        ref,
+                        widget.symbol,
                       ),
+                      symbol: widget.symbol,
+                      showFsScore: false,
+                      price: hoverPrice ?? currentPrice,
+                      change: priceChange,
+                      changePercent: priceChangePercent,
+                      isUp: isPositive,
+                      // Simulated market has no real session concept —
+                      // no label, no glow, plain price color throughout.
+                      showSessionLabel: false,
+                      palette: palette,
                     ),
                     const SizedBox(height: 12),
                     if (!hasSyntheticHistory)
