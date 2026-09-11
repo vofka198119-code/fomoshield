@@ -304,19 +304,22 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     // the one real-price entry _generateSparkData's fallback draws as a
     // flat 2-point line (or nothing at all outside the 1D view). Show the
     // real company's actual historical chart (same widget/data Company
-    // Detail uses) instead until the engine has produced its own
-    // synthetic ticks — once it has, this falls back to the existing
-    // StockSparklineChart path unchanged. Deliberately NOT also checking
-    // dailyPriceHistory here: opening this screen for ANY not-yet-held
-    // symbol seeds both priceHistory AND a single dailyPriceHistory
-    // bucket via _ensurePriceForNewAsset -> setExternalPrice (see
-    // stress_test_engine.dart), so dailyPriceHistory is never actually
-    // empty by the time this builds — priceHistory's length is the only
-    // signal that distinguishes "just the one seeded price" from "the
-    // engine has ticked since," since only the periodic simulation tick
-    // (noise_engine.dart) ever appends a 2nd+ entry to it.
-    final hasSyntheticHistory =
-        (session.priceHistory[widget.symbol]?.length ?? 0) > 1;
+    // Detail uses) instead until StockSparklineChart would actually have
+    // a real line to draw for whatever period is currently selected —
+    // once it does, this falls back to that existing path unchanged.
+    // Deliberately checking _points itself (from the exact same
+    // _generateSparkData this screen already runs on every tick/period
+    // change) rather than a raw priceHistory-length threshold: the
+    // stress test's live-tick timer fires every 20s regardless of when a
+    // symbol was bought, so a naive "priceHistory.length > 1" check flips
+    // over the instant that timer next fires — often just seconds after
+    // the purchase — while the daily-bucketed history a period like 1M
+    // reads from still has nothing to show, producing a real chart that
+    // flashes to "insufficient data" moments after appearing. _points
+    // length > 2 excludes both degenerate cases (the empty-history flat
+    // 2-point fallback, and the empty list from insufficient daily
+    // history) so the switch only happens once there's an actual line.
+    final hasSyntheticHistory = _chartReady && _points.length > 2;
     final hoverPrice = hasSyntheticHistory
         ? _hoverPrice
         : ref.watch(chartHoverPriceProvider(widget.symbol));
