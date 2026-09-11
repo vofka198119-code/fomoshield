@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
@@ -221,96 +220,6 @@ class _EmployeeProfileScreenState
     );
   }
 
-  Widget _statsCard(
-    AppPalette palette,
-    AppLocalizations l10n,
-    EmployeeProfile profile,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: CardFrame(
-        decoration: FomoShieldTheme.cardDecoration,
-        palette: palette,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            themedHeaderText(
-              l10n.etfEmployeeProfileStatsTitle,
-              palette,
-              FomoShieldTheme.cardTitle(),
-            ),
-            const SizedBox(height: 12),
-            _statRow(
-              palette,
-              l10n.etfEmployeeProfileStatsApproved,
-              '${profile.approvedProposalsCount}',
-            ),
-            const SizedBox(height: 8),
-            _statRow(
-              palette,
-              l10n.etfEmployeeProfileStatsRejected,
-              '${profile.rejectedProposalsCount}',
-            ),
-            const SizedBox(height: 8),
-            _statRow(
-              palette,
-              l10n.etfEmployeeProfileStatsFundsChanged,
-              '${profile.fundsChangedCount}',
-            ),
-            const SizedBox(height: 8),
-            _statRow(
-              palette,
-              l10n.etfEmployeeProfileStatsRating,
-              profile.rating != null
-                  ? profile.rating!.toStringAsFixed(1)
-                  : l10n.etfEmployeeProfileRatingPending,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _statRow(AppPalette palette, String label, String value) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(
-        label,
-        style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
-      ),
-      Text(
-        value,
-        style: GoogleFonts.inter(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: palette.textHeader,
-        ),
-      ),
-    ],
-  );
-
-  Widget _invitationsButton(AppPalette palette, AppLocalizations l10n) {
-    final invitationsAsync = ref.watch(myInvitationsProvider);
-    final count = invitationsAsync.valueOrNull?.length ?? 0;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: OutlinedButton(
-        onPressed: () => context.push('/funds/invitations'),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 48),
-          side: BorderSide(color: palette.accentPrimary),
-        ),
-        child: Text(
-          l10n.etfEmployeeProfileInvitationsButton(count),
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            color: palette.accentPrimary,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _submitButton(AppPalette palette, AppLocalizations l10n) {
     final radius = BorderRadius.circular(ThemeV2.buttonRadius);
     return SizedBox(
@@ -416,10 +325,6 @@ class _EmployeeProfileScreenState
         padding: const EdgeInsets.all(20),
         children: [
           EmployeeIdentityCard(palette: palette),
-          if (profile != null) ...[
-            _statsCard(palette, l10n, profile),
-            _invitationsButton(palette, l10n),
-          ],
           _fieldHeader(palette, l10n.etfEmployeeProfileNicknameLabel),
           // Read-only — this is the global account nickname (Migration
           // 017), chosen once at ChooseNicknameScreen and never editable

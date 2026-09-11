@@ -6480,10 +6480,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfEmployeeHubTitle => 'МОЙ ПРОФИЛЬ';
 
   @override
-  String get etfEmployeeHubInvitationsRow => 'Мои приглашения';
+  String get etfEmployeeHubInvitationsRow => 'Приглашения';
 
   @override
-  String get etfEmployeeHubApplicationsRow => 'Мои заявки';
+  String get etfEmployeeHubApplicationsRow => 'Заявки';
 
   @override
   String get etfComingSoonTitle => 'Скоро';
@@ -6715,7 +6715,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfEmployeeProfileTitle => 'МОЯ АНКЕТА';
 
   @override
-  String get etfEmployeeProfileButtonLabel => 'Моя анкета';
+  String get etfEmployeeProfileButtonLabel => 'Анкета';
 
   @override
   String get etfEmployeeProfileSaveError =>
@@ -6839,6 +6839,39 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get etfFundManagementViewPublicButton => 'Открыть публичную карточку';
+
+  @override
+  String get etfEmployeeHubTeamRow => 'Сотрудники';
+
+  @override
+  String get etfPositionFundManager => 'Управляющий фондом';
+
+  @override
+  String get etfPositionEmployee => 'Сотрудник';
+
+  @override
+  String get etfAdminBadge => 'АДМИН';
+
+  @override
+  String get etfAdminRenameNicknameTooltip => 'Переименовать ник (админ)';
+
+  @override
+  String get etfAdminCreateFundTooltip => 'Создать ещё фонд (админ)';
+
+  @override
+  String get etfAdminRenameFundTooltip => 'Переименовать фонд (админ)';
+
+  @override
+  String get etfAdminRenameNicknameTitle => 'Переименовать ник';
+
+  @override
+  String get etfAdminRenameFundTitle => 'Переименовать фонд';
+
+  @override
+  String get etfAdminRenameFundNameRequired => 'Название фонда обязательно';
+
+  @override
+  String get etfAdminRenameFundGenericError => 'Не удалось переименовать фонд';
 
   @override
   String get etfFundManagementAccessDenied =>

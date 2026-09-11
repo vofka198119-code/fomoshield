@@ -6458,10 +6458,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfEmployeeHubTitle => 'MY PROFILE';
 
   @override
-  String get etfEmployeeHubInvitationsRow => 'My Invitations';
+  String get etfEmployeeHubInvitationsRow => 'Invitations';
 
   @override
-  String get etfEmployeeHubApplicationsRow => 'My Applications';
+  String get etfEmployeeHubApplicationsRow => 'Applications';
 
   @override
   String get etfComingSoonTitle => 'Coming Soon';
@@ -6693,7 +6693,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfEmployeeProfileTitle => 'MY RESUME';
 
   @override
-  String get etfEmployeeProfileButtonLabel => 'My Resume';
+  String get etfEmployeeProfileButtonLabel => 'Resume';
 
   @override
   String get etfEmployeeProfileSaveError =>
@@ -6818,6 +6818,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfFundManagementViewPublicButton => 'View public page';
+
+  @override
+  String get etfEmployeeHubTeamRow => 'Team';
+
+  @override
+  String get etfPositionFundManager => 'Fund Manager';
+
+  @override
+  String get etfPositionEmployee => 'Employee';
+
+  @override
+  String get etfAdminBadge => 'ADMIN';
+
+  @override
+  String get etfAdminRenameNicknameTooltip => 'Rename nickname (admin)';
+
+  @override
+  String get etfAdminCreateFundTooltip => 'Create another fund (admin)';
+
+  @override
+  String get etfAdminRenameFundTooltip => 'Rename fund (admin)';
+
+  @override
+  String get etfAdminRenameNicknameTitle => 'Rename nickname';
+
+  @override
+  String get etfAdminRenameFundTitle => 'Rename fund';
+
+  @override
+  String get etfAdminRenameFundNameRequired => 'Fund name is required';
+
+  @override
+  String get etfAdminRenameFundGenericError => 'Failed to rename fund';
 
   @override
   String get etfFundManagementAccessDenied =>

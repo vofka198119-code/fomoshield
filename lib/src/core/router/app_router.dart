@@ -64,6 +64,7 @@ import '../../features/funds/screens/employee_hub_screen.dart';
 import '../../features/funds/screens/employee_profile_screen.dart';
 import '../../features/funds/screens/fund_detail_screen.dart';
 import '../../features/funds/screens/fund_management_screen.dart';
+import '../../features/funds/screens/fund_team_screen.dart';
 import '../../features/funds/screens/my_invitations_screen.dart';
 import '../../features/funds/widgets/fund_list_screen.dart';
 import '../theme/app_palette.dart';
@@ -526,6 +527,14 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return FundManagementScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/team',
+        name: 'fundTeam',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundTeamScreen(fundId: id);
         },
       ),
       GoRoute(

@@ -10906,13 +10906,13 @@ abstract class AppLocalizations {
   /// No description provided for @etfEmployeeHubInvitationsRow.
   ///
   /// In en, this message translates to:
-  /// **'My Invitations'**
+  /// **'Invitations'**
   String get etfEmployeeHubInvitationsRow;
 
   /// No description provided for @etfEmployeeHubApplicationsRow.
   ///
   /// In en, this message translates to:
-  /// **'My Applications'**
+  /// **'Applications'**
   String get etfEmployeeHubApplicationsRow;
 
   /// No description provided for @etfComingSoonTitle.
@@ -11344,7 +11344,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfEmployeeProfileButtonLabel.
   ///
   /// In en, this message translates to:
-  /// **'My Resume'**
+  /// **'Resume'**
   String get etfEmployeeProfileButtonLabel;
 
   /// No description provided for @etfEmployeeProfileSaveError.
@@ -11574,6 +11574,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View public page'**
   String get etfFundManagementViewPublicButton;
+
+  /// No description provided for @etfEmployeeHubTeamRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get etfEmployeeHubTeamRow;
+
+  /// No description provided for @etfPositionFundManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund Manager'**
+  String get etfPositionFundManager;
+
+  /// No description provided for @etfPositionEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee'**
+  String get etfPositionEmployee;
+
+  /// No description provided for @etfAdminBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'ADMIN'**
+  String get etfAdminBadge;
+
+  /// No description provided for @etfAdminRenameNicknameTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename nickname (admin)'**
+  String get etfAdminRenameNicknameTooltip;
+
+  /// No description provided for @etfAdminCreateFundTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Create another fund (admin)'**
+  String get etfAdminCreateFundTooltip;
+
+  /// No description provided for @etfAdminRenameFundTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename fund (admin)'**
+  String get etfAdminRenameFundTooltip;
+
+  /// No description provided for @etfAdminRenameNicknameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename nickname'**
+  String get etfAdminRenameNicknameTitle;
+
+  /// No description provided for @etfAdminRenameFundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename fund'**
+  String get etfAdminRenameFundTitle;
+
+  /// No description provided for @etfAdminRenameFundNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund name is required'**
+  String get etfAdminRenameFundNameRequired;
+
+  /// No description provided for @etfAdminRenameFundGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to rename fund'**
+  String get etfAdminRenameFundGenericError;
 
   /// No description provided for @etfFundManagementAccessDenied.
   ///

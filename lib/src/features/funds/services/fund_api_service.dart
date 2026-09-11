@@ -144,6 +144,21 @@ class FundApiService {
     }
   }
 
+  /// Admin-only dev tool — no other UI calls this yet. Head-only
+  /// server-side (checked by head_user_id, same as [deleteFund]).
+  Future<void> renameFund(String id, String name) async {
+    try {
+      await _dio.patch('/funds/$id', data: {'name': name});
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to rename fund'),
+        code: code,
+      );
+    }
+  }
+
   Future<void> deleteFund(String id) async {
     try {
       await _dio.delete('/funds/$id');
