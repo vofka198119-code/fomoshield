@@ -300,26 +300,27 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     final holding = _findHolding(session);
     final logoAsync = ref.watch(cachedLogoProvider(widget.symbol));
 
-    // Right after the first purchase the engine hasn't ticked yet — only
-    // the one real-price entry _generateSparkData's fallback draws as a
+    // Right before the very first purchase (or in the moment right after
+    // it, before the engine has ticked this symbol even once) only the
+    // one real-price entry exists — _generateSparkData's fallback draws a
     // flat 2-point line (or nothing at all outside the 1D view). Show the
     // real company's actual historical chart (same widget/data Company
-    // Detail uses) instead until StockSparklineChart would actually have
-    // a real line to draw for whatever period is currently selected —
-    // once it does, this falls back to that existing path unchanged.
-    // Deliberately checking _points itself (from the exact same
-    // _generateSparkData this screen already runs on every tick/period
-    // change) rather than a raw priceHistory-length threshold: the
-    // stress test's live-tick timer fires every 20s regardless of when a
-    // symbol was bought, so a naive "priceHistory.length > 1" check flips
-    // over the instant that timer next fires — often just seconds after
-    // the purchase — while the daily-bucketed history a period like 1M
-    // reads from still has nothing to show, producing a real chart that
-    // flashes to "insufficient data" moments after appearing. _points
-    // length > 2 excludes both degenerate cases (the empty-history flat
-    // 2-point fallback, and the empty list from insufficient daily
-    // history) so the switch only happens once there's an actual line.
-    final hasSyntheticHistory = _chartReady && _points.length > 2;
+    // Detail uses) instead for that one moment. As soon as the engine has
+    // ticked this symbol once — real holding, real simulation from here
+    // on — hand off to the existing StockSparklineChart path unchanged,
+    // even if it reads "insufficient data" for whatever period happens to
+    // be selected: that's this mechanic's existing, expected behavior,
+    // not something to smooth over here. Deliberately NOT also checking
+    // dailyPriceHistory here: opening this screen for ANY not-yet-held
+    // symbol seeds both priceHistory AND a single dailyPriceHistory
+    // bucket via _ensurePriceForNewAsset -> setExternalPrice (see
+    // stress_test_engine.dart), so dailyPriceHistory is never actually
+    // empty by the time this builds — priceHistory's length is the only
+    // signal that distinguishes "just the one seeded price" from "the
+    // engine has ticked since," since only the periodic simulation tick
+    // (noise_engine.dart) ever appends a 2nd+ entry to it.
+    final hasSyntheticHistory =
+        (session.priceHistory[widget.symbol]?.length ?? 0) > 1;
     final hoverPrice = hasSyntheticHistory
         ? _hoverPrice
         : ref.watch(chartHoverPriceProvider(widget.symbol));
