@@ -24,11 +24,8 @@ import '../../../shared/services/finnhub_service.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../company_detail/widgets/price_header.dart';
-import '../../company_detail/widgets/price_chart.dart';
 import '../../company_detail/widgets/company_bottom_bar.dart';
 import '../../company_detail/widgets/key_metrics_section.dart';
-import '../../company_detail/company_detail_provider.dart'
-    show chartHoverPriceProvider;
 import '../../../shared/widgets/simulated_trading_disclaimer.dart';
 import '../../stress_test/stress_test_naming.dart';
 import '../../stress_test/stress_test_live_metrics.dart';
@@ -300,31 +297,6 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     final holding = _findHolding(session);
     final logoAsync = ref.watch(cachedLogoProvider(widget.symbol));
 
-    // Right before the very first purchase (or in the moment right after
-    // it, before the engine has ticked this symbol even once) only the
-    // one real-price entry exists — _generateSparkData's fallback draws a
-    // flat 2-point line (or nothing at all outside the 1D view). Show the
-    // real company's actual historical chart (same widget/data Company
-    // Detail uses) instead for that one moment. As soon as the engine has
-    // ticked this symbol once — real holding, real simulation from here
-    // on — hand off to the existing StockSparklineChart path unchanged,
-    // even if it reads "insufficient data" for whatever period happens to
-    // be selected: that's this mechanic's existing, expected behavior,
-    // not something to smooth over here. Deliberately NOT also checking
-    // dailyPriceHistory here: opening this screen for ANY not-yet-held
-    // symbol seeds both priceHistory AND a single dailyPriceHistory
-    // bucket via _ensurePriceForNewAsset -> setExternalPrice (see
-    // stress_test_engine.dart), so dailyPriceHistory is never actually
-    // empty by the time this builds — priceHistory's length is the only
-    // signal that distinguishes "just the one seeded price" from "the
-    // engine has ticked since," since only the periodic simulation tick
-    // (noise_engine.dart) ever appends a 2nd+ entry to it.
-    final hasSyntheticHistory =
-        (session.priceHistory[widget.symbol]?.length ?? 0) > 1;
-    final hoverPrice = hasSyntheticHistory
-        ? _hoverPrice
-        : ref.watch(chartHoverPriceProvider(widget.symbol));
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: _buildAppBar(context, palette),
@@ -343,8 +315,8 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                     // directly in a Column with no wrapper of its own.
                     // Wrapping it in another 16px Padding here used to
                     // double that to 32px, making its cards visibly
-                    // narrower than StockSparklineChart/PriceChart below
-                    // (each margined by only 16px).
+                    // narrower than StockSparklineChart below (margined
+                    // by only 16px).
                     PriceHeader(
                       logo: logoAsync.valueOrNull,
                       companyName: resolveStressTestCompanyName(
@@ -353,7 +325,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       ),
                       symbol: widget.symbol,
                       showFsScore: false,
-                      price: hoverPrice ?? currentPrice,
+                      price: _hoverPrice ?? currentPrice,
                       change: priceChange,
                       changePercent: priceChangePercent,
                       isUp: isPositive,
@@ -363,32 +335,23 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       palette: palette,
                     ),
                     const SizedBox(height: 12),
-                    if (!hasSyntheticHistory)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: PriceChart(
-                          symbol: widget.symbol,
-                          palette: palette,
-                        ),
-                      )
-                    else
-                      StockSparklineChart(
-                        ready: _chartReady,
-                        points: _points,
-                        avgPrice: holding?.averagePrice,
-                        availablePeriods: _availablePeriods(session),
-                        selectedPeriod: _selectedPeriod,
-                        palette: palette,
-                        onPeriodChanged: (p) {
-                          setState(() => _selectedPeriod = p);
-                          _generateSparkData();
-                        },
-                        onTouchedPriceChanged: (price) {
-                          if (_hoverPrice != price) {
-                            setState(() => _hoverPrice = price);
-                          }
-                        },
-                      ),
+                    StockSparklineChart(
+                      ready: _chartReady,
+                      points: _points,
+                      avgPrice: holding?.averagePrice,
+                      availablePeriods: _availablePeriods(session),
+                      selectedPeriod: _selectedPeriod,
+                      palette: palette,
+                      onPeriodChanged: (p) {
+                        setState(() => _selectedPeriod = p);
+                        _generateSparkData();
+                      },
+                      onTouchedPriceChanged: (price) {
+                        if (_hoverPrice != price) {
+                          setState(() => _hoverPrice = price);
+                        }
+                      },
+                    ),
                     if (holding != null) ...[
                       StockPositionCard(
                         shares: holding.shares,
