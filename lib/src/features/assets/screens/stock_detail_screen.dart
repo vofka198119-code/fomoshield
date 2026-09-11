@@ -24,8 +24,11 @@ import '../../../shared/services/finnhub_service.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../company_detail/widgets/price_header.dart';
+import '../../company_detail/widgets/price_chart.dart';
 import '../../company_detail/widgets/company_bottom_bar.dart';
 import '../../company_detail/widgets/key_metrics_section.dart';
+import '../../company_detail/company_detail_provider.dart'
+    show chartHoverPriceProvider;
 import '../../../shared/widgets/simulated_trading_disclaimer.dart';
 import '../../stress_test/stress_test_naming.dart';
 import '../../stress_test/stress_test_live_metrics.dart';
@@ -297,6 +300,21 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     final holding = _findHolding(session);
     final logoAsync = ref.watch(cachedLogoProvider(widget.symbol));
 
+    // Right after the first purchase the engine hasn't ticked yet — only
+    // the one real-price entry _generateSparkData's fallback draws as a
+    // flat 2-point line, and dailyPriceHistory is still empty outright
+    // (blank chart for any non-1D period). Show the real company's actual
+    // historical chart (same widget/data Company Detail uses) instead
+    // until the engine has produced enough synthetic ticks of its own —
+    // once it has, this falls back to the existing StockSparklineChart
+    // path unchanged.
+    final hasSyntheticHistory =
+        (session.priceHistory[widget.symbol]?.length ?? 0) > 1 ||
+        (session.dailyPriceHistory[widget.symbol]?.isNotEmpty ?? false);
+    final hoverPrice = hasSyntheticHistory
+        ? _hoverPrice
+        : ref.watch(chartHoverPriceProvider(widget.symbol));
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: _buildAppBar(context, palette),
@@ -319,7 +337,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                         ),
                         symbol: widget.symbol,
                         showFsScore: false,
-                        price: _hoverPrice ?? currentPrice,
+                        price: hoverPrice ?? currentPrice,
                         change: priceChange,
                         changePercent: priceChangePercent,
                         isUp: isPositive,
@@ -330,23 +348,32 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    StockSparklineChart(
-                      ready: _chartReady,
-                      points: _points,
-                      avgPrice: holding?.averagePrice,
-                      availablePeriods: _availablePeriods(session),
-                      selectedPeriod: _selectedPeriod,
-                      palette: palette,
-                      onPeriodChanged: (p) {
-                        setState(() => _selectedPeriod = p);
-                        _generateSparkData();
-                      },
-                      onTouchedPriceChanged: (price) {
-                        if (_hoverPrice != price) {
-                          setState(() => _hoverPrice = price);
-                        }
-                      },
-                    ),
+                    if (!hasSyntheticHistory)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: PriceChart(
+                          symbol: widget.symbol,
+                          palette: palette,
+                        ),
+                      )
+                    else
+                      StockSparklineChart(
+                        ready: _chartReady,
+                        points: _points,
+                        avgPrice: holding?.averagePrice,
+                        availablePeriods: _availablePeriods(session),
+                        selectedPeriod: _selectedPeriod,
+                        palette: palette,
+                        onPeriodChanged: (p) {
+                          setState(() => _selectedPeriod = p);
+                          _generateSparkData();
+                        },
+                        onTouchedPriceChanged: (price) {
+                          if (_hoverPrice != price) {
+                            setState(() => _hoverPrice = price);
+                          }
+                        },
+                      ),
                     if (holding != null) ...[
                       StockPositionCard(
                         shares: holding.shares,
