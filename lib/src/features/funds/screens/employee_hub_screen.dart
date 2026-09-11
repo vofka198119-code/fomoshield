@@ -6,7 +6,7 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../../shared/widgets/infinite_circle_shortcut_row.dart';
+import '../../../shared/widgets/circle_shortcut_row.dart';
 import '../providers/employee_providers.dart';
 import '../widgets/employee_identity_card.dart';
 
@@ -15,9 +15,9 @@ import '../widgets/employee_identity_card.dart';
 // (Home's "My Profile" tile routes here now, not straight to the profile
 // form — 2026-09-10, per the reference mockups the author shared). Name
 // card up top (EmployeeIdentityCard, shared with EmployeeProfileScreen),
-// then an infinite circle-shortcut row to jump anywhere in "the profile"
-// from one starting screen — reuses InfiniteCircleShortcutRow so adding a
-// 5th/6th shortcut later is a one-line addition, not a redesign.
+// then a circle-shortcut row to jump anywhere in "the profile" from one
+// starting screen — reuses CircleShortcutRow so adding a 5th/6th shortcut
+// later is a one-line addition, not a redesign.
 //
 // Profile and My Invitations are real destinations; Vacancies/My
 // Applications are ComingSoonScreen stubs — the "analyst applies to an
@@ -59,7 +59,7 @@ class EmployeeHubScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(20),
           children: [
             EmployeeIdentityCard(palette: palette),
-            InfiniteCircleShortcutRow(
+            CircleShortcutRow(
               palette: palette,
               items: [
                 CircleShortcut(

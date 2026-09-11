@@ -6455,7 +6455,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfHomeCardTitleVacancies => 'Job Offers';
 
   @override
-  String get etfEmployeeHubTitle => 'EMPLOYEE';
+  String get etfEmployeeHubTitle => 'MY PROFILE';
 
   @override
   String get etfEmployeeHubInvitationsRow => 'My Invitations';
@@ -6690,10 +6690,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfRoleRiskManager => 'Risk Manager';
 
   @override
-  String get etfEmployeeProfileTitle => 'MY PROFILE';
+  String get etfEmployeeProfileTitle => 'MY RESUME';
 
   @override
-  String get etfEmployeeProfileButtonLabel => 'My Profile';
+  String get etfEmployeeProfileButtonLabel => 'My Resume';
 
   @override
   String get etfEmployeeProfileSaveError =>

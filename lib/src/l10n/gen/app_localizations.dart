@@ -10900,7 +10900,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfEmployeeHubTitle.
   ///
   /// In en, this message translates to:
-  /// **'EMPLOYEE'**
+  /// **'MY PROFILE'**
   String get etfEmployeeHubTitle;
 
   /// No description provided for @etfEmployeeHubInvitationsRow.
@@ -11338,13 +11338,13 @@ abstract class AppLocalizations {
   /// No description provided for @etfEmployeeProfileTitle.
   ///
   /// In en, this message translates to:
-  /// **'MY PROFILE'**
+  /// **'MY RESUME'**
   String get etfEmployeeProfileTitle;
 
   /// No description provided for @etfEmployeeProfileButtonLabel.
   ///
   /// In en, this message translates to:
-  /// **'My Profile'**
+  /// **'My Resume'**
   String get etfEmployeeProfileButtonLabel;
 
   /// No description provided for @etfEmployeeProfileSaveError.

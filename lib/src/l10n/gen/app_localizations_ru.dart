@@ -6477,7 +6477,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfHomeCardTitleVacancies => 'Вакансии';
 
   @override
-  String get etfEmployeeHubTitle => 'СОТРУДНИК';
+  String get etfEmployeeHubTitle => 'МОЙ ПРОФИЛЬ';
 
   @override
   String get etfEmployeeHubInvitationsRow => 'Мои приглашения';
@@ -6712,10 +6712,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfRoleRiskManager => 'Риск-менеджер';
 
   @override
-  String get etfEmployeeProfileTitle => 'МОЙ ПРОФИЛЬ';
+  String get etfEmployeeProfileTitle => 'МОЯ АНКЕТА';
 
   @override
-  String get etfEmployeeProfileButtonLabel => 'Мой профиль';
+  String get etfEmployeeProfileButtonLabel => 'Моя анкета';
 
   @override
   String get etfEmployeeProfileSaveError =>
