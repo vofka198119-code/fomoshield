@@ -11374,7 +11374,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfEmployeeProfileBioHint.
   ///
   /// In en, this message translates to:
-  /// **'Your skills, experience, what you\'re looking for'**
+  /// **'E.g.: 5 years analyzing tech-sector stocks, focused on fundamental analysis, looking for a spot on a growing fund'**
   String get etfEmployeeProfileBioHint;
 
   /// No description provided for @etfEmployeeProfileLanguageLabel.
@@ -11386,8 +11386,20 @@ abstract class AppLocalizations {
   /// No description provided for @etfEmployeeProfileLanguageHint.
   ///
   /// In en, this message translates to:
-  /// **'Language you prefer to work in'**
+  /// **'E.g.: English, Russian'**
   String get etfEmployeeProfileLanguageHint;
+
+  /// No description provided for @etfEmployeeProfileDesiredRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Desired position'**
+  String get etfEmployeeProfileDesiredRoleLabel;
+
+  /// No description provided for @etfEmployeeProfileDesiredRoleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Not chosen'**
+  String get etfEmployeeProfileDesiredRoleHint;
 
   /// No description provided for @etfEmployeeProfileAvailableLabel.
   ///
@@ -11466,6 +11478,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not enough activity yet'**
   String get etfEmployeeProfileRatingPending;
+
+  /// No description provided for @etfEmployeeProfileRatingCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'RATING'**
+  String get etfEmployeeProfileRatingCardTitle;
 
   /// No description provided for @etfEmployeeProfileInvitationsButton.
   ///

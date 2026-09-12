@@ -8,6 +8,7 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_border.dart';
+import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/supabase/supabase_providers.dart'
     show
@@ -21,6 +22,7 @@ import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/circle_shortcut_row.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
+import '../widgets/rating_stars_row.dart';
 import '../widgets/employee_identity_card.dart';
 
 // ---------------------------------------------------------------------------
@@ -132,6 +134,8 @@ class EmployeeHubScreen extends ConsumerWidget {
             ),
             if (profile != null) ...[
               const SizedBox(height: 20),
+              _ratingCard(palette, l10n, profile.rating),
+              const SizedBox(height: 16),
               _statsCard(palette, l10n, profile),
             ],
           ],
@@ -143,47 +147,114 @@ class EmployeeHubScreen extends ConsumerWidget {
   // Moved here from EmployeeProfileScreen's form (2026-09-11) — read-only
   // career record belongs on the hub landing point, not buried in the
   // editable "Анкета" form.
+  // Header/divider/body layout matches target_widget.dart's own CardFrame
+  // recipe exactly (padding: zero on the frame, title padded on its own,
+  // themedDivider between title and body, body padded separately) — the
+  // Career Record/Rating cards were missing the divider every other
+  // light-card widget in the app has between its title and body.
   Widget _statsCard(
     AppPalette palette,
     AppLocalizations l10n,
     EmployeeProfile profile,
   ) {
     return CardFrame(
+      padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,
       palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          themedHeaderText(
-            l10n.etfEmployeeProfileStatsTitle,
-            palette,
-            FomoShieldTheme.cardTitle(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+            child: themedHeaderText(
+              l10n.etfEmployeeProfileStatsTitle,
+              palette,
+              FomoShieldTheme.cardTitle(),
+            ),
           ),
-          const SizedBox(height: 12),
-          _statRow(
-            palette,
-            l10n.etfEmployeeProfileStatsApproved,
-            '${profile.approvedProposalsCount}',
+          themedDivider(palette),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _statRow(
+                  palette,
+                  l10n.etfEmployeeProfileStatsApproved,
+                  '${profile.approvedProposalsCount}',
+                ),
+                const SizedBox(height: 8),
+                _statRow(
+                  palette,
+                  l10n.etfEmployeeProfileStatsRejected,
+                  '${profile.rejectedProposalsCount}',
+                ),
+                const SizedBox(height: 8),
+                _statRow(
+                  palette,
+                  l10n.etfEmployeeProfileStatsFundsChanged,
+                  '${profile.fundsChangedCount}',
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          _statRow(
-            palette,
-            l10n.etfEmployeeProfileStatsRejected,
-            '${profile.rejectedProposalsCount}',
+        ],
+      ),
+    );
+  }
+
+  // Above the career-stats card (explicit ask, 2026-09-12) — the rating
+  // used to be one more stat row there; pulled out into its own card since
+  // a 0-10 star rating with a fractional fill genuinely needs the room a
+  // plain label/value row doesn't have.
+  Widget _ratingCard(AppPalette palette, AppLocalizations l10n, double? rating) {
+    return CardFrame(
+      padding: EdgeInsets.zero,
+      decoration: FomoShieldTheme.cardDecoration,
+      palette: palette,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+            child: themedHeaderText(
+              l10n.etfEmployeeProfileRatingCardTitle,
+              palette,
+              FomoShieldTheme.cardTitle(),
+            ),
           ),
-          const SizedBox(height: 8),
-          _statRow(
-            palette,
-            l10n.etfEmployeeProfileStatsFundsChanged,
-            '${profile.fundsChangedCount}',
-          ),
-          const SizedBox(height: 8),
-          _statRow(
-            palette,
-            l10n.etfEmployeeProfileStatsRating,
-            profile.rating != null
-                ? profile.rating!.toStringAsFixed(1)
-                : l10n.etfEmployeeProfileRatingPending,
+          themedDivider(palette),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    RatingStarsRow(rating: rating, palette: palette),
+                    const Spacer(),
+                    Text(
+                      '${(rating ?? 0).toStringAsFixed(1)}/${RatingStarsRow.starCount}',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: palette.textHeader,
+                      ),
+                    ),
+                  ],
+                ),
+                if (rating == null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.etfEmployeeProfileRatingPending,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: palette.textBody,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ],
       ),

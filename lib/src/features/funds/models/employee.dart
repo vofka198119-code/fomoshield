@@ -17,6 +17,10 @@ class EmployeeProfile {
   final String nickname;
   final String? bio;
   final String? language;
+  // Migration 018 (2026-09-12) — a wishlist entry from the same [employeeRoles]
+  // list fundTeamService hires against, never validated against any fund's
+  // actual open roles.
+  final String? desiredRole;
   final bool availableForHire;
   final int approvedProposalsCount;
   final int rejectedProposalsCount;
@@ -30,6 +34,7 @@ class EmployeeProfile {
     required this.nickname,
     this.bio,
     this.language,
+    this.desiredRole,
     required this.availableForHire,
     required this.approvedProposalsCount,
     required this.rejectedProposalsCount,
@@ -44,6 +49,7 @@ class EmployeeProfile {
     nickname: json['nickname'] as String,
     bio: json['bio'] as String?,
     language: json['language'] as String?,
+    desiredRole: json['desiredRole'] as String?,
     availableForHire: json['availableForHire'] as bool,
     approvedProposalsCount: json['approvedProposalsCount'] as int,
     rejectedProposalsCount: json['rejectedProposalsCount'] as int,

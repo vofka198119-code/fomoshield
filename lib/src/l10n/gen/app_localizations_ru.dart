@@ -6731,14 +6731,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfEmployeeProfileBioLabel => 'О себе';
 
   @override
-  String get etfEmployeeProfileBioHint => 'Навыки, опыт, что ищешь';
+  String get etfEmployeeProfileBioHint =>
+      'Например: 5 лет анализирую акции технологического сектора, специализируюсь на фундаментальном анализе, ищу позицию в растущем фонде';
 
   @override
   String get etfEmployeeProfileLanguageLabel => 'Язык';
 
   @override
-  String get etfEmployeeProfileLanguageHint =>
-      'На каком языке удобнее работать';
+  String get etfEmployeeProfileLanguageHint => 'Например: русский, английский';
+
+  @override
+  String get etfEmployeeProfileDesiredRoleLabel => 'Желаемая должность';
+
+  @override
+  String get etfEmployeeProfileDesiredRoleHint => 'Не выбрано';
 
   @override
   String get etfEmployeeProfileAvailableLabel => 'Открыт для найма';
@@ -6781,6 +6787,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get etfEmployeeProfileRatingPending => 'Пока недостаточно активности';
+
+  @override
+  String get etfEmployeeProfileRatingCardTitle => 'РЕЙТИНГ';
 
   @override
   String etfEmployeeProfileInvitationsButton(int count) {

@@ -6710,13 +6710,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfEmployeeProfileBioHint =>
-      'Your skills, experience, what you\'re looking for';
+      'E.g.: 5 years analyzing tech-sector stocks, focused on fundamental analysis, looking for a spot on a growing fund';
 
   @override
   String get etfEmployeeProfileLanguageLabel => 'Language';
 
   @override
-  String get etfEmployeeProfileLanguageHint => 'Language you prefer to work in';
+  String get etfEmployeeProfileLanguageHint => 'E.g.: English, Russian';
+
+  @override
+  String get etfEmployeeProfileDesiredRoleLabel => 'Desired position';
+
+  @override
+  String get etfEmployeeProfileDesiredRoleHint => 'Not chosen';
 
   @override
   String get etfEmployeeProfileAvailableLabel => 'Available for hire';
@@ -6759,6 +6765,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfEmployeeProfileRatingPending => 'Not enough activity yet';
+
+  @override
+  String get etfEmployeeProfileRatingCardTitle => 'RATING';
 
   @override
   String etfEmployeeProfileInvitationsButton(int count) {

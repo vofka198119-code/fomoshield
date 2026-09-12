@@ -2690,9 +2690,11 @@
   "etfEmployeeProfileNicknameLabel": "Nickname",
   "etfEmployeeProfileNicknameHint": "How fund heads will see you",
   "etfEmployeeProfileBioLabel": "Bio",
-  "etfEmployeeProfileBioHint": "Your skills, experience, what you're looking for",
+  "etfEmployeeProfileBioHint": "E.g.: 5 years analyzing tech-sector stocks, focused on fundamental analysis, looking for a spot on a growing fund",
   "etfEmployeeProfileLanguageLabel": "Language",
-  "etfEmployeeProfileLanguageHint": "Language you prefer to work in",
+  "etfEmployeeProfileLanguageHint": "E.g.: English, Russian",
+  "etfEmployeeProfileDesiredRoleLabel": "Desired position",
+  "etfEmployeeProfileDesiredRoleHint": "Not chosen",
   "etfEmployeeProfileAvailableLabel": "Available for hire",
   "etfEmployeeProfileAvailableBody": "Visible on the hiring marketplace to any fund head",
   "etfEmployeeProfileSaveButton": "Save Profile",
@@ -2706,6 +2708,7 @@
   "etfEmployeeProfileStatsFundsChanged": "Funds changed",
   "etfEmployeeProfileStatsRating": "Rating",
   "etfEmployeeProfileRatingPending": "Not enough activity yet",
+  "etfEmployeeProfileRatingCardTitle": "RATING",
   "etfEmployeeProfileInvitationsButton": "Invitations ({count})",
   "@etfEmployeeProfileInvitationsButton": {
     "placeholders": { "count": { "type": "int" } }

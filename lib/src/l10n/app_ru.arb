@@ -1928,9 +1928,11 @@
   "etfEmployeeProfileNicknameLabel": "Никнейм",
   "etfEmployeeProfileNicknameHint": "Так тебя увидят главы фондов",
   "etfEmployeeProfileBioLabel": "О себе",
-  "etfEmployeeProfileBioHint": "Навыки, опыт, что ищешь",
+  "etfEmployeeProfileBioHint": "Например: 5 лет анализирую акции технологического сектора, специализируюсь на фундаментальном анализе, ищу позицию в растущем фонде",
   "etfEmployeeProfileLanguageLabel": "Язык",
-  "etfEmployeeProfileLanguageHint": "На каком языке удобнее работать",
+  "etfEmployeeProfileLanguageHint": "Например: русский, английский",
+  "etfEmployeeProfileDesiredRoleLabel": "Желаемая должность",
+  "etfEmployeeProfileDesiredRoleHint": "Не выбрано",
   "etfEmployeeProfileAvailableLabel": "Открыт для найма",
   "etfEmployeeProfileAvailableBody": "Виден на бирже вакансий любому главе фонда",
   "etfEmployeeProfileSaveButton": "Сохранить анкету",
@@ -1944,6 +1946,7 @@
   "etfEmployeeProfileStatsFundsChanged": "Смен фондов",
   "etfEmployeeProfileStatsRating": "Рейтинг",
   "etfEmployeeProfileRatingPending": "Пока недостаточно активности",
+  "etfEmployeeProfileRatingCardTitle": "РЕЙТИНГ",
   "etfEmployeeProfileInvitationsButton": "Приглашения ({count})",
   "@etfEmployeeProfileInvitationsButton": {
     "placeholders": { "count": { "type": "int" } }

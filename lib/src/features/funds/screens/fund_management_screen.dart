@@ -242,9 +242,12 @@ class FundManagementScreen extends ConsumerWidget {
                   children: [
                     Text(
                       fund.name,
+                      // Exactly PriceHeader's own companyName style
+                      // (price_header.dart) — matches EmployeeIdentityCard's
+                      // nickname text precisely, not just approximately.
                       style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
                         color: palette.onWindow ?? Colors.white,
                       ),
                       maxLines: 1,

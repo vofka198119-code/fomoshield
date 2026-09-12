@@ -33,11 +33,11 @@ class EmployeeProfileScreen extends ConsumerStatefulWidget {
       _EmployeeProfileScreenState();
 }
 
-class _EmployeeProfileScreenState
-    extends ConsumerState<EmployeeProfileScreen> {
+class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _bioController = TextEditingController();
   final _languageController = TextEditingController();
+  String? _desiredRole;
   bool _availableForHire = true;
   bool _submitting = false;
   bool _loadedOnce = false;
@@ -61,6 +61,7 @@ class _EmployeeProfileScreenState
   void _applyProfile(EmployeeProfile profile) {
     _bioController.text = profile.bio ?? '';
     _languageController.text = profile.language ?? '';
+    _desiredRole = profile.desiredRole;
     _availableForHire = profile.availableForHire;
   }
 
@@ -85,6 +86,7 @@ class _EmployeeProfileScreenState
                 ? null
                 : _languageController.text.trim(),
             availableForHire: _availableForHire,
+            desiredRole: _desiredRole,
           );
       // Keeps the provider's cache correct for the next screen that reads
       // it (e.g. reopening this screen later) without forcing a refetch
@@ -148,6 +150,14 @@ class _EmployeeProfileScreenState
       border: InputBorder.none,
       enabledBorder: InputBorder.none,
       focusedBorder: InputBorder.none,
+      // Explicit, not left to Flutter's own default contentPadding
+      // calculation (which varies with decoration shape/isDense and isn't
+      // something to reason about "from memory") — this is the exact same
+      // vertical:12 every other field on this form uses (the read-only
+      // nickname box, the desired-role field), so every box comes out the
+      // same height regardless of whether it's a plain Text or a
+      // TextFormField underneath.
+      contentPadding: const EdgeInsets.symmetric(vertical: 12),
     );
   }
 
@@ -175,6 +185,103 @@ class _EmployeeProfileScreenState
               borderRadius: ThemeV2.borderRadiusMedium,
               child: content,
             ),
+    );
+  }
+
+  // Same role list + label mapping as send_invite_sheet.dart's own role
+  // selector (a head choosing a role when inviting someone) — this is the
+  // analyst-side wishlist equivalent, so it reuses the exact same
+  // employeeRoles list for consistency.
+  String _roleLabel(AppLocalizations l10n, String role) {
+    switch (role) {
+      case 'co_manager':
+        return l10n.etfRoleCoManager;
+      case 'trader':
+        return l10n.etfRoleTrader;
+      case 'risk_manager':
+        return l10n.etfRoleRiskManager;
+      default:
+        return l10n.etfRoleAnalyst;
+    }
+  }
+
+  // A single field, same box as every other field on this form (and the
+  // read-only nickname box above) — a value + chevron, tap opens a popup
+  // menu anchored under the field, picking an item writes it into the box
+  // and closes the popup. Not a multi-chip picker — explicit correction
+  // 2026-09-12 after a first pass used ChoiceChips instead.
+  Future<void> _showRoleMenu(
+    BuildContext fieldContext,
+    AppPalette palette,
+    AppLocalizations l10n,
+  ) async {
+    final box = fieldContext.findRenderObject() as RenderBox;
+    final overlay =
+        Navigator.of(fieldContext).overlay!.context.findRenderObject()
+            as RenderBox;
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        box.localToGlobal(Offset(0, box.size.height), ancestor: overlay),
+        box.localToGlobal(box.size.bottomRight(Offset.zero), ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+    final selected = await showMenu<String>(
+      context: fieldContext,
+      position: position,
+      color: palette.card,
+      items: [
+        for (final role in employeeRoles)
+          PopupMenuItem<String>(
+            value: role,
+            child: Text(
+              _roleLabel(l10n, role),
+              style: GoogleFonts.inter(color: palette.textHeader),
+            ),
+          ),
+      ],
+    );
+    if (selected != null) setState(() => _desiredRole = selected);
+  }
+
+  Widget _desiredRoleField(AppPalette palette, AppLocalizations l10n) {
+    return _fieldWrapper(
+      palette,
+      Builder(
+        builder: (fieldContext) => InkWell(
+          onTap: () => _showRoleMenu(fieldContext, palette, l10n),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _desiredRole != null
+                        ? _roleLabel(l10n, _desiredRole!)
+                        : l10n.etfEmployeeProfileDesiredRoleHint,
+                    // fontSize matches the Bio/Language TextFormFields'
+                    // own rendered size (their unset fontSize falls back
+                    // to the input theme's default, 16) — this field reads
+                    // as one more entry in the same form, not a plain Text
+                    // widget with its own ambient (smaller) default.
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      color: _desiredRole != null
+                          ? palette.textHeader
+                          : palette.textHeader.withValues(alpha: 0.5),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: palette.textBody,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -319,64 +426,104 @@ class _EmployeeProfileScreenState
     AppLocalizations l10n,
     EmployeeProfile? profile,
   ) {
-    return Form(
-      key: _formKey,
-      child: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          EmployeeIdentityCard(palette: palette),
-          _fieldHeader(palette, l10n.etfEmployeeProfileNicknameLabel),
-          // Read-only — this is the global account nickname (Migration
-          // 017), chosen once at ChooseNicknameScreen and never editable
-          // again, not a per-profile free-text field anymore.
-          _fieldWrapper(
-            palette,
-            Text(
-              ref.watch(myNicknameProvider).valueOrNull ?? '—',
-              style: GoogleFonts.inter(
-                color: palette.textHeader,
-                fontWeight: FontWeight.w600,
+    // Cursor/selection-handle color otherwise falls back to the app-wide
+    // TextSelectionTheme (green, tied to ThemeV2.primary) regardless of
+    // this screen's own palette-aware field colors — same fix
+    // portfolio_screen.dart/stress_test_screen.dart already apply to
+    // their own text fields, wrapped once here for every field on this
+    // form (Bio, Language) instead of repeating it per field.
+    return Theme(
+      data: Theme.of(context).copyWith(
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: palette.accentPrimary,
+          selectionColor: palette.accentPrimary.withValues(alpha: 0.3),
+          selectionHandleColor: palette.accentPrimary,
+        ),
+      ),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            EmployeeIdentityCard(palette: palette),
+            _fieldHeader(palette, l10n.etfEmployeeProfileNicknameLabel),
+            // Read-only — this is the global account nickname (Migration
+            // 017), chosen once at ChooseNicknameScreen and never editable
+            // again, not a per-profile free-text field anymore.
+            _fieldWrapper(
+              palette,
+              // vertical:12 padding matches the desired-role field's own box
+              // height below — a bare Text with only the wrapper's own
+              // vertical:4 padding sat noticeably shorter/pill-shaped next to
+              // every other (taller) field on this form.
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  ref.watch(myNicknameProvider).valueOrNull ?? '—',
+                  style: GoogleFonts.inter(
+                    color: palette.textHeader,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ),
-          ),
-          _fieldHeader(palette, l10n.etfEmployeeProfileBioLabel),
-          _fieldWrapper(
-            palette,
-            hasError: _serverBioError != null,
-            TextFormField(
-              controller: _bioController,
-              maxLength: 300,
-              minLines: 3,
-              maxLines: 5,
-              style: GoogleFonts.inter(color: palette.textHeader),
-              onChanged: (_) {
-                if (_serverBioError != null) {
-                  setState(() => _serverBioError = null);
-                }
-              },
-              decoration: _decoration(
-                palette,
-                hint: l10n.etfEmployeeProfileBioHint,
+            _fieldHeader(palette, l10n.etfEmployeeProfileBioLabel),
+            _fieldWrapper(
+              palette,
+              hasError: _serverBioError != null,
+              TextFormField(
+                controller: _bioController,
+                maxLength: 500,
+                // No maxLines cap — grows one line at a time with typed
+                // content instead of freezing at a fixed height and
+                // scrolling internally (the outer ListView already scrolls
+                // the whole form). minLines:1 keeps it from reserving empty
+                // height when blank.
+                minLines: 1,
+                maxLines: null,
+                // Exactly FundTextCard's own body-text style
+                // (fund_text_card.dart, used for Strategy/Description on the
+                // fund card) — the explicit reference for "how long-form
+                // text reads in this app."
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  height: 1.5,
+                  color: palette.textHeader,
+                ),
+                onChanged: (_) {
+                  if (_serverBioError != null) {
+                    setState(() => _serverBioError = null);
+                  }
+                },
+                decoration: _decoration(
+                  palette,
+                  hint: l10n.etfEmployeeProfileBioHint,
+                ),
+                validator: (_) => _serverBioError,
               ),
-              validator: (_) => _serverBioError,
             ),
-          ),
-          _fieldHeader(palette, l10n.etfEmployeeProfileLanguageLabel),
-          _fieldWrapper(
-            palette,
-            TextFormField(
-              controller: _languageController,
-              maxLength: 30,
-              style: GoogleFonts.inter(color: palette.textHeader),
-              decoration: _decoration(
-                palette,
-                hint: l10n.etfEmployeeProfileLanguageHint,
+            _fieldHeader(palette, l10n.etfEmployeeProfileLanguageLabel),
+            _fieldWrapper(
+              palette,
+              TextFormField(
+                controller: _languageController,
+                maxLength: 60,
+                minLines: 1,
+                maxLines: null,
+                style: GoogleFonts.inter(color: palette.textHeader),
+                decoration: _decoration(
+                  palette,
+                  hint: l10n.etfEmployeeProfileLanguageHint,
+                ),
               ),
             ),
-          ),
-          _availabilityCard(palette, l10n),
-          _submitButton(palette, l10n),
-        ],
+            _fieldHeader(palette, l10n.etfEmployeeProfileDesiredRoleLabel),
+            _desiredRoleField(palette, l10n),
+            _availabilityCard(palette, l10n),
+            _submitButton(palette, l10n),
+          ],
+        ),
       ),
     );
   }

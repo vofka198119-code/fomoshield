@@ -105,9 +105,15 @@ class EmployeeIdentityCard extends ConsumerWidget {
                 children: [
                   Text(
                     ref.watch(myNicknameProvider).valueOrNull ?? '—',
+                    // Exactly PriceHeader's own companyName style
+                    // (price_header.dart) — this card claims to mirror it
+                    // (see file doc comment) but had drifted to 17/w700;
+                    // matching it precisely, same as FundManagementScreen's
+                    // name card below, fixes a same-day inconsistency
+                    // between the two nearly-identical cards.
                     style: GoogleFonts.inter(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                       color: palette.onWindow ?? Colors.white,
                     ),
                     maxLines: 1,
@@ -150,8 +156,11 @@ class _AdminBadge extends StatelessWidget {
       ),
       child: Text(
         l10n.etfAdminBadge,
+        // Same fontSize as the position chip it sits next to (10, matching
+        // PriceHeader's own sector-chip size) — was 9, a stray mismatch
+        // between two adjacent same-row pills.
         style: GoogleFonts.inter(
-          fontSize: 9,
+          fontSize: 10,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.6,
           color: ThemeV2.loss,

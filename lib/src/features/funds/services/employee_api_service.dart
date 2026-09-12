@@ -67,6 +67,7 @@ class EmployeeApiService {
     String? bio,
     String? language,
     required bool availableForHire,
+    String? desiredRole,
   }) async {
     try {
       final response = await _dio.put(
@@ -76,6 +77,7 @@ class EmployeeApiService {
           'bio': bio,
           'language': language,
           'availableForHire': availableForHire,
+          'desiredRole': desiredRole,
         },
       );
       return EmployeeProfile.fromJson(response.data as Map<String, dynamic>);
