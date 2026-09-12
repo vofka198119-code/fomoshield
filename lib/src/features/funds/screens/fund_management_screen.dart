@@ -19,6 +19,8 @@ import '../providers/fund_providers.dart';
 import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart';
 import '../widgets/fund_delete_dialog.dart';
+import '../widgets/fund_key_metrics_card.dart';
+import '../widgets/fund_management_holdings_card.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Management — the head/team-facing screen, split out from
@@ -50,17 +52,19 @@ class FundManagementScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: themedBackButton(context, palette),
-        title: fundAsync.maybeWhen(
-          data: (fund) => themedHeaderText(
-            fund.ticker,
-            palette,
-            GoogleFonts.inter(
+        // Static "MANAGEMENT PANEL" label instead of the fund's own ticker
+        // (2026-09-12 ask) — same convention as CompanyDetailScreen's own
+        // generic companyDetailTitle ("О КОМПАНИИ"): this screen's identity
+        // is the *kind* of screen it is, not which fund it's showing. The
+        // fund's own name/ticker still lives right below in _buildNameCard.
+        title: themedHeaderText(
+          l10n.etfFundManagementTitle,
+          palette,
+          GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.5,
           ),
-          ),
-          orElse: () => const SizedBox.shrink(),
         ),
         actions: [
           fundAsync.maybeWhen(
@@ -78,8 +82,13 @@ class FundManagementScreen extends ConsumerWidget {
                       ),
                       palette,
                     ),
-                    onPressed: () =>
-                        _showAdminActionsSheet(context, ref, l10n, palette, fund),
+                    onPressed: () => _showAdminActionsSheet(
+                      context,
+                      ref,
+                      l10n,
+                      palette,
+                      fund,
+                    ),
                   )
                 : const SizedBox.shrink(),
             orElse: () => const SizedBox.shrink(),
@@ -136,6 +145,15 @@ class FundManagementScreen extends ConsumerWidget {
                         onTap: () => context.push('/funds/${fund.id}/blotter'),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+                  FundKeyMetricsCard(fund: fund, palette: palette),
+                  const SizedBox(height: 12),
+                  FundManagementHoldingsCard(
+                    fund: fund,
+                    palette: palette,
+                    onHoldingTap: (holding) =>
+                        _openFundHolding(context, fund, holding),
                   ),
                 ],
               ),
@@ -206,10 +224,7 @@ class FundManagementScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: palette.accentPrimary,
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: palette.accentPrimary, width: 1.5),
                   boxShadow: [
                     BoxShadow(
                       color: palette.accentPrimary.withValues(alpha: 0.35),
@@ -283,6 +298,34 @@ class FundManagementScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // The real Company Detail screen (chart, key metrics, financial score —
+  // everything a normal company card has), just with its 'position' slot
+  // swapped to FundPositionSection instead of the viewer's own personal
+  // PositionSection (2026-09-12: "нормальную карточку компании", not a
+  // popup) — see CompanyDetailScreen.fundContext and
+  // fund_position_section.dart for how that swap works.
+  void _openFundHolding(
+    BuildContext context,
+    FundDetail fund,
+    FundHolding holding,
+  ) {
+    final total = fund.holdings.fold<double>(0, (sum, h) => sum + h.value);
+    final percent = total > 0 ? holding.value / total * 100 : 0.0;
+    context.push(
+      '/company/${holding.symbol}',
+      extra: {
+        'fundContext': {
+          'fundId': fund.id,
+          'fundName': fund.name,
+          'quantity': holding.quantity,
+          'price': holding.price,
+          'value': holding.value,
+          'percentOfFund': percent,
+        },
+      },
     );
   }
 

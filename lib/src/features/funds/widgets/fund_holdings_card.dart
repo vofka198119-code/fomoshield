@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
@@ -103,75 +102,77 @@ class _Row extends ConsumerWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GestureDetector(
-          onTap: () => context.push('/company/${holding.symbol}'),
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 72),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: donutAllocationColor(
-                        colorIndex,
-                      ).withValues(alpha: 0.7),
-                      width: 1.5,
+        // Deliberately not tappable (2026-09-12) -- this used to push
+        // /company/:symbol, but that screen unconditionally shows the
+        // viewer's OWN personal "Мои инвестиции" position for that symbol,
+        // with zero concept of "this is the fund's holding, not yours" --
+        // confusing when the viewer happens to hold the same stock
+        // personally too. This row is informational only, tap or not.
+        Container(
+          constraints: const BoxConstraints(minHeight: 72),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: donutAllocationColor(
+                      colorIndex,
+                    ).withValues(alpha: 0.7),
+                    width: 1.5,
+                  ),
+                ),
+                padding: const EdgeInsets.all(1.5),
+                child: ClipOval(
+                  child: SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: CompanyLogo(
+                      ticker: holding.symbol,
+                      logoUrl: logoUrl,
+                      radius: 18,
+                      resolveIfMissing: false,
                     ),
                   ),
-                  padding: const EdgeInsets.all(1.5),
-                  child: ClipOval(
-                    child: SizedBox(
-                      width: 36,
-                      height: 36,
-                      child: CompanyLogo(
-                        ticker: holding.symbol,
-                        logoUrl: logoUrl,
-                        radius: 18,
-                        resolveIfMissing: false,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: palette.textHeader,
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: palette.textHeader,
-                        ),
+                    const SizedBox(height: 2),
+                    Text(
+                      holding.symbol,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: palette.textBody,
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        holding.symbol,
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: palette.textBody,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                themedPriceText(
-                  '${percent.toStringAsFixed(1)}%',
-                  palette,
-                  interNums(fontSize: 14, fontWeight: FontWeight.w700),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              themedPriceText(
+                '${percent.toStringAsFixed(1)}%',
+                palette,
+                interNums(fontSize: 14, fontWeight: FontWeight.w700),
+              ),
+            ],
           ),
         ),
         if (showDivider) themedRowDivider(palette),

@@ -6996,6 +6996,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'You don\'t have access to manage this fund';
 
   @override
+  String get etfFundManagementTitle => 'MANAGEMENT PANEL';
+
+  @override
+  String get etfFundHoldingSheetQuantity => 'Fund holds';
+
+  @override
+  String get etfFundHoldingSheetPrice => 'Price';
+
+  @override
+  String get etfFundHoldingSheetValue => 'Market value';
+
+  @override
+  String get etfFundHoldingSheetPercent => '% of fund';
+
+  @override
+  String get etfFundPositionTitle => 'FUND POSITION';
+
+  @override
   String get etfInvitationsTitle => 'MY INVITATIONS';
 
   @override

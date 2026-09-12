@@ -64,19 +64,29 @@ class FundHolding {
   final double quantity;
   final double price;
   final double value;
+  // Weighted-average buy price, maintained server-side by fund_execute_trade
+  // (Migration 021) — 0 for a holding bought before that migration ran, so
+  // callers should treat 0 as "no cost basis yet" rather than a real P&L.
+  final double avgCost;
 
   const FundHolding({
     required this.symbol,
     required this.quantity,
     required this.price,
     required this.value,
+    required this.avgCost,
   });
+
+  double get costBasis => quantity * avgCost;
+  double get pnl => value - costBasis;
+  double get pnlPercent => avgCost > 0 ? (price - avgCost) / avgCost * 100 : 0;
 
   factory FundHolding.fromJson(Map<String, dynamic> json) => FundHolding(
     symbol: json['symbol'] as String,
     quantity: (json['quantity'] as num).toDouble(),
     price: (json['price'] as num).toDouble(),
     value: (json['value'] as num).toDouble(),
+    avgCost: (json['avgCost'] as num?)?.toDouble() ?? 0,
   );
 }
 

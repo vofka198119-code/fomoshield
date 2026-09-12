@@ -34,6 +34,7 @@ import 'widgets/company_encyclopedia_widget.dart';
 import 'widgets/company_bottom_bar.dart';
 import 'widgets/company_ad_overlay.dart';
 import '../search/recently_viewed_provider.dart';
+import '../funds/widgets/fund_position_section.dart';
 
 // ---------------------------------------------------------------------------
 // Screen
@@ -47,11 +48,17 @@ class CompanyDetailScreen extends ConsumerStatefulWidget {
   // (Search, Watchlist, Recently Viewed) — the picker is the right call
   // there since we don't know which portfolio the user means.
   final String? contextPortfolioId;
+  // Set when navigated here from FundManagementScreen's holdings widget
+  // (2026-09-12) — swaps the 'position' widget slot to show the FUND's own
+  // holding instead of the viewer's personal "Мои инвестиции" position.
+  // Two separate sandboxes; never both at once.
+  final FundHoldingContext? fundContext;
 
   const CompanyDetailScreen({
     super.key,
     required this.symbol,
     this.contextPortfolioId,
+    this.fundContext,
   });
 
   @override
@@ -273,6 +280,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
           symbol: widget.symbol,
           data: data,
           contextPortfolioId: widget.contextPortfolioId,
+          fundContext: widget.fundContext,
         ),
       ),
     );
@@ -283,11 +291,13 @@ class _CompanyDetailBody extends ConsumerStatefulWidget {
   final String symbol;
   final Map<String, dynamic> data;
   final String? contextPortfolioId;
+  final FundHoldingContext? fundContext;
 
   const _CompanyDetailBody({
     required this.symbol,
     required this.data,
     this.contextPortfolioId,
+    this.fundContext,
   });
 
   @override
@@ -616,13 +626,18 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
           ),
         ),
         // --- Sticky Bottom Bar: BUY / SELL ---
-        CompanyBottomBar(
-          price: price,
-          isUp: isUp,
-          onBuy: () => _openOrderEntry('buy'),
-          onSell: () => _openOrderEntry('sell'),
-          palette: palette,
-        ),
+        // Hidden in fund context (2026-09-12) -- Buy/Sell here trades into
+        // the VIEWER's own personal portfolio, which is exactly the
+        // sandbox-mixing this whole fund/personal split exists to prevent.
+        // Trading a fund's holdings goes through Propose Trade, not this bar.
+        if (widget.fundContext == null)
+          CompanyBottomBar(
+            price: price,
+            isUp: isUp,
+            onBuy: () => _openOrderEntry('buy'),
+            onSell: () => _openOrderEntry('sell'),
+            palette: palette,
+          ),
       ],
     );
   }
@@ -710,9 +725,19 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
           ],
         );
       case 'position':
+        final fundContext = widget.fundContext;
         return Column(
           children: [
-            PositionSection(symbol: symbol, price: price, palette: palette),
+            fundContext != null
+                ? FundPositionSection(
+                    fundContext: fundContext,
+                    palette: palette,
+                  )
+                : PositionSection(
+                    symbol: symbol,
+                    price: price,
+                    palette: palette,
+                  ),
             const SizedBox(height: 24),
           ],
         );

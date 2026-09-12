@@ -11923,6 +11923,42 @@ abstract class AppLocalizations {
   /// **'You don\'t have access to manage this fund'**
   String get etfFundManagementAccessDenied;
 
+  /// No description provided for @etfFundManagementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MANAGEMENT PANEL'**
+  String get etfFundManagementTitle;
+
+  /// No description provided for @etfFundHoldingSheetQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund holds'**
+  String get etfFundHoldingSheetQuantity;
+
+  /// No description provided for @etfFundHoldingSheetPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get etfFundHoldingSheetPrice;
+
+  /// No description provided for @etfFundHoldingSheetValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Market value'**
+  String get etfFundHoldingSheetValue;
+
+  /// No description provided for @etfFundHoldingSheetPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'% of fund'**
+  String get etfFundHoldingSheetPercent;
+
+  /// No description provided for @etfFundPositionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FUND POSITION'**
+  String get etfFundPositionTitle;
+
   /// No description provided for @etfInvitationsTitle.
   ///
   /// In en, this message translates to:

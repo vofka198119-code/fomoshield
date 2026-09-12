@@ -33,6 +33,8 @@ import '../../features/profile/theme_picker_screen.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
+import '../../features/funds/widgets/fund_position_section.dart'
+    show FundHoldingContext;
 import '../../features/company_detail/widgets/metric_info_screen.dart';
 import '../../features/company_detail/widgets/metric_info_data.dart';
 import '../../features/stress_test/stress_test_setup_screen.dart';
@@ -66,6 +68,9 @@ import '../../features/funds/screens/fund_detail_screen.dart';
 import '../../features/funds/screens/fund_management_screen.dart';
 import '../../features/funds/screens/fund_team_screen.dart';
 import '../../features/funds/screens/fund_blotter_screen.dart';
+import '../../features/funds/screens/propose_trade_screen.dart';
+import '../../features/funds/screens/proposal_detail_screen.dart';
+import '../../features/funds/models/trade_proposal.dart' show TradeProposal;
 import '../../features/funds/screens/companies_history_screen.dart';
 import '../../features/funds/screens/employment_detail_screen.dart';
 import '../../features/funds/models/employee.dart' show EmploymentRecord;
@@ -192,9 +197,20 @@ class AppRouter {
         builder: (context, state) {
           final symbol = state.pathParameters['symbol'] ?? '';
           final extra = state.extra as Map<String, dynamic>?;
+          final fc = extra?['fundContext'] as Map<String, dynamic>?;
           return CompanyDetailScreen(
             symbol: symbol.toUpperCase(),
             contextPortfolioId: extra?['portfolioId'] as String?,
+            fundContext: fc == null
+                ? null
+                : FundHoldingContext(
+                    fundId: fc['fundId'] as String,
+                    fundName: fc['fundName'] as String,
+                    quantity: (fc['quantity'] as num).toDouble(),
+                    price: (fc['price'] as num).toDouble(),
+                    value: (fc['value'] as num).toDouble(),
+                    percentOfFund: (fc['percentOfFund'] as num).toDouble(),
+                  ),
           );
         },
       ),
@@ -562,6 +578,22 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return FundBlotterScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/propose',
+        name: 'proposeTrade',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return ProposeTradeScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/proposals/detail',
+        name: 'proposalDetail',
+        builder: (context, state) {
+          final proposal = state.extra as TradeProposal;
+          return ProposalDetailScreen(proposal: proposal);
         },
       ),
       GoRoute(

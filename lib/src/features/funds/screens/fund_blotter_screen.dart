@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/fomo_shield_theme.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
-import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../../shared/widgets/card_frame.dart';
-import '../models/trade_proposal.dart';
 import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
-import '../widgets/propose_trade_sheet.dart';
+import '../widgets/proposal_card.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Blotter — Phase 4 (docs/ETF_FUND_EMULATION.md). The "рабочий экран
@@ -26,38 +23,17 @@ import '../widgets/propose_trade_sheet.dart';
 // checks: isHead (fund.headUserId) OR the caller's own fund_team_members
 // permissions row -- there's no dedicated "my permissions" endpoint, this
 // mirrors fundTradeService.js's _getPermissions exactly.
+//
+// "Propose" is its own full screen now (propose_trade_screen.dart), not a
+// bottom sheet -- the sheet version lagged noticeably typing into its
+// typeahead field (2026-09-12). Rows here push into ProposalDetailScreen
+// (proposal_card.dart's ProposalCard is shared by both).
 // ---------------------------------------------------------------------------
 
 class FundBlotterScreen extends ConsumerWidget {
   final String fundId;
 
   const FundBlotterScreen({super.key, required this.fundId});
-
-  String _statusLabel(AppLocalizations l10n, TradeProposal p) {
-    switch (p.status) {
-      case 'approved':
-        return l10n.etfProposalStatusApproved;
-      case 'rejected':
-        return l10n.etfProposalStatusRejected;
-      case 'executed':
-        return l10n.etfProposalStatusExecuted;
-      default:
-        return l10n.etfProposalStatusPending;
-    }
-  }
-
-  Color _statusColor(TradeProposal p) {
-    switch (p.status) {
-      case 'approved':
-        return ThemeV2.warning;
-      case 'rejected':
-        return ThemeV2.loss;
-      case 'executed':
-        return ThemeV2.success;
-      default:
-        return ThemeV2.textSecondary;
-    }
-  }
 
   Future<void> _act(
     BuildContext context,
@@ -126,13 +102,7 @@ class FundBlotterScreen extends ConsumerWidget {
           if (canPropose)
             IconButton(
               icon: Icon(Icons.add_rounded, color: palette.accentPrimary),
-              onPressed: () =>
-                  showProposeTradeSheet(
-                    context: context,
-                    ref: ref,
-                    fundId: fundId,
-                    palette: palette,
-                  ),
+              onPressed: () => context.push('/funds/$fundId/propose'),
             ),
         ],
       ),
@@ -160,185 +130,48 @@ class FundBlotterScreen extends ConsumerWidget {
                     for (final proposal in proposals)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: CardFrame(
-                          decoration: FomoShieldTheme.cardDecoration,
+                        child: ProposalCard(
+                          proposal: proposal,
                           palette: palette,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    proposal.symbol,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: palette.textHeader,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          (proposal.isBuy
-                                                  ? ThemeV2.success
-                                                  : ThemeV2.loss)
-                                              .withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      proposal.isBuy ? l10n.tradeBuy : l10n.tradeSell,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w700,
-                                        color: proposal.isBuy
-                                            ? ThemeV2.success
-                                            : ThemeV2.loss,
-                                      ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _statusColor(
-                                        proposal,
-                                      ).withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      _statusLabel(l10n, proposal),
-                                      style: GoogleFonts.inter(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                        color: _statusColor(proposal),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${proposal.quantity} @ ${proposal.orderType == 'limit' ? proposal.limitPrice?.toStringAsFixed(2) : l10n.etfProposeOrderTypeMarket}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: palette.textBody,
-                                ),
-                              ),
-                              if (proposal.justification != null &&
-                                  proposal.justification!.isNotEmpty) ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  proposal.justification!,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: palette.textBody,
-                                  ),
-                                ),
-                              ],
-                              if (proposal.flaggedRisky) ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  l10n.etfProposalFlaggedLabel,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: ThemeV2.warning,
-                                  ),
-                                ),
-                              ],
-                              if (proposal.isPending &&
-                                  (canApprove || canFlagRisk)) ...[
-                                const SizedBox(height: 10),
-                                themedDivider(palette, indent: 0, endIndent: 0),
-                                const SizedBox(height: 8),
-                                Wrap(
-                                  spacing: 8,
-                                  children: [
-                                    if (canApprove)
-                                      TextButton(
-                                        onPressed: () => _act(
-                                          context,
-                                          ref,
-                                          () => ref
-                                              .read(fundApiServiceProvider)
-                                              .approveProposal(
-                                                fundId,
-                                                proposal.id,
-                                              ),
-                                          l10n,
-                                        ),
-                                        child: Text(
-                                          l10n.etfProposalApproveButton,
-                                          style: TextStyle(color: ThemeV2.success),
-                                        ),
-                                      ),
-                                    if (canApprove)
-                                      TextButton(
-                                        onPressed: () => _act(
-                                          context,
-                                          ref,
-                                          () => ref
-                                              .read(fundApiServiceProvider)
-                                              .rejectProposal(
-                                                fundId,
-                                                proposal.id,
-                                              ),
-                                          l10n,
-                                        ),
-                                        child: Text(
-                                          l10n.etfProposalRejectButton,
-                                          style: const TextStyle(color: ThemeV2.loss),
-                                        ),
-                                      ),
-                                    if (canFlagRisk && !proposal.flaggedRisky)
-                                      TextButton(
-                                        onPressed: () => _act(
-                                          context,
-                                          ref,
-                                          () => ref
-                                              .read(fundApiServiceProvider)
-                                              .flagProposal(
-                                                fundId,
-                                                proposal.id,
-                                              ),
-                                          l10n,
-                                        ),
-                                        child: Text(
-                                          l10n.etfProposalFlagButton,
-                                          style: const TextStyle(color: ThemeV2.warning),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ],
-                              if (proposal.isApproved && canExecute) ...[
-                                const SizedBox(height: 10),
-                                themedDivider(palette, indent: 0, endIndent: 0),
-                                const SizedBox(height: 8),
-                                TextButton(
-                                  onPressed: () => _act(
-                                    context,
-                                    ref,
-                                    () => ref
-                                        .read(fundApiServiceProvider)
-                                        .executeProposal(fundId, proposal.id),
-                                    l10n,
-                                  ),
-                                  child: Text(
-                                    l10n.etfProposalExecuteButton,
-                                    style: TextStyle(color: palette.accentPrimary),
-                                  ),
-                                ),
-                              ],
-                            ],
+                          l10n: l10n,
+                          canApprove: canApprove,
+                          canFlagRisk: canFlagRisk,
+                          canExecute: canExecute,
+                          onTap: () => context.push(
+                            '/funds/$fundId/proposals/detail',
+                            extra: proposal,
+                          ),
+                          onApprove: () => _act(
+                            context,
+                            ref,
+                            () => ref
+                                .read(fundApiServiceProvider)
+                                .approveProposal(fundId, proposal.id),
+                            l10n,
+                          ),
+                          onReject: () => _act(
+                            context,
+                            ref,
+                            () => ref
+                                .read(fundApiServiceProvider)
+                                .rejectProposal(fundId, proposal.id),
+                            l10n,
+                          ),
+                          onFlag: () => _act(
+                            context,
+                            ref,
+                            () => ref
+                                .read(fundApiServiceProvider)
+                                .flagProposal(fundId, proposal.id),
+                            l10n,
+                          ),
+                          onExecute: () => _act(
+                            context,
+                            ref,
+                            () => ref
+                                .read(fundApiServiceProvider)
+                                .executeProposal(fundId, proposal.id),
+                            l10n,
                           ),
                         ),
                       ),

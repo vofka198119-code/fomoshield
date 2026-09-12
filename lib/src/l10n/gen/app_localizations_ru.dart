@@ -7017,6 +7017,24 @@ class AppLocalizationsRu extends AppLocalizations {
       'У тебя нет доступа к управлению этим фондом';
 
   @override
+  String get etfFundManagementTitle => 'ПАНЕЛЬ УПРАВЛЕНИЯ';
+
+  @override
+  String get etfFundHoldingSheetQuantity => 'В портфеле фонда';
+
+  @override
+  String get etfFundHoldingSheetPrice => 'Цена';
+
+  @override
+  String get etfFundHoldingSheetValue => 'Стоимость';
+
+  @override
+  String get etfFundHoldingSheetPercent => 'Доля в фонде';
+
+  @override
+  String get etfFundPositionTitle => 'ПОЗИЦИЯ ФОНДА';
+
+  @override
   String get etfInvitationsTitle => 'МОИ ПРИГЛАШЕНИЯ';
 
   @override

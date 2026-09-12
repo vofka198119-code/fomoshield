@@ -1,51 +1,48 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_button.dart';
+import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/services/finnhub_service.dart';
+import '../../../shared/widgets/company_logo.dart';
 import '../providers/fund_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 
 // ---------------------------------------------------------------------------
-// Propose Trade Sheet — Phase 4 (docs/ETF_FUND_EMULATION.md). Same bottom-
-// sheet shell + ChoiceChip picker recipe as send_invite_sheet.dart. Doc:
-// "краткое обоснование + лимитная цена + количество" — justification,
-// limit price (only for a limit order), and quantity are the fields the
-// design calls for; symbol + side (buy/sell) + order type round it out.
+// Propose Trade — full screen, not a bottom sheet (2026-09-12, explicit ask
+// after the sheet version lagged noticeably typing into the typeahead
+// field). Same fields/mechanics as the sheet it replaces
+// (propose_trade_sheet.dart, now unused): symbol typeahead, side, order
+// type, quantity, limit price, justification. On success, pushes straight
+// into the new proposal's own detail screen instead of just popping back
+// to the blotter.
 // ---------------------------------------------------------------------------
 
-Future<bool?> showProposeTradeSheet({
-  required BuildContext context,
-  required WidgetRef ref,
-  required String fundId,
-  required AppPalette palette,
-}) {
-  return showModalBottomSheet<bool>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (ctx) => _ProposeTradeSheet(fundId: fundId, palette: palette),
-  );
-}
-
-class _ProposeTradeSheet extends ConsumerStatefulWidget {
+class ProposeTradeScreen extends ConsumerStatefulWidget {
   final String fundId;
-  final AppPalette palette;
 
-  const _ProposeTradeSheet({required this.fundId, required this.palette});
+  const ProposeTradeScreen({super.key, required this.fundId});
 
   @override
-  ConsumerState<_ProposeTradeSheet> createState() => _ProposeTradeSheetState();
+  ConsumerState<ProposeTradeScreen> createState() => _ProposeTradeScreenState();
 }
 
-class _ProposeTradeSheetState extends ConsumerState<_ProposeTradeSheet> {
+class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
   final _symbolController = TextEditingController();
   final _quantityController = TextEditingController();
   final _limitPriceController = TextEditingController();
   final _justificationController = TextEditingController();
+  final _api = FinnhubService();
+  Timer? _debounce;
+  List<Map<String, dynamic>> _symbolResults = [];
+  bool _searchingSymbol = false;
+  String? _selectedSymbol;
+  bool _programmaticTextChange = false;
   String _side = 'buy';
   String _orderType = 'market';
   bool _submitting = false;
@@ -57,12 +54,58 @@ class _ProposeTradeSheetState extends ConsumerState<_ProposeTradeSheet> {
     _quantityController.dispose();
     _limitPriceController.dispose();
     _justificationController.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _onSymbolChanged(String text) {
+    if (_programmaticTextChange) {
+      _programmaticTextChange = false;
+      return;
+    }
+    _selectedSymbol = null;
+    _debounce?.cancel();
+    final q = text.trim();
+    if (q.length < 2) {
+      setState(() {
+        _symbolResults = [];
+        _searchingSymbol = false;
+      });
+      return;
+    }
+    setState(() => _searchingSymbol = true);
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final r = await _api.searchLocal(q);
+        if (!mounted) return;
+        setState(() {
+          _symbolResults = r;
+          _searchingSymbol = false;
+        });
+      } catch (_) {
+        if (!mounted) return;
+        setState(() {
+          _symbolResults = [];
+          _searchingSymbol = false;
+        });
+      }
+    });
+  }
+
+  void _pickSymbol(String symbol, String description) {
+    _selectedSymbol = symbol;
+    _programmaticTextChange = true;
+    _symbolController.text = '$description ($symbol)';
+    _symbolController.selection = TextSelection.collapsed(
+      offset: _symbolController.text.length,
+    );
+    FocusScope.of(context).unfocus();
+    setState(() => _symbolResults = []);
   }
 
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
-    final symbol = _symbolController.text.trim();
+    final symbol = _selectedSymbol ?? _symbolController.text.trim();
     if (symbol.isEmpty) {
       setState(() => _error = l10n.etfProposeSymbolRequired);
       return;
@@ -99,7 +142,12 @@ class _ProposeTradeSheetState extends ConsumerState<_ProposeTradeSheet> {
           );
       ref.invalidate(fundProposalsProvider(widget.fundId));
       if (!mounted) return;
-      Navigator.of(context).pop(true);
+      // Straight back to the blotter (2026-09-12, reverted the earlier
+      // "auto-open the new proposal's own detail screen" ask) — the
+      // blotter's own row already shows everything a detail screen would
+      // (status, approve/reject/flag), so opening a second view of the
+      // exact same data right after submitting just read as a duplicate.
+      Navigator.of(context).pop();
     } on FundApiException catch (e) {
       setState(() => _error = e.message);
     } catch (_) {
@@ -124,46 +172,97 @@ class _ProposeTradeSheetState extends ConsumerState<_ProposeTradeSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final palette = widget.palette;
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        leading: themedBackButton(context, palette),
+        title: themedHeaderText(
+          l10n.etfProposeTradeTitle,
+          palette,
+          GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1,
+          ),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+      ),
+      body: SafeArea(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                l10n.etfProposeTradeTitle,
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: palette.textHeader,
-                ),
-              ),
-              const SizedBox(height: 16),
               _sectionLabel(palette, l10n.etfProposeSymbolLabel),
               TextField(
                 controller: _symbolController,
-                textCapitalization: TextCapitalization.characters,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp('[A-Za-z.]')),
-                ],
+                onChanged: _onSymbolChanged,
                 style: GoogleFonts.inter(color: palette.textHeader),
                 decoration: InputDecoration(
                   hintText: l10n.etfProposeSymbolHint,
+                  suffixIcon: _searchingSymbol
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
+              if (_symbolResults.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(top: 4),
+                  constraints: const BoxConstraints(maxHeight: 260),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListView.separated(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: _symbolResults.length,
+                    separatorBuilder: (_, _) =>
+                        const Divider(height: 1, indent: 56),
+                    itemBuilder: (ctx, i) {
+                      final item = _symbolResults[i];
+                      final symbol = (item['symbol'] as String? ?? '')
+                          .split('.')
+                          .first;
+                      final desc = item['description'] as String? ?? symbol;
+                      return ListTile(
+                        dense: true,
+                        leading: CompanyLogo(ticker: symbol, radius: 16),
+                        title: Text(
+                          symbol,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: palette.textHeader,
+                          ),
+                        ),
+                        subtitle: Text(
+                          desc,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: palette.textBody,
+                          ),
+                        ),
+                        onTap: () => _pickSymbol(symbol, desc),
+                      );
+                    },
+                  ),
+                ),
               const SizedBox(height: 16),
               _sectionLabel(palette, l10n.etfProposeSideLabel),
               Wrap(
@@ -265,7 +364,7 @@ class _ProposeTradeSheetState extends ConsumerState<_ProposeTradeSheet> {
                   style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
                 ),
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 height: ThemeV2.buttonHeight,
