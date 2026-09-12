@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../core/utils/constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../models/fund.dart';
+import '../models/trade_proposal.dart';
 
 /// A fund-creation/validation error from the backend, carrying the stable
 /// `code` field (e.g. "name_taken") alongside the raw (English, log-only)
@@ -214,6 +215,120 @@ class FundApiService {
       final code = data is Map ? data['code'] as String? : null;
       throw FundApiException(
         _errorMessage(e, 'Failed to sell fund units'),
+        code: code,
+      );
+    }
+  }
+
+  // ── Phase 4: trade proposals ──────────────────────────────────────────
+
+  Future<TradeProposal> proposeTrade({
+    required String fundId,
+    required String symbol,
+    required String side,
+    required String orderType,
+    double? limitPrice,
+    required double quantity,
+    String? justification,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/proposals',
+        data: {
+          'symbol': symbol,
+          'side': side,
+          'orderType': orderType,
+          'limitPrice': limitPrice,
+          'quantity': quantity,
+          'justification': justification,
+        },
+      );
+      return TradeProposal.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to propose trade'),
+        code: code,
+      );
+    }
+  }
+
+  Future<List<TradeProposal>> listProposals(String fundId) async {
+    try {
+      final response = await _dio.get('/funds/$fundId/proposals');
+      final list = ((response.data as Map)['proposals'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(TradeProposal.fromJson).toList();
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to load proposals'));
+    }
+  }
+
+  Future<TradeProposal> approveProposal(String fundId, String proposalId) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/proposals/$proposalId/approve',
+      );
+      return TradeProposal.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to approve proposal'),
+        code: code,
+      );
+    }
+  }
+
+  Future<TradeProposal> rejectProposal(
+    String fundId,
+    String proposalId, {
+    String? reason,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/proposals/$proposalId/reject',
+        data: {'reason': reason},
+      );
+      return TradeProposal.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to reject proposal'),
+        code: code,
+      );
+    }
+  }
+
+  Future<TradeProposal> executeProposal(String fundId, String proposalId) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/proposals/$proposalId/execute',
+      );
+      return TradeProposal.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to execute proposal'),
+        code: code,
+      );
+    }
+  }
+
+  Future<TradeProposal> flagProposal(String fundId, String proposalId) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/proposals/$proposalId/flag',
+      );
+      return TradeProposal.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to flag proposal'),
         code: code,
       );
     }

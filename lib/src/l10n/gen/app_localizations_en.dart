@@ -6492,6 +6492,99 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfEmploymentDetailLeaveError => 'Failed to leave fund';
 
   @override
+  String get etfBlotterTitle => 'ORDERS';
+
+  @override
+  String get etfBlotterShortcutLabel => 'Orders';
+
+  @override
+  String get etfBlotterEmptyText => 'No trade proposals yet';
+
+  @override
+  String get etfProposeTradeButton => 'Propose a trade';
+
+  @override
+  String get etfProposeTradeTitle => 'Propose a trade';
+
+  @override
+  String get etfProposeSymbolLabel => 'Symbol';
+
+  @override
+  String get etfProposeSymbolHint => 'e.g. AAPL';
+
+  @override
+  String get etfProposeSideLabel => 'Side';
+
+  @override
+  String get etfProposeOrderTypeLabel => 'Order type';
+
+  @override
+  String get etfProposeOrderTypeMarket => 'Market';
+
+  @override
+  String get etfProposeOrderTypeLimit => 'Limit';
+
+  @override
+  String get etfProposeQuantityLabel => 'Quantity (shares)';
+
+  @override
+  String get etfProposeLimitPriceLabel => 'Limit price';
+
+  @override
+  String get etfProposeJustificationLabel => 'Justification';
+
+  @override
+  String get etfProposeJustificationHint => 'Why this trade?';
+
+  @override
+  String get etfProposeSubmitButton => 'Submit proposal';
+
+  @override
+  String get etfProposeSymbolRequired => 'Symbol is required';
+
+  @override
+  String get etfProposeQuantityRequired => 'Enter a valid quantity';
+
+  @override
+  String get etfProposeLimitPriceRequired => 'Enter a valid limit price';
+
+  @override
+  String get etfProposeSuccessSnackbar => 'Proposal submitted';
+
+  @override
+  String get etfProposeGenericError => 'Failed to submit proposal';
+
+  @override
+  String get etfProposalStatusPending => 'Pending';
+
+  @override
+  String get etfProposalStatusApproved => 'Approved — queued';
+
+  @override
+  String get etfProposalStatusRejected => 'Rejected';
+
+  @override
+  String get etfProposalStatusExecuted => 'Executed';
+
+  @override
+  String get etfProposalFlaggedLabel => 'Flagged risky';
+
+  @override
+  String get etfProposalApproveButton => 'Approve';
+
+  @override
+  String get etfProposalRejectButton => 'Reject';
+
+  @override
+  String get etfProposalFlagButton => 'Flag risky';
+
+  @override
+  String get etfProposalExecuteButton => 'Execute';
+
+  @override
+  String get etfProposalActionError => 'Action failed';
+
+  @override
   String get etfEmployeeHubInvitationsRow => 'Invitations';
 
   @override

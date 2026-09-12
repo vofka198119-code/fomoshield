@@ -6514,6 +6514,99 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfEmploymentDetailLeaveError => 'Не удалось покинуть фонд';
 
   @override
+  String get etfBlotterTitle => 'ЗАЯВКИ';
+
+  @override
+  String get etfBlotterShortcutLabel => 'Заявки';
+
+  @override
+  String get etfBlotterEmptyText => 'Пока нет предложений по сделкам';
+
+  @override
+  String get etfProposeTradeButton => 'Предложить сделку';
+
+  @override
+  String get etfProposeTradeTitle => 'Предложить сделку';
+
+  @override
+  String get etfProposeSymbolLabel => 'Тикер';
+
+  @override
+  String get etfProposeSymbolHint => 'Например: AAPL';
+
+  @override
+  String get etfProposeSideLabel => 'Сторона';
+
+  @override
+  String get etfProposeOrderTypeLabel => 'Тип ордера';
+
+  @override
+  String get etfProposeOrderTypeMarket => 'Рыночный';
+
+  @override
+  String get etfProposeOrderTypeLimit => 'Лимитный';
+
+  @override
+  String get etfProposeQuantityLabel => 'Количество (акций)';
+
+  @override
+  String get etfProposeLimitPriceLabel => 'Лимитная цена';
+
+  @override
+  String get etfProposeJustificationLabel => 'Обоснование';
+
+  @override
+  String get etfProposeJustificationHint => 'Почему эта сделка?';
+
+  @override
+  String get etfProposeSubmitButton => 'Отправить предложение';
+
+  @override
+  String get etfProposeSymbolRequired => 'Укажи тикер';
+
+  @override
+  String get etfProposeQuantityRequired => 'Укажи корректное количество';
+
+  @override
+  String get etfProposeLimitPriceRequired => 'Укажи корректную лимитную цену';
+
+  @override
+  String get etfProposeSuccessSnackbar => 'Предложение отправлено';
+
+  @override
+  String get etfProposeGenericError => 'Не удалось отправить предложение';
+
+  @override
+  String get etfProposalStatusPending => 'Ожидает решения';
+
+  @override
+  String get etfProposalStatusApproved => 'Одобрено — в очереди';
+
+  @override
+  String get etfProposalStatusRejected => 'Отклонено';
+
+  @override
+  String get etfProposalStatusExecuted => 'Исполнено';
+
+  @override
+  String get etfProposalFlaggedLabel => 'Помечено как рискованное';
+
+  @override
+  String get etfProposalApproveButton => 'Одобрить';
+
+  @override
+  String get etfProposalRejectButton => 'Отклонить';
+
+  @override
+  String get etfProposalFlagButton => 'Пометить риск';
+
+  @override
+  String get etfProposalExecuteButton => 'Исполнить';
+
+  @override
+  String get etfProposalActionError => 'Действие не выполнено';
+
+  @override
   String get etfEmployeeHubInvitationsRow => 'Приглашения';
 
   @override

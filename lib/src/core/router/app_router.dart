@@ -65,6 +65,7 @@ import '../../features/funds/screens/employee_profile_screen.dart';
 import '../../features/funds/screens/fund_detail_screen.dart';
 import '../../features/funds/screens/fund_management_screen.dart';
 import '../../features/funds/screens/fund_team_screen.dart';
+import '../../features/funds/screens/fund_blotter_screen.dart';
 import '../../features/funds/screens/companies_history_screen.dart';
 import '../../features/funds/screens/employment_detail_screen.dart';
 import '../../features/funds/models/employee.dart' show EmploymentRecord;
@@ -553,6 +554,14 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return FundTeamScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/blotter',
+        name: 'fundBlotter',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundBlotterScreen(fundId: id);
         },
       ),
       GoRoute(

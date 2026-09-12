@@ -130,6 +130,11 @@ class FundManagementScreen extends ConsumerWidget {
                         label: l10n.etfEmployeeHubTeamRow,
                         onTap: () => context.push('/funds/${fund.id}/team'),
                       ),
+                      CircleShortcut(
+                        icon: Icons.receipt_long_rounded,
+                        label: l10n.etfBlotterShortcutLabel,
+                        onTap: () => context.push('/funds/${fund.id}/blotter'),
+                      ),
                     ],
                   ),
                 ],

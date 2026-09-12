@@ -10969,6 +10969,192 @@ abstract class AppLocalizations {
   /// **'Failed to leave fund'**
   String get etfEmploymentDetailLeaveError;
 
+  /// No description provided for @etfBlotterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ORDERS'**
+  String get etfBlotterTitle;
+
+  /// No description provided for @etfBlotterShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get etfBlotterShortcutLabel;
+
+  /// No description provided for @etfBlotterEmptyText.
+  ///
+  /// In en, this message translates to:
+  /// **'No trade proposals yet'**
+  String get etfBlotterEmptyText;
+
+  /// No description provided for @etfProposeTradeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Propose a trade'**
+  String get etfProposeTradeButton;
+
+  /// No description provided for @etfProposeTradeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Propose a trade'**
+  String get etfProposeTradeTitle;
+
+  /// No description provided for @etfProposeSymbolLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbol'**
+  String get etfProposeSymbolLabel;
+
+  /// No description provided for @etfProposeSymbolHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. AAPL'**
+  String get etfProposeSymbolHint;
+
+  /// No description provided for @etfProposeSideLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Side'**
+  String get etfProposeSideLabel;
+
+  /// No description provided for @etfProposeOrderTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Order type'**
+  String get etfProposeOrderTypeLabel;
+
+  /// No description provided for @etfProposeOrderTypeMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Market'**
+  String get etfProposeOrderTypeMarket;
+
+  /// No description provided for @etfProposeOrderTypeLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit'**
+  String get etfProposeOrderTypeLimit;
+
+  /// No description provided for @etfProposeQuantityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity (shares)'**
+  String get etfProposeQuantityLabel;
+
+  /// No description provided for @etfProposeLimitPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit price'**
+  String get etfProposeLimitPriceLabel;
+
+  /// No description provided for @etfProposeJustificationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Justification'**
+  String get etfProposeJustificationLabel;
+
+  /// No description provided for @etfProposeJustificationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Why this trade?'**
+  String get etfProposeJustificationHint;
+
+  /// No description provided for @etfProposeSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit proposal'**
+  String get etfProposeSubmitButton;
+
+  /// No description provided for @etfProposeSymbolRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbol is required'**
+  String get etfProposeSymbolRequired;
+
+  /// No description provided for @etfProposeQuantityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid quantity'**
+  String get etfProposeQuantityRequired;
+
+  /// No description provided for @etfProposeLimitPriceRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid limit price'**
+  String get etfProposeLimitPriceRequired;
+
+  /// No description provided for @etfProposeSuccessSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal submitted'**
+  String get etfProposeSuccessSnackbar;
+
+  /// No description provided for @etfProposeGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit proposal'**
+  String get etfProposeGenericError;
+
+  /// No description provided for @etfProposalStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get etfProposalStatusPending;
+
+  /// No description provided for @etfProposalStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved — queued'**
+  String get etfProposalStatusApproved;
+
+  /// No description provided for @etfProposalStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get etfProposalStatusRejected;
+
+  /// No description provided for @etfProposalStatusExecuted.
+  ///
+  /// In en, this message translates to:
+  /// **'Executed'**
+  String get etfProposalStatusExecuted;
+
+  /// No description provided for @etfProposalFlaggedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Flagged risky'**
+  String get etfProposalFlaggedLabel;
+
+  /// No description provided for @etfProposalApproveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get etfProposalApproveButton;
+
+  /// No description provided for @etfProposalRejectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get etfProposalRejectButton;
+
+  /// No description provided for @etfProposalFlagButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag risky'**
+  String get etfProposalFlagButton;
+
+  /// No description provided for @etfProposalExecuteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Execute'**
+  String get etfProposalExecuteButton;
+
+  /// No description provided for @etfProposalActionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Action failed'**
+  String get etfProposalActionError;
+
   /// No description provided for @etfEmployeeHubInvitationsRow.
   ///
   /// In en, this message translates to:

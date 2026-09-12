@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
 import '../models/fund.dart';
+import '../models/trade_proposal.dart';
 import '../services/fund_api_service.dart';
 
 /// Fund tickers are always "FS" + 1-5 uppercase letters (fundService.js's
@@ -58,4 +59,11 @@ final resolvedAssetNameProvider = FutureProvider.autoDispose
         if (match != null) return match.name;
       }
       return ref.watch(resolvedCompanyNameProvider(symbol).future);
+    });
+
+/// The blotter — every proposal for a fund, newest first. Autodispose:
+/// this screen isn't kept warm across navigation the way the funds list is.
+final fundProposalsProvider = FutureProvider.autoDispose
+    .family<List<TradeProposal>, String>((ref, fundId) {
+      return ref.watch(fundApiServiceProvider).listProposals(fundId);
     });
