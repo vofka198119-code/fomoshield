@@ -6589,6 +6589,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfProposalStatusExecuted => 'Исполнено';
 
   @override
+  String get etfProposalStatusNeedsRevision => 'На доработке';
+
+  @override
   String get etfProposalFlaggedLabel => 'Помечено как рискованное';
 
   @override
@@ -6602,6 +6605,36 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get etfProposalExecuteButton => 'Исполнить';
+
+  @override
+  String get etfProposalReworkButton => 'Отправить на доработку';
+
+  @override
+  String get etfProposalReworkDialogTitle => 'Отправить на доработку';
+
+  @override
+  String get etfProposalReworkReasonHint => 'Что нужно исправить?';
+
+  @override
+  String get etfProposalReworkReasonRequired => 'Укажи причину';
+
+  @override
+  String get etfProposalReworkSubmitButton => 'Отправить';
+
+  @override
+  String get etfProposalDetailsButton => 'Подробности';
+
+  @override
+  String get etfProposalHeaderBuy => 'ОРДЕР НА ПОКУПКУ';
+
+  @override
+  String get etfProposalHeaderSell => 'ОРДЕР НА ПРОДАЖУ';
+
+  @override
+  String get etfProposalCreateBuyOrderButton => 'Ордер на покупку';
+
+  @override
+  String get etfProposalCreateSellOrderButton => 'Ордер на продажу';
 
   @override
   String get etfProposalActionError => 'Действие не выполнено';

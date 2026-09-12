@@ -302,6 +302,27 @@ class FundApiService {
     }
   }
 
+  Future<TradeProposal> reworkProposal(
+    String fundId,
+    String proposalId, {
+    String? reason,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/proposals/$proposalId/rework',
+        data: {'reason': reason},
+      );
+      return TradeProposal.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to send proposal back for revision'),
+        code: code,
+      );
+    }
+  }
+
   Future<TradeProposal> executeProposal(String fundId, String proposalId) async {
     try {
       final response = await _dio.post(

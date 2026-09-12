@@ -6567,6 +6567,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfProposalStatusExecuted => 'Executed';
 
   @override
+  String get etfProposalStatusNeedsRevision => 'Needs revision';
+
+  @override
   String get etfProposalFlaggedLabel => 'Flagged risky';
 
   @override
@@ -6580,6 +6583,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfProposalExecuteButton => 'Execute';
+
+  @override
+  String get etfProposalReworkButton => 'Send back for revision';
+
+  @override
+  String get etfProposalReworkDialogTitle => 'Send back for revision';
+
+  @override
+  String get etfProposalReworkReasonHint => 'What needs to change?';
+
+  @override
+  String get etfProposalReworkReasonRequired => 'A reason is required';
+
+  @override
+  String get etfProposalReworkSubmitButton => 'Send';
+
+  @override
+  String get etfProposalDetailsButton => 'Details';
+
+  @override
+  String get etfProposalHeaderBuy => 'BUY ORDER';
+
+  @override
+  String get etfProposalHeaderSell => 'SELL ORDER';
+
+  @override
+  String get etfProposalCreateBuyOrderButton => 'Buy order';
+
+  @override
+  String get etfProposalCreateSellOrderButton => 'Sell order';
 
   @override
   String get etfProposalActionError => 'Action failed';

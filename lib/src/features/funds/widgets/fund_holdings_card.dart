@@ -10,13 +10,16 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/company_logo.dart';
-import '../../../shared/widgets/donut_ring_painter.dart';
 import '../models/fund.dart';
 
-// Same card/row chrome as Portfolio's PortfolioHoldingsWidget (light-card
-// skin, ring-bordered logo, name/ticker left) — percent-of-fund on the
-// right instead of value/P&L, since a fund holding has no per-user cost
-// basis.
+// Same card/row chrome as Watchlist's own tile (watchlist_widget.dart) —
+// light-card skin, single themed-accent ring around the logo, name/ticker
+// left — percent-of-fund on the right instead of value/P&L, since a fund
+// holding has no per-user cost basis. Plain palette.accentPrimary ring, not
+// donutAllocationColor(i) (2026-09-12: that rainbow-per-row ring belongs to
+// an allocation breakdown with a matching donut chart elsewhere on the same
+// screen -- there's no such chart here, so a single themed color is the
+// app's actual standard for a list-row logo).
 class FundHoldingsCard extends StatelessWidget {
   final FundDetail fund;
   final AppPalette palette;
@@ -65,7 +68,6 @@ class FundHoldingsCard extends StatelessWidget {
               _Row(
                 holding: sorted[i],
                 percent: total > 0 ? sorted[i].value / total * 100 : 0,
-                colorIndex: i,
                 showDivider: i < sorted.length - 1,
                 palette: palette,
               ),
@@ -80,14 +82,12 @@ class FundHoldingsCard extends StatelessWidget {
 class _Row extends ConsumerWidget {
   final FundHolding holding;
   final double percent;
-  final int colorIndex;
   final bool showDivider;
   final AppPalette palette;
 
   const _Row({
     required this.holding,
     required this.percent,
-    required this.colorIndex,
     required this.showDivider,
     required this.palette,
   });
@@ -118,12 +118,7 @@ class _Row extends ConsumerWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: donutAllocationColor(
-                      colorIndex,
-                    ).withValues(alpha: 0.7),
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: palette.accentPrimary, width: 1.5),
                 ),
                 padding: const EdgeInsets.all(1.5),
                 child: ClipOval(

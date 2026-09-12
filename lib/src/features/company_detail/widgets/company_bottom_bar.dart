@@ -20,6 +20,13 @@ class CompanyBottomBar extends StatelessWidget {
   final VoidCallback onBuy;
   final VoidCallback onSell;
   final AppPalette palette;
+  // Override the button text without touching styling -- used in fund
+  // context (2026-09-12) where tapping doesn't trade directly, it opens
+  // Propose Trade with the symbol prefilled, so "Создать ордер на
+  // покупку/продажу" reads more honestly than plain "Купить"/"Продать".
+  // Null (every other call site) keeps the original labels.
+  final String? buyLabel;
+  final String? sellLabel;
 
   const CompanyBottomBar({
     super.key,
@@ -28,6 +35,8 @@ class CompanyBottomBar extends StatelessWidget {
     required this.onBuy,
     required this.onSell,
     required this.palette,
+    this.buyLabel,
+    this.sellLabel,
   });
 
   @override
@@ -73,12 +82,21 @@ class CompanyBottomBar extends StatelessWidget {
                           onTap: onBuy,
                           borderRadius: BorderRadius.circular(18),
                           child: Center(
-                            child: Text(
-                              l10n.tradeBuy,
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                              ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  buyLabel ?? l10n.tradeBuy,
+                                  maxLines: 1,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -110,17 +128,27 @@ class CompanyBottomBar extends StatelessWidget {
                           Colors.white,
                         ),
                         foregroundColor: Colors.black,
+                        // Matches the BUY button's own 6px Padding exactly
+                        // (2026-09-12) -- ElevatedButton's own default
+                        // padding is much wider, so the two FittedBoxes had
+                        // different available width and scaled their equal-
+                        // length labels to two different font sizes.
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18),
                         ),
                         elevation: 0,
                       ),
-                      child: Text(
-                        l10n.tradeSell,
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          sellLabel ?? l10n.tradeSell,
+                          maxLines: 1,
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),

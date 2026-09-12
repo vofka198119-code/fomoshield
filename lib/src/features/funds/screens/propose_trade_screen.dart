@@ -25,8 +25,23 @@ import '../services/fund_api_service.dart' show FundApiException;
 
 class ProposeTradeScreen extends ConsumerStatefulWidget {
   final String fundId;
+  // Prefilled when reached from a company card in fund context (2026-09-12:
+  // "смотрел на компанию и решил добавить ее или продать") -- the symbol
+  // search box starts already resolved to this symbol/name instead of
+  // empty, side defaults to whichever button was tapped. Every other entry
+  // point (the blotter's own "+") leaves these null and the form starts
+  // blank as before.
+  final String? initialSymbol;
+  final String? initialSymbolName;
+  final String? initialSide;
 
-  const ProposeTradeScreen({super.key, required this.fundId});
+  const ProposeTradeScreen({
+    super.key,
+    required this.fundId,
+    this.initialSymbol,
+    this.initialSymbolName,
+    this.initialSide,
+  });
 
   @override
   ConsumerState<ProposeTradeScreen> createState() => _ProposeTradeScreenState();
@@ -47,6 +62,18 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
   String _orderType = 'market';
   bool _submitting = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    final symbol = widget.initialSymbol;
+    if (symbol != null && symbol.isNotEmpty) {
+      _selectedSymbol = symbol;
+      _symbolController.text =
+          '${widget.initialSymbolName ?? symbol} ($symbol)';
+    }
+    if (widget.initialSide != null) _side = widget.initialSide!;
+  }
 
   @override
   void dispose() {
@@ -274,8 +301,12 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
                     onSelected: (_) => setState(() => _side = 'buy'),
                     selectedColor: ThemeV2.success.withValues(alpha: 0.2),
                     labelStyle: GoogleFonts.inter(
-                      color: _side == 'buy' ? ThemeV2.success : palette.textBody,
-                      fontWeight: _side == 'buy' ? FontWeight.w700 : FontWeight.w500,
+                      color: _side == 'buy'
+                          ? ThemeV2.success
+                          : palette.textBody,
+                      fontWeight: _side == 'buy'
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                     ),
                   ),
                   ChoiceChip(
@@ -285,7 +316,9 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
                     selectedColor: ThemeV2.loss.withValues(alpha: 0.2),
                     labelStyle: GoogleFonts.inter(
                       color: _side == 'sell' ? ThemeV2.loss : palette.textBody,
-                      fontWeight: _side == 'sell' ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: _side == 'sell'
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                     ),
                   ),
                 ],
@@ -301,8 +334,12 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
                     onSelected: (_) => setState(() => _orderType = 'market'),
                     selectedColor: palette.accentPrimary.withValues(alpha: 0.2),
                     labelStyle: GoogleFonts.inter(
-                      color: _orderType == 'market' ? palette.accentPrimary : palette.textBody,
-                      fontWeight: _orderType == 'market' ? FontWeight.w700 : FontWeight.w500,
+                      color: _orderType == 'market'
+                          ? palette.accentPrimary
+                          : palette.textBody,
+                      fontWeight: _orderType == 'market'
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                     ),
                   ),
                   ChoiceChip(
@@ -311,8 +348,12 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
                     onSelected: (_) => setState(() => _orderType = 'limit'),
                     selectedColor: palette.accentPrimary.withValues(alpha: 0.2),
                     labelStyle: GoogleFonts.inter(
-                      color: _orderType == 'limit' ? palette.accentPrimary : palette.textBody,
-                      fontWeight: _orderType == 'limit' ? FontWeight.w700 : FontWeight.w500,
+                      color: _orderType == 'limit'
+                          ? palette.accentPrimary
+                          : palette.textBody,
+                      fontWeight: _orderType == 'limit'
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                     ),
                   ),
                 ],
@@ -321,7 +362,9 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
               _sectionLabel(palette, l10n.etfProposeQuantityLabel),
               TextField(
                 controller: _quantityController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 style: GoogleFonts.inter(color: palette.textHeader),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -334,7 +377,9 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
                 _sectionLabel(palette, l10n.etfProposeLimitPriceLabel),
                 TextField(
                   controller: _limitPriceController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   style: GoogleFonts.inter(color: palette.textHeader),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(

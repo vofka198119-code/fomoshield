@@ -585,7 +585,13 @@ class AppRouter {
         name: 'proposeTrade',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          return ProposeTradeScreen(fundId: id);
+          final extra = state.extra as Map<String, dynamic>?;
+          return ProposeTradeScreen(
+            fundId: id,
+            initialSymbol: extra?['symbol'] as String?,
+            initialSymbolName: extra?['symbolName'] as String?,
+            initialSide: extra?['side'] as String?,
+          );
         },
       ),
       GoRoute(

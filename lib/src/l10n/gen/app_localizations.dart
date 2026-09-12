@@ -11119,6 +11119,12 @@ abstract class AppLocalizations {
   /// **'Executed'**
   String get etfProposalStatusExecuted;
 
+  /// No description provided for @etfProposalStatusNeedsRevision.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs revision'**
+  String get etfProposalStatusNeedsRevision;
+
   /// No description provided for @etfProposalFlaggedLabel.
   ///
   /// In en, this message translates to:
@@ -11148,6 +11154,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Execute'**
   String get etfProposalExecuteButton;
+
+  /// No description provided for @etfProposalReworkButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send back for revision'**
+  String get etfProposalReworkButton;
+
+  /// No description provided for @etfProposalReworkDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send back for revision'**
+  String get etfProposalReworkDialogTitle;
+
+  /// No description provided for @etfProposalReworkReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What needs to change?'**
+  String get etfProposalReworkReasonHint;
+
+  /// No description provided for @etfProposalReworkReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A reason is required'**
+  String get etfProposalReworkReasonRequired;
+
+  /// No description provided for @etfProposalReworkSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get etfProposalReworkSubmitButton;
+
+  /// No description provided for @etfProposalDetailsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get etfProposalDetailsButton;
+
+  /// No description provided for @etfProposalHeaderBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'BUY ORDER'**
+  String get etfProposalHeaderBuy;
+
+  /// No description provided for @etfProposalHeaderSell.
+  ///
+  /// In en, this message translates to:
+  /// **'SELL ORDER'**
+  String get etfProposalHeaderSell;
+
+  /// No description provided for @etfProposalCreateBuyOrderButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy order'**
+  String get etfProposalCreateBuyOrderButton;
+
+  /// No description provided for @etfProposalCreateSellOrderButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell order'**
+  String get etfProposalCreateSellOrderButton;
 
   /// No description provided for @etfProposalActionError.
   ///

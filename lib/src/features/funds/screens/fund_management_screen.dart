@@ -57,13 +57,16 @@ class FundManagementScreen extends ConsumerWidget {
         // generic companyDetailTitle ("О КОМПАНИИ"): this screen's identity
         // is the *kind* of screen it is, not which fund it's showing. The
         // fund's own name/ticker still lives right below in _buildNameCard.
-        title: themedHeaderText(
-          l10n.etfFundManagementTitle,
-          palette,
-          GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.5,
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: themedHeaderText(
+            l10n.etfFundManagementTitle,
+            palette,
+            GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
         actions: [

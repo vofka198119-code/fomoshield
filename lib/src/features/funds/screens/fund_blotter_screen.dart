@@ -3,14 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
-import '../services/fund_api_service.dart' show FundApiException;
 import '../widgets/proposal_card.dart';
 
 // ---------------------------------------------------------------------------
@@ -19,46 +17,23 @@ import '../widgets/proposal_card.dart';
 // a status chip per row, not a hero chart. Reached from
 // FundManagementScreen's own circle-shortcut row.
 //
-// Permissions are computed client-side from the SAME source the backend
-// checks: isHead (fund.headUserId) OR the caller's own fund_team_members
-// permissions row -- there's no dedicated "my permissions" endpoint, this
-// mirrors fundTradeService.js's _getPermissions exactly.
+// Redesigned 2026-09-12 to be a plain identification+status list — no
+// action buttons here anymore. Every row (ProposalListTile,
+// proposal_card.dart) just names the order side, shows the company +
+// status, and pushes into ProposalDetailScreen, which owns the single
+// "одно окно большое со всеми подробностями" (modeled on
+// PortfolioTradeDetailScreen's "детали сделки") where Approve/Reject/
+// Flag/Rework/Execute actually live.
 //
-// "Propose" is its own full screen now (propose_trade_screen.dart), not a
+// "Propose" is its own full screen (propose_trade_screen.dart), not a
 // bottom sheet -- the sheet version lagged noticeably typing into its
-// typeahead field (2026-09-12). Rows here push into ProposalDetailScreen
-// (proposal_card.dart's ProposalCard is shared by both).
+// typeahead field (2026-09-12).
 // ---------------------------------------------------------------------------
 
 class FundBlotterScreen extends ConsumerWidget {
   final String fundId;
 
   const FundBlotterScreen({super.key, required this.fundId});
-
-  Future<void> _act(
-    BuildContext context,
-    WidgetRef ref,
-    Future<void> Function() action,
-    AppLocalizations l10n,
-  ) async {
-    try {
-      await action();
-      ref.invalidate(fundProposalsProvider(fundId));
-    } on FundApiException catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message), backgroundColor: ThemeV2.loss),
-      );
-    } catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.etfProposalActionError),
-          backgroundColor: ThemeV2.loss,
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -79,9 +54,6 @@ class FundBlotterScreen extends ConsumerWidget {
       }
     }
     final canPropose = isHead || (myPermissions?['canPropose'] ?? false);
-    final canApprove = isHead || (myPermissions?['canApprove'] ?? false);
-    final canFlagRisk = isHead || (myPermissions?['canFlagRisk'] ?? false);
-    final canExecute = isHead || (myPermissions?['canExecute'] ?? false);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -130,48 +102,13 @@ class FundBlotterScreen extends ConsumerWidget {
                     for (final proposal in proposals)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: ProposalCard(
+                        child: ProposalListTile(
                           proposal: proposal,
                           palette: palette,
                           l10n: l10n,
-                          canApprove: canApprove,
-                          canFlagRisk: canFlagRisk,
-                          canExecute: canExecute,
                           onTap: () => context.push(
                             '/funds/$fundId/proposals/detail',
                             extra: proposal,
-                          ),
-                          onApprove: () => _act(
-                            context,
-                            ref,
-                            () => ref
-                                .read(fundApiServiceProvider)
-                                .approveProposal(fundId, proposal.id),
-                            l10n,
-                          ),
-                          onReject: () => _act(
-                            context,
-                            ref,
-                            () => ref
-                                .read(fundApiServiceProvider)
-                                .rejectProposal(fundId, proposal.id),
-                            l10n,
-                          ),
-                          onFlag: () => _act(
-                            context,
-                            ref,
-                            () => ref
-                                .read(fundApiServiceProvider)
-                                .flagProposal(fundId, proposal.id),
-                            l10n,
-                          ),
-                          onExecute: () => _act(
-                            context,
-                            ref,
-                            () => ref
-                                .read(fundApiServiceProvider)
-                                .executeProposal(fundId, proposal.id),
-                            l10n,
                           ),
                         ),
                       ),

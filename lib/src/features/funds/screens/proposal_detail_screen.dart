@@ -124,6 +124,12 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   .rejectProposal(fundId, _proposal.id),
               l10n,
             ),
+            onRework: (reason) => _act(
+              () => ref
+                  .read(fundApiServiceProvider)
+                  .reworkProposal(fundId, _proposal.id, reason: reason),
+              l10n,
+            ),
             onFlag: () => _act(
               () => ref
                   .read(fundApiServiceProvider)

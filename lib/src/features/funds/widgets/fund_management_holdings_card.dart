@@ -12,7 +12,6 @@ import '../../../shared/widgets/more_less_pill.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
-import '../../../shared/widgets/donut_ring_painter.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../models/fund.dart';
 
@@ -90,7 +89,6 @@ class _FundManagementHoldingsCardState
             for (int i = 0; i < display.length; i++)
               _Row(
                 holding: display[i],
-                colorIndex: i,
                 showDivider: i < display.length - 1,
                 palette: palette,
                 onTap: () => widget.onHoldingTap(display[i]),
@@ -114,14 +112,12 @@ class _FundManagementHoldingsCardState
 
 class _Row extends ConsumerWidget {
   final FundHolding holding;
-  final int colorIndex;
   final bool showDivider;
   final AppPalette palette;
   final VoidCallback onTap;
 
   const _Row({
     required this.holding,
-    required this.colorIndex,
     required this.showDivider,
     required this.palette,
     required this.onTap,
@@ -151,9 +147,7 @@ class _Row extends ConsumerWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: donutAllocationColor(
-                        colorIndex,
-                      ).withValues(alpha: 0.7),
+                      color: palette.accentPrimary,
                       width: 1.5,
                     ),
                   ),

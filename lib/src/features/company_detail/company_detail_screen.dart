@@ -346,6 +346,19 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     };
   }
 
+  void _openProposeTrade(String side) {
+    final fundContext = widget.fundContext;
+    if (fundContext == null) return;
+    context.push(
+      '/funds/${fundContext.fundId}/propose',
+      extra: {
+        'symbol': widget.symbol,
+        'symbolName': _quoteExtra['companyName'] as String?,
+        'side': side,
+      },
+    );
+  }
+
   void _openOrderEntry(String type) {
     final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.read(portfoliosProvider);
@@ -626,18 +639,29 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
           ),
         ),
         // --- Sticky Bottom Bar: BUY / SELL ---
-        // Hidden in fund context (2026-09-12) -- Buy/Sell here trades into
-        // the VIEWER's own personal portfolio, which is exactly the
-        // sandbox-mixing this whole fund/personal split exists to prevent.
-        // Trading a fund's holdings goes through Propose Trade, not this bar.
-        if (widget.fundContext == null)
-          CompanyBottomBar(
-            price: price,
-            isUp: isUp,
-            onBuy: () => _openOrderEntry('buy'),
-            onSell: () => _openOrderEntry('sell'),
-            palette: palette,
-          ),
+        // In fund context (2026-09-12) this opens Propose Trade with the
+        // symbol prefilled instead of trading into the VIEWER's own
+        // personal portfolio -- that would be exactly the sandbox-mixing
+        // this whole fund/personal split exists to prevent. Relabeled
+        // "Создать ордер на покупку/продажу" so it reads as creating a
+        // proposal, not executing a trade on the spot.
+        widget.fundContext == null
+            ? CompanyBottomBar(
+                price: price,
+                isUp: isUp,
+                onBuy: () => _openOrderEntry('buy'),
+                onSell: () => _openOrderEntry('sell'),
+                palette: palette,
+              )
+            : CompanyBottomBar(
+                price: price,
+                isUp: isUp,
+                buyLabel: l10n.etfProposalCreateBuyOrderButton,
+                sellLabel: l10n.etfProposalCreateSellOrderButton,
+                onBuy: () => _openProposeTrade('buy'),
+                onSell: () => _openProposeTrade('sell'),
+                palette: palette,
+              ),
       ],
     );
   }
