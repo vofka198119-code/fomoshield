@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -20,8 +21,10 @@ import '../../../core/supabase/supabase_providers.dart'
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/circle_shortcut_row.dart';
+import '../../../shared/widgets/widget_container.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
+import '../widgets/company_history_tile.dart';
 import '../widgets/rating_stars_row.dart';
 import '../widgets/employee_identity_card.dart';
 
@@ -134,6 +137,8 @@ class EmployeeHubScreen extends ConsumerWidget {
             ),
             if (profile != null) ...[
               const SizedBox(height: 20),
+              _companiesWidget(context, ref, palette, l10n),
+              const SizedBox(height: 16),
               _ratingCard(palette, l10n, profile.rating),
               const SizedBox(height: 16),
               _statsCard(palette, l10n, profile),
@@ -141,6 +146,62 @@ class EmployeeHubScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // Same role list + label mapping as send_invite_sheet.dart's own role
+  // selector — no shared helper exists across these call sites yet
+  // (fund_team_card.dart, invitation_detail_sheet.dart, send_invite_sheet.dart
+  // each keep their own copy), matching that existing convention.
+  String _roleLabel(AppLocalizations l10n, String role) {
+    switch (role) {
+      case 'co_manager':
+        return l10n.etfRoleCoManager;
+      case 'trader':
+        return l10n.etfRoleTrader;
+      case 'risk_manager':
+        return l10n.etfRoleRiskManager;
+      default:
+        return l10n.etfRoleAnalyst;
+    }
+  }
+
+  // Same 5-visible + WidgetContainer "More" recipe as
+  // portfolio_trade_history_widget.dart — hidden entirely (not an empty
+  // card) when there's no history yet, same as that widget does for zero
+  // transactions.
+  Widget _companiesWidget(
+    BuildContext context,
+    WidgetRef ref,
+    AppPalette palette,
+    AppLocalizations l10n,
+  ) {
+    final history = ref.watch(myEmploymentHistoryProvider).valueOrNull ?? [];
+    if (history.isEmpty) return const SizedBox.shrink();
+    final displayed = history.take(5).toList();
+    final hasMore = history.length > 5;
+
+    return WidgetContainer(
+      title: l10n.etfEmployeeHubCompaniesTitle,
+      showFooter: hasMore,
+      footerText: l10n.commonMoreCount(history.length - 5),
+      palette: palette,
+      onTap: hasMore ? () => context.push('/funds/employment-history') : null,
+      children: displayed
+          .map(
+            (record) => CompanyHistoryTile(
+              fundName: record.fundName ?? record.fundTicker ?? '—',
+              fundTicker: record.fundTicker ?? '',
+              roleLabel: _roleLabel(l10n, record.role),
+              isActive: record.isActive,
+              palette: palette,
+              onTap: () => context.push(
+                '/funds/employment-history/detail',
+                extra: record,
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -194,6 +255,14 @@ class EmployeeHubScreen extends ConsumerWidget {
                   palette,
                   l10n.etfEmployeeProfileStatsFundsChanged,
                   '${profile.fundsChangedCount}',
+                ),
+                const SizedBox(height: 8),
+                _statRow(
+                  palette,
+                  l10n.etfEmployeeProfileStatsRegisteredAt,
+                  DateFormat.yMMMd(
+                    l10n.localeName,
+                  ).format(profile.createdAt.toLocal()),
                 ),
               ],
             ),

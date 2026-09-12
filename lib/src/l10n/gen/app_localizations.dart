@@ -10903,6 +10903,72 @@ abstract class AppLocalizations {
   /// **'MY PROFILE'**
   String get etfEmployeeHubTitle;
 
+  /// No description provided for @etfEmployeeHubCompaniesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPANIES'**
+  String get etfEmployeeHubCompaniesTitle;
+
+  /// No description provided for @etfEmploymentDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EMPLOYMENT'**
+  String get etfEmploymentDetailTitle;
+
+  /// No description provided for @etfEmploymentDetailJoinedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get etfEmploymentDetailJoinedLabel;
+
+  /// No description provided for @etfEmploymentDetailLeftLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get etfEmploymentDetailLeftLabel;
+
+  /// No description provided for @etfEmploymentDetailStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently employed'**
+  String get etfEmploymentDetailStatusActive;
+
+  /// No description provided for @etfEmploymentDetailStatusResigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Resigned'**
+  String get etfEmploymentDetailStatusResigned;
+
+  /// No description provided for @etfEmploymentDetailStatusTerminated.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminated'**
+  String get etfEmploymentDetailStatusTerminated;
+
+  /// No description provided for @etfEmploymentDetailLeaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this fund'**
+  String get etfEmploymentDetailLeaveButton;
+
+  /// No description provided for @etfEmploymentDetailLeaveConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this fund?'**
+  String get etfEmploymentDetailLeaveConfirmTitle;
+
+  /// No description provided for @etfEmploymentDetailLeaveConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll lose access to this fund\'s team tools immediately. This can\'t be undone.'**
+  String get etfEmploymentDetailLeaveConfirmBody;
+
+  /// No description provided for @etfEmploymentDetailLeaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to leave fund'**
+  String get etfEmploymentDetailLeaveError;
+
   /// No description provided for @etfEmployeeHubInvitationsRow.
   ///
   /// In en, this message translates to:
@@ -11466,6 +11532,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Funds changed'**
   String get etfEmployeeProfileStatsFundsChanged;
+
+  /// No description provided for @etfEmployeeProfileStatsRegisteredAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered'**
+  String get etfEmployeeProfileStatsRegisteredAt;
 
   /// No description provided for @etfEmployeeProfileStatsRating.
   ///

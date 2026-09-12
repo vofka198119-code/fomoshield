@@ -39,3 +39,9 @@ final fundTeamProvider = FutureProvider.autoDispose
     .family<List<FundTeamMember>, String>((ref, fundId) {
       return ref.watch(employeeApiServiceProvider).getTeam(fundId);
     });
+
+/// "Companies I've worked for" — every stint, open or closed, newest first.
+final myEmploymentHistoryProvider =
+    FutureProvider.autoDispose<List<EmploymentRecord>>((ref) {
+      return ref.watch(employeeApiServiceProvider).getMyEmploymentHistory();
+    });

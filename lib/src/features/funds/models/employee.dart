@@ -142,3 +142,39 @@ class FundInvitation {
         : null,
   );
 }
+
+// Migration 019 — one row per fund stint (open or closed), the "companies
+// I've worked for" record. fund_team_members only tracks CURRENT
+// membership (the row disappears on departure); this is the durable log
+// leaveType/leftAt survive that deletion in.
+class EmploymentRecord {
+  final String fundId;
+  final String? fundName;
+  final String? fundTicker;
+  final String role;
+  final DateTime joinedAt;
+  final DateTime? leftAt;
+  final String? leaveType; // 'resigned' | 'terminated' | null (still active)
+
+  const EmploymentRecord({
+    required this.fundId,
+    this.fundName,
+    this.fundTicker,
+    required this.role,
+    required this.joinedAt,
+    this.leftAt,
+    this.leaveType,
+  });
+
+  bool get isActive => leftAt == null;
+
+  factory EmploymentRecord.fromJson(Map<String, dynamic> json) => EmploymentRecord(
+    fundId: json['fundId'] as String,
+    fundName: json['fundName'] as String?,
+    fundTicker: json['fundTicker'] as String?,
+    role: json['role'] as String,
+    joinedAt: DateTime.parse(json['joinedAt'] as String),
+    leftAt: json['leftAt'] != null ? DateTime.parse(json['leftAt'] as String) : null,
+    leaveType: json['leaveType'] as String?,
+  );
+}

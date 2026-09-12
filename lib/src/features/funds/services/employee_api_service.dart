@@ -86,6 +86,27 @@ class EmployeeApiService {
     }
   }
 
+  Future<List<EmploymentRecord>> getMyEmploymentHistory() async {
+    try {
+      final response = await _dio.get('/employees/me/employment-history');
+      final list = ((response.data as Map)['history'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(EmploymentRecord.fromJson).toList();
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to load employment history'));
+    }
+  }
+
+  /// Self-service resignation — the only voluntary-departure path (a head
+  /// can only fire, via terminateTeamMember). Immediate, no notice period.
+  Future<void> leaveFund(String fundId) async {
+    try {
+      await _dio.post('/funds/$fundId/team/me/leave');
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to leave fund');
+    }
+  }
+
   Future<List<EmployeeProfile>> listMarketplace({String? excludeFundId}) async {
     try {
       final response = await _dio.get(

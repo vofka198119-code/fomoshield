@@ -6480,6 +6480,40 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfEmployeeHubTitle => 'МОЙ ПРОФИЛЬ';
 
   @override
+  String get etfEmployeeHubCompaniesTitle => 'КОМПАНИИ';
+
+  @override
+  String get etfEmploymentDetailTitle => 'ЗАНЯТОСТЬ';
+
+  @override
+  String get etfEmploymentDetailJoinedLabel => 'Нанят';
+
+  @override
+  String get etfEmploymentDetailLeftLabel => 'Ушёл';
+
+  @override
+  String get etfEmploymentDetailStatusActive => 'Работает сейчас';
+
+  @override
+  String get etfEmploymentDetailStatusResigned => 'Уволился сам';
+
+  @override
+  String get etfEmploymentDetailStatusTerminated => 'Уволен';
+
+  @override
+  String get etfEmploymentDetailLeaveButton => 'Покинуть фонд';
+
+  @override
+  String get etfEmploymentDetailLeaveConfirmTitle => 'Покинуть фонд?';
+
+  @override
+  String get etfEmploymentDetailLeaveConfirmBody =>
+      'Ты сразу потеряешь доступ к инструментам команды этого фонда. Отменить нельзя.';
+
+  @override
+  String get etfEmploymentDetailLeaveError => 'Не удалось покинуть фонд';
+
+  @override
   String get etfEmployeeHubInvitationsRow => 'Приглашения';
 
   @override
@@ -6781,6 +6815,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get etfEmployeeProfileStatsFundsChanged => 'Смен фондов';
+
+  @override
+  String get etfEmployeeProfileStatsRegisteredAt => 'Дата регистрации';
 
   @override
   String get etfEmployeeProfileStatsRating => 'Рейтинг';

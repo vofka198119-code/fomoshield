@@ -65,6 +65,9 @@ import '../../features/funds/screens/employee_profile_screen.dart';
 import '../../features/funds/screens/fund_detail_screen.dart';
 import '../../features/funds/screens/fund_management_screen.dart';
 import '../../features/funds/screens/fund_team_screen.dart';
+import '../../features/funds/screens/companies_history_screen.dart';
+import '../../features/funds/screens/employment_detail_screen.dart';
+import '../../features/funds/models/employee.dart' show EmploymentRecord;
 import '../../features/funds/screens/my_invitations_screen.dart';
 import '../../features/funds/widgets/fund_list_screen.dart';
 import '../theme/app_palette.dart';
@@ -504,6 +507,21 @@ class AppRouter {
           title: AppLocalizations.of(context)!.etfEmployeeHubApplicationsRow,
           icon: Icons.assignment_outlined,
         ),
+      ),
+      // Registered before '/funds/:id' so these literal paths win the
+      // match, same reasoning as '/funds/list' etc. above.
+      GoRoute(
+        path: '/funds/employment-history',
+        name: 'employmentHistory',
+        builder: (context, state) => const CompaniesHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/funds/employment-history/detail',
+        name: 'employmentDetail',
+        builder: (context, state) {
+          final record = state.extra as EmploymentRecord;
+          return EmploymentDetailScreen(record: record);
+        },
       ),
       GoRoute(
         path: '/funds/:id',

@@ -6458,6 +6458,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfEmployeeHubTitle => 'MY PROFILE';
 
   @override
+  String get etfEmployeeHubCompaniesTitle => 'COMPANIES';
+
+  @override
+  String get etfEmploymentDetailTitle => 'EMPLOYMENT';
+
+  @override
+  String get etfEmploymentDetailJoinedLabel => 'Joined';
+
+  @override
+  String get etfEmploymentDetailLeftLabel => 'Left';
+
+  @override
+  String get etfEmploymentDetailStatusActive => 'Currently employed';
+
+  @override
+  String get etfEmploymentDetailStatusResigned => 'Resigned';
+
+  @override
+  String get etfEmploymentDetailStatusTerminated => 'Terminated';
+
+  @override
+  String get etfEmploymentDetailLeaveButton => 'Leave this fund';
+
+  @override
+  String get etfEmploymentDetailLeaveConfirmTitle => 'Leave this fund?';
+
+  @override
+  String get etfEmploymentDetailLeaveConfirmBody =>
+      'You\'ll lose access to this fund\'s team tools immediately. This can\'t be undone.';
+
+  @override
+  String get etfEmploymentDetailLeaveError => 'Failed to leave fund';
+
+  @override
   String get etfEmployeeHubInvitationsRow => 'Invitations';
 
   @override
@@ -6759,6 +6793,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfEmployeeProfileStatsFundsChanged => 'Funds changed';
+
+  @override
+  String get etfEmployeeProfileStatsRegisteredAt => 'Registered';
 
   @override
   String get etfEmployeeProfileStatsRating => 'Rating';
