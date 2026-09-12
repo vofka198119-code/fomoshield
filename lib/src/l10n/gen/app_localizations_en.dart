@@ -6618,6 +6618,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfProposalActionError => 'Action failed';
 
   @override
+  String get etfProposalPlacementPriceLabel => 'Order placement price';
+
+  @override
+  String get etfProposalExecutionPriceLabel => 'Deal price';
+
+  @override
+  String get etfProposalProposedByLabel => 'Proposed by';
+
+  @override
   String get etfEmployeeHubInvitationsRow => 'Invitations';
 
   @override

@@ -11221,6 +11221,24 @@ abstract class AppLocalizations {
   /// **'Action failed'**
   String get etfProposalActionError;
 
+  /// No description provided for @etfProposalPlacementPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Order placement price'**
+  String get etfProposalPlacementPriceLabel;
+
+  /// No description provided for @etfProposalExecutionPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deal price'**
+  String get etfProposalExecutionPriceLabel;
+
+  /// No description provided for @etfProposalProposedByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Proposed by'**
+  String get etfProposalProposedByLabel;
+
   /// No description provided for @etfEmployeeHubInvitationsRow.
   ///
   /// In en, this message translates to:

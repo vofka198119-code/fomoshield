@@ -6640,6 +6640,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfProposalActionError => 'Действие не выполнено';
 
   @override
+  String get etfProposalPlacementPriceLabel => 'Цена размещения ордера';
+
+  @override
+  String get etfProposalExecutionPriceLabel => 'Цена сделки';
+
+  @override
+  String get etfProposalProposedByLabel => 'Предложил';
+
+  @override
   String get etfEmployeeHubInvitationsRow => 'Приглашения';
 
   @override

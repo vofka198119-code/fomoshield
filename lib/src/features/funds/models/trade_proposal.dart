@@ -10,6 +10,7 @@ class TradeProposal {
   final String id;
   final String fundId;
   final String proposerUserId;
+  final String? proposerNickname;
   final String symbol;
   final String side; // 'buy' | 'sell'
   final String orderType; // 'market' | 'limit'
@@ -23,6 +24,7 @@ class TradeProposal {
   final DateTime? resolvedAt;
   final String? rejectionReason;
   final double? executedPrice;
+  final double? commission;
   final DateTime? executedAt;
   final DateTime createdAt;
 
@@ -30,6 +32,7 @@ class TradeProposal {
     required this.id,
     required this.fundId,
     required this.proposerUserId,
+    this.proposerNickname,
     required this.symbol,
     required this.side,
     required this.orderType,
@@ -43,6 +46,7 @@ class TradeProposal {
     this.resolvedAt,
     this.rejectionReason,
     this.executedPrice,
+    this.commission,
     this.executedAt,
     required this.createdAt,
   });
@@ -55,6 +59,7 @@ class TradeProposal {
     id: json['id'] as String,
     fundId: json['fundId'] as String,
     proposerUserId: json['proposerUserId'] as String,
+    proposerNickname: json['proposerNickname'] as String?,
     symbol: json['symbol'] as String,
     side: json['side'] as String,
     orderType: json['orderType'] as String,
@@ -70,6 +75,7 @@ class TradeProposal {
         : null,
     rejectionReason: json['rejectionReason'] as String?,
     executedPrice: (json['executedPrice'] as num?)?.toDouble(),
+    commission: (json['commission'] as num?)?.toDouble(),
     executedAt: json['executedAt'] != null
         ? DateTime.parse(json['executedAt'] as String)
         : null,

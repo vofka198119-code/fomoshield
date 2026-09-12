@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_divider.dart';
@@ -14,16 +15,20 @@ import '../../../shared/widgets/company_logo.dart';
 import '../models/trade_proposal.dart';
 
 // ---------------------------------------------------------------------------
-// Proposal Card + Proposal List Tile — 2026-09-12 redesign. The blotter list
-// (ProposalListTile) is now just identification + status, no action
-// buttons; ProposalCard is the "одно окно большое со всеми подробностями"
-// that lives on ProposalDetailScreen, modeled directly on
-// PortfolioTradeDetailScreen's own _TradeDetailCard/_DetailRow ("детали
-// сделки" -- the reference the user pointed at): ringed logo header
-// (green/red per side, same as every other trade/order row in the app --
-// TradeHistoryTile, _TradeDetailCard -- NOT the plain Watchlist-style
-// single-accent ring, which is for a non-directional asset list), then a
-// clean label/value row list, then action buttons.
+// Proposal Card + Proposal List Tile — 2026-09-12 redesign, refined same day
+// per explicit user spec. ProposalListTile is the blotter's identification
+// row; ProposalCard is the "одно окно большое со всеми подробностями" full
+// detail view on ProposalDetailScreen, modeled on PortfolioTradeDetailScreen's
+// own _TradeDetailCard/_DetailRow. Logo ring is the plain Watchlist-style
+// single theme-accent ring (NOT the green/red directional ring TradeHistoryTile
+// uses) -- user explicitly asked for the ring itself to read as "under the
+// theme", with direction communicated only by the BUY/SELL badge next to it.
+// Action buttons (Approve/Reject/Rework/Flag/Execute) are themed too --
+// filled primary actions use the app's own themedDarkCtaButtonShell CTA
+// treatment (same recipe as set_goal_screen.dart's _saveButton), secondary
+// ones an outline in palette.accentPrimary -- replacing the previous
+// ThemeV2.success/loss/warning fixed colors, which read as a mismatched
+// "vinaigrette" against a themed (Luxury Gold/Graphite/etc.) card.
 // ---------------------------------------------------------------------------
 
 String proposalStatusLabel(AppLocalizations l10n, TradeProposal p) {
@@ -102,51 +107,87 @@ Future<void> _showReworkDialog(
   );
 }
 
-Widget _pairedButton({
+/// Primary action (Approve/Execute) — the app's own full-width CTA
+/// treatment (themedDarkCtaButtonShell), same recipe as
+/// set_goal_screen.dart's _saveButton, sized down to sit in a paired row.
+Widget _themedFilledButton({
+  required AppPalette palette,
   required VoidCallback? onPressed,
   required IconData icon,
   required String label,
-  required Color color,
-  required bool filled,
 }) {
-  final child = Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, size: 16, color: filled ? Colors.white : color),
-      const SizedBox(width: 6),
-      Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: filled ? Colors.white : color,
+  final radius = BorderRadius.circular(10);
+  final contentColor = themedDarkCtaContentColor(palette);
+  return SizedBox(
+    width: double.infinity,
+    height: 42,
+    child: Material(
+      type: MaterialType.transparency,
+      child: themedDarkCtaButtonShell(
+        palette: palette,
+        borderRadius: radius,
+        standardDecoration: BoxDecoration(
+          color: ThemeV2.primary,
+          borderRadius: radius,
+        ),
+        child: InkWell(
+          borderRadius: radius,
+          onTap: onPressed,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: contentColor),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: contentColor,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ],
+    ),
   );
-  if (filled) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        minimumSize: const Size.fromHeight(42),
-        padding: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        elevation: 0,
-      ),
-      child: child,
-    );
-  }
+}
+
+/// Secondary action (Reject/Rework/Flag) — outline in the theme's own
+/// accent instead of a fixed semantic color, so it reads consistently
+/// under every admin theme rather than clashing as a stray red/orange.
+Widget _themedOutlineButton({
+  required AppPalette palette,
+  required VoidCallback? onPressed,
+  required IconData icon,
+  required String label,
+}) {
   return OutlinedButton(
     onPressed: onPressed,
     style: OutlinedButton.styleFrom(
       minimumSize: const Size.fromHeight(42),
       padding: EdgeInsets.zero,
-      side: BorderSide(color: color.withValues(alpha: 0.5)),
+      side: BorderSide(color: palette.accentPrimary.withValues(alpha: 0.5)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     ),
-    child: child,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: palette.accentPrimary),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: palette.accentPrimary,
+          ),
+        ),
+      ],
+    ),
   );
 }
 
@@ -189,7 +230,9 @@ Widget _detailRow({
 // ProposalListTile — the blotter's own row. Simple by design (2026-09-12):
 // a header naming the order side, then identification + status, tap (or
 // the "Подробности" affordance) goes to ProposalDetailScreen where the
-// actual actions live. Same ringed-logo row shape as TradeHistoryTile.
+// actual actions live. Logo ring matches ProposalCard's own theme-accent
+// ring for consistency between the list and its own detail screen --
+// direction is already communicated by the BUY/SELL header text above it.
 // ---------------------------------------------------------------------------
 class ProposalListTile extends ConsumerWidget {
   final TradeProposal proposal;
@@ -241,10 +284,7 @@ class ProposalListTile extends ConsumerWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: accent.withValues(alpha: 0.3),
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: palette.accentPrimary, width: 1.5),
                   ),
                   padding: const EdgeInsets.all(2),
                   child: ClipOval(
@@ -379,7 +419,20 @@ class ProposalCard extends ConsumerWidget {
     final companyName =
         ref.watch(resolvedCompanyNameProvider(proposal.symbol)).valueOrNull ??
         proposal.symbol;
-    final accent = proposal.isBuy ? ThemeV2.success : ThemeV2.loss;
+    final directionAccent = proposal.isBuy ? ThemeV2.success : ThemeV2.loss;
+    // Order placement price only means something for a limit order -- a
+    // market order has no price at the moment it's proposed, only once it
+    // executes (2026-09-12 decision, see migration_024).
+    final placementPrice = proposal.orderType == 'limit'
+        ? proposal.limitPrice
+        : null;
+    final totalValuePrice = proposal.executedPrice ?? placementPrice;
+    final hasFooterText =
+        (proposal.justification != null &&
+            proposal.justification!.isNotEmpty) ||
+        (proposal.rejectionReason != null &&
+            proposal.rejectionReason!.isNotEmpty) ||
+        proposal.flaggedRisky;
 
     return CardFrame(
       decoration: FomoShieldTheme.cardDecoration,
@@ -390,15 +443,15 @@ class ProposalCard extends ConsumerWidget {
         children: [
           Row(
             children: [
+              // Theme-accent ring (Watchlist's own convention), NOT a
+              // green/red directional ring -- direction is communicated by
+              // the BUY/SELL badge to the right instead (explicit user ask).
               Container(
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: accent.withValues(alpha: 0.3),
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: palette.accentPrimary, width: 1.5),
                 ),
                 padding: const EdgeInsets.all(2),
                 child: ClipOval(
@@ -442,7 +495,7 @@ class ProposalCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.12),
+                  color: directionAccent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -450,7 +503,7 @@ class ProposalCard extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: accent,
+                    color: directionAccent,
                   ),
                 ),
               ),
@@ -482,10 +535,10 @@ class ProposalCard extends ConsumerWidget {
                 : l10n.etfProposeOrderTypeMarket,
             palette: palette,
           ),
-          if (proposal.limitPrice != null)
+          if (placementPrice != null)
             _detailRow(
-              label: l10n.tradeLimitPriceLabel,
-              value: '\$${proposal.limitPrice!.toStringAsFixed(2)}',
+              label: l10n.etfProposalPlacementPriceLabel,
+              value: '\$${placementPrice.toStringAsFixed(2)}',
               palette: palette,
             ),
           _detailRow(
@@ -497,21 +550,33 @@ class ProposalCard extends ConsumerWidget {
           ),
           if (proposal.executedPrice != null)
             _detailRow(
-              label: l10n.etfProposalStatusExecuted,
+              label: l10n.etfProposalExecutionPriceLabel,
               value: '\$${proposal.executedPrice!.toStringAsFixed(2)}',
-              valueColor: ThemeV2.success,
+              palette: palette,
+            ),
+          if (totalValuePrice != null)
+            _detailRow(
+              label: l10n.tradeTotalValueLabel,
+              value:
+                  '\$${(proposal.quantity * totalValuePrice).toStringAsFixed(2)}',
+              palette: palette,
+            ),
+          if (proposal.commission != null)
+            _detailRow(
+              label: l10n.tradeCommissionLabel,
+              value: '\$${proposal.commission!.toStringAsFixed(2)}',
               palette: palette,
             ),
           _detailRow(
             label: l10n.tradeDateLabel,
             value: _formatDate(context, proposal.createdAt),
             palette: palette,
-            isLast:
-                (proposal.justification == null ||
-                    proposal.justification!.isEmpty) &&
-                (proposal.rejectionReason == null ||
-                    proposal.rejectionReason!.isEmpty) &&
-                !proposal.flaggedRisky,
+          ),
+          _detailRow(
+            label: l10n.etfProposalProposedByLabel,
+            value: proposal.proposerNickname ?? '—',
+            palette: palette,
+            isLast: !hasFooterText,
           ),
           if (proposal.justification != null &&
               proposal.justification!.isNotEmpty) ...[
@@ -559,45 +624,41 @@ class ProposalCard extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _pairedButton(
+                    child: _themedOutlineButton(
+                      palette: palette,
                       onPressed: onReject,
                       icon: Icons.close_rounded,
                       label: l10n.etfProposalRejectButton,
-                      color: ThemeV2.loss,
-                      filled: false,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _pairedButton(
+                    child: _themedFilledButton(
+                      palette: palette,
                       onPressed: onApprove,
                       icon: Icons.check_rounded,
                       label: l10n.etfProposalApproveButton,
-                      color: ThemeV2.success,
-                      filled: true,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
-              _pairedButton(
+              _themedOutlineButton(
+                palette: palette,
                 onPressed: onRework == null
                     ? null
                     : () => _showReworkDialog(context, l10n, onRework!),
                 icon: Icons.undo_rounded,
                 label: l10n.etfProposalReworkButton,
-                color: ThemeV2.warning,
-                filled: false,
               ),
             ],
             if (canFlagRisk && !proposal.flaggedRisky) ...[
               if (canApprove) const SizedBox(height: 8),
-              _pairedButton(
+              _themedOutlineButton(
+                palette: palette,
                 onPressed: onFlag,
                 icon: Icons.flag_outlined,
                 label: l10n.etfProposalFlagButton,
-                color: ThemeV2.warning,
-                filled: false,
               ),
             ],
           ],
@@ -605,12 +666,11 @@ class ProposalCard extends ConsumerWidget {
             const SizedBox(height: 16),
             themedDivider(palette, indent: 0, endIndent: 0),
             const SizedBox(height: 12),
-            _pairedButton(
+            _themedFilledButton(
+              palette: palette,
               onPressed: onExecute,
               icon: Icons.play_arrow_rounded,
               label: l10n.etfProposalExecuteButton,
-              color: palette.accentPrimary,
-              filled: true,
             ),
           ],
         ],
