@@ -6627,6 +6627,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfProposalProposedByLabel => 'Proposed by';
 
   @override
+  String etfProposeAvailableLabel(String value) {
+    return 'Available: $value';
+  }
+
+  @override
+  String get etfFundBalanceTitle => 'FUND BALANCE';
+
+  @override
+  String get etfFundBalanceAvailableLabel => 'Available';
+
+  @override
+  String get etfFundBalanceTotalLabel => 'Total (incl. P&L)';
+
+  @override
   String get etfEmployeeHubInvitationsRow => 'Invitations';
 
   @override

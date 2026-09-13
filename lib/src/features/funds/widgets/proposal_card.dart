@@ -10,6 +10,7 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../models/trade_proposal.dart';
@@ -538,7 +539,7 @@ class ProposalCard extends ConsumerWidget {
           if (placementPrice != null)
             _detailRow(
               label: l10n.etfProposalPlacementPriceLabel,
-              value: '\$${placementPrice.toStringAsFixed(2)}',
+              value: formatUsd(placementPrice),
               palette: palette,
             ),
           _detailRow(
@@ -551,20 +552,19 @@ class ProposalCard extends ConsumerWidget {
           if (proposal.executedPrice != null)
             _detailRow(
               label: l10n.etfProposalExecutionPriceLabel,
-              value: '\$${proposal.executedPrice!.toStringAsFixed(2)}',
+              value: formatUsd(proposal.executedPrice!),
               palette: palette,
             ),
           if (totalValuePrice != null)
             _detailRow(
               label: l10n.tradeTotalValueLabel,
-              value:
-                  '\$${(proposal.quantity * totalValuePrice).toStringAsFixed(2)}',
+              value: formatUsd(proposal.quantity * totalValuePrice),
               palette: palette,
             ),
           if (proposal.commission != null)
             _detailRow(
               label: l10n.tradeCommissionLabel,
-              value: '\$${proposal.commission!.toStringAsFixed(2)}',
+              value: formatUsd(proposal.commission!),
               palette: palette,
             ),
           _detailRow(

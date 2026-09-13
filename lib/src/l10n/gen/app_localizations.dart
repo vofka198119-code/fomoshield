@@ -11239,6 +11239,30 @@ abstract class AppLocalizations {
   /// **'Proposed by'**
   String get etfProposalProposedByLabel;
 
+  /// No description provided for @etfProposeAvailableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Available: {value}'**
+  String etfProposeAvailableLabel(String value);
+
+  /// No description provided for @etfFundBalanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FUND BALANCE'**
+  String get etfFundBalanceTitle;
+
+  /// No description provided for @etfFundBalanceAvailableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get etfFundBalanceAvailableLabel;
+
+  /// No description provided for @etfFundBalanceTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total (incl. P&L)'**
+  String get etfFundBalanceTotalLabel;
+
   /// No description provided for @etfEmployeeHubInvitationsRow.
   ///
   /// In en, this message translates to:

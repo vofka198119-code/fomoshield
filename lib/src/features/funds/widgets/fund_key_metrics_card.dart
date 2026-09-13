@@ -6,6 +6,7 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/fund.dart';
 
@@ -25,7 +26,7 @@ class FundKeyMetricsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final items = <(String, String)>[
-      (l10n.etfFundDetailAumLabel, '\$${fund.aum.toStringAsFixed(0)}'),
+      (l10n.etfFundDetailAumLabel, formatUsd(fund.aum)),
       (l10n.etfFundDetailUnitsLabel, fund.unitsOutstanding.toStringAsFixed(0)),
       (l10n.etfFundDetailHoldingsCountLabel, fund.holdings.length.toString()),
     ];

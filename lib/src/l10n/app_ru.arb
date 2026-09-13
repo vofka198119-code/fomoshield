@@ -1900,6 +1900,17 @@
   "etfProposalPlacementPriceLabel": "Цена размещения ордера",
   "etfProposalExecutionPriceLabel": "Цена сделки",
   "etfProposalProposedByLabel": "Предложил",
+  "etfProposeAvailableLabel": "Доступно: {value}",
+  "@etfProposeAvailableLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "etfFundBalanceTitle": "БАЛАНС ФОНДА",
+  "etfFundBalanceAvailableLabel": "Доступно",
+  "etfFundBalanceTotalLabel": "Всего (вкл. P&L)",
   "etfEmployeeHubInvitationsRow": "Приглашения",
   "etfEmployeeHubApplicationsRow": "Заявки",
   "etfComingSoonTitle": "Скоро",

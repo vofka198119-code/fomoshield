@@ -7,6 +7,7 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_border.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/supabase/supabase_providers.dart';
@@ -18,6 +19,8 @@ import '../models/fund.dart';
 import '../providers/fund_providers.dart';
 import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart';
+import '../widgets/fund_balance_card.dart';
+import '../widgets/fund_cash_widget.dart';
 import '../widgets/fund_delete_dialog.dart';
 import '../widgets/fund_key_metrics_card.dart';
 import '../widgets/fund_management_holdings_card.dart';
@@ -149,6 +152,10 @@ class FundManagementScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  FundBalanceCard(fund: fund, palette: palette),
+                  const SizedBox(height: 12),
+                  FundCashWidget(cash: fund.cash, palette: palette),
                   const SizedBox(height: 12),
                   FundKeyMetricsCard(fund: fund, palette: palette),
                   const SizedBox(height: 12),
@@ -285,18 +292,23 @@ class FundManagementScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           themedDivider(palette, indent: 0, endIndent: 0),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () => context.push('/funds/${fund.id}'),
-              child: Text(
-                l10n.etfFundManagementViewPublicButton,
-                style: GoogleFonts.inter(
-                  color: palette.accentPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+          const SizedBox(height: 12),
+          // Themed pill button (2026-09-13 fix) -- was a plain accent-colored
+          // TextButton right-aligned under the divider, which read as
+          // shifted/off-balance and, being unthemed, didn't match how a
+          // secondary action button looks anywhere else in the app.
+          // themedAddWidgetsButton is the app's one established
+          // "per-theme-aware pill button inside a card" recipe (Standard:
+          // flat accent-outlined pill; Luxury Gold/Graphite/etc.: gradient
+          // ring + windowGradient fill) -- reused here with a different
+          // icon/label rather than inventing a new button style.
+          Center(
+            child: themedAddWidgetsButton(
+              context,
+              palette,
+              icon: Icons.open_in_new_rounded,
+              label: l10n.etfFundManagementViewPublicButton,
+              onTap: () => context.push('/funds/${fund.id}'),
             ),
           ),
         ],

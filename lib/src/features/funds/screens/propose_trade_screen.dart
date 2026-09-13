@@ -9,7 +9,9 @@ import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/services/finnhub_service.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
+import '../models/fund.dart';
 import '../providers/fund_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 
@@ -90,7 +92,10 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
       _programmaticTextChange = false;
       return;
     }
-    _selectedSymbol = null;
+    // Rebuilds immediately (not just once the debounced search below
+    // settles) so a sell order's "Available: N shares" hint tracks the
+    // typed symbol as it's typed, not 500ms behind.
+    setState(() => _selectedSymbol = null);
     _debounce?.cancel();
     final q = text.trim();
     if (q.length < 2) {
@@ -196,10 +201,33 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
     ),
   );
 
+  // What's actually available to spend/sell against right now, so the
+  // proposer isn't guessing at a quantity blind (2026-09-12 ask). Buy is
+  // always fund.cash; sell needs a symbol match against fund.holdings --
+  // resolved the same way _submit() resolves the symbol to propose, so
+  // typing a symbol that isn't picked from the typeahead still works.
+  String? _availableText(AppLocalizations l10n, FundDetail? fund) {
+    if (fund == null) return null;
+    if (_side == 'buy') {
+      return l10n.etfProposeAvailableLabel(formatUsd(fund.cash));
+    }
+    final symbol = (_selectedSymbol ?? _symbolController.text.trim())
+        .toUpperCase();
+    if (symbol.isEmpty) return null;
+    final held = fund.holdings
+        .where((h) => h.symbol.toUpperCase() == symbol)
+        .fold<double>(0, (sum, h) => sum + h.quantity);
+    return l10n.etfProposeAvailableLabel(
+      l10n.sharesCount(held.toStringAsFixed(4)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    final fund = ref.watch(fundDetailProvider(widget.fundId)).valueOrNull;
+    final availableText = _availableText(l10n, fund);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -372,6 +400,17 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
                   ),
                 ),
               ),
+              if (availableText != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  availableText,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: palette.accentPrimary,
+                  ),
+                ),
+              ],
               if (_orderType == 'limit') ...[
                 const SizedBox(height: 16),
                 _sectionLabel(palette, l10n.etfProposeLimitPriceLabel),

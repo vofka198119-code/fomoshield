@@ -2662,6 +2662,17 @@
   "etfProposalPlacementPriceLabel": "Order placement price",
   "etfProposalExecutionPriceLabel": "Deal price",
   "etfProposalProposedByLabel": "Proposed by",
+  "etfProposeAvailableLabel": "Available: {value}",
+  "@etfProposeAvailableLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "etfFundBalanceTitle": "FUND BALANCE",
+  "etfFundBalanceAvailableLabel": "Available",
+  "etfFundBalanceTotalLabel": "Total (incl. P&L)",
   "etfEmployeeHubInvitationsRow": "Invitations",
   "etfEmployeeHubApplicationsRow": "Applications",
   "etfComingSoonTitle": "Coming Soon",

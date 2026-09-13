@@ -93,12 +93,18 @@ Widget themedAddWidgetsButton(
   AppPalette palette, {
   required String label,
   required VoidCallback onTap,
+  // Defaults to the original "+" so every existing call site (Home, Market
+  // Clock, Stress Test, Company Detail, Portfolio) renders byte-for-byte
+  // unchanged -- added 2026-09-13 so a non-"add" action (e.g. Fund
+  // Management's "open public card") can reuse this exact per-theme pill
+  // shape instead of a plain TextButton that doesn't follow theme at all.
+  IconData icon = Icons.add_rounded,
 }) {
   final gradient = palette.windowGradient;
   if (gradient == null) {
     return TextButton.icon(
       onPressed: onTap,
-      icon: Icon(Icons.add_rounded, color: palette.accentPrimary, size: 20),
+      icon: Icon(icon, color: palette.accentPrimary, size: 20),
       label: Text(
         label,
         style: GoogleFonts.inter(
@@ -131,7 +137,7 @@ Widget themedAddWidgetsButton(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.add_rounded, color: onWindowColor, size: 20),
+              Icon(icon, color: onWindowColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 label,
