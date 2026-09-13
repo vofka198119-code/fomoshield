@@ -2636,6 +2636,7 @@
   "etfChartsScreenTitle": "CHARTS",
   "etfChartsWidgetsSettingsSheetTitle": "Chart Widgets",
   "etfNavHistoryChartTitle": "NAV PER UNIT",
+  "etfDrawdownChartTitle": "DRAWDOWN",
   "etfProposeTradeButton": "Propose a trade",
   "etfProposeTradeTitle": "Propose a trade",
   "etfProposeSymbolLabel": "Symbol",

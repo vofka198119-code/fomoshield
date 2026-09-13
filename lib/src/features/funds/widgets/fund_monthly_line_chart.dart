@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +9,7 @@ import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../../shared/widgets/chart_left_axis.dart';
 import '../../../shared/widgets/year_pill.dart';
 
 // ---------------------------------------------------------------------------
@@ -18,20 +18,14 @@ import '../../../shared/widgets/year_pill.dart';
 // Balance-History-only widget so NAV-per-unit could reuse it verbatim
 // instead of a copy-pasted near-duplicate). Modeled on a generic
 // "User Growth" line-chart dashboard reference: the broken/curved line
-// itself, a real left $ axis, bottom month labels in the same style as
-// FundInvestorFlowChart's bars, and the same year-picker header. Unlike
-// FundNavChart (the public fund detail screen's own line chart, which
-// deliberately hides every axis for a minimal sparkline look with a
-// custom glow overlay), this one shows real axes on purpose, so it
-// doesn't reuse that widget's glow-painter approach -- a plain fl_chart
-// LineChart is enough here.
-//
-// The left $ axis is a SEPARATE, non-scrolling column next to the
-// horizontally-scrollable plot (fl_chart's own leftTitles is disabled
-// inside the scrollable LineChart) -- putting the axis inside the same
-// scroll view it first shipped with meant swiping right to see later
-// months scrolled the $ scale off-screen along with the data, leaving no
-// reference at all (caught in review before it reached the device).
+// itself, a real left $ axis (shared/widgets/chart_left_axis.dart -- see
+// its own header comment for why it's a separate non-scrolling column),
+// bottom month labels in the same style as FundInvestorFlowChart's bars,
+// and the same year-picker header. Unlike FundNavChart (the public fund
+// detail screen's own line chart, which deliberately hides every axis for
+// a minimal sparkline look with a custom glow overlay), this one shows
+// real axes on purpose, so it doesn't reuse that widget's glow-painter
+// approach -- a plain fl_chart LineChart is enough here.
 //
 // [axisLabelFormatter] is the one thing that actually differs between
 // call sites: Balance History's AUM values want compact "$150K" rounding
@@ -60,9 +54,7 @@ String compactUsdAxisLabel(double value) {
   return '$sign\$${absValue.toStringAsFixed(0)}';
 }
 
-const double _plotHeight = 220;
 const double _plotWidthPerMonth = 60;
-const double _leftAxisWidth = 50;
 
 class FundMonthlyLineChart extends StatelessWidget {
   final String title;
@@ -82,26 +74,6 @@ class FundMonthlyLineChart extends StatelessWidget {
     this.axisLabelFormatter = compactUsdAxisLabel,
   });
 
-  /// Rounds a raw step (e.g. 13,842) to a "nice" 1/2/5 × 10^n value (e.g.
-  /// 10,000) — fl_chart's own default interval picker doesn't do this, and
-  /// left uninterval'd it also renders an extra label pinned exactly at
-  /// the raw min/max on top of the regular ticks, duplicating whatever
-  /// tick already sits nearby (confirmed on-device: "$173K" over "$170K").
-  double _niceInterval(double rawStep) {
-    if (rawStep <= 0) return 1;
-    final magnitude = math.pow(10, (math.log(rawStep) / math.ln10).floor())
-        .toDouble();
-    final residual = rawStep / magnitude;
-    final niceResidual = residual > 5
-        ? 10
-        : residual > 2
-        ? 5
-        : residual > 1
-        ? 2
-        : 1;
-    return niceResidual * magnitude;
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -115,7 +87,7 @@ class FundMonthlyLineChart extends StatelessWidget {
     Widget plotArea;
     if (points.isEmpty) {
       plotArea = SizedBox(
-        height: _plotHeight,
+        height: chartPlotHeight,
         child: Center(
           child: Text(
             l10n.companyDetailChartNotEnoughData,
@@ -136,14 +108,14 @@ class FundMonthlyLineChart extends StatelessWidget {
       // Snap the axis bounds AND the tick interval to the same "nice" step
       // so every rendered label lands on a clean multiple with no stray
       // edge label duplicating the nearest regular tick.
-      final interval = _niceInterval((rawMaxY - rawMinY) / 5);
+      final interval = niceAxisInterval((rawMaxY - rawMinY) / 5);
       final chartMinY = (rawMinY / interval).floor() * interval;
       final chartMaxY = (rawMaxY / interval).ceil() * interval;
 
       plotArea = Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _LeftAxis(
+          ChartLeftAxis(
             chartMinY: chartMinY,
             chartMaxY: chartMaxY,
             interval: interval,
@@ -158,7 +130,7 @@ class FundMonthlyLineChart extends StatelessWidget {
                 // half-month margin on each side included) -- same
                 // per-month density as before the margin was added.
                 width: _plotWidthPerMonth * 12,
-                height: _plotHeight,
+                height: chartPlotHeight,
                 child: _chart(points, locale, chartMinY, chartMaxY, interval),
               ),
             ),
@@ -262,8 +234,9 @@ class FundMonthlyLineChart extends StatelessWidget {
         ),
         titlesData: FlTitlesData(
           show: true,
-          // The $ axis is now the separate, non-scrolling _LeftAxis column
-          // next to this chart -- see this file's own header comment.
+          // The $ axis is now the separate, non-scrolling ChartLeftAxis
+          // column next to this chart -- see that file's own header
+          // comment.
           leftTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
@@ -323,67 +296,6 @@ class FundMonthlyLineChart extends StatelessWidget {
               gradient: areaGradient,
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// The chart's own $ scale, pinned outside the horizontal scroll view so
-/// it stays visible while swiping through months. Manually positions each
-/// tick label at the same pixel row fl_chart's own (now-disabled) left
-/// axis would have used, via the identical linear-interpolation formula
-/// LineChart uses internally (portion of the Y range -> fraction of
-/// _plotHeight from the bottom).
-class _LeftAxis extends StatelessWidget {
-  final double chartMinY;
-  final double chartMaxY;
-  final double interval;
-  final String Function(double value) formatter;
-  final AppPalette palette;
-
-  const _LeftAxis({
-    required this.chartMinY,
-    required this.chartMaxY,
-    required this.interval,
-    required this.formatter,
-    required this.palette,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final range = chartMaxY - chartMinY;
-    final tickCount = range > 0 ? (range / interval).round() : 0;
-    final ticks = [
-      for (int i = 0; i <= tickCount; i++) chartMinY + i * interval,
-    ];
-
-    return SizedBox(
-      width: _leftAxisWidth,
-      height: _plotHeight,
-      child: Stack(
-        children: [
-          for (final tick in ticks)
-            Positioned(
-              // Same "portion of the range, measured from the top" fl_chart
-              // itself uses for a vertical axis; -7 centers the ~14px-tall
-              // label line on that pixel row instead of hanging below it.
-              // Clamped to stay fully inside the box -- the topmost/
-              // bottommost ticks sit exactly at the plot's edges (0 and
-              // _plotHeight), so centering them uncapped pushed the label
-              // partly above/below the SizedBox and into whatever sits
-              // next to it (confirmed on-device: a clipped "$180K" bleeding
-              // into the divider above).
-              top: (range > 0
-                      ? _plotHeight * (1 - (tick - chartMinY) / range) - 7
-                      : _plotHeight / 2 - 7)
-                  .clamp(0.0, _plotHeight - 14),
-              right: 4,
-              child: Text(
-                formatter(tick),
-                style: TextStyle(fontSize: 10, color: palette.textBody),
-              ),
-            ),
         ],
       ),
     );

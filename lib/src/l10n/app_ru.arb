@@ -1874,6 +1874,7 @@
   "etfChartsScreenTitle": "ГРАФИКИ",
   "etfChartsWidgetsSettingsSheetTitle": "Виджеты графиков",
   "etfNavHistoryChartTitle": "NAV НА ПАЙ",
+  "etfDrawdownChartTitle": "ПРОСАДКА",
   "etfProposeTradeButton": "Предложить сделку",
   "etfProposeTradeTitle": "Предложить сделку",
   "etfProposeSymbolLabel": "Тикер",

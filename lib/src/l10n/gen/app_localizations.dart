@@ -11083,6 +11083,12 @@ abstract class AppLocalizations {
   /// **'NAV PER UNIT'**
   String get etfNavHistoryChartTitle;
 
+  /// No description provided for @etfDrawdownChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DRAWDOWN'**
+  String get etfDrawdownChartTitle;
+
   /// No description provided for @etfProposeTradeButton.
   ///
   /// In en, this message translates to:

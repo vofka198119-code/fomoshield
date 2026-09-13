@@ -29,4 +29,25 @@ class FundBalanceHistory {
       navPerUnit: monthly('navPerUnit'),
     );
   }
+
+  /// Peak-to-trough % decline from the running peak NAV per unit, measured
+  /// within this response's own year window (not since the fund's
+  /// inception -- the backend only ever returns one calendar year of
+  /// snapshots at a time). A pure derivative of [navPerUnit], so no
+  /// separate backend endpoint was needed for the Drawdown chart. Always
+  /// <= 0; null for a month with no snapshot; 0 for the month(s) that set
+  /// a new peak.
+  List<double?> get drawdownPercent {
+    double? peak;
+    final result = <double?>[];
+    for (final nav in navPerUnit) {
+      if (nav == null) {
+        result.add(null);
+        continue;
+      }
+      peak = peak == null || nav > peak ? nav : peak;
+      result.add(peak > 0 ? (nav - peak) / peak * 100 : 0);
+    }
+    return result;
+  }
 }

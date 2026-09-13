@@ -6549,6 +6549,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfNavHistoryChartTitle => 'NAV PER UNIT';
 
   @override
+  String get etfDrawdownChartTitle => 'DRAWDOWN';
+
+  @override
   String get etfProposeTradeButton => 'Propose a trade';
 
   @override

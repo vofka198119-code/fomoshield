@@ -11,6 +11,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/year_picker_sheet.dart';
 import '../providers/fund_charts_widget_order_provider.dart';
 import '../providers/fund_providers.dart';
+import '../widgets/fund_drawdown_chart.dart';
 import '../widgets/fund_monthly_line_chart.dart';
 
 // ---------------------------------------------------------------------------
@@ -127,6 +128,12 @@ class _FundChartsScreenState extends ConsumerState<FundChartsScreen> {
                           axisLabelFormatter: (v) =>
                               '\$${v.toStringAsFixed(2)}',
                         ),
+                        'drawdown' => FundDrawdownChart(
+                          monthlyDrawdownPercent: history.drawdownPercent,
+                          palette: palette,
+                          selectedYear: _selectedYear,
+                          onTapYear: () => _pickYear(palette, firstYear),
+                        ),
                         _ => const SizedBox.shrink(),
                       },
                       const SizedBox(height: 12),
@@ -210,6 +217,8 @@ class _FundChartsWidgetsSettingsSheetState
         return Icons.show_chart_rounded;
       case 'nav_history':
         return Icons.trending_up_rounded;
+      case 'drawdown':
+        return Icons.trending_down_rounded;
       default:
         return Icons.widgets_rounded;
     }
