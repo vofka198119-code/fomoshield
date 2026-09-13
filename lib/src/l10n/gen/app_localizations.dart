@@ -11077,6 +11077,12 @@ abstract class AppLocalizations {
   /// **'Chart Widgets'**
   String get etfChartsWidgetsSettingsSheetTitle;
 
+  /// No description provided for @etfNavHistoryChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NAV PER UNIT'**
+  String get etfNavHistoryChartTitle;
+
   /// No description provided for @etfProposeTradeButton.
   ///
   /// In en, this message translates to:

@@ -6569,6 +6569,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfChartsWidgetsSettingsSheetTitle => 'Виджеты графиков';
 
   @override
+  String get etfNavHistoryChartTitle => 'NAV НА ПАЙ';
+
+  @override
   String get etfProposeTradeButton => 'Предложить сделку';
 
   @override

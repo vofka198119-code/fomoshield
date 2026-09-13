@@ -11,7 +11,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/year_picker_sheet.dart';
 import '../providers/fund_charts_widget_order_provider.dart';
 import '../providers/fund_providers.dart';
-import '../widgets/fund_balance_history_chart.dart';
+import '../widgets/fund_monthly_line_chart.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Charts — a dedicated hub for every financial chart about the fund
@@ -101,29 +101,38 @@ class _FundChartsScreenState extends ConsumerState<FundChartsScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           children: [
-            for (final config in visible) ...[
-              if (config.id == 'balance_history')
-                ...ref
-                    .watch(
-                      fundBalanceHistoryProvider((
-                        widget.fundId,
-                        _selectedYear,
-                      )),
-                    )
-                    .when(
-                      loading: () => const [],
-                      error: (_, _) => const [],
-                      data: (history) => [
-                        FundBalanceHistoryChart(
-                          monthlyBalance: history.balance,
+            ...ref
+                .watch(
+                  fundBalanceHistoryProvider((widget.fundId, _selectedYear)),
+                )
+                .when(
+                  loading: () => const [],
+                  error: (_, _) => const [],
+                  data: (history) => [
+                    for (final config in visible) ...[
+                      switch (config.id) {
+                        'balance_history' => FundMonthlyLineChart(
+                          title: l10n.etfBalanceHistoryChartTitle,
+                          monthlyValues: history.balance,
                           palette: palette,
                           selectedYear: _selectedYear,
                           onTapYear: () => _pickYear(palette, firstYear),
                         ),
-                        const SizedBox(height: 12),
-                      ],
-                    ),
-            ],
+                        'nav_history' => FundMonthlyLineChart(
+                          title: l10n.etfNavHistoryChartTitle,
+                          monthlyValues: history.navPerUnit,
+                          palette: palette,
+                          selectedYear: _selectedYear,
+                          onTapYear: () => _pickYear(palette, firstYear),
+                          axisLabelFormatter: (v) =>
+                              '\$${v.toStringAsFixed(2)}',
+                        ),
+                        _ => const SizedBox.shrink(),
+                      },
+                      const SizedBox(height: 12),
+                    ],
+                  ],
+                ),
             Center(
               child: themedAddWidgetsButton(
                 context,
@@ -199,6 +208,8 @@ class _FundChartsWidgetsSettingsSheetState
     switch (id) {
       case 'balance_history':
         return Icons.show_chart_rounded;
+      case 'nav_history':
+        return Icons.trending_up_rounded;
       default:
         return Icons.widgets_rounded;
     }

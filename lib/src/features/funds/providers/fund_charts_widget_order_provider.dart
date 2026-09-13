@@ -19,7 +19,10 @@ import '../../../l10n/gen/app_localizations.dart';
 // catalog grew over time.
 // ---------------------------------------------------------------------------
 
-const List<String> _defaultFundChartsOrder = ['balance_history'];
+const List<String> _defaultFundChartsOrder = [
+  'balance_history',
+  'nav_history',
+];
 
 String _orderPrefsKey(String fundId, String? uid) =>
     'fund_charts_widget_order_${fundId}_${uid ?? 'anon'}';
@@ -36,6 +39,8 @@ class FundChartsWidgetConfig {
     switch (id) {
       case 'balance_history':
         return l10n.etfBalanceHistoryChartTitle;
+      case 'nav_history':
+        return l10n.etfNavHistoryChartTitle;
       default:
         return id;
     }

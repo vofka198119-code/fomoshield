@@ -6546,6 +6546,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfChartsWidgetsSettingsSheetTitle => 'Chart Widgets';
 
   @override
+  String get etfNavHistoryChartTitle => 'NAV PER UNIT';
+
+  @override
   String get etfProposeTradeButton => 'Propose a trade';
 
   @override
