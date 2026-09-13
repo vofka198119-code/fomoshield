@@ -1869,6 +1869,7 @@
   "etfInvestorsInflowChartTitle": "ПРИТОК ИНВЕСТОРОВ",
   "etfInvestorsOutflowChartTitle": "ОТТОК ИНВЕСТОРОВ",
   "etfInvestorsYearPickerTitle": "ВЫБОР ГОДА",
+  "etfBalanceHistoryChartTitle": "ИСТОРИЯ БАЛАНСА",
   "etfProposeTradeButton": "Предложить сделку",
   "etfProposeTradeTitle": "Предложить сделку",
   "etfProposeSymbolLabel": "Тикер",

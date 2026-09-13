@@ -6534,6 +6534,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfInvestorsYearPickerTitle => 'SELECT YEAR';
 
   @override
+  String get etfBalanceHistoryChartTitle => 'BALANCE HISTORY';
+
+  @override
   String get etfProposeTradeButton => 'Propose a trade';
 
   @override

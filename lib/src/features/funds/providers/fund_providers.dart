@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
 import '../models/fund.dart';
+import '../models/fund_balance_history.dart';
 import '../models/fund_investor.dart';
 import '../models/fund_investor_flows.dart';
 import '../models/trade_proposal.dart';
@@ -59,6 +60,16 @@ final fundInvestorFlowsProvider = FutureProvider.autoDispose
       return ref
           .watch(fundApiServiceProvider)
           .getFundInvestorFlows(fundId, year: year);
+    });
+
+/// One calendar year's monthly AUM — Fund Management's balance chart. Same
+/// access gate as fundInvestorsProvider.
+final fundBalanceHistoryProvider = FutureProvider.autoDispose
+    .family<FundBalanceHistory, (String, int)>((ref, args) {
+      final (fundId, year) = args;
+      return ref
+          .watch(fundApiServiceProvider)
+          .getFundBalanceHistory(fundId, year: year);
     });
 
 /// Display name for a Portfolio holding/transaction's symbol — resolves a

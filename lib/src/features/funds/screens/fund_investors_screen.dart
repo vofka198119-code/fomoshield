@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
-import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
-import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
-import '../../../shared/widgets/card_frame.dart';
+import '../../../shared/widgets/year_picker_sheet.dart';
 import '../providers/fund_providers.dart';
 import '../widgets/fund_investor_flow_chart.dart';
 import '../widgets/fund_investors_list_card.dart';
@@ -39,63 +37,11 @@ class _FundInvestorsScreenState extends ConsumerState<FundInvestorsScreen> {
   late int _selectedYear = DateTime.now().year;
 
   Future<void> _pickYear(AppPalette palette, int firstYear) async {
-    final l10n = AppLocalizations.of(context)!;
-    final currentYear = DateTime.now().year;
-    final years = [for (var y = currentYear; y >= firstYear; y--) y];
-
-    final picked = await showModalBottomSheet<int>(
+    final picked = await showYearPickerSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: CardFrame(
-            decoration: FomoShieldTheme.cardDecoration,
-            palette: palette,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 14),
-                    decoration: BoxDecoration(
-                      color: palette.textBody.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                themedHeaderText(
-                  l10n.etfInvestorsYearPickerTitle,
-                  palette,
-                  FomoShieldTheme.cardTitle(),
-                ),
-                const SizedBox(height: 10),
-                themedDivider(palette, indent: 0, endIndent: 0),
-                for (final year in years)
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      '$year',
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: year == _selectedYear
-                            ? FontWeight.w800
-                            : FontWeight.w500,
-                        color: year == _selectedYear
-                            ? palette.accentPrimary
-                            : palette.textHeader,
-                      ),
-                    ),
-                    onTap: () => Navigator.of(sheetContext).pop(year),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      palette: palette,
+      selectedYear: _selectedYear,
+      firstYear: firstYear,
     );
     if (picked != null && picked != _selectedYear) {
       setState(() => _selectedYear = picked);

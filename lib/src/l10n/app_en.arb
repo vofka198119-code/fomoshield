@@ -2631,6 +2631,7 @@
   "etfInvestorsInflowChartTitle": "INVESTOR INFLOW",
   "etfInvestorsOutflowChartTitle": "INVESTOR OUTFLOW",
   "etfInvestorsYearPickerTitle": "SELECT YEAR",
+  "etfBalanceHistoryChartTitle": "BALANCE HISTORY",
   "etfProposeTradeButton": "Propose a trade",
   "etfProposeTradeTitle": "Propose a trade",
   "etfProposeSymbolLabel": "Symbol",

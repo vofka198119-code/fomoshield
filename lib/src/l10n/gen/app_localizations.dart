@@ -11053,6 +11053,12 @@ abstract class AppLocalizations {
   /// **'SELECT YEAR'**
   String get etfInvestorsYearPickerTitle;
 
+  /// No description provided for @etfBalanceHistoryChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'BALANCE HISTORY'**
+  String get etfBalanceHistoryChartTitle;
+
   /// No description provided for @etfProposeTradeButton.
   ///
   /// In en, this message translates to:
