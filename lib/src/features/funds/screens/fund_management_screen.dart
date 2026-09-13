@@ -15,13 +15,11 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../../../shared/widgets/circle_shortcut_row.dart';
-import '../../../shared/widgets/year_picker_sheet.dart';
 import '../models/fund.dart';
 import '../providers/fund_providers.dart';
 import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart';
 import '../widgets/fund_balance_card.dart';
-import '../widgets/fund_balance_history_chart.dart';
 import '../widgets/fund_cash_widget.dart';
 import '../widgets/fund_delete_dialog.dart';
 import '../widgets/fund_key_metrics_card.dart';
@@ -38,36 +36,16 @@ import '../widgets/fund_management_holdings_card.dart';
 // Hire/Terminate actions and the delete-fund flow.
 // ---------------------------------------------------------------------------
 
-class FundManagementScreen extends ConsumerStatefulWidget {
+class FundManagementScreen extends ConsumerWidget {
   final String fundId;
 
   const FundManagementScreen({super.key, required this.fundId});
 
   @override
-  ConsumerState<FundManagementScreen> createState() =>
-      _FundManagementScreenState();
-}
-
-class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
-  late int _selectedYear = DateTime.now().year;
-
-  Future<void> _pickYear(AppPalette palette, int firstYear) async {
-    final picked = await showYearPickerSheet(
-      context: context,
-      palette: palette,
-      selectedYear: _selectedYear,
-      firstYear: firstYear,
-    );
-    if (picked != null && picked != _selectedYear) {
-      setState(() => _selectedYear = picked);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
-    final fundAsync = ref.watch(fundDetailProvider(widget.fundId));
+    final fundAsync = ref.watch(fundDetailProvider(fundId));
     final currentUserId = ref.watch(currentUserProvider)?.id;
     final isAdmin = ref.watch(isAdminProvider);
 
@@ -150,12 +128,8 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
 
             Widget buildBody() => RefreshIndicator(
               color: palette.accentPrimary,
-              onRefresh: () async {
-                ref.invalidate(fundDetailProvider(widget.fundId));
-                ref.invalidate(
-                  fundBalanceHistoryProvider((widget.fundId, _selectedYear)),
-                );
-              },
+              onRefresh: () async =>
+                  ref.invalidate(fundDetailProvider(fundId)),
               child: ListView(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -183,6 +157,11 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                         onTap: () =>
                             context.push('/funds/${fund.id}/investors'),
                       ),
+                      CircleShortcut(
+                        icon: Icons.show_chart_rounded,
+                        label: l10n.etfChartsShortcutLabel,
+                        onTap: () => context.push('/funds/${fund.id}/charts'),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -190,24 +169,6 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                   const SizedBox(height: 12),
                   FundCashWidget(cash: fund.cash, palette: palette),
                   const SizedBox(height: 12),
-                  ...ref
-                      .watch(
-                        fundBalanceHistoryProvider((fund.id, _selectedYear)),
-                      )
-                      .when(
-                        loading: () => const [],
-                        error: (_, _) => const [],
-                        data: (history) => [
-                          FundBalanceHistoryChart(
-                            monthlyBalance: history.balance,
-                            palette: palette,
-                            selectedYear: _selectedYear,
-                            onTapYear: () =>
-                                _pickYear(palette, fund.createdAt.year),
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                      ),
                   FundKeyMetricsCard(fund: fund, palette: palette),
                   const SizedBox(height: 12),
                   FundManagementHoldingsCard(

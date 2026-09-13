@@ -126,7 +126,10 @@ class FundBalanceHistoryChart extends StatelessWidget {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: SizedBox(
-                  width: 55.0 * 12,
+                  // minX/maxX below span 12 units (-0.5..11.5, the extra
+                  // half-month margin on each side included) -- same ~60px
+                  // per month density as before the margin was added.
+                  width: 60.0 * 12,
                   height: 220,
                   child: _chart(points, locale),
                 ),
@@ -183,8 +186,11 @@ class FundBalanceHistoryChart extends StatelessWidget {
 
     return LineChart(
       LineChartData(
-        minX: 0,
-        maxX: 11,
+        // Half a month of margin on each side -- January/December sat
+        // exactly on the plot's edge otherwise, clipping their bottom
+        // labels in half (confirmed on-device: "де" instead of "дек").
+        minX: -0.5,
+        maxX: 11.5,
         minY: chartMinY,
         maxY: chartMaxY,
         gridData: const FlGridData(show: false),
@@ -240,6 +246,13 @@ class FundBalanceHistoryChart extends StatelessWidget {
               showTitles: true,
               reservedSize: 22,
               interval: 1,
+              // Safe to disable here now that minX/maxX (-0.5/11.5) no
+              // longer sit exactly on a real tick (0/11) -- forced
+              // min/max labels used to coincide with the real edge ticks
+              // and were harmless, but once minX/maxX became pure margin
+              // the forced pair duplicated "дек" (confirmed on-device).
+              minIncluded: false,
+              maxIncluded: false,
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
                 if (index < 0 || index > 11) {

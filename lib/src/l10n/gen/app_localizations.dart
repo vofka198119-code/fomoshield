@@ -11059,6 +11059,24 @@ abstract class AppLocalizations {
   /// **'BALANCE HISTORY'**
   String get etfBalanceHistoryChartTitle;
 
+  /// No description provided for @etfChartsShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Charts'**
+  String get etfChartsShortcutLabel;
+
+  /// No description provided for @etfChartsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CHARTS'**
+  String get etfChartsScreenTitle;
+
+  /// No description provided for @etfChartsWidgetsSettingsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart Widgets'**
+  String get etfChartsWidgetsSettingsSheetTitle;
+
   /// No description provided for @etfProposeTradeButton.
   ///
   /// In en, this message translates to:

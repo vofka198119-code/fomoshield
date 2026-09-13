@@ -6560,6 +6560,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfBalanceHistoryChartTitle => 'ИСТОРИЯ БАЛАНСА';
 
   @override
+  String get etfChartsShortcutLabel => 'Графики';
+
+  @override
+  String get etfChartsScreenTitle => 'ГРАФИКИ';
+
+  @override
+  String get etfChartsWidgetsSettingsSheetTitle => 'Виджеты графиков';
+
+  @override
   String get etfProposeTradeButton => 'Предложить сделку';
 
   @override
