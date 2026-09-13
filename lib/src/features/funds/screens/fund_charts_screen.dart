@@ -12,6 +12,7 @@ import '../../../shared/widgets/year_picker_sheet.dart';
 import '../providers/fund_charts_widget_order_provider.dart';
 import '../providers/fund_providers.dart';
 import '../widgets/fund_asset_allocation_card.dart';
+import '../widgets/fund_cash_vs_invested_chart.dart';
 import '../widgets/fund_commission_chart.dart';
 import '../widgets/fund_drawdown_chart.dart';
 import '../widgets/fund_monthly_line_chart.dart';
@@ -164,6 +165,13 @@ class _FundChartsScreenState extends ConsumerState<FundChartsScreen> {
                     selectedYear: _selectedYear,
                     onTapYear: () => _pickYear(palette, firstYear),
                   ),
+                  'cash_vs_invested' => FundCashVsInvestedChart(
+                    monthlyCash: history.requireValue.cash,
+                    monthlyInvested: history.requireValue.invested,
+                    palette: palette,
+                    selectedYear: _selectedYear,
+                    onTapYear: () => _pickYear(palette, firstYear),
+                  ),
                   _ => const SizedBox.shrink(),
                 },
                 const SizedBox(height: 12),
@@ -251,6 +259,8 @@ class _FundChartsWidgetsSettingsSheetState
         return Icons.pie_chart_rounded;
       case 'commission':
         return Icons.receipt_long_rounded;
+      case 'cash_vs_invested':
+        return Icons.account_balance_wallet_rounded;
       default:
         return Icons.widgets_rounded;
     }

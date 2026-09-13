@@ -11107,6 +11107,24 @@ abstract class AppLocalizations {
   /// **'BROKER COMMISSION'**
   String get etfCommissionChartTitle;
 
+  /// No description provided for @etfCashVsInvestedChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CASH VS INVESTED'**
+  String get etfCashVsInvestedChartTitle;
+
+  /// No description provided for @etfCashVsInvestedCashLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get etfCashVsInvestedCashLabel;
+
+  /// No description provided for @etfCashVsInvestedInvestedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invested'**
+  String get etfCashVsInvestedInvestedLabel;
+
   /// No description provided for @etfProposeTradeButton.
   ///
   /// In en, this message translates to:

@@ -6584,6 +6584,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfCommissionChartTitle => 'КОМИССИЯ БРОКЕРА';
 
   @override
+  String get etfCashVsInvestedChartTitle => 'КЭШ И ИНВЕСТИЦИИ';
+
+  @override
+  String get etfCashVsInvestedCashLabel => 'Кэш';
+
+  @override
+  String get etfCashVsInvestedInvestedLabel => 'Инвестировано';
+
+  @override
   String get etfProposeTradeButton => 'Предложить сделку';
 
   @override

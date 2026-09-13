@@ -6561,6 +6561,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfCommissionChartTitle => 'BROKER COMMISSION';
 
   @override
+  String get etfCashVsInvestedChartTitle => 'CASH VS INVESTED';
+
+  @override
+  String get etfCashVsInvestedCashLabel => 'Cash';
+
+  @override
+  String get etfCashVsInvestedInvestedLabel => 'Invested';
+
+  @override
   String get etfProposeTradeButton => 'Propose a trade';
 
   @override

@@ -25,6 +25,7 @@ const List<String> _defaultFundChartsOrder = [
   'drawdown',
   'asset_allocation',
   'commission',
+  'cash_vs_invested',
 ];
 
 String _orderPrefsKey(String fundId, String? uid) =>
@@ -50,6 +51,8 @@ class FundChartsWidgetConfig {
         return l10n.etfAssetAllocationChartTitle;
       case 'commission':
         return l10n.etfCommissionChartTitle;
+      case 'cash_vs_invested':
+        return l10n.etfCashVsInvestedChartTitle;
       default:
         return id;
     }

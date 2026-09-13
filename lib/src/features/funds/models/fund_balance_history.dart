@@ -12,11 +12,15 @@ class FundBalanceHistory {
   final int year;
   final List<double?> balance;
   final List<double?> navPerUnit;
+  // Migration 025 -- null for a month with no snapshot yet OR a snapshot
+  // written before this column existed (both read as "no data").
+  final List<double?> cash;
 
   const FundBalanceHistory({
     required this.year,
     required this.balance,
     required this.navPerUnit,
+    required this.cash,
   });
 
   factory FundBalanceHistory.fromJson(Map<String, dynamic> json) {
@@ -27,7 +31,18 @@ class FundBalanceHistory {
       year: json['year'] as int,
       balance: monthly('balance'),
       navPerUnit: monthly('navPerUnit'),
+      cash: monthly('cash'),
     );
+  }
+
+  /// Holdings-only slice of [balance] -- balance (AUM) is always cash +
+  /// holdings value, so this is a pure derivative, not a separate backend
+  /// field. Null wherever either side is missing data.
+  List<double?> get invested {
+    return [
+      for (var i = 0; i < balance.length; i++)
+        (balance[i] == null || cash[i] == null) ? null : balance[i]! - cash[i]!,
+    ];
   }
 
   /// Peak-to-trough % decline from the running peak NAV per unit, measured
