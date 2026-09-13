@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
 import '../models/fund.dart';
+import '../models/fund_investor.dart';
+import '../models/fund_investor_flows.dart';
 import '../models/trade_proposal.dart';
 import '../services/fund_api_service.dart';
 
@@ -38,6 +40,25 @@ final fundsListProvider = FutureProvider<List<Fund>>((ref) {
 final fundDetailProvider = FutureProvider.autoDispose
     .family<FundDetail, String>((ref, fundId) {
       return ref.watch(fundApiServiceProvider).getFundDetail(fundId);
+    });
+
+/// Head + active team members only (server-gated) — the Investors screen
+/// (2026-09-13 ask). Already sorted by net invested descending.
+final fundInvestorsProvider = FutureProvider.autoDispose
+    .family<List<FundInvestor>, String>((ref, fundId) {
+      return ref.watch(fundApiServiceProvider).getFundInvestors(fundId);
+    });
+
+/// One calendar year's monthly inflow/outflow — the Investors screen's two
+/// bar charts, re-requested with a different year when the header's year
+/// picker changes (2026-09-13 ask: "archive" by calendar year). Same
+/// access gate as fundInvestorsProvider.
+final fundInvestorFlowsProvider = FutureProvider.autoDispose
+    .family<FundInvestorFlows, (String, int)>((ref, args) {
+      final (fundId, year) = args;
+      return ref
+          .watch(fundApiServiceProvider)
+          .getFundInvestorFlows(fundId, year: year);
     });
 
 /// Display name for a Portfolio holding/transaction's symbol — resolves a

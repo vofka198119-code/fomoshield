@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import '../../../core/utils/constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../models/fund.dart';
+import '../models/fund_investor.dart';
+import '../models/fund_investor_flows.dart';
 import '../models/trade_proposal.dart';
 
 /// A fund-creation/validation error from the backend, carrying the stable
@@ -174,6 +176,37 @@ class FundApiService {
       return FundDetail.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw Exception(_errorMessage(e, 'Failed to load fund'));
+    }
+  }
+
+  /// Head + active team members only — server-gated, unlike listProposals'
+  /// wider permission set (see fundService.js's getFundInvestors). Already
+  /// sorted by net invested descending.
+  Future<List<FundInvestor>> getFundInvestors(String fundId) async {
+    try {
+      final response = await _dio.get('/funds/$fundId/investors');
+      final list = ((response.data as Map)['investors'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(FundInvestor.fromJson).toList();
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to load investors'));
+    }
+  }
+
+  /// Same access gate as getFundInvestors. [year] defaults server-side to
+  /// the current calendar year.
+  Future<FundInvestorFlows> getFundInvestorFlows(
+    String fundId, {
+    int? year,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/funds/$fundId/investor-flows',
+        queryParameters: year != null ? {'year': year} : null,
+      );
+      return FundInvestorFlows.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to load investor flows'));
     }
   }
 

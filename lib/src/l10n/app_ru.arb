@@ -1858,6 +1858,17 @@
   "etfBlotterTitle": "ЗАЯВКИ",
   "etfBlotterShortcutLabel": "Заявки",
   "etfBlotterEmptyText": "Пока нет предложений по сделкам",
+  "etfInvestorsShortcutLabel": "Инвесторы",
+  "etfInvestorsScreenTitle": "ИНВЕСТОРЫ",
+  "etfInvestorsStatsTitle": "СТАТИСТИКА ИНВЕСТОРОВ",
+  "etfInvestorsStatsTotalLabel": "Всего вложено",
+  "etfInvestorsStatsCountLabel": "Инвесторов",
+  "etfInvestorsStatsBankruptcyPayoutLabel": "Выплата при банкротстве",
+  "etfInvestorsListTitle": "СПИСОК ИНВЕСТОРОВ",
+  "etfInvestorsListEmptyText": "Пока нет инвесторов",
+  "etfInvestorsInflowChartTitle": "ПРИТОК ИНВЕСТОРОВ",
+  "etfInvestorsOutflowChartTitle": "ОТТОК ИНВЕСТОРОВ",
+  "etfInvestorsYearPickerTitle": "ВЫБОР ГОДА",
   "etfProposeTradeButton": "Предложить сделку",
   "etfProposeTradeTitle": "Предложить сделку",
   "etfProposeSymbolLabel": "Тикер",
@@ -1961,7 +1972,16 @@
 
   "etfFundDetailNavLabel": "NAV / пай",
   "etfFundDetailAumLabel": "AUM",
+  "etfFundDetailInvestorCapitalLabel": "Вложено инвесторами",
   "etfFundDetailUnitsLabel": "Паёв в обращении",
+  "fundUnitsCount": "{count} паёв",
+  "@fundUnitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "etfFundDetailHoldingsTitle": "АКТИВЫ",
   "etfFundDetailHoldingsEmpty": "Пока нет активов",
   "etfFundDeleteConfirmTitle": "Удалить этот фонд?",

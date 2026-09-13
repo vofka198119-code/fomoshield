@@ -2620,6 +2620,17 @@
   "etfBlotterTitle": "ORDERS",
   "etfBlotterShortcutLabel": "Orders",
   "etfBlotterEmptyText": "No trade proposals yet",
+  "etfInvestorsShortcutLabel": "Investors",
+  "etfInvestorsScreenTitle": "INVESTORS",
+  "etfInvestorsStatsTitle": "INVESTOR STATISTICS",
+  "etfInvestorsStatsTotalLabel": "Total Invested",
+  "etfInvestorsStatsCountLabel": "Investors",
+  "etfInvestorsStatsBankruptcyPayoutLabel": "Bankruptcy Payout",
+  "etfInvestorsListTitle": "INVESTOR LIST",
+  "etfInvestorsListEmptyText": "No investors yet",
+  "etfInvestorsInflowChartTitle": "INVESTOR INFLOW",
+  "etfInvestorsOutflowChartTitle": "INVESTOR OUTFLOW",
+  "etfInvestorsYearPickerTitle": "SELECT YEAR",
   "etfProposeTradeButton": "Propose a trade",
   "etfProposeTradeTitle": "Propose a trade",
   "etfProposeSymbolLabel": "Symbol",
@@ -2723,7 +2734,16 @@
 
   "etfFundDetailNavLabel": "NAV / Unit",
   "etfFundDetailAumLabel": "AUM",
+  "etfFundDetailInvestorCapitalLabel": "Investor Deposits",
   "etfFundDetailUnitsLabel": "Units Outstanding",
+  "fundUnitsCount": "{count} units",
+  "@fundUnitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "etfFundDetailHoldingsTitle": "HOLDINGS",
   "etfFundDetailHoldingsEmpty": "No holdings yet",
   "etfFundDeleteConfirmTitle": "Delete this fund?",

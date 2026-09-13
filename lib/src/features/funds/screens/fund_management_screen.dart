@@ -150,6 +150,12 @@ class FundManagementScreen extends ConsumerWidget {
                         label: l10n.etfBlotterShortcutLabel,
                         onTap: () => context.push('/funds/${fund.id}/blotter'),
                       ),
+                      CircleShortcut(
+                        icon: Icons.savings_rounded,
+                        label: l10n.etfInvestorsShortcutLabel,
+                        onTap: () =>
+                            context.push('/funds/${fund.id}/investors'),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),

@@ -10987,6 +10987,72 @@ abstract class AppLocalizations {
   /// **'No trade proposals yet'**
   String get etfBlotterEmptyText;
 
+  /// No description provided for @etfInvestorsShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Investors'**
+  String get etfInvestorsShortcutLabel;
+
+  /// No description provided for @etfInvestorsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTORS'**
+  String get etfInvestorsScreenTitle;
+
+  /// No description provided for @etfInvestorsStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTOR STATISTICS'**
+  String get etfInvestorsStatsTitle;
+
+  /// No description provided for @etfInvestorsStatsTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Invested'**
+  String get etfInvestorsStatsTotalLabel;
+
+  /// No description provided for @etfInvestorsStatsCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Investors'**
+  String get etfInvestorsStatsCountLabel;
+
+  /// No description provided for @etfInvestorsStatsBankruptcyPayoutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bankruptcy Payout'**
+  String get etfInvestorsStatsBankruptcyPayoutLabel;
+
+  /// No description provided for @etfInvestorsListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTOR LIST'**
+  String get etfInvestorsListTitle;
+
+  /// No description provided for @etfInvestorsListEmptyText.
+  ///
+  /// In en, this message translates to:
+  /// **'No investors yet'**
+  String get etfInvestorsListEmptyText;
+
+  /// No description provided for @etfInvestorsInflowChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTOR INFLOW'**
+  String get etfInvestorsInflowChartTitle;
+
+  /// No description provided for @etfInvestorsOutflowChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTOR OUTFLOW'**
+  String get etfInvestorsOutflowChartTitle;
+
+  /// No description provided for @etfInvestorsYearPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SELECT YEAR'**
+  String get etfInvestorsYearPickerTitle;
+
   /// No description provided for @etfProposeTradeButton.
   ///
   /// In en, this message translates to:
@@ -11539,11 +11605,23 @@ abstract class AppLocalizations {
   /// **'AUM'**
   String get etfFundDetailAumLabel;
 
+  /// No description provided for @etfFundDetailInvestorCapitalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Investor Deposits'**
+  String get etfFundDetailInvestorCapitalLabel;
+
   /// No description provided for @etfFundDetailUnitsLabel.
   ///
   /// In en, this message translates to:
   /// **'Units Outstanding'**
   String get etfFundDetailUnitsLabel;
+
+  /// No description provided for @fundUnitsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} units'**
+  String fundUnitsCount(String count);
 
   /// No description provided for @etfFundDetailHoldingsTitle.
   ///

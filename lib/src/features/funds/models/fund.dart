@@ -107,6 +107,11 @@ class FundNavPoint {
 /// own subset, this just adds the rest.
 class FundDetail extends Fund {
   final double cash;
+  // Net cash investors have put in via subscribe/redeem -- NOT the same as
+  // aum (which also folds in P&L) or startingCapital (the founder's own
+  // seed money, never routed through the investor ledger). See
+  // fundService.js's _getInvestorCapital.
+  final double investorCapital;
   final List<FundHolding> holdings;
   final List<FundNavPoint> navHistory;
 
@@ -126,6 +131,7 @@ class FundDetail extends Fund {
     required super.aum,
     super.lastInviteMessage,
     required this.cash,
+    required this.investorCapital,
     required this.holdings,
     required this.navHistory,
   });
@@ -148,6 +154,7 @@ class FundDetail extends Fund {
       aum: base.aum,
       lastInviteMessage: base.lastInviteMessage,
       cash: (json['cash'] as num).toDouble(),
+      investorCapital: (json['investorCapital'] as num?)?.toDouble() ?? 0,
       holdings: (json['holdings'] as List<dynamic>? ?? const [])
           .map((e) => FundHolding.fromJson(e as Map<String, dynamic>))
           .toList(),

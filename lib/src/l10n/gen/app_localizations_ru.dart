@@ -6523,6 +6523,40 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfBlotterEmptyText => 'Пока нет предложений по сделкам';
 
   @override
+  String get etfInvestorsShortcutLabel => 'Инвесторы';
+
+  @override
+  String get etfInvestorsScreenTitle => 'ИНВЕСТОРЫ';
+
+  @override
+  String get etfInvestorsStatsTitle => 'СТАТИСТИКА ИНВЕСТОРОВ';
+
+  @override
+  String get etfInvestorsStatsTotalLabel => 'Всего вложено';
+
+  @override
+  String get etfInvestorsStatsCountLabel => 'Инвесторов';
+
+  @override
+  String get etfInvestorsStatsBankruptcyPayoutLabel =>
+      'Выплата при банкротстве';
+
+  @override
+  String get etfInvestorsListTitle => 'СПИСОК ИНВЕСТОРОВ';
+
+  @override
+  String get etfInvestorsListEmptyText => 'Пока нет инвесторов';
+
+  @override
+  String get etfInvestorsInflowChartTitle => 'ПРИТОК ИНВЕСТОРОВ';
+
+  @override
+  String get etfInvestorsOutflowChartTitle => 'ОТТОК ИНВЕСТОРОВ';
+
+  @override
+  String get etfInvestorsYearPickerTitle => 'ВЫБОР ГОДА';
+
+  @override
   String get etfProposeTradeButton => 'Предложить сделку';
 
   @override
@@ -6816,7 +6850,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfFundDetailAumLabel => 'AUM';
 
   @override
+  String get etfFundDetailInvestorCapitalLabel => 'Вложено инвесторами';
+
+  @override
   String get etfFundDetailUnitsLabel => 'Паёв в обращении';
+
+  @override
+  String fundUnitsCount(String count) {
+    return '$count паёв';
+  }
 
   @override
   String get etfFundDetailHoldingsTitle => 'АКТИВЫ';

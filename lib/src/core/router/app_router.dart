@@ -68,6 +68,7 @@ import '../../features/funds/screens/fund_detail_screen.dart';
 import '../../features/funds/screens/fund_management_screen.dart';
 import '../../features/funds/screens/fund_team_screen.dart';
 import '../../features/funds/screens/fund_blotter_screen.dart';
+import '../../features/funds/screens/fund_investors_screen.dart';
 import '../../features/funds/screens/propose_trade_screen.dart';
 import '../../features/funds/screens/proposal_detail_screen.dart';
 import '../../features/funds/models/trade_proposal.dart' show TradeProposal;
@@ -578,6 +579,14 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return FundBlotterScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/investors',
+        name: 'fundInvestors',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundInvestorsScreen(fundId: id);
         },
       ),
       GoRoute(

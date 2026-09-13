@@ -8,32 +8,38 @@ import '../../../core/theme/themed_divider.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
-import '../models/fund.dart';
+import '../models/fund_investor.dart';
 
-// Light-card skin, matches Company Detail's KeyMetricsSection. Fund-flavored
-// metrics: AUM, investor deposits (gross, no P&L, no founder capital --
-// 2026-09-13 ask), units outstanding, number of holdings.
-class FundKeyMetricsCard extends StatelessWidget {
-  final FundDetail fund;
+// ---------------------------------------------------------------------------
+// FundInvestorsStatsCard — Investors screen's first widget (2026-09-13 ask).
+// Same title/divider/row shell as FundKeyMetricsCard/FundBalanceCard.
+// Bankruptcy Payout is a PREVIEW of the solvent-case payout formula
+// (invested * 1.05 per investor, summed — see
+// [[fomoshield_etf_bankruptcy_flow_spec]]), not a promise the fund can
+// always honor -- the real liquidation flow (not yet built) still has to
+// fall back to a pro-rata split if the fund's actual balance falls short.
+// ---------------------------------------------------------------------------
+class FundInvestorsStatsCard extends StatelessWidget {
+  final List<FundInvestor> investors;
   final AppPalette palette;
 
-  const FundKeyMetricsCard({
+  const FundInvestorsStatsCard({
     super.key,
-    required this.fund,
+    required this.investors,
     required this.palette,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final totalInvested = investors.fold<double>(0, (s, i) => s + i.invested);
     final items = <(String, String)>[
-      (l10n.etfFundDetailAumLabel, formatUsd(fund.aum)),
+      (l10n.etfInvestorsStatsTotalLabel, formatUsd(totalInvested)),
+      (l10n.etfInvestorsStatsCountLabel, investors.length.toString()),
       (
-        l10n.etfFundDetailInvestorCapitalLabel,
-        formatUsd(fund.investorCapital),
+        l10n.etfInvestorsStatsBankruptcyPayoutLabel,
+        formatUsd(totalInvested * 1.05),
       ),
-      (l10n.etfFundDetailUnitsLabel, fund.unitsOutstanding.toStringAsFixed(0)),
-      (l10n.etfFundDetailHoldingsCountLabel, fund.holdings.length.toString()),
     ];
 
     return CardFrame(
@@ -43,7 +49,7 @@ class FundKeyMetricsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           themedHeaderText(
-            l10n.companyDetailKeyMetricsTitle,
+            l10n.etfInvestorsStatsTitle,
             palette,
             FomoShieldTheme.cardTitle(),
           ),

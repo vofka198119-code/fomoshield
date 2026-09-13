@@ -6501,6 +6501,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfBlotterEmptyText => 'No trade proposals yet';
 
   @override
+  String get etfInvestorsShortcutLabel => 'Investors';
+
+  @override
+  String get etfInvestorsScreenTitle => 'INVESTORS';
+
+  @override
+  String get etfInvestorsStatsTitle => 'INVESTOR STATISTICS';
+
+  @override
+  String get etfInvestorsStatsTotalLabel => 'Total Invested';
+
+  @override
+  String get etfInvestorsStatsCountLabel => 'Investors';
+
+  @override
+  String get etfInvestorsStatsBankruptcyPayoutLabel => 'Bankruptcy Payout';
+
+  @override
+  String get etfInvestorsListTitle => 'INVESTOR LIST';
+
+  @override
+  String get etfInvestorsListEmptyText => 'No investors yet';
+
+  @override
+  String get etfInvestorsInflowChartTitle => 'INVESTOR INFLOW';
+
+  @override
+  String get etfInvestorsOutflowChartTitle => 'INVESTOR OUTFLOW';
+
+  @override
+  String get etfInvestorsYearPickerTitle => 'SELECT YEAR';
+
+  @override
   String get etfProposeTradeButton => 'Propose a trade';
 
   @override
@@ -6793,7 +6826,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundDetailAumLabel => 'AUM';
 
   @override
+  String get etfFundDetailInvestorCapitalLabel => 'Investor Deposits';
+
+  @override
   String get etfFundDetailUnitsLabel => 'Units Outstanding';
+
+  @override
+  String fundUnitsCount(String count) {
+    return '$count units';
+  }
 
   @override
   String get etfFundDetailHoldingsTitle => 'HOLDINGS';
