@@ -23,6 +23,8 @@ const List<String> _defaultFundChartsOrder = [
   'balance_history',
   'nav_history',
   'drawdown',
+  'asset_allocation',
+  'commission',
 ];
 
 String _orderPrefsKey(String fundId, String? uid) =>
@@ -44,6 +46,10 @@ class FundChartsWidgetConfig {
         return l10n.etfNavHistoryChartTitle;
       case 'drawdown':
         return l10n.etfDrawdownChartTitle;
+      case 'asset_allocation':
+        return l10n.etfAssetAllocationChartTitle;
+      case 'commission':
+        return l10n.etfCommissionChartTitle;
       default:
         return id;
     }

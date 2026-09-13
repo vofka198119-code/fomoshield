@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
 import '../models/fund.dart';
 import '../models/fund_balance_history.dart';
+import '../models/fund_commission_history.dart';
 import '../models/fund_investor.dart';
 import '../models/fund_investor_flows.dart';
 import '../models/trade_proposal.dart';
@@ -70,6 +71,16 @@ final fundBalanceHistoryProvider = FutureProvider.autoDispose
       return ref
           .watch(fundApiServiceProvider)
           .getFundBalanceHistory(fundId, year: year);
+    });
+
+/// One calendar year's monthly broker commission — Charts screen's Broker
+/// Commission chart. Same access gate as fundInvestorsProvider.
+final fundCommissionHistoryProvider = FutureProvider.autoDispose
+    .family<FundCommissionHistory, (String, int)>((ref, args) {
+      final (fundId, year) = args;
+      return ref
+          .watch(fundApiServiceProvider)
+          .getFundCommissionHistory(fundId, year: year);
     });
 
 /// Display name for a Portfolio holding/transaction's symbol — resolves a

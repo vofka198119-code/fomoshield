@@ -6552,6 +6552,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfDrawdownChartTitle => 'DRAWDOWN';
 
   @override
+  String get etfAssetAllocationChartTitle => 'ASSET ALLOCATION';
+
+  @override
+  String get etfAssetAllocationEmptyText => 'No holdings yet';
+
+  @override
+  String get etfCommissionChartTitle => 'BROKER COMMISSION';
+
+  @override
   String get etfProposeTradeButton => 'Propose a trade';
 
   @override

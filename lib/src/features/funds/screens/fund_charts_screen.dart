@@ -11,6 +11,8 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/year_picker_sheet.dart';
 import '../providers/fund_charts_widget_order_provider.dart';
 import '../providers/fund_providers.dart';
+import '../widgets/fund_asset_allocation_card.dart';
+import '../widgets/fund_commission_chart.dart';
 import '../widgets/fund_drawdown_chart.dart';
 import '../widgets/fund_monthly_line_chart.dart';
 
@@ -81,6 +83,26 @@ class _FundChartsScreenState extends ConsumerState<FundChartsScreen> {
     final visible = configs.where((c) => c.visible).toList();
     final fundAsync = ref.watch(fundDetailProvider(widget.fundId));
     final firstYear = fundAsync.valueOrNull?.createdAt.year ?? _selectedYear;
+    // Both queries have to be ready before ANY widget renders -- the fund
+    // (asset_allocation's source) tends to resolve first since it's often
+    // already cached from the screen this was opened from, while
+    // balance/nav/drawdown wait on their own slower year-scoped query.
+    // Rendering asset_allocation the moment it's ready and letting the
+    // other three pop in later, above it, made it visibly jump from the
+    // top of the list down to its real position once they loaded
+    // (confirmed on-device). Gating everything on the slower of the two
+    // means every visible card appears together, already in final order.
+    final history = ref.watch(
+      fundBalanceHistoryProvider((widget.fundId, _selectedYear)),
+    );
+    final commissionHistory = ref.watch(
+      fundCommissionHistoryProvider((widget.fundId, _selectedYear)),
+    );
+    final holdings = fundAsync.valueOrNull?.holdings;
+    final ready =
+        history.valueOrNull != null &&
+        commissionHistory.valueOrNull != null &&
+        holdings != null;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -102,44 +124,50 @@ class _FundChartsScreenState extends ConsumerState<FundChartsScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           children: [
-            ...ref
-                .watch(
-                  fundBalanceHistoryProvider((widget.fundId, _selectedYear)),
-                )
-                .when(
-                  loading: () => const [],
-                  error: (_, _) => const [],
-                  data: (history) => [
-                    for (final config in visible) ...[
-                      switch (config.id) {
-                        'balance_history' => FundMonthlyLineChart(
-                          title: l10n.etfBalanceHistoryChartTitle,
-                          monthlyValues: history.balance,
-                          palette: palette,
-                          selectedYear: _selectedYear,
-                          onTapYear: () => _pickYear(palette, firstYear),
-                        ),
-                        'nav_history' => FundMonthlyLineChart(
-                          title: l10n.etfNavHistoryChartTitle,
-                          monthlyValues: history.navPerUnit,
-                          palette: palette,
-                          selectedYear: _selectedYear,
-                          onTapYear: () => _pickYear(palette, firstYear),
-                          axisLabelFormatter: (v) =>
-                              '\$${v.toStringAsFixed(2)}',
-                        ),
-                        'drawdown' => FundDrawdownChart(
-                          monthlyDrawdownPercent: history.drawdownPercent,
-                          palette: palette,
-                          selectedYear: _selectedYear,
-                          onTapYear: () => _pickYear(palette, firstYear),
-                        ),
-                        _ => const SizedBox.shrink(),
-                      },
-                      const SizedBox(height: 12),
-                    ],
-                  ],
-                ),
+            if (!ready)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 60),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else
+              for (final config in visible) ...[
+                switch (config.id) {
+                  'balance_history' => FundMonthlyLineChart(
+                    title: l10n.etfBalanceHistoryChartTitle,
+                    monthlyValues: history.requireValue.balance,
+                    palette: palette,
+                    selectedYear: _selectedYear,
+                    onTapYear: () => _pickYear(palette, firstYear),
+                  ),
+                  'nav_history' => FundMonthlyLineChart(
+                    title: l10n.etfNavHistoryChartTitle,
+                    monthlyValues: history.requireValue.navPerUnit,
+                    palette: palette,
+                    selectedYear: _selectedYear,
+                    onTapYear: () => _pickYear(palette, firstYear),
+                    axisLabelFormatter: (v) => '\$${v.toStringAsFixed(2)}',
+                  ),
+                  'drawdown' => FundDrawdownChart(
+                    monthlyDrawdownPercent:
+                        history.requireValue.drawdownPercent,
+                    palette: palette,
+                    selectedYear: _selectedYear,
+                    onTapYear: () => _pickYear(palette, firstYear),
+                  ),
+                  'asset_allocation' => FundAssetAllocationCard(
+                    holdings: holdings,
+                    palette: palette,
+                  ),
+                  'commission' => FundCommissionChart(
+                    monthlyCommission: commissionHistory.requireValue.commission,
+                    palette: palette,
+                    selectedYear: _selectedYear,
+                    onTapYear: () => _pickYear(palette, firstYear),
+                  ),
+                  _ => const SizedBox.shrink(),
+                },
+                const SizedBox(height: 12),
+              ],
             Center(
               child: themedAddWidgetsButton(
                 context,
@@ -219,6 +247,10 @@ class _FundChartsWidgetsSettingsSheetState
         return Icons.trending_up_rounded;
       case 'drawdown':
         return Icons.trending_down_rounded;
+      case 'asset_allocation':
+        return Icons.pie_chart_rounded;
+      case 'commission':
+        return Icons.receipt_long_rounded;
       default:
         return Icons.widgets_rounded;
     }

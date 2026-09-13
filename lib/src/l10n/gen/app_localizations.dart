@@ -11089,6 +11089,24 @@ abstract class AppLocalizations {
   /// **'DRAWDOWN'**
   String get etfDrawdownChartTitle;
 
+  /// No description provided for @etfAssetAllocationChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ASSET ALLOCATION'**
+  String get etfAssetAllocationChartTitle;
+
+  /// No description provided for @etfAssetAllocationEmptyText.
+  ///
+  /// In en, this message translates to:
+  /// **'No holdings yet'**
+  String get etfAssetAllocationEmptyText;
+
+  /// No description provided for @etfCommissionChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'BROKER COMMISSION'**
+  String get etfCommissionChartTitle;
+
   /// No description provided for @etfProposeTradeButton.
   ///
   /// In en, this message translates to:

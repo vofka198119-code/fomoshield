@@ -3,6 +3,7 @@ import '../../../core/utils/constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../models/fund.dart';
 import '../models/fund_balance_history.dart';
+import '../models/fund_commission_history.dart';
 import '../models/fund_investor.dart';
 import '../models/fund_investor_flows.dart';
 import '../models/trade_proposal.dart';
@@ -225,6 +226,25 @@ class FundApiService {
       return FundBalanceHistory.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw Exception(_errorMessage(e, 'Failed to load balance history'));
+    }
+  }
+
+  /// Same access gate as getFundInvestors. [year] defaults server-side to
+  /// the current calendar year.
+  Future<FundCommissionHistory> getFundCommissionHistory(
+    String fundId, {
+    int? year,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/funds/$fundId/commission-history',
+        queryParameters: year != null ? {'year': year} : null,
+      );
+      return FundCommissionHistory.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to load commission history'));
     }
   }
 
