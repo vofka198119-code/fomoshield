@@ -57,7 +57,9 @@ class _FundChartsScreenState extends ConsumerState<FundChartsScreen> {
   }
 
   void _showWidgetsBottomSheet(AppPalette palette) {
-    final notifier = ref.read(fundChartsWidgetsProvider(widget.fundId).notifier);
+    final notifier = ref.read(
+      fundChartsWidgetsProvider(widget.fundId).notifier,
+    );
     final currentConfigs = ref.read(fundChartsWidgetsProvider(widget.fundId));
 
     showModalBottomSheet(
@@ -122,69 +124,82 @@ class _FundChartsScreenState extends ConsumerState<FundChartsScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          children: [
-            if (!ready)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else
-              for (final config in visible) ...[
-                switch (config.id) {
-                  'balance_history' => FundMonthlyLineChart(
-                    title: l10n.etfBalanceHistoryChartTitle,
-                    monthlyValues: history.requireValue.balance,
-                    palette: palette,
-                    selectedYear: _selectedYear,
-                    onTapYear: () => _pickYear(palette, firstYear),
-                  ),
-                  'nav_history' => FundMonthlyLineChart(
-                    title: l10n.etfNavHistoryChartTitle,
-                    monthlyValues: history.requireValue.navPerUnit,
-                    palette: palette,
-                    selectedYear: _selectedYear,
-                    onTapYear: () => _pickYear(palette, firstYear),
-                    axisLabelFormatter: (v) => '\$${v.toStringAsFixed(2)}',
-                  ),
-                  'drawdown' => FundDrawdownChart(
-                    monthlyDrawdownPercent:
-                        history.requireValue.drawdownPercent,
-                    palette: palette,
-                    selectedYear: _selectedYear,
-                    onTapYear: () => _pickYear(palette, firstYear),
-                  ),
-                  'asset_allocation' => FundAssetAllocationCard(
-                    holdings: holdings,
-                    palette: palette,
-                  ),
-                  'commission' => FundCommissionChart(
-                    monthlyCommission: commissionHistory.requireValue.commission,
-                    palette: palette,
-                    selectedYear: _selectedYear,
-                    onTapYear: () => _pickYear(palette, firstYear),
-                  ),
-                  'cash_vs_invested' => FundCashVsInvestedChart(
-                    monthlyCash: history.requireValue.cash,
-                    monthlyInvested: history.requireValue.invested,
-                    palette: palette,
-                    selectedYear: _selectedYear,
-                    onTapYear: () => _pickYear(palette, firstYear),
-                  ),
-                  _ => const SizedBox.shrink(),
-                },
-                const SizedBox(height: 12),
-              ],
-            Center(
-              child: themedAddWidgetsButton(
-                context,
-                palette,
-                label: l10n.homeAddWidgets,
-                onTap: () => _showWidgetsBottomSheet(palette),
+        child: RefreshIndicator(
+          color: palette.accentPrimary,
+          onRefresh: () async {
+            ref.invalidate(fundDetailProvider(widget.fundId));
+            ref.invalidate(
+              fundBalanceHistoryProvider((widget.fundId, _selectedYear)),
+            );
+            ref.invalidate(
+              fundCommissionHistoryProvider((widget.fundId, _selectedYear)),
+            );
+          },
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            children: [
+              if (!ready)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 60),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else
+                for (final config in visible) ...[
+                  switch (config.id) {
+                    'balance_history' => FundMonthlyLineChart(
+                      title: l10n.etfBalanceHistoryChartTitle,
+                      monthlyValues: history.requireValue.balance,
+                      palette: palette,
+                      selectedYear: _selectedYear,
+                      onTapYear: () => _pickYear(palette, firstYear),
+                    ),
+                    'nav_history' => FundMonthlyLineChart(
+                      title: l10n.etfNavHistoryChartTitle,
+                      monthlyValues: history.requireValue.navPerUnit,
+                      palette: palette,
+                      selectedYear: _selectedYear,
+                      onTapYear: () => _pickYear(palette, firstYear),
+                      axisLabelFormatter: (v) => '\$${v.toStringAsFixed(2)}',
+                    ),
+                    'drawdown' => FundDrawdownChart(
+                      monthlyDrawdownPercent:
+                          history.requireValue.drawdownPercent,
+                      palette: palette,
+                      selectedYear: _selectedYear,
+                      onTapYear: () => _pickYear(palette, firstYear),
+                    ),
+                    'asset_allocation' => FundAssetAllocationCard(
+                      holdings: holdings,
+                      palette: palette,
+                    ),
+                    'commission' => FundCommissionChart(
+                      monthlyCommission:
+                          commissionHistory.requireValue.commission,
+                      palette: palette,
+                      selectedYear: _selectedYear,
+                      onTapYear: () => _pickYear(palette, firstYear),
+                    ),
+                    'cash_vs_invested' => FundCashVsInvestedChart(
+                      monthlyCash: history.requireValue.cash,
+                      monthlyInvested: history.requireValue.invested,
+                      palette: palette,
+                      selectedYear: _selectedYear,
+                      onTapYear: () => _pickYear(palette, firstYear),
+                    ),
+                    _ => const SizedBox.shrink(),
+                  },
+                  const SizedBox(height: 12),
+                ],
+              Center(
+                child: themedAddWidgetsButton(
+                  context,
+                  palette,
+                  label: l10n.homeAddWidgets,
+                  onTap: () => _showWidgetsBottomSheet(palette),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

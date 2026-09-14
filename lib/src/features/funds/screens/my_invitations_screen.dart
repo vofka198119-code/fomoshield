@@ -120,6 +120,16 @@ class MyInvitationsScreen extends ConsumerWidget {
                         );
                         if (joined == null) return;
                         ref.invalidate(myInvitationsProvider);
+                        if (joined) {
+                          // New team membership -- without this, the
+                          // fund's own Team screen and this user's
+                          // employment history kept showing pre-join
+                          // state until a fresh (non-cached) mount.
+                          ref.invalidate(
+                            fundTeamProvider(invitation.fundId),
+                          );
+                          ref.invalidate(myEmploymentHistoryProvider);
+                        }
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

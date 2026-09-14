@@ -546,6 +546,15 @@ class _PortfolioOrderEntryScreenState
         return;
       }
       if (!mounted) return;
+      // subscribe/redeem move the fund's own cash/units/NAV and the
+      // investor ledger server-side -- without this, Fund Detail/
+      // Management/Investors/Charts kept showing pre-trade data until the
+      // user left and re-opened those screens (same staleness bug already
+      // fixed for trade-proposal approve/execute, 2026-09-14).
+      ref.invalidate(fundDetailProvider(widget.fundId!));
+      ref.invalidate(fundInvestorsProvider(widget.fundId!));
+      ref.invalidate(fundInvestorFlowsProvider);
+      ref.invalidate(fundBalanceHistoryProvider);
     }
 
     final order = ref

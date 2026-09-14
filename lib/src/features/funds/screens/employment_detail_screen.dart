@@ -91,6 +91,7 @@ class _EmploymentDetailScreenState
           .read(employeeApiServiceProvider)
           .leaveFund(widget.record.fundId);
       ref.invalidate(myEmploymentHistoryProvider);
+      ref.invalidate(fundTeamProvider(widget.record.fundId));
       if (!mounted) return;
       Navigator.of(context).pop();
     } catch (_) {

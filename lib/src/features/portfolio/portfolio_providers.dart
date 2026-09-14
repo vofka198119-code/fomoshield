@@ -548,7 +548,17 @@ final portfolioPerformanceProvider =
           .map((e) => e.key)
           .where(fundTickerPattern.hasMatch)
           .toSet();
+      // listFunds() is the cheap, batch-snapshotted NAV meant for list
+      // views (fund_nav_snapshots, refreshed at most every 24h) -- using it
+      // here priced a held fund up to a day stale against Fund Detail's own
+      // live recompute, enough to flip the P&L sign on a small position
+      // (confirmed on-device 2026-09-14: $112.20/-0.02% here vs $112.41/
+      // +0.16% on Fund Detail for the same holding). Only listFunds()'s
+      // id/ticker mapping is used now; the actual price comes from a live
+      // getFundDetail() call per matched fund below, same "fetch it fresh"
+      // treatment every other holding's Finnhub quote already gets.
       var fundsByTicker = <String, Fund>{};
+      var liveNavByTicker = <String, double>{};
       if (candidateFundSymbols.isNotEmpty) {
         try {
           final funds = await ref.read(fundApiServiceProvider).listFunds();
@@ -556,6 +566,19 @@ final portfolioPerformanceProvider =
             for (final f in funds)
               if (candidateFundSymbols.contains(f.ticker)) f.ticker: f,
           };
+          final fundApi = ref.read(fundApiServiceProvider);
+          final liveDetails = await Future.wait(
+            fundsByTicker.values.map((f) async {
+              try {
+                return await fundApi.getFundDetail(f.id);
+              } catch (_) {
+                return null;
+              }
+            }),
+          );
+          for (final detail in liveDetails) {
+            if (detail != null) liveNavByTicker[detail.ticker] = detail.navPerUnit;
+          }
         } catch (_) {
           // Leave empty — any matching symbol just falls through to the
           // Finnhub path below (its pre-existing, if wrong, behavior).
@@ -590,7 +613,7 @@ final portfolioPerformanceProvider =
         final fund = fundsByTicker[symbol];
         final quote = quotes[i];
         final currentPrice = fund != null
-            ? fund.navPerUnit
+            ? (liveNavByTicker[symbol] ?? fund.navPerUnit)
             : (quote != null
                   ? ((quote['c'] as num?)?.toDouble() ?? avgCost)
                   : avgCost);

@@ -39,13 +39,31 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     _proposal = widget.proposal;
   }
 
+  // [alsoInvalidateFundData] covers approve AND execute -- approve alone
+  // can move holdings/cash too: fundTradeService.js auto-executes on
+  // approval whenever the fund has no Trader hired ("если Trader не нанят
+  // — одобрение сразу отправляет ордер в исполнение"), so a plain approve
+  // isn't always the holdings-neutral action it looks like. Without this,
+  // Fund Holdings/Asset Allocation/Balance/Commission charts kept showing
+  // pre-trade data until the user manually left and re-opened the screen
+  // (autoDispose only refetches on a fresh watch) -- confirmed on-device
+  // 2026-09-14. Balance/commission history are invalidated by their bare
+  // family reference (every cached year, not just the one currently
+  // selected on Fund Charts -- that screen's own _selectedYear isn't
+  // reachable from here).
   Future<void> _act(
     Future<TradeProposal> Function() action,
-    AppLocalizations l10n,
-  ) async {
+    AppLocalizations l10n, {
+    bool alsoInvalidateFundData = false,
+  }) async {
     try {
       final updated = await action();
       ref.invalidate(fundProposalsProvider(_proposal.fundId));
+      if (alsoInvalidateFundData) {
+        ref.invalidate(fundDetailProvider(_proposal.fundId));
+        ref.invalidate(fundBalanceHistoryProvider);
+        ref.invalidate(fundCommissionHistoryProvider);
+      }
       if (!mounted) return;
       setState(() => _proposal = updated);
     } on FundApiException catch (e) {
@@ -117,6 +135,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   .read(fundApiServiceProvider)
                   .approveProposal(fundId, _proposal.id),
               l10n,
+              alsoInvalidateFundData: true,
             ),
             onReject: () => _act(
               () => ref
@@ -141,6 +160,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   .read(fundApiServiceProvider)
                   .executeProposal(fundId, _proposal.id),
               l10n,
+              alsoInvalidateFundData: true,
             ),
           ),
         ),
