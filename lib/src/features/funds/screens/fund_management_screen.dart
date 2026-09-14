@@ -102,7 +102,15 @@ class FundManagementScreen extends ConsumerWidget {
           fundAsync.maybeWhen(
             data: (fund) => fund.headUserId == currentUserId
                 ? IconButton(
-                    icon: Icon(Icons.delete_outline, color: palette.textBody),
+                    // Fixed red, not a palette field -- a destructive
+                    // action's color shouldn't vary by theme (2026-09-14
+                    // ask), same reasoning ThemeV2.loss is used as a flat
+                    // color everywhere else in the app rather than a
+                    // per-theme accent.
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: ThemeV2.loss,
+                    ),
                     onPressed: () => showFundBankruptcyFlow(
                       context,
                       ref,
