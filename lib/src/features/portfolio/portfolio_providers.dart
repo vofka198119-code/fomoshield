@@ -554,9 +554,15 @@ final portfolioPerformanceProvider =
       // live recompute, enough to flip the P&L sign on a small position
       // (confirmed on-device 2026-09-14: $112.20/-0.02% here vs $112.41/
       // +0.16% on Fund Detail for the same holding). Only listFunds()'s
-      // id/ticker mapping is used now; the actual price comes from a live
-      // getFundDetail() call per matched fund below, same "fetch it fresh"
-      // treatment every other holding's Finnhub quote already gets.
+      // id/ticker mapping is used now; the actual price comes from
+      // fundDetailProvider below via ref.watch (not a one-shot API call) --
+      // a plain fetch still drifted a cent or two from Fund Detail's own
+      // number (two independent live snapshots landing on either side of
+      // the ~20-min quote tick) and never picked up a trade's fresh NAV
+      // until this provider happened to re-run on its own. Watching the
+      // SAME provider instance Fund Detail/proposal-execute already
+      // invalidate means this one recomputes automatically right along
+      // with it -- one live number, shared everywhere, always current.
       var fundsByTicker = <String, Fund>{};
       var liveNavByTicker = <String, double>{};
       if (candidateFundSymbols.isNotEmpty) {
@@ -566,11 +572,10 @@ final portfolioPerformanceProvider =
             for (final f in funds)
               if (candidateFundSymbols.contains(f.ticker)) f.ticker: f,
           };
-          final fundApi = ref.read(fundApiServiceProvider);
           final liveDetails = await Future.wait(
             fundsByTicker.values.map((f) async {
               try {
-                return await fundApi.getFundDetail(f.id);
+                return await ref.watch(fundDetailProvider(f.id).future);
               } catch (_) {
                 return null;
               }
