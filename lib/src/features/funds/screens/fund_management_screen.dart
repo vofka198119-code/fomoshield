@@ -21,7 +21,7 @@ import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart';
 import '../widgets/fund_balance_card.dart';
 import '../widgets/fund_cash_widget.dart';
-import '../widgets/fund_delete_dialog.dart';
+import '../widgets/fund_bankruptcy_flow.dart';
 import '../widgets/fund_key_metrics_card.dart';
 import '../widgets/fund_management_holdings_card.dart';
 
@@ -103,8 +103,12 @@ class FundManagementScreen extends ConsumerWidget {
             data: (fund) => fund.headUserId == currentUserId
                 ? IconButton(
                     icon: Icon(Icons.delete_outline, color: palette.textBody),
-                    onPressed: () =>
-                        showFundDeleteFlow(context, ref, fund.id, palette),
+                    onPressed: () => showFundBankruptcyFlow(
+                      context,
+                      ref,
+                      fund.id,
+                      palette,
+                    ),
                   )
                 : const SizedBox.shrink(),
             orElse: () => const SizedBox.shrink(),

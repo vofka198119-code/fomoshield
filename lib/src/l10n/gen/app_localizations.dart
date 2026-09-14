@@ -11707,47 +11707,101 @@ abstract class AppLocalizations {
   /// **'No holdings yet'**
   String get etfFundDetailHoldingsEmpty;
 
-  /// No description provided for @etfFundDeleteConfirmTitle.
+  /// No description provided for @etfFundBankruptcyStep1Title.
   ///
   /// In en, this message translates to:
-  /// **'Delete this fund?'**
-  String get etfFundDeleteConfirmTitle;
+  /// **'Are you sure you want to start deleting your fund?'**
+  String get etfFundBankruptcyStep1Title;
 
-  /// No description provided for @etfFundDeleteConfirmBody.
-  ///
-  /// In en, this message translates to:
-  /// **'This starts the fund deletion process.'**
-  String get etfFundDeleteConfirmBody;
-
-  /// No description provided for @etfFundDeleteConfirmYes.
+  /// No description provided for @etfFundBankruptcyStep1Confirm.
   ///
   /// In en, this message translates to:
   /// **'Yes, continue'**
-  String get etfFundDeleteConfirmYes;
+  String get etfFundBankruptcyStep1Confirm;
 
-  /// No description provided for @etfFundDeleteFinalTitle.
+  /// No description provided for @etfFundBankruptcyExplanationTitle.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure?'**
-  String get etfFundDeleteFinalTitle;
+  /// **'Fund bankruptcy'**
+  String get etfFundBankruptcyExplanationTitle;
 
-  /// No description provided for @etfFundDeleteFinalBody.
+  /// No description provided for @etfFundBankruptcyExplanationBody.
   ///
   /// In en, this message translates to:
-  /// **'This permanently deletes the fund and all its data. This cannot be undone. You can create a new fund afterward.'**
-  String get etfFundDeleteFinalBody;
+  /// **'Deleting a fund means declaring it bankrupt. Every holding will be sold at market price. Each active employee will be paid 1% of what\'s left. The remaining cash goes to investors: if there\'s enough, each gets their investment back plus 5%; if not, they\'re paid proportionally to what they invested, minus the broker commission. Afterward the fund\'s balance is zeroed and the fund becomes inaccessible. Every participant will get a notification with their payout breakdown.'**
+  String get etfFundBankruptcyExplanationBody;
 
-  /// No description provided for @etfFundDeleteFinalConfirm.
+  /// No description provided for @etfFundBankruptcyHoldingsLabel.
   ///
   /// In en, this message translates to:
-  /// **'Delete fund'**
-  String get etfFundDeleteFinalConfirm;
+  /// **'Assets to sell'**
+  String get etfFundBankruptcyHoldingsLabel;
 
-  /// No description provided for @etfFundDeleteSuccess.
+  /// No description provided for @etfFundBankruptcyCommissionLabel.
   ///
   /// In en, this message translates to:
-  /// **'Fund deleted'**
-  String get etfFundDeleteSuccess;
+  /// **'Broker commission'**
+  String get etfFundBankruptcyCommissionLabel;
+
+  /// No description provided for @etfFundBankruptcyEmployeesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To employees ({count} × 1%)'**
+  String etfFundBankruptcyEmployeesLabel(int count);
+
+  /// No description provided for @etfFundBankruptcyInvestorsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To investors'**
+  String get etfFundBankruptcyInvestorsLabel;
+
+  /// No description provided for @etfFundBankruptcySolventNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully covered — everyone gets +5%'**
+  String get etfFundBankruptcySolventNote;
+
+  /// No description provided for @etfFundBankruptcyInsolventNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Not fully covered — paid proportionally'**
+  String get etfFundBankruptcyInsolventNote;
+
+  /// No description provided for @etfFundBankruptcyTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total payout'**
+  String get etfFundBankruptcyTotalLabel;
+
+  /// No description provided for @etfFundBankruptcyConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Start bankruptcy procedure'**
+  String get etfFundBankruptcyConfirmButton;
+
+  /// No description provided for @etfFundBankruptcyCancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get etfFundBankruptcyCancelButton;
+
+  /// No description provided for @etfFundBankruptcySuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund liquidated'**
+  String get etfFundBankruptcySuccessMessage;
+
+  /// No description provided for @etfFundBankruptcyErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to complete the bankruptcy procedure'**
+  String get etfFundBankruptcyErrorMessage;
+
+  /// No description provided for @etfFundBankruptcyPreviewErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the payout calculation'**
+  String get etfFundBankruptcyPreviewErrorMessage;
 
   /// No description provided for @etfCreateFundLimitReachedError.
   ///

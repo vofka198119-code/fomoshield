@@ -6879,27 +6879,60 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundDetailHoldingsEmpty => 'No holdings yet';
 
   @override
-  String get etfFundDeleteConfirmTitle => 'Delete this fund?';
+  String get etfFundBankruptcyStep1Title =>
+      'Are you sure you want to start deleting your fund?';
 
   @override
-  String get etfFundDeleteConfirmBody =>
-      'This starts the fund deletion process.';
+  String get etfFundBankruptcyStep1Confirm => 'Yes, continue';
 
   @override
-  String get etfFundDeleteConfirmYes => 'Yes, continue';
+  String get etfFundBankruptcyExplanationTitle => 'Fund bankruptcy';
 
   @override
-  String get etfFundDeleteFinalTitle => 'Are you sure?';
+  String get etfFundBankruptcyExplanationBody =>
+      'Deleting a fund means declaring it bankrupt. Every holding will be sold at market price. Each active employee will be paid 1% of what\'s left. The remaining cash goes to investors: if there\'s enough, each gets their investment back plus 5%; if not, they\'re paid proportionally to what they invested, minus the broker commission. Afterward the fund\'s balance is zeroed and the fund becomes inaccessible. Every participant will get a notification with their payout breakdown.';
 
   @override
-  String get etfFundDeleteFinalBody =>
-      'This permanently deletes the fund and all its data. This cannot be undone. You can create a new fund afterward.';
+  String get etfFundBankruptcyHoldingsLabel => 'Assets to sell';
 
   @override
-  String get etfFundDeleteFinalConfirm => 'Delete fund';
+  String get etfFundBankruptcyCommissionLabel => 'Broker commission';
 
   @override
-  String get etfFundDeleteSuccess => 'Fund deleted';
+  String etfFundBankruptcyEmployeesLabel(int count) {
+    return 'To employees ($count × 1%)';
+  }
+
+  @override
+  String get etfFundBankruptcyInvestorsLabel => 'To investors';
+
+  @override
+  String get etfFundBankruptcySolventNote =>
+      'Fully covered — everyone gets +5%';
+
+  @override
+  String get etfFundBankruptcyInsolventNote =>
+      'Not fully covered — paid proportionally';
+
+  @override
+  String get etfFundBankruptcyTotalLabel => 'Total payout';
+
+  @override
+  String get etfFundBankruptcyConfirmButton => 'Start bankruptcy procedure';
+
+  @override
+  String get etfFundBankruptcyCancelButton => 'Cancel';
+
+  @override
+  String get etfFundBankruptcySuccessMessage => 'Fund liquidated';
+
+  @override
+  String get etfFundBankruptcyErrorMessage =>
+      'Failed to complete the bankruptcy procedure';
+
+  @override
+  String get etfFundBankruptcyPreviewErrorMessage =>
+      'Failed to load the payout calculation';
 
   @override
   String get etfCreateFundLimitReachedError => 'You already have a fund';

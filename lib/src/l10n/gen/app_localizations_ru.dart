@@ -6903,26 +6903,59 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfFundDetailHoldingsEmpty => 'Пока нет активов';
 
   @override
-  String get etfFundDeleteConfirmTitle => 'Удалить этот фонд?';
+  String get etfFundBankruptcyStep1Title =>
+      'Вы действительно собираетесь активировать этап удаления вашего фонда?';
 
   @override
-  String get etfFundDeleteConfirmBody => 'Это запустит процесс удаления фонда.';
+  String get etfFundBankruptcyStep1Confirm => 'Да, продолжить';
 
   @override
-  String get etfFundDeleteConfirmYes => 'Да, продолжить';
+  String get etfFundBankruptcyExplanationTitle => 'Банкротство фонда';
 
   @override
-  String get etfFundDeleteFinalTitle => 'Вы уверены?';
+  String get etfFundBankruptcyExplanationBody =>
+      'Процесс удаления — это объявление о банкротстве фонда. Все активы будут проданы по рыночной цене. Каждому активному сотруднику выплатим 1% от остатка. Оставшиеся средства пойдут инвесторам: если хватает — каждый получит вложенное плюс 5%, если нет — пропорционально вкладу за вычетом брокерской комиссии. После расчётов счёт фонда обнулится, а сам фонд станет недоступен. Каждый участник получит уведомление с разбивкой выплаты.';
 
   @override
-  String get etfFundDeleteFinalBody =>
-      'Фонд и все его данные будут удалены навсегда. Это нельзя отменить. Позже вы сможете создать новый фонд.';
+  String get etfFundBankruptcyHoldingsLabel => 'Активы к продаже';
 
   @override
-  String get etfFundDeleteFinalConfirm => 'Удалить фонд';
+  String get etfFundBankruptcyCommissionLabel => 'Комиссия брокера';
 
   @override
-  String get etfFundDeleteSuccess => 'Фонд удалён';
+  String etfFundBankruptcyEmployeesLabel(int count) {
+    return 'Сотрудникам ($count × 1%)';
+  }
+
+  @override
+  String get etfFundBankruptcyInvestorsLabel => 'Инвесторам';
+
+  @override
+  String get etfFundBankruptcySolventNote => 'Хватает на всех — каждому +5%';
+
+  @override
+  String get etfFundBankruptcyInsolventNote =>
+      'Не хватает — пропорционально вкладу';
+
+  @override
+  String get etfFundBankruptcyTotalLabel => 'Итого к выплате';
+
+  @override
+  String get etfFundBankruptcyConfirmButton => 'Начать процедуру банкротства';
+
+  @override
+  String get etfFundBankruptcyCancelButton => 'Отменить';
+
+  @override
+  String get etfFundBankruptcySuccessMessage => 'Фонд ликвидирован';
+
+  @override
+  String get etfFundBankruptcyErrorMessage =>
+      'Не удалось выполнить процедуру банкротства';
+
+  @override
+  String get etfFundBankruptcyPreviewErrorMessage =>
+      'Не удалось загрузить расчёт выплат';
 
   @override
   String get etfCreateFundLimitReachedError => 'У вас уже есть фонд';

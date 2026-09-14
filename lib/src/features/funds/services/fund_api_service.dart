@@ -3,6 +3,7 @@ import '../../../core/utils/constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../models/fund.dart';
 import '../models/fund_balance_history.dart';
+import '../models/fund_bankruptcy_preview.dart';
 import '../models/fund_commission_history.dart';
 import '../models/fund_investor.dart';
 import '../models/fund_investor_flows.dart';
@@ -169,6 +170,42 @@ class FundApiService {
       await _dio.delete('/funds/$id');
     } on DioException catch (e) {
       throw Exception(_errorMessage(e, 'Failed to delete fund'));
+    }
+  }
+
+  /// The liquidation payout plan, computed but not written -- powers the
+  /// bankruptcy confirm flow's explanation sheet with real numbers.
+  Future<FundBankruptcyPreview> previewBankruptcy(String id) async {
+    try {
+      final response = await _dio.get('/funds/$id/bankruptcy-preview');
+      return FundBankruptcyPreview.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to preview liquidation'),
+        code: code,
+      );
+    }
+  }
+
+  /// Sells every holding, pays active employees + investors, marks the
+  /// fund 'bankrupt'. Real payouts land in a server-side ledger the
+  /// recipients' own clients claim on next load (no server write path to
+  /// a user's personal Portfolio cash) -- see
+  /// fomoshield_etf_bankruptcy_flow_spec memory.
+  Future<void> triggerBankruptcy(String id) async {
+    try {
+      await _dio.post('/funds/$id/bankruptcy');
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to liquidate fund'),
+        code: code,
+      );
     }
   }
 
