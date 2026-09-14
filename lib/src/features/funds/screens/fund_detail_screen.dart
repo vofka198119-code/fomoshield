@@ -167,6 +167,8 @@ class FundDetailScreen extends ConsumerWidget {
                           fundId: fund.id,
                           isHead: false,
                           palette: palette,
+                          headNickname: fund.headNickname,
+                          headUserId: fund.headUserId,
                         ),
                       ),
                       const SizedBox(height: 16),

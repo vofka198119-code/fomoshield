@@ -418,6 +418,23 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
     _syncToSupabase();
   }
 
+  /// Generic capital credit — bumps startingBalance directly, same "not a
+  /// Transaction" reasoning as [creditWeeklyPayout], but without touching
+  /// any payout-specific clock field. Used by the fund liquidation payout
+  /// catch-up (fund_liquidation_provider.dart) -- that flow tracks "have I
+  /// claimed payout X" server-side per payout id, not via a portfolio-side
+  /// clock, so it has nothing else on the portfolio to advance.
+  void creditCapital(String portfolioId, double amount) {
+    state = state.map((p) {
+      if (p.id == portfolioId) {
+        p.startingBalance += amount;
+      }
+      return p;
+    }).toList();
+    _saveLocal();
+    _syncToSupabase();
+  }
+
   /// Starts (or restarts) a portfolio's payout clock without crediting
   /// anything — called the first time a portfolio is seen as premium, so
   /// there's no retroactive credit for time before the user ever had

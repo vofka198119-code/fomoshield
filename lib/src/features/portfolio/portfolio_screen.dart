@@ -15,6 +15,7 @@ import '../../core/supabase/supabase_providers.dart';
 import 'portfolio_providers.dart';
 import 'portfolio_limits_provider.dart';
 import 'weekly_payout_provider.dart';
+import '../funds/providers/fund_liquidation_payout_provider.dart';
 import '../orders/pending_orders_checker.dart';
 import 'portfolio_widget_order_provider.dart';
 import 'widgets/portfolio_balance_widget.dart';

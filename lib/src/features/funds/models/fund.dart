@@ -114,6 +114,12 @@ class FundDetail extends Fund {
   final double investorCapital;
   final List<FundHolding> holdings;
   final List<FundNavPoint> navHistory;
+  // Not a fund_team_members row (the head has full authority on their own
+  // fund without needing one, see fundTradeService.js) -- resolved
+  // server-side so FundTeamCard can list the head as the roster's own
+  // first entry even before any employee is hired. Null if the head has
+  // never set a global nickname yet.
+  final String? headNickname;
 
   const FundDetail({
     required super.id,
@@ -134,6 +140,7 @@ class FundDetail extends Fund {
     required this.investorCapital,
     required this.holdings,
     required this.navHistory,
+    this.headNickname,
   });
 
   factory FundDetail.fromJson(Map<String, dynamic> json) {
@@ -161,6 +168,7 @@ class FundDetail extends Fund {
       navHistory: (json['navHistory'] as List<dynamic>? ?? const [])
           .map((e) => FundNavPoint.fromJson(e as Map<String, dynamic>))
           .toList(),
+      headNickname: json['headNickname'] as String?,
     );
   }
 }

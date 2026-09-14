@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_border.dart';
 import '../../../core/supabase/supabase_providers.dart'
     show myNicknameProvider, isAdminProvider, currentUserProvider;
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/widgets/admin_badge.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../providers/fund_providers.dart';
@@ -125,7 +125,7 @@ class EmployeeIdentityCard extends ConsumerWidget {
                       _PositionChip(label: positionLabel, palette: palette),
                       if (isAdmin) ...[
                         const SizedBox(width: 6),
-                        _AdminBadge(palette: palette, l10n: l10n),
+                        const AdminBadge(),
                       ],
                     ],
                   ),
@@ -133,37 +133,6 @@ class EmployeeIdentityCard extends ConsumerWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AdminBadge extends StatelessWidget {
-  final AppPalette palette;
-  final AppLocalizations l10n;
-
-  const _AdminBadge({required this.palette, required this.l10n});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: ThemeV2.loss.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: ThemeV2.loss, width: 1),
-      ),
-      child: Text(
-        l10n.etfAdminBadge,
-        // Same fontSize as the position chip it sits next to (10, matching
-        // PriceHeader's own sector-chip size) — was 9, a stray mismatch
-        // between two adjacent same-row pills.
-        style: GoogleFonts.inter(
-          fontSize: 10,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.6,
-          color: ThemeV2.loss,
         ),
       ),
     );

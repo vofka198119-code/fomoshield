@@ -67,7 +67,13 @@ class FundTeamScreen extends ConsumerWidget {
                   vertical: 20,
                 ),
                 children: [
-                  FundTeamCard(fundId: fund.id, isHead: isHead, palette: palette),
+                  FundTeamCard(
+                    fundId: fund.id,
+                    isHead: isHead,
+                    palette: palette,
+                    headNickname: fund.headNickname,
+                    headUserId: fund.headUserId,
+                  ),
                 ],
               ),
             );

@@ -7,7 +7,10 @@ import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
+import '../../../core/supabase/supabase_providers.dart'
+    show currentUserProvider, isAdminProvider;
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/widgets/admin_badge.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
@@ -39,12 +42,26 @@ class FundTeamCard extends ConsumerWidget {
   final String fundId;
   final bool isHead;
   final AppPalette palette;
+  // The head is never a fund_team_members row (see fundTradeService.js --
+  // full authority on their own fund without one), so the real roster
+  // list below never includes them. Shown as the card's own first,
+  // unremovable entry instead (2026-09-14 ask: "уже можно прописать
+  // владельца фонда"), even while the team is otherwise empty.
+  final String? headNickname;
+  // Distinct from [isHead], which callers can hardcode false to hide
+  // hire/fire actions (e.g. the public FundDetailScreen) regardless of who
+  // is actually looking -- the admin badge instead needs to know for real
+  // whether the CURRENT viewer is this fund's head, so it still shows on
+  // that same public screen when the head is looking at their own fund.
+  final String? headUserId;
 
   const FundTeamCard({
     super.key,
     required this.fundId,
     required this.isHead,
     required this.palette,
+    this.headNickname,
+    this.headUserId,
   });
 
   Future<void> _confirmTerminate(
@@ -103,6 +120,15 @@ class FundTeamCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final teamAsync = ref.watch(fundTeamProvider(fundId));
+    // "мой админ значок" (2026-09-14) -- same self-view-only precedent as
+    // EmployeeIdentityCard's own badge (there's no lookup yet for whether
+    // an ARBITRARY other user is the admin account, only the current
+    // session's own status), so this only ever lights up for the admin
+    // looking at a fund where they themselves are the head.
+    final viewerId = ref.watch(currentUserProvider)?.id;
+    final viewerIsAdmin = ref.watch(isAdminProvider);
+    final showHeadAdminBadge =
+        viewerIsAdmin && headUserId != null && viewerId == headUserId;
 
     return CardFrame(
       decoration: FomoShieldTheme.cardDecoration,
@@ -134,6 +160,12 @@ class FundTeamCard extends ConsumerWidget {
           const SizedBox(height: 4),
           themedDivider(palette, indent: 0, endIndent: 0),
           const SizedBox(height: 12),
+          _memberRow(
+            nickname: headNickname,
+            roleLabel: l10n.etfRoleHead,
+            roleColor: palette.textBody,
+            nameBadge: showHeadAdminBadge ? const AdminBadge() : null,
+          ),
           teamAsync.when(
             loading: () => const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
@@ -141,84 +173,94 @@ class FundTeamCard extends ConsumerWidget {
             ),
             error: (_, _) => const SizedBox.shrink(),
             data: (team) {
-              if (team.isEmpty) {
-                return Text(
-                  l10n.etfFundDetailEmployeesStub,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: palette.textBody,
-                  ),
-                );
-              }
+              if (team.isEmpty) return const SizedBox.shrink();
               return Column(
                 children: [
                   for (final member in team)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  member.nickname ?? '—',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: palette.textHeader,
-                                  ),
+                    _memberRow(
+                      nickname: member.nickname,
+                      roleLabel: member.isPendingTermination
+                          ? l10n.etfTeamMemberPendingTerminationLabel
+                          : _roleLabel(l10n, member.role),
+                      roleColor: member.isPendingTermination
+                          ? ThemeV2.loss
+                          : palette.textBody,
+                      trailing: !isHead
+                          ? null
+                          : member.isPendingTermination
+                          ? TextButton(
+                              onPressed: () => _cancelTermination(ref, member),
+                              child: Text(
+                                l10n.etfTeamMemberCancelTerminationButton,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: palette.accentPrimary,
                                 ),
-                                Text(
-                                  member.isPendingTermination
-                                      ? l10n
-                                          .etfTeamMemberPendingTerminationLabel
-                                      : _roleLabel(l10n, member.role),
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: member.isPendingTermination
-                                        ? ThemeV2.loss
-                                        : palette.textBody,
-                                  ),
+                              ),
+                            )
+                          : TextButton(
+                              onPressed: () =>
+                                  _confirmTerminate(context, ref, member),
+                              child: Text(
+                                l10n.etfTeamMemberTerminateButton,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: ThemeV2.loss,
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                          if (isHead)
-                            member.isPendingTermination
-                                ? TextButton(
-                                    onPressed: () =>
-                                        _cancelTermination(ref, member),
-                                    child: Text(
-                                      l10n
-                                          .etfTeamMemberCancelTerminationButton,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: palette.accentPrimary,
-                                      ),
-                                    ),
-                                  )
-                                : TextButton(
-                                    onPressed: () => _confirmTerminate(
-                                      context,
-                                      ref,
-                                      member,
-                                    ),
-                                    child: Text(
-                                      l10n.etfTeamMemberTerminateButton,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: ThemeV2.loss,
-                                      ),
-                                    ),
-                                  ),
-                        ],
-                      ),
                     ),
                 ],
               );
             },
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _memberRow({
+    required String? nickname,
+    required String roleLabel,
+    required Color roleColor,
+    Widget? nameBadge,
+    Widget? trailing,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        nickname ?? '—',
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: palette.textHeader,
+                        ),
+                      ),
+                    ),
+                    if (nameBadge != null) ...[
+                      const SizedBox(width: 6),
+                      nameBadge,
+                    ],
+                  ],
+                ),
+                Text(
+                  roleLabel,
+                  style: GoogleFonts.inter(fontSize: 12, color: roleColor),
+                ),
+              ],
+            ),
+          ),
+          ?trailing,
         ],
       ),
     );

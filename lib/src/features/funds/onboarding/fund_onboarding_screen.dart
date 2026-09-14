@@ -10,11 +10,17 @@ import '../../../l10n/gen/app_localizations.dart';
 import 'fund_onboarding_providers.dart';
 
 // ---------------------------------------------------------------------------
-// Fund Onboarding — one-time, 3-step tutorial shown before either ETF entry
-// point (fund head / analyst) is used for the first time. Design doc:
-// step 1 explains the concept, step 2 what's required, step 3 is the
-// simulator/disclaimer step ending in an explicit accept. Shown once per
-// branch (see fund_onboarding_providers.dart), never again after that.
+// Fund Onboarding — one-time, 7-step tutorial shown before either ETF entry
+// point (fund head / analyst) is used for the first time. Expanded from 3
+// steps to 7 (2026-09-14 ask: "углубленное описание... что есть в
+// функционале") to actually cover the feature set instead of just the
+// concept: 1) what a fund is, 2) what's required to create one, 3) team
+// roles, 4) how trade proposals/approval/execution work, 5) investors and
+// NAV, 6) the bankruptcy/liquidation risk (mirrors
+// fomoshield_etf_bankruptcy_flow_spec so a head/employee sees this before
+// ever touching the mechanic for real), 7) the simulator/disclaimer step
+// ending in an explicit accept. Shown once per branch (see
+// fund_onboarding_providers.dart), never again after that.
 // ---------------------------------------------------------------------------
 
 class FundOnboardingScreen extends ConsumerStatefulWidget {
@@ -31,7 +37,7 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
   final _pageController = PageController();
   int _page = 0;
 
-  static const _stepCount = 3;
+  static const _stepCount = 7;
 
   @override
   void dispose() {
@@ -67,9 +73,11 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
     Navigator.of(context).pop(true);
   }
 
-  // (title, body, button label) per step — button label is per-step/per-
-  // branch on purpose (e.g. head's step 2 says "Create Fund", analyst's
-  // says "Create Profile"), not a generic "Next", per the author's copy.
+  // (title, body, button label) per step. Steps 1-5 all use the generic
+  // "Continue" button -- only step 6 (the last purely-informational step,
+  // right before the disclaimer) gets the per-branch aspirational label
+  // ("Create Fund"/"Create Profile"), and step 7 (disclaimer) always ends
+  // on the explicit accept button.
   List<(String, String, String)> _steps(AppLocalizations l10n) {
     final isHead = widget.branch == FundOnboardingBranch.head;
     return [
@@ -88,16 +96,60 @@ class _FundOnboardingScreenState extends ConsumerState<FundOnboardingScreen> {
           ? (
               l10n.etfOnboardingStep2TitleHead,
               l10n.etfOnboardingStep2BodyHead,
-              l10n.etfOnboardingStep2ButtonHead,
+              l10n.etfOnboardingContinueButton,
             )
           : (
               l10n.etfOnboardingStep2TitleAnalyst,
               l10n.etfOnboardingStep2BodyAnalyst,
+              l10n.etfOnboardingContinueButton,
+            ),
+      isHead
+          ? (
+              l10n.etfOnboardingStep3TitleHead,
+              l10n.etfOnboardingStep3BodyHead,
+              l10n.etfOnboardingContinueButton,
+            )
+          : (
+              l10n.etfOnboardingStep3TitleAnalyst,
+              l10n.etfOnboardingStep3BodyAnalyst,
+              l10n.etfOnboardingContinueButton,
+            ),
+      isHead
+          ? (
+              l10n.etfOnboardingStep4TitleHead,
+              l10n.etfOnboardingStep4BodyHead,
+              l10n.etfOnboardingContinueButton,
+            )
+          : (
+              l10n.etfOnboardingStep4TitleAnalyst,
+              l10n.etfOnboardingStep4BodyAnalyst,
+              l10n.etfOnboardingContinueButton,
+            ),
+      isHead
+          ? (
+              l10n.etfOnboardingStep5TitleHead,
+              l10n.etfOnboardingStep5BodyHead,
+              l10n.etfOnboardingContinueButton,
+            )
+          : (
+              l10n.etfOnboardingStep5TitleAnalyst,
+              l10n.etfOnboardingStep5BodyAnalyst,
+              l10n.etfOnboardingContinueButton,
+            ),
+      isHead
+          ? (
+              l10n.etfOnboardingStep6TitleHead,
+              l10n.etfOnboardingStep6BodyHead,
+              l10n.etfOnboardingStep2ButtonHead,
+            )
+          : (
+              l10n.etfOnboardingStep6TitleAnalyst,
+              l10n.etfOnboardingStep6BodyAnalyst,
               l10n.etfOnboardingStep2ButtonAnalyst,
             ),
       (
-        l10n.etfOnboardingStep3Title,
-        l10n.etfOnboardingStep3Body,
+        l10n.etfOnboardingStep7Title,
+        l10n.etfOnboardingStep7Body,
         l10n.etfOnboardingAccept,
       ),
     ];

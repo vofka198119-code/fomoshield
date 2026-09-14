@@ -11452,8 +11452,56 @@ abstract class AppLocalizations {
   /// No description provided for @etfOnboardingStep2BodyHead.
   ///
   /// In en, this message translates to:
-  /// **'Opening your own fund requires a Premium subscription.\n\nDuring setup, you\'ll create your fund\'s profile: name, logo, description, strategy, and team.\n\nYour fund starts with \$150,000 in virtual capital. These funds are used exclusively inside the simulator and become your fund\'s starting capital.\n\nCreate your fund. Build your team. See how far your decisions can take you.'**
+  /// **'Opening your own fund requires a Premium subscription.\n\nDuring setup, you\'ll create your fund\'s profile: name, logo, description, strategy, and team.\n\nYour fund starts with \$150,000 in virtual capital. These funds are used exclusively inside the simulator and become your fund\'s starting capital.'**
   String get etfOnboardingStep2BodyHead;
+
+  /// No description provided for @etfOnboardingStep3TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s On a Fund\'s Team?'**
+  String get etfOnboardingStep3TitleHead;
+
+  /// No description provided for @etfOnboardingStep3BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund is rarely run alone — you can hire a team, each with their own role.\n\nAn Analyst proposes trades: which assets to buy or sell, and why.\n\nA Trader sends approved trades to market — without one, an approved order executes automatically instead.\n\nA Risk Manager flags trades as risky — a signal to the team, though the final call always stays with you or a Co-Manager.\n\nA Co-Manager shares your right to approve or reject trades.\n\nYou decide who to hire and what permissions to give them.'**
+  String get etfOnboardingStep3BodyHead;
+
+  /// No description provided for @etfOnboardingStep4TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'How Are Trade Decisions Made?'**
+  String get etfOnboardingStep4TitleHead;
+
+  /// No description provided for @etfOnboardingStep4BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Every trade in a fund follows a clear path.\n\nAn employee with the right permissions proposes a trade: ticker, direction, order type, and reasoning.\n\nYou or your Co-Manager approve it, reject it, or send it back for rework. If the fund has a Trader, they execute the approved order; without one, it executes immediately on approval.\n\nEvery trade carries a 0.5% broker commission, same as a personal portfolio.\n\nThis keeps the fund\'s trading transparent: who proposed it, who approved it, and why.'**
+  String get etfOnboardingStep4BodyHead;
+
+  /// No description provided for @etfOnboardingStep5TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Where Does Investor Money Come From?'**
+  String get etfOnboardingStep5TitleHead;
+
+  /// No description provided for @etfOnboardingStep5BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Other users can invest in your fund by buying its units — the same way they\'d buy shares of a real company.\n\nThe unit price (NAV) is computed automatically: the fund\'s assets plus cash, divided by units outstanding. As the fund\'s assets grow in value, so does NAV — and every unit holder\'s return along with it.\n\nAn investor can redeem their units at any time and get paid out at the current price.\n\nAs manager, your job is to trade in a way that grows NAV — investor trust and the fund\'s reputation depend on it.'**
+  String get etfOnboardingStep5BodyHead;
+
+  /// No description provided for @etfOnboardingStep6TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'What Happens If the Fund Fails?'**
+  String get etfOnboardingStep6TitleHead;
+
+  /// No description provided for @etfOnboardingStep6BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Running a fund is a responsibility, not just an opportunity.\n\nIf you decide to close the fund, a bankruptcy procedure kicks in: every holding is sold at market price, and each active employee is paid 1% of what\'s left.\n\nWhatever remains goes to investors: if there\'s enough, everyone gets their investment back plus 5%; if not, they\'re paid proportionally to what they invested, minus the broker commission.\n\nOnce settled, the fund closes for good — its ticker and history remain, but it can no longer be managed.\n\nCreate your fund. Build your team. See how far your decisions can take you.'**
+  String get etfOnboardingStep6BodyHead;
 
   /// No description provided for @etfOnboardingStep1TitleAnalyst.
   ///
@@ -11476,20 +11524,68 @@ abstract class AppLocalizations {
   /// No description provided for @etfOnboardingStep2BodyAnalyst.
   ///
   /// In en, this message translates to:
-  /// **'Working as an employee doesn\'t require Premium.\n\nFirst, create your professional profile: choose a role, list your skills and experience, and add some information about yourself.\n\nOnce that\'s done, you can list your profile on the jobs marketplace and wait for invitations from funds.\n\nOr join directly — if a friend who manages a fund invites you.\n\nFind your role. Join a team. Help shape a fund\'s decisions.'**
+  /// **'Working as an employee doesn\'t require Premium.\n\nFirst, create your professional profile: choose a role, list your skills and experience, and add some information about yourself.\n\nOnce that\'s done, you can list your profile on the jobs marketplace and wait for invitations from funds.\n\nOr join directly — if a friend who manages a fund invites you.'**
   String get etfOnboardingStep2BodyAnalyst;
 
-  /// No description provided for @etfOnboardingStep3Title.
+  /// No description provided for @etfOnboardingStep3TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Which Role Should You Pick?'**
+  String get etfOnboardingStep3TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep3BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Each role on a fund\'s team has its own area of responsibility.\n\nAn Analyst researches companies and proposes trades — buy or sell an asset, and why.\n\nA Trader sends approved trades to the exchange — the final \"execute\" tap.\n\nA Risk Manager assesses trades for risk and can flag them for the team.\n\nA Co-Manager helps the fund\'s head approve or reject proposals.\n\nPick the role that fits you, and become part of the fund\'s decisions.'**
+  String get etfOnboardingStep3BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep4TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'What Will You Be Able to Do?'**
+  String get etfOnboardingStep4TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep4BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'If you have permission to propose trades, you\'ll enter a ticker, direction, order type, and reasoning — why it\'s worth buying or selling.\n\nThe fund\'s head or Co-Manager reviews it: approves, rejects, or sends it back for rework.\n\nIf you\'re the Trader, you\'re the one who taps the final execute button on approved trades.\n\nEvery trade you make is visible in the fund\'s history — a real record of your contribution to the team\'s result.'**
+  String get etfOnboardingStep4BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep5TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Whose Money Does the Fund Trade With?'**
+  String get etfOnboardingStep5TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep5BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund\'s capital isn\'t just the head\'s money — it\'s also investor capital from people who bought the fund\'s units.\n\nThe unit price (NAV) is computed automatically from the fund\'s assets and cash — the team\'s trades decide whether it grows.\n\nInvestors trust the team with their virtual capital, expecting the fund\'s decisions to pay off.\n\nThe better the team trades, the better the result for everyone, including you.'**
+  String get etfOnboardingStep5BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep6TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'What Happens If the Fund Closes?'**
+  String get etfOnboardingStep6TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep6BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund can close — its head can start the bankruptcy procedure at any time.\n\nIn a bankruptcy, every holding is sold at market price, and each active employee is paid 1% of what\'s left in the fund — including you, if you\'re still on the team.\n\nAfter that, the fund closes for good, and you\'ll need to find another team or start your own fund.\n\nFind your role. Join a team. Help shape a fund\'s decisions.'**
+  String get etfOnboardingStep6BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep7Title.
   ///
   /// In en, this message translates to:
   /// **'This Is a Simulator'**
-  String get etfOnboardingStep3Title;
+  String get etfOnboardingStep7Title;
 
-  /// No description provided for @etfOnboardingStep3Body.
+  /// No description provided for @etfOnboardingStep7Body.
   ///
   /// In en, this message translates to:
   /// **'FOMO Shield is a fund-management simulator.\n\nAll money, assets, trades, and results inside funds are virtual and have no real monetary value. They cannot be withdrawn, exchanged, or used outside the app.\n\nWhen there aren\'t enough real participants, or to keep the simulation liquid, the system may use synthetic investors. Their actions are generated by the system and are not the actions of real users.\n\nNo statistic, return, rating, or simulation result is financial advice, a guarantee of income, or a promise of future results.'**
-  String get etfOnboardingStep3Body;
+  String get etfOnboardingStep7Body;
 
   /// No description provided for @etfOnboardingContinueButton.
   ///
@@ -11803,6 +11899,90 @@ abstract class AppLocalizations {
   /// **'Failed to load the payout calculation'**
   String get etfFundBankruptcyPreviewErrorMessage;
 
+  /// No description provided for @fundLiquidationNotifTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund bankruptcy settlement'**
+  String get fundLiquidationNotifTitle;
+
+  /// No description provided for @fundLiquidationNotifDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{fundName}\" declared bankruptcy. You were credited {amount}.'**
+  String fundLiquidationNotifDetail(String fundName, String amount);
+
+  /// No description provided for @fundLiquidationDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund settlement'**
+  String get fundLiquidationDetailTitle;
+
+  /// No description provided for @fundLiquidationDetailAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Credited'**
+  String get fundLiquidationDetailAmountLabel;
+
+  /// No description provided for @fundLiquidationDetailFundLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund'**
+  String get fundLiquidationDetailFundLabel;
+
+  /// No description provided for @fundLiquidationDetailReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get fundLiquidationDetailReasonLabel;
+
+  /// No description provided for @fundLiquidationDetailReasonValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund bankruptcy'**
+  String get fundLiquidationDetailReasonValue;
+
+  /// No description provided for @fundLiquidationDetailUnitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Units sold'**
+  String get fundLiquidationDetailUnitsLabel;
+
+  /// No description provided for @fundLiquidationDetailAssetsSoldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets'**
+  String get fundLiquidationDetailAssetsSoldLabel;
+
+  /// No description provided for @fundLiquidationDetailSoldAtMarketValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold at market price'**
+  String get fundLiquidationDetailSoldAtMarketValue;
+
+  /// No description provided for @fundLiquidationDetailCommissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Broker commission'**
+  String get fundLiquidationDetailCommissionLabel;
+
+  /// No description provided for @fundLiquidationDetailNeustoikaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Early-exit bonus (+5%)'**
+  String get fundLiquidationDetailNeustoikaLabel;
+
+  /// No description provided for @fundLiquidationDetailRecipientEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee payout'**
+  String get fundLiquidationDetailRecipientEmployee;
+
+  /// No description provided for @fundLiquidationDetailRecipientInvestor.
+  ///
+  /// In en, this message translates to:
+  /// **'Investor payout'**
+  String get fundLiquidationDetailRecipientInvestor;
+
   /// No description provided for @etfCreateFundLimitReachedError.
   ///
   /// In en, this message translates to:
@@ -11863,17 +12043,17 @@ abstract class AppLocalizations {
   /// **'Team'**
   String get etfFundDetailEmployeesLabel;
 
-  /// No description provided for @etfFundDetailEmployeesStub.
-  ///
-  /// In en, this message translates to:
-  /// **'No team members yet'**
-  String get etfFundDetailEmployeesStub;
-
   /// No description provided for @etfFundDetailHireButton.
   ///
   /// In en, this message translates to:
   /// **'Hire'**
   String get etfFundDetailHireButton;
+
+  /// No description provided for @etfRoleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund Head'**
+  String get etfRoleHead;
 
   /// No description provided for @etfRoleAnalyst.
   ///

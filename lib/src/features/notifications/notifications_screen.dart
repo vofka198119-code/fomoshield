@@ -61,6 +61,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       context.push('/notifications/weekly-payout-detail', extra: n);
       return;
     }
+    if (n.type == AppNotificationType.fundLiquidation) {
+      context.push('/notifications/fund-liquidation-detail', extra: n);
+      return;
+    }
     if (n.type == AppNotificationType.subscriptionStatusChanged) {
       context.go('/profile');
       return;
@@ -286,6 +290,8 @@ class _NotificationRow extends StatelessWidget {
         return Icons.pause_circle_rounded;
       case AppNotificationType.subscriptionStatusChanged:
         return Icons.workspace_premium_rounded;
+      case AppNotificationType.fundLiquidation:
+        return Icons.account_balance_rounded;
     }
   }
 

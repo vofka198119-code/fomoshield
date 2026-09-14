@@ -17,6 +17,7 @@ import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
 import '../../features/notifications/weekly_payout_detail_screen.dart';
+import '../../features/notifications/fund_liquidation_detail_screen.dart';
 import '../models/app_notification.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/search/top_companies_provider.dart';
@@ -254,6 +255,13 @@ class AppRouter {
         path: '/notifications/weekly-payout-detail',
         name: 'weeklyPayoutDetail',
         builder: (context, state) => WeeklyPayoutDetailScreen(
+          notification: state.extra as AppNotification?,
+        ),
+      ),
+      GoRoute(
+        path: '/notifications/fund-liquidation-detail',
+        name: 'fundLiquidationDetail',
+        builder: (context, state) => FundLiquidationDetailScreen(
           notification: state.extra as AppNotification?,
         ),
       ),

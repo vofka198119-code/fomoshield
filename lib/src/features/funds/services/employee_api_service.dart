@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../core/utils/constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../models/employee.dart';
+import '../models/fund_liquidation_payout.dart';
 import 'fund_api_service.dart' show FundApiException;
 
 // ---------------------------------------------------------------------------
@@ -227,4 +228,51 @@ class EmployeeApiService {
       throw _apiException(e, 'Failed to cancel termination');
     }
   }
+
+  /// Every bankruptcy settlement the caller hasn't claimed yet, across
+  /// every fund -- see fund_liquidation_payout_provider.dart's catch-up.
+  Future<List<FundLiquidationPayout>> getMyLiquidationPayouts() async {
+    try {
+      final response = await _dio.get('/employees/me/liquidation-payouts');
+      final list = ((response.data as Map)['payouts'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(FundLiquidationPayout.fromJson).toList();
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to load liquidation payouts'));
+    }
+  }
+
+  /// Claims a payout server-side FIRST (idempotent -- claiming an
+  /// already-claimed id just 400s) and returns the confirmed row, so the
+  /// caller credits its local balance only from data it knows the server
+  /// has already marked as claimed. Deliberately NOT "credit locally then
+  /// claim" -- a claim call failing after a local credit would re-offer
+  /// the same payout next check-in and double-credit it (same class of
+  /// bug as [[fomoshield_weekly_payout_double_credit_fix]]).
+  Future<FundLiquidationPayout> claimLiquidationPayout(String payoutId) async {
+    try {
+      final response = await _dio.post(
+        '/employees/me/liquidation-payouts/$payoutId/claim',
+      );
+      return FundLiquidationPayout.fromJson(
+        _shapeClaimedPayout(response.data as Map<String, dynamic>),
+      );
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to claim payout');
+    }
+  }
+
+  /// The claim endpoint returns the raw DB row (snake_case: fund_id,
+  /// recipient_type, created_at), not the camelCase shape
+  /// getMyLiquidationPayouts()/FundLiquidationPayout.fromJson expect --
+  /// normalizes it rather than adding a second fromJson variant for one
+  /// call site.
+  Map<String, dynamic> _shapeClaimedPayout(Map<String, dynamic> row) => {
+    'id': row['id'],
+    'fundId': row['fund_id'],
+    'recipientType': row['recipient_type'],
+    'amount': row['amount'],
+    'details': row['details'],
+    'createdAt': row['created_at'],
+  };
 }

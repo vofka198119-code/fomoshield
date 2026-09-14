@@ -6736,7 +6736,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfOnboardingStep2BodyHead =>
-      'Opening your own fund requires a Premium subscription.\n\nDuring setup, you\'ll create your fund\'s profile: name, logo, description, strategy, and team.\n\nYour fund starts with \$150,000 in virtual capital. These funds are used exclusively inside the simulator and become your fund\'s starting capital.\n\nCreate your fund. Build your team. See how far your decisions can take you.';
+      'Opening your own fund requires a Premium subscription.\n\nDuring setup, you\'ll create your fund\'s profile: name, logo, description, strategy, and team.\n\nYour fund starts with \$150,000 in virtual capital. These funds are used exclusively inside the simulator and become your fund\'s starting capital.';
+
+  @override
+  String get etfOnboardingStep3TitleHead => 'Who\'s On a Fund\'s Team?';
+
+  @override
+  String get etfOnboardingStep3BodyHead =>
+      'A fund is rarely run alone — you can hire a team, each with their own role.\n\nAn Analyst proposes trades: which assets to buy or sell, and why.\n\nA Trader sends approved trades to market — without one, an approved order executes automatically instead.\n\nA Risk Manager flags trades as risky — a signal to the team, though the final call always stays with you or a Co-Manager.\n\nA Co-Manager shares your right to approve or reject trades.\n\nYou decide who to hire and what permissions to give them.';
+
+  @override
+  String get etfOnboardingStep4TitleHead => 'How Are Trade Decisions Made?';
+
+  @override
+  String get etfOnboardingStep4BodyHead =>
+      'Every trade in a fund follows a clear path.\n\nAn employee with the right permissions proposes a trade: ticker, direction, order type, and reasoning.\n\nYou or your Co-Manager approve it, reject it, or send it back for rework. If the fund has a Trader, they execute the approved order; without one, it executes immediately on approval.\n\nEvery trade carries a 0.5% broker commission, same as a personal portfolio.\n\nThis keeps the fund\'s trading transparent: who proposed it, who approved it, and why.';
+
+  @override
+  String get etfOnboardingStep5TitleHead =>
+      'Where Does Investor Money Come From?';
+
+  @override
+  String get etfOnboardingStep5BodyHead =>
+      'Other users can invest in your fund by buying its units — the same way they\'d buy shares of a real company.\n\nThe unit price (NAV) is computed automatically: the fund\'s assets plus cash, divided by units outstanding. As the fund\'s assets grow in value, so does NAV — and every unit holder\'s return along with it.\n\nAn investor can redeem their units at any time and get paid out at the current price.\n\nAs manager, your job is to trade in a way that grows NAV — investor trust and the fund\'s reputation depend on it.';
+
+  @override
+  String get etfOnboardingStep6TitleHead => 'What Happens If the Fund Fails?';
+
+  @override
+  String get etfOnboardingStep6BodyHead =>
+      'Running a fund is a responsibility, not just an opportunity.\n\nIf you decide to close the fund, a bankruptcy procedure kicks in: every holding is sold at market price, and each active employee is paid 1% of what\'s left.\n\nWhatever remains goes to investors: if there\'s enough, everyone gets their investment back plus 5%; if not, they\'re paid proportionally to what they invested, minus the broker commission.\n\nOnce settled, the fund closes for good — its ticker and history remain, but it can no longer be managed.\n\nCreate your fund. Build your team. See how far your decisions can take you.';
 
   @override
   String get etfOnboardingStep1TitleAnalyst => 'Who Is a Fund Employee?';
@@ -6750,13 +6779,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfOnboardingStep2BodyAnalyst =>
-      'Working as an employee doesn\'t require Premium.\n\nFirst, create your professional profile: choose a role, list your skills and experience, and add some information about yourself.\n\nOnce that\'s done, you can list your profile on the jobs marketplace and wait for invitations from funds.\n\nOr join directly — if a friend who manages a fund invites you.\n\nFind your role. Join a team. Help shape a fund\'s decisions.';
+      'Working as an employee doesn\'t require Premium.\n\nFirst, create your professional profile: choose a role, list your skills and experience, and add some information about yourself.\n\nOnce that\'s done, you can list your profile on the jobs marketplace and wait for invitations from funds.\n\nOr join directly — if a friend who manages a fund invites you.';
 
   @override
-  String get etfOnboardingStep3Title => 'This Is a Simulator';
+  String get etfOnboardingStep3TitleAnalyst => 'Which Role Should You Pick?';
 
   @override
-  String get etfOnboardingStep3Body =>
+  String get etfOnboardingStep3BodyAnalyst =>
+      'Each role on a fund\'s team has its own area of responsibility.\n\nAn Analyst researches companies and proposes trades — buy or sell an asset, and why.\n\nA Trader sends approved trades to the exchange — the final \"execute\" tap.\n\nA Risk Manager assesses trades for risk and can flag them for the team.\n\nA Co-Manager helps the fund\'s head approve or reject proposals.\n\nPick the role that fits you, and become part of the fund\'s decisions.';
+
+  @override
+  String get etfOnboardingStep4TitleAnalyst => 'What Will You Be Able to Do?';
+
+  @override
+  String get etfOnboardingStep4BodyAnalyst =>
+      'If you have permission to propose trades, you\'ll enter a ticker, direction, order type, and reasoning — why it\'s worth buying or selling.\n\nThe fund\'s head or Co-Manager reviews it: approves, rejects, or sends it back for rework.\n\nIf you\'re the Trader, you\'re the one who taps the final execute button on approved trades.\n\nEvery trade you make is visible in the fund\'s history — a real record of your contribution to the team\'s result.';
+
+  @override
+  String get etfOnboardingStep5TitleAnalyst =>
+      'Whose Money Does the Fund Trade With?';
+
+  @override
+  String get etfOnboardingStep5BodyAnalyst =>
+      'A fund\'s capital isn\'t just the head\'s money — it\'s also investor capital from people who bought the fund\'s units.\n\nThe unit price (NAV) is computed automatically from the fund\'s assets and cash — the team\'s trades decide whether it grows.\n\nInvestors trust the team with their virtual capital, expecting the fund\'s decisions to pay off.\n\nThe better the team trades, the better the result for everyone, including you.';
+
+  @override
+  String get etfOnboardingStep6TitleAnalyst =>
+      'What Happens If the Fund Closes?';
+
+  @override
+  String get etfOnboardingStep6BodyAnalyst =>
+      'A fund can close — its head can start the bankruptcy procedure at any time.\n\nIn a bankruptcy, every holding is sold at market price, and each active employee is paid 1% of what\'s left in the fund — including you, if you\'re still on the team.\n\nAfter that, the fund closes for good, and you\'ll need to find another team or start your own fund.\n\nFind your role. Join a team. Help shape a fund\'s decisions.';
+
+  @override
+  String get etfOnboardingStep7Title => 'This Is a Simulator';
+
+  @override
+  String get etfOnboardingStep7Body =>
       'FOMO Shield is a fund-management simulator.\n\nAll money, assets, trades, and results inside funds are virtual and have no real monetary value. They cannot be withdrawn, exchanged, or used outside the app.\n\nWhen there aren\'t enough real participants, or to keep the simulation liquid, the system may use synthetic investors. Their actions are generated by the system and are not the actions of real users.\n\nNo statistic, return, rating, or simulation result is financial advice, a guarantee of income, or a promise of future results.';
 
   @override
@@ -6935,6 +6994,50 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to load the payout calculation';
 
   @override
+  String get fundLiquidationNotifTitle => 'Fund bankruptcy settlement';
+
+  @override
+  String fundLiquidationNotifDetail(String fundName, String amount) {
+    return '\"$fundName\" declared bankruptcy. You were credited $amount.';
+  }
+
+  @override
+  String get fundLiquidationDetailTitle => 'Fund settlement';
+
+  @override
+  String get fundLiquidationDetailAmountLabel => 'Credited';
+
+  @override
+  String get fundLiquidationDetailFundLabel => 'Fund';
+
+  @override
+  String get fundLiquidationDetailReasonLabel => 'Reason';
+
+  @override
+  String get fundLiquidationDetailReasonValue => 'Fund bankruptcy';
+
+  @override
+  String get fundLiquidationDetailUnitsLabel => 'Units sold';
+
+  @override
+  String get fundLiquidationDetailAssetsSoldLabel => 'Assets';
+
+  @override
+  String get fundLiquidationDetailSoldAtMarketValue => 'Sold at market price';
+
+  @override
+  String get fundLiquidationDetailCommissionLabel => 'Broker commission';
+
+  @override
+  String get fundLiquidationDetailNeustoikaLabel => 'Early-exit bonus (+5%)';
+
+  @override
+  String get fundLiquidationDetailRecipientEmployee => 'Employee payout';
+
+  @override
+  String get fundLiquidationDetailRecipientInvestor => 'Investor payout';
+
+  @override
   String get etfCreateFundLimitReachedError => 'You already have a fund';
 
   @override
@@ -6965,10 +7068,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundDetailEmployeesLabel => 'Team';
 
   @override
-  String get etfFundDetailEmployeesStub => 'No team members yet';
+  String get etfFundDetailHireButton => 'Hire';
 
   @override
-  String get etfFundDetailHireButton => 'Hire';
+  String get etfRoleHead => 'Fund Head';
 
   @override
   String get etfRoleAnalyst => 'Analyst';
