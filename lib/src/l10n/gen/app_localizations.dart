@@ -10987,6 +10987,18 @@ abstract class AppLocalizations {
   /// **'No trade proposals yet'**
   String get etfBlotterEmptyText;
 
+  /// No description provided for @etfBlotterEmptyFilteredText.
+  ///
+  /// In en, this message translates to:
+  /// **'No proposals match this filter'**
+  String get etfBlotterEmptyFilteredText;
+
+  /// No description provided for @etfBlotterFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get etfBlotterFilterAll;
+
   /// No description provided for @etfInvestorsShortcutLabel.
   ///
   /// In en, this message translates to:
@@ -11065,6 +11077,18 @@ abstract class AppLocalizations {
   /// **'Charts'**
   String get etfChartsShortcutLabel;
 
+  /// No description provided for @etfTradingShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Trading'**
+  String get etfTradingShortcutLabel;
+
+  /// No description provided for @etfRulebookShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules'**
+  String get etfRulebookShortcutLabel;
+
   /// No description provided for @etfChartsScreenTitle.
   ///
   /// In en, this message translates to:
@@ -11125,42 +11149,6 @@ abstract class AppLocalizations {
   /// **'Invested'**
   String get etfCashVsInvestedInvestedLabel;
 
-  /// No description provided for @etfProposeTradeButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Propose a trade'**
-  String get etfProposeTradeButton;
-
-  /// No description provided for @etfProposeTradeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Propose a trade'**
-  String get etfProposeTradeTitle;
-
-  /// No description provided for @etfProposeSymbolLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Symbol'**
-  String get etfProposeSymbolLabel;
-
-  /// No description provided for @etfProposeSymbolHint.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g. AAPL'**
-  String get etfProposeSymbolHint;
-
-  /// No description provided for @etfProposeSideLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Side'**
-  String get etfProposeSideLabel;
-
-  /// No description provided for @etfProposeOrderTypeLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Order type'**
-  String get etfProposeOrderTypeLabel;
-
   /// No description provided for @etfProposeOrderTypeMarket.
   ///
   /// In en, this message translates to:
@@ -11172,18 +11160,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Limit'**
   String get etfProposeOrderTypeLimit;
-
-  /// No description provided for @etfProposeQuantityLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Quantity (shares)'**
-  String get etfProposeQuantityLabel;
-
-  /// No description provided for @etfProposeLimitPriceLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Limit price'**
-  String get etfProposeLimitPriceLabel;
 
   /// No description provided for @etfProposeJustificationLabel.
   ///
@@ -11203,29 +11179,11 @@ abstract class AppLocalizations {
   /// **'Submit proposal'**
   String get etfProposeSubmitButton;
 
-  /// No description provided for @etfProposeSymbolRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Symbol is required'**
-  String get etfProposeSymbolRequired;
-
-  /// No description provided for @etfProposeQuantityRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a valid quantity'**
-  String get etfProposeQuantityRequired;
-
   /// No description provided for @etfProposeLimitPriceRequired.
   ///
   /// In en, this message translates to:
   /// **'Enter a valid limit price'**
   String get etfProposeLimitPriceRequired;
-
-  /// No description provided for @etfProposeSuccessSnackbar.
-  ///
-  /// In en, this message translates to:
-  /// **'Proposal submitted'**
-  String get etfProposeSuccessSnackbar;
 
   /// No description provided for @etfProposeGenericError.
   ///
@@ -11365,6 +11323,18 @@ abstract class AppLocalizations {
   /// **'Order placement price'**
   String get etfProposalPlacementPriceLabel;
 
+  /// No description provided for @etfProposalEstimatedPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current price (estimate)'**
+  String get etfProposalEstimatedPriceLabel;
+
+  /// No description provided for @etfProposalEstimatedCommissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission (estimate)'**
+  String get etfProposalEstimatedCommissionLabel;
+
   /// No description provided for @etfProposalExecutionPriceLabel.
   ///
   /// In en, this message translates to:
@@ -11376,12 +11346,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Proposed by'**
   String get etfProposalProposedByLabel;
-
-  /// No description provided for @etfProposeAvailableLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Available: {value}'**
-  String etfProposeAvailableLabel(String value);
 
   /// No description provided for @etfFundBalanceTitle.
   ///
@@ -11586,6 +11550,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'FOMO Shield is a fund-management simulator.\n\nAll money, assets, trades, and results inside funds are virtual and have no real monetary value. They cannot be withdrawn, exchanged, or used outside the app.\n\nWhen there aren\'t enough real participants, or to keep the simulation liquid, the system may use synthetic investors. Their actions are generated by the system and are not the actions of real users.\n\nNo statistic, return, rating, or simulation result is financial advice, a guarantee of income, or a promise of future results.'**
   String get etfOnboardingStep7Body;
+
+  /// No description provided for @etfRulebookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How Funds Work'**
+  String get etfRulebookTitle;
+
+  /// No description provided for @etfRulebookSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A quick reference for FOMO Shield\'s fund simulator — open it any time.'**
+  String get etfRulebookSubtitle;
+
+  /// No description provided for @etfRulebookFundSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'What is a fund'**
+  String get etfRulebookFundSectionHeader;
+
+  /// No description provided for @etfRulebookFundSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund is a simulated investment vehicle run by a head (its creator) and, optionally, a hired team. It starts with \$150,000 in virtual capital. Other users can invest in it by buying its units, and the fund\'s team decides which assets to buy and sell.'**
+  String get etfRulebookFundSectionBody;
+
+  /// No description provided for @etfRulebookRolesSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Team roles'**
+  String get etfRulebookRolesSectionHeader;
+
+  /// No description provided for @etfRulebookRolesSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Head — owns the fund, with full authority to approve or reject trades and manage the team.\n\nCo-head — shares the head\'s right to approve or reject trade proposals.\n\nAnalyst — proposes trades: which asset to buy or sell, and why.\n\nTrader — executes an approved trade on the market. Without a trader, an approved trade executes automatically.\n\nRisk manager — flags a proposal as risky, a signal to the team; the decision still rests with the head or a co-head.'**
+  String get etfRulebookRolesSectionBody;
+
+  /// No description provided for @etfRulebookTradeFlowSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'How a trade proposal moves'**
+  String get etfRulebookTradeFlowSectionHeader;
+
+  /// No description provided for @etfRulebookTradeFlowSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'An employee with the right permission proposes a trade — symbol, side, order type, and a justification.\n\nThe head or a co-head approves, rejects, or sends it back for revision. If the fund has a trader, they execute the approved order; otherwise it executes automatically.\n\nEvery trade carries the same 0.5% broker commission as a personal portfolio.'**
+  String get etfRulebookTradeFlowSectionBody;
+
+  /// No description provided for @etfRulebookNavSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Investors and NAV'**
+  String get etfRulebookNavSectionHeader;
+
+  /// No description provided for @etfRulebookNavSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone can invest in a fund by buying its units, the same way they\'d buy shares of a company.\n\nA unit\'s price (NAV) is calculated automatically: the fund\'s total assets and cash, divided by the number of units outstanding. When the fund\'s holdings gain value, NAV rises — and so does every unit holder\'s return.\n\nAn investor can redeem their units at any time for the current NAV.'**
+  String get etfRulebookNavSectionBody;
+
+  /// No description provided for @etfRulebookBankruptcySectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'If the fund closes'**
+  String get etfRulebookBankruptcySectionHeader;
+
+  /// No description provided for @etfRulebookBankruptcySectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The head can close the fund at any time. When they do:\n\n1. Every holding is sold at market price.\n\n2. Each currently active employee receives 1% of the remaining balance.\n\n3. What\'s left goes to investors: if there\'s enough, each gets their invested amount plus 5%; if not, payouts are made proportionally to each investor\'s stake, after the broker\'s commission on the asset sales.\n\nThe fund then closes permanently — its ticker and name are freed for reuse, and it can never be reopened or managed again.'**
+  String get etfRulebookBankruptcySectionBody;
 
   /// No description provided for @etfOnboardingContinueButton.
   ///

@@ -71,7 +71,9 @@ import '../../features/funds/screens/fund_team_screen.dart';
 import '../../features/funds/screens/fund_blotter_screen.dart';
 import '../../features/funds/screens/fund_charts_screen.dart';
 import '../../features/funds/screens/fund_investors_screen.dart';
-import '../../features/funds/screens/propose_trade_screen.dart';
+import '../../features/funds/screens/fund_trade_entry_screen.dart';
+import '../../features/funds/screens/fund_search_screen.dart';
+import '../../features/funds/screens/fund_rulebook_screen.dart';
 import '../../features/funds/screens/proposal_detail_screen.dart';
 import '../../features/funds/models/trade_proposal.dart' show TradeProposal;
 import '../../features/funds/screens/companies_history_screen.dart';
@@ -607,16 +609,39 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: '/funds/rulebook',
+        name: 'fundRulebook',
+        builder: (context, state) => const FundRulebookScreen(),
+      ),
+      GoRoute(
+        path: '/funds/:id/search',
+        name: 'fundSearch',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extra = state.extra as Map<String, dynamic>?;
+          return FundSearchScreen(
+            fundId: id,
+            fundName: extra?['fundName'] as String? ?? '',
+          );
+        },
+      ),
+      GoRoute(
         path: '/funds/:id/propose',
         name: 'proposeTrade',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           final extra = state.extra as Map<String, dynamic>?;
-          return ProposeTradeScreen(
+          // Only reachable from a specific company's Buy/Sell (Company
+          // Detail in fund context) -- symbol is always resolved by the
+          // time this route is pushed (see FundSearchScreen -> fund-context
+          // Company Detail -> here, and the Blotter's old symbol-less "+"
+          // entry point, removed 2026-09-15 now that this search-first flow
+          // replaces it).
+          return FundTradeEntryScreen(
             fundId: id,
-            initialSymbol: extra?['symbol'] as String?,
-            initialSymbolName: extra?['symbolName'] as String?,
-            initialSide: extra?['side'] as String?,
+            symbol: extra?['symbol'] as String? ?? '',
+            companyName: extra?['symbolName'] as String?,
+            initialSide: extra?['side'] as String? ?? 'buy',
           );
         },
       ),

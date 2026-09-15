@@ -10,10 +10,24 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/company_logo.dart';
+import '../../portfolio/portfolio_providers.dart' show brokerCommissionRate;
 import '../models/trade_proposal.dart';
+
+// A still-pending/approved market order has no stored price at all (see
+// ProposalCard's own placementPrice comment below) -- this fetches a live
+// quote purely for an on-screen estimate, same one-off "just this symbol"
+// shape as every other screen's own _fetchPrice, just as a provider since
+// ProposalCard itself stays a plain ConsumerWidget rather than turning
+// stateful just for this.
+final _proposalLivePriceProvider = FutureProvider.autoDispose
+    .family<double, String>((ref, symbol) async {
+      final quote = await ref.watch(finnhubServiceProvider).quote(symbol);
+      return (quote['c'] as num?)?.toDouble() ?? 0;
+    });
 
 // ---------------------------------------------------------------------------
 // Proposal Card + Proposal List Tile — 2026-09-12 redesign, refined same day
@@ -32,8 +46,11 @@ import '../models/trade_proposal.dart';
 // "vinaigrette" against a themed (Luxury Gold/Graphite/etc.) card.
 // ---------------------------------------------------------------------------
 
-String proposalStatusLabel(AppLocalizations l10n, TradeProposal p) {
-  switch (p.status) {
+// Takes the raw status string (not a TradeProposal) so FundBlotterScreen's
+// status filter chips can reuse the exact same label/color mapping without
+// needing a dummy proposal to switch on.
+String proposalStatusLabel(AppLocalizations l10n, String status) {
+  switch (status) {
     case 'approved':
       return l10n.etfProposalStatusApproved;
     case 'rejected':
@@ -47,8 +64,8 @@ String proposalStatusLabel(AppLocalizations l10n, TradeProposal p) {
   }
 }
 
-Color proposalStatusColor(TradeProposal p) {
-  switch (p.status) {
+Color proposalStatusColor(String status) {
+  switch (status) {
     case 'approved':
       return ThemeV2.warning;
     case 'rejected':
@@ -335,16 +352,16 @@ class ProposalListTile extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     color: proposalStatusColor(
-                      proposal,
+                      proposal.status,
                     ).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    proposalStatusLabel(l10n, proposal),
+                    proposalStatusLabel(l10n, proposal.status),
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: proposalStatusColor(proposal),
+                      color: proposalStatusColor(proposal.status),
                     ),
                   ),
                 ),
@@ -423,11 +440,21 @@ class ProposalCard extends ConsumerWidget {
     final directionAccent = proposal.isBuy ? ThemeV2.success : ThemeV2.loss;
     // Order placement price only means something for a limit order -- a
     // market order has no price at the moment it's proposed, only once it
-    // executes (2026-09-12 decision, see migration_024).
+    // executes (2026-09-12 decision, see migration_024). A still-pending
+    // market order (no executedPrice yet either) fetches a live quote
+    // instead, purely as an on-screen estimate (2026-09-15 ask -- the card
+    // read as too sparse without ANY $ figures while waiting on a
+    // decision) -- clearly labeled as an estimate, not stored anywhere.
     final placementPrice = proposal.orderType == 'limit'
         ? proposal.limitPrice
         : null;
-    final totalValuePrice = proposal.executedPrice ?? placementPrice;
+    final needsLiveEstimate =
+        proposal.executedPrice == null && placementPrice == null;
+    final estimatedPrice = needsLiveEstimate
+        ? ref.watch(_proposalLivePriceProvider(proposal.symbol)).valueOrNull
+        : null;
+    final totalValuePrice =
+        proposal.executedPrice ?? placementPrice ?? estimatedPrice;
     final hasFooterText =
         (proposal.justification != null &&
             proposal.justification!.isNotEmpty) ||
@@ -514,15 +541,17 @@ class ProposalCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: proposalStatusColor(proposal).withValues(alpha: 0.12),
+              color: proposalStatusColor(
+                proposal.status,
+              ).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              proposalStatusLabel(l10n, proposal),
+              proposalStatusLabel(l10n, proposal.status),
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: proposalStatusColor(proposal),
+                color: proposalStatusColor(proposal.status),
               ),
             ),
           ),
@@ -540,6 +569,12 @@ class ProposalCard extends ConsumerWidget {
             _detailRow(
               label: l10n.etfProposalPlacementPriceLabel,
               value: formatUsd(placementPrice),
+              palette: palette,
+            ),
+          if (estimatedPrice != null)
+            _detailRow(
+              label: l10n.etfProposalEstimatedPriceLabel,
+              value: formatUsd(estimatedPrice),
               palette: palette,
             ),
           _detailRow(
@@ -565,6 +600,14 @@ class ProposalCard extends ConsumerWidget {
             _detailRow(
               label: l10n.tradeCommissionLabel,
               value: formatUsd(proposal.commission!),
+              palette: palette,
+            )
+          else if (estimatedPrice != null)
+            _detailRow(
+              label: l10n.etfProposalEstimatedCommissionLabel,
+              value: formatUsd(
+                proposal.quantity * estimatedPrice * brokerCommissionRate,
+              ),
               palette: palette,
             ),
           _detailRow(
@@ -594,7 +637,7 @@ class ProposalCard extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: proposalStatusColor(proposal),
+                color: proposalStatusColor(proposal.status),
               ),
             ),
           ],

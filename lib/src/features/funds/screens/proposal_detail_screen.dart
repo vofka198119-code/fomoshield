@@ -15,9 +15,12 @@ import '../widgets/proposal_card.dart';
 
 // ---------------------------------------------------------------------------
 // Proposal Detail — one trade proposal, full screen. Reached from
-// FundBlotterScreen's own rows, and automatically after submitting a new
-// one via ProposeTradeScreen (explicit ask, 2026-09-12). Same ProposalCard
-// as the blotter list, just alone on its own screen.
+// FundBlotterScreen's own rows -- NOT auto-opened after submitting a new
+// proposal via FundTradeEntryScreen, which pops straight back to wherever
+// it was opened from instead (2026-09-12 ask, still the rule as of the
+// 2026-09-15 rebuild: opening a second view of the exact same data right
+// after submitting read as a duplicate). Same ProposalCard as the blotter
+// list, just alone on its own screen.
 // ---------------------------------------------------------------------------
 
 class ProposalDetailScreen extends ConsumerStatefulWidget {

@@ -6523,6 +6523,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfBlotterEmptyText => 'Пока нет предложений по сделкам';
 
   @override
+  String get etfBlotterEmptyFilteredText => 'Нет заявок с таким статусом';
+
+  @override
+  String get etfBlotterFilterAll => 'Все';
+
+  @override
   String get etfInvestorsShortcutLabel => 'Инвесторы';
 
   @override
@@ -6563,6 +6569,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfChartsShortcutLabel => 'Графики';
 
   @override
+  String get etfTradingShortcutLabel => 'Торговля';
+
+  @override
+  String get etfRulebookShortcutLabel => 'Правила';
+
+  @override
   String get etfChartsScreenTitle => 'ГРАФИКИ';
 
   @override
@@ -6593,34 +6605,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfCashVsInvestedInvestedLabel => 'Инвестировано';
 
   @override
-  String get etfProposeTradeButton => 'Предложить сделку';
-
-  @override
-  String get etfProposeTradeTitle => 'Предложить сделку';
-
-  @override
-  String get etfProposeSymbolLabel => 'Тикер';
-
-  @override
-  String get etfProposeSymbolHint => 'Например: AAPL';
-
-  @override
-  String get etfProposeSideLabel => 'Сторона';
-
-  @override
-  String get etfProposeOrderTypeLabel => 'Тип ордера';
-
-  @override
   String get etfProposeOrderTypeMarket => 'Рыночный';
 
   @override
   String get etfProposeOrderTypeLimit => 'Лимитный';
-
-  @override
-  String get etfProposeQuantityLabel => 'Количество (акций)';
-
-  @override
-  String get etfProposeLimitPriceLabel => 'Лимитная цена';
 
   @override
   String get etfProposeJustificationLabel => 'Обоснование';
@@ -6632,16 +6620,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfProposeSubmitButton => 'Отправить предложение';
 
   @override
-  String get etfProposeSymbolRequired => 'Укажи тикер';
-
-  @override
-  String get etfProposeQuantityRequired => 'Укажи корректное количество';
-
-  @override
   String get etfProposeLimitPriceRequired => 'Укажи корректную лимитную цену';
-
-  @override
-  String get etfProposeSuccessSnackbar => 'Предложение отправлено';
 
   @override
   String get etfProposeGenericError => 'Не удалось отправить предложение';
@@ -6713,15 +6692,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfProposalPlacementPriceLabel => 'Цена размещения ордера';
 
   @override
+  String get etfProposalEstimatedPriceLabel => 'Текущая цена (оценка)';
+
+  @override
+  String get etfProposalEstimatedCommissionLabel => 'Комиссия (оценка)';
+
+  @override
   String get etfProposalExecutionPriceLabel => 'Цена сделки';
 
   @override
   String get etfProposalProposedByLabel => 'Предложил';
-
-  @override
-  String etfProposeAvailableLabel(String value) {
-    return 'Доступно: $value';
-  }
 
   @override
   String get etfFundBalanceTitle => 'БАЛАНС ФОНДА';
@@ -6842,6 +6822,48 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get etfOnboardingStep7Body =>
       'FOMO Shield — это симулятор управления инвестиционными фондами.\n\nВсе деньги, активы, сделки и результаты внутри фондов являются виртуальными и не имеют реальной денежной стоимости. Они не могут быть выведены, обменены или использованы вне приложения.\n\nВ периоды недостатка реальных участников или для поддержания ликвидности симуляции система может использовать искусственных инвесторов. Их действия генерируются системой и не являются действиями реальных пользователей.\n\nНикакая статистика, доходность, рейтинг или результат симуляции не являются финансовой рекомендацией, гарантией дохода или обещанием будущих результатов.';
+
+  @override
+  String get etfRulebookTitle => 'Как работают фонды';
+
+  @override
+  String get etfRulebookSubtitle =>
+      'Краткий справочник о работе симулятора фондов FOMO Shield — можно открыть в любой момент.';
+
+  @override
+  String get etfRulebookFundSectionHeader => 'Что такое фонд';
+
+  @override
+  String get etfRulebookFundSectionBody =>
+      'Фонд — это симулированный инвестиционный инструмент, которым управляет глава (его создатель) и, при желании, нанятая команда. На старте фонд получает виртуальный капитал \$150 000. Другие пользователи могут инвестировать в фонд, покупая его паи, а команда фонда решает, какие активы покупать и продавать.';
+
+  @override
+  String get etfRulebookRolesSectionHeader => 'Роли в команде';
+
+  @override
+  String get etfRulebookRolesSectionBody =>
+      'Глава — владелец фонда, обладает полным правом одобрять или отклонять сделки и управлять командой.\n\nСо-управляющий — разделяет с главой право одобрять или отклонять предложения по сделкам.\n\nАналитик — предлагает сделки: какой актив купить или продать и почему.\n\nТрейдер — исполняет одобренную сделку на рынке. Без трейдера одобренная сделка исполняется автоматически.\n\nРиск-менеджер — помечает предложение как рискованное — это сигнал команде, но решение всё равно остаётся за главой или со-управляющим.';
+
+  @override
+  String get etfRulebookTradeFlowSectionHeader => 'Как проходит сделка';
+
+  @override
+  String get etfRulebookTradeFlowSectionBody =>
+      'Сотрудник с нужными правами предлагает сделку — тикер, направление, тип ордера и обоснование.\n\nГлава или со-управляющий одобряет, отклоняет или отправляет предложение на доработку. Если в фонде есть трейдер — он исполняет одобренный ордер, иначе сделка исполняется автоматически.\n\nКаждая сделка облагается той же брокерской комиссией 0.5%, что и в личном портфеле.';
+
+  @override
+  String get etfRulebookNavSectionHeader => 'Инвесторы и NAV';
+
+  @override
+  String get etfRulebookNavSectionBody =>
+      'Инвестировать в фонд можно, купив его паи — так же, как акции компании.\n\nЦена пая (NAV) считается автоматически: суммарная стоимость активов и кэша фонда делится на количество паёв в обращении. Когда активы фонда растут в цене — растёт и NAV, а вместе с ним доход каждого держателя пая.\n\nИнвестор может погасить свои паи в любой момент и получить деньги по текущей цене.';
+
+  @override
+  String get etfRulebookBankruptcySectionHeader => 'Если фонд закрывается';
+
+  @override
+  String get etfRulebookBankruptcySectionBody =>
+      'Глава может закрыть фонд в любой момент. При закрытии:\n\n1. Все активы продаются по рыночной цене.\n\n2. Каждый активный на тот момент сотрудник получает 1% от оставшегося баланса.\n\n3. Остаток идёт инвесторам: если средств хватает — каждый получает вложенное плюс 5%, если нет — выплата пропорциональна вкладу, за вычетом брокерской комиссии со сделок продажи.\n\nПосле этого фонд закрывается навсегда — его тикер и название освобождаются для повторного использования, а управлять им больше нельзя.';
 
   @override
   String get etfOnboardingContinueButton => 'Продолжить';

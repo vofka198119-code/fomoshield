@@ -137,6 +137,19 @@ class FundManagementScreen extends ConsumerWidget {
           data: (fund) {
             final isHead = fund.headUserId == currentUserId;
             final teamAsync = ref.watch(fundTeamProvider(fund.id));
+            // Same gate FundBlotterScreen's own (now-removed) "+" button
+            // used -- the Trading shortcut replaces it as the one way to
+            // start a trade proposal, so it needs the same permission
+            // check, not just fund membership.
+            final team = teamAsync.valueOrNull ?? [];
+            Map<String, bool>? myPermissions;
+            for (final member in team) {
+              if (member.userId == currentUserId) {
+                myPermissions = member.permissions;
+                break;
+              }
+            }
+            final canPropose = isHead || (myPermissions?['canPropose'] ?? false);
 
             Widget buildBody() => RefreshIndicator(
               color: palette.accentPrimary,
@@ -173,6 +186,22 @@ class FundManagementScreen extends ConsumerWidget {
                         icon: Icons.show_chart_rounded,
                         label: l10n.etfChartsShortcutLabel,
                         onTap: () => context.push('/funds/${fund.id}/charts'),
+                      ),
+                      if (canPropose)
+                        CircleShortcut(
+                          icon: Icons.swap_horiz_rounded,
+                          label: l10n.etfTradingShortcutLabel,
+                          onTap: () => context.push(
+                            '/funds/${fund.id}/search',
+                            extra: {'fundName': fund.name},
+                          ),
+                        ),
+                      // Always last, regardless of whether Trading shows
+                      // above it (2026-09-15 ask).
+                      CircleShortcut(
+                        icon: Icons.menu_book_rounded,
+                        label: l10n.etfRulebookShortcutLabel,
+                        onTap: () => context.push('/funds/rulebook'),
                       ),
                     ],
                   ),

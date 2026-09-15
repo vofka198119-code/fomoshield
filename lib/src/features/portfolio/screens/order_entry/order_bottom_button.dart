@@ -20,6 +20,9 @@ class OrderBottomButton extends StatelessWidget {
   final double displayAmount;
   final VoidCallback? onSubmit;
   final AppPalette palette;
+  // Overrides the button's default "Place Order" text -- used by fund trade
+  // proposals, which don't execute immediately (see FundTradeEntryScreen).
+  final String? label;
 
   const OrderBottomButton({
     super.key,
@@ -28,6 +31,7 @@ class OrderBottomButton extends StatelessWidget {
     required this.displayAmount,
     required this.onSubmit,
     required this.palette,
+    this.label,
   });
 
   @override
@@ -74,7 +78,12 @@ class OrderBottomButton extends StatelessWidget {
                 ],
               ),
             ),
-          ReviewOrderButton(isBuy: isBuy, onSubmit: onSubmit, palette: palette),
+          ReviewOrderButton(
+            isBuy: isBuy,
+            onSubmit: onSubmit,
+            palette: palette,
+            label: label,
+          ),
         ],
       ),
     );
@@ -91,6 +100,10 @@ class ReviewOrderButton extends StatelessWidget {
   final VoidCallback? onSubmit;
   final double height;
   final AppPalette palette;
+  // Overrides the default "Place Order" text -- fund trade proposals use
+  // this to say "Submit proposal" instead, since tapping it doesn't
+  // execute a trade, just creates one for approval.
+  final String? label;
 
   const ReviewOrderButton({
     super.key,
@@ -98,12 +111,14 @@ class ReviewOrderButton extends StatelessWidget {
     required this.onSubmit,
     required this.palette,
     this.height = 52,
+    this.label,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final canExecute = onSubmit != null;
+    final buttonLabel = label ?? l10n.orderEntryPlaceOrder;
 
     if (!canExecute) {
       return Container(
@@ -115,7 +130,7 @@ class ReviewOrderButton extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Text(
-          l10n.orderEntryPlaceOrder,
+          buttonLabel,
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -138,7 +153,7 @@ class ReviewOrderButton extends StatelessWidget {
             height: height,
             alignment: Alignment.center,
             child: Text(
-              l10n.orderEntryPlaceOrder,
+              buttonLabel,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -169,7 +184,7 @@ class ReviewOrderButton extends StatelessWidget {
               height: height,
               alignment: Alignment.center,
               child: Text(
-                l10n.orderEntryPlaceOrder,
+                buttonLabel,
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

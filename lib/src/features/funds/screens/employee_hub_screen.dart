@@ -133,6 +133,13 @@ class EmployeeHubScreen extends ConsumerWidget {
                   label: l10n.etfEmployeeHubApplicationsRow,
                   onTap: () => context.push('/funds/my-applications'),
                 ),
+                // Always last (2026-09-15 ask) -- same shortcut as Fund
+                // Management's own, same destination.
+                CircleShortcut(
+                  icon: Icons.menu_book_rounded,
+                  label: l10n.etfRulebookShortcutLabel,
+                  onTap: () => context.push('/funds/rulebook'),
+                ),
               ],
             ),
             if (profile != null) ...[
