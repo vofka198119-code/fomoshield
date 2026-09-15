@@ -56,6 +56,16 @@ Future<void> checkFundLiquidationPayouts(
       ref
           .read(portfoliosProvider.notifier)
           .creditCapital(portfolio.id, claimed.amount);
+      // The fund's units are void once liquidated -- without this, old buy
+      // transactions for its ticker stuck around forever and, if a LATER
+      // fund ever reused the same ticker (Migration 027 deliberately frees
+      // a bankrupt fund's ticker for reuse), got priced against that new,
+      // unrelated fund's live NAV (confirmed live 2026-09-15).
+      if (claimed.fundTicker != null) {
+        ref
+            .read(portfoliosProvider.notifier)
+            .clearHoldingsForSymbol(portfolio.id, claimed.fundTicker!);
+      }
 
       final fundLabel = claimed.fundName ?? claimed.fundTicker ?? '';
       pushAppNotification(

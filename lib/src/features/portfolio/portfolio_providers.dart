@@ -435,6 +435,28 @@ class PortfolioNotifier extends StateNotifier<List<Portfolio>> {
     _syncToSupabase();
   }
 
+  /// Removes every transaction for one symbol -- used when a fund is
+  /// liquidated (fund_liquidation_payout_provider.dart's claim catch-up):
+  /// the shares a bankrupt fund's investors held are void once the fund
+  /// closes, replaced by the cash payout [creditCapital] already handles.
+  /// Without this, the old buy transactions stayed in local history
+  /// forever, and if a LATER fund ever reused the same ticker (confirmed
+  /// live 2026-09-15 -- Migration 027 deliberately frees a bankrupt fund's
+  /// ticker for reuse), Portfolio Holdings priced that new, unrelated
+  /// fund's live NAV against the old ghost share count.
+  void clearHoldingsForSymbol(String portfolioId, String symbol) {
+    state = state.map((p) {
+      if (p.id == portfolioId) {
+        p.transactions = p.transactions
+            .where((t) => t.symbol != symbol)
+            .toList();
+      }
+      return p;
+    }).toList();
+    _saveLocal();
+    _syncToSupabase();
+  }
+
   /// Starts (or restarts) a portfolio's payout clock without crediting
   /// anything — called the first time a portfolio is seen as premium, so
   /// there's no retroactive credit for time before the user ever had
