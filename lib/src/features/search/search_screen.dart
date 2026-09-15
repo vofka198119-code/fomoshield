@@ -10,6 +10,7 @@ import '../../core/theme/themed_divider.dart';
 import '../../core/theme/themed_border.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/company_logo.dart';
+import '../funds/providers/fund_providers.dart';
 import '../funds/widgets/funds_tab_list.dart';
 import '../home/home_providers.dart';
 import '../home/watchlist_limits_provider.dart';
@@ -77,6 +78,33 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _clear() {
     _controller.clear();
     ref.read(searchProvider.notifier).onSearchInput('');
+  }
+
+  // A fund's units aren't a real company -- Company Detail has no idea what
+  // to do with one, and its own quote lookup would hit the real Finnhub
+  // endpoint for a ticker that doesn't actually exist there (confirmed
+  // live 2026-09-15: a fund reached via this screen showed a frozen price
+  // and an empty NAV history, because it never got here). Same
+  // fundTickerPattern + fundsListProvider match already used by Portfolio
+  // Holdings/Notifications' own row taps -- route to Fund Detail instead
+  // whenever the symbol actually matches a fund that exists, not just the
+  // ticker shape.
+  void _navigateToCompany(String symbol, String? portfolioId) {
+    final matchingFund = fundTickerPattern.hasMatch(symbol)
+        ? ref
+              .read(fundsListProvider)
+              .valueOrNull
+              ?.where((f) => f.ticker == symbol)
+              .firstOrNull
+        : null;
+    if (matchingFund != null) {
+      context.push('/funds/${matchingFund.id}');
+      return;
+    }
+    context.push(
+      '/company/$symbol',
+      extra: portfolioId != null ? {'portfolioId': portfolioId} : null,
+    );
   }
 
   @override
@@ -384,12 +412,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   );
                   return;
                 }
-                context.push(
-                  '/company/$symbol',
-                  extra: portfolioId != null
-                      ? {'portfolioId': portfolioId}
-                      : null,
-                );
+                _navigateToCompany(symbol, portfolioId);
               });
             },
           )
@@ -571,12 +594,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         '/stress-test/$stressTestSessionId/stock/$symbol',
                       );
                     } else {
-                      context.push(
-                        '/company/$symbol',
-                        extra: portfolioId != null
-                            ? {'portfolioId': portfolioId}
-                            : null,
-                      );
+                      _navigateToCompany(symbol, portfolioId);
                     }
                   });
                 },

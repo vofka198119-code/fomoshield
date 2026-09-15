@@ -8,6 +8,7 @@ import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/services/gics_sector_mapper.dart';
+import '../../funds/providers/fund_providers.dart';
 import '../home_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 
@@ -73,9 +74,23 @@ class _WatchlistTile extends ConsumerWidget {
     final resolvedName = ref.watch(resolvedCompanyNameProvider(symbol));
     final name = resolvedName.valueOrNull ?? symbol;
     final sector = resolveGicsSector(symbol, companyName: name);
+    // A fund's units aren't a real company -- Company Detail's quote
+    // lookup hits the real Finnhub endpoint for a ticker that doesn't
+    // exist there (confirmed live 2026-09-15: frozen price, empty NAV
+    // history). Same fundTickerPattern + fundsListProvider match already
+    // used by Portfolio Holdings/Notifications/Search's own row taps.
+    final matchingFund = fundTickerPattern.hasMatch(symbol)
+        ? ref
+              .watch(fundsListProvider)
+              .valueOrNull
+              ?.where((f) => f.ticker == symbol)
+              .firstOrNull
+        : null;
 
     return InkWell(
-      onTap: () => context.push('/company/$symbol'),
+      onTap: () => matchingFund != null
+          ? context.push('/funds/${matchingFund.id}')
+          : context.push('/company/$symbol'),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
