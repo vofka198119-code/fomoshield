@@ -445,7 +445,6 @@ class _PortfolioOrderEntryScreenState
       session: session,
       side: side,
       shares: shares,
-      amount: amount,
       limitPrice: limitPrice,
     );
   }
@@ -515,7 +514,6 @@ class _PortfolioOrderEntryScreenState
     required orders.MarketSession session,
     required orders.OrderSide side,
     required double shares,
-    required double amount,
     double? limitPrice,
   }) async {
     final l10n = AppLocalizations.of(context)!;
@@ -526,9 +524,19 @@ class _PortfolioOrderEntryScreenState
     if (widget.fundId != null) {
       try {
         if (_isBuy) {
+          // NOT the raw [amount] param -- in shares-input mode that's a
+          // share COUNT, not a dollar figure (see _submitOrder: `shares =
+          // amount` when not in cost mode), and subscribe() only ever
+          // takes a $ amount. Passing it straight through silently bought
+          // far fewer units than typed (confirmed live 2026-09-15: typed
+          // "56" meaning 56 units, subscribe() received $56, bought 5.6).
+          // [shares] is already correctly resolved for either input mode,
+          // so re-deriving the dollar cost from it here is always right;
+          // fund subscribe has no limit-price concept, so this is always
+          // priced off the live [_currentPrice], not [limitPrice].
           final result = await ref
               .read(fundApiServiceProvider)
-              .subscribe(widget.fundId!, amount);
+              .subscribe(widget.fundId!, shares * _currentPrice);
           executionShares = result.unitsIssued;
           executionPrice = result.navPerUnit;
         } else {
