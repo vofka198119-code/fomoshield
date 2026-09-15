@@ -11,10 +11,8 @@ import '../models/fund.dart';
 
 // Creation date is real. Employee roster now lives in its own FundTeamCard
 // (Phase 3, real fund_team_members data) instead of a stub count here —
-// this card only keeps the Creator row, still a stub: showing the head's
-// real nickname needs a "get employee_profile by arbitrary userId" lookup
-// that doesn't exist yet (the head isn't a fund_team_members row, unlike
-// every other employee, whose nickname the roster already joins in).
+// this card only keeps the Creator row, backed by fund.headNickname (same
+// field FundTeamCard already uses for the head's own unremovable row).
 class FundInfoCard extends StatelessWidget {
   final FundDetail fund;
   final AppPalette palette;
@@ -43,7 +41,7 @@ class FundInfoCard extends StatelessWidget {
           const SizedBox(height: 12),
           _row(l10n.etfFundDetailCreatedLabel, created),
           const SizedBox(height: 8),
-          _row(l10n.etfFundDetailCreatorLabel, '—'),
+          _row(l10n.etfFundDetailCreatorLabel, fund.headNickname ?? '—'),
         ],
       ),
     );

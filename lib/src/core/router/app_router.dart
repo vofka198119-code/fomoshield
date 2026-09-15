@@ -553,6 +553,11 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: '/funds/rulebook',
+        name: 'fundRulebook',
+        builder: (context, state) => const FundRulebookScreen(),
+      ),
+      GoRoute(
         path: '/funds/:id',
         name: 'fundDetail',
         builder: (context, state) {
@@ -607,11 +612,6 @@ class AppRouter {
           final id = state.pathParameters['id'] ?? '';
           return FundChartsScreen(fundId: id);
         },
-      ),
-      GoRoute(
-        path: '/funds/rulebook',
-        name: 'fundRulebook',
-        builder: (context, state) => const FundRulebookScreen(),
       ),
       GoRoute(
         path: '/funds/:id/search',

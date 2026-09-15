@@ -292,8 +292,18 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
             style: GoogleFonts.inter(color: palette.textHeader),
             decoration: InputDecoration(
               hintText: l10n.etfProposeJustificationHint,
-              border: OutlineInputBorder(
+              hintStyle: GoogleFonts.inter(
+                color: palette.textBody,
+                fontSize: 14,
+              ),
+              filled: false,
+              enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: palette.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: palette.accentPrimary, width: 2),
               ),
             ),
           ),

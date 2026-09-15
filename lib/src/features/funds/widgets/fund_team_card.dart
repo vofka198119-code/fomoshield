@@ -143,7 +143,7 @@ class FundTeamCard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               themedHeaderText(
-                l10n.etfFundDetailEmployeesLabel,
+                l10n.etfFundDetailEmployeesLabel.toUpperCase(),
                 palette,
                 FomoShieldTheme.cardTitle(),
               ),
