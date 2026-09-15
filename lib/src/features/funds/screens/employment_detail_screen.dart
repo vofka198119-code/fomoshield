@@ -64,20 +64,27 @@ class _EmploymentDetailScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.etfEmploymentDetailLeaveConfirmTitle),
-        content: Text(l10n.etfEmploymentDetailLeaveConfirmBody),
+        title: Text(
+          l10n.etfEmploymentDetailLeaveConfirmTitle,
+          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+        ),
+        content: Text(
+          l10n.etfEmploymentDetailLeaveConfirmBody,
+          style: GoogleFonts.inter(),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
             child: Text(
               MaterialLocalizations.of(dialogContext).cancelButtonLabel,
+              style: GoogleFonts.inter(),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             child: Text(
               l10n.etfEmploymentDetailLeaveButton,
-              style: const TextStyle(color: ThemeV2.loss),
+              style: GoogleFonts.inter(color: ThemeV2.loss),
             ),
           ),
         ],

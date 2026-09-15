@@ -79,7 +79,7 @@ class FundCashVsInvestedChart extends StatelessWidget {
         child: Center(
           child: Text(
             l10n.companyDetailChartNotEnoughData,
-            style: TextStyle(fontSize: 13, color: palette.textBody),
+            style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
           ),
         ),
       );
@@ -210,7 +210,7 @@ class FundCashVsInvestedChart extends StatelessWidget {
             getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                 BarTooltipItem(
                   formatUsd(rod.toY),
-                  TextStyle(
+                  GoogleFonts.inter(
                     color: palette.textHeader,
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
@@ -248,7 +248,7 @@ class FundCashVsInvestedChart extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
                     label,
-                    style: TextStyle(fontSize: 10, color: palette.textBody),
+                    style: GoogleFonts.inter(fontSize: 10, color: palette.textBody),
                   ),
                 );
               },

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -65,7 +66,7 @@ class FundNavChart extends StatelessWidget {
       return Center(
         child: Text(
           l10n.companyDetailChartNotEnoughData,
-          style: TextStyle(fontSize: 13, color: palette.textBody),
+          style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
         ),
       );
     }

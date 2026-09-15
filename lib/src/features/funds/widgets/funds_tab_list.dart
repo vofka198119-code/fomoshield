@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
+import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
@@ -164,7 +165,7 @@ class _FundRow extends StatelessWidget {
             up ? '▲' : '▼',
             style: GoogleFonts.inter(
               fontSize: 11,
-              color: up ? Colors.green : Colors.red,
+              color: up ? ThemeV2.success : ThemeV2.loss,
             ),
           ),
         ],

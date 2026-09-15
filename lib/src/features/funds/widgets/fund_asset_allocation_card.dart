@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
@@ -123,7 +124,7 @@ class _FundAssetAllocationCardState
               child: Center(
                 child: Text(
                   l10n.etfAssetAllocationEmptyText,
-                  style: TextStyle(fontSize: 13, color: palette.textBody),
+                  style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
                 ),
               ),
             ),

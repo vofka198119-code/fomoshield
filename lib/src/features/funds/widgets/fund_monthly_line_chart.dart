@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
@@ -91,7 +92,7 @@ class FundMonthlyLineChart extends StatelessWidget {
         child: Center(
           child: Text(
             l10n.companyDetailChartNotEnoughData,
-            style: TextStyle(fontSize: 13, color: palette.textBody),
+            style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
           ),
         ),
       );
@@ -222,7 +223,7 @@ class FundMonthlyLineChart extends StatelessWidget {
                 .map(
                   (spot) => LineTooltipItem(
                     formatUsd(spot.y),
-                    TextStyle(
+                    GoogleFonts.inter(
                       color: palette.textHeader,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
@@ -276,7 +277,7 @@ class FundMonthlyLineChart extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
                     label,
-                    style: TextStyle(fontSize: 10, color: palette.textBody),
+                    style: GoogleFonts.inter(fontSize: 10, color: palette.textBody),
                   ),
                 );
               },

@@ -78,17 +78,20 @@ class FundTeamCard extends ConsumerWidget {
           l10n.etfTeamMemberTerminateConfirmTitle,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
         ),
-        content: Text(l10n.etfTeamMemberTerminateConfirmBody),
+        content: Text(
+          l10n.etfTeamMemberTerminateConfirmBody,
+          style: GoogleFonts.inter(),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.profileCancel),
+            child: Text(l10n.profileCancel, style: GoogleFonts.inter()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               l10n.etfTeamMemberTerminateConfirmAction,
-              style: const TextStyle(color: ThemeV2.loss),
+              style: GoogleFonts.inter(color: ThemeV2.loss),
             ),
           ),
         ],
