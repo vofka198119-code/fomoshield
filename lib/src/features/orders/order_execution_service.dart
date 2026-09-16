@@ -76,6 +76,7 @@ class OrderExecutionService {
     required Order order,
     required double currentPrice,
     required MarketSession session,
+    bool applyCommission = true,
   }) {
     // Only active orders can be evaluated
     if (!order.status.isActive) {
@@ -89,7 +90,12 @@ class OrderExecutionService {
     // Evaluate based on order type
     switch (order.type) {
       case OrderType.market:
-        return _evaluateMarket(order, currentPrice, session);
+        return _evaluateMarket(
+          order,
+          currentPrice,
+          session,
+          applyCommission: applyCommission,
+        );
       case OrderType.limit:
         return _evaluateLimit(order, currentPrice, session);
       case OrderType.stop:
@@ -131,14 +137,20 @@ class OrderExecutionService {
   OrderExecutionResult _evaluateMarket(
     Order order,
     double currentPrice,
-    MarketSession session,
-  ) {
+    MarketSession session, {
+    bool applyCommission = true,
+  }) {
     // Filled at the exact quoted price — no artificial slippage. There's
     // no real bid/ask in this app (just one quote field), so any spread
     // added here at fill time was never mirrored on the unrealized-P&L
     // side, making every fresh buy look underwater the instant it filled.
     // See 2026-08-08 bug report.
-    return _fillOrder(order, currentPrice, order.remainingQuantity);
+    return _fillOrder(
+      order,
+      currentPrice,
+      order.remainingQuantity,
+      applyCommission: applyCommission,
+    );
   }
 
   // -----------------------------------------------------------------------
@@ -307,8 +319,9 @@ class OrderExecutionService {
   OrderExecutionResult _fillOrder(
     Order order,
     double executionPrice,
-    double fillQuantity,
-  ) {
+    double fillQuantity, {
+    bool applyCommission = true,
+  }) {
     final newFilled = order.filledQuantity + fillQuantity;
     final isFull = newFilled >= order.quantity - 0.0001;
 
@@ -328,7 +341,9 @@ class OrderExecutionService {
       price: executionPrice,
       date: DateTime.now(),
       orderId: order.orderId,
-      fee: fillQuantity * executionPrice * brokerCommissionRate,
+      fee: applyCommission
+          ? fillQuantity * executionPrice * brokerCommissionRate
+          : 0,
     );
 
     return OrderExecutionResult(

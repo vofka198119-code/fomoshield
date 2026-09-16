@@ -103,6 +103,13 @@ class OrderNotifier extends StateNotifier<List<Order>> {
     double? limitPrice,
     double? stopPrice,
     MarketSession session = MarketSession.regular,
+    // Fund unit subscribe/redeem trades never carry a commission — the
+    // server-side fund_subscribe/fund_redeem functions have no fee concept
+    // at all, full NAV in, full NAV out (see docs/supabase_migration.sql).
+    // Without this, the generic execution engine below unconditionally
+    // charged the standard 0.5% broker commission on top, which never went
+    // anywhere (not to the fund, not tracked) — found live 2026-09-15/16.
+    bool applyCommission = true,
   }) {
     final order = Order(
       orderId: _generateOrderId(),
@@ -127,6 +134,7 @@ class OrderNotifier extends StateNotifier<List<Order>> {
         order: order,
         currentPrice: createdPrice,
         session: session,
+        applyCommission: applyCommission,
       );
 
       _upsertOrder(result.updatedOrder);

@@ -379,8 +379,12 @@ class _PortfolioOrderEntryScreenState
       // Mirrors _fillOrder's own fee stamp (order_execution_service.dart)
       // — without this margin, an order sized for exactly 100% of
       // available cash would pass this check but then push cash negative
-      // once the commission comes out on fill.
-      final orderCostWithFee = orderCost * (1 + brokerCommissionRate);
+      // once the commission comes out on fill. Fund unit trades carry no
+      // commission (see the `applyCommission` note on _submitOrder below),
+      // so no margin is needed there.
+      final orderCostWithFee = widget.fundId == null
+          ? orderCost * (1 + brokerCommissionRate)
+          : orderCost;
       if (orderCostWithFee > _availableCash + 0.01) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -423,7 +427,9 @@ class _PortfolioOrderEntryScreenState
     }
 
     final orderPrice = limitPrice ?? _currentPrice;
-    final orderFee = shares * orderPrice * brokerCommissionRate;
+    final orderFee = widget.fundId == null
+        ? shares * orderPrice * brokerCommissionRate
+        : 0.0;
     final confirmed = await showOrderConfirmationSheet(
       context: context,
       palette: resolveAppPalette(ref.read(themeVariantProvider)),
@@ -578,6 +584,11 @@ class _PortfolioOrderEntryScreenState
           limitPrice: limitPrice,
           stopPrice: null,
           session: session,
+          // Fund subscribe/redeem already settled server-side at full NAV,
+          // no fee either way (see FundApiService.subscribe/redeem above) —
+          // this generic engine must not tack its own 0.5% onto a fund
+          // unit trade on top of that.
+          applyCommission: widget.fundId == null,
         );
 
     if (mounted) {
@@ -811,7 +822,8 @@ class _PortfolioOrderEntryScreenState
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
                       palette: palette,
                     ),
-                    _commissionNotice(l10n, palette, displayAmount),
+                    if (widget.fundId == null)
+                      _commissionNotice(l10n, palette, displayAmount),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
                       limitPriceController: _limitPriceController,
