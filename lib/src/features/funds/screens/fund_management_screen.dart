@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,16 +38,47 @@ import '../widgets/fund_management_holdings_card.dart';
 // Hire/Terminate actions and the delete-fund flow.
 // ---------------------------------------------------------------------------
 
-class FundManagementScreen extends ConsumerWidget {
+class FundManagementScreen extends ConsumerStatefulWidget {
   final String fundId;
 
   const FundManagementScreen({super.key, required this.fundId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FundManagementScreen> createState() =>
+      _FundManagementScreenState();
+}
+
+class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Same reasoning as Portfolio's own _PortfolioBodyState: tapping into
+    // a holding (_openFundHolding pushes a route) keeps this screen
+    // mounted-but-hidden underneath, not disposed — without a periodic
+    // refresh of its own, fundDetailProvider's value (fetched once on
+    // first build) then sits frozen indefinitely, since nothing else ever
+    // re-triggers it. Confirmed live 2026-09-16: holdings here showed
+    // stale prices/0% P&L on several positions that had genuinely moved
+    // on the server (fund_detail_screen.dart's own periodic refresh
+    // doesn't cover this separate management screen).
+    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (_) {
+      if (mounted) ref.invalidate(fundDetailProvider(widget.fundId));
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
-    final fundAsync = ref.watch(fundDetailProvider(fundId));
+    final fundAsync = ref.watch(fundDetailProvider(widget.fundId));
     final currentUserId = ref.watch(currentUserProvider)?.id;
     final isAdmin = ref.watch(isAdminProvider);
 
@@ -154,7 +187,7 @@ class FundManagementScreen extends ConsumerWidget {
             Widget buildBody() => RefreshIndicator(
               color: palette.accentPrimary,
               onRefresh: () async =>
-                  ref.invalidate(fundDetailProvider(fundId)),
+                  ref.invalidate(fundDetailProvider(widget.fundId)),
               child: ListView(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
