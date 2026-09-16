@@ -18,13 +18,18 @@ class FundPriceHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Live navPerUnit against the most recent snapshot — same "price vs
+    // prevClose" shape as a real stock quote. The old version compared two
+    // history entries against EACH OTHER (history[last-2] vs history[last]),
+    // never touching the live price at all, so this badge could sit dead
+    // for a whole day even while the big price above it kept moving (found
+    // live 2026-09-16 — "NAV стоит на месте" despite a live, moving price).
     final history = fund.navHistory;
     double change = 0;
     double changePercent = 0;
-    if (history.length >= 2) {
-      final prev = history[history.length - 2].navPerUnit;
-      final last = history.last.navPerUnit;
-      change = last - prev;
+    if (history.isNotEmpty) {
+      final prev = history.last.navPerUnit;
+      change = fund.navPerUnit - prev;
       changePercent = prev == 0 ? 0 : change / prev * 100;
     }
 

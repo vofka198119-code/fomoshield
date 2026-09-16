@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_divider.dart';
-import '../../../shared/utils/currency_format.dart';
 import '../models/fund.dart';
 
 // ---------------------------------------------------------------------------
 // FundMiniCard — one row inside a Funds browse lane (ETF Fund Emulation).
 // Same row chrome as Search's CompanyMiniCard (ring avatar, name + subtitle
-// stacked, thin bottom divider) — see that file's own doc comment for the
-// shared recipe. Differs only in trailing content: NAV/unit + up/down is
-// already sitting in the same fundsListProvider response FundsTabList's own
-// flat-list row (_FundRow) shows, so unlike CompanyMiniCard (which
-// deliberately omits price to avoid a live per-row quote call) there's no
-// extra cost to showing it here too.
+// stacked, trailing chevron, thin bottom divider) — see that file's own doc
+// comment for the shared recipe, including its "no price here" reasoning.
+//
+// Used to show NAV/unit + a up/down arrow here, but the arrow compared live
+// navPerUnit against a hardcoded $10.00 launch reference — not any real
+// prevClose/change — so it was static and misleading regardless of what
+// actually happened to the fund (found live 2026-09-16). Rather than wire
+// up a real per-row change%, dropped the price here entirely, matching
+// CompanyMiniCard's own precedent: a lane full of these rows should never
+// carry live-pricing weight — the fund's real, live NAV only shows once the
+// user taps into its own detail card.
 // ---------------------------------------------------------------------------
 
 class FundMiniCard extends StatelessWidget {
@@ -33,7 +36,6 @@ class FundMiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final up = fund.navPerUnit >= 10.0; // vs. the $10.00 launch NAV
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -105,26 +107,10 @@ class FundMiniCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      formatUsd(fund.navPerUnit),
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: palette.textHeader,
-                      ),
-                    ),
-                    Text(
-                      up ? '▲' : '▼',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: up ? ThemeV2.success : ThemeV2.loss,
-                      ),
-                    ),
-                  ],
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: palette.textBody,
+                  size: 20,
                 ),
               ],
             ),
