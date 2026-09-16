@@ -10,25 +10,17 @@ import '../../l10n/gen/app_localizations.dart';
 // (the standard palette), same convention as disclaimer_screen.dart and
 // choose_nickname_screen.dart — this is pre-theme-choice first-run content.
 //
-// Both buttons lead to the nickname screen next — a nickname is required
-// either way (matches Migration 017's original "gates /home" intent). The
-// tutorial content itself doesn't exist yet (a later phase); for now this
-// screen only records the choice so a future tutorial phase can route a
-// "tour" pick into real step-by-step content instead of straight past
-// nickname to /home, without this screen needing to change again.
+// "I'll figure it out" skips straight to the nickname screen (mandatory
+// either way — matches Migration 017's original "gates /home" intent).
+// "Take the tour" goes through AppTourScreen first, which itself ends on
+// the same nickname screen.
 // ---------------------------------------------------------------------------
 
 class OnboardingChoiceScreen extends StatelessWidget {
   const OnboardingChoiceScreen({super.key});
 
   void _choose(BuildContext context, {required bool wantsTutorial}) {
-    // TODO(onboarding-phase-3): once real tutorial content ships, a
-    // wantsTutorial=true pick should route into it here instead of
-    // straight to nickname. Recording the choice happens where the
-    // nickname write already goes (choose_nickname_screen.dart) once
-    // that storage is needed — no persistence required yet since both
-    // paths converge on the same next screen today.
-    context.go('/choose-nickname');
+    context.go(wantsTutorial ? '/app-tour' : '/choose-nickname');
   }
 
   @override

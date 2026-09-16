@@ -6477,4 +6477,45 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onboardingChoiceSkipButton => 'Я сам разберусь';
+
+  @override
+  String get onboardingTourContinueButton => 'Далее';
+
+  @override
+  String get onboardingTourStep1Title => 'Как всё устроено';
+
+  @override
+  String get onboardingTourStep1Body =>
+      'У тебя есть виртуальный портфель с реальными рыночными котировками. Покупай и продавай акции, следи за результатом — без единого реального доллара на кону. Это площадка для тренировки, а не биржа.';
+
+  @override
+  String get onboardingTourStep2Title => 'Поиск';
+
+  @override
+  String get onboardingTourStep2Body =>
+      'Здесь ты находишь компании — по названию, тикеру или сектору. У каждой есть FS Score — наша независимая оценка на основе финансовых показателей, и карточка с графиком цены и ключевыми метриками.';
+
+  @override
+  String get onboardingTourStep3Title => 'Портфель';
+
+  @override
+  String get onboardingTourStep3Body =>
+      'Твои позиции, свободные средства и прибыль/убыток — всё здесь. Покупка и продажа занимают пару тапов: выбрал компанию, указал сумму или количество акций, подтвердил.';
+
+  @override
+  String get onboardingTourStep4Title => 'Симуляция рынка';
+
+  @override
+  String get onboardingTourStep4Body =>
+      'Хочешь проверить себя в разных рыночных условиях? Симуляция прогоняет твой портфель через смоделированный сценарий — от спокойного роста до резкого обвала — и в конце показывает честный разбор твоих решений.';
+
+  @override
+  String get onboardingTourStep5Title => 'Готов начать?';
+
+  @override
+  String get onboardingTourStep5Body =>
+      'Это всё, что нужно знать для старта. Остальное — находить компании, которые тебе интересны, и учиться на своих сделках. Осталось выбрать никнейм — и вперёд.';
+
+  @override
+  String get onboardingTourStep5Button => 'Выбрать никнейм';
 }

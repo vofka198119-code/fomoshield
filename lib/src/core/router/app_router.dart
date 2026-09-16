@@ -13,6 +13,7 @@ import '../../features/auth/account_restore_screen.dart';
 import '../../shared/services/finnhub_service.dart' show AccountDeletionStatus;
 import '../../features/disclaimer/disclaimer_screen.dart';
 import '../../features/onboarding/onboarding_choice_screen.dart';
+import '../../features/onboarding/app_tour_screen.dart';
 import '../../features/nickname/choose_nickname_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
@@ -87,6 +88,7 @@ const _authExemptPaths = {
   '/forgot-password',
   '/disclaimer',
   '/onboarding-choice',
+  '/app-tour',
   '/choose-nickname',
 };
 
@@ -141,6 +143,12 @@ class AppRouter {
         path: '/onboarding-choice',
         name: 'onboardingChoice',
         builder: (context, state) => const OnboardingChoiceScreen(),
+      ),
+
+      GoRoute(
+        path: '/app-tour',
+        name: 'appTour',
+        builder: (context, state) => const AppTourScreen(),
       ),
 
       GoRoute(

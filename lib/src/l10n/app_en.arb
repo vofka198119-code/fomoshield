@@ -2605,5 +2605,18 @@
   "onboardingChoiceTitle": "Welcome to FOMO Shield",
   "onboardingChoiceSubtitle": "This is a stock market simulator with no real money — a place to learn and practice risk-free. Want a quick tour of the app, or would you rather figure it out yourself?",
   "onboardingChoiceTutorialButton": "Take the tour",
-  "onboardingChoiceSkipButton": "I'll figure it out"
+  "onboardingChoiceSkipButton": "I'll figure it out",
+
+  "onboardingTourContinueButton": "Next",
+  "onboardingTourStep1Title": "How it all works",
+  "onboardingTourStep1Body": "You get a virtual portfolio priced with real market quotes. Buy and sell stocks, track your results — with not a single real dollar on the line. This is a practice space, not an exchange.",
+  "onboardingTourStep2Title": "Search",
+  "onboardingTourStep2Body": "Find companies here — by name, ticker, or sector. Every company has an FS Score, our independent rating based on real financials, plus a card with a price chart and key metrics.",
+  "onboardingTourStep3Title": "Portfolio",
+  "onboardingTourStep3Body": "Your positions, available cash, and profit/loss all live here. Buying and selling takes a couple of taps: pick a company, enter an amount or a share count, confirm.",
+  "onboardingTourStep4Title": "Market Simulation",
+  "onboardingTourStep4Body": "Want to test yourself under different market conditions? The simulation runs your portfolio through a modeled scenario — from calm growth to a sharp crash — and gives you an honest breakdown of your decisions at the end.",
+  "onboardingTourStep5Title": "Ready to start?",
+  "onboardingTourStep5Body": "That's everything you need to get going. The rest is finding companies you're curious about and learning from your own trades. One last step — pick a nickname.",
+  "onboardingTourStep5Button": "Choose your nickname"
 }

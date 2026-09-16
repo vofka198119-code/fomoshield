@@ -6456,4 +6456,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingChoiceSkipButton => 'I\'ll figure it out';
+
+  @override
+  String get onboardingTourContinueButton => 'Next';
+
+  @override
+  String get onboardingTourStep1Title => 'How it all works';
+
+  @override
+  String get onboardingTourStep1Body =>
+      'You get a virtual portfolio priced with real market quotes. Buy and sell stocks, track your results — with not a single real dollar on the line. This is a practice space, not an exchange.';
+
+  @override
+  String get onboardingTourStep2Title => 'Search';
+
+  @override
+  String get onboardingTourStep2Body =>
+      'Find companies here — by name, ticker, or sector. Every company has an FS Score, our independent rating based on real financials, plus a card with a price chart and key metrics.';
+
+  @override
+  String get onboardingTourStep3Title => 'Portfolio';
+
+  @override
+  String get onboardingTourStep3Body =>
+      'Your positions, available cash, and profit/loss all live here. Buying and selling takes a couple of taps: pick a company, enter an amount or a share count, confirm.';
+
+  @override
+  String get onboardingTourStep4Title => 'Market Simulation';
+
+  @override
+  String get onboardingTourStep4Body =>
+      'Want to test yourself under different market conditions? The simulation runs your portfolio through a modeled scenario — from calm growth to a sharp crash — and gives you an honest breakdown of your decisions at the end.';
+
+  @override
+  String get onboardingTourStep5Title => 'Ready to start?';
+
+  @override
+  String get onboardingTourStep5Body =>
+      'That\'s everything you need to get going. The rest is finding companies you\'re curious about and learning from your own trades. One last step — pick a nickname.';
+
+  @override
+  String get onboardingTourStep5Button => 'Choose your nickname';
 }

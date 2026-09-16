@@ -10896,6 +10896,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I\'ll figure it out'**
   String get onboardingChoiceSkipButton;
+
+  /// No description provided for @onboardingTourContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingTourContinueButton;
+
+  /// No description provided for @onboardingTourStep1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'How it all works'**
+  String get onboardingTourStep1Title;
+
+  /// No description provided for @onboardingTourStep1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'You get a virtual portfolio priced with real market quotes. Buy and sell stocks, track your results — with not a single real dollar on the line. This is a practice space, not an exchange.'**
+  String get onboardingTourStep1Body;
+
+  /// No description provided for @onboardingTourStep2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get onboardingTourStep2Title;
+
+  /// No description provided for @onboardingTourStep2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Find companies here — by name, ticker, or sector. Every company has an FS Score, our independent rating based on real financials, plus a card with a price chart and key metrics.'**
+  String get onboardingTourStep2Body;
+
+  /// No description provided for @onboardingTourStep3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio'**
+  String get onboardingTourStep3Title;
+
+  /// No description provided for @onboardingTourStep3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your positions, available cash, and profit/loss all live here. Buying and selling takes a couple of taps: pick a company, enter an amount or a share count, confirm.'**
+  String get onboardingTourStep3Body;
+
+  /// No description provided for @onboardingTourStep4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Simulation'**
+  String get onboardingTourStep4Title;
+
+  /// No description provided for @onboardingTourStep4Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Want to test yourself under different market conditions? The simulation runs your portfolio through a modeled scenario — from calm growth to a sharp crash — and gives you an honest breakdown of your decisions at the end.'**
+  String get onboardingTourStep4Body;
+
+  /// No description provided for @onboardingTourStep5Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to start?'**
+  String get onboardingTourStep5Title;
+
+  /// No description provided for @onboardingTourStep5Body.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s everything you need to get going. The rest is finding companies you\'re curious about and learning from your own trades. One last step — pick a nickname.'**
+  String get onboardingTourStep5Body;
+
+  /// No description provided for @onboardingTourStep5Button.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your nickname'**
+  String get onboardingTourStep5Button;
 }
 
 class _AppLocalizationsDelegate
