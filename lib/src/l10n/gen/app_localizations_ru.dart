@@ -5785,6 +5785,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get disclaimerScreenTitle => 'Дисклеймер';
 
   @override
+  String get disclaimerScreenIntro =>
+      'Прежде чем начать — пара важных моментов о том, как всё устроено. Это займёт минуту.';
+
+  @override
   String get disclaimerScreenAccessRestricted => 'Доступ ограничен';
 
   @override
@@ -5794,11 +5798,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get disclaimerScreenCloseAppButton => 'Закрыть приложение';
 
   @override
+  String get disclaimerScreenNoRealMoneyTitle => 'Это симулятор — не биржа';
+
+  @override
+  String get disclaimerScreenNoRealMoneyBody =>
+      'Все балансы, сделки и портфели в приложении полностью виртуальны. Реальные деньги никогда не используются, реальные ценные бумаги не покупаются и не продаются, и результаты симуляции не создают никаких реальных финансовых обязательств или прав.';
+
+  @override
   String get disclaimerScreenImportantNoticeTitle => 'Важное уведомление';
 
   @override
   String get disclaimerScreenImportantNoticeBody =>
-      'F.O.M.O. Shield — образовательный инструмент, созданный, чтобы помочь инвесторам понять поведение рынка и собственные модели принятия решений. Приложение не предоставляет финансовые консультации, инвестиционные рекомендации или какие-либо консультационные услуги.';
+      'F.O.M.O. Shield — образовательный инструмент, созданный, чтобы помочь пользователям понять поведение рынка и собственные модели принятия решений. Приложение не является инвестиционным советником, брокером-дилером или финансовым посредником и не предоставляет индивидуальные финансовые консультации, инвестиционные рекомендации или иные консультационные услуги. Приложение предоставляется «как есть», без каких-либо гарантий, и мы не несём ответственности за решения, принятые на основе информации из приложения, включая решения за пределами симуляции.';
 
   @override
   String get disclaimerScreenFsScoresTitle => 'Независимость FS Score';
@@ -5819,7 +5830,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get disclaimerScreenPrivacyBody =>
-      'Мы собираем минимум данных, необходимых для работы приложения: ваш email (для создания аккаунта) и данные, которые вы создаёте внутри приложения (портфели, список отслеживания, симуляции). Мы не продаём ваши данные третьим лицам.';
+      'Мы собираем минимум данных, необходимых для работы приложения: ваш email (для создания аккаунта) и данные, которые вы создаёте внутри приложения (портфели, список отслеживания, симуляции). Мы не продаём ваши данные третьим лицам. Полный текст — в Политике конфиденциальности по ссылке ниже.';
 
   @override
   String get disclaimerScreenTermsUpdatesTitle => 'Обновления условий';
@@ -6426,4 +6437,44 @@ class AppLocalizationsRu extends AppLocalizations {
   ) {
     return 'Тест «$duration» завершён — $percent% — нажмите, чтобы посмотреть вердикт.';
   }
+
+  @override
+  String get chooseNicknameTitle => 'Выбери свой никнейм';
+
+  @override
+  String get chooseNicknameSubtitle =>
+      'Это твой публичный ник в приложении — именно его увидят другие пользователи. Почта нигде не показывается. Выбирай внимательно: сменить ник потом будет нельзя.';
+
+  @override
+  String get chooseNicknameHint => 'Никнейм';
+
+  @override
+  String get chooseNicknameRequired => 'Введи никнейм';
+
+  @override
+  String get chooseNicknameInvalidChars =>
+      'Только латинские буквы, цифры и подчёркивание, до 25 символов';
+
+  @override
+  String get chooseNicknameTakenError => 'Этот никнейм уже занят';
+
+  @override
+  String get chooseNicknameGenericError =>
+      'Не удалось сохранить никнейм — попробуй ещё раз';
+
+  @override
+  String get chooseNicknameContinueButton => 'Продолжить';
+
+  @override
+  String get onboardingChoiceTitle => 'Добро пожаловать в FOMO Shield';
+
+  @override
+  String get onboardingChoiceSubtitle =>
+      'Это симулятор биржи без реальных денег — место, чтобы учиться и тренироваться без риска. Хочешь короткую экскурсию по приложению, или сразу разберёшься сам?';
+
+  @override
+  String get onboardingChoiceTutorialButton => 'Пройти обучение';
+
+  @override
+  String get onboardingChoiceSkipButton => 'Я сам разберусь';
 }

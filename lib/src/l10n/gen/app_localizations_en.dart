@@ -5768,6 +5768,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disclaimerScreenTitle => 'Disclaimer';
 
   @override
+  String get disclaimerScreenIntro =>
+      'Before we start, a few important things about how this all works — takes a minute.';
+
+  @override
   String get disclaimerScreenAccessRestricted => 'Access Restricted';
 
   @override
@@ -5777,11 +5781,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disclaimerScreenCloseAppButton => 'Close App';
 
   @override
+  String get disclaimerScreenNoRealMoneyTitle =>
+      'This is a simulator — not an exchange';
+
+  @override
+  String get disclaimerScreenNoRealMoneyBody =>
+      'Every balance, trade, and portfolio in this app is entirely virtual. No real money is ever used, no real securities are bought or sold, and nothing that happens in the simulation creates any real financial obligation or right.';
+
+  @override
   String get disclaimerScreenImportantNoticeTitle => 'Important Notice';
 
   @override
   String get disclaimerScreenImportantNoticeBody =>
-      'F.O.M.O. Shield is an educational tool designed to help investors understand market behavior and their own decision-making patterns. It does not provide financial advice, investment recommendations, or any form of financial advisory services.';
+      'F.O.M.O. Shield is an educational tool designed to help users understand market behavior and their own decision-making patterns. It is not an investment adviser, broker-dealer, or financial intermediary, and does not provide individualized financial advice, investment recommendations, or other advisory services. The app is provided \"as is\", without warranties of any kind, and we are not liable for decisions made based on information in the app, including decisions outside the simulation.';
 
   @override
   String get disclaimerScreenFsScoresTitle => 'Independence of FS Scores';
@@ -5802,7 +5814,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get disclaimerScreenPrivacyBody =>
-      'We collect minimal data necessary for app functionality: your email address (for account creation) and the data you generate inside the app (portfolios, watchlist, simulations). We do not sell your data to third parties.';
+      'We collect minimal data necessary for app functionality: your email address (for account creation) and the data you generate inside the app (portfolios, watchlist, simulations). We do not sell your data to third parties. See the full text in our Privacy Policy, linked below.';
 
   @override
   String get disclaimerScreenTermsUpdatesTitle => 'Terms Updates';
@@ -6404,4 +6416,44 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return '$duration test finished — $percent% — tap to view your verdict.';
   }
+
+  @override
+  String get chooseNicknameTitle => 'Choose your nickname';
+
+  @override
+  String get chooseNicknameSubtitle =>
+      'This is your public handle in the app — it\'s what other users will see. Your email is never shown. Choose carefully: it cannot be changed later.';
+
+  @override
+  String get chooseNicknameHint => 'Nickname';
+
+  @override
+  String get chooseNicknameRequired => 'Enter a nickname';
+
+  @override
+  String get chooseNicknameInvalidChars =>
+      'Latin letters, numbers and underscore only, up to 25 characters';
+
+  @override
+  String get chooseNicknameTakenError => 'This nickname is already taken';
+
+  @override
+  String get chooseNicknameGenericError =>
+      'Couldn\'t save your nickname — try again';
+
+  @override
+  String get chooseNicknameContinueButton => 'Continue';
+
+  @override
+  String get onboardingChoiceTitle => 'Welcome to FOMO Shield';
+
+  @override
+  String get onboardingChoiceSubtitle =>
+      'This is a stock market simulator with no real money — a place to learn and practice risk-free. Want a quick tour of the app, or would you rather figure it out yourself?';
+
+  @override
+  String get onboardingChoiceTutorialButton => 'Take the tour';
+
+  @override
+  String get onboardingChoiceSkipButton => 'I\'ll figure it out';
 }

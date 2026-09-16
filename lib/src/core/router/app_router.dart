@@ -12,6 +12,8 @@ import '../supabase/supabase_client.dart';
 import '../../features/auth/account_restore_screen.dart';
 import '../../shared/services/finnhub_service.dart' show AccountDeletionStatus;
 import '../../features/disclaimer/disclaimer_screen.dart';
+import '../../features/onboarding/onboarding_choice_screen.dart';
+import '../../features/nickname/choose_nickname_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
@@ -79,7 +81,14 @@ class _GoRouterRefreshStream extends ChangeNotifier {
 // Routes that manage their own auth/session logic — never redirected away
 // from by the session guard below (Splash resolves the real destination
 // itself; Auth/forgot-password/disclaimer are the destinations).
-const _authExemptPaths = {'/', '/auth', '/forgot-password', '/disclaimer'};
+const _authExemptPaths = {
+  '/',
+  '/auth',
+  '/forgot-password',
+  '/disclaimer',
+  '/onboarding-choice',
+  '/choose-nickname',
+};
 
 class AppRouter {
   AppRouter._();
@@ -126,6 +135,18 @@ class AppRouter {
         path: '/disclaimer',
         name: 'disclaimer',
         builder: (context, state) => const DisclaimerScreen(),
+      ),
+
+      GoRoute(
+        path: '/onboarding-choice',
+        name: 'onboardingChoice',
+        builder: (context, state) => const OnboardingChoiceScreen(),
+      ),
+
+      GoRoute(
+        path: '/choose-nickname',
+        name: 'chooseNickname',
+        builder: (context, state) => const ChooseNicknameScreen(),
       ),
 
       GoRoute(

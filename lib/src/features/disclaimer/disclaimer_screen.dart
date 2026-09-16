@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../auth/auth_providers.dart' show resolvePostAuthRoute;
 
 import 'disclaimer_providers.dart';
 
@@ -52,9 +53,20 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
         });
       }
 
-      if (mounted) context.go('/home');
+      if (!mounted) return;
+      final resolved = await resolvePostAuthRoute(ref);
+      if (mounted) context.go(resolved.route, extra: resolved.extra);
     } catch (_) {
-      if (mounted) context.go('/home');
+      if (!mounted) return;
+      // Re-resolve even on a failed write — isDisclaimerAcceptedProvider
+      // reads SharedPreferences fresh, so if acceptedVersionsProvider's
+      // own write above didn't reach this point, this correctly sends
+      // the user back to /disclaimer instead of a stale hardcoded /home
+      // that used to skip the nickname gate outright (found live
+      // 2026-09-16 — accepting the disclaimer always landed straight on
+      // /home regardless of nickname status).
+      final resolved = await resolvePostAuthRoute(ref);
+      if (mounted) context.go(resolved.route, extra: resolved.extra);
     }
   }
 
@@ -100,6 +112,18 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                   color: ThemeV2.textPrimary,
                 ),
               ),
+              if (!isBlocked) ...[
+                const SizedBox(height: 8),
+                Text(
+                  l10n.disclaimerScreenIntro,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: ThemeV2.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -166,26 +190,37 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               children: [
                 _section(
+                  Icons.videogame_asset_rounded,
+                  l10n.disclaimerScreenNoRealMoneyTitle,
+                  l10n.disclaimerScreenNoRealMoneyBody,
+                ),
+                const SizedBox(height: 16),
+                _section(
+                  Icons.school_rounded,
                   l10n.disclaimerScreenImportantNoticeTitle,
                   l10n.disclaimerScreenImportantNoticeBody,
                 ),
                 const SizedBox(height: 16),
                 _section(
+                  Icons.insights_rounded,
                   l10n.disclaimerScreenFsScoresTitle,
                   l10n.disclaimerScreenFsScoresBody,
                 ),
                 const SizedBox(height: 16),
                 _section(
+                  Icons.dns_rounded,
                   l10n.disclaimerScreenDataSourcesTitle,
                   l10n.disclaimerScreenDataSourcesBody,
                 ),
                 const SizedBox(height: 16),
                 _section(
+                  Icons.lock_outline_rounded,
                   l10n.disclaimerScreenPrivacyTitle,
                   l10n.disclaimerScreenPrivacyBody,
                 ),
                 const SizedBox(height: 16),
                 _section(
+                  Icons.update_rounded,
                   l10n.disclaimerScreenTermsUpdatesTitle,
                   l10n.disclaimerScreenTermsUpdatesBody,
                 ),
@@ -335,17 +370,25 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
     );
   }
 
-  Widget _section(String title, String body) {
+  Widget _section(IconData icon, String title, String body) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: ThemeV2.primary,
-          ),
+        Row(
+          children: [
+            Icon(icon, color: ThemeV2.primary, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: ThemeV2.primary,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         Text(

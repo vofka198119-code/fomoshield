@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../core/supabase/supabase_providers.dart' show myNicknameProvider;
+import '../../core/theme/theme_variant_provider.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../disclaimer/disclaimer_providers.dart';
 
@@ -79,6 +81,10 @@ Future<void> clearAllSessionData() async {
 Future<({String route, Object? extra})> resolvePostAuthRoute(
   WidgetRef ref,
 ) async {
+  // Theme is a device setting a prior sign-out may have temporarily reset
+  // to Standard (see resetToStandardForSignOut's doc comment) — restore
+  // whatever this device had saved, for whichever account just signed in.
+  await ref.read(themeVariantProvider.notifier).restoreFromPrefs();
   try {
     final status = await FinnhubService().accountDeletionStatus();
     if (status.pendingDeletion) {
@@ -90,5 +96,12 @@ Future<({String route, Object? extra})> resolvePostAuthRoute(
   final disclaimerAccepted = await ref.read(
     isDisclaimerAcceptedProvider.future,
   );
-  return (route: disclaimerAccepted ? '/home' : '/disclaimer', extra: null);
+  if (!disclaimerAccepted) return (route: '/disclaimer', extra: null);
+
+  // Global account nickname (Migration 017) — mandatory, one-time. Checked
+  // AFTER disclaimer so a not-yet-accepted account always sees that first.
+  final nickname = await ref.read(myNicknameProvider.future);
+  if (nickname == null) return (route: '/onboarding-choice', extra: null);
+
+  return (route: '/home', extra: null);
 }

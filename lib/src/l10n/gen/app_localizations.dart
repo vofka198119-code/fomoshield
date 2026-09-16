@@ -9721,6 +9721,12 @@ abstract class AppLocalizations {
   /// **'Disclaimer'**
   String get disclaimerScreenTitle;
 
+  /// No description provided for @disclaimerScreenIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Before we start, a few important things about how this all works — takes a minute.'**
+  String get disclaimerScreenIntro;
+
   /// No description provided for @disclaimerScreenAccessRestricted.
   ///
   /// In en, this message translates to:
@@ -9739,6 +9745,18 @@ abstract class AppLocalizations {
   /// **'Close App'**
   String get disclaimerScreenCloseAppButton;
 
+  /// No description provided for @disclaimerScreenNoRealMoneyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a simulator — not an exchange'**
+  String get disclaimerScreenNoRealMoneyTitle;
+
+  /// No description provided for @disclaimerScreenNoRealMoneyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every balance, trade, and portfolio in this app is entirely virtual. No real money is ever used, no real securities are bought or sold, and nothing that happens in the simulation creates any real financial obligation or right.'**
+  String get disclaimerScreenNoRealMoneyBody;
+
   /// No description provided for @disclaimerScreenImportantNoticeTitle.
   ///
   /// In en, this message translates to:
@@ -9748,7 +9766,7 @@ abstract class AppLocalizations {
   /// No description provided for @disclaimerScreenImportantNoticeBody.
   ///
   /// In en, this message translates to:
-  /// **'F.O.M.O. Shield is an educational tool designed to help investors understand market behavior and their own decision-making patterns. It does not provide financial advice, investment recommendations, or any form of financial advisory services.'**
+  /// **'F.O.M.O. Shield is an educational tool designed to help users understand market behavior and their own decision-making patterns. It is not an investment adviser, broker-dealer, or financial intermediary, and does not provide individualized financial advice, investment recommendations, or other advisory services. The app is provided \"as is\", without warranties of any kind, and we are not liable for decisions made based on information in the app, including decisions outside the simulation.'**
   String get disclaimerScreenImportantNoticeBody;
 
   /// No description provided for @disclaimerScreenFsScoresTitle.
@@ -9784,7 +9802,7 @@ abstract class AppLocalizations {
   /// No description provided for @disclaimerScreenPrivacyBody.
   ///
   /// In en, this message translates to:
-  /// **'We collect minimal data necessary for app functionality: your email address (for account creation) and the data you generate inside the app (portfolios, watchlist, simulations). We do not sell your data to third parties.'**
+  /// **'We collect minimal data necessary for app functionality: your email address (for account creation) and the data you generate inside the app (portfolios, watchlist, simulations). We do not sell your data to third parties. See the full text in our Privacy Policy, linked below.'**
   String get disclaimerScreenPrivacyBody;
 
   /// No description provided for @disclaimerScreenTermsUpdatesTitle.
@@ -10806,6 +10824,78 @@ abstract class AppLocalizations {
     String duration,
     String percent,
   );
+
+  /// No description provided for @chooseNicknameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your nickname'**
+  String get chooseNicknameTitle;
+
+  /// No description provided for @chooseNicknameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This is your public handle in the app — it\'s what other users will see. Your email is never shown. Choose carefully: it cannot be changed later.'**
+  String get chooseNicknameSubtitle;
+
+  /// No description provided for @chooseNicknameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get chooseNicknameHint;
+
+  /// No description provided for @chooseNicknameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a nickname'**
+  String get chooseNicknameRequired;
+
+  /// No description provided for @chooseNicknameInvalidChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Latin letters, numbers and underscore only, up to 25 characters'**
+  String get chooseNicknameInvalidChars;
+
+  /// No description provided for @chooseNicknameTakenError.
+  ///
+  /// In en, this message translates to:
+  /// **'This nickname is already taken'**
+  String get chooseNicknameTakenError;
+
+  /// No description provided for @chooseNicknameGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save your nickname — try again'**
+  String get chooseNicknameGenericError;
+
+  /// No description provided for @chooseNicknameContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get chooseNicknameContinueButton;
+
+  /// No description provided for @onboardingChoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to FOMO Shield'**
+  String get onboardingChoiceTitle;
+
+  /// No description provided for @onboardingChoiceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a stock market simulator with no real money — a place to learn and practice risk-free. Want a quick tour of the app, or would you rather figure it out yourself?'**
+  String get onboardingChoiceSubtitle;
+
+  /// No description provided for @onboardingChoiceTutorialButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the tour'**
+  String get onboardingChoiceTutorialButton;
+
+  /// No description provided for @onboardingChoiceSkipButton.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll figure it out'**
+  String get onboardingChoiceSkipButton;
 }
 
 class _AppLocalizationsDelegate
