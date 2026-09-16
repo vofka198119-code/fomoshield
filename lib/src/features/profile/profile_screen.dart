@@ -88,10 +88,9 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
     // see finnhub_service.dart's doc comment and accountCleanup.js on the
     // backend for the actual sweep that does the permanent erase.
     await FinnhubService().scheduleAccountDeletion();
-    await clearAllSessionData();
-    if (!context.mounted) return;
-    Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
-    // Same cache invalidation as Sign Out — see that button's comment.
+    // Same cache invalidation as Sign Out — see that button's comment on
+    // why this runs BEFORE clearAllSessionData() (its signOut() call can
+    // dispose this context mid-sequence via the router's session redirect).
     ref.invalidate(isLoggedInProvider);
     ref.invalidate(hasSupabaseSessionProvider);
     ref.invalidate(watchlistSymbolsProvider);
@@ -99,7 +98,11 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
     ref.invalidate(homeWidgetsProvider);
     ref.invalidate(searchProvider);
     ref.invalidate(searchCounterProvider);
+    ref.invalidate(myNicknameProvider);
+    ref.read(themeVariantProvider.notifier).resetToStandardForSignOut();
+    await clearAllSessionData();
     if (!context.mounted) return;
+    Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
     context.go('/auth');
   } catch (_) {
     if (!context.mounted) return;
@@ -554,13 +557,22 @@ class ProfileScreen extends ConsumerWidget {
             height: 48,
             child: OutlinedButton.icon(
               onPressed: () async {
-                // 1) Clear ALL user session data (SharedPrefs + SecureStorage)
-                await clearAllSessionData();
-                // 2) Invalidate Riverpod providers so they re-load fresh —
+                // 1) Invalidate Riverpod providers so they re-load fresh —
                 // isLoggedIn/hasSupabaseSession are cached FutureProviders;
                 // without this, navigating back to Splash mid-session would
                 // read their stale pre-signout value and silently restore
-                // the old session (real bug, found 2026-08-14).
+                // the old session (real bug, found 2026-08-14). Done BEFORE
+                // clearAllSessionData() below, not after — signOut() fires
+                // the auth-state stream that drives the router's session
+                // redirect, which can dispose this screen mid-sequence;
+                // invalidating first (all synchronous, no `await` between
+                // them) means the widget can't be torn down partway through
+                // and silently skip the later calls (confirmed live
+                // 2026-09-16: myNicknameProvider's invalidate was crashing
+                // with "Cannot use ref after the widget was disposed" when
+                // ordered after the sign-out, so a new account signing in
+                // right after kept reading the previous account's cached
+                // nickname and skipped the mandatory choose-nickname gate).
                 ref.invalidate(isLoggedInProvider);
                 ref.invalidate(hasSupabaseSessionProvider);
                 ref.invalidate(watchlistSymbolsProvider);
@@ -568,6 +580,15 @@ class ProfileScreen extends ConsumerWidget {
                 ref.invalidate(homeWidgetsProvider);
                 ref.invalidate(searchProvider);
                 ref.invalidate(searchCounterProvider);
+                ref.invalidate(myNicknameProvider);
+                // Theme is a device setting, not account-scoped — reset it
+                // so Auth/Disclaimer/onboarding (hardcoded to the standard
+                // palette) aren't painted behind a leftover dark admin
+                // background. resolvePostAuthRoute() restores whichever
+                // theme this device had saved once someone next logs in.
+                ref.read(themeVariantProvider.notifier).resetToStandardForSignOut();
+                // 2) Clear ALL user session data (SharedPrefs + SecureStorage)
+                await clearAllSessionData();
                 // 3) Navigate instantly to login (skip Splash's loading delay)
                 if (!context.mounted) return;
                 context.go('/auth');

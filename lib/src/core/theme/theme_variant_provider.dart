@@ -48,6 +48,29 @@ class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
     if (_hasExplicitChoice) return;
     state = AppThemeVariant.luxuryGold;
   }
+
+  /// Forces the in-memory theme back to Standard without touching the
+  /// persisted choice or [_hasExplicitChoice] — call on sign-out. This is a
+  /// DEVICE-wide setting, not account-scoped, so signed-out screens
+  /// (Auth, Disclaimer, onboarding) must never show whatever theme the
+  /// previous session had selected (found live 2026-09-16: signing out of
+  /// an admin account with a dark theme active left the Auth screen's
+  /// background dark too, unreadable against its own hardcoded-standard
+  /// text). [restoreFromPrefs] undoes this on the next successful login.
+  void resetToStandardForSignOut() {
+    state = AppThemeVariant.standard;
+  }
+
+  /// Re-reads the persisted choice after a successful login, so a sign-out's
+  /// [resetToStandardForSignOut] doesn't strand the device on Standard
+  /// forever — whoever signs in next sees this device's last saved theme,
+  /// same as before sign-out ever touched it.
+  Future<void> restoreFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString(_prefsKey);
+    final match = AppThemeVariant.values.where((v) => v.name == name);
+    if (match.isNotEmpty) state = match.first;
+  }
 }
 
 final themeVariantProvider =
