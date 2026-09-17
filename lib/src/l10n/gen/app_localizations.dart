@@ -10873,6 +10873,24 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get chooseNicknameContinueButton;
 
+  /// No description provided for @languageOnboardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language'**
+  String get languageOnboardingTitle;
+
+  /// No description provided for @languageOnboardingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You can always change this later in Profile settings.'**
+  String get languageOnboardingSubtitle;
+
+  /// No description provided for @languageOnboardingContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get languageOnboardingContinueButton;
+
   /// No description provided for @onboardingChoiceTitle.
   ///
   /// In en, this message translates to:

@@ -12,6 +12,7 @@ import '../supabase/supabase_client.dart';
 import '../../features/auth/account_restore_screen.dart';
 import '../../shared/services/finnhub_service.dart' show AccountDeletionStatus;
 import '../../features/disclaimer/disclaimer_screen.dart';
+import '../../features/onboarding/language_onboarding_screen.dart';
 import '../../features/onboarding/onboarding_choice_screen.dart';
 import '../../features/onboarding/app_tour_screen.dart';
 import '../../features/nickname/choose_nickname_screen.dart';
@@ -86,6 +87,7 @@ const _authExemptPaths = {
   '/',
   '/auth',
   '/forgot-password',
+  '/language-onboarding',
   '/disclaimer',
   '/onboarding-choice',
   '/app-tour',
@@ -131,6 +133,12 @@ class AppRouter {
         path: '/forgot-password',
         name: 'forgotPassword',
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+
+      GoRoute(
+        path: '/language-onboarding',
+        name: 'languageOnboarding',
+        builder: (context, state) => const LanguageOnboardingScreen(),
       ),
 
       GoRoute(

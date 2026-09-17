@@ -47,3 +47,24 @@ class LanguageNotifier extends StateNotifier<Locale?> {
 final languageProvider = StateNotifierProvider<LanguageNotifier, Locale?>(
   (ref) => LanguageNotifier(),
 );
+
+// ---------------------------------------------------------------------------
+// First-run language onboarding gate — separate from the override above,
+// which can legitimately be null ("follow system") even after the user has
+// explicitly chosen that. This flag only tracks whether the onboarding
+// screen itself has ever been shown, same "read directly from
+// SharedPreferences, safe for splash" shape as
+// disclaimer_providers.dart's isDisclaimerAcceptedProvider.
+// ---------------------------------------------------------------------------
+
+const _onboardingSeenKey = 'has_seen_language_onboarding';
+
+final hasChosenLanguageProvider = FutureProvider<bool>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(_onboardingSeenKey) ?? false;
+});
+
+Future<void> markLanguageOnboardingSeen() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(_onboardingSeenKey, true);
+}

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../core/localization/language_provider.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../auth/auth_providers.dart';
 import '../home/home_providers.dart'
@@ -90,18 +91,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   /// re-login network call.
   Future<({String route, Object? extra})> _resolveTargetRoute() async {
     try {
-      final rememberMe = await ref.read(isLoggedInProvider.future);
-      if (!rememberMe) {
-        await clearAllSessionData();
-        return (route: '/auth', extra: null);
+      // First-run language choice comes before everything else — including
+      // the auth screen itself — so a brand new install shows login/signup
+      // already in the language the user just picked. Existing installs
+      // upgrading into this flag for the first time also see it once, but
+      // its own "Continue" button resolves onward via resolveEntryRoute
+      // too, so they land on /home (or whatever gate is still pending)
+      // rather than being bounced back to /auth.
+      final hasChosenLanguage = await ref.read(
+        hasChosenLanguageProvider.future,
+      );
+      if (!hasChosenLanguage) {
+        return (route: '/language-onboarding', extra: null);
       }
 
-      final hasSession = await ref.read(hasSupabaseSessionProvider.future);
-      if (!hasSession) {
-        return (route: '/auth', extra: null);
-      }
-
-      final resolved = await resolvePostAuthRoute(ref);
+      final resolved = await resolveEntryRoute(ref);
       if (resolved.route == '/home') _prefetchHomeData();
       return resolved;
     } catch (_) {

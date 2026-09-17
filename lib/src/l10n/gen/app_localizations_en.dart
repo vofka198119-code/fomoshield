@@ -6445,6 +6445,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseNicknameContinueButton => 'Continue';
 
   @override
+  String get languageOnboardingTitle => 'Choose your language';
+
+  @override
+  String get languageOnboardingSubtitle =>
+      'You can always change this later in Profile settings.';
+
+  @override
+  String get languageOnboardingContinueButton => 'Continue';
+
+  @override
   String get onboardingChoiceTitle => 'Welcome to FOMO Shield';
 
   @override

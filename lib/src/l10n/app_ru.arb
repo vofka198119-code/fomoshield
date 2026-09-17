@@ -1840,6 +1840,10 @@
   "chooseNicknameGenericError": "Не удалось сохранить никнейм — попробуй ещё раз",
   "chooseNicknameContinueButton": "Продолжить",
 
+  "languageOnboardingTitle": "Выбери язык",
+  "languageOnboardingSubtitle": "Ты всегда сможешь изменить это позже в настройках профиля.",
+  "languageOnboardingContinueButton": "Продолжить",
+
   "onboardingChoiceTitle": "Добро пожаловать в FOMO Shield",
   "onboardingChoiceSubtitle": "Это симулятор биржи без реальных денег — место, чтобы учиться и тренироваться без риска. Хочешь короткую экскурсию по приложению, или сразу разберёшься сам?",
   "onboardingChoiceTutorialButton": "Пройти обучение",

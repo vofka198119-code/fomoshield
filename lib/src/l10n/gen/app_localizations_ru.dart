@@ -6466,6 +6466,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chooseNicknameContinueButton => 'Продолжить';
 
   @override
+  String get languageOnboardingTitle => 'Выбери язык';
+
+  @override
+  String get languageOnboardingSubtitle =>
+      'Ты всегда сможешь изменить это позже в настройках профиля.';
+
+  @override
+  String get languageOnboardingContinueButton => 'Продолжить';
+
+  @override
   String get onboardingChoiceTitle => 'Добро пожаловать в FOMO Shield';
 
   @override

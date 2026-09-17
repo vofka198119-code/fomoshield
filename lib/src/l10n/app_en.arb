@@ -2602,6 +2602,10 @@
   "chooseNicknameGenericError": "Couldn't save your nickname — try again",
   "chooseNicknameContinueButton": "Continue",
 
+  "languageOnboardingTitle": "Choose your language",
+  "languageOnboardingSubtitle": "You can always change this later in Profile settings.",
+  "languageOnboardingContinueButton": "Continue",
+
   "onboardingChoiceTitle": "Welcome to FOMO Shield",
   "onboardingChoiceSubtitle": "This is a stock market simulator with no real money — a place to learn and practice risk-free. Want a quick tour of the app, or would you rather figure it out yourself?",
   "onboardingChoiceTutorialButton": "Take the tour",

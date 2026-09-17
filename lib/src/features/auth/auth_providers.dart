@@ -105,3 +105,28 @@ Future<({String route, Object? extra})> resolvePostAuthRoute(
 
   return (route: '/home', extra: null);
 }
+
+// ---------------------------------------------------------------------------
+// Entry route — the session-check half of SplashScreen's resolution,
+// factored out so LanguageOnboardingScreen's "Continue" button can land an
+// upgrading existing user exactly where Splash would have (straight to
+// /home, or whatever gate is still pending) instead of hardcoding /auth,
+// which would force a already-signed-in user back through login.
+// ---------------------------------------------------------------------------
+
+Future<({String route, Object? extra})> resolveEntryRoute(
+  WidgetRef ref,
+) async {
+  final rememberMe = await ref.read(isLoggedInProvider.future);
+  if (!rememberMe) {
+    await clearAllSessionData();
+    return (route: '/auth', extra: null);
+  }
+
+  final hasSession = await ref.read(hasSupabaseSessionProvider.future);
+  if (!hasSession) {
+    return (route: '/auth', extra: null);
+  }
+
+  return resolvePostAuthRoute(ref);
+}
