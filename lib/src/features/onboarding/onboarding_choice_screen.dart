@@ -56,7 +56,7 @@ class OnboardingChoiceScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 14,
-                  color: ThemeV2.textSecondary,
+                  color: ThemeV2.textBody,
                   height: 1.5,
                 ),
               ),

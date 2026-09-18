@@ -1,8 +1,9 @@
 // ---------------------------------------------------------------------------
-// Theme Picker — reached from Profile → Preferences → Theme (admin-only for
-// now, see profile_screen.dart). Standard (default) + Luxury Gold, the
-// admin preview theme being built out molecule by molecule — see
-// theme_variant_provider.dart / luxury_gold_theme.dart.
+// Theme Picker — reached from Profile → Preferences → Theme. Gated on
+// premium/admin in profile_screen.dart (opened up 2026-09-18 from an
+// earlier admin-only preview, now that all 5 themes are stable/shipped —
+// free stays on Standard). See theme_variant_provider.dart for the
+// variant enum and app_palette.dart for each theme's token set.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';

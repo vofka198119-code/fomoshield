@@ -5,6 +5,11 @@ import '../../core/supabase/supabase_providers.dart' show myNicknameProvider;
 import '../../core/theme/theme_variant_provider.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../disclaimer/disclaimer_providers.dart';
+import '../home/home_providers.dart' show watchlistSymbolsProvider;
+import '../home/widget_order_provider.dart' show homeWidgetsProvider;
+import '../portfolio/portfolio_providers.dart' show portfoliosProvider;
+import '../search/search_provider.dart' show searchProvider;
+import '../search/search_counter_provider.dart' show searchCounterProvider;
 
 // ---------------------------------------------------------------------------
 // Supabase Session Check (for splash screen)
@@ -60,6 +65,37 @@ Future<void> clearAllSessionData() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool('is_logged_in', false);
   await SupabaseConfig.client.auth.signOut();
+}
+
+/// Invalidates every cached provider that must not leak from one account
+/// into the next — call this immediately before every [clearAllSessionData]
+/// (all synchronous, no `await` between them, same reasoning as
+/// profile_screen.dart's own sign-out buttons: signOut() fires the auth-
+/// state stream that drives the router's session redirect, which can
+/// dispose the caller mid-sequence and silently skip whatever came after).
+///
+/// Originally only profile_screen.dart's two sign-out buttons did this
+/// (added 2026-09-16 after a stale myNicknameProvider let a new sign-in
+/// skip the mandatory nickname gate). Three MORE sign-out call sites
+/// existed without it — [resolveEntryRoute]'s "remember me" unchecked
+/// path (hit on every cold start, including every `flutter run` restart
+/// during dev testing), account_restore_screen.dart, and auth_screen
+/// .dart's duplicate-email sign-up probe — found live 2026-09-18 when an
+/// admin account got bounced back to the choose-nickname screen after a
+/// plain account switch, because one of these paths left a DIFFERENT
+/// account's stale (null) nickname cached. Consolidated into one function
+/// so a future sign-out path can't independently forget a provider this
+/// one already knows about.
+void invalidateSessionScopedProviders(WidgetRef ref) {
+  ref.invalidate(isLoggedInProvider);
+  ref.invalidate(hasSupabaseSessionProvider);
+  ref.invalidate(watchlistSymbolsProvider);
+  ref.invalidate(portfoliosProvider);
+  ref.invalidate(homeWidgetsProvider);
+  ref.invalidate(searchProvider);
+  ref.invalidate(searchCounterProvider);
+  ref.invalidate(myNicknameProvider);
+  ref.read(themeVariantProvider.notifier).resetToStandardForSignOut();
 }
 
 // ---------------------------------------------------------------------------
@@ -119,6 +155,7 @@ Future<({String route, Object? extra})> resolveEntryRoute(
 ) async {
   final rememberMe = await ref.read(isLoggedInProvider.future);
   if (!rememberMe) {
+    invalidateSessionScopedProviders(ref);
     await clearAllSessionData();
     return (route: '/auth', extra: null);
   }

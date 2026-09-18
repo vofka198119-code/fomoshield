@@ -64,9 +64,21 @@ abstract final class ThemeV2 {
   /// Step 11
   static const Color surface = Color(0xFFFFFFFF);
 
-  /// Secondary text — muted, grey.
+  /// Secondary text — muted, grey. Reserve for low-emphasis chrome
+  /// (borders, hint text, disabled labels) — too low-contrast for
+  /// anything a user actually needs to read; use [textBody] instead for
+  /// subtitles/paragraphs (found live 2026-09-18: this exact color was
+  /// hard to read as onboarding-choice/disclaimer/nickname screens'
+  /// intro paragraphs).
   /// Step 12
   static const Color textSecondary = Color(0xFF8B8B8B);
+
+  /// Readable body/subtitle text — darker than [textSecondary] (which
+  /// reads too faint for actual paragraph copy), lighter than
+  /// [textPrimary]. Use for intro/description text on the pre-theme
+  /// first-run screens (disclaimer, onboarding, nickname) that
+  /// [textSecondary] was previously (mis)used for.
+  static const Color textBody = Color(0xFF5A5A5A);
 
   /// Primary text — near-black.
   /// Step 13

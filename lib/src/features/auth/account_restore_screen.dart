@@ -62,6 +62,9 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
   }
 
   Future<void> _signOut() async {
+    // Same shared invalidation as every other sign-out path in the app —
+    // see auth_providers.dart's invalidateSessionScopedProviders.
+    invalidateSessionScopedProviders(ref);
     await clearAllSessionData();
     if (!mounted) return;
     context.go('/auth');

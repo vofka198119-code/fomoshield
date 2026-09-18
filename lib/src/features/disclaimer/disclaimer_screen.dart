@@ -119,7 +119,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: ThemeV2.textSecondary,
+                    color: ThemeV2.textBody,
                     height: 1.4,
                   ),
                 ),
@@ -146,7 +146,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       fontSize: 16,
-                      color: ThemeV2.textSecondary,
+                      color: ThemeV2.textBody,
                       height: 1.5,
                     ),
                   ),
@@ -269,7 +269,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                         text: TextSpan(
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: ThemeV2.textSecondary,
+                            color: ThemeV2.textBody,
                             height: 1.5,
                           ),
                           children: [
@@ -395,7 +395,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
           body,
           style: GoogleFonts.inter(
             fontSize: 13,
-            color: ThemeV2.textSecondary,
+            color: ThemeV2.textBody,
             height: 1.6,
           ),
         ),

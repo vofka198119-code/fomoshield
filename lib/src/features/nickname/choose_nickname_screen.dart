@@ -107,7 +107,7 @@ class _ChooseNicknameScreenState extends ConsumerState<ChooseNicknameScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: ThemeV2.textSecondary,
+                    color: ThemeV2.textBody,
                     height: 1.5,
                   ),
                 ),
@@ -157,14 +157,6 @@ class _ChooseNicknameScreenState extends ConsumerState<ChooseNicknameScreen> {
                     },
                   ),
                 ),
-                if (_serverError != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    _serverError!,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
-                  ),
-                ],
                 const SizedBox(height: 24),
                 SizedBox(
                   height: 52,

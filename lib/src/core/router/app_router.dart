@@ -171,7 +171,8 @@ class AppRouter {
         builder: (context, state) => const LanguagePickerScreen(),
       ),
 
-      // Admin-only preview for now — see profile_screen.dart's gating.
+      // Premium+admin (opened up 2026-09-18) — see profile_screen.dart's
+      // gating for the actual access check.
       GoRoute(
         path: '/theme',
         name: 'theme',

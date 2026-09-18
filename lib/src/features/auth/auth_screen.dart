@@ -153,7 +153,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           // This probe's only purpose was to check for a duplicate — undo
           // the session it accidentally established before surfacing the
           // error, so the app doesn't end up silently authenticated as
-          // this account while still showing the Sign Up screen.
+          // this account while still showing the Sign Up screen. Also
+          // invalidate every session-scoped provider — the brief real
+          // sign-in above already loaded whichever theme/nickname/data
+          // THAT account had, and without this it stayed cached and
+          // leaked into whatever signs in next.
+          invalidateSessionScopedProviders(ref);
           await SupabaseConfig.client.auth.signOut();
           if (!mounted) return;
           setState(() {

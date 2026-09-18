@@ -13,11 +13,8 @@ import '../../core/theme/themed_divider.dart';
 import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../auth/auth_providers.dart';
-import '../home/home_providers.dart';
-import '../home/widget_order_provider.dart';
 import '../portfolio/portfolio_providers.dart';
 import '../search/search_counter_provider.dart';
-import '../search/search_provider.dart';
 import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
@@ -88,18 +85,11 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
     // see finnhub_service.dart's doc comment and accountCleanup.js on the
     // backend for the actual sweep that does the permanent erase.
     await FinnhubService().scheduleAccountDeletion();
-    // Same cache invalidation as Sign Out — see that button's comment on
-    // why this runs BEFORE clearAllSessionData() (its signOut() call can
-    // dispose this context mid-sequence via the router's session redirect).
-    ref.invalidate(isLoggedInProvider);
-    ref.invalidate(hasSupabaseSessionProvider);
-    ref.invalidate(watchlistSymbolsProvider);
-    ref.invalidate(portfoliosProvider);
-    ref.invalidate(homeWidgetsProvider);
-    ref.invalidate(searchProvider);
-    ref.invalidate(searchCounterProvider);
-    ref.invalidate(myNicknameProvider);
-    ref.read(themeVariantProvider.notifier).resetToStandardForSignOut();
+    // Same cache invalidation as Sign Out — see
+    // invalidateSessionScopedProviders's own doc comment for why this
+    // runs BEFORE clearAllSessionData() (its signOut() call can dispose
+    // this context mid-sequence via the router's session redirect).
+    invalidateSessionScopedProviders(ref);
     await clearAllSessionData();
     if (!context.mounted) return;
     Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
@@ -164,7 +154,14 @@ class ProfileScreen extends ConsumerWidget {
           );
 
     final email = user?.email ?? l10n.profileNotSignedIn;
-    final displayName = email.split('@').first;
+    // Real account nickname (Migration 017) — was never actually wired up
+    // here despite gating onboarding; fell back to the email's own local
+    // part as a placeholder "display name" the whole time (found live
+    // 2026-09-18). valueOrNull's own null (still loading, or genuinely
+    // unset) keeps that same email-derived fallback rather than showing
+    // nothing.
+    final nickname = ref.watch(myNicknameProvider).valueOrNull;
+    final displayName = nickname ?? email.split('@').first;
     final isPremium = subscriptionTier == SubscriptionTier.premium;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
@@ -445,8 +442,10 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Theme (admin-only preview for now) ─────────────────────
-          if (isAdmin) ...[
+          // ── Theme (premium+admin, 2026-09-18 — themes are stable now,
+          // opened up from the earlier admin-only preview; free stays on
+          // Standard) ─────────────────────
+          if (subscriptionTier.isPremiumOrAdmin) ...[
             const SizedBox(height: 12),
             CardFrame(
               padding: EdgeInsets.zero,
@@ -557,36 +556,17 @@ class ProfileScreen extends ConsumerWidget {
             height: 48,
             child: OutlinedButton.icon(
               onPressed: () async {
-                // 1) Invalidate Riverpod providers so they re-load fresh —
-                // isLoggedIn/hasSupabaseSession are cached FutureProviders;
-                // without this, navigating back to Splash mid-session would
-                // read their stale pre-signout value and silently restore
-                // the old session (real bug, found 2026-08-14). Done BEFORE
+                // 1) Invalidate every session-scoped provider so they
+                // re-load fresh for whoever signs in next — done BEFORE
                 // clearAllSessionData() below, not after — signOut() fires
                 // the auth-state stream that drives the router's session
                 // redirect, which can dispose this screen mid-sequence;
                 // invalidating first (all synchronous, no `await` between
-                // them) means the widget can't be torn down partway through
-                // and silently skip the later calls (confirmed live
-                // 2026-09-16: myNicknameProvider's invalidate was crashing
-                // with "Cannot use ref after the widget was disposed" when
-                // ordered after the sign-out, so a new account signing in
-                // right after kept reading the previous account's cached
-                // nickname and skipped the mandatory choose-nickname gate).
-                ref.invalidate(isLoggedInProvider);
-                ref.invalidate(hasSupabaseSessionProvider);
-                ref.invalidate(watchlistSymbolsProvider);
-                ref.invalidate(portfoliosProvider);
-                ref.invalidate(homeWidgetsProvider);
-                ref.invalidate(searchProvider);
-                ref.invalidate(searchCounterProvider);
-                ref.invalidate(myNicknameProvider);
-                // Theme is a device setting, not account-scoped — reset it
-                // so Auth/Disclaimer/onboarding (hardcoded to the standard
-                // palette) aren't painted behind a leftover dark admin
-                // background. resolvePostAuthRoute() restores whichever
-                // theme this device had saved once someone next logs in.
-                ref.read(themeVariantProvider.notifier).resetToStandardForSignOut();
+                // them) means the widget can't be torn down partway
+                // through and silently skip the later calls (confirmed
+                // live 2026-09-16 for myNicknameProvider specifically —
+                // see invalidateSessionScopedProviders's own doc comment).
+                invalidateSessionScopedProviders(ref);
                 // 2) Clear ALL user session data (SharedPrefs + SecureStorage)
                 await clearAllSessionData();
                 // 3) Navigate instantly to login (skip Splash's loading delay)
