@@ -8,9 +8,10 @@
 > through and marked up changes, tell me and I'll fold them in — this file
 > is not linked from the app or the server yet.
 
-**Last updated:** [DATE — fill in when published]
-**Effective for app version:** 1.0.0 (confirm this still matches
-`pubspec.yaml` at the time you actually publish)
+**Last updated:** September 17, 2026
+**Effective for app version:** 1.0.0 (build 123) — synced with the live
+page at fomoshield.app/privacy; re-check against `pubspec.yaml` before
+each future publish.
 
 ---
 

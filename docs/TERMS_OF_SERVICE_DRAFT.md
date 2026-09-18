@@ -6,7 +6,7 @@
 > values. Not linked from the app or server yet — read it, mark it up, and
 > I'll fold in your changes.
 
-**Last updated:** [DATE]
+**Last updated:** September 17, 2026
 
 ---
 
