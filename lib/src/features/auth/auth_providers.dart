@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../core/supabase/supabase_providers.dart' show myNicknameProvider;
@@ -61,10 +62,27 @@ Future<void> setIsLoggedIn(bool value) async {
 /// Clears auth session data. Does NOT clear SharedPreferences (portfolios,
 /// watchlist, widget order) so data persists for the next login under the
 /// same email.
+///
+/// Also signs out of the native GoogleSignIn session (found 2026-09-19,
+/// live on-device debugging a Play Store closed-testing round): this was
+/// never called anywhere, so every sign-out only cleared the Supabase side
+/// — the native Android Credential Manager session GoogleSignIn.instance
+/// holds stayed alive underneath. The very next authenticate() call inside
+/// that same still-alive native session behaved inconsistently (silent
+/// failures with no error reaching Dart), which is why sign-in tended to
+/// work once per fresh app install/process but broke on a sign-out-then-
+/// sign-back-in cycle with the SAME process still running.
 Future<void> clearAllSessionData() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool('is_logged_in', false);
   await SupabaseConfig.client.auth.signOut();
+  try {
+    await GoogleSignIn.instance.signOut();
+  } catch (_) {
+    // Not signed in via Google, or the plugin isn't initialized yet on
+    // this path (e.g. signing out an email/password-only account) —
+    // safe to ignore, this is best-effort cleanup only.
+  }
 }
 
 /// Invalidates every cached provider that must not leak from one account

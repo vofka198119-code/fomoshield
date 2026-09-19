@@ -291,6 +291,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       context.go(resolved.route, extra: resolved.extra);
     } on GoogleSignInException catch (e) {
       if (!mounted) return;
+      // TEMP DEBUG 2026-09-19: the plugin folds several distinct native
+      // Credential Manager failures (real user-cancel, SHA-1/OAuth-client
+      // mismatch, etc.) into this one .canceled code with no UI-visible
+      // text — logging the raw exception to tell them apart live via
+      // logcat. Remove once Google Sign-In on the Play Store build is
+      // confirmed working.
+      debugPrint(
+        '🔑 GoogleSignInException: code=${e.code} description=${e.description} details=${e.details}',
+      );
       if (e.code == GoogleSignInExceptionCode.canceled) {
         setState(() => _isLoading = false);
         return;
