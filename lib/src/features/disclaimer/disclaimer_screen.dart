@@ -39,6 +39,13 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
     try {
       final remoteVersions = await ref.read(remoteVersionsProvider.future);
       await ref.read(acceptedVersionsProvider.notifier).accept(remoteVersions);
+      // isDisclaimerAcceptedProvider is a plain (non-autoDispose)
+      // FutureProvider — it caches its resolved value forever until
+      // invalidated. resolvePostAuthRoute() (called below) reads it, so
+      // without this invalidation it keeps returning the stale pre-accept
+      // `false` it resolved to on Splash, sending the user right back to
+      // /disclaimer on every tap despite the write above having succeeded.
+      ref.invalidate(isDisclaimerAcceptedProvider);
 
       // Mark setup as complete in Supabase users table
       final user = SupabaseConfig.client.auth.currentUser;

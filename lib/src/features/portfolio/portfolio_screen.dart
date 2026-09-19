@@ -142,16 +142,44 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               style: GoogleFonts.inter(fontSize: 14, color: palette.textBody),
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => _showCreatePortfolioDialog(context, ref),
-              icon: const Icon(Icons.add_rounded),
-              label: Text(l10n.portfolioCreateButton),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ThemeV2.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+            SizedBox(
+              height: ThemeV2.buttonHeight,
+              child: IntrinsicWidth(
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: themedDarkCtaButtonShell(
+                    palette: palette,
+                    borderRadius: ThemeV2.borderRadiusMedium,
+                    standardDecoration: BoxDecoration(
+                      color: ThemeV2.primary,
+                      borderRadius: ThemeV2.borderRadiusMedium,
+                    ),
+                    child: InkWell(
+                      borderRadius: ThemeV2.borderRadiusMedium,
+                      onTap: () => _showCreatePortfolioDialog(context, ref),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.add_rounded,
+                              color: themedDarkCtaContentColor(palette),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.portfolioCreateButton,
+                              style: GoogleFonts.inter(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: themedDarkCtaContentColor(palette),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
