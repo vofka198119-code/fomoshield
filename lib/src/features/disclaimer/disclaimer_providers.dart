@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/services/finnhub_service.dart';
@@ -142,12 +143,23 @@ final isDisclaimerAcceptedProvider = FutureProvider<bool>((ref) async {
   final ppv = prefs.getString('accepted_privacy_policy_version');
   final tv = prefs.getString('accepted_terms_version');
 
+  // TEMP DEBUG 2026-09-20 — chasing a false disclaimer/onboarding re-prompt
+  // on rapid account switching (see mac_migration_gotchas memory). Remove
+  // once confirmed fixed.
+  debugPrint('📜 isDisclaimerAcceptedProvider: stored dv=$dv ppv=$ppv tv=$tv');
+
   if (dv == null || ppv == null || tv == null) return false;
 
   final remote = await ref.watch(remoteVersionsProvider.future);
-  return dv == remote.disclaimerVersion &&
+  final result =
+      dv == remote.disclaimerVersion &&
       ppv == remote.privacyPolicyVersion &&
       tv == remote.termsVersion;
+  debugPrint(
+    '📜 isDisclaimerAcceptedProvider: remote dv=${remote.disclaimerVersion} '
+    'ppv=${remote.privacyPolicyVersion} tv=${remote.termsVersion} -> result=$result',
+  );
+  return result;
 });
 
 // ---------------------------------------------------------------------------

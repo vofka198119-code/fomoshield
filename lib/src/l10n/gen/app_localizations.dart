@@ -9925,12 +9925,6 @@ abstract class AppLocalizations {
   /// **'If this email is registered in our system, we\'ve sent a password reset link to it.'**
   String get forgotPasswordScreenSentMessage;
 
-  /// No description provided for @forgotPasswordScreenDevModeNote.
-  ///
-  /// In en, this message translates to:
-  /// **'Dev mode: reset link is logged in the debug console.'**
-  String get forgotPasswordScreenDevModeNote;
-
   /// No description provided for @forgotPasswordScreenSendButton.
   ///
   /// In en, this message translates to:
@@ -9942,6 +9936,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to Sign In'**
   String get forgotPasswordScreenBackToSignIn;
+
+  /// No description provided for @resetPasswordScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a new password'**
+  String get resetPasswordScreenTitle;
+
+  /// No description provided for @resetPasswordScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a new password for your account.'**
+  String get resetPasswordScreenSubtitle;
+
+  /// No description provided for @resetPasswordScreenNewPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get resetPasswordScreenNewPasswordHint;
+
+  /// No description provided for @resetPasswordScreenConfirmPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get resetPasswordScreenConfirmPasswordHint;
+
+  /// No description provided for @resetPasswordScreenEnterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a new password'**
+  String get resetPasswordScreenEnterPassword;
+
+  /// No description provided for @resetPasswordScreenMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords don\'t match'**
+  String get resetPasswordScreenMismatch;
+
+  /// No description provided for @resetPasswordScreenGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get resetPasswordScreenGenericError;
+
+  /// No description provided for @resetPasswordScreenSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Set New Password'**
+  String get resetPasswordScreenSubmitButton;
+
+  /// No description provided for @resetPasswordScreenDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated'**
+  String get resetPasswordScreenDoneTitle;
+
+  /// No description provided for @resetPasswordScreenDoneSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again with your new password.'**
+  String get resetPasswordScreenDoneSubtitle;
+
+  /// No description provided for @resetPasswordScreenBackToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Sign In'**
+  String get resetPasswordScreenBackToSignIn;
 
   /// No description provided for @authGoogleNoIdToken.
   ///

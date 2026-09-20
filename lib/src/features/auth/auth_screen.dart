@@ -354,9 +354,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                _isLogin
-                    ? l10n.authSignInSubtitle
-                    : l10n.authSignUpSubtitle,
+                _isLogin ? l10n.authSignInSubtitle : l10n.authSignUpSubtitle,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: ThemeV2.textSecondary,

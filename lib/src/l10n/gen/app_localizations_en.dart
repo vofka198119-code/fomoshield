@@ -5897,14 +5897,46 @@ class AppLocalizationsEn extends AppLocalizations {
       'If this email is registered in our system, we\'ve sent a password reset link to it.';
 
   @override
-  String get forgotPasswordScreenDevModeNote =>
-      'Dev mode: reset link is logged in the debug console.';
-
-  @override
   String get forgotPasswordScreenSendButton => 'Send Reset Link';
 
   @override
   String get forgotPasswordScreenBackToSignIn => 'Back to Sign In';
+
+  @override
+  String get resetPasswordScreenTitle => 'Set a new password';
+
+  @override
+  String get resetPasswordScreenSubtitle =>
+      'Choose a new password for your account.';
+
+  @override
+  String get resetPasswordScreenNewPasswordHint => 'New password';
+
+  @override
+  String get resetPasswordScreenConfirmPasswordHint => 'Confirm new password';
+
+  @override
+  String get resetPasswordScreenEnterPassword => 'Please enter a new password';
+
+  @override
+  String get resetPasswordScreenMismatch => 'Passwords don\'t match';
+
+  @override
+  String get resetPasswordScreenGenericError =>
+      'Something went wrong. Please try again.';
+
+  @override
+  String get resetPasswordScreenSubmitButton => 'Set New Password';
+
+  @override
+  String get resetPasswordScreenDoneTitle => 'Password updated';
+
+  @override
+  String get resetPasswordScreenDoneSubtitle =>
+      'Sign in again with your new password.';
+
+  @override
+  String get resetPasswordScreenBackToSignIn => 'Back to Sign In';
 
   @override
   String get authGoogleNoIdToken => 'Google did not return an ID token.';

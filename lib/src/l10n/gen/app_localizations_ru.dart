@@ -5914,14 +5914,45 @@ class AppLocalizationsRu extends AppLocalizations {
       'Если этот email зарегистрирован в системе, мы отправили на него ссылку для сброса пароля.';
 
   @override
-  String get forgotPasswordScreenDevModeNote =>
-      'Режим разработки: ссылка для сброса выводится в консоль отладки.';
-
-  @override
   String get forgotPasswordScreenSendButton => 'Отправить ссылку';
 
   @override
   String get forgotPasswordScreenBackToSignIn => 'Назад ко входу';
+
+  @override
+  String get resetPasswordScreenTitle => 'Придумай новый пароль';
+
+  @override
+  String get resetPasswordScreenSubtitle =>
+      'Выбери новый пароль для своего аккаунта.';
+
+  @override
+  String get resetPasswordScreenNewPasswordHint => 'Новый пароль';
+
+  @override
+  String get resetPasswordScreenConfirmPasswordHint => 'Повтори новый пароль';
+
+  @override
+  String get resetPasswordScreenEnterPassword => 'Введи новый пароль';
+
+  @override
+  String get resetPasswordScreenMismatch => 'Пароли не совпадают';
+
+  @override
+  String get resetPasswordScreenGenericError =>
+      'Что-то пошло не так. Попробуй ещё раз.';
+
+  @override
+  String get resetPasswordScreenSubmitButton => 'Сохранить пароль';
+
+  @override
+  String get resetPasswordScreenDoneTitle => 'Пароль обновлён';
+
+  @override
+  String get resetPasswordScreenDoneSubtitle => 'Войди снова с новым паролем.';
+
+  @override
+  String get resetPasswordScreenBackToSignIn => 'Назад ко входу';
 
   @override
   String get authGoogleNoIdToken => 'Google не вернул ID-токен.';

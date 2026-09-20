@@ -62,10 +62,20 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     });
 
     try {
-      // ── Attempt to send reset via Supabase ─────────────────────
-      // In dev/test mode, Supabase won't actually send an email,
-      // but the API will accept the request.
-      await SupabaseConfig.client.auth.resetPasswordForEmail(email);
+      // redirectTo reuses the SAME deep link + intent-filter as sign-up's
+      // email confirmation (auth_screen.dart) — com.scanco.scanco://
+      // login-callback is already registered and working, so the reset
+      // link lands back in the app instead of an unconfigured page (found
+      // broken 2026-09-19, see mac_migration_gotchas memory). Supabase
+      // fires AuthChangeEvent.passwordRecovery (not a plain signedIn) when
+      // this specific link is what opened the app — the router's redirect
+      // callback watches for that (see password_recovery.dart) and sends
+      // the user to /reset-password instead of wherever a normal session
+      // would go.
+      await SupabaseConfig.client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'com.scanco.scanco://login-callback',
+      );
 
       // Record this request for rate limiting
       _lastResetRequest[email.toLowerCase()] = DateTime.now();
@@ -78,15 +88,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         _isSent = true;
         _isLoading = false;
       });
-
-      // ── Mock: log the reset link to console for testing ────────
-      debugPrint('═══════════════════════════════════════');
-      debugPrint('🔑 PASSWORD RESET (MOCK)');
-      debugPrint('   Email: $email');
-      debugPrint('   In production, Supabase sends an email.');
-      debugPrint('   For testing: check Supabase Auth logs or');
-      debugPrint('   use the "magic link" from your Supabase dashboard.');
-      debugPrint('═══════════════════════════════════════');
     } on AuthException catch (e) {
       if (!mounted) return;
       // Still show generic message for security
@@ -186,34 +187,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           fontSize: 13,
                           color: ThemeV2.textSecondary,
                           height: 1.4,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // Mock note for testing
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: ThemeV2.surfaceDark,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.info_outlined,
-                              color: ThemeV2.primary,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                l10n.forgotPasswordScreenDevModeNote,
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  color: ThemeV2.primary,
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ],

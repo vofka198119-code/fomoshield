@@ -15,11 +15,19 @@ import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
 import 'src/core/theme/app_palette.dart';
 import 'src/core/theme/theme_variant_provider.dart';
+import 'src/features/auth/password_recovery.dart';
 import 'src/features/orders/pending_orders_checker.dart';
 import 'src/l10n/gen/app_localizations.dart';
 
 void main() async {
+  // TEMP DEBUG 2026-09-19 — bracketing main()'s startup awaits to find
+  // exactly where a real-device boot stalls (see mac_migration_gotchas
+  // memory: build 128 showed only 1 I/flutter logcat line ever, no
+  // steady-state traffic, during 3 reported sign-in attempts). Remove once
+  // the hang location is found.
+  debugPrint('🐛 main() start');
   WidgetsFlutterBinding.ensureInitialized();
+  debugPrint('🐛 WidgetsFlutterBinding ready');
 
   // Locked portrait-only regardless of the device's own rotation-lock
   // setting or auto-rotate being on — nothing in the UI (fixed-width 430
@@ -30,6 +38,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  debugPrint('🐛 orientation locked');
 
   // Edge-to-edge with a fully transparent system nav bar — no solid plate
   // behind the 3-button/gesture bar, regardless of the device's system
@@ -62,6 +71,7 @@ void main() async {
     url: SupabaseConfig.projectUrl,
     publishableKey: SupabaseConfig.anonKey,
   );
+  initPasswordRecoveryListener();
 
   // GoogleSignIn.instance.initialize() moved off this blocking path
   // (2026-08-14) — it isn't needed until the user actually taps "Continue
@@ -145,13 +155,15 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
             value: SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,
               statusBarIconBrightness:
-                  palette.backgroundGradient != null || palette.background != null
+                  palette.backgroundGradient != null ||
+                      palette.background != null
                   ? Brightness.light
                   : Brightness.dark,
               systemNavigationBarColor: Colors.transparent,
               systemNavigationBarDividerColor: Colors.transparent,
               systemNavigationBarIconBrightness:
-                  palette.backgroundGradient != null || palette.background != null
+                  palette.backgroundGradient != null ||
+                      palette.background != null
                   ? Brightness.light
                   : Brightness.dark,
             ),
@@ -160,7 +172,8 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
                 // Priority: a themed gradient, else a themed flat color,
                 // else Standard's own default gradient. Mirrors the
                 // 3-way fallback every screen used to hand-roll itself.
-                gradient: palette.backgroundGradient ??
+                gradient:
+                    palette.backgroundGradient ??
                     (palette.background == null
                         ? ThemeV2.backgroundGradient
                         : null),

@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/auth/auth_screen.dart';
 import '../../features/auth/forgot_password_screen.dart';
+import '../../features/auth/reset_password_screen.dart';
+import '../../features/auth/password_recovery.dart';
 import '../supabase/supabase_client.dart';
 
 import '../../features/auth/account_restore_screen.dart';
@@ -87,6 +89,7 @@ const _authExemptPaths = {
   '/',
   '/auth',
   '/forgot-password',
+  '/reset-password',
   '/language-onboarding',
   '/disclaimer',
   '/onboarding-choice',
@@ -111,6 +114,15 @@ class AppRouter {
     // already handles), send the user back to /auth instead of leaving
     // them stranded on a screen that assumes they're signed in.
     redirect: (context, state) {
+      // Checked BEFORE the exempt-paths/session guard below: opening the
+      // password-reset deep link leaves a real, live Supabase session (see
+      // password_recovery.dart's doc comment) — without this check, that
+      // session would just look like a normal sign-in and send the user
+      // straight to Home instead of letting them actually set a new
+      // password.
+      if (isInPasswordRecovery && state.matchedLocation != '/reset-password') {
+        return '/reset-password';
+      }
       if (_authExemptPaths.contains(state.matchedLocation)) return null;
       final hasSession = SupabaseConfig.client.auth.currentSession != null;
       return hasSession ? null : '/auth';
@@ -133,6 +145,14 @@ class AppRouter {
         path: '/forgot-password',
         name: 'forgotPassword',
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+
+      // Set-new-password landing screen for the recovery deep link (full
+      // screen, no shell) — see password_recovery.dart.
+      GoRoute(
+        path: '/reset-password',
+        name: 'resetPassword',
+        builder: (context, state) => const ResetPasswordScreen(),
       ),
 
       GoRoute(
