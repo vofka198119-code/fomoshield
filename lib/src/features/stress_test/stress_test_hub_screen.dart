@@ -20,7 +20,6 @@ import '../../core/theme/themed_border.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../monetization/monetization_modal.dart';
-import '../monetization/premium_promo_overlay.dart';
 import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/widget_container.dart';
 import '../../shared/widgets/card_frame.dart';
@@ -334,6 +333,7 @@ class StressTestHubScreen extends ConsumerWidget {
                         ? l10n.stressTestActiveCountFree(
                             activeCount,
                             maxSessions,
+                            premiumMaxStressTestSessions,
                           )
                         : l10n.stressTestEmotionalResilience,
                     style: GoogleFonts.inter(
@@ -383,19 +383,21 @@ class StressTestHubScreen extends ConsumerWidget {
     final tier = ref.read(subscriptionTierProvider);
     final notifier = ref.read(stressTestProvider.notifier);
 
-    // Only the concurrent-slot limit gates creation (free: 2 at once,
-    // premium: 5 at once) — no lifetime cap. Completing or deleting a
+    // Only the concurrent-slot limit gates creation (free: 1 at once,
+    // premium: 3 at once) — no lifetime cap. Completing or deleting a
     // test frees its slot for a new one.
     if (activeCount >= maxSessions) {
       final l10n = AppLocalizations.of(context)!;
       if (tier == SubscriptionTier.free) {
-        showPremiumPromoOverlay(
-          context: context,
-          title: l10n.stressTestLimitReachedTitle,
-          durationSeconds: 5,
-          onComplete: () {
-            if (context.mounted) showMonetizationModal(context, ref);
-          },
+        // Straight to the real sheet — the green promo-overlay teaser
+        // used to show first, but it's own content duplicated this
+        // sheet's (same benefit list, same "go Premium" pitch), so it
+        // was just a redundant extra tap before the real thing (found
+        // live 2026-09-20).
+        showMonetizationModal(
+          context,
+          ref,
+          trigger: MonetizationTrigger.stressTestLimit,
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -433,7 +435,11 @@ class StressTestHubScreen extends ConsumerWidget {
 
     if (index == 1 && !isPremiumTier) {
       return InkWell(
-        onTap: () => showMonetizationModal(context, ref),
+        onTap: () => showMonetizationModal(
+          context,
+          ref,
+          trigger: MonetizationTrigger.voluntary,
+        ),
         borderRadius: BorderRadius.circular(5),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),

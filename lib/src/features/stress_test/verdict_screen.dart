@@ -120,7 +120,11 @@ class VerdictScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => showMonetizationModal(context, ref),
+                  onPressed: () => showMonetizationModal(
+                    context,
+                    ref,
+                    trigger: MonetizationTrigger.voluntary,
+                  ),
                   child: Text(l10n.verdictAccessLockedTitle),
                 ),
               ],

@@ -38,10 +38,22 @@ part 'stress_test_why_diagnostics.dart';
 
 const double _freeStartingCash = 7000;
 const double _premiumStartingCash = 15000;
+
+/// Public aliases so UI copy (the premium upsell banner) can quote the
+/// real numbers instead of hand-typed literals.
+const double freeStressTestStartingCash = _freeStartingCash;
+const double premiumStressTestStartingCash = _premiumStartingCash;
 // Concurrent active slots. No lifetime cap on total tests ever created —
 // completing/deleting a test frees its slot.
 const int _freeMaxSessions = 1;
 const int _premiumMaxSessions = 3;
+
+/// Public alias so UI copy (stress_test_hub_screen.dart's "Premium unlocks
+/// up to N" banner) can quote the real number instead of a hand-typed
+/// literal — a hardcoded "5" there silently went stale when this was
+/// lowered from 5 to 3 during the 2026-08-22 tier rework, found live
+/// 2026-09-20.
+const int premiumMaxStressTestSessions = _premiumMaxSessions;
 const int _adEveryNTrades = 5; // show ad after every N trades for free users
 const int _adEveryNOpen = 6; // show ad on every Nth opening
 

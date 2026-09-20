@@ -11,7 +11,7 @@
   "languageRussian": "Русский",
   "languagePickerSubtitle": "Choose the language for the app's interface.",
   "themeTitle": "Theme",
-  "themePickerSubtitle": "Choose the app's visual theme. Admin preview only for now.",
+  "themePickerSubtitle": "Choose the app's visual theme. Standard is free — every other theme is a Premium perk.",
   "themeOptionStandard": "Standard",
   "themeOptionLuxuryGold": "Luxury Gold",
   "themeOptionBlackWhite": "Black & White",
@@ -74,6 +74,7 @@
   "profileDelete": "Delete",
   "profileDeleteFailed": "Could not delete account. Please try again.",
   "premiumActive": "Premium Active",
+  "profileFreeUpsellTitle": "Unlock Premium",
   "premiumLifetime": "Lifetime subscription",
   "premiumExpired": "Subscription expired",
   "premiumDaysRemaining": "{days}d remaining",
@@ -98,6 +99,9 @@
   "premiumBenefitCapital": "$15,000 market simulation starting capital",
   "premiumBenefitStressTests": "Up to 3 market simulations",
   "premiumBenefitAdFree": "Ad-free experience",
+  "premiumBenefitThemes": "Exclusive color themes",
+  "monetizationModalVoluntaryTitle": "F.O.M.O. Shield Premium",
+  "monetizationModalVoluntaryPlansNote": "Available as monthly, quarterly, or annual billing.",
   "premiumBenefitWeeklyPayout": "$180 portfolio top-up every week",
   "premiumBenefitStressTestDca": "Simulated weekly funding in Market Simulation",
   "tradeBuy": "BUY",
@@ -175,7 +179,15 @@
   "stressTestNoTestsYet": "No market simulations yet",
   "stressTestNoTestsHint": "Tap the button above to start your first simulation",
   "stressTestNewTest": "New Market Simulation",
-  "stressTestActiveCountFree": "{active}/{max} active · Premium = 5 at once",
+  "stressTestActiveCountFree": "{active}/{max} active · Premium = {premiumMax} at once",
+  "stressTestFreeSlotBanner": "Free: 1 simulation at a time · Premium unlocks {premiumMax} at once, no ads",
+  "@stressTestFreeSlotBanner": {
+    "placeholders": {
+      "premiumMax": {
+        "type": "int"
+      }
+    }
+  },
   "@stressTestActiveCountFree": {
     "placeholders": {
       "active": {
@@ -183,11 +195,51 @@
       },
       "max": {
         "type": "int"
+      },
+      "premiumMax": {
+        "type": "int"
       }
     }
   },
   "stressTestEmotionalResilience": "Test your emotional resilience",
   "stressTestLimitReachedTitle": "Market simulation limit reached",
+  "monetizationModalStressTestLimitDescription": "You've used your free simulation slot. Wait for it to finish to start a new one — or go Premium for 2 extra slots at once, more flexible test settings, and weekly top-ups.",
+  "monetizationModalHoldingsLimitDescription": "You've reached this portfolio's company limit. Go Premium to raise it to {premiumMax} companies.",
+  "premiumUpsellPortfolioBalance": "Grow your balance from {from} to {to} — Premium also adds a weekly {weekly} top-up.",
+  "@premiumUpsellPortfolioBalance": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "weekly": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumUpsellStressTestBalance": "Grow your starting balance from {from} to {to} — Premium also simulates a weekly {weekly} top-up.",
+  "@premiumUpsellStressTestBalance": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "weekly": {
+        "type": "String"
+      }
+    }
+  },
+  "@monetizationModalHoldingsLimitDescription": {
+    "placeholders": {
+      "premiumMax": {
+        "type": "int"
+      }
+    }
+  },
   "stressTestMaxSessionsReached": "Maximum active simulation sessions reached",
   "stressTestArchiveSummary": "Final: {amount} · {holdings} holdings · {trades} trades",
   "@stressTestArchiveSummary": {
@@ -210,8 +262,6 @@
   "stressTestRenameDialogTitle": "Rename Test",
   "stressTestDurationSectionTitle": "SIMULATION DURATION",
   "stressTestStartButton": "START MARKET SIMULATION",
-  "stressTestSlot1Free": "Simulation slot 1/2 free · Upgrade for 5 at once & no ads",
-  "stressTestSlot2Free": "Simulation slot 2/2 free · Premium = 5 at once, no ads",
   "stressTestAvailableCash": "Available Cash",
   "stressTestOfTotal": "of {amount} total",
   "@stressTestOfTotal": {
@@ -375,15 +425,6 @@
   "portfolioResetDialogTitle": "Reset Portfolio?",
   "portfolioResetDialogBody": "All holdings and history will be cleared.\nBalance will be restored to its original amount.",
   "portfolioNewDialogTitle": "New Portfolio",
-  "portfolioFreeLimitOne": "FREE limit: 1 portfolio. Upgrade to Premium (3).",
-  "portfolioMaxReached": "Max {max} portfolios reached.",
-  "@portfolioMaxReached": {
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
-  },
   "portfolioCreate": "Create",
   "portfolioAdditionalPromoTitle": "Additional portfolio",
   "portfolioSwitchedPromoTitle": "Portfolio switched",
@@ -2223,8 +2264,11 @@
     }
   },
   "monetizationModalSkip": "Skip",
-  "monetizationModalComingSoon": "🏗️ Premium subscription — coming soon!",
   "monetizationModalRewardEarned": "✓ Earned 15 more searches!",
+  "monetizationModalProcessing": "Processing…",
+  "monetizationModalPurchaseError": "Purchase failed. Please try again.",
+  "monetizationModalRestorePurchases": "Restore purchases",
+  "monetizationModalRestoreNotFound": "No previous purchase found.",
   "premiumPromoOverlayBarrierLabel": "Premium promo overlay",
   "premiumPromoOverlayDefaultTitle": "Premium feature",
   "premiumPromoOverlayBadge": "PREMIUM",

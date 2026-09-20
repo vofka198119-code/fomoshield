@@ -1,7 +1,7 @@
 name: scanco
 description: "F.O.M.O. Shield — Invest with discipline, not emotion"
 publish_to: 'none'
-version: 1.0.0+130
+version: 1.0.0+131
 
 environment:
   sdk: ^3.12.1
@@ -48,12 +48,15 @@ dependencies:
   firebase_core: ^3.8.0
   firebase_crashlytics: ^4.1.5
 
-  # In-app purchases (Play Billing) — declared now so an AAB with the
-  # billing permission can be uploaded, which Play Console requires before
-  # it allows creating a subscription product at all. Purchase-flow logic
-  # itself isn't wired up yet (see monetization_modal.dart's "Coming Soon"
-  # stub) — that's the next phase, after the product exists in Console.
+  # In-app purchases (Play Billing) — real purchase flow wired up in
+  # purchase_service.dart (2026-09-20), monthly base plan only so far.
+  # in_app_purchase_android is normally just a transitive dependency of
+  # in_app_purchase, but purchase_service.dart needs its Android-specific
+  # types directly (GooglePlayProductDetails, GooglePlayPurchaseParam) to
+  # pick a base plan's offer token — Android-only is fine, this app has no
+  # iOS build yet (see feedback_ios_deprioritized_google_play_first memory).
   in_app_purchase: ^3.2.0
+  in_app_purchase_android: ^0.5.0
 
 dev_dependencies:
   flutter_test:

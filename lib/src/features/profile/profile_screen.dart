@@ -18,6 +18,7 @@ import '../search/search_counter_provider.dart';
 import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
+import '../monetization/monetization_modal.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
@@ -287,10 +288,19 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Premium Status Card (gold, for premium/admin users) ──
+          // ── Premium Status Card (gold, for premium/admin users) —
+          // Free users get the mirror-image upsell card instead: same
+          // benefit list, but a real "Upgrade to Premium" button in
+          // place of the days-remaining badge. Before this, a free user
+          // browsing their own Profile saw nothing about Premium at all
+          // — the only way to ever see the offer was to accidentally hit
+          // a limit somewhere else first.
           if (subscriptionTier.isPremiumOrAdmin) ...[
             const SizedBox(height: 12),
             _PremiumStatusCard(),
+          ] else ...[
+            const SizedBox(height: 12),
+            _FreeTierUpsellCard(),
           ],
 
           // ── Admin Badge ──────────────────────────────────────────
@@ -442,28 +452,30 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Theme (premium+admin, 2026-09-18 — themes are stable now,
-          // opened up from the earlier admin-only preview; free stays on
-          // Standard) ─────────────────────
-          if (subscriptionTier.isPremiumOrAdmin) ...[
-            const SizedBox(height: 12),
-            CardFrame(
-              padding: EdgeInsets.zero,
-              palette: palette,
-              child: ListTile(
-                leading: Icon(
-                  Icons.palette_rounded,
-                  color: palette.accentPrimary,
-                ),
-                title: Text(
-                  l10n.themeTitle,
-                  style: GoogleFonts.inter(color: palette.textHeader),
-                ),
-                trailing: Icon(Icons.chevron_right, color: palette.textBody),
-                onTap: () => context.push('/theme'),
+          // ── Theme — visible to every tier now (2026-09-20). Was
+          // hidden entirely for free users, meaning a free user had no
+          // way to even discover themes exist as a Premium perk. The
+          // picker screen itself (theme_picker_screen.dart) does the
+          // actual per-theme locking: Standard stays free, every other
+          // theme shows a lock/PREMIUM badge and opens the voluntary
+          // monetization sheet instead of applying it.
+          const SizedBox(height: 12),
+          CardFrame(
+            padding: EdgeInsets.zero,
+            palette: palette,
+            child: ListTile(
+              leading: Icon(
+                Icons.palette_rounded,
+                color: palette.accentPrimary,
               ),
+              title: Text(
+                l10n.themeTitle,
+                style: GoogleFonts.inter(color: palette.textHeader),
+              ),
+              trailing: Icon(Icons.chevron_right, color: palette.textBody),
+              onTap: () => context.push('/theme'),
             ),
-          ],
+          ),
 
           const SizedBox(height: 24),
 
@@ -702,6 +714,194 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
+// Free-Tier Upsell Card — mirror of _PremiumStatusCard below for free
+// users: same gradient/border treatment and the same benefit list, but a
+// real "Upgrade to Premium" button where the days-remaining badge would
+// go. Opens the same monetization modal every other paywall in the app
+// already uses (search limit, portfolio/stress-test limits, Encyclopedia
+// paywall) — this is just a new, user-initiated entry point into it.
+// ---------------------------------------------------------------------------
+
+class _FreeTierUpsellCard extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    final accentColor = palette.marketClockAccent ?? ThemeV2.warning;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient:
+            palette.windowGradient ??
+            const LinearGradient(
+              colors: [Color(0xFF002010), Color(0xFF003018), Color(0xFF002010)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: accentColor.withValues(alpha: 0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: accentColor.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.workspace_premium_rounded,
+                  color: accentColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.profileFreeUpsellTitle,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: accentColor,
+                      ),
+                    ),
+                    Text(
+                      l10n.premiumPromoOverlaySubtitle,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: accentColor.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          // Benefits list — same set and order as _PremiumStatusCard's,
+          // so this reads as "here's what that card would show" rather
+          // than a different pitch.
+          _upsellBenefitRow(
+            Icons.search_rounded,
+            l10n.premiumBenefitSearches,
+            accentColor,
+          ),
+          const SizedBox(height: 6),
+          _upsellBenefitRow(
+            Icons.account_balance_rounded,
+            l10n.premiumBenefitPortfolios,
+            accentColor,
+          ),
+          const SizedBox(height: 6),
+          _upsellBenefitRow(
+            Icons.monetization_on_rounded,
+            l10n.premiumBenefitCapital,
+            accentColor,
+          ),
+          const SizedBox(height: 6),
+          _upsellBenefitRow(
+            Icons.psychology_rounded,
+            l10n.premiumBenefitStressTests,
+            accentColor,
+          ),
+          const SizedBox(height: 6),
+          _upsellBenefitRow(
+            Icons.savings_rounded,
+            l10n.premiumBenefitWeeklyPayout,
+            accentColor,
+          ),
+          const SizedBox(height: 6),
+          _upsellBenefitRow(
+            Icons.auto_graph_rounded,
+            l10n.premiumBenefitStressTestDca,
+            accentColor,
+          ),
+          const SizedBox(height: 6),
+          _upsellBenefitRow(
+            Icons.block_rounded,
+            l10n.premiumBenefitAdFree,
+            accentColor,
+          ),
+          const SizedBox(height: 6),
+          _upsellBenefitRow(
+            Icons.palette_rounded,
+            l10n.premiumBenefitThemes,
+            accentColor,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => showMonetizationModal(
+                context,
+                ref,
+                trigger: MonetizationTrigger.voluntary,
+              ),
+              icon: Icon(
+                Icons.workspace_premium_rounded,
+                size: 18,
+                color: Colors.black,
+              ),
+              label: Text(
+                l10n.monetizationModalUpgradeButton,
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  color: Colors.black,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: accentColor,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _upsellBenefitRow(IconData icon, String text, Color accentColor) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: accentColor.withValues(alpha: 0.7)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: accentColor.withValues(alpha: 0.85),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Premium Status Card — gold card with days remaining counter
 // ---------------------------------------------------------------------------
 
@@ -891,6 +1091,12 @@ class _PremiumStatusCard extends ConsumerWidget {
         _benefitRow(
           Icons.block_rounded,
           l10n.premiumBenefitAdFree,
+          accentColor,
+        ),
+        const SizedBox(height: 6),
+        _benefitRow(
+          Icons.palette_rounded,
+          l10n.premiumBenefitThemes,
           accentColor,
         ),
       ],

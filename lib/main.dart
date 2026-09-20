@@ -10,6 +10,7 @@ import 'firebase_options.dart';
 import 'src/core/cache/sector_providers.dart';
 import 'src/core/localization/language_provider.dart';
 import 'src/core/overlay/app_overlay_host.dart';
+import 'src/core/purchases/purchase_listener.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
 import 'src/core/theme/theme_v2.dart';
@@ -106,6 +107,12 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
   @override
   void initState() {
     super.initState();
+    // NOT delayed, unlike checkPendingOrders below — the purchaseStream
+    // doc comment explicitly warns to subscribe "as soon as your app
+    // launches", since any purchase update that arrives before a listener
+    // is attached is simply lost.
+    initPurchaseListener(ref);
+
     // Delayed so this doesn't compete with everything else the first
     // frame already loads (widget order providers, home widgets, sector
     // cache hydration, ...) — the CPU spike right at cold start is real.

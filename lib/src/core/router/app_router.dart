@@ -191,8 +191,9 @@ class AppRouter {
         builder: (context, state) => const LanguagePickerScreen(),
       ),
 
-      // Premium+admin (opened up 2026-09-18) — see profile_screen.dart's
-      // gating for the actual access check.
+      // Route itself has no tier gate — visible to every tier (2026-09-20).
+      // theme_picker_screen.dart locks each non-Standard theme individually
+      // (lock icon + PREMIUM badge, taps open the monetization sheet).
       GoRoute(
         path: '/theme',
         name: 'theme',

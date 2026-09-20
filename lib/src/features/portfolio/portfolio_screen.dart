@@ -25,6 +25,7 @@ import 'widgets/portfolio_trade_history_widget.dart';
 import '../../shared/utils/currency_format.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
+import '../../shared/widgets/premium_upsell_banner.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
 import 'widgets/my_limit_orders_widget.dart';
 
@@ -498,9 +499,10 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
 
 }
 
-// Library-scoped (not a class member) so both PortfolioScreen's empty-state
-// button and _PortfolioSelector's premium-slot tap (portfolio_selector.dart)
-// can open it without one needing an instance of the other's State class.
+// Library-scoped (not a class member). Only reachable from
+// PortfolioScreen's own empty-state button — the multi-portfolio
+// _PortfolioSelector this was once also shared with is gone (single
+// portfolio per account now, see portfolio_limits_provider.dart).
 void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
   final l10n = AppLocalizations.of(context)!;
   final controller = TextEditingController();
@@ -545,24 +547,12 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
         TextButton(
           onPressed: () {
             if (controller.text.trim().isNotEmpty) {
-              final maxP = ref.read(maxPortfoliosProvider);
-              final currentCount = ref.read(portfoliosProvider).length;
-              if (currentCount >= maxP) {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      maxP == 1
-                          ? l10n.portfolioFreeLimitOne
-                          : l10n.portfolioMaxReached(maxP),
-                      style: GoogleFonts.inter(fontSize: 13),
-                    ),
-                    backgroundColor: ThemeV2.primary,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-                return;
-              }
+              // No multi-portfolio limit check here anymore — every tier
+              // gets exactly one portfolio now (only its starting capital
+              // differs, see portfolio_limits_provider.dart), and this
+              // dialog is only ever reachable from the empty state (0
+              // portfolios), so a second-portfolio cap could never
+              // actually trigger. Removed dead branch, 2026-09-20.
               ref
                   .read(portfoliosProvider.notifier)
                   .addPortfolio(

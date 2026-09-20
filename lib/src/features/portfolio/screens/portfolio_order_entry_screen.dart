@@ -487,7 +487,13 @@ class _PortfolioOrderEntryScreenState
         title: l10n.orderEntryHoldingsLimitPromoTitle,
         durationSeconds: 5,
         onComplete: () {
-          if (context.mounted) showMonetizationModal(context, ref);
+          if (context.mounted) {
+            showMonetizationModal(
+              context,
+              ref,
+              trigger: MonetizationTrigger.holdingsLimit,
+            );
+          }
         },
       );
     }

@@ -97,7 +97,14 @@ Future<bool?> showCompanyEncyclopediaPaywallSheet(
               child: OutlinedButton(
                 onPressed: () {
                   Navigator.pop(ctx, false);
-                  showMonetizationModal(context, ref);
+                  // "Watch Ad" is already this sheet's own button above
+                  // — voluntary skips the modal's redundant Watch Ad
+                  // option.
+                  showMonetizationModal(
+                    context,
+                    ref,
+                    trigger: MonetizationTrigger.voluntary,
+                  );
                 },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: palette.accentPrimary,

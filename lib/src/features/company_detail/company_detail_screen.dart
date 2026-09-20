@@ -176,7 +176,14 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed: () {
-                    showMonetizationModal(context, ref);
+                    // "Watch Ad" is already the sibling button right
+                    // above this one — voluntary skips the modal's own
+                    // (redundant) Watch Ad option.
+                    showMonetizationModal(
+                      context,
+                      ref,
+                      trigger: MonetizationTrigger.voluntary,
+                    );
                   },
                   child: Text(
                     l10n.companyDetailUpgradeNoAds,

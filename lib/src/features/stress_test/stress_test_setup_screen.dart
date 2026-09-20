@@ -23,7 +23,6 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../shared/utils/currency_format.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../monetization/monetization_modal.dart';
-import '../monetization/premium_promo_overlay.dart';
 import '../market_clock/market_clock_dial.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
@@ -110,13 +109,13 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     if (activeCount >= maxSessions) {
       final l10n = AppLocalizations.of(context)!;
       if (tier == SubscriptionTier.free) {
-        showPremiumPromoOverlay(
-          context: context,
-          title: l10n.stressTestLimitReachedTitle,
-          durationSeconds: 5,
-          onComplete: () {
-            if (context.mounted) showMonetizationModal(context, ref);
-          },
+        // Straight to the real sheet — see stress_test_hub_screen.dart's
+        // identical fix for why the green promo-overlay teaser was
+        // dropped here (redundant with this sheet's own content).
+        showMonetizationModal(
+          context,
+          ref,
+          trigger: MonetizationTrigger.stressTestLimit,
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -291,62 +290,68 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     if (tier.isPremiumOrAdmin) {
       return const SizedBox.shrink();
     }
-    // Which concurrent slot this session (still in setup, not yet
-    // counted as active) will occupy once started — slot 1 is always
-    // ad-free, slot 2 is the ad-gated extra (no ad integration yet, so
-    // just a "Go Premium" nudge for now).
-    final activeCount = ref
-        .read(stressTestProvider)
-        .where((s) => s.status == StressTestStatus.active)
-        .length;
-    final isFirst = activeCount == 0;
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        gradient: palette.windowGradient,
-        color: palette.windowGradient == null
-            ? ThemeV2.primary.withValues(alpha: 0.08)
-            : null,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: palette.accentPrimary.withValues(alpha: 0.2)),
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () => showMonetizationModal(
+        context,
+        ref,
+        trigger: MonetizationTrigger.voluntary,
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: palette.windowGradient != null
-                ? BoxDecoration(
-                    gradient: palette.windowGradient,
-                    borderRadius: BorderRadius.circular(12),
-                  )
-                : darkCardDecoration(borderRadius: BorderRadius.circular(12)),
-            child: Text(
-              l10n.profilePremiumBadge,
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: palette.marketClockAccent ?? dialBrassLight,
-                letterSpacing: 1.5,
-                shadows: _goldGlow(palette.marketClockAccent ?? dialBrassLight),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: palette.windowGradient,
+          color: palette.windowGradient == null
+              ? ThemeV2.primary.withValues(alpha: 0.08)
+              : null,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: palette.accentPrimary.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: palette.windowGradient != null
+                  ? BoxDecoration(
+                      gradient: palette.windowGradient,
+                      borderRadius: BorderRadius.circular(12),
+                    )
+                  : darkCardDecoration(borderRadius: BorderRadius.circular(12)),
+              child: Text(
+                l10n.profilePremiumBadge,
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: palette.marketClockAccent ?? dialBrassLight,
+                  letterSpacing: 1.5,
+                  shadows: _goldGlow(palette.marketClockAccent ?? dialBrassLight),
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              isFirst ? l10n.stressTestSlot1Free : l10n.stressTestSlot2Free,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: palette.windowGradient != null
-                    ? (palette.onWindow ?? palette.accentPrimary)
-                    : palette.accentPrimary,
-                fontWeight: FontWeight.w500,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                l10n.stressTestFreeSlotBanner(premiumMaxStressTestSessions),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: palette.windowGradient != null
+                      ? (palette.onWindow ?? palette.accentPrimary)
+                      : palette.accentPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-        ],
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: palette.windowGradient != null
+                  ? (palette.onWindow ?? palette.accentPrimary)
+                  : palette.accentPrimary,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -699,7 +704,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.of(ctx).pop();
-                    showMonetizationModal(context, ref);
+                    // A locked FEATURE (custom/infinite duration), not a
+                    // numeric limit — "search limit reached" framing
+                    // would make no sense here (found live 2026-09-20).
+                    showMonetizationModal(
+                      context,
+                      ref,
+                      trigger: MonetizationTrigger.voluntary,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentColor,

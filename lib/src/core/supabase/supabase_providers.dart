@@ -103,6 +103,17 @@ final isAdminProvider = Provider<bool>((ref) {
   return user?.email == adminEmail;
 });
 
+/// Forces a fresh subscription_tier/subscription_expires_at fetch from
+/// Supabase — call right after a Play Billing purchase is verified
+/// server-side (see purchase_service.dart) so the UI reflects premium
+/// immediately instead of waiting for whatever next triggers
+/// [_premiumLoaderProvider] on its own. [_premiumLoaderProvider] is
+/// private to this file, so this is the one exported way for other
+/// features to ask for a re-fetch.
+void refreshSubscriptionTier(WidgetRef ref) {
+  ref.invalidate(_premiumLoaderProvider);
+}
+
 // ---------------------------------------------------------------------------
 // Premium details for the Profile screen gold card
 // ---------------------------------------------------------------------------

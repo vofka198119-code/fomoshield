@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scanco/src/core/theme/app_theme.dart';
+import '../market_clock/market_clock_dial.dart' show dialBrassLight;
 import '../../l10n/gen/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
@@ -142,10 +143,10 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.premiumGreen.withValues(alpha: 0.15),
+                    color: dialBrassLight.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: AppTheme.premiumGreen.withValues(alpha: 0.25),
+                      color: dialBrassLight.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -154,7 +155,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                       Icon(
                         Icons.workspace_premium_rounded,
                         size: 16,
-                        color: AppTheme.premiumGreen,
+                        color: dialBrassLight,
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -163,7 +164,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 2,
-                          color: AppTheme.premiumGreen,
+                          color: dialBrassLight,
                         ),
                       ),
                     ],
@@ -172,12 +173,19 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                 const SizedBox(height: 24),
 
                 // ── Title ────────────────────────────────────────
+                // White + soft-white subtitle — was AppTheme.textPrimary
+                // (near-black, #121212) and premiumGreen-on-dark-green,
+                // both close to unreadable against this card's own dark
+                // green gradient background (found live 2026-09-20:
+                // "green on green" — this card's background/text were
+                // never actually checked against each other for
+                // contrast).
                 Text(
                   widget.title,
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
+                    color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -187,7 +195,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                   l10n.premiumPromoOverlaySubtitle,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: AppTheme.premiumGreen.withValues(alpha: 0.6),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -215,6 +223,8 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                   Icons.block_rounded,
                   l10n.premiumPromoOverlayFeatureAdFree,
                 ),
+                const SizedBox(height: 10),
+                _featureRow(Icons.palette_rounded, l10n.premiumBenefitThemes),
                 const SizedBox(height: 28),
 
                 // ── Countdown timer ──────────────────────────────
@@ -237,9 +247,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                             child: CircularProgressIndicator(
                               value: 1.0,
                               strokeWidth: 3,
-                              color: AppTheme.premiumGreen.withValues(
-                                alpha: 0.1,
-                              ),
+                              color: dialBrassLight.withValues(alpha: 0.15),
                             ),
                           ),
                           // Progress ring
@@ -250,7 +258,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                               value: _progress.value,
                               strokeWidth: 3,
                               strokeCap: StrokeCap.round,
-                              color: AppTheme.premiumGreen,
+                              color: dialBrassLight,
                             ),
                           ),
                           // Seconds text
@@ -259,7 +267,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: AppTheme.premiumGreen,
+                              color: dialBrassLight,
                             ),
                           ),
                         ],
@@ -293,9 +301,7 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
                       widget.onComplete?.call();
                     },
                     style: TextButton.styleFrom(
-                      foregroundColor: AppTheme.premiumGreen.withValues(
-                        alpha: 0.6,
-                      ),
+                      foregroundColor: Colors.white.withValues(alpha: 0.6),
                       textStyle: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -320,22 +326,25 @@ class _PremiumPromoOverlayState extends State<_PremiumPromoOverlay>
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: AppTheme.premiumGreen.withValues(alpha: 0.12),
+            color: dialBrassLight.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Icon(
-            icon,
-            size: 16,
-            color: AppTheme.premiumGreen.withValues(alpha: 0.8),
-          ),
+          child: Icon(icon, size: 16, color: dialBrassLight),
         ),
         const SizedBox(width: 12),
-        Text(
-          text,
-          style: GoogleFonts.inter(
-            fontSize: 13,
-            color: AppTheme.premiumGreen.withValues(alpha: 0.8),
-            fontWeight: FontWeight.w500,
+        // Expanded — without it a long enough label (found live
+        // 2026-09-20 adding the themes row: "Эксклюзивные цветовые
+        // темы" overflowed the Row's right edge by 63px, visible as the
+        // debug-mode overflow stripes) has nowhere to wrap and just
+        // runs past the card's edge instead.
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: Colors.white.withValues(alpha: 0.9),
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],

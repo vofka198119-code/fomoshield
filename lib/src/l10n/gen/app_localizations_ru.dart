@@ -43,7 +43,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get themePickerSubtitle =>
-      'Выберите визуальную тему приложения. Пока доступно только в admin-превью.';
+      'Выбери визуальную тему приложения. Стандартная — бесплатно, остальные темы доступны с Premium.';
 
   @override
   String get themeOptionStandard => 'Стандартная';
@@ -203,6 +203,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get premiumActive => 'Премиум активен';
 
   @override
+  String get profileFreeUpsellTitle => 'Разблокируй Premium';
+
+  @override
   String get premiumLifetime => 'Бессрочная подписка';
 
   @override
@@ -236,6 +239,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get premiumBenefitAdFree => 'Без рекламы';
+
+  @override
+  String get premiumBenefitThemes => 'Эксклюзивные цветовые темы';
+
+  @override
+  String get monetizationModalVoluntaryTitle => 'F.O.M.O. Shield Premium';
+
+  @override
+  String get monetizationModalVoluntaryPlansNote =>
+      'Доступно с ежемесячной, ежеквартальной или годовой оплатой.';
 
   @override
   String get premiumBenefitWeeklyPayout =>
@@ -460,8 +473,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get stressTestNewTest => 'Новая симуляция рынка';
 
   @override
-  String stressTestActiveCountFree(int active, int max) {
-    return '$active/$max активно · Premium = до 5 одновременно';
+  String stressTestActiveCountFree(int active, int max, int premiumMax) {
+    return '$active/$max активно · Premium = $premiumMax одновременно';
+  }
+
+  @override
+  String stressTestFreeSlotBanner(int premiumMax) {
+    return 'Бесплатно: 1 симуляция одновременно · Premium открывает $premiumMax сразу, без рекламы';
   }
 
   @override
@@ -470,6 +488,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get stressTestLimitReachedTitle => 'Достигнут лимит симуляций рынка';
+
+  @override
+  String get monetizationModalStressTestLimitDescription =>
+      'Ты исчерпал бесплатный слот симуляции. Дождись окончания теста, чтобы начать новый — либо перейди на Premium и получи 2 дополнительных слота, более гибкую настройку теста и еженедельное пополнение.';
+
+  @override
+  String monetizationModalHoldingsLimitDescription(int premiumMax) {
+    return 'Ты исчерпал лимит компаний в этом портфеле. Перейди на Premium, чтобы увеличить лимит до $premiumMax компаний.';
+  }
+
+  @override
+  String premiumUpsellPortfolioBalance(String from, String to, String weekly) {
+    return 'Увеличь баланс с $from до $to — Premium добавляет ещё еженедельное пополнение +$weekly.';
+  }
+
+  @override
+  String premiumUpsellStressTestBalance(String from, String to, String weekly) {
+    return 'Увеличь стартовый баланс с $from до $to — Premium добавляет имитацию еженедельного пополнения +$weekly.';
+  }
 
   @override
   String get stressTestMaxSessionsReached =>
@@ -500,14 +537,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get stressTestStartButton => 'НАЧАТЬ СИМУЛЯЦИЮ РЫНКА';
-
-  @override
-  String get stressTestSlot1Free =>
-      'Слот 1/2 бесплатно · Premium — до 5 сразу и без рекламы';
-
-  @override
-  String get stressTestSlot2Free =>
-      'Слот 2/2 бесплатно · Premium — до 5 сразу, без рекламы';
 
   @override
   String get stressTestAvailableCash => 'Доступные средства';
@@ -891,15 +920,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get portfolioNewDialogTitle => 'Новый портфель';
-
-  @override
-  String get portfolioFreeLimitOne =>
-      'Лимит FREE: 1 портфель. Перейдите на Premium (3).';
-
-  @override
-  String portfolioMaxReached(int max) {
-    return 'Достигнут лимит $max портфелей.';
-  }
 
   @override
   String get portfolioCreate => 'Создать';
@@ -5747,10 +5767,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get monetizationModalSkip => 'Пропустить';
 
   @override
-  String get monetizationModalComingSoon => '🏗️ Подписка Premium — скоро!';
+  String get monetizationModalRewardEarned => '✓ Получено ещё 15 поисков!';
 
   @override
-  String get monetizationModalRewardEarned => '✓ Получено ещё 15 поисков!';
+  String get monetizationModalProcessing => 'Обработка…';
+
+  @override
+  String get monetizationModalPurchaseError =>
+      'Не удалось оформить покупку. Попробуй снова.';
+
+  @override
+  String get monetizationModalRestorePurchases => 'Восстановить покупки';
+
+  @override
+  String get monetizationModalRestoreNotFound =>
+      'Предыдущая покупка не найдена.';
 
   @override
   String get premiumPromoOverlayBarrierLabel => 'Промо-заставка Premium';

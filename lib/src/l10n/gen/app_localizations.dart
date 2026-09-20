@@ -167,7 +167,7 @@ abstract class AppLocalizations {
   /// No description provided for @themePickerSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Choose the app\'s visual theme. Admin preview only for now.'**
+  /// **'Choose the app\'s visual theme. Standard is free — every other theme is a Premium perk.'**
   String get themePickerSubtitle;
 
   /// No description provided for @themeOptionStandard.
@@ -458,6 +458,12 @@ abstract class AppLocalizations {
   /// **'Premium Active'**
   String get premiumActive;
 
+  /// No description provided for @profileFreeUpsellTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Premium'**
+  String get profileFreeUpsellTitle;
+
   /// No description provided for @premiumLifetime.
   ///
   /// In en, this message translates to:
@@ -517,6 +523,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ad-free experience'**
   String get premiumBenefitAdFree;
+
+  /// No description provided for @premiumBenefitThemes.
+  ///
+  /// In en, this message translates to:
+  /// **'Exclusive color themes'**
+  String get premiumBenefitThemes;
+
+  /// No description provided for @monetizationModalVoluntaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'F.O.M.O. Shield Premium'**
+  String get monetizationModalVoluntaryTitle;
+
+  /// No description provided for @monetizationModalVoluntaryPlansNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Available as monthly, quarterly, or annual billing.'**
+  String get monetizationModalVoluntaryPlansNote;
 
   /// No description provided for @premiumBenefitWeeklyPayout.
   ///
@@ -941,8 +965,14 @@ abstract class AppLocalizations {
   /// No description provided for @stressTestActiveCountFree.
   ///
   /// In en, this message translates to:
-  /// **'{active}/{max} active · Premium = 5 at once'**
-  String stressTestActiveCountFree(int active, int max);
+  /// **'{active}/{max} active · Premium = {premiumMax} at once'**
+  String stressTestActiveCountFree(int active, int max, int premiumMax);
+
+  /// No description provided for @stressTestFreeSlotBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Free: 1 simulation at a time · Premium unlocks {premiumMax} at once, no ads'**
+  String stressTestFreeSlotBanner(int premiumMax);
 
   /// No description provided for @stressTestEmotionalResilience.
   ///
@@ -955,6 +985,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Market simulation limit reached'**
   String get stressTestLimitReachedTitle;
+
+  /// No description provided for @monetizationModalStressTestLimitDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used your free simulation slot. Wait for it to finish to start a new one — or go Premium for 2 extra slots at once, more flexible test settings, and weekly top-ups.'**
+  String get monetizationModalStressTestLimitDescription;
+
+  /// No description provided for @monetizationModalHoldingsLimitDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached this portfolio\'s company limit. Go Premium to raise it to {premiumMax} companies.'**
+  String monetizationModalHoldingsLimitDescription(int premiumMax);
+
+  /// No description provided for @premiumUpsellPortfolioBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Grow your balance from {from} to {to} — Premium also adds a weekly {weekly} top-up.'**
+  String premiumUpsellPortfolioBalance(String from, String to, String weekly);
+
+  /// No description provided for @premiumUpsellStressTestBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Grow your starting balance from {from} to {to} — Premium also simulates a weekly {weekly} top-up.'**
+  String premiumUpsellStressTestBalance(String from, String to, String weekly);
 
   /// No description provided for @stressTestMaxSessionsReached.
   ///
@@ -1009,18 +1063,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'START MARKET SIMULATION'**
   String get stressTestStartButton;
-
-  /// No description provided for @stressTestSlot1Free.
-  ///
-  /// In en, this message translates to:
-  /// **'Simulation slot 1/2 free · Upgrade for 5 at once & no ads'**
-  String get stressTestSlot1Free;
-
-  /// No description provided for @stressTestSlot2Free.
-  ///
-  /// In en, this message translates to:
-  /// **'Simulation slot 2/2 free · Premium = 5 at once, no ads'**
-  String get stressTestSlot2Free;
 
   /// No description provided for @stressTestAvailableCash.
   ///
@@ -1698,18 +1740,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New Portfolio'**
   String get portfolioNewDialogTitle;
-
-  /// No description provided for @portfolioFreeLimitOne.
-  ///
-  /// In en, this message translates to:
-  /// **'FREE limit: 1 portfolio. Upgrade to Premium (3).'**
-  String get portfolioFreeLimitOne;
-
-  /// No description provided for @portfolioMaxReached.
-  ///
-  /// In en, this message translates to:
-  /// **'Max {max} portfolios reached.'**
-  String portfolioMaxReached(int max);
 
   /// No description provided for @portfolioCreate.
   ///
@@ -9655,17 +9685,35 @@ abstract class AppLocalizations {
   /// **'Skip'**
   String get monetizationModalSkip;
 
-  /// No description provided for @monetizationModalComingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'🏗️ Premium subscription — coming soon!'**
-  String get monetizationModalComingSoon;
-
   /// No description provided for @monetizationModalRewardEarned.
   ///
   /// In en, this message translates to:
   /// **'✓ Earned 15 more searches!'**
   String get monetizationModalRewardEarned;
+
+  /// No description provided for @monetizationModalProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing…'**
+  String get monetizationModalProcessing;
+
+  /// No description provided for @monetizationModalPurchaseError.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed. Please try again.'**
+  String get monetizationModalPurchaseError;
+
+  /// No description provided for @monetizationModalRestorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get monetizationModalRestorePurchases;
+
+  /// No description provided for @monetizationModalRestoreNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No previous purchase found.'**
+  String get monetizationModalRestoreNotFound;
 
   /// No description provided for @premiumPromoOverlayBarrierLabel.
   ///

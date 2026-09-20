@@ -119,7 +119,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                 _buildWidget('portfolio_holdings', palette, hasError: true),
               ],
               data: (perf) => [
-                for (int i = 0; i < visibleWidgets.length; i++)
+                for (int i = 0; i < visibleWidgets.length; i++) ...[
                   StaggerFadeIn(
                     index: i,
                     child: _buildWidget(
@@ -128,6 +128,22 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
                       performance: perf,
                     ),
                   ),
+                  // Fixed placement right after the balance widget —
+                  // NOT part of the reorderable widget list, always here
+                  // regardless of what the user does to the others.
+                  if (visibleWidgets[i].id == 'portfolio_balance') ...[
+                    PremiumUpsellBanner(
+                      message: AppLocalizations.of(
+                        context,
+                      )!.premiumUpsellPortfolioBalance(
+                        formatUsd(freeStartingCapital),
+                        formatUsd(premiumStartingCapital),
+                        formatUsd(weeklyPayoutAmount),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ],
               ],
             ),
             const SizedBox(height: 24),

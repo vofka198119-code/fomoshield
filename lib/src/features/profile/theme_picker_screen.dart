@@ -1,19 +1,26 @@
 // ---------------------------------------------------------------------------
-// Theme Picker — reached from Profile → Preferences → Theme. Gated on
-// premium/admin in profile_screen.dart (opened up 2026-09-18 from an
-// earlier admin-only preview, now that all 5 themes are stable/shipped —
-// free stays on Standard). See theme_variant_provider.dart for the
-// variant enum and app_palette.dart for each theme's token set.
+// Theme Picker — reached from Profile → Preferences → Theme. Row itself is
+// now visible to every tier (2026-09-20, see profile_screen.dart) so free
+// users can see what they're missing — Standard stays freely selectable,
+// every other theme is locked behind Premium here: tapping one shows a
+// lock/PREMIUM badge instead of applying it and opens the voluntary
+// monetization sheet (same pattern as stress_test_setup_screen.dart's
+// locked-row convention: lock icon + dimmed label + small PREMIUM chip).
+// See theme_variant_provider.dart for the variant enum and app_palette.dart
+// for each theme's token set.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/supabase/supabase_providers.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_divider.dart';
 import '../../shared/widgets/card_frame.dart';
+import '../market_clock/market_clock_dial.dart' show darkCardDecoration, dialBrassLight;
+import '../monetization/monetization_modal.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 /// Localized display name for each variant — the one place to add a case
@@ -37,6 +44,7 @@ class ThemePickerScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final current = ref.watch(themeVariantProvider);
     final palette = resolveAppPalette(current);
+    final isPremium = ref.watch(subscriptionTierProvider).isPremiumOrAdmin;
 
     final options = [
       for (final variant in AppThemeVariant.values)
@@ -91,10 +99,27 @@ class ThemePickerScreen extends ConsumerWidget {
                     _ThemeRow(
                       option: options[i],
                       selected: options[i].variant == current,
-                      onTap: () => ref
-                          .read(themeVariantProvider.notifier)
-                          .setVariant(options[i].variant),
+                      locked:
+                          !isPremium &&
+                          options[i].variant != AppThemeVariant.standard,
+                      onTap: () {
+                        final locked =
+                            !isPremium &&
+                            options[i].variant != AppThemeVariant.standard;
+                        if (locked) {
+                          showMonetizationModal(
+                            context,
+                            ref,
+                            trigger: MonetizationTrigger.voluntary,
+                          );
+                        } else {
+                          ref
+                              .read(themeVariantProvider.notifier)
+                              .setVariant(options[i].variant);
+                        }
+                      },
                       palette: palette,
+                      l10n: l10n,
                     ),
                   ],
                 ],
@@ -116,24 +141,57 @@ class _ThemeOption {
 class _ThemeRow extends StatelessWidget {
   final _ThemeOption option;
   final bool selected;
+  final bool locked;
   final VoidCallback onTap;
   final AppPalette palette;
+  final AppLocalizations l10n;
 
   const _ThemeRow({
     required this.option,
     required this.selected,
+    required this.locked,
     required this.onTap,
     required this.palette,
+    required this.l10n,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      leading: locked
+          ? Icon(Icons.lock_rounded, color: palette.textBody, size: 20)
+          : null,
       title: Text(
         option.label,
-        style: GoogleFonts.inter(color: palette.textHeader),
+        style: GoogleFonts.inter(
+          // 0.5 read as near-illegible gray-on-white (found live,
+          // 2026-09-20) — locked should read as "disabled", not
+          // "can't tell what this says".
+          color: locked
+              ? palette.textHeader.withValues(alpha: 0.75)
+              : palette.textHeader,
+        ),
       ),
-      trailing: selected
+      trailing: locked
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: palette.windowGradient != null
+                  ? BoxDecoration(
+                      gradient: palette.windowGradient,
+                      borderRadius: BorderRadius.circular(8),
+                    )
+                  : darkCardDecoration(borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                l10n.profilePremiumBadge,
+                style: GoogleFonts.inter(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  color: palette.marketClockAccent ?? dialBrassLight,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            )
+          : selected
           ? Icon(Icons.check_rounded, color: palette.accentPrimary)
           : null,
       onTap: onTap,

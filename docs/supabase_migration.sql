@@ -503,3 +503,40 @@ CREATE OR REPLACE TRIGGER guard_user_data_sanity_ceiling_trigger
     BEFORE INSERT OR UPDATE ON public.user_data
     FOR EACH ROW
     EXECUTE FUNCTION public.guard_user_data_sanity_ceiling();
+
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 013*
+-- Table: subscription_purchases (NEW)
+-- Description: Real Google Play Billing subscriptions (2026-09-20 session).
+--              Tracks which Supabase user owns each Play purchase token, so
+--              the RTDN webhook (scanco-backend's routes/playRtdn.js) can
+--              resync subscription_tier/subscription_expires_at on renewal/
+--              cancel/refund events, when all Google's push gives us is the
+--              token — not our user id. Written by the backend only
+--              (service_role, via services/playBilling.js's
+--              syncSubscriptionForUser); the app never reads or writes this
+--              table directly, so no RLS policy is needed. Same
+--              subscription_tier/subscription_expires_at columns this writes
+--              into are the ones Migration 008 already locks down against
+--              direct client writes.
+--
+--              * NOTE: this doc file's own numbering was last kept current at
+--              Migration 012 — several migrations since (e.g. the nickname
+--              system, Migration 017) were applied straight from chat to
+--              Supabase's SQL Editor without ever being appended here. Check
+--              what's actually live in Supabase before assuming "013" is the
+--              real next number; the number itself doesn't matter, only that
+--              this table + comment get applied once.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS public.subscription_purchases (
+    purchase_token text PRIMARY KEY,
+    user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    product_id text NOT NULL,
+    base_plan_id text NOT NULL,
+    subscription_state text,
+    updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.subscription_purchases ENABLE ROW LEVEL SECURITY;
+-- No policies — service_role (used exclusively by scanco-backend) bypasses
+-- RLS entirely, and the app itself never queries this table.

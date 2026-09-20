@@ -308,7 +308,11 @@ class StressTestWidget extends ConsumerWidget {
 
     if (index == 1 && !isPremiumTier) {
       return InkWell(
-        onTap: () => showMonetizationModal(context, ref),
+        onTap: () => showMonetizationModal(
+          context,
+          ref,
+          trigger: MonetizationTrigger.voluntary,
+        ),
         borderRadius: BorderRadius.circular(5),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),

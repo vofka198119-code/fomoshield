@@ -34,6 +34,7 @@ import '../../shared/utils/currency_format.dart';
 
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/widgets/donut_ring_painter.dart';
+import '../../shared/widgets/premium_upsell_banner.dart';
 import '../../shared/widgets/trade_history_tile.dart';
 
 import '../monetization/monetization_modal.dart';
@@ -111,12 +112,23 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ? notifier.checkAndIncrementFrozenViewCounter()
           : notifier.checkAndIncrementOpenCounter();
       if (showAd) {
+        // This is a periodic "every 6th opening" nudge, not a real
+        // session-limit block (the test is still fully usable) — was
+        // wrongly given the stressTestLimit trigger in an earlier pass
+        // today, which would have claimed a slot limit that was never
+        // actually hit. voluntary's generic pitch fits this correctly.
         showPremiumPromoOverlay(
           context: context,
           title: AppLocalizations.of(context)!.stressTestAccessTitle,
           durationSeconds: 5,
           onComplete: () {
-            if (context.mounted) showMonetizationModal(context, ref);
+            if (context.mounted) {
+              showMonetizationModal(
+                context,
+                ref,
+                trigger: MonetizationTrigger.voluntary,
+              );
+            }
           },
         );
       }
@@ -735,6 +747,18 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   for (final cfg in visibleWidgets) ...[
                     _buildWidgetById(cfg.id, session),
                     const SizedBox(height: 12),
+                    // Fixed placement right after the balance widget —
+                    // NOT part of the reorderable widget list.
+                    if (cfg.id == 'allocation_chart') ...[
+                      PremiumUpsellBanner(
+                        message: l10n.premiumUpsellStressTestBalance(
+                          formatUsd(freeStressTestStartingCash),
+                          formatUsd(premiumStressTestStartingCash),
+                          formatUsd(dcaWeeklyAmount),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ],
 
                   const SizedBox(height: 4),
