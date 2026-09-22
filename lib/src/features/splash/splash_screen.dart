@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../core/ads/ad_service.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../core/localization/language_provider.dart';
@@ -77,6 +78,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       clientId: SupabaseConfig.googleIosClientId,
       serverClientId: SupabaseConfig.googleWebClientId,
     );
+
+    // Same reasoning as GoogleSignIn above — the AdMob SDK's own init call
+    // can be slow (network round-trip), and nothing needs it until the
+    // first ad placement is actually reached, well after splash.
+    AdService().init();
   }
 
   /// Auth/disclaimer resolution — returns a destination instead of
