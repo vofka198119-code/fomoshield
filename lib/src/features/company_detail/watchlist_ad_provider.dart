@@ -3,17 +3,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_providers.dart';
 
 // ---------------------------------------------------------------------------
-// Watchlist Ad Counter — first 10 free, then every 5th triggers an ad
+// Watchlist Ad Counter — first 10 free, then every 8th triggers an ad
 // ---------------------------------------------------------------------------
 // - FREE tier: counter starts at 0, first 10 views free
-// - After 10: every 5th company detail view shows ad
+// - View #11 triggers the ad, then every 8th after that (19, 27, ...) — 8,
+//   not 5, because viewing a company card is a cheap/frequent action like
+//   Stress Test navigation, not a deliberate one like a trade — same
+//   reasoning, same interval (see fomoshield_admob_plan_2026_09_22
+//   memory), aligned 2026-09-22.
 // - PREMIUM: never show ads
 // - Call `incrementView()` before showing company detail
 // - Returns true if an ad should be shown
 // ---------------------------------------------------------------------------
 
 const int _freeViews = 10;
-const int _adInterval = 5;
+const int _adInterval = 8;
 
 class WatchlistAdNotifier extends StateNotifier<int> {
   String? _userId;
@@ -44,9 +48,8 @@ class WatchlistAdNotifier extends StateNotifier<int> {
 
   /// Returns true if the user should see an ad before the detail view.
   bool get shouldShowAd {
-    if (state < _freeViews) return false;
-    final adjusted = state - _freeViews;
-    return adjusted > 0 && adjusted % _adInterval == 0;
+    if (state <= _freeViews) return false;
+    return (state - _freeViews - 1) % _adInterval == 0;
   }
 
   /// Increments the view counter and returns true if an ad should show.
