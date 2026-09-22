@@ -410,6 +410,12 @@ abstract class AppLocalizations {
   /// **'Terms of Use'**
   String get profileTermsOfUse;
 
+  /// No description provided for @profilePurchaseRenewal.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase & Premium Renewal'**
+  String get profilePurchaseRenewal;
+
   /// No description provided for @profileSignOut.
   ///
   /// In en, this message translates to:

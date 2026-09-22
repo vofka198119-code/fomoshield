@@ -177,6 +177,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileTermsOfUse => 'Условия использования';
 
   @override
+  String get profilePurchaseRenewal => 'Покупка и продление Premium';
+
+  @override
   String get profileSignOut => 'Выйти';
 
   @override

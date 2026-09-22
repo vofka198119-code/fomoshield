@@ -178,6 +178,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileTermsOfUse => 'Terms of Use';
 
   @override
+  String get profilePurchaseRenewal => 'Purchase & Premium Renewal';
+
+  @override
   String get profileSignOut => 'Sign Out';
 
   @override

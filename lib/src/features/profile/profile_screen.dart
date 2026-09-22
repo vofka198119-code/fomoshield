@@ -526,6 +526,17 @@ class ProfileScreen extends ConsumerWidget {
                   trailing: Icon(Icons.chevron_right, color: palette.textBody),
                   onTap: () => _openLink('https://fomoshield.app/terms'),
                 ),
+                palette.dividerGradient != null
+                    ? themedDivider(palette, indent: 0, endIndent: 0)
+                    : const Divider(height: 1),
+                ListTile(
+                  title: Text(
+                    l10n.profilePurchaseRenewal,
+                    style: GoogleFonts.inter(color: palette.textHeader),
+                  ),
+                  trailing: Icon(Icons.chevron_right, color: palette.textBody),
+                  onTap: () => _openLink('https://fomoshield.app/premium'),
+                ),
               ],
             ),
           ),
