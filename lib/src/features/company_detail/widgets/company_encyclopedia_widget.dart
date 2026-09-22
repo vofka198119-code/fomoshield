@@ -9,8 +9,9 @@ import '../../../core/theme/themed_divider.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../core/ads/ad_providers.dart';
+import '../../../core/ads/ad_loading_overlay.dart';
 import '../company_encyclopedia_provider.dart';
-import 'company_ad_overlay.dart';
 import 'company_encyclopedia_detail_screen.dart';
 import 'company_encyclopedia_paywall_sheet.dart';
 
@@ -183,11 +184,13 @@ class CompanyEncyclopediaWidget extends ConsumerWidget {
         );
         if (wantsAd != true || !context.mounted) return;
         // Two ads back to back, per spec — a single watch-flow doesn't
-        // unlock reading, both have to finish.
-        await _showAdOverlay(context);
-        if (!context.mounted) return;
-        await _showAdOverlay(context);
-        if (!context.mounted) return;
+        // unlock reading, both have to finish. Bail without unlocking if
+        // either one fails to load/show or gets dismissed before the
+        // reward is earned.
+        final first = await _showAdOverlay(context, ref);
+        if (!context.mounted || !first) return;
+        final second = await _showAdOverlay(context, ref);
+        if (!context.mounted || !second) return;
         ref.read(companyEncyclopediaUnlockedProvider(symbol).notifier).state =
             true;
       }
@@ -206,21 +209,9 @@ class CompanyEncyclopediaWidget extends ConsumerWidget {
     );
   }
 
-  Future<void> _showAdOverlay(BuildContext context) {
-    final completer = Completer<void>();
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: Colors.black87,
-        barrierDismissible: false,
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            CompanyAdOverlay(onComplete: () => completer.complete()),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
-    );
-    return completer.future;
+  /// Returns true only if the user actually earned the reward (watched to
+  /// completion) — false on any load/show failure or early dismissal.
+  Future<bool> _showAdOverlay(BuildContext context, WidgetRef ref) {
+    return withAdLoadingOverlay(context, ref.read(adServiceProvider).showRewarded());
   }
 }

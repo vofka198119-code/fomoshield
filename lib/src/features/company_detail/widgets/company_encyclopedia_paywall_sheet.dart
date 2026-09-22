@@ -7,10 +7,10 @@ import '../../monetization/monetization_modal.dart';
 
 // ---------------------------------------------------------------------------
 // Company Encyclopedia paywall — shown to a free-tier user tapping a locked
-// article row. Two ways in: watch two short ads (reuses the existing
-// CompanyAdOverlay, shown twice back to back — see company_encyclopedia_
-// widget.dart's caller), or go Premium (reuses the app's existing
-// monetization modal rather than building a second upgrade flow).
+// article row. Two ways in: watch two real AdMob rewarded ads back to back
+// (see company_encyclopedia_widget.dart's caller / ad_service.dart), or go
+// Premium (reuses the app's existing monetization modal rather than
+// building a second upgrade flow).
 // ---------------------------------------------------------------------------
 
 /// Returns true if the user chose "watch ads", false/null otherwise

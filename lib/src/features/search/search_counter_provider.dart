@@ -8,7 +8,7 @@ import '../../core/supabase/supabase_providers.dart';
 // - FREE tier: starts at 15, decrements on each search
 // - PREMIUM tier: 999 (effectively unlimited)
 // - Call `consumeSearch()` before navigating to company detail
-// - Call `addSearches(15)` after watching an ad
+// - Call `addSearches(10)` after watching an ad
 // - Call `resetToFree()` from admin panel
 // ---------------------------------------------------------------------------
 

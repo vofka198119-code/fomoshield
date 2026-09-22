@@ -5723,13 +5723,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monetizationModalDescription =>
-      'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 15 more.';
+      'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 10 more.';
 
   @override
   String get monetizationModalUpgradeButton => 'Upgrade to Premium';
 
   @override
-  String get monetizationModalWatchAdButton => 'Watch Ad (+15 searches)';
+  String get monetizationModalWatchAdButton => 'Watch Ad (+10 searches)';
 
   @override
   String get monetizationModalCounterResetAdmin =>
@@ -5742,7 +5742,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monetizationModalSponsoredAd => 'Sponsored Ad';
 
   @override
-  String get monetizationModalRewardText => 'Your reward: +15 free searches';
+  String get monetizationModalRewardText => 'Your reward: +10 free searches';
 
   @override
   String monetizationModalSecondsRemaining(int seconds) {
@@ -5753,7 +5753,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monetizationModalSkip => 'Skip';
 
   @override
-  String get monetizationModalRewardEarned => '✓ Earned 15 more searches!';
+  String get monetizationModalRewardEarned => '✓ Earned 10 more searches!';
 
   @override
   String get monetizationModalProcessing => 'Processing…';

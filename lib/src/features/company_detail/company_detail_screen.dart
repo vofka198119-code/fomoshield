@@ -30,7 +30,8 @@ import 'widgets/portfolio_option_tile.dart';
 import 'widgets/company_widgets_settings_sheet.dart';
 import 'widgets/company_encyclopedia_widget.dart';
 import 'widgets/company_bottom_bar.dart';
-import 'widgets/company_ad_overlay.dart';
+import '../../core/ads/ad_providers.dart';
+import '../../core/ads/ad_loading_overlay.dart';
 import '../search/recently_viewed_provider.dart';
 
 // ---------------------------------------------------------------------------
@@ -59,6 +60,7 @@ class CompanyDetailScreen extends ConsumerStatefulWidget {
 
 class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   bool _showAd = false;
+  bool _adLoading = false;
 
   @override
   void initState() {
@@ -88,24 +90,17 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
     setState(() => _showAd = false);
   }
 
-  void _showWatchAdOverlay(BuildContext context) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: Colors.black87,
-        barrierDismissible: false,
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            CompanyAdOverlay(
-              onComplete: () {
-                if (mounted) _dismissAd();
-              },
-            ),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+  Future<void> _showWatchAdOverlay(BuildContext context) async {
+    setState(() => _adLoading = true);
+    final earned = await withAdLoadingOverlay(
+      context,
+      ref.read(adServiceProvider).showRewarded(),
     );
+    if (!mounted) return;
+    setState(() => _adLoading = false);
+    // Not earned (failed to load/show, or dismissed early) — stay on the
+    // "Sponsored" prompt so the button is there to retry.
+    if (earned) _dismissAd();
   }
 
   @override
@@ -155,7 +150,9 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => _showWatchAdOverlay(context),
+                    onPressed: _adLoading
+                        ? null
+                        : () => _showWatchAdOverlay(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ThemeV2.primary,
                       foregroundColor: Colors.white,
@@ -164,13 +161,22 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: Text(
-                      l10n.companyDetailWatchAdButton,
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                      ),
-                    ),
+                    child: _adLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            l10n.companyDetailWatchAdButton,
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 12),

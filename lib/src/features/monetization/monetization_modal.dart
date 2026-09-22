@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/ads/ad_providers.dart';
 import '../../core/purchases/purchase_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/supabase/supabase_providers.dart';
@@ -382,7 +383,7 @@ class _MonetizationSheet extends ConsumerWidget {
 }
 
 // ===========================================================================
-// Simulated Ad Overlay
+// Ad Overlay — real AdMob rewarded ad
 // ===========================================================================
 
 void _showAdOverlay(BuildContext context) {
@@ -408,48 +409,26 @@ class _AdOverlay extends ConsumerStatefulWidget {
   ConsumerState<_AdOverlay> createState() => _AdOverlayState();
 }
 
-// Was a plain StatefulWidget holding a WidgetRef borrowed from the
-// _MonetizationSheet that pushed this overlay — but that sheet is popped
-// (and its ref disposed) well before the 3s countdown/Skip fires, so
-// widget.ref.read(...) in _grantRewardAndClose threw a Riverpod
-// StateError ("Cannot use ref after the widget was disposed"), which
-// happened BEFORE the Navigator.pop() below it — the overlay stayed
-// stuck on screen forever, blocking Search underneath. ConsumerState
-// owns a ref tied to THIS still-mounted widget's own lifecycle instead.
-class _AdOverlayState extends ConsumerState<_AdOverlay>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _progress;
-  bool _showSkip = false;
-  static const _skipDelay = Duration(seconds: 1);
-
+// Owns its own ref rather than borrowing one from the sheet that pushed
+// this — that sheet is popped (and its ref disposed) well before a real
+// ad's load+show round-trip finishes, so a borrowed ref throws a Riverpod
+// StateError here, leaving this overlay stuck on screen forever, blocking
+// Search underneath. ConsumerState ties a ref to THIS still-mounted
+// widget's own lifecycle instead.
+class _AdOverlayState extends ConsumerState<_AdOverlay> {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    );
-    _progress = CurvedAnimation(parent: _controller, curve: Curves.linear);
-    _controller.forward();
-
-    // Show skip button after 1s — standard Rewarded Ad practice
-    Future.delayed(_skipDelay, () {
-      if (mounted) setState(() => _showSkip = true);
-    });
-
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _grantRewardAndClose();
-      }
-    });
+    _run();
   }
 
-  void _grantRewardAndClose() {
-    ref.read(searchCounterProvider.notifier).addSearches(15);
-    if (mounted) {
-      final l10n = AppLocalizations.of(context)!;
-      Navigator.of(context).pop();
+  Future<void> _run() async {
+    final earned = await ref.read(adServiceProvider).showRewarded();
+    if (!mounted) return;
+    if (earned) ref.read(searchCounterProvider.notifier).addSearches(10);
+    final l10n = AppLocalizations.of(context)!;
+    Navigator.of(context).pop();
+    if (earned) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.monetizationModalRewardEarned),
@@ -461,106 +440,10 @@ class _AdOverlayState extends ConsumerState<_AdOverlay>
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.transparent,
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.all(32),
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: AppTheme.card,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Spinning icon
-              const Icon(
-                Icons.videocam_rounded,
-                color: AppTheme.accentBlue,
-                size: 48,
-              ),
-              const SizedBox(height: 24),
-
-              Text(
-                l10n.monetizationModalSponsoredAd,
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              Text(
-                l10n.monetizationModalRewardText,
-                style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textDim),
-              ),
-              const SizedBox(height: 24),
-
-              // Progress bar
-              AnimatedBuilder(
-                animation: _progress,
-                builder: (context, child) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: _progress.value,
-                      backgroundColor: AppTheme.cardDark,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppTheme.accentBlue,
-                      ),
-                      minHeight: 6,
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-
-              AnimatedBuilder(
-                animation: _progress,
-                builder: (context, child) {
-                  final remaining = 3 - (_progress.value * 3).toInt();
-                  return Text(
-                    l10n.monetizationModalSecondsRemaining(remaining),
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: AppTheme.textDim,
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              // Skip button appears after 1s — standard Rewarded Ad UX
-              if (_showSkip)
-                TextButton(
-                  onPressed: () {
-                    _controller.stop();
-                    _grantRewardAndClose();
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppTheme.textDim,
-                    textStyle: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  child: Text(l10n.monetizationModalSkip),
-                )
-              else
-                const SizedBox(height: 4),
-            ],
-          ),
-        ),
-      ),
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }

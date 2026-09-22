@@ -5738,14 +5738,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get monetizationModalDescription =>
-      'Вы использовали все бесплатные поиски. Оформите Premium для безлимитного поиска или посмотрите рекламу, чтобы получить ещё 15.';
+      'Вы использовали все бесплатные поиски. Оформите Premium для безлимитного поиска или посмотрите рекламу, чтобы получить ещё 10.';
 
   @override
   String get monetizationModalUpgradeButton => 'Оформить Premium';
 
   @override
   String get monetizationModalWatchAdButton =>
-      'Посмотреть рекламу (+15 поисков)';
+      'Посмотреть рекламу (+10 поисков)';
 
   @override
   String get monetizationModalCounterResetAdmin =>
@@ -5759,7 +5759,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get monetizationModalRewardText =>
-      'Ваша награда: +15 бесплатных поисков';
+      'Ваша награда: +10 бесплатных поисков';
 
   @override
   String monetizationModalSecondsRemaining(int seconds) {
@@ -5770,7 +5770,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get monetizationModalSkip => 'Пропустить';
 
   @override
-  String get monetizationModalRewardEarned => '✓ Получено ещё 15 поисков!';
+  String get monetizationModalRewardEarned => '✓ Получено ещё 10 поисков!';
 
   @override
   String get monetizationModalProcessing => 'Обработка…';

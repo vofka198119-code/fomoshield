@@ -2249,13 +2249,13 @@
     }
   },
   "monetizationModalTitle": "Search limit reached",
-  "monetizationModalDescription": "You've used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 15 more.",
+  "monetizationModalDescription": "You've used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 10 more.",
   "monetizationModalUpgradeButton": "Upgrade to Premium",
-  "monetizationModalWatchAdButton": "Watch Ad (+15 searches)",
+  "monetizationModalWatchAdButton": "Watch Ad (+10 searches)",
   "monetizationModalCounterResetAdmin": "🔧 Counter reset to 15 (admin)",
   "monetizationModalResetCounterAdmin": "Reset counter (admin)",
   "monetizationModalSponsoredAd": "Sponsored Ad",
-  "monetizationModalRewardText": "Your reward: +15 free searches",
+  "monetizationModalRewardText": "Your reward: +10 free searches",
   "monetizationModalSecondsRemaining": "{seconds}s remaining",
   "@monetizationModalSecondsRemaining": {
     "placeholders": {
@@ -2265,7 +2265,7 @@
     }
   },
   "monetizationModalSkip": "Skip",
-  "monetizationModalRewardEarned": "✓ Earned 15 more searches!",
+  "monetizationModalRewardEarned": "✓ Earned 10 more searches!",
   "monetizationModalProcessing": "Processing…",
   "monetizationModalPurchaseError": "Purchase failed. Please try again.",
   "monetizationModalRestorePurchases": "Restore purchases",

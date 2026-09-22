@@ -9640,7 +9640,7 @@ abstract class AppLocalizations {
   /// No description provided for @monetizationModalDescription.
   ///
   /// In en, this message translates to:
-  /// **'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 15 more.'**
+  /// **'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 10 more.'**
   String get monetizationModalDescription;
 
   /// No description provided for @monetizationModalUpgradeButton.
@@ -9652,7 +9652,7 @@ abstract class AppLocalizations {
   /// No description provided for @monetizationModalWatchAdButton.
   ///
   /// In en, this message translates to:
-  /// **'Watch Ad (+15 searches)'**
+  /// **'Watch Ad (+10 searches)'**
   String get monetizationModalWatchAdButton;
 
   /// No description provided for @monetizationModalCounterResetAdmin.
@@ -9676,7 +9676,7 @@ abstract class AppLocalizations {
   /// No description provided for @monetizationModalRewardText.
   ///
   /// In en, this message translates to:
-  /// **'Your reward: +15 free searches'**
+  /// **'Your reward: +10 free searches'**
   String get monetizationModalRewardText;
 
   /// No description provided for @monetizationModalSecondsRemaining.
@@ -9694,7 +9694,7 @@ abstract class AppLocalizations {
   /// No description provided for @monetizationModalRewardEarned.
   ///
   /// In en, this message translates to:
-  /// **'✓ Earned 15 more searches!'**
+  /// **'✓ Earned 10 more searches!'**
   String get monetizationModalRewardEarned;
 
   /// No description provided for @monetizationModalProcessing.
