@@ -1030,7 +1030,7 @@
   "companyDetailTitle": "COMPANY OVERVIEW",
   "companyDetailSponsoredTitle": "Sponsored content",
   "companyDetailWatchAdBody": "Please watch a short ad to continue viewing company details.",
-  "companyDetailWatchAdButton": "Watch 3s Ad",
+  "companyDetailWatchAdButton": "Watch Ad",
   "companyDetailUpgradeNoAds": "Upgrade to Premium — no ads",
   "companyDetailLoadError": "Could not load company data",
   "companyDetailLoadErrorBody": "The market data API may be temporarily unavailable. Please try again.",
@@ -1149,8 +1149,6 @@
   },
   "companyDetailAcademicDisclaimerTitle": "Educational & Academic Disclaimer",
   "companyDetailAcademicDisclaimerBody": "The methodology, definitions, and analytical principles presented here are based on standard corporate finance theory and valuation frameworks taught in leading business schools. Provided strictly for educational purposes.",
-  "companyDetailAdTitle": "Sponsored Ad",
-  "companyDetailAdContinuing": "Continuing in a moment…",
   "companyDetailNoPriceDataAvailable": "No price data available",
   "companyDetailChartLoadError": "Failed to load chart",
   "companyDetailChartNotEnoughData": "Not enough data",
@@ -2254,17 +2252,6 @@
   "monetizationModalWatchAdButton": "Watch Ad (+10 searches)",
   "monetizationModalCounterResetAdmin": "🔧 Counter reset to 15 (admin)",
   "monetizationModalResetCounterAdmin": "Reset counter (admin)",
-  "monetizationModalSponsoredAd": "Sponsored Ad",
-  "monetizationModalRewardText": "Your reward: +10 free searches",
-  "monetizationModalSecondsRemaining": "{seconds}s remaining",
-  "@monetizationModalSecondsRemaining": {
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
-  "monetizationModalSkip": "Skip",
   "monetizationModalRewardEarned": "✓ Earned 10 more searches!",
   "monetizationModalProcessing": "Processing…",
   "monetizationModalPurchaseError": "Purchase failed. Please try again.",

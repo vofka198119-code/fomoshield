@@ -4516,7 +4516,7 @@ abstract class AppLocalizations {
   /// No description provided for @companyDetailWatchAdButton.
   ///
   /// In en, this message translates to:
-  /// **'Watch 3s Ad'**
+  /// **'Watch Ad'**
   String get companyDetailWatchAdButton;
 
   /// No description provided for @companyDetailUpgradeNoAds.
@@ -4932,18 +4932,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The methodology, definitions, and analytical principles presented here are based on standard corporate finance theory and valuation frameworks taught in leading business schools. Provided strictly for educational purposes.'**
   String get companyDetailAcademicDisclaimerBody;
-
-  /// No description provided for @companyDetailAdTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sponsored Ad'**
-  String get companyDetailAdTitle;
-
-  /// No description provided for @companyDetailAdContinuing.
-  ///
-  /// In en, this message translates to:
-  /// **'Continuing in a moment…'**
-  String get companyDetailAdContinuing;
 
   /// No description provided for @companyDetailNoPriceDataAvailable.
   ///
@@ -9666,30 +9654,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset counter (admin)'**
   String get monetizationModalResetCounterAdmin;
-
-  /// No description provided for @monetizationModalSponsoredAd.
-  ///
-  /// In en, this message translates to:
-  /// **'Sponsored Ad'**
-  String get monetizationModalSponsoredAd;
-
-  /// No description provided for @monetizationModalRewardText.
-  ///
-  /// In en, this message translates to:
-  /// **'Your reward: +10 free searches'**
-  String get monetizationModalRewardText;
-
-  /// No description provided for @monetizationModalSecondsRemaining.
-  ///
-  /// In en, this message translates to:
-  /// **'{seconds}s remaining'**
-  String monetizationModalSecondsRemaining(int seconds);
-
-  /// No description provided for @monetizationModalSkip.
-  ///
-  /// In en, this message translates to:
-  /// **'Skip'**
-  String get monetizationModalSkip;
 
   /// No description provided for @monetizationModalRewardEarned.
   ///

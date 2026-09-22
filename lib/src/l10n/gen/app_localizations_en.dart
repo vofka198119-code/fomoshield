@@ -2560,7 +2560,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please watch a short ad to continue viewing company details.';
 
   @override
-  String get companyDetailWatchAdButton => 'Watch 3s Ad';
+  String get companyDetailWatchAdButton => 'Watch Ad';
 
   @override
   String get companyDetailUpgradeNoAds => 'Upgrade to Premium — no ads';
@@ -2790,12 +2790,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get companyDetailAcademicDisclaimerBody =>
       'The methodology, definitions, and analytical principles presented here are based on standard corporate finance theory and valuation frameworks taught in leading business schools. Provided strictly for educational purposes.';
-
-  @override
-  String get companyDetailAdTitle => 'Sponsored Ad';
-
-  @override
-  String get companyDetailAdContinuing => 'Continuing in a moment…';
 
   @override
   String get companyDetailNoPriceDataAvailable => 'No price data available';
@@ -5737,20 +5731,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monetizationModalResetCounterAdmin => 'Reset counter (admin)';
-
-  @override
-  String get monetizationModalSponsoredAd => 'Sponsored Ad';
-
-  @override
-  String get monetizationModalRewardText => 'Your reward: +10 free searches';
-
-  @override
-  String monetizationModalSecondsRemaining(int seconds) {
-    return '${seconds}s remaining';
-  }
-
-  @override
-  String get monetizationModalSkip => 'Skip';
 
   @override
   String get monetizationModalRewardEarned => '✓ Earned 10 more searches!';

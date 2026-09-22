@@ -2562,7 +2562,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Посмотрите короткую рекламу, чтобы продолжить просмотр информации о компании.';
 
   @override
-  String get companyDetailWatchAdButton => 'Смотреть рекламу (3с)';
+  String get companyDetailWatchAdButton => 'Смотреть рекламу';
 
   @override
   String get companyDetailUpgradeNoAds => 'Перейти на Premium — без рекламы';
@@ -2793,12 +2793,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get companyDetailAcademicDisclaimerBody =>
       'Представленная здесь методология, определения и аналитические принципы основаны на стандартной теории корпоративных финансов и моделях оценки, преподаваемых в ведущих бизнес-школах. Предоставлено исключительно в образовательных целях.';
-
-  @override
-  String get companyDetailAdTitle => 'Спонсорская реклама';
-
-  @override
-  String get companyDetailAdContinuing => 'Продолжение через мгновение…';
 
   @override
   String get companyDetailNoPriceDataAvailable => 'Нет данных о цене';
@@ -5753,21 +5747,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get monetizationModalResetCounterAdmin => 'Сбросить счётчик (админ)';
-
-  @override
-  String get monetizationModalSponsoredAd => 'Спонсорская реклама';
-
-  @override
-  String get monetizationModalRewardText =>
-      'Ваша награда: +10 бесплатных поисков';
-
-  @override
-  String monetizationModalSecondsRemaining(int seconds) {
-    return 'Осталось $seconds с';
-  }
-
-  @override
-  String get monetizationModalSkip => 'Пропустить';
 
   @override
   String get monetizationModalRewardEarned => '✓ Получено ещё 10 поисков!';
