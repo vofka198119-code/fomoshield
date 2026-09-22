@@ -21,6 +21,7 @@ import '../../stress_test/stress_test_engine.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../stress_test/stress_test_nav_ad_trigger.dart';
 import '../widgets/asset_row_widget.dart';
 
 /// Asset list sort mode
@@ -39,6 +40,12 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
   AssetSortMode _sortMode = AssetSortMode.value;
+
+  @override
+  void initState() {
+    super.initState();
+    maybeShowStressTestNavAd(ref);
+  }
 
   @override
   void dispose() {
@@ -160,7 +167,10 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
             // ── Divider ──────────────────────────────────────────
             palette.dividerGradient != null
                 ? themedDivider(palette, indent: 0, endIndent: 0)
-                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+                : Divider(
+                    height: 1,
+                    color: Colors.black.withValues(alpha: 0.06),
+                  ),
 
             // ── Assets List ──────────────────────────────────────
             Expanded(
@@ -284,7 +294,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         _devChip(
           l10n.assetsScreenDevNewsLabel(news.symbol),
           '${news.currentTick}/${news.rampDurationTicks} '
-              '(${_remainingLabel(news.currentTick, news.rampDurationTicks, l10n)})',
+          '(${_remainingLabel(news.currentTick, news.rampDurationTicks, l10n)})',
           news.isPositive ? const Color(0xFF66BB6A) : const Color(0xFFEF5350),
           monoStyle,
         ),
@@ -295,7 +305,7 @@ class _AssetsScreenState extends ConsumerState<AssetsScreen> {
         _devChip(
           l10n.assetsScreenDevHypeLabel(hype.sector.label),
           '${hype.currentTick}/${hype.rampDurationTicks} '
-              '(${_remainingLabel(hype.currentTick, hype.rampDurationTicks, l10n)})',
+          '(${_remainingLabel(hype.currentTick, hype.rampDurationTicks, l10n)})',
           hype.isPositive ? const Color(0xFF66BB6A) : const Color(0xFFEF5350),
           monoStyle,
         ),

@@ -25,6 +25,7 @@ import 'widgets/psychology/psychology_panic_widget.dart';
 import 'widgets/psychology/psychology_patience_widget.dart';
 import 'widgets/psychology/psychology_strategy_widget.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
+import 'stress_test_nav_ad_trigger.dart';
 
 class StressTestPsychologyMeterScreen extends ConsumerWidget {
   final String sessionId;
@@ -41,74 +42,86 @@ class StressTestPsychologyMeterScreen extends ConsumerWidget {
         : PsychologyMeterData.fromSession(session);
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        centerTitle: true,
-        leading: themedBackButton(context, palette, size: 22),
-        title: themedHeaderText(
-          l10n.stressTestPsychologyMeterTitle,
-          palette,
-          GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            leading: themedBackButton(context, palette, size: 22),
+            title: themedHeaderText(
+              l10n.stressTestPsychologyMeterTitle,
+              palette,
+              GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+          body: SafeArea(
+            bottom: true,
+            top: false,
+            left: false,
+            right: false,
+            child: session == null || data == null
+                ? const SizedBox.shrink()
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        _FsScoreGaugeCard(
+                          score: data.strategicScore,
+                          label: l10n.psychologyMeterScreenStrategyScore,
+                          palette: palette,
+                        ),
+                        const SizedBox(height: 16),
+                        PsychologyStrategyCard(
+                          session: session,
+                          palette: palette,
+                        ),
+                        const SizedBox(height: 16),
+                        PsychologyDiversificationCard(
+                          session: session,
+                          palette: palette,
+                        ),
+                        const SizedBox(height: 24),
+                        _FsScoreGaugeCard(
+                          score: data.psychologicalScore,
+                          label: l10n.psychologyMeterScreenPsychologyScore,
+                          palette: palette,
+                        ),
+                        const SizedBox(height: 16),
+                        PsychologyDisciplineCard(
+                          discipline: session.psychologyProfile.discipline,
+                          palette: palette,
+                        ),
+                        const SizedBox(height: 16),
+                        PsychologyPanicCard(
+                          panicResistance:
+                              session.psychologyProfile.panicResistance,
+                          palette: palette,
+                        ),
+                        const SizedBox(height: 16),
+                        PsychologyPatienceCard(
+                          patience: session.psychologyProfile.patience,
+                          palette: palette,
+                        ),
+                        const SizedBox(height: 16),
+                        _PsychologyMeterDetailCard(
+                          data: data,
+                          palette: palette,
+                        ),
+                        StressTestVerdictDisclaimer(palette: palette),
+                      ],
+                    ),
+                  ),
           ),
         ),
-      ),
-      body: SafeArea(
-        bottom: true,
-        top: false,
-        left: false,
-        right: false,
-        child: session == null || data == null
-            ? const SizedBox.shrink()
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    _FsScoreGaugeCard(
-                      score: data.strategicScore,
-                      label: l10n.psychologyMeterScreenStrategyScore,
-                      palette: palette,
-                    ),
-                    const SizedBox(height: 16),
-                    PsychologyStrategyCard(session: session, palette: palette),
-                    const SizedBox(height: 16),
-                    PsychologyDiversificationCard(
-                      session: session,
-                      palette: palette,
-                    ),
-                    const SizedBox(height: 24),
-                    _FsScoreGaugeCard(
-                      score: data.psychologicalScore,
-                      label: l10n.psychologyMeterScreenPsychologyScore,
-                      palette: palette,
-                    ),
-                    const SizedBox(height: 16),
-                    PsychologyDisciplineCard(
-                      discipline: session.psychologyProfile.discipline,
-                      palette: palette,
-                    ),
-                    const SizedBox(height: 16),
-                    PsychologyPanicCard(
-                      panicResistance:
-                          session.psychologyProfile.panicResistance,
-                      palette: palette,
-                    ),
-                    const SizedBox(height: 16),
-                    PsychologyPatienceCard(
-                      patience: session.psychologyProfile.patience,
-                      palette: palette,
-                    ),
-                    const SizedBox(height: 16),
-                    _PsychologyMeterDetailCard(data: data, palette: palette),
-                    StressTestVerdictDisclaimer(palette: palette),
-                  ],
-                ),
-              ),
-      ),
+        const StressTestNavAdTrigger(),
+      ],
     );
   }
 }

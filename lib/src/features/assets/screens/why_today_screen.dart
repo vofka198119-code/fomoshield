@@ -49,6 +49,7 @@ import '../../../core/services/gics_sector_mapper.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../core/notifications/news_scenario_l10n.dart';
+import '../../stress_test/stress_test_nav_ad_trigger.dart';
 
 const _marketColor = FomoShieldTheme.factorMarket;
 const _sectorColor = FomoShieldTheme.factorSector;
@@ -94,6 +95,7 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
       duration: ThemeV2.animNormal,
     );
     Future.microtask(() => _staggerController.forward());
+    maybeShowStressTestNavAd(ref);
   }
 
   @override
@@ -317,15 +319,15 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: FomoShieldTheme.cardTitle(palette.accentPrimary)),
+            Text(
+              title,
+              style: FomoShieldTheme.cardTitle(palette.accentPrimary),
+            ),
             if (subtitle != null) ...[
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  color: palette.textBody,
-                ),
+                style: GoogleFonts.inter(fontSize: 11, color: palette.textBody),
               ),
             ],
             const SizedBox(height: 10),
@@ -350,7 +352,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: palette.accentPrimary.withValues(alpha: 0.25)),
+        border: Border.all(
+          color: palette.accentPrimary.withValues(alpha: 0.25),
+        ),
         borderRadius: BorderRadius.circular(ThemeV2.radiusMedium),
       ),
       child: Column(
@@ -416,19 +420,53 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
     );
   }
 
-  Widget _factorBars(PriceContribution c, AppLocalizations l10n, AppPalette palette) {
+  Widget _factorBars(
+    PriceContribution c,
+    AppLocalizations l10n,
+    AppPalette palette,
+  ) {
     return Column(
       children: [
-        _factorBar(l10n.whyTodayScreenFactorMarketTrends, c.marketPct, _marketColor, palette),
-        _factorBar(l10n.whyTodayScreenFactorSector, c.sectorPct, _sectorColor, palette),
-        _factorBar(l10n.whyTodayScreenFactorNews, c.newsPct, _newsColor, palette),
-        _factorBar(l10n.whyTodayScreenFactorSectorHype, c.hypePct, _hypeColor, palette),
-        _factorBar(l10n.whyTodayScreenFactorNoise, c.noisePct, _noiseColor, palette),
+        _factorBar(
+          l10n.whyTodayScreenFactorMarketTrends,
+          c.marketPct,
+          _marketColor,
+          palette,
+        ),
+        _factorBar(
+          l10n.whyTodayScreenFactorSector,
+          c.sectorPct,
+          _sectorColor,
+          palette,
+        ),
+        _factorBar(
+          l10n.whyTodayScreenFactorNews,
+          c.newsPct,
+          _newsColor,
+          palette,
+        ),
+        _factorBar(
+          l10n.whyTodayScreenFactorSectorHype,
+          c.hypePct,
+          _hypeColor,
+          palette,
+        ),
+        _factorBar(
+          l10n.whyTodayScreenFactorNoise,
+          c.noisePct,
+          _noiseColor,
+          palette,
+        ),
       ],
     );
   }
 
-  Widget _factorBar(String label, double percent, Color color, AppPalette palette) {
+  Widget _factorBar(
+    String label,
+    double percent,
+    Color color,
+    AppPalette palette,
+  ) {
     final clamped = (percent / 100).clamp(0.0, 1.0);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -753,7 +791,9 @@ class _WhyTodayScreenState extends ConsumerState<WhyTodayScreen>
             ),
           ),
           Text(
-            e.isActive ? l10n.whyTodayScreenActiveLabel : _fmtDuration(e.duration),
+            e.isActive
+                ? l10n.whyTodayScreenActiveLabel
+                : _fmtDuration(e.duration),
             style: ThemeV2.small.copyWith(color: palette.textBody),
           ),
         ],

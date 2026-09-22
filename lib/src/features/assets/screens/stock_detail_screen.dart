@@ -29,6 +29,7 @@ import '../../company_detail/widgets/key_metrics_section.dart';
 import '../../../shared/widgets/simulated_trading_disclaimer.dart';
 import '../../stress_test/stress_test_naming.dart';
 import '../../stress_test/stress_test_live_metrics.dart';
+import '../../stress_test/stress_test_nav_ad_trigger.dart';
 import 'stock_detail/widgets/stock_sparkline_chart.dart';
 import 'stock_detail/widgets/stock_position_card.dart';
 import 'stock_detail/widgets/stock_why_today_card.dart';
@@ -67,6 +68,7 @@ class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
     _generateSparkData();
     // If this is a new asset (not yet in portfolio), fetch price from Finnhub
     Future.microtask(() => _ensurePriceForNewAsset());
+    maybeShowStressTestNavAd(ref);
   }
 
   @override

@@ -30,6 +30,7 @@ import 'widgets/verdict/panic_tiers.dart';
 import 'widgets/verdict/patience_tiers.dart';
 import 'widgets/verdict/verdict_tier.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
+import 'stress_test_nav_ad_trigger.dart';
 
 class _MarkerInfo {
   final double Function(VerdictArchiveEntry) score;
@@ -104,7 +105,11 @@ VerdictTier? _tierFor(
         entry.safetyMarkerHasData,
       );
     case 'sector-balance':
-      return sectorBalanceTierFor(l10n, entry.strategySector, entry.holdingCount);
+      return sectorBalanceTierFor(
+        l10n,
+        entry.strategySector,
+        entry.holdingCount,
+      );
     case 'concentration':
       return concentrationTierFor(
         l10n,
@@ -154,44 +159,50 @@ class VerdictMarkerDetailScreen extends ConsumerWidget {
         : _labelForMarker(l10n, markerId);
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        centerTitle: true,
-        leading: themedBackButton(context, palette, size: 22),
-        title: themedHeaderText(
-          markerLabel.toUpperCase(),
-          palette,
-          GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            leading: themedBackButton(context, palette, size: 22),
+            title: themedHeaderText(
+              markerLabel.toUpperCase(),
+              palette,
+              GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+          body: SafeArea(
+            bottom: true,
+            top: false,
+            left: false,
+            right: false,
+            child: (entry == null || marker == null)
+                ? Center(
+                    child: Text(
+                      l10n.verdictMarkerNotAvailable,
+                      style: GoogleFonts.inter(color: palette.textBody),
+                    ),
+                  )
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: _MarkerDetailBody(
+                      label: markerLabel,
+                      score: marker.score(entry),
+                      tier: _tierFor(l10n, markerId, entry),
+                      palette: palette,
+                    ),
+                  ),
           ),
         ),
-      ),
-      body: SafeArea(
-        bottom: true,
-        top: false,
-        left: false,
-        right: false,
-        child: (entry == null || marker == null)
-            ? Center(
-                child: Text(
-                  l10n.verdictMarkerNotAvailable,
-                  style: GoogleFonts.inter(color: palette.textBody),
-                ),
-              )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: _MarkerDetailBody(
-                  label: markerLabel,
-                  score: marker.score(entry),
-                  tier: _tierFor(l10n, markerId, entry),
-                  palette: palette,
-                ),
-              ),
-      ),
+        const StressTestNavAdTrigger(),
+      ],
     );
   }
 }

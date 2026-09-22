@@ -24,6 +24,7 @@ import '../../shared/widgets/company_logo.dart';
 import 'stress_test_engine.dart' show stressTestSessionProvider;
 import 'stress_test_models.dart';
 import 'stress_test_naming.dart';
+import 'stress_test_nav_ad_trigger.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 class StressTestTradeDetailScreen extends ConsumerWidget {
@@ -42,43 +43,49 @@ class StressTestTradeDetailScreen extends ConsumerWidget {
     final t = trade;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        centerTitle: true,
-        leading: themedBackButton(context, palette, size: 22),
-        title: themedHeaderText(
-          l10n.tradeDetailTitle,
-          palette,
-          GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            leading: themedBackButton(context, palette, size: 22),
+            title: themedHeaderText(
+              l10n.tradeDetailTitle,
+              palette,
+              GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+          body: SafeArea(
+            bottom: true,
+            top: false,
+            left: false,
+            right: false,
+            child: t == null
+                ? Center(
+                    child: Text(
+                      l10n.tradeNotFound,
+                      style: GoogleFonts.inter(color: palette.textBody),
+                    ),
+                  )
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: _TradeDetailCard(
+                      trade: t,
+                      sessionId: sessionId,
+                      palette: palette,
+                    ),
+                  ),
           ),
         ),
-      ),
-      body: SafeArea(
-        bottom: true,
-        top: false,
-        left: false,
-        right: false,
-        child: t == null
-            ? Center(
-                child: Text(
-                  l10n.tradeNotFound,
-                  style: GoogleFonts.inter(color: palette.textBody),
-                ),
-              )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: _TradeDetailCard(
-                  trade: t,
-                  sessionId: sessionId,
-                  palette: palette,
-                ),
-              ),
-      ),
+        const StressTestNavAdTrigger(),
+      ],
     );
   }
 }
@@ -274,20 +281,31 @@ class _DetailRow extends StatelessWidget {
             label,
             style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
           ),
-          valueColor != null
-              ? Text(
-                  value,
-                  style: interNums(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: valueColor,
+          const SizedBox(width: 12),
+          // Flexible + ellipsis — the "simulation" row's value is a
+          // session name (user-editable, arbitrary length), unlike every
+          // other row here (price/date/share count), which can overflow
+          // the row's remaining width otherwise.
+          Flexible(
+            child: valueColor != null
+                ? Text(
+                    value,
+                    textAlign: TextAlign.right,
+                    overflow: TextOverflow.ellipsis,
+                    style: interNums(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: valueColor,
+                    ),
+                  )
+                : themedPriceText(
+                    value,
+                    palette,
+                    interNums(fontSize: 14, fontWeight: FontWeight.w600),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
                   ),
-                )
-              : themedPriceText(
-                  value,
-                  palette,
-                  interNums(fontSize: 14, fontWeight: FontWeight.w600),
-                ),
+          ),
         ],
       ),
     );

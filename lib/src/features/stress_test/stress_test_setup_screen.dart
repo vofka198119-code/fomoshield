@@ -28,6 +28,7 @@ import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_dca_provider.dart';
 import 'stress_test_dividend_provider.dart';
+import 'stress_test_nav_ad_trigger.dart';
 
 // Market Clock ring's gold accent — used for every "PREMIUM" tag on this
 // screen.
@@ -67,6 +68,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: _session?.name ?? '');
+    maybeShowStressTestNavAd(ref);
   }
 
   @override
@@ -307,7 +309,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               ? ThemeV2.primary.withValues(alpha: 0.08)
               : null,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: palette.accentPrimary.withValues(alpha: 0.2)),
+          border: Border.all(
+            color: palette.accentPrimary.withValues(alpha: 0.2),
+          ),
         ),
         child: Row(
           children: [
@@ -326,7 +330,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                   fontWeight: FontWeight.w800,
                   color: palette.marketClockAccent ?? dialBrassLight,
                   letterSpacing: 1.5,
-                  shadows: _goldGlow(palette.marketClockAccent ?? dialBrassLight),
+                  shadows: _goldGlow(
+                    palette.marketClockAccent ?? dialBrassLight,
+                  ),
                 ),
               ),
             ),
@@ -413,7 +419,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     // instrument-panel fill every other themed card uses, with text color
     // derived from the palette instead of assumed-always-white.
     final isThemed = palette.windowGradient != null;
-    final onCard = isThemed ? (palette.onWindow ?? palette.textHeader) : Colors.white;
+    final onCard = isThemed
+        ? (palette.onWindow ?? palette.textHeader)
+        : Colors.white;
     return CardFrame(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -483,7 +491,10 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           const SizedBox(height: 8),
           Text(
             l10n.stressTestOfTotal(formatUsd(session.startingCash)),
-            style: interNums(fontSize: 12, color: onCard.withValues(alpha: 0.6)),
+            style: interNums(
+              fontSize: 12,
+              color: onCard.withValues(alpha: 0.6),
+            ),
           ),
         ],
       ),

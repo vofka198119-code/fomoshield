@@ -28,6 +28,7 @@ import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'stress_test_naming.dart';
 import '../../l10n/gen/app_localizations.dart';
+import 'stress_test_nav_ad_trigger.dart';
 
 class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
   final String sessionId;
@@ -44,158 +45,167 @@ class VerdictTradeBreakdownDetailScreen extends ConsumerWidget {
     );
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        centerTitle: true,
-        leading: themedBackButton(context, palette, size: 22),
-        title: themedHeaderText(
-          l10n.verdictTradeBreakdownTitle,
-          palette,
-          GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            leading: themedBackButton(context, palette, size: 22),
+            title: themedHeaderText(
+              l10n.verdictTradeBreakdownTitle,
+              palette,
+              GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+              ),
+            ),
+          ),
+          body: SafeArea(
+            bottom: true,
+            top: false,
+            left: false,
+            right: false,
+            child: entry == null
+                ? Center(
+                    child: Text(
+                      l10n.verdictSessionNotFound,
+                      style: GoogleFonts.inter(color: palette.textBody),
+                    ),
+                  )
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        KeyedSubtree(
+                          key: const ValueKey('duration'),
+                          child: StaggerFadeIn(
+                            index: 0,
+                            child: _DarkCard(
+                              palette: palette,
+                              child: _Row(
+                                label: l10n.verdictTestDurationLabel,
+                                value: _durationDays(l10n, entry.durationLabel),
+                                isLast: true,
+                                palette: palette,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        KeyedSubtree(
+                          key: const ValueKey('statistics'),
+                          child: StaggerFadeIn(
+                            index: 1,
+                            child: _DarkCard(
+                              title: l10n.verdictStatisticsTitle,
+                              palette: palette,
+                              child: Column(
+                                children: [
+                                  _Row(
+                                    label: l10n.verdictTotalTradesLabel,
+                                    value: '${entry.totalTrades}',
+                                    palette: palette,
+                                  ),
+                                  _Row(
+                                    label: l10n.verdictBoughtLabel,
+                                    value:
+                                        '${entry.trades.where((t) => t.isBuy).length}',
+                                    palette: palette,
+                                  ),
+                                  _Row(
+                                    label: l10n.verdictSoldLabel,
+                                    value:
+                                        '${entry.trades.where((t) => !t.isBuy).length}',
+                                    isLast: true,
+                                    palette: palette,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        KeyedSubtree(
+                          key: const ValueKey('totalAssets'),
+                          child: StaggerFadeIn(
+                            index: 2,
+                            child: _DarkCard(
+                              title: l10n.verdictTotalAssetsTitle,
+                              palette: palette,
+                              child: Column(
+                                children: [
+                                  _Row(
+                                    label: l10n.verdictAssetsHeldTotalLabel,
+                                    value: '${_totalAssetsEverHeld(entry)}',
+                                    palette: palette,
+                                  ),
+                                  _Row(
+                                    label: l10n.verdictAssetsAtEndLabel,
+                                    value: '${entry.holdingCount}',
+                                    isLast: true,
+                                    palette: palette,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        KeyedSubtree(
+                          key: const ValueKey('financialSummary'),
+                          child: StaggerFadeIn(
+                            index: 3,
+                            child: _financialSummaryCard(l10n, entry, palette),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        KeyedSubtree(
+                          key: const ValueKey('scenarios'),
+                          child: StaggerFadeIn(
+                            index: 4,
+                            child: _scenariosCard(l10n, entry, palette),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        KeyedSubtree(
+                          key: const ValueKey('companies'),
+                          child: StaggerFadeIn(
+                            index: 5,
+                            child: _CompaniesCard(
+                              entry: entry,
+                              palette: palette,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        KeyedSubtree(
+                          key: const ValueKey('tradeHistory'),
+                          child: StaggerFadeIn(
+                            index: 6,
+                            child: _TradeHistoryCard(
+                              entry: entry,
+                              palette: palette,
+                            ),
+                          ),
+                        ),
+                        KeyedSubtree(
+                          key: const ValueKey('breakdownDisclaimer'),
+                          child: StaggerFadeIn(
+                            index: 7,
+                            child: _TradeBreakdownDisclaimer(palette: palette),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
           ),
         ),
-      ),
-      body: SafeArea(
-        bottom: true,
-        top: false,
-        left: false,
-        right: false,
-        child: entry == null
-            ? Center(
-                child: Text(
-                  l10n.verdictSessionNotFound,
-                  style: GoogleFonts.inter(color: palette.textBody),
-                ),
-              )
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    KeyedSubtree(
-                      key: const ValueKey('duration'),
-                      child: StaggerFadeIn(
-                        index: 0,
-                        child: _DarkCard(
-                          palette: palette,
-                          child: _Row(
-                            label: l10n.verdictTestDurationLabel,
-                            value: _durationDays(l10n, entry.durationLabel),
-                            isLast: true,
-                            palette: palette,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    KeyedSubtree(
-                      key: const ValueKey('statistics'),
-                      child: StaggerFadeIn(
-                        index: 1,
-                        child: _DarkCard(
-                          title: l10n.verdictStatisticsTitle,
-                          palette: palette,
-                          child: Column(
-                            children: [
-                              _Row(
-                                label: l10n.verdictTotalTradesLabel,
-                                value: '${entry.totalTrades}',
-                                palette: palette,
-                              ),
-                              _Row(
-                                label: l10n.verdictBoughtLabel,
-                                value:
-                                    '${entry.trades.where((t) => t.isBuy).length}',
-                                palette: palette,
-                              ),
-                              _Row(
-                                label: l10n.verdictSoldLabel,
-                                value:
-                                    '${entry.trades.where((t) => !t.isBuy).length}',
-                                isLast: true,
-                                palette: palette,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    KeyedSubtree(
-                      key: const ValueKey('totalAssets'),
-                      child: StaggerFadeIn(
-                        index: 2,
-                        child: _DarkCard(
-                          title: l10n.verdictTotalAssetsTitle,
-                          palette: palette,
-                          child: Column(
-                            children: [
-                              _Row(
-                                label: l10n.verdictAssetsHeldTotalLabel,
-                                value: '${_totalAssetsEverHeld(entry)}',
-                                palette: palette,
-                              ),
-                              _Row(
-                                label: l10n.verdictAssetsAtEndLabel,
-                                value: '${entry.holdingCount}',
-                                isLast: true,
-                                palette: palette,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    KeyedSubtree(
-                      key: const ValueKey('financialSummary'),
-                      child: StaggerFadeIn(
-                        index: 3,
-                        child: _financialSummaryCard(l10n, entry, palette),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    KeyedSubtree(
-                      key: const ValueKey('scenarios'),
-                      child: StaggerFadeIn(
-                        index: 4,
-                        child: _scenariosCard(l10n, entry, palette),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    KeyedSubtree(
-                      key: const ValueKey('companies'),
-                      child: StaggerFadeIn(
-                        index: 5,
-                        child: _CompaniesCard(entry: entry, palette: palette),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    KeyedSubtree(
-                      key: const ValueKey('tradeHistory'),
-                      child: StaggerFadeIn(
-                        index: 6,
-                        child: _TradeHistoryCard(
-                          entry: entry,
-                          palette: palette,
-                        ),
-                      ),
-                    ),
-                    KeyedSubtree(
-                      key: const ValueKey('breakdownDisclaimer'),
-                      child: StaggerFadeIn(
-                        index: 7,
-                        child: _TradeBreakdownDisclaimer(palette: palette),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ),
+        const StressTestNavAdTrigger(),
+      ],
     );
   }
 
@@ -371,7 +381,9 @@ class _CompaniesCardState extends State<_CompaniesCard> {
                 l10n.verdictNoCompaniesTraded,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: (widget.palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
+                  color: (widget.palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.6,
+                  ),
                 ),
               ),
             )
@@ -433,7 +445,9 @@ class _TradeHistoryCardState extends State<_TradeHistoryCard> {
                 l10n.verdictNoTradesYet,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: (widget.palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
+                  color: (widget.palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.6,
+                  ),
                 ),
               ),
             )
@@ -526,7 +540,12 @@ class _DarkCard extends StatelessWidget {
         children: [
           if (title != null) ...[
             themedGoldGradient(
-              Text(title!, style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white)),
+              Text(
+                title!,
+                style: FomoShieldTheme.cardTitle(
+                  palette.onWindow ?? Colors.white,
+                ),
+              ),
               palette,
             ),
             const SizedBox(height: 12),
@@ -534,7 +553,9 @@ class _DarkCard extends StatelessWidget {
                 ? themedDivider(palette, indent: 0, endIndent: 0)
                 : Divider(
                     height: 1,
-                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
+                    color: (palette.onWindow ?? Colors.white).withValues(
+                      alpha: 0.12,
+                    ),
                   ),
             const SizedBox(height: 4),
           ],
@@ -566,7 +587,11 @@ class _Row extends StatelessWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12)),
+                bottom: BorderSide(
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.12,
+                  ),
+                ),
               ),
             ),
       child: Row(
@@ -621,7 +646,11 @@ class _CompanyRow extends ConsumerWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12)),
+                bottom: BorderSide(
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.12,
+                  ),
+                ),
               ),
             ),
       child: Row(
@@ -665,7 +694,9 @@ class _CompanyRow extends ConsumerWidget {
                   symbol,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
+                    color: (palette.onWindow ?? Colors.white).withValues(
+                      alpha: 0.6,
+                    ),
                   ),
                 ),
               ],
@@ -711,7 +742,11 @@ class _TradeRow extends ConsumerWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12)),
+                bottom: BorderSide(
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.12,
+                  ),
+                ),
               ),
             ),
       child: Row(
@@ -755,7 +790,9 @@ class _TradeRow extends ConsumerWidget {
                   trade.symbol,
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
+                    color: (palette.onWindow ?? Colors.white).withValues(
+                      alpha: 0.6,
+                    ),
                   ),
                 ),
               ],

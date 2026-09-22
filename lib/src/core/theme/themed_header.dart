@@ -124,11 +124,21 @@ Widget themedPriceText(
   // color (e.g. white) — see this file's "always-dark panel" pattern note
   // in the Luxury Gold project memory.
   Color? fallbackColor,
+  // Unset by default (Text's own default: unbounded, no truncation) —
+  // only needed by callers whose value can be arbitrary-length (e.g. a
+  // user-editable session name), unlike a normal price/amount.
+  TextOverflow? overflow,
+  TextAlign? textAlign,
 }) {
   final color = palette.titleGradient != null
       ? palette.textHeader
       : (fallbackColor ?? palette.textHeader);
-  return Text(text, style: baseStyle.copyWith(color: color));
+  return Text(
+    text,
+    style: baseStyle.copyWith(color: color),
+    overflow: overflow,
+    textAlign: textAlign,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -163,7 +173,9 @@ Widget themedHelpIcon({
   // Black & White's `onWindow` (still wins, checked first).
   final color = onWindow
       ? (palette.onWindow ??
-            (palette.titleShadow != null ? palette.accentPrimary : Colors.white))
+            (palette.titleShadow != null
+                ? palette.accentPrimary
+                : Colors.white))
       : palette.accentPrimary;
   final icon = Container(
     width: 20,

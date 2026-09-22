@@ -19,6 +19,7 @@ import '../../shared/widgets/stagger_fade_in.dart';
 import '../../shared/widgets/trade_history_tile.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_naming.dart';
+import 'stress_test_nav_ad_trigger.dart';
 
 // Rows are revealed 6 at a time (MoreLessPill below the list) instead of
 // all at once — same reasoning as the Portfolio counterpart
@@ -38,6 +39,12 @@ class StressTestTradeHistoryScreen extends ConsumerStatefulWidget {
 class _StressTestTradeHistoryScreenState
     extends ConsumerState<StressTestTradeHistoryScreen> {
   int _revealedCount = _revealBatchSize;
+
+  @override
+  void initState() {
+    super.initState();
+    maybeShowStressTestNavAd(ref);
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -35,6 +35,7 @@ import 'widgets/verdict/verdict_marker_row.dart';
 import 'widgets/verdict/verdict_diversification_card.dart';
 import 'widgets/verdict/verdict_strategy_card.dart';
 import 'widgets/verdict/stress_test_verdict_disclaimer.dart';
+import 'stress_test_nav_ad_trigger.dart';
 
 class VerdictScreen extends ConsumerWidget {
   final String sessionId;
@@ -134,222 +135,231 @@ class VerdictScreen extends ConsumerWidget {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        centerTitle: true,
-        title: themedHeaderText(
-          l10n.verdictSessionCompleteTitle,
-          palette,
-          GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            title: themedHeaderText(
+              l10n.verdictSessionCompleteTitle,
+              palette,
+              GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+              ),
+            ),
+            leading: themedBackButton(
+              context,
+              palette,
+              size: 22,
+              onPressed: () => context.go('/stress-test-hub'),
+            ),
           ),
-        ),
-        leading: themedBackButton(
-          context,
-          palette,
-          size: 22,
-          onPressed: () => context.go('/stress-test-hub'),
-        ),
-      ),
-      body: SafeArea(
-        bottom: true,
-        top: false,
-        left: false,
-        right: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // ── Guardian Verdict ────────────────────────────────
-              KeyedSubtree(
-                key: const ValueKey('guardian'),
-                child: StaggerFadeIn(
-                  index: 0,
-                  child: _GuardianVerdictSection(palette: palette),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // ── Strategy Score ───────────────────────────────────
-              KeyedSubtree(
-                key: const ValueKey('strategyScore'),
-                child: StaggerFadeIn(
-                  index: 1,
-                  child: _buildFsScoreGauge(
-                    (computeStrategicScore(
-                              diversification: entry.strategyDiversification,
-                              sector: entry.strategySector,
-                              concentration: entry.strategyConcentration,
-                              etf: entry.strategyEtf,
-                              cashBuffer: entry.strategyCashBuffer,
-                              safetyMarker: entry.safetyMarker,
-                            ) *
-                            100)
-                        .round(),
-                    l10n.verdictScreenStrategyScoreLabel,
-                    palette,
+          body: SafeArea(
+            bottom: true,
+            top: false,
+            left: false,
+            right: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // ── Guardian Verdict ────────────────────────────────
+                  KeyedSubtree(
+                    key: const ValueKey('guardian'),
+                    child: StaggerFadeIn(
+                      index: 0,
+                      child: _GuardianVerdictSection(palette: palette),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-              // ── Strategy ─────────────────────────────────────────
-              KeyedSubtree(
-                key: const ValueKey('strategy'),
-                child: StaggerFadeIn(
-                  index: 2,
-                  child: VerdictStrategyCard(
-                    sessionId: sessionId,
-                    concentrationScore: entry.strategyConcentration,
-                    etfExposureScore: entry.strategyEtf,
-                    cashBufferScore: entry.strategyCashBuffer,
+                  // ── Strategy Score ───────────────────────────────────
+                  KeyedSubtree(
+                    key: const ValueKey('strategyScore'),
+                    child: StaggerFadeIn(
+                      index: 1,
+                      child: _buildFsScoreGauge(
+                        (computeStrategicScore(
+                                  diversification:
+                                      entry.strategyDiversification,
+                                  sector: entry.strategySector,
+                                  concentration: entry.strategyConcentration,
+                                  etf: entry.strategyEtf,
+                                  cashBuffer: entry.strategyCashBuffer,
+                                  safetyMarker: entry.safetyMarker,
+                                ) *
+                                100)
+                            .round(),
+                        l10n.verdictScreenStrategyScoreLabel,
+                        palette,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 12),
+                  const SizedBox(height: 24),
 
-              // ── Diversification ──────────────────────────────────
-              KeyedSubtree(
-                key: const ValueKey('diversification'),
-                child: StaggerFadeIn(
-                  index: 3,
-                  child: VerdictDiversificationCard(
-                    sessionId: sessionId,
-                    sectorDiversificationScore: entry.strategyDiversification,
-                    safetyMarkerScore: entry.safetyMarker,
-                    sectorBalanceScore: entry.strategySector,
+                  // ── Strategy ─────────────────────────────────────────
+                  KeyedSubtree(
+                    key: const ValueKey('strategy'),
+                    child: StaggerFadeIn(
+                      index: 2,
+                      child: VerdictStrategyCard(
+                        sessionId: sessionId,
+                        concentrationScore: entry.strategyConcentration,
+                        etfExposureScore: entry.strategyEtf,
+                        cashBufferScore: entry.strategyCashBuffer,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
+                  const SizedBox(height: 12),
 
-              // ── Psychology Score ─────────────────────────────────
-              KeyedSubtree(
-                key: const ValueKey('psychologyScore'),
-                child: StaggerFadeIn(
-                  index: 4,
-                  child: _buildFsScoreGauge(
-                    ((entry.discipline * 0.37 +
-                                    entry.panicResistance * 0.32 +
-                                    entry.patience * 0.31)
-                                .clamp(0.0, 1.0) *
-                            100)
-                        .round(),
-                    l10n.verdictScreenPsychologyScoreLabel,
-                    palette,
+                  // ── Diversification ──────────────────────────────────
+                  KeyedSubtree(
+                    key: const ValueKey('diversification'),
+                    child: StaggerFadeIn(
+                      index: 3,
+                      child: VerdictDiversificationCard(
+                        sessionId: sessionId,
+                        sectorDiversificationScore:
+                            entry.strategyDiversification,
+                        safetyMarkerScore: entry.safetyMarker,
+                        sectorBalanceScore: entry.strategySector,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-              // ── Per-marker verdict cards ─────────────────────────
-              KeyedSubtree(
-                key: const ValueKey('discipline'),
-                child: StaggerFadeIn(
-                  index: 5,
-                  child: VerdictSingleMarkerCard(
-                    sessionId: sessionId,
-                    markerId: 'discipline',
-                    title: l10n.verdictScreenDisciplineTitle,
-                    label: l10n.verdictScreenDisciplineLabel,
-                    score: entry.discipline,
+                  // ── Psychology Score ─────────────────────────────────
+                  KeyedSubtree(
+                    key: const ValueKey('psychologyScore'),
+                    child: StaggerFadeIn(
+                      index: 4,
+                      child: _buildFsScoreGauge(
+                        ((entry.discipline * 0.37 +
+                                        entry.panicResistance * 0.32 +
+                                        entry.patience * 0.31)
+                                    .clamp(0.0, 1.0) *
+                                100)
+                            .round(),
+                        l10n.verdictScreenPsychologyScoreLabel,
+                        palette,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              KeyedSubtree(
-                key: const ValueKey('panic'),
-                child: StaggerFadeIn(
-                  index: 6,
-                  child: VerdictSingleMarkerCard(
-                    sessionId: sessionId,
-                    markerId: 'panic',
-                    title: l10n.verdictScreenPanicTitle,
-                    label: l10n.verdictScreenPanicLabel,
-                    score: entry.panicResistance,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              KeyedSubtree(
-                key: const ValueKey('patience'),
-                child: StaggerFadeIn(
-                  index: 7,
-                  child: VerdictSingleMarkerCard(
-                    sessionId: sessionId,
-                    markerId: 'patience',
-                    title: l10n.verdictScreenPatienceTitle,
-                    label: l10n.verdictScreenPatienceLabel,
-                    score: entry.patience,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
+                  const SizedBox(height: 24),
 
-              // ── Trade Breakdown (incl. session stats; full detail
-              // screen — reached via its own chevron — now also hosts
-              // Trade History) ──────────────────────────────────────
-              KeyedSubtree(
-                key: const ValueKey('tradeBreakdown'),
-                child: StaggerFadeIn(
-                  index: 8,
-                  child: VerdictTradeBreakdownWidget(
-                    entry: entry,
-                    palette: palette,
+                  // ── Per-marker verdict cards ─────────────────────────
+                  KeyedSubtree(
+                    key: const ValueKey('discipline'),
+                    child: StaggerFadeIn(
+                      index: 5,
+                      child: VerdictSingleMarkerCard(
+                        sessionId: sessionId,
+                        markerId: 'discipline',
+                        title: l10n.verdictScreenDisciplineTitle,
+                        label: l10n.verdictScreenDisciplineLabel,
+                        score: entry.discipline,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
+                  const SizedBox(height: 12),
+                  KeyedSubtree(
+                    key: const ValueKey('panic'),
+                    child: StaggerFadeIn(
+                      index: 6,
+                      child: VerdictSingleMarkerCard(
+                        sessionId: sessionId,
+                        markerId: 'panic',
+                        title: l10n.verdictScreenPanicTitle,
+                        label: l10n.verdictScreenPanicLabel,
+                        score: entry.panicResistance,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  KeyedSubtree(
+                    key: const ValueKey('patience'),
+                    child: StaggerFadeIn(
+                      index: 7,
+                      child: VerdictSingleMarkerCard(
+                        sessionId: sessionId,
+                        markerId: 'patience',
+                        title: l10n.verdictScreenPatienceTitle,
+                        label: l10n.verdictScreenPatienceLabel,
+                        score: entry.patience,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-              KeyedSubtree(
-                key: const ValueKey('disclaimer'),
-                child: StaggerFadeIn(
-                  index: 9,
-                  child: StressTestVerdictDisclaimer(palette: palette),
-                ),
-              ),
-              const SizedBox(height: 24),
+                  // ── Trade Breakdown (incl. session stats; full detail
+                  // screen — reached via its own chevron — now also hosts
+                  // Trade History) ──────────────────────────────────────
+                  KeyedSubtree(
+                    key: const ValueKey('tradeBreakdown'),
+                    child: StaggerFadeIn(
+                      index: 8,
+                      child: VerdictTradeBreakdownWidget(
+                        entry: entry,
+                        palette: palette,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-              // ── Continue Learning ───────────────────────────────
-              KeyedSubtree(
-                key: const ValueKey('continueLearning'),
-                child: StaggerFadeIn(
-                  index: 10,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => context.go('/stress-test-hub'),
-                        borderRadius: BorderRadius.circular(14),
-                        child: themedDarkCtaButtonShell(
-                          palette: palette,
-                          borderRadius: BorderRadius.circular(14),
-                          standardDecoration:
-                              darkCardDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                              ).copyWith(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: dialDark.withValues(alpha: 0.35),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
+                  KeyedSubtree(
+                    key: const ValueKey('disclaimer'),
+                    child: StaggerFadeIn(
+                      index: 9,
+                      child: StressTestVerdictDisclaimer(palette: palette),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ── Continue Learning ───────────────────────────────
+                  KeyedSubtree(
+                    key: const ValueKey('continueLearning'),
+                    child: StaggerFadeIn(
+                      index: 10,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => context.go('/stress-test-hub'),
+                            borderRadius: BorderRadius.circular(14),
+                            child: themedDarkCtaButtonShell(
+                              palette: palette,
+                              borderRadius: BorderRadius.circular(14),
+                              standardDecoration:
+                                  darkCardDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ).copyWith(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: dialDark.withValues(alpha: 0.35),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            alignment: Alignment.center,
-                            child: Text(
-                              l10n.verdictContinueLearning,
-                              style: GoogleFonts.inter(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: themedDarkCtaContentColor(palette),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  l10n.verdictContinueLearning,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: themedDarkCtaContentColor(palette),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -357,36 +367,37 @@ class VerdictScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              KeyedSubtree(
-                key: const ValueKey('backToHome'),
-                child: StaggerFadeIn(
-                  index: 11,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: TextButton(
-                      onPressed: () {
-                        context.go('/home');
-                      },
-                      child: Text(
-                        l10n.verdictBackToHome,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: palette.textBody,
-                          fontWeight: FontWeight.w600,
+                  const SizedBox(height: 12),
+                  KeyedSubtree(
+                    key: const ValueKey('backToHome'),
+                    child: StaggerFadeIn(
+                      index: 11,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          onPressed: () {
+                            context.go('/home');
+                          },
+                          child: Text(
+                            l10n.verdictBackToHome,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: palette.textBody,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 40),
+                ],
               ),
-              const SizedBox(height: 40),
-            ],
+            ),
           ),
         ),
-      ),
+        const StressTestNavAdTrigger(),
+      ],
     );
   }
 

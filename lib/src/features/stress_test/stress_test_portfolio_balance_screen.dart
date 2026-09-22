@@ -30,6 +30,7 @@ import 'widgets/stress_test_sector_allocation_widget.dart';
 import 'widgets/stress_test_asset_count_widget.dart';
 import 'widgets/stress_test_portfolio_health_widget.dart';
 import 'widgets/stress_test_portfolio_balance_widget_settings_sheet.dart';
+import 'stress_test_nav_ad_trigger.dart';
 
 class StressTestPortfolioBalanceScreen extends ConsumerWidget {
   final String sessionId;
@@ -47,61 +48,67 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        centerTitle: true,
-        leading: themedBackButton(context, palette, size: 22),
-        title: themedHeaderText(
-          l10n.portfolioBalanceScreenTitle,
-          palette,
-          GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            leading: themedBackButton(context, palette, size: 22),
+            title: themedHeaderText(
+              l10n.portfolioBalanceScreenTitle,
+              palette,
+              GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: SafeArea(
-        bottom: true,
-        top: false,
-        left: false,
-        right: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              if (session != null) ...[
-                for (int i = 0; i < visibleWidgets.length; i++) ...[
-                  StaggerFadeIn(
-                    index: i,
-                    child: _buildWidgetById(
-                      visibleWidgets[i].id,
-                      session,
-                      palette,
+          body: SafeArea(
+            bottom: true,
+            top: false,
+            left: false,
+            right: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  if (session != null) ...[
+                    for (int i = 0; i < visibleWidgets.length; i++) ...[
+                      StaggerFadeIn(
+                        index: i,
+                        child: _buildWidgetById(
+                          visibleWidgets[i].id,
+                          session,
+                          palette,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // ── Add widgets button ───────────────────────────
+                    Center(
+                      child: themedAddWidgetsButton(
+                        context,
+                        palette,
+                        label: l10n.homeAddWidgets,
+                        onTap: () => _showWidgetSettingsSheet(context, ref),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
+
+                    // ── Educational disclaimer ───────────────────────
+                    _educationalDisclaimer(l10n, palette),
+                  ],
                 ],
-
-                // ── Add widgets button ───────────────────────────
-                Center(
-                  child: themedAddWidgetsButton(
-                    context,
-                    palette,
-                    label: l10n.homeAddWidgets,
-                    onTap: () => _showWidgetSettingsSheet(context, ref),
-                  ),
-                ),
-
-                // ── Educational disclaimer ───────────────────────
-                _educationalDisclaimer(l10n, palette),
-              ],
-            ],
+              ),
+            ),
           ),
         ),
-      ),
+        const StressTestNavAdTrigger(),
+      ],
     );
   }
 
@@ -243,11 +250,14 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
                   themedGoldGradient(
                     Text(
                       l10n.portfolioBalanceScreenAssetAllocationTitle,
-                      style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white).copyWith(
-                        shadows: palette.titleShadow != null
-                            ? [palette.titleShadow!]
-                            : null,
-                      ),
+                      style:
+                          FomoShieldTheme.cardTitle(
+                            palette.onWindow ?? Colors.white,
+                          ).copyWith(
+                            shadows: palette.titleShadow != null
+                                ? [palette.titleShadow!]
+                                : null,
+                          ),
                     ),
                     palette,
                   ),
@@ -267,7 +277,9 @@ class _AssetAllocationBarsCard extends ConsumerWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.12,
+                  ),
                 ),
           if (hasData)
             Padding(
