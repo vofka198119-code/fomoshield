@@ -316,7 +316,6 @@
   "stressTestUpsellUnlimitedDuration": "Unlimited simulation duration",
   "stressTestUpsellFullCrashScenarios": "Full market crash scenarios",
   "stressTestUpsellAdvancedAnalytics": "Advanced portfolio analytics",
-  "stressTestAccessTitle": "Market simulation access",
   "stressTestPortfolioTitle": "MARKET SIMULATION PORTFOLIO",
   "stressTestNotStartedYet": "Simulation not started yet",
   "stressTestGoBackToSetup": "Go back to setup and start the simulation",
@@ -1029,9 +1028,10 @@
   },
   "companyDetailTitle": "COMPANY OVERVIEW",
   "companyDetailSponsoredTitle": "Sponsored content",
-  "companyDetailWatchAdBody": "Please watch a short ad to continue viewing company details.",
+  "companyDetailWatchAdBody": "To keep the app free, we have to ask you to watch a couple of short ads.",
   "companyDetailWatchAdButton": "Watch Ad",
-  "companyDetailUpgradeNoAds": "Upgrade to Premium — no ads",
+  "orderAdGateTitle": "Unlock this order",
+  "orderAdGateBody": "To keep the app free, we have to ask you to watch a short ad before placing this order — or go Premium for unlimited order placement.",
   "companyDetailLoadError": "Could not load company data",
   "companyDetailLoadErrorBody": "The market data API may be temporarily unavailable. Please try again.",
   "companyDetailNoPortfolios": "No portfolios yet. Create one first.",
@@ -2246,39 +2246,14 @@
       }
     }
   },
-  "monetizationModalTitle": "Search limit reached",
-  "monetizationModalDescription": "You've used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 10 more.",
   "monetizationModalUpgradeButton": "Upgrade to Premium",
-  "monetizationModalWatchAdButton": "Watch Ad (+10 searches)",
   "monetizationModalCounterResetAdmin": "🔧 Counter reset to 15 (admin)",
   "monetizationModalResetCounterAdmin": "Reset counter (admin)",
-  "monetizationModalRewardEarned": "✓ Earned 10 more searches!",
   "monetizationModalProcessing": "Processing…",
   "monetizationModalPurchaseError": "Purchase failed. Please try again.",
   "monetizationModalRestorePurchases": "Restore purchases",
   "monetizationModalRestoreNotFound": "No previous purchase found.",
-  "premiumPromoOverlayBarrierLabel": "Premium promo overlay",
-  "premiumPromoOverlayDefaultTitle": "Premium feature",
-  "premiumPromoOverlayBadge": "PREMIUM",
   "premiumPromoOverlaySubtitle": "Upgrade to unlock this and more",
-  "premiumPromoOverlayFeatureAdFree": "Completely ad‑free",
-  "premiumPromoOverlaySecondsShort": "{seconds}s",
-  "@premiumPromoOverlaySecondsShort": {
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
-  "premiumPromoOverlayClosingIn": "Closing in {seconds}s…",
-  "@premiumPromoOverlayClosingIn": {
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
-  "premiumPromoOverlayClose": "Close",
   "disclaimerScreenTitle": "Disclaimer",
   "disclaimerScreenIntro": "Before we start, a few important things about how this all works — takes a minute.",
   "disclaimerScreenAccessRestricted": "Access Restricted",

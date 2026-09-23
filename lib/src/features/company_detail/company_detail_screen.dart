@@ -10,13 +10,12 @@ import '../../core/theme/app_palette.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_button.dart';
-import '../../shared/widgets/card_frame.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/stagger_fade_in.dart';
+import '../../shared/widgets/ad_or_premium_sheet.dart';
 import '../home/home_providers.dart';
 import '../home/watchlist_limits_provider.dart';
 import '../portfolio/portfolio_providers.dart';
-import '../monetization/monetization_modal.dart';
 import 'watchlist_ad_provider.dart';
 import 'company_detail_provider.dart';
 import 'company_widget_order_provider.dart';
@@ -60,12 +59,16 @@ class CompanyDetailScreen extends ConsumerStatefulWidget {
 
 class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   bool _showAd = false;
-  bool _adLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _checkAd();
+    // Deferred to after the current build finishes — calling _checkAd()
+    // (which synchronously mutates watchlistAdProvider's state) directly
+    // from initState throws Riverpod's "Tried to modify a provider while
+    // the widget tree was building" (confirmed live 2026-09-23; same
+    // fix as stress_test_nav_ad_trigger.dart's maybeShowStressTestNavAd).
+    Future(_checkAd);
   }
 
   Future<void> _checkAd() async {
@@ -78,29 +81,67 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
       final shouldShow = await ref
           .read(watchlistAdProvider.notifier)
           .incrementAndCheck();
-      if (mounted) {
-        setState(() => _showAd = shouldShow);
-      }
+      if (!mounted || !shouldShow) return;
+      setState(() => _showAd = true);
+      await _resolveAdGate();
     } catch (_) {
-      // If ad check fails, just show the data without ad overlay
+      // If anything in the gate throws — before _showAd flips true, this
+      // just shows the data ungated, matching the original intent. If it
+      // throws AFTER (mid-sheet/mid-ad), _showAd would otherwise stay
+      // stuck true forever with no data and no way back — leave instead,
+      // same as a declined/failed gate.
+      if (mounted && _showAd) _leave();
     }
   }
 
-  void _dismissAd() {
-    setState(() => _showAd = false);
-  }
-
-  Future<void> _showWatchAdOverlay(BuildContext context) async {
-    setState(() => _adLoading = true);
-    final earned = await withAdLoadingOverlay(
+  /// Shows the shared ad-or-Premium sheet (same one Company Encyclopedia
+  /// uses — see ad_or_premium_sheet.dart), then plays two back-to-back
+  /// rewarded ads if the user opts in. There's no free-tier fallback view
+  /// to stay on here, so declining or either ad failing just leaves the
+  /// screen — reopening it (from Search/Watchlist/etc.) tries again.
+  Future<void> _resolveAdGate() async {
+    final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
+    final wantsAd = await showAdOrPremiumSheet(
+      context,
+      ref,
+      palette: palette,
+      icon: Icons.play_circle_rounded,
+      title: l10n.companyDetailSponsoredTitle,
+      body: l10n.companyDetailWatchAdBody,
+      watchAdLabel: l10n.companyDetailWatchAdButton,
+      goPremiumLabel: l10n.companyEncyclopediaGoPremiumButton,
+    );
+    if (!mounted) return;
+    if (wantsAd != true) {
+      _leave();
+      return;
+    }
+    final first = await withAdLoadingOverlay(
       context,
       ref.read(adServiceProvider).showRewarded(),
     );
     if (!mounted) return;
-    setState(() => _adLoading = false);
-    // Not earned (failed to load/show, or dismissed early) — stay on the
-    // "Sponsored" prompt so the button is there to retry.
-    if (earned) _dismissAd();
+    if (!first) {
+      _leave();
+      return;
+    }
+    final second = await withAdLoadingOverlay(
+      context,
+      ref.read(adServiceProvider).showRewarded(),
+    );
+    if (!mounted) return;
+    if (!second) {
+      _leave();
+      return;
+    }
+    setState(() => _showAd = false);
+  }
+
+  void _leave() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -108,101 +149,11 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     if (_showAd) {
-      return Scaffold(
+      // Blank placeholder — the actual ad-or-Premium choice happens in
+      // the shared bottom sheet triggered from _checkAd/_resolveAdGate.
+      return const Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(
-          child: CardFrame(
-            margin: const EdgeInsets.all(32),
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: ThemeV2.surface,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            palette: palette,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.play_circle_rounded,
-                  color: palette.accentPrimary,
-                  size: 64,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.companyDetailSponsoredTitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: palette.textHeader,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.companyDetailWatchAdBody,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: palette.textBody,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _adLoading
-                        ? null
-                        : () => _showWatchAdOverlay(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ThemeV2.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: _adLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            l10n.companyDetailWatchAdButton,
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () {
-                    // "Watch Ad" is already the sibling button right
-                    // above this one — voluntary skips the modal's own
-                    // (redundant) Watch Ad option.
-                    showMonetizationModal(
-                      context,
-                      ref,
-                      trigger: MonetizationTrigger.voluntary,
-                    );
-                  },
-                  child: Text(
-                    l10n.companyDetailUpgradeNoAds,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: palette.accentPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        body: SizedBox.shrink(),
       );
     }
 

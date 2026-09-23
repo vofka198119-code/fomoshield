@@ -123,6 +123,11 @@ class _StressTestSearchSheetState
     String description, {
     bool isEtf = false,
   }) async {
+    // Was briefly gated behind searchCounterProvider (added 2026-09-23,
+    // matching the main Search screen's typed-result tap) — reverted the
+    // same day: every tap here, like every entry point, already goes
+    // through Company Detail's own universal view-gate downstream, so
+    // this search-specific gate was pure duplicated friction.
     setState(() {
       _isLoading = true;
       _errorMessage = null;

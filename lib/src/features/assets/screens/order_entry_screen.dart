@@ -27,6 +27,7 @@ import '../../../core/theme/theme_variant_provider.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../core/ads/order_ad_gate.dart';
 import '../../stress_test/stress_test_models.dart';
 import '../../stress_test/stress_test_engine.dart';
 import '../../stress_test/stress_test_pending_orders_provider.dart';
@@ -322,6 +323,14 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       fee: orderFee,
     );
     if (confirmed != true || !mounted) return;
+
+    // 3 free order placements per session/device, then every one after
+    // that needs an ad or Premium — see fomoshield_admob_plan_2026_09_22
+    // memory (agreed 2026-09-23). Own counter, separate from Portfolio's.
+    if (!await checkOrderAdGate(context, ref, contextKey: 'stress_test')) {
+      return;
+    }
+    if (!mounted) return;
 
     if (_selectedOrderType == _OrderType.limit) {
       final confirmedLimitPrice = limitPrice!;

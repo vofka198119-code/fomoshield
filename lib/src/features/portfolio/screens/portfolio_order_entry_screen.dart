@@ -33,8 +33,8 @@ import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../core/ads/order_ad_gate.dart';
 import '../../monetization/monetization_modal.dart';
-import '../../monetization/premium_promo_overlay.dart';
 import '../portfolio_limits_provider.dart';
 import '../portfolio_providers.dart';
 import '../../orders/order_model.dart' as orders;
@@ -431,6 +431,14 @@ class _PortfolioOrderEntryScreenState
     );
     if (confirmed != true || !mounted) return;
 
+    // 3 free order placements per portfolio/device, then every one after
+    // that needs an ad or Premium — see fomoshield_admob_plan_2026_09_22
+    // memory (agreed 2026-09-23). Own counter, separate from Stress Test's.
+    if (!await checkOrderAdGate(context, ref, contextKey: 'portfolio')) {
+      return;
+    }
+    if (!mounted) return;
+
     _executeOrder(
       orderType: orderType,
       session: session,
@@ -482,19 +490,14 @@ class _PortfolioOrderEntryScreenState
         ),
       );
     } else {
-      showPremiumPromoOverlay(
-        context: context,
-        title: l10n.orderEntryHoldingsLimitPromoTitle,
-        durationSeconds: 5,
-        onComplete: () {
-          if (context.mounted) {
-            showMonetizationModal(
-              context,
-              ref,
-              trigger: MonetizationTrigger.holdingsLimit,
-            );
-          }
-        },
+      // Used to fade in a fake simulated-ad screen first (removed
+      // 2026-09-23 — dead weight from before real AdMob existed, see
+      // fomoshield_admob_plan_2026_09_22 memory); goes straight to the
+      // real modal now.
+      showMonetizationModal(
+        context,
+        ref,
+        trigger: MonetizationTrigger.holdingsLimit,
       );
     }
   }

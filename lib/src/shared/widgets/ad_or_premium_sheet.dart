@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/app_palette.dart';
-import '../../../l10n/gen/app_localizations.dart';
-import '../../monetization/monetization_modal.dart';
+import '../../core/theme/app_palette.dart';
+import '../../features/monetization/monetization_modal.dart';
 
 // ---------------------------------------------------------------------------
-// Company Encyclopedia paywall — shown to a free-tier user tapping a locked
-// article row. Two ways in: watch two real AdMob rewarded ads back to back
-// (see company_encyclopedia_widget.dart's caller / ad_service.dart), or go
-// Premium (reuses the app's existing monetization modal rather than
-// building a second upgrade flow).
+// Generic "watch an ad or go Premium" bottom sheet — the shared UI shell
+// behind every ad-gate in the app (Company Encyclopedia unlock, Stress
+// Test/Portfolio order gate, ...). Callers own the counter/eligibility
+// logic and only ask this sheet to present the choice.
 // ---------------------------------------------------------------------------
 
-/// Returns true if the user chose "watch ads", false/null otherwise
+/// Returns true if the user chose "watch ad(s)", false/null otherwise
 /// (dismissed, or chose "Go Premium" — that flow has its own modal and
-/// doesn't unlock reading on its own since the upgrade itself is a stub).
-Future<bool?> showCompanyEncyclopediaPaywallSheet(
+/// doesn't unlock anything on its own since the upgrade itself is a stub).
+Future<bool?> showAdOrPremiumSheet(
   BuildContext context,
-  WidgetRef ref,
-  AppPalette palette,
-) {
-  final l10n = AppLocalizations.of(context)!;
+  WidgetRef ref, {
+  required AppPalette palette,
+  required IconData icon,
+  required String title,
+  required String body,
+  required String watchAdLabel,
+  required String goPremiumLabel,
+}) {
   return showModalBottomSheet<bool>(
     context: context,
     backgroundColor: palette.card,
@@ -44,14 +46,10 @@ Future<bool?> showCompanyEncyclopediaPaywallSheet(
               ),
             ),
             const SizedBox(height: 18),
-            Icon(
-              Icons.auto_stories_rounded,
-              color: palette.accentPrimary,
-              size: 40,
-            ),
+            Icon(icon, color: palette.accentPrimary, size: 40),
             const SizedBox(height: 16),
             Text(
-              l10n.companyEncyclopediaPaywallTitle,
+              title,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 17,
@@ -61,7 +59,7 @@ Future<bool?> showCompanyEncyclopediaPaywallSheet(
             ),
             const SizedBox(height: 8),
             Text(
-              l10n.companyEncyclopediaPaywallBody,
+              body,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 13,
@@ -83,7 +81,7 @@ Future<bool?> showCompanyEncyclopediaPaywallSheet(
                   ),
                 ),
                 child: Text(
-                  l10n.companyDetailWatchAdButton,
+                  watchAdLabel,
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
@@ -97,9 +95,8 @@ Future<bool?> showCompanyEncyclopediaPaywallSheet(
               child: OutlinedButton(
                 onPressed: () {
                   Navigator.pop(ctx, false);
-                  // "Watch Ad" is already this sheet's own button above
-                  // — voluntary skips the modal's redundant Watch Ad
-                  // option.
+                  // "Watch Ad" is already this sheet's own button above —
+                  // voluntary skips the modal's redundant Watch Ad option.
                   showMonetizationModal(
                     context,
                     ref,
@@ -115,7 +112,7 @@ Future<bool?> showCompanyEncyclopediaPaywallSheet(
                   ),
                 ),
                 child: Text(
-                  l10n.companyEncyclopediaGoPremiumButton,
+                  goPremiumLabel,
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.w700,
                     fontSize: 15,

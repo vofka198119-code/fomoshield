@@ -1262,12 +1262,6 @@ abstract class AppLocalizations {
   /// **'Advanced portfolio analytics'**
   String get stressTestUpsellAdvancedAnalytics;
 
-  /// No description provided for @stressTestAccessTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Market simulation access'**
-  String get stressTestAccessTitle;
-
   /// No description provided for @stressTestPortfolioTitle.
   ///
   /// In en, this message translates to:
@@ -4510,7 +4504,7 @@ abstract class AppLocalizations {
   /// No description provided for @companyDetailWatchAdBody.
   ///
   /// In en, this message translates to:
-  /// **'Please watch a short ad to continue viewing company details.'**
+  /// **'To keep the app free, we have to ask you to watch a couple of short ads.'**
   String get companyDetailWatchAdBody;
 
   /// No description provided for @companyDetailWatchAdButton.
@@ -4519,11 +4513,17 @@ abstract class AppLocalizations {
   /// **'Watch Ad'**
   String get companyDetailWatchAdButton;
 
-  /// No description provided for @companyDetailUpgradeNoAds.
+  /// No description provided for @orderAdGateTitle.
   ///
   /// In en, this message translates to:
-  /// **'Upgrade to Premium — no ads'**
-  String get companyDetailUpgradeNoAds;
+  /// **'Unlock this order'**
+  String get orderAdGateTitle;
+
+  /// No description provided for @orderAdGateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To keep the app free, we have to ask you to watch a short ad before placing this order — or go Premium for unlimited order placement.'**
+  String get orderAdGateBody;
 
   /// No description provided for @companyDetailLoadError.
   ///
@@ -9619,29 +9619,11 @@ abstract class AppLocalizations {
   /// **'Limit Price {price}'**
   String stressTestOrderRowLimitPriceLine(String price);
 
-  /// No description provided for @monetizationModalTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Search limit reached'**
-  String get monetizationModalTitle;
-
-  /// No description provided for @monetizationModalDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 10 more.'**
-  String get monetizationModalDescription;
-
   /// No description provided for @monetizationModalUpgradeButton.
   ///
   /// In en, this message translates to:
   /// **'Upgrade to Premium'**
   String get monetizationModalUpgradeButton;
-
-  /// No description provided for @monetizationModalWatchAdButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Watch Ad (+10 searches)'**
-  String get monetizationModalWatchAdButton;
 
   /// No description provided for @monetizationModalCounterResetAdmin.
   ///
@@ -9654,12 +9636,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset counter (admin)'**
   String get monetizationModalResetCounterAdmin;
-
-  /// No description provided for @monetizationModalRewardEarned.
-  ///
-  /// In en, this message translates to:
-  /// **'✓ Earned 10 more searches!'**
-  String get monetizationModalRewardEarned;
 
   /// No description provided for @monetizationModalProcessing.
   ///
@@ -9685,53 +9661,11 @@ abstract class AppLocalizations {
   /// **'No previous purchase found.'**
   String get monetizationModalRestoreNotFound;
 
-  /// No description provided for @premiumPromoOverlayBarrierLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Premium promo overlay'**
-  String get premiumPromoOverlayBarrierLabel;
-
-  /// No description provided for @premiumPromoOverlayDefaultTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Premium feature'**
-  String get premiumPromoOverlayDefaultTitle;
-
-  /// No description provided for @premiumPromoOverlayBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'PREMIUM'**
-  String get premiumPromoOverlayBadge;
-
   /// No description provided for @premiumPromoOverlaySubtitle.
   ///
   /// In en, this message translates to:
   /// **'Upgrade to unlock this and more'**
   String get premiumPromoOverlaySubtitle;
-
-  /// No description provided for @premiumPromoOverlayFeatureAdFree.
-  ///
-  /// In en, this message translates to:
-  /// **'Completely ad‑free'**
-  String get premiumPromoOverlayFeatureAdFree;
-
-  /// No description provided for @premiumPromoOverlaySecondsShort.
-  ///
-  /// In en, this message translates to:
-  /// **'{seconds}s'**
-  String premiumPromoOverlaySecondsShort(int seconds);
-
-  /// No description provided for @premiumPromoOverlayClosingIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Closing in {seconds}s…'**
-  String premiumPromoOverlayClosingIn(int seconds);
-
-  /// No description provided for @premiumPromoOverlayClose.
-  ///
-  /// In en, this message translates to:
-  /// **'Close'**
-  String get premiumPromoOverlayClose;
 
   /// No description provided for @disclaimerScreenTitle.
   ///

@@ -18,13 +18,20 @@ import 'stress_test_ad_provider.dart';
 /// is Riverpod's own suggested fix for exactly this — defers the actual
 /// increment to right after the current build finishes.
 void maybeShowStressTestNavAd(WidgetRef ref) {
+  debugPrint('🎬 maybeShowStressTestNavAd: scheduled');
   Future(() async {
     final tier = ref.read(subscriptionTierProvider);
-    if (tier.isPremiumOrAdmin) return;
+    debugPrint('🎬 maybeShowStressTestNavAd: tier=$tier');
+    if (tier.isPremiumOrAdmin) {
+      debugPrint('🎬 maybeShowStressTestNavAd: skipped (premium/admin)');
+      return;
+    }
     final trigger = await ref
         .read(stressTestAdProvider.notifier)
         .incrementAndCheck();
+    debugPrint('🎬 maybeShowStressTestNavAd: incrementAndCheck -> $trigger');
     if (trigger) {
+      debugPrint('🎬 maybeShowStressTestNavAd: showInterstitial()');
       ref.read(adServiceProvider).showInterstitial();
     }
   });

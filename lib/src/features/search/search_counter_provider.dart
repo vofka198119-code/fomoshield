@@ -3,13 +3,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/supabase/supabase_providers.dart';
 
 // ---------------------------------------------------------------------------
-// Search Counter — 15 free searches per user, persisted in SharedPreferences
-// ---------------------------------------------------------------------------
-// - FREE tier: starts at 15, decrements on each search
-// - PREMIUM tier: 999 (effectively unlimited)
-// - Call `consumeSearch()` before navigating to company detail
-// - Call `addSearches(10)` after watching an ad
-// - Call `resetToFree()` from admin panel
+// Search Counter — legacy per-user search allowance, persisted in
+// SharedPreferences. The counter no longer gates anything (retired
+// 2026-09-23 — every entry point into Company Detail already goes through
+// its own universal ad-or-Premium view-gate, so a second gate on top of
+// it, specific to Search, was pure duplicated friction — see
+// fomoshield_admob_plan_2026_09_22 memory). Kept only for the admin
+// panel's reset/unlimited toggles (profile_screen.dart,
+// monetization_modal.dart) and to invalidate on logout — nothing reads
+// `state` to make a decision anymore.
 // ---------------------------------------------------------------------------
 
 const int _defaultFreeSearches = 15;
@@ -41,24 +43,6 @@ class SearchCounterNotifier extends StateNotifier<int> {
     await prefs.setInt(_prefsKey, state);
   }
 
-  /// Returns true if the user can search (counter > 0).
-  bool get canSearch => state > 0;
-
-  /// Decrements the counter by 1. Returns remaining count.
-  Future<int> consumeSearch() async {
-    if (state > 0) {
-      state = state - 1;
-      await _save();
-    }
-    return state;
-  }
-
-  /// Adds additional searches (e.g. +15 after watching an ad).
-  Future<void> addSearches(int count) async {
-    state = state + count;
-    await _save();
-  }
-
   /// Resets counter to the default free amount.
   Future<void> resetToFree() async {
     state = _defaultFreeSearches;
@@ -78,12 +62,3 @@ final searchCounterProvider = StateNotifierProvider<SearchCounterNotifier, int>(
     return SearchCounterNotifier(userId: user?.id);
   },
 );
-
-/// Provides whether the current user can perform a search.
-final canSearchProvider = Provider<bool>((ref) {
-  final counter = ref.watch(searchCounterProvider);
-  final tier = ref.watch(subscriptionTierProvider);
-  return tier == SubscriptionTier.premium ||
-      tier == SubscriptionTier.admin ||
-      counter > 0;
-});

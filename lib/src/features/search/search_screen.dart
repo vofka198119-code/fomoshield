@@ -8,12 +8,9 @@ import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_divider.dart';
 import '../../core/theme/themed_border.dart';
-import '../../core/supabase/supabase_providers.dart';
 import '../../shared/widgets/company_logo.dart';
 import '../home/home_providers.dart';
 import '../home/watchlist_limits_provider.dart';
-import '../monetization/monetization_modal.dart';
-import 'search_counter_provider.dart';
 import 'search_provider.dart';
 import 'widgets/exchange_badge.dart';
 import 'widgets/search_browse_lanes.dart';
@@ -183,33 +180,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     ? SearchBrowseLanes(
                         palette: palette,
                         onTapSymbol: (symbol) {
-                          // Same check+consume+navigate-inside-debounce
-                          // sequence as the typed-result ListTile below —
-                          // browsing a lane counts as a search too, so it
-                          // shares the same counter and double-tap guard.
+                          // Browsing a lane/recently-viewed doesn't hit
+                          // Finnhub's /search endpoint at all (it's just
+                          // navigating to an already-known symbol from a
+                          // pre-loaded list), so it no longer shares the
+                          // search counter with the typed-result ListTile
+                          // below (changed 2026-09-23) — only kept the
+                          // debounce as a double-tap guard.
                           ref.read(debouncerProvider).run(() async {
-                            final tier = ref.read(subscriptionTierProvider);
-                            final canSearch =
-                                tier == SubscriptionTier.premium ||
-                                tier == SubscriptionTier.admin ||
-                                ref.read(searchCounterProvider) > 0;
-
-                            if (!canSearch) {
-                              if (context.mounted) {
-                                showMonetizationModal(context, ref);
-                              }
-                              return;
-                            }
-
-                            if (tier != SubscriptionTier.premium &&
-                                tier != SubscriptionTier.admin) {
-                              await ref
-                                  .read(searchCounterProvider.notifier)
-                                  .consumeSearch();
-                            }
-
-                            if (!context.mounted) return;
-
                             if (stressTestSource == 'stress-test' &&
                                 stressTestSessionId != null) {
                               context.push(
@@ -384,36 +362,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               ],
                             ),
                             onTap: () {
-                              // Whole check+consume+navigate sequence runs
-                              // inside the debounce so a fast double-tap only
-                              // executes it once — previously the counter
-                              // check/consume ran synchronously on every tap
-                              // while only navigation was debounced, so a
-                              // double-tap could burn 2 searches for 1 visit.
+                              // Search's own per-search limit was retired
+                              // 2026-09-23 — every tap here (like every
+                              // other entry point) already goes through
+                              // Company Detail's own universal view-gate
+                              // (watchlist_ad_provider.dart), so gating it
+                              // a second time here was pure duplicated
+                              // friction unique to this one entry point.
+                              // searchCounterProvider itself is left in
+                              // place (admin reset/unlimited controls,
+                              // Premium's setUnlimited() call still touch
+                              // it) — just no longer consumed or checked
+                              // here. Debounce kept as a double-tap guard.
                               ref.read(debouncerProvider).run(() async {
-                                final tier = ref.read(subscriptionTierProvider);
-                                final canSearch =
-                                    tier == SubscriptionTier.premium ||
-                                    tier == SubscriptionTier.admin ||
-                                    ref.read(searchCounterProvider) > 0;
-
-                                if (!canSearch) {
-                                  if (context.mounted) {
-                                    showMonetizationModal(context, ref);
-                                  }
-                                  return;
-                                }
-
-                                // Consume one search (no-op for premium)
-                                if (tier != SubscriptionTier.premium &&
-                                    tier != SubscriptionTier.admin) {
-                                  await ref
-                                      .read(searchCounterProvider.notifier)
-                                      .consumeSearch();
-                                }
-
-                                if (!context.mounted) return;
-
                                 // Check if navigating from stress-test context
                                 final extra =
                                     GoRouterState.of(context).extra

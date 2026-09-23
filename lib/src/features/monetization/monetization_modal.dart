@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/ads/ad_providers.dart';
 import '../../core/purchases/purchase_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/supabase/supabase_providers.dart';
@@ -11,27 +10,28 @@ import '../search/search_counter_provider.dart';
 
 // ---------------------------------------------------------------------------
 // Monetization Modal — one sheet, three reasons to show it, each with its
-// own framing (2026-09-20: split after [MonetizationTrigger.limitReached]'s
-// "search limit reached" copy — the only variant that existed at first —
-// turned out to be wrongly reused for every OTHER kind of paywall trigger
-// in the app too, e.g. a user tapping "Unlock Premium" from Profile, or
-// hitting the Stress Test session cap, both got told they'd "used all
-// their free searches"):
+// own framing:
 //
-//   - [MonetizationTrigger.limitReached] (default — search limit only):
-//     search-specific title + description, plus the "Watch Ad
-//     (+15 searches)" off-ramp (the ad grants searches specifically, so
-//     it only makes sense here).
 //   - [MonetizationTrigger.stressTestLimit] (hit the concurrent Stress
 //     Test session cap): its own title/description naming the real
-//     numbers, no Watch Ad off-ramp (no ad mechanic exists for this
-//     limit).
+//     numbers.
+//   - [MonetizationTrigger.holdingsLimit] (too many distinct positions in
+//     one portfolio): its own title/description naming the cap.
 //   - [MonetizationTrigger.voluntary] (Profile's free-tier upsell card,
 //     or any locked-feature tap that isn't about a numeric limit at all —
 //     a locked theme, a locked Stress Test duration, ad-free browsing,
 //     locked Encyclopedia articles): generic Premium pitch — full
 //     benefits list, a note that monthly/quarterly/annual billing all
-//     exist — no ad off-ramp, no "limit reached" framing.
+//     exist.
+//
+// A 4th variant, [MonetizationTrigger.limitReached] (the original —
+// and until 2026-09-05, only — trigger, for the search limit), was
+// retired 2026-09-23 along with the search-limit gate itself: every ad
+// gate in the app (Company Detail, Company Encyclopedia, the order
+// placement gate) now has its own dedicated ad-or-Premium sheet
+// (ad_or_premium_sheet.dart) instead of routing through here, so this
+// modal no longer needs a "Watch Ad" off-ramp of its own — see
+// fomoshield_admob_plan_2026_09_22 memory.
 //
 // All variants share: "Upgrade to Premium" (real Play Billing purchase,
 // monthly plan only for now — see purchase_service.dart) and "Restore
@@ -39,13 +39,13 @@ import '../search/search_counter_provider.dart';
 // isAdminProvider == true.
 // ---------------------------------------------------------------------------
 
-enum MonetizationTrigger { limitReached, stressTestLimit, holdingsLimit, voluntary }
+enum MonetizationTrigger { stressTestLimit, holdingsLimit, voluntary }
 
 /// Shows the monetization modal as a bottom sheet.
 Future<void> showMonetizationModal(
   BuildContext context,
   WidgetRef ref, {
-  MonetizationTrigger trigger = MonetizationTrigger.limitReached,
+  required MonetizationTrigger trigger,
 }) {
   return showModalBottomSheet(
     context: context,
@@ -86,10 +86,6 @@ class _MonetizationSheet extends ConsumerWidget {
     final String title;
     final String description;
     switch (trigger) {
-      case MonetizationTrigger.limitReached:
-        headerIcon = Icons.search_off_rounded;
-        title = l10n.monetizationModalTitle;
-        description = l10n.monetizationModalDescription;
       case MonetizationTrigger.stressTestLimit:
         headerIcon = Icons.psychology_rounded;
         title = l10n.stressTestLimitReachedTitle;
@@ -276,37 +272,6 @@ class _MonetizationSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
 
-          // ── Watch Ad Button — irrelevant for a voluntary upgrade
-          // (nothing was blocked, there's no counter to top up) ────
-          if (trigger == MonetizationTrigger.limitReached) ...[
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showAdOverlay(context);
-                },
-                icon: const Icon(Icons.play_circle_rounded, size: 20),
-                label: Text(
-                  l10n.monetizationModalWatchAdButton,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.accentBlue,
-                  side: const BorderSide(color: AppTheme.accentBlue),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-          ],
-
           // ── Restore Purchases ───────────────────────────────────
           // Required by Play policy for subscriptions, and the only way
           // back to premium after a reinstall/device switch without
@@ -378,72 +343,6 @@ class _MonetizationSheet extends ConsumerWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-// ===========================================================================
-// Ad Overlay — real AdMob rewarded ad
-// ===========================================================================
-
-void _showAdOverlay(BuildContext context) {
-  Navigator.of(context).push(
-    PageRouteBuilder(
-      opaque: false,
-      barrierColor: Colors.black87,
-      barrierDismissible: false,
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          const _AdOverlay(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(opacity: animation, child: child);
-      },
-      transitionDuration: const Duration(milliseconds: 300),
-    ),
-  );
-}
-
-class _AdOverlay extends ConsumerStatefulWidget {
-  const _AdOverlay();
-
-  @override
-  ConsumerState<_AdOverlay> createState() => _AdOverlayState();
-}
-
-// Owns its own ref rather than borrowing one from the sheet that pushed
-// this — that sheet is popped (and its ref disposed) well before a real
-// ad's load+show round-trip finishes, so a borrowed ref throws a Riverpod
-// StateError here, leaving this overlay stuck on screen forever, blocking
-// Search underneath. ConsumerState ties a ref to THIS still-mounted
-// widget's own lifecycle instead.
-class _AdOverlayState extends ConsumerState<_AdOverlay> {
-  @override
-  void initState() {
-    super.initState();
-    _run();
-  }
-
-  Future<void> _run() async {
-    final earned = await ref.read(adServiceProvider).showRewarded();
-    if (!mounted) return;
-    if (earned) ref.read(searchCounterProvider.notifier).addSearches(10);
-    final l10n = AppLocalizations.of(context)!;
-    Navigator.of(context).pop();
-    if (earned) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.monetizationModalRewardEarned),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -38,7 +38,6 @@ import '../../shared/widgets/premium_upsell_banner.dart';
 import '../../shared/widgets/trade_history_tile.dart';
 
 import '../monetization/monetization_modal.dart';
-import '../monetization/premium_promo_overlay.dart';
 import '../../shared/widgets/psychology_meter.dart';
 import '../../shared/widgets/market_timeline.dart';
 import '../../shared/widgets/more_less_pill.dart';
@@ -117,19 +116,14 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
         // wrongly given the stressTestLimit trigger in an earlier pass
         // today, which would have claimed a slot limit that was never
         // actually hit. voluntary's generic pitch fits this correctly.
-        showPremiumPromoOverlay(
-          context: context,
-          title: AppLocalizations.of(context)!.stressTestAccessTitle,
-          durationSeconds: 5,
-          onComplete: () {
-            if (context.mounted) {
-              showMonetizationModal(
-                context,
-                ref,
-                trigger: MonetizationTrigger.voluntary,
-              );
-            }
-          },
+        // Used to fade in a fake simulated-ad screen first (removed
+        // 2026-09-23 — dead weight from before real AdMob existed, see
+        // fomoshield_admob_plan_2026_09_22 memory); goes straight to the
+        // real modal now.
+        showMonetizationModal(
+          context,
+          ref,
+          trigger: MonetizationTrigger.voluntary,
         );
       }
     });

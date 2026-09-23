@@ -659,9 +659,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Расширенную аналитику портфеля';
 
   @override
-  String get stressTestAccessTitle => 'Доступ к симуляции рынка';
-
-  @override
   String get stressTestPortfolioTitle => 'ПОРТФЕЛЬ СИМУЛЯЦИИ РЫНКА';
 
   @override
@@ -2559,13 +2556,17 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get companyDetailWatchAdBody =>
-      'Посмотрите короткую рекламу, чтобы продолжить просмотр информации о компании.';
+      'Чтобы приложение оставалось бесплатным, мы вынуждены попросить вас просмотреть пару коротких рекламных роликов.';
 
   @override
   String get companyDetailWatchAdButton => 'Смотреть рекламу';
 
   @override
-  String get companyDetailUpgradeNoAds => 'Перейти на Premium — без рекламы';
+  String get orderAdGateTitle => 'Разблокировать ордер';
+
+  @override
+  String get orderAdGateBody =>
+      'Чтобы приложение оставалось бесплатным, мы вынуждены попросить вас посмотреть короткую рекламу перед размещением ордера — либо оформите Premium для неограниченного размещения ордеров.';
 
   @override
   String get companyDetailLoadError => 'Не удалось загрузить данные компании';
@@ -5728,18 +5729,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get monetizationModalTitle => 'Достигнут лимит поиска';
-
-  @override
-  String get monetizationModalDescription =>
-      'Вы использовали все бесплатные поиски. Оформите Premium для безлимитного поиска или посмотрите рекламу, чтобы получить ещё 10.';
-
-  @override
   String get monetizationModalUpgradeButton => 'Оформить Premium';
-
-  @override
-  String get monetizationModalWatchAdButton =>
-      'Посмотреть рекламу (+10 поисков)';
 
   @override
   String get monetizationModalCounterResetAdmin =>
@@ -5747,9 +5737,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get monetizationModalResetCounterAdmin => 'Сбросить счётчик (админ)';
-
-  @override
-  String get monetizationModalRewardEarned => '✓ Получено ещё 10 поисков!';
 
   @override
   String get monetizationModalProcessing => 'Обработка…';
@@ -5766,33 +5753,8 @@ class AppLocalizationsRu extends AppLocalizations {
       'Предыдущая покупка не найдена.';
 
   @override
-  String get premiumPromoOverlayBarrierLabel => 'Промо-заставка Premium';
-
-  @override
-  String get premiumPromoOverlayDefaultTitle => 'Функция Premium';
-
-  @override
-  String get premiumPromoOverlayBadge => 'PREMIUM';
-
-  @override
   String get premiumPromoOverlaySubtitle =>
       'Оформите подписку, чтобы открыть это и многое другое';
-
-  @override
-  String get premiumPromoOverlayFeatureAdFree => 'Полностью без рекламы';
-
-  @override
-  String premiumPromoOverlaySecondsShort(int seconds) {
-    return '$seconds с';
-  }
-
-  @override
-  String premiumPromoOverlayClosingIn(int seconds) {
-    return 'Закроется через $seconds с…';
-  }
-
-  @override
-  String get premiumPromoOverlayClose => 'Закрыть';
 
   @override
   String get disclaimerScreenTitle => 'Дисклеймер';

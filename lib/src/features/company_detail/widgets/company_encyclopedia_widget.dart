@@ -13,7 +13,7 @@ import '../../../core/ads/ad_providers.dart';
 import '../../../core/ads/ad_loading_overlay.dart';
 import '../company_encyclopedia_provider.dart';
 import 'company_encyclopedia_detail_screen.dart';
-import 'company_encyclopedia_paywall_sheet.dart';
+import '../../../shared/widgets/ad_or_premium_sheet.dart';
 
 // ---------------------------------------------------------------------------
 // Company Encyclopedia widget — "История компании": two rows, Business
@@ -177,10 +177,15 @@ class CompanyEncyclopediaWidget extends ConsumerWidget {
     if (!tier.isPremiumOrAdmin) {
       final unlocked = ref.read(companyEncyclopediaUnlockedProvider(symbol));
       if (!unlocked) {
-        final wantsAd = await showCompanyEncyclopediaPaywallSheet(
+        final wantsAd = await showAdOrPremiumSheet(
           context,
           ref,
-          palette,
+          palette: palette,
+          icon: Icons.auto_stories_rounded,
+          title: l10n.companyEncyclopediaPaywallTitle,
+          body: l10n.companyEncyclopediaPaywallBody,
+          watchAdLabel: l10n.companyDetailWatchAdButton,
+          goPremiumLabel: l10n.companyEncyclopediaGoPremiumButton,
         );
         if (wantsAd != true || !context.mounted) return;
         // Two ads back to back, per spec — a single watch-flow doesn't

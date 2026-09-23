@@ -657,9 +657,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Advanced portfolio analytics';
 
   @override
-  String get stressTestAccessTitle => 'Market simulation access';
-
-  @override
   String get stressTestPortfolioTitle => 'MARKET SIMULATION PORTFOLIO';
 
   @override
@@ -2557,13 +2554,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get companyDetailWatchAdBody =>
-      'Please watch a short ad to continue viewing company details.';
+      'To keep the app free, we have to ask you to watch a couple of short ads.';
 
   @override
   String get companyDetailWatchAdButton => 'Watch Ad';
 
   @override
-  String get companyDetailUpgradeNoAds => 'Upgrade to Premium — no ads';
+  String get orderAdGateTitle => 'Unlock this order';
+
+  @override
+  String get orderAdGateBody =>
+      'To keep the app free, we have to ask you to watch a short ad before placing this order — or go Premium for unlimited order placement.';
 
   @override
   String get companyDetailLoadError => 'Could not load company data';
@@ -5713,17 +5714,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get monetizationModalTitle => 'Search limit reached';
-
-  @override
-  String get monetizationModalDescription =>
-      'You\'ve used all your free searches. Upgrade to Premium for unlimited searches or watch an ad to get 10 more.';
-
-  @override
   String get monetizationModalUpgradeButton => 'Upgrade to Premium';
-
-  @override
-  String get monetizationModalWatchAdButton => 'Watch Ad (+10 searches)';
 
   @override
   String get monetizationModalCounterResetAdmin =>
@@ -5731,9 +5722,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monetizationModalResetCounterAdmin => 'Reset counter (admin)';
-
-  @override
-  String get monetizationModalRewardEarned => '✓ Earned 10 more searches!';
 
   @override
   String get monetizationModalProcessing => 'Processing…';
@@ -5749,32 +5737,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monetizationModalRestoreNotFound => 'No previous purchase found.';
 
   @override
-  String get premiumPromoOverlayBarrierLabel => 'Premium promo overlay';
-
-  @override
-  String get premiumPromoOverlayDefaultTitle => 'Premium feature';
-
-  @override
-  String get premiumPromoOverlayBadge => 'PREMIUM';
-
-  @override
   String get premiumPromoOverlaySubtitle => 'Upgrade to unlock this and more';
-
-  @override
-  String get premiumPromoOverlayFeatureAdFree => 'Completely ad‑free';
-
-  @override
-  String premiumPromoOverlaySecondsShort(int seconds) {
-    return '${seconds}s';
-  }
-
-  @override
-  String premiumPromoOverlayClosingIn(int seconds) {
-    return 'Closing in ${seconds}s…';
-  }
-
-  @override
-  String get premiumPromoOverlayClose => 'Close';
 
   @override
   String get disclaimerScreenTitle => 'Disclaimer';
