@@ -2252,6 +2252,8 @@
   "monetizationModalProcessing": "Processing…",
   "monetizationModalPurchaseError": "Purchase failed. Please try again.",
   "monetizationModalRestorePurchases": "Restore purchases",
+  "appUpdateReadyMessage": "Update downloaded — restart to apply",
+  "appUpdateRestartButton": "Restart",
   "monetizationModalRestoreNotFound": "No previous purchase found.",
   "premiumPromoOverlaySubtitle": "Upgrade to unlock this and more",
   "disclaimerScreenTitle": "Disclaimer",

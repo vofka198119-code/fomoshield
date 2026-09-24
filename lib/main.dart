@@ -7,12 +7,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
+import 'src/core/ads/ad_providers.dart';
+import 'src/core/ads/app_open_ad_provider.dart';
 import 'src/core/cache/sector_providers.dart';
 import 'src/core/localization/language_provider.dart';
 import 'src/core/overlay/app_overlay_host.dart';
 import 'src/core/purchases/purchase_listener.dart';
 import 'src/core/router/app_router.dart';
 import 'src/core/supabase/supabase_client.dart';
+import 'src/core/supabase/supabase_providers.dart';
+import 'src/core/updates/in_app_update_service.dart';
 import 'src/core/theme/theme_v2.dart';
 import 'src/core/theme/app_palette.dart';
 import 'src/core/theme/theme_variant_provider.dart';
@@ -103,7 +107,13 @@ class ScanCoApp extends ConsumerStatefulWidget {
   ConsumerState<ScanCoApp> createState() => _ScanCoAppState();
 }
 
-class _ScanCoAppState extends ConsumerState<ScanCoApp> {
+class _ScanCoAppState extends ConsumerState<ScanCoApp>
+    with WidgetsBindingObserver {
+  // Global so the in-app-update "restart to apply" snackbar can be shown
+  // from a lifecycle callback that isn't tied to whatever screen GoRouter
+  // currently has up — MaterialApp.router below wires this in.
+  final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
   @override
   void initState() {
     super.initState();
@@ -119,6 +129,58 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
     Future.delayed(const Duration(seconds: 8), () {
       if (mounted) checkPendingOrders(ref);
     });
+
+    // App Open ad — this State object is the one thing that lives for the
+    // app's entire process lifetime (unlike any single route/screen), so
+    // it's the only place that can reliably see every resume regardless
+    // of which screen GoRouter currently has up. WidgetsBindingObserver
+    // only reports actual pause->resume transitions, never the initial
+    // cold-start frame, so cold start needs its own explicit trigger —
+    // fired after splash's own 7s minimum display window (splash_screen.dart)
+    // so this lands right as Home first appears, not on top of the splash
+    // branding, and gives subscriptionTierProvider's async fetch time to
+    // resolve before the very first premium/admin check.
+    WidgetsBinding.instance.addObserver(this);
+    Future.delayed(const Duration(seconds: 7), _maybeShowAppOpenAd);
+
+    // In-app update check — cheap no-op if already on the latest version,
+    // so no delay/cooldown needed like the ad above. Re-checked on every
+    // resume too (see didChangeAppLifecycleState) in case a newer version
+    // published while the app sat backgrounded.
+    checkForAppUpdate(_scaffoldMessengerKey);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _maybeShowAppOpenAd();
+      checkForAppUpdate(_scaffoldMessengerKey);
+    }
+  }
+
+  Future<void> _maybeShowAppOpenAd() async {
+    if (!mounted) return;
+    final tier = ref.read(subscriptionTierProvider);
+    debugPrint('🚪 appOpenAd: tier=$tier');
+    if (tier.isPremiumOrAdmin) {
+      debugPrint('🚪 appOpenAd: skipped (premium/admin)');
+      return;
+    }
+    final cooldown = ref.read(appOpenAdCooldownProvider);
+    final ready = await cooldown.isReady;
+    debugPrint('🚪 appOpenAd: cooldown ready=$ready');
+    if (!ready) return;
+    if (!mounted) return;
+    await cooldown.recordShown();
+    debugPrint('🚪 appOpenAd: showAppOpen()');
+    await ref.read(adServiceProvider).showAppOpen();
+    debugPrint('🚪 appOpenAd: dismissed');
   }
 
   @override
@@ -132,6 +194,7 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp> {
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return MaterialApp.router(
       title: 'F.O.M.O. Shield',
+      scaffoldMessengerKey: _scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeV2.lightTheme,
       // null follows the device's system locale; a non-null value is the

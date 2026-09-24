@@ -9655,6 +9655,18 @@ abstract class AppLocalizations {
   /// **'Restore purchases'**
   String get monetizationModalRestorePurchases;
 
+  /// No description provided for @appUpdateReadyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Update downloaded — restart to apply'**
+  String get appUpdateReadyMessage;
+
+  /// No description provided for @appUpdateRestartButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get appUpdateRestartButton;
+
   /// No description provided for @monetizationModalRestoreNotFound.
   ///
   /// In en, this message translates to:

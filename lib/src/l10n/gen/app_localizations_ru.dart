@@ -5749,6 +5749,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get monetizationModalRestorePurchases => 'Восстановить покупки';
 
   @override
+  String get appUpdateReadyMessage =>
+      'Обновление загружено — перезапустите, чтобы применить';
+
+  @override
+  String get appUpdateRestartButton => 'Перезапустить';
+
+  @override
   String get monetizationModalRestoreNotFound =>
       'Предыдущая покупка не найдена.';
 

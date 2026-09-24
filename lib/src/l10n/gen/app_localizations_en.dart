@@ -5734,6 +5734,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monetizationModalRestorePurchases => 'Restore purchases';
 
   @override
+  String get appUpdateReadyMessage => 'Update downloaded — restart to apply';
+
+  @override
+  String get appUpdateRestartButton => 'Restart';
+
+  @override
   String get monetizationModalRestoreNotFound => 'No previous purchase found.';
 
   @override

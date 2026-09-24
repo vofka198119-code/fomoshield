@@ -1,7 +1,7 @@
 name: scanco
 description: "F.O.M.O. Shield — Invest with discipline, not emotion"
 publish_to: 'none'
-version: 1.0.0+138
+version: 1.0.0+139
 
 environment:
   sdk: ^3.12.1
@@ -62,6 +62,12 @@ dependencies:
   # ad_service.dart. Starts on Google's public test ad unit IDs (see
   # AndroidManifest.xml's test App ID) until a real AdMob account exists.
   google_mobile_ads: ^9.1.0
+
+  # Google Play In-App Updates — lets the app itself prompt "an update is
+  # available" instead of relying on the user to notice on the Play Store.
+  # Only takes effect starting with the release that first ships it — see
+  # in_app_update_service.dart.
+  in_app_update: ^4.2.3
 
 dev_dependencies:
   flutter_test:

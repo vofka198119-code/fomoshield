@@ -1637,6 +1637,8 @@
   "monetizationModalProcessing": "Обработка…",
   "monetizationModalPurchaseError": "Не удалось оформить покупку. Попробуй снова.",
   "monetizationModalRestorePurchases": "Восстановить покупки",
+  "appUpdateReadyMessage": "Обновление загружено — перезапустите, чтобы применить",
+  "appUpdateRestartButton": "Перезапустить",
   "monetizationModalRestoreNotFound": "Предыдущая покупка не найдена.",
   "premiumPromoOverlaySubtitle": "Оформите подписку, чтобы открыть это и многое другое",
   "disclaimerScreenTitle": "Дисклеймер",
