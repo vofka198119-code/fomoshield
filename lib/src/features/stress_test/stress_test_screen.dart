@@ -131,18 +131,17 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
     // above (checkStressTestDcaPayout itself gates on premium/admin, so a
     // free-tier viewer here is simply a no-op, matching the freeze logic).
     //
-    // Also re-run on the periodic timer below, not just once here — this
-    // very first call races subscriptionTierProvider's async DB fetch
-    // (_premiumLoaderProvider in supabase_providers.dart), which almost
-    // never wins on a fresh screen open, so `tier` reads as the free-tier
-    // default and the "lapsed" branch silently pins the payout clock to
-    // now instead of crediting. With no retry, that reset a fresh-open
-    // could recur on every single open — devices confirmed real, reported
-    // 2026-09-17 (DCA top-ups never arriving despite weeks elapsed).
-    // Portfolio's own checkWeeklyPayout (weekly_payout_provider.dart) has
-    // the same race but never showed the bug because portfolio_body.dart
-    // already re-checks it every 5 minutes on its own timer — mirroring
-    // that here instead of trying to close the race itself.
+    // Historically this raced subscriptionTierProvider's async DB fetch
+    // (_premiumLoaderProvider in supabase_providers.dart) on a fresh screen
+    // open, silently pinning the payout clock to now instead of crediting
+    // — devices confirmed real, reported 2026-09-17 (DCA top-ups never
+    // arriving despite weeks elapsed). checkStressTestDcaPayout/
+    // checkStressTestDividendPayout now await resolveSubscriptionTier
+    // instead of racing it (fixed 2026-09-25, same root cause as
+    // weekly_payout_provider.dart's checkWeeklyPayout, also fixed then).
+    // Still re-run on the periodic timer below as well, same as before —
+    // cheap, and a fallback for anything resolveSubscriptionTier's own
+    // timeout doesn't cover.
     void checkWeeklyCredits() {
       if (!mounted) return;
       final session = ref

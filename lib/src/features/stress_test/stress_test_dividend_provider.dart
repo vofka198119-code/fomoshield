@@ -128,7 +128,10 @@ Future<void> checkStressTestDividendPayout(
   final entry = store[session.id];
   if (entry == null || !entry.enabled) return;
 
-  final tier = ref.read(subscriptionTierProvider);
+  // Awaits the real tier instead of racing subscriptionTierProvider's
+  // async DB fetch — same fix as stress_test_dca_provider.dart's
+  // checkStressTestDcaPayout, see resolveSubscriptionTier's doc comment.
+  final tier = await resolveSubscriptionTier(ref);
   if (!tier.isPremiumOrAdmin) {
     store[session.id] = _DividendEntry(
       enabled: true,

@@ -98,7 +98,12 @@ Future<void> checkStressTestDcaPayout(
   final entry = store[session.id];
   if (entry == null) return; // not a DCA-funded session
 
-  final tier = ref.read(subscriptionTierProvider);
+  // Awaits the real tier instead of racing subscriptionTierProvider's
+  // async DB fetch (see resolveSubscriptionTier's doc comment) — closes
+  // the race this function's own doc comment above used to route around
+  // via the 20s timer retry alone, which doesn't help a session shorter
+  // than that.
+  final tier = await resolveSubscriptionTier(ref);
   if (!tier.isPremiumOrAdmin) {
     // Pin the clock to now while lapsed, so the elapsed-weeks calc below
     // never spans the lapsed stretch once Premium resumes — otherwise the

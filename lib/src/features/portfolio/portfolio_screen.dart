@@ -545,7 +545,7 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
           ),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             if (controller.text.trim().isNotEmpty) {
               // No multi-portfolio limit check here anymore — every tier
               // gets exactly one portfolio now (only its starting capital
@@ -553,15 +553,22 @@ void _showCreatePortfolioDialog(BuildContext context, WidgetRef ref) {
               // dialog is only ever reachable from the empty state (0
               // portfolios), so a second-portfolio cap could never
               // actually trigger. Removed dead branch, 2026-09-20.
+              //
+              // Awaits the real tier instead of racing
+              // subscriptionTierProvider's async DB fetch — this is a
+              // one-time, effectively permanent decision (a portfolio's
+              // startingBalance is set once here and never recalculated
+              // on a later tier change), so a premature "free" read would
+              // permanently under-fund a premium user's portfolio by
+              // $3,000 instead of just showing stale UI for a moment.
+              final tier = await resolveSubscriptionTier(ref);
               ref
                   .read(portfoliosProvider.notifier)
                   .addPortfolio(
                     controller.text.trim(),
-                    startingBalance: startingCapitalForTier(
-                      ref.read(subscriptionTierProvider),
-                    ),
+                    startingBalance: startingCapitalForTier(tier),
                   );
-              Navigator.pop(ctx);
+              if (ctx.mounted) Navigator.pop(ctx);
             }
           },
           child: Text(

@@ -46,7 +46,13 @@ Future<void> checkWeeklyPayout(WidgetRef ref, AppLocalizations l10n) async {
   // portfolio_limits_provider.dart; every user has exactly one.
   final portfolio = portfolios.first;
 
-  final tier = ref.read(subscriptionTierProvider);
+  // Awaits the real tier instead of racing subscriptionTierProvider's
+  // async DB fetch — a premature "free" read here doesn't just show a
+  // stale UI (harmless elsewhere), it resets lastWeeklyPayoutAt and fires
+  // a false "subscription downgraded/paused" notification at a real
+  // premium user. The 5-min refresh timer (portfolio_body.dart) usually
+  // masks this in practice, but not for a session shorter than 5 minutes.
+  final tier = await resolveSubscriptionTier(ref);
   final isPremiumNow = tier.isPremiumOrAdmin;
 
   final user = ref.read(currentUserProvider);
