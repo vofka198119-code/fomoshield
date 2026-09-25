@@ -394,6 +394,13 @@ class _PortfolioOrderEntryScreenState
       );
       final alreadyHeld = portfolio.holdings.containsKey(widget.symbol);
       if (!alreadyHeld) {
+        // Awaits the real tier instead of racing subscriptionTierProvider's
+        // async DB fetch (see resolveSubscriptionTier's doc comment) —
+        // maxHoldingsPerPortfolioProvider derives from it, so this closes
+        // the same race for a premium user's cap (30) reading back as
+        // free's (20) and wrongly blocking a legitimate buy.
+        await resolveSubscriptionTier(ref);
+        if (!mounted) return;
         final maxHoldings = ref.read(maxHoldingsPerPortfolioProvider);
         if (portfolio.holdings.length >= maxHoldings) {
           _showHoldingsLimitReached(l10n, maxHoldings);

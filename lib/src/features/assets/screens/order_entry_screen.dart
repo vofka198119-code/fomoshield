@@ -260,12 +260,19 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       return;
     }
 
+    // Awaits the real tier instead of racing subscriptionTierProvider's
+    // async DB fetch (see resolveSubscriptionTier's doc comment) — read
+    // once here and reused below for executeTrade's own tier param too,
+    // so both checks agree on the same resolved value.
+    final tier = await resolveSubscriptionTier(ref);
+    if (!mounted) return;
+
     // Frozen slot (#2/#3, lapsed Premium) — block both market AND limit
     // orders here, before either path below fires.
     if (isStressTestSlotFrozen(
       ref.read(stressTestProvider),
       widget.sessionId,
-      ref.read(subscriptionTierProvider),
+      tier,
     )) {
       ScaffoldMessenger.of(
         context,
@@ -380,7 +387,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
           shares,
           useShares: true,
           l10n: AppLocalizations.of(context)!,
-          tier: ref.read(subscriptionTierProvider),
+          tier: tier,
         );
 
     if (!result.success) {
