@@ -173,7 +173,10 @@ class CompanyEncyclopediaWidget extends ConsumerWidget {
     String rowLabel,
     String text,
   ) async {
-    final tier = ref.read(subscriptionTierProvider);
+    // Awaits the real tier instead of racing subscriptionTierProvider's
+    // async DB fetch — see resolveSubscriptionTier's doc comment.
+    final tier = await resolveSubscriptionTier(ref);
+    if (!context.mounted) return;
     if (!tier.isPremiumOrAdmin) {
       final unlocked = ref.read(companyEncyclopediaUnlockedProvider(symbol));
       if (!unlocked) {

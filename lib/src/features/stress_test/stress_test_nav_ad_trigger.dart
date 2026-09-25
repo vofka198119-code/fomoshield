@@ -20,7 +20,12 @@ import 'stress_test_ad_provider.dart';
 void maybeShowStressTestNavAd(WidgetRef ref) {
   debugPrint('🎬 maybeShowStressTestNavAd: scheduled');
   Future(() async {
-    final tier = ref.read(subscriptionTierProvider);
+    // Awaits the real tier instead of racing subscriptionTierProvider's
+    // async DB fetch — see resolveSubscriptionTier's doc comment. Fires
+    // on every Stress Test screen's initState, including right after a
+    // cold start, same race class as the App Open ad fix (59d18aa/
+    // 63314eb).
+    final tier = await resolveSubscriptionTier(ref);
     debugPrint('🎬 maybeShowStressTestNavAd: tier=$tier');
     if (tier.isPremiumOrAdmin) {
       debugPrint('🎬 maybeShowStressTestNavAd: skipped (premium/admin)');

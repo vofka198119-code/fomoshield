@@ -25,7 +25,10 @@ Future<bool> checkOrderAdGate(
   WidgetRef ref, {
   required String contextKey,
 }) async {
-  final tier = ref.read(subscriptionTierProvider);
+  // Awaits the real tier instead of racing subscriptionTierProvider's
+  // async DB fetch — see resolveSubscriptionTier's doc comment.
+  final tier = await resolveSubscriptionTier(ref);
+  if (!context.mounted) return false;
   if (tier.isPremiumOrAdmin) return true;
 
   final gated = await ref

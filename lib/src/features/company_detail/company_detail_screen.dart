@@ -72,7 +72,14 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   }
 
   Future<void> _checkAd() async {
-    final tier = ref.read(subscriptionTierProvider);
+    // Awaits the real tier instead of racing subscriptionTierProvider's
+    // async DB fetch (see resolveSubscriptionTier's doc comment) — this
+    // is the most-visited screen in the app and fires right on a fresh
+    // cold-start-era mount, same shape as the App Open ad race fixed
+    // 2026-09-25 (59d18aa/63314eb), which showed ads to premium/admin
+    // users before their real tier had resolved.
+    final tier = await resolveSubscriptionTier(ref);
+    if (!mounted) return;
     // Admin/premium bypass ads entirely
     if (tier.isPremiumOrAdmin) {
       return;

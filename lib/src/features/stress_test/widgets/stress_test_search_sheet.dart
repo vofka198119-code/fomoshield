@@ -174,7 +174,11 @@ class _StressTestSearchSheetState
     final engine = ref.read(stressTestProvider.notifier);
     final session = engine.getSession(widget.sessionId);
     final isSetup = session?.status == StressTestStatus.setup;
-    final tier = ref.read(subscriptionTierProvider);
+    // Awaits the real tier instead of racing subscriptionTierProvider's
+    // async DB fetch — see resolveSubscriptionTier's doc comment. Gates
+    // both the frozen-slot check below and the buy call itself.
+    final tier = await resolveSubscriptionTier(ref);
+    if (!mounted) return;
 
     if (isStressTestSlotFrozen(
       ref.read(stressTestProvider),
