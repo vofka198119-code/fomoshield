@@ -20,6 +20,7 @@ import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
 import '../monetization/monetization_modal.dart';
 import '../../core/purchases/purchase_service.dart' show premiumProductId;
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../core/ads/ad_providers.dart';
 import '../../core/ads/consent_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -430,6 +431,29 @@ class ProfileScreen extends ConsumerWidget {
                     onTap: () {
                       ref.read(stressTestProvider.notifier).deleteAllSessions();
                       _showSnack(context, 'All stress tests cleared');
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  // Google Mobile Ads SDK's own diagnostic overlay — ad
+                  // unit/mediation status, live load/show events, and a
+                  // dedicated UMP/consent debug view. Added 2026-09-25
+                  // while chasing why the GDPR consent form wasn't
+                  // appearing under a forced EEA debug geography despite
+                  // the AdMob-side message showing fully published — this
+                  // gives far more detail than our own debugPrint logging.
+                  _adminButton(
+                    palette: palette,
+                    icon: Icons.bug_report_rounded,
+                    label: 'Open Ad Inspector',
+                    onTap: () {
+                      MobileAds.instance.openAdInspector((error) {
+                        if (error != null) {
+                          _showSnack(
+                            context,
+                            'Ad Inspector error: ${error.message}',
+                          );
+                        }
+                      });
                     },
                   ),
                 ],

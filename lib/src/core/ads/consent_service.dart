@@ -17,14 +17,28 @@ class ConsentService {
   /// Ads SDK / requesting any ad, every app session — Google requires the
   /// status be re-checked each session, not just on first install.
   static Future<void> gatherConsent() async {
+    // Debug-only reset before every request, so a stale local "not
+    // required"/error status (the SDK caches consent status between app
+    // sessions per its own docs) can never mask a fresh check during
+    // testing. Reset is documented as test-only, so this never runs
+    // outside kDebugMode. Keep this through Production launch verification
+    // (see fomoshield_admob_plan_2026_09_22 memory, 2026-09-25 section) —
+    // closed-testing apps can't get a real consent-form status at all
+    // (confirmed via Google's own docs), so this couldn't be fully tested
+    // locally yet; re-verify once live, then this + the debugPrint below
+    // can be trimmed if no longer needed.
+    if (kDebugMode) {
+      await ConsentInformation.instance.reset();
+    }
     final completer = Completer<void>();
     ConsentInformation.instance.requestConsentInfoUpdate(
       ConsentRequestParameters(
         consentDebugSettings: kDebugMode
             ? ConsentDebugSettings(
                 debugGeography: DebugGeography.debugGeographyEea,
-                // This physical dev-test device's AdMob test-device hash
-                // (logged by the SDK itself on first run) — without it,
+                // This physical dev-test device's UMP-hashed device ID
+                // (confirmed correct via the SDK's own log hint 2026-09-25
+                // — matches the Ads-SDK test-device hash) — without it,
                 // debugGeographyEea alone doesn't reliably force the form
                 // on a real (non-emulator) device.
                 testIdentifiers: ['E9C631123C155B92EDA90F918304DA69'],
@@ -33,6 +47,15 @@ class ConsentService {
       ),
       () async {
         try {
+          // Diagnostic only (kDebugMode-gated call site, see above) — kept
+          // for Production-launch verification, see this class's other
+          // doc comment.
+          final status = await ConsentInformation.instance.getConsentStatus();
+          final formAvailable = await ConsentInformation.instance
+              .isConsentFormAvailable();
+          debugPrint(
+            '🔒 UMP status=$status formAvailable=$formAvailable',
+          );
           await _loadAndShowIfRequired();
         } finally {
           if (!completer.isCompleted) completer.complete();
