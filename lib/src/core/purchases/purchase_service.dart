@@ -64,19 +64,34 @@ class PurchaseService {
   Stream<List<PurchaseDetails>> get purchaseStream => _iap.purchaseStream;
 
   Future<ProductDetails?> _queryMonthlyProduct() async {
+    // Diagnostic logging — queryProductDetails reliably returns
+    // notFoundIDs=[premium] on a sideloaded (flutter run/adb) build, even
+    // though the exact same product resolved fine in earlier sessions'
+    // Play-installed testing. Confirmed reproducible 2026-09-25 (see
+    // fomoshield_admob_plan_2026_09_22 memory's second finding that
+    // night). Keep this logging until re-verified via an actual
+    // Play-installed build, not a local one.
     final response = await _iap.queryProductDetails({premiumProductId});
-    if (response.error != null) {
-      debugPrint(
-        'PurchaseService: queryProductDetails error: ${response.error}',
-      );
-    }
+    debugPrint(
+      'PurchaseService: queryProductDetails notFoundIDs=${response.notFoundIDs} '
+      'productDetails=${response.productDetails.map((p) => p.id).toList()} '
+      'error=${response.error}',
+    );
     for (final product in response.productDetails) {
-      if (product is! GooglePlayProductDetails) continue;
+      if (product is! GooglePlayProductDetails) {
+        debugPrint('PurchaseService: ${product.id} is not GooglePlayProductDetails');
+        continue;
+      }
       final index = product.subscriptionIndex;
       final offers = product.productDetails.subscriptionOfferDetails;
+      debugPrint(
+        'PurchaseService: ${product.id} subscriptionIndex=$index '
+        'offers=${offers?.map((o) => o.basePlanId).toList()}',
+      );
       if (index == null || offers == null) continue;
       if (offers[index].basePlanId == monthlyBasePlanId) return product;
     }
+    debugPrint('PurchaseService: no product matched basePlanId=$monthlyBasePlanId');
     return null;
   }
 
@@ -86,7 +101,9 @@ class PurchaseService {
   /// only ever arrives later via [purchaseStream], never as this method's
   /// return value.
   Future<bool> buyMonthly(String userId) async {
-    if (!await _iap.isAvailable()) return false;
+    final available = await _iap.isAvailable();
+    debugPrint('PurchaseService: buyMonthly isAvailable=$available');
+    if (!available) return false;
     final product = await _queryMonthlyProduct();
     if (product == null) return false;
 

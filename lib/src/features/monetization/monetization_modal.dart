@@ -376,6 +376,10 @@ Future<void> _startPurchase(
   AppLocalizations l10n,
 ) async {
   final userId = ref.read(currentUserProvider)?.id;
+  // Diagnostic logging — kept until real purchases are re-verified on a
+  // Play-installed build (see purchase_service.dart's own doc comment and
+  // fomoshield_admob_plan_2026_09_22 memory's 2026-09-25 findings).
+  debugPrint('MonetizationModal: _startPurchase tapped, userId=$userId');
   if (userId == null) return;
 
   ref.read(purchaseInFlightProvider.notifier).state = true;
