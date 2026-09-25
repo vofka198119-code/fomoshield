@@ -374,7 +374,17 @@ class StressTestHubScreen extends ConsumerWidget {
     );
   }
 
-  void _startNewTest(BuildContext context, WidgetRef ref) {
+  Future<void> _startNewTest(BuildContext context, WidgetRef ref) async {
+    // Awaits the real tier instead of racing subscriptionTierProvider's
+    // async DB fetch (see resolveSubscriptionTier's doc comment) — a new
+    // session's starting cash is set once, right below, and never
+    // recalculated later, so a premature "free" read here would
+    // permanently under-fund a premium user's test instead of just
+    // showing stale UI for a moment. maxStressTestSessionsProvider and the
+    // free-tier upsell branch below both read subscriptionTierProvider
+    // too, so this also fixes those against the same race.
+    await resolveSubscriptionTier(ref);
+    if (!context.mounted) return;
     final activeCount = ref
         .read(stressTestProvider)
         .where((s) => s.status == StressTestStatus.active)

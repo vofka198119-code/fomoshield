@@ -78,7 +78,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   }
 
   void _startTest() async {
-    final tier = ref.read(subscriptionTierProvider);
+    // Awaits the real tier instead of racing subscriptionTierProvider's
+    // async DB fetch (see resolveSubscriptionTier's doc comment) — this
+    // gates whether Infinite/Custom duration (and DCA/dividend
+    // simulation) are even allowed below. A premature "free" read would
+    // silently no-op a premium user's attempt to start a Custom-duration
+    // test instead of just showing stale UI for a moment.
+    final tier = await resolveSubscriptionTier(ref);
+    if (!mounted) return;
     final isPremium = tier.isPremiumOrAdmin;
 
     // Safety guard: Free cannot start Infinite or Custom
@@ -760,10 +767,14 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
   /// Opens a bottom sheet to pick custom duration (14–365 days).
   /// Free users are redirected to [_showPremiumUpsell] instead.
-  void _showCustomDurationPicker() {
-    final isPremium =
-        ref.read(subscriptionTierProvider) == SubscriptionTier.premium ||
-        ref.read(subscriptionTierProvider) == SubscriptionTier.admin;
+  void _showCustomDurationPicker() async {
+    // Awaits the real tier instead of racing subscriptionTierProvider's
+    // async DB fetch — a premature "free" read would wrongly show a
+    // premium user the upsell paywall instead of the picker (see
+    // resolveSubscriptionTier's doc comment for the general race).
+    final tier = await resolveSubscriptionTier(ref);
+    if (!mounted) return;
+    final isPremium = tier.isPremiumOrAdmin;
     if (!isPremium) {
       _showPremiumUpsell();
       return;
