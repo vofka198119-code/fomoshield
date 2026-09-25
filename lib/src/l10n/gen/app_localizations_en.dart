@@ -261,7 +261,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Billed monthly. Cancel anytime.';
 
   @override
-  String get premiumBenefitWeeklyPayout => '\$180 portfolio top-up every week';
+  String get premiumBenefitWeeklyPayout => '\$100 portfolio top-up every week';
 
   @override
   String get premiumBenefitStressTestDca =>

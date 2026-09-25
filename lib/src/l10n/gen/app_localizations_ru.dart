@@ -261,7 +261,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get premiumBenefitWeeklyPayout =>
-      'Пополнение портфеля на \$180 каждую неделю';
+      'Пополнение портфеля на \$100 каждую неделю';
 
   @override
   String get premiumBenefitStressTestDca =>

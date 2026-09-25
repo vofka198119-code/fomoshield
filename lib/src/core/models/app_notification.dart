@@ -13,7 +13,7 @@ enum AppNotificationType {
   stressTestCompleted,
   priceSwing,
   goalUpdated,
-  // Premium/admin weekly auto-deposit (Portfolio: +$180, Stress Test
+  // Premium/admin weekly auto-deposit (Portfolio: +$100, Stress Test
   // Custom-duration DCA: +$200) — see weekly_payout_provider.dart.
   weeklyPayout,
   // Fired once when a weekly payout stream stops because the subscription

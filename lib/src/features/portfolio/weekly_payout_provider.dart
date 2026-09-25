@@ -9,7 +9,7 @@ import '../../shared/utils/currency_format.dart';
 import 'portfolio_providers.dart';
 
 // ---------------------------------------------------------------------------
-// Weekly Premium Payout — +$180/week auto-deposit into a Premium/admin
+// Weekly Premium Payout — +$100/week auto-deposit into a Premium/admin
 // user's portfolio.
 // ---------------------------------------------------------------------------
 // Client-driven catch-up, same idiom as Stress Test's own tick simulation
@@ -27,7 +27,7 @@ import 'portfolio_providers.dart';
 // (no back-pay for the lapsed period).
 // ---------------------------------------------------------------------------
 
-const double weeklyPayoutAmount = 180;
+const double weeklyPayoutAmount = 100;
 const Duration weeklyPayoutInterval = Duration(days: 7);
 
 String _wasPremiumKey(String? uid) => uid != null

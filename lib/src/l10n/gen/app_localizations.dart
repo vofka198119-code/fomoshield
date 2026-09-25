@@ -563,7 +563,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumBenefitWeeklyPayout.
   ///
   /// In en, this message translates to:
-  /// **'\$180 portfolio top-up every week'**
+  /// **'\$100 portfolio top-up every week'**
   String get premiumBenefitWeeklyPayout;
 
   /// No description provided for @premiumBenefitStressTestDca.
