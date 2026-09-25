@@ -75,7 +75,7 @@
   "premiumBenefitAdFree": "Без рекламы",
   "premiumBenefitThemes": "Эксклюзивные цветовые темы",
   "monetizationModalVoluntaryTitle": "F.O.M.O. Shield Premium",
-  "monetizationModalVoluntaryPlansNote": "Доступно с ежемесячной, ежеквартальной или годовой оплатой.",
+  "monetizationModalVoluntaryPlansNote": "Ежемесячная оплата. Отменить можно в любой момент.",
   "premiumBenefitWeeklyPayout": "Пополнение портфеля на $180 каждую неделю",
   "premiumBenefitStressTestDca": "Симулированное еженедельное пополнение в симуляции рынка",
   "tradeBuy": "ПОКУПКА",
@@ -1633,6 +1633,14 @@
   "stressTestOrderRowSellLine": "Продать {quantity} акций",
   "stressTestOrderRowLimitPriceLine": "Лимитная цена {price}",
   "monetizationModalUpgradeButton": "Оформить Premium",
+  "monetizationModalUpgradeButtonWithPrice": "Оформить Premium — {price}/мес",
+  "@monetizationModalUpgradeButtonWithPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "monetizationModalCounterResetAdmin": "🔧 Счётчик сброшен до 15 (админ)",
   "monetizationModalResetCounterAdmin": "Сбросить счётчик (админ)",
   "monetizationModalProcessing": "Обработка…",

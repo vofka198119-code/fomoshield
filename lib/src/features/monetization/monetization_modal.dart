@@ -81,6 +81,11 @@ class _MonetizationSheet extends ConsumerWidget {
     final isPurchasing = ref.watch(purchaseInFlightProvider);
     final isVoluntary = trigger == MonetizationTrigger.voluntary;
     final l10n = AppLocalizations.of(context)!;
+    // Google's own region-priced label (see monthlyPriceLabelProvider's
+    // doc comment) — null while still loading or if the query failed,
+    // in which case the button falls back to a price-less label rather
+    // than blocking on it.
+    final priceLabel = ref.watch(monthlyPriceLabelProvider).valueOrNull;
 
     final IconData headerIcon;
     final String title;
@@ -253,7 +258,16 @@ class _MonetizationSheet extends ConsumerWidget {
               label: Text(
                 isPurchasing
                     ? l10n.monetizationModalProcessing
+                    : priceLabel != null
+                    ? l10n.monetizationModalUpgradeButtonWithPrice(priceLabel)
                     : l10n.monetizationModalUpgradeButton,
+                // A long localized price+currency string (some locales run
+                // noticeably longer than "$4.99") combined with the fixed
+                // "Upgrade to Premium —" prefix could overflow this
+                // full-width button on a narrow device — clip with an
+                // ellipsis instead of wrapping/overflowing ugly.
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,

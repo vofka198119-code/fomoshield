@@ -103,7 +103,7 @@
   "premiumBenefitAdFree": "Ad-free experience",
   "premiumBenefitThemes": "Exclusive color themes",
   "monetizationModalVoluntaryTitle": "F.O.M.O. Shield Premium",
-  "monetizationModalVoluntaryPlansNote": "Available as monthly, quarterly, or annual billing.",
+  "monetizationModalVoluntaryPlansNote": "Billed monthly. Cancel anytime.",
   "premiumBenefitWeeklyPayout": "$180 portfolio top-up every week",
   "premiumBenefitStressTestDca": "Simulated weekly funding in Market Simulation",
   "tradeBuy": "BUY",
@@ -2248,6 +2248,14 @@
     }
   },
   "monetizationModalUpgradeButton": "Upgrade to Premium",
+  "monetizationModalUpgradeButtonWithPrice": "Upgrade to Premium — {price}/mo",
+  "@monetizationModalUpgradeButtonWithPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "monetizationModalCounterResetAdmin": "🔧 Counter reset to 15 (admin)",
   "monetizationModalResetCounterAdmin": "Reset counter (admin)",
   "monetizationModalProcessing": "Processing…",

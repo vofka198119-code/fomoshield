@@ -551,7 +551,7 @@ abstract class AppLocalizations {
   /// No description provided for @monetizationModalVoluntaryPlansNote.
   ///
   /// In en, this message translates to:
-  /// **'Available as monthly, quarterly, or annual billing.'**
+  /// **'Billed monthly. Cancel anytime.'**
   String get monetizationModalVoluntaryPlansNote;
 
   /// No description provided for @premiumBenefitWeeklyPayout.
@@ -9630,6 +9630,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Upgrade to Premium'**
   String get monetizationModalUpgradeButton;
+
+  /// No description provided for @monetizationModalUpgradeButtonWithPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium — {price}/mo'**
+  String monetizationModalUpgradeButtonWithPrice(String price);
 
   /// No description provided for @monetizationModalCounterResetAdmin.
   ///

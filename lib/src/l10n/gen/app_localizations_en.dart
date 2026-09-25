@@ -255,7 +255,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monetizationModalVoluntaryPlansNote =>
-      'Available as monthly, quarterly, or annual billing.';
+      'Billed monthly. Cancel anytime.';
 
   @override
   String get premiumBenefitWeeklyPayout => '\$180 portfolio top-up every week';
@@ -5718,6 +5718,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monetizationModalUpgradeButton => 'Upgrade to Premium';
+
+  @override
+  String monetizationModalUpgradeButtonWithPrice(String price) {
+    return 'Upgrade to Premium — $price/mo';
+  }
 
   @override
   String get monetizationModalCounterResetAdmin =>

@@ -102,6 +102,18 @@ class PurchaseService {
     return _iap.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
+  /// The monthly plan's real price, already formatted/localized by Play
+  /// Billing for the user's own region and currency (e.g. "$4.99",
+  /// "€4,99", "₽399") — never hardcode a price string in the app, pricing
+  /// varies by country and Google is the source of truth for it. Null if
+  /// billing is unavailable or the product/offer couldn't be resolved
+  /// (same conditions as [buyMonthly] returning false) — callers should
+  /// fall back to a price-less label rather than blocking on this.
+  Future<String?> monthlyPriceLabel() async {
+    final product = await _queryMonthlyProduct();
+    return product?.price;
+  }
+
   Future<void> restorePurchases() => _iap.restorePurchases();
 
   /// Verifies a purchased/restored purchase with scanco-backend. Returns
@@ -131,6 +143,16 @@ class PurchaseService {
 
 final purchaseServiceProvider = Provider<PurchaseService>(
   (ref) => PurchaseService(),
+);
+
+/// The monthly plan's real, region-priced label (see
+/// [PurchaseService.monthlyPriceLabel]) — watched by monetization_modal.dart
+/// to show the actual charge on the Upgrade button instead of a bare
+/// "Upgrade to Premium" with the price hidden until Play's own purchase
+/// sheet. autoDispose: this is cheap to re-fetch and shouldn't outlive
+/// whichever paywall sheet asked for it.
+final monthlyPriceLabelProvider = FutureProvider.autoDispose<String?>(
+  (ref) => ref.read(purchaseServiceProvider).monthlyPriceLabel(),
 );
 
 /// True while a purchase this app just launched is being processed

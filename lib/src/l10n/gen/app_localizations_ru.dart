@@ -254,7 +254,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get monetizationModalVoluntaryPlansNote =>
-      'Доступно с ежемесячной, ежеквартальной или годовой оплатой.';
+      'Ежемесячная оплата. Отменить можно в любой момент.';
 
   @override
   String get premiumBenefitWeeklyPayout =>
@@ -5733,6 +5733,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get monetizationModalUpgradeButton => 'Оформить Premium';
+
+  @override
+  String monetizationModalUpgradeButtonWithPrice(String price) {
+    return 'Оформить Premium — $price/мес';
+  }
 
   @override
   String get monetizationModalCounterResetAdmin =>
