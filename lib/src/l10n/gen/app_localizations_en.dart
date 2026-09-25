@@ -251,6 +251,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumBenefitThemes => 'Exclusive color themes';
 
   @override
+  String get premiumManageSubscription => 'Manage subscription';
+
+  @override
   String get monetizationModalVoluntaryTitle => 'F.O.M.O. Shield Premium';
 
   @override

@@ -250,6 +250,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get premiumBenefitThemes => 'Эксклюзивные цветовые темы';
 
   @override
+  String get premiumManageSubscription => 'Управление подпиской';
+
+  @override
   String get monetizationModalVoluntaryTitle => 'F.O.M.O. Shield Premium';
 
   @override

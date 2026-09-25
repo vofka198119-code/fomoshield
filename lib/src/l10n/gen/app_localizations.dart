@@ -542,6 +542,12 @@ abstract class AppLocalizations {
   /// **'Exclusive color themes'**
   String get premiumBenefitThemes;
 
+  /// No description provided for @premiumManageSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage subscription'**
+  String get premiumManageSubscription;
+
   /// No description provided for @monetizationModalVoluntaryTitle.
   ///
   /// In en, this message translates to:

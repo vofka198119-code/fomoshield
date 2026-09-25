@@ -19,6 +19,7 @@ import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
 import '../monetization/monetization_modal.dart';
+import '../../core/purchases/purchase_service.dart' show premiumProductId;
 import '../../core/ads/ad_providers.dart';
 import '../../core/ads/consent_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -1133,6 +1134,30 @@ class _PremiumStatusCard extends ConsumerWidget {
           l10n.premiumBenefitThemes,
           accentColor,
         ),
+        // Google Play Subscriptions policy requires a clear, easy way to
+        // cancel from within the app — this was missing entirely before
+        // (found during the 2026-09-25 audit). Only for a real Play
+        // Billing subscription (isLifetime == false — an admin/manually-
+        // granted account has no actual subscription on Play to manage).
+        if (!isLifetime) ...[
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => _openLink(
+              'https://play.google.com/store/account/subscriptions'
+              '?sku=$premiumProductId&package=com.scanco.scanco',
+            ),
+            child: Text(
+              l10n.premiumManageSubscription,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: accentColor,
+                decoration: TextDecoration.underline,
+                decorationColor: accentColor.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
