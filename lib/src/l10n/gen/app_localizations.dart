@@ -416,6 +416,12 @@ abstract class AppLocalizations {
   /// **'Purchase & Premium Renewal'**
   String get profilePurchaseRenewal;
 
+  /// No description provided for @profileAdConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad Consent (GDPR)'**
+  String get profileAdConsent;
+
   /// No description provided for @profileSignOut.
   ///
   /// In en, this message translates to:

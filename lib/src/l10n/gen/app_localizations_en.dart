@@ -181,6 +181,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePurchaseRenewal => 'Purchase & Premium Renewal';
 
   @override
+  String get profileAdConsent => 'Ad Consent (GDPR)';
+
+  @override
   String get profileSignOut => 'Sign Out';
 
   @override

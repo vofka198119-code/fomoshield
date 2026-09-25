@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/ads/ad_service.dart';
+import '../../core/ads/consent_service.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../core/localization/language_provider.dart';
@@ -79,10 +80,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       serverClientId: SupabaseConfig.googleWebClientId,
     );
 
-    // Same reasoning as GoogleSignIn above — the AdMob SDK's own init call
-    // can be slow (network round-trip), and nothing needs it until the
-    // first ad placement is actually reached, well after splash.
-    AdService().init();
+    // Same reasoning as GoogleSignIn above — nothing needs ads until the
+    // first ad placement is actually reached, well after splash. Consent
+    // is gathered (Google's UMP form, shown only if required) BEFORE the
+    // Mobile Ads SDK is initialized, per Google's own UMP integration
+    // guide — this way MobileAds.instance.initialize() and every ad
+    // request after it already reflect whatever the user just chose,
+    // instead of a request slipping out mid-flow on the old consent state.
+    ConsentService.gatherConsent().then((_) => AdService().init());
   }
 
   /// Auth/disclaimer resolution — returns a destination instead of

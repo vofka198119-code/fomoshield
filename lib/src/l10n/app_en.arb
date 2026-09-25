@@ -67,6 +67,7 @@
   "profilePrivacyPolicy": "Privacy Policy",
   "profileTermsOfUse": "Terms of Use",
   "profilePurchaseRenewal": "Purchase & Premium Renewal",
+  "profileAdConsent": "Ad Consent (GDPR)",
   "profileSignOut": "Sign Out",
   "profileDeleteAccount": "Delete Account",
   "profileDeleteAccountTitle": "Delete Account?",

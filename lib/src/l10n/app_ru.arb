@@ -53,6 +53,7 @@
   "profilePrivacyPolicy": "Политика конфиденциальности",
   "profileTermsOfUse": "Условия использования",
   "profilePurchaseRenewal": "Покупка и продление Premium",
+  "profileAdConsent": "Согласие на рекламу (GDPR)",
   "profileSignOut": "Выйти",
   "profileDeleteAccount": "Удалить аккаунт",
   "profileDeleteAccountTitle": "Удалить аккаунт?",

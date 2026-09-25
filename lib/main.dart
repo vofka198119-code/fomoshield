@@ -10,6 +10,7 @@ import 'firebase_options.dart';
 import 'src/core/ads/ad_providers.dart';
 import 'src/core/ads/app_open_ad_provider.dart';
 import 'src/core/cache/sector_providers.dart';
+import 'src/features/disclaimer/disclaimer_providers.dart';
 import 'src/core/localization/language_provider.dart';
 import 'src/core/overlay/app_overlay_host.dart';
 import 'src/core/purchases/purchase_listener.dart';
@@ -166,7 +167,40 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp>
 
   Future<void> _maybeShowAppOpenAd() async {
     if (!mounted) return;
-    final tier = ref.read(subscriptionTierProvider);
+    // Only show once the user is actually inside the app — logged in, past
+    // the disclaimer, and past mandatory nickname setup — not merely
+    // "not premium/admin". Confirmed live 2026-09-25: without this, the ad
+    // could fire on top of the auth/disclaimer/onboarding screens
+    // themselves, before the user had even signed in — jarring UX, and
+    // premature from a consent standpoint since no ad-consent flow (UMP)
+    // has run for someone who isn't authenticated yet.
+    final user = ref.read(currentUserProvider);
+    if (user == null) {
+      debugPrint('🚪 appOpenAd: skipped (not logged in)');
+      return;
+    }
+    final disclaimerAccepted = await ref.read(
+      isDisclaimerAcceptedProvider.future,
+    );
+    if (!mounted) return;
+    if (!disclaimerAccepted) {
+      debugPrint('🚪 appOpenAd: skipped (disclaimer not accepted)');
+      return;
+    }
+    final nickname = await ref.read(myNicknameProvider.future);
+    if (!mounted) return;
+    if (nickname == null) {
+      debugPrint('🚪 appOpenAd: skipped (onboarding incomplete)');
+      return;
+    }
+
+    // Waits for the real tier instead of trusting whatever's cached at this
+    // exact instant — the fixed post-splash delay above was found to still
+    // lose the race against Supabase's DB round-trip on real devices (see
+    // resolveSubscriptionTier's doc comment), showing the ad to a
+    // premium/admin user. Bounded internally so this can't hang forever.
+    final tier = await resolveSubscriptionTier(ref);
+    if (!mounted) return;
     debugPrint('🚪 appOpenAd: tier=$tier');
     if (tier.isPremiumOrAdmin) {
       debugPrint('🚪 appOpenAd: skipped (premium/admin)');

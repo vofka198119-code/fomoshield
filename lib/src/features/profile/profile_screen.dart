@@ -19,6 +19,8 @@ import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
 import '../monetization/monetization_modal.dart';
+import '../../core/ads/ad_providers.dart';
+import '../../core/ads/consent_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
@@ -537,6 +539,27 @@ class ProfileScreen extends ConsumerWidget {
                   trailing: Icon(Icons.chevron_right, color: palette.textBody),
                   onTap: () => _openLink('https://fomoshield.app/premium'),
                 ),
+                // Only shown for a user the Google UMP consent form was
+                // actually presented to (EEA/UK) — Play policy requires
+                // this stay reachable so they can change their answer
+                // later, but there's nothing to manage for anyone else.
+                if (ref.watch(privacyOptionsRequiredProvider).value ==
+                    true) ...[
+                  palette.dividerGradient != null
+                      ? themedDivider(palette, indent: 0, endIndent: 0)
+                      : const Divider(height: 1),
+                  ListTile(
+                    title: Text(
+                      l10n.profileAdConsent,
+                      style: GoogleFonts.inter(color: palette.textHeader),
+                    ),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: palette.textBody,
+                    ),
+                    onTap: () => ConsentService.showPrivacyOptionsForm(),
+                  ),
+                ],
               ],
             ),
           ),

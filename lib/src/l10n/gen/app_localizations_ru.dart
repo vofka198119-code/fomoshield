@@ -180,6 +180,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profilePurchaseRenewal => 'Покупка и продление Premium';
 
   @override
+  String get profileAdConsent => 'Согласие на рекламу (GDPR)';
+
+  @override
   String get profileSignOut => 'Выйти';
 
   @override

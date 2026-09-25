@@ -103,6 +103,46 @@ final isAdminProvider = Provider<bool>((ref) {
   return user?.email == adminEmail;
 });
 
+/// Awaits the async DB fetch behind [subscriptionTierProvider] so a caller
+/// gets the REAL tier instead of racing it. Reading subscriptionTierProvider
+/// before the fetch resolves silently returns SubscriptionTier.free (see
+/// _premiumLoaderProvider above) — harmless for most UI (it just re-renders
+/// once the real tier lands) but wrong for a one-shot decision like "show
+/// this ad now", which never gets a second chance. Confirmed live 2026-09-25:
+/// the App Open ad's fixed post-splash delay wasn't always enough to beat
+/// the DB round-trip, so it fired for a premium tester and (rarer — auth
+/// session restore, not the DB fetch) an admin account. Bounded by [timeout]
+/// so a stuck/offline fetch can't hang the caller forever — falls back to
+/// whatever's cached (free, if nothing loaded yet) same as before.
+Future<SubscriptionTier> resolveSubscriptionTier(
+  WidgetRef ref, {
+  Duration timeout = const Duration(seconds: 6),
+}) async {
+  // Supabase.initialize() in main() already awaits local session restore,
+  // so currentUser is normally populated by the first frame — this only
+  // matters on the rare device where that still lags.
+  if (ref.read(currentUserProvider) == null) {
+    try {
+      await ref
+          .read(authStateProvider.future)
+          .timeout(const Duration(seconds: 3));
+    } catch (_) {
+      // timeout or no session — fall through, still not logged in
+    }
+  }
+
+  final user = ref.read(currentUserProvider);
+  if (user != null && user.email != adminEmail) {
+    try {
+      await ref.read(_premiumLoaderProvider.future).timeout(timeout);
+    } catch (_) {
+      // timeout or DB error — fall through with whatever's cached
+    }
+  }
+
+  return ref.read(subscriptionTierProvider);
+}
+
 /// Forces a fresh subscription_tier/subscription_expires_at fetch from
 /// Supabase — call right after a Play Billing purchase is verified
 /// server-side (see purchase_service.dart) so the UI reflects premium
