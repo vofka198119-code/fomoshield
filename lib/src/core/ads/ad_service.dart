@@ -18,6 +18,26 @@ class AdUnitIds {
   static const appOpen = 'ca-app-pub-4765078548912596/8615048616';
 }
 
+/// Outcome of a rewarded ad attempt — three states, not a bool, because
+/// "the user walked away" and "our ad inventory didn't fill" must lead to
+/// different behavior at the call site.
+///
+/// [failed] is OUR side breaking: no fill, a load error, or a show error.
+/// [dismissed] is the user choosing to abandon the ad, which legitimately
+/// earns no reward.
+///
+/// Every call site must handle [failed] deliberately, and NEVER let it pass
+/// silently — a no-fill with no feedback is indistinguishable from a broken
+/// app. How to handle it depends on what blocking costs (decided 2026-09-26):
+/// - order_ad_gate.dart FAILS OPEN — the gate is 100% after the free
+///   allowance, so blocking would kill this app's core action for hours.
+/// - The view gates (company_detail_screen.dart, company_encyclopedia_widget
+///   .dart) stay CLOSED and explain why — they cost the user little (the
+///   Company Detail gate only fires every 5th view; the Encyclopedia unlock
+///   is permanent), so failing open there would hand unlimited free access
+///   to anyone running an ad blocker.
+enum RewardedAdOutcome { earned, dismissed, failed }
+
 class AdService {
   Future<void> init() async {
     final status = await MobileAds.instance.initialize();
@@ -26,10 +46,10 @@ class AdService {
     );
   }
 
-  /// Loads and shows a rewarded ad. Returns true only if the user actually
-  /// earned the reward (watched to completion) — false on any load/show
-  /// failure, or if dismissed before earning it.
-  Future<bool> showRewarded() async {
+  /// Loads and shows a rewarded ad. See [RewardedAdOutcome] — callers must
+  /// distinguish a user dismissal from a load/show failure, and fail open
+  /// on the latter.
+  Future<RewardedAdOutcome> showRewarded() async {
     final loaded = Completer<RewardedAd?>();
     RewardedAd.load(
       adUnitId: AdUnitIds.rewarded,
@@ -40,18 +60,22 @@ class AdService {
       ),
     );
     final ad = await loaded.future;
-    if (ad == null) return false;
+    if (ad == null) return RewardedAdOutcome.failed;
 
-    final shown = Completer<bool>();
+    final shown = Completer<RewardedAdOutcome>();
     var earned = false;
     ad.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (a) {
         a.dispose();
-        if (!shown.isCompleted) shown.complete(earned);
+        if (!shown.isCompleted) {
+          shown.complete(
+            earned ? RewardedAdOutcome.earned : RewardedAdOutcome.dismissed,
+          );
+        }
       },
       onAdFailedToShowFullScreenContent: (a, _) {
         a.dispose();
-        if (!shown.isCompleted) shown.complete(false);
+        if (!shown.isCompleted) shown.complete(RewardedAdOutcome.failed);
       },
     );
     ad.show(onUserEarnedReward: (_, _) => earned = true);

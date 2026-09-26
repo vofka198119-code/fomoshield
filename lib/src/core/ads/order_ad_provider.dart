@@ -25,9 +25,10 @@ const Duration _resetAfter = Duration(hours: 5);
 class OrderAdNotifier extends StateNotifier<int> {
   final String contextKey;
   String? _userId;
+  late Future<void> _loadFuture;
 
   OrderAdNotifier({required this.contextKey, this._userId}) : super(0) {
-    _load();
+    _loadFuture = _load();
   }
 
   String get _countKey => _userId != null
@@ -39,7 +40,7 @@ class OrderAdNotifier extends StateNotifier<int> {
 
   void setUserId(String? uid) {
     _userId = uid;
-    _load();
+    _loadFuture = _load();
   }
 
   Future<void> _load() async {
@@ -60,6 +61,14 @@ class OrderAdNotifier extends StateNotifier<int> {
   /// Increments the order counter and returns true if this order should be
   /// gated behind an ad/Premium.
   Future<bool> incrementAndCheck() async {
+    // Wait for the initial prefs read before mutating state — otherwise a
+    // fast first order increments against the fresh default (0), then
+    // _load() resolves moments later and clobbers it with the stale
+    // persisted value, silently losing the increment (an un-gated free
+    // order). Same race, same fix as stress_test_ad_provider.dart and
+    // watchlist_ad_provider.dart, which both got it 2026-09-23 — this
+    // provider was missed in that pass.
+    await _loadFuture;
     state = state + 1;
     final prefs = await SharedPreferences.getInstance();
     if (state > _freeOrders && prefs.getInt(_resetAtKey) == null) {

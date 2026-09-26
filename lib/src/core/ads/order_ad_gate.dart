@@ -6,6 +6,8 @@ import '../theme/app_palette.dart';
 import '../theme/theme_variant_provider.dart';
 import '../../shared/widgets/ad_or_premium_sheet.dart';
 import 'ad_providers.dart';
+import 'ad_service.dart';
+import 'ad_failure_notice.dart';
 import 'ad_loading_overlay.dart';
 import 'order_ad_provider.dart';
 
@@ -14,8 +16,9 @@ import 'order_ad_provider.dart';
 // Portfolio) and right before actually placing/executing it. Returns true
 // if the order may proceed — either it was still within the free
 // allowance, the user is Premium/Admin, or they watched the ad to earn
-// this one. Returns false if they should stay on the order screen
-// (cancelled the ad, or it failed to load/show).
+// this one — and also when the ad simply failed to load, which is never
+// held against the user (see the fail-open note at the call below).
+// Returns false only when the user themselves backed out of the ad.
 // ---------------------------------------------------------------------------
 
 /// [contextKey] scopes the counter — use `'stress_test'` or `'portfolio'`
@@ -51,5 +54,18 @@ Future<bool> checkOrderAdGate(
   );
   if (wantsAd != true || !context.mounted) return false;
 
-  return withAdLoadingOverlay(context, ref.read(adServiceProvider).showRewarded());
+  final outcome = await withAdLoadingOverlay(
+    context,
+    ref.read(adServiceProvider).showRewarded(),
+  );
+  if (!context.mounted) return false;
+  // Fail open: a no-fill is our problem, not the user's — placing an order
+  // is this app's core action, and the gate is 100% after the free
+  // allowance, so blocking on a failed load would silently kill trading
+  // for up to the full reset window.
+  if (outcome == RewardedAdOutcome.failed) {
+    showAdLetThroughNotice(context);
+    return true;
+  }
+  return outcome == RewardedAdOutcome.earned;
 }

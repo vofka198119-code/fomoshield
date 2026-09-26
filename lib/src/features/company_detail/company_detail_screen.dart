@@ -30,6 +30,8 @@ import 'widgets/company_widgets_settings_sheet.dart';
 import 'widgets/company_encyclopedia_widget.dart';
 import 'widgets/company_bottom_bar.dart';
 import '../../core/ads/ad_providers.dart';
+import '../../core/ads/ad_service.dart';
+import '../../core/ads/ad_failure_notice.dart';
 import '../../core/ads/ad_loading_overlay.dart';
 import '../search/recently_viewed_provider.dart';
 
@@ -124,23 +126,25 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
       _leave();
       return;
     }
-    final first = await withAdLoadingOverlay(
-      context,
-      ref.read(adServiceProvider).showRewarded(),
-    );
-    if (!mounted) return;
-    if (!first) {
-      _leave();
-      return;
-    }
-    final second = await withAdLoadingOverlay(
-      context,
-      ref.read(adServiceProvider).showRewarded(),
-    );
-    if (!mounted) return;
-    if (!second) {
-      _leave();
-      return;
+    // Two ads back to back, per spec — both have to finish. Anything but an
+    // earned reward sends the user back, a failed load included: this gate
+    // only fires on every 5th view, so their very next tap is free anyway,
+    // and failing open here would hand unlimited free views to anyone
+    // running an ad blocker. A failure does get an explanation, though —
+    // being bounced with no message is what makes a no-fill read as a bug.
+    for (var i = 0; i < 2; i++) {
+      final outcome = await withAdLoadingOverlay(
+        context,
+        ref.read(adServiceProvider).showRewarded(),
+      );
+      if (!mounted) return;
+      if (outcome != RewardedAdOutcome.earned) {
+        if (outcome == RewardedAdOutcome.failed) {
+          showAdRetryNotice(context);
+        }
+        _leave();
+        return;
+      }
     }
     setState(() => _showAd = false);
   }

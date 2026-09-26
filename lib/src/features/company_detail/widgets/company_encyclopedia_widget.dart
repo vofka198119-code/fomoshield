@@ -10,6 +10,8 @@ import '../../../core/supabase/supabase_providers.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../core/ads/ad_providers.dart';
+import '../../../core/ads/ad_service.dart';
+import '../../../core/ads/ad_failure_notice.dart';
 import '../../../core/ads/ad_loading_overlay.dart';
 import '../company_encyclopedia_provider.dart';
 import 'company_encyclopedia_detail_screen.dart';
@@ -192,13 +194,22 @@ class CompanyEncyclopediaWidget extends ConsumerWidget {
         );
         if (wantsAd != true || !context.mounted) return;
         // Two ads back to back, per spec — a single watch-flow doesn't
-        // unlock reading, both have to finish. Bail without unlocking if
-        // either one fails to load/show or gets dismissed before the
-        // reward is earned.
-        final first = await _showAdOverlay(context, ref);
-        if (!context.mounted || !first) return;
-        final second = await _showAdOverlay(context, ref);
-        if (!context.mounted || !second) return;
+        // unlock reading, both have to finish. Anything but an earned
+        // reward leaves the article locked, a failed load included: the
+        // unlock below is PERMANENT for this symbol, so failing open here
+        // would be the easiest of all the gates to farm with an ad blocker.
+        // A failure still gets an explanation so the tap doesn't just look
+        // broken.
+        for (var i = 0; i < 2; i++) {
+          final outcome = await _showAdOverlay(context, ref);
+          if (!context.mounted) return;
+          if (outcome != RewardedAdOutcome.earned) {
+            if (outcome == RewardedAdOutcome.failed) {
+              showAdRetryNotice(context);
+            }
+            return;
+          }
+        }
         ref.read(companyEncyclopediaUnlockedProvider(symbol).notifier).state =
             true;
       }
@@ -217,9 +228,10 @@ class CompanyEncyclopediaWidget extends ConsumerWidget {
     );
   }
 
-  /// Returns true only if the user actually earned the reward (watched to
-  /// completion) — false on any load/show failure or early dismissal.
-  Future<bool> _showAdOverlay(BuildContext context, WidgetRef ref) {
+  /// See [RewardedAdOutcome] — the caller must tell a user dismissal apart
+  /// from a load/show failure, and explain the latter rather than leaving
+  /// the tap looking broken.
+  Future<RewardedAdOutcome> _showAdOverlay(BuildContext context, WidgetRef ref) {
     return withAdLoadingOverlay(context, ref.read(adServiceProvider).showRewarded());
   }
 }
