@@ -10,16 +10,15 @@
 // Same centered title+body shape as stress_test_portfolio_balance_screen's
 // _educationalDisclaimer() ("Company Card style"), but this is a distinct,
 // stress-test-verdict-specific text — don't merge the two. Color is the
-// same fixed muted gray as DisclaimerFooter's reference treatment
-// (2026-08-25: unify every card-level disclaimer to that one look) — NOT
-// palette-based.
+// resolved centrally by resolveDisclaimerColor (disclaimer_style.dart),
+// shared with DisclaimerFooter and SimulatedTradingDisclaimer.
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_palette.dart';
-import '../../../../core/theme/theme_v2.dart';
 import '../../../../l10n/gen/app_localizations.dart';
+import '../../../../shared/widgets/disclaimer_style.dart';
 
 class StressTestVerdictDisclaimer extends StatelessWidget {
   /// Optional theme palette — see [AppPalette.disclaimerColor]'s doc
@@ -31,8 +30,7 @@ class StressTestVerdictDisclaimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final disclaimerColor =
-        palette?.disclaimerColor ?? ThemeV2.textSecondary.withValues(alpha: 0.5);
+    final disclaimerColor = resolveDisclaimerColor(palette);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(

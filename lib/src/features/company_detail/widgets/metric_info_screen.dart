@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/app_palette.dart';
+import '../../../shared/widgets/disclaimer_style.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -82,7 +83,7 @@ class MetricInfoScreen extends ConsumerWidget {
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: ThemeV2.textSecondary.withValues(alpha: 0.5),
+                        color: resolveDisclaimerColor(palette),
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -91,7 +92,7 @@ class MetricInfoScreen extends ConsumerWidget {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 9,
-                        color: ThemeV2.textSecondary.withValues(alpha: 0.5),
+                        color: resolveDisclaimerColor(palette),
                         height: 1.5,
                       ),
                     ),
@@ -99,7 +100,7 @@ class MetricInfoScreen extends ConsumerWidget {
                 ),
               ],
               if (content.showStressTestDisclaimer)
-                const StressTestVerdictDisclaimer(),
+                StressTestVerdictDisclaimer(palette: palette),
             ],
           ),
         ),

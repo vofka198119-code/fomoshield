@@ -7,8 +7,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_palette.dart';
-import '../../core/theme/theme_v2.dart';
 import '../../l10n/gen/app_localizations.dart';
+import 'disclaimer_style.dart';
 
 // Sits directly on the screen background (no card behind it). Color is
 // deliberately the same fixed muted gray as DisclaimerFooter's reference
@@ -23,8 +23,7 @@ class SimulatedTradingDisclaimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final disclaimerColor =
-        palette?.disclaimerColor ?? ThemeV2.textSecondary.withValues(alpha: 0.5);
+    final disclaimerColor = resolveDisclaimerColor(palette);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(

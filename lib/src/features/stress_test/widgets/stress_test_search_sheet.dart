@@ -10,7 +10,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/theme_variant_provider.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../../shared/utils/currency_format.dart';
@@ -275,6 +277,7 @@ class _StressTestSearchSheetState
         ref.watch(stressTestSessionProvider(widget.sessionId))?.cash ?? 0;
     final exceedsCash = _amount > availableCash;
     final l10n = AppLocalizations.of(context)!;
+    final palette = resolveAppPalette(ref.watch(themeVariantProvider));
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -615,7 +618,7 @@ class _StressTestSearchSheetState
                           ),
                         ),
 
-                      const SimulatedTradingDisclaimer(),
+                      SimulatedTradingDisclaimer(palette: palette),
                       const SizedBox(height: 16),
 
                       // Buy button

@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/app_palette.dart';
+import '../../shared/widgets/disclaimer_style.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_button.dart';
@@ -170,7 +171,7 @@ class StressTestPortfolioBalanceScreen extends ConsumerWidget {
   // it, 2026-09-05).
   Widget _educationalDisclaimer(AppLocalizations l10n, AppPalette palette) {
     final disclaimerColor =
-        palette.disclaimerColor ?? ThemeV2.textSecondary.withValues(alpha: 0.5);
+        resolveDisclaimerColor(palette);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(

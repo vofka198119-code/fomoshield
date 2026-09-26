@@ -768,7 +768,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
                   const SizedBox(height: 16),
 
                   // ── Disclaimer (always at bottom) ────────────────
-                  const DisclaimerFooter(),
+                  DisclaimerFooter(palette: palette),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -1540,7 +1540,7 @@ class _StressTestScreenState extends ConsumerState<StressTestScreen> {
           ),
 
           const SizedBox(height: 24),
-          const DisclaimerFooter(),
+          DisclaimerFooter(palette: palette),
           const SizedBox(height: 24),
         ],
       ),

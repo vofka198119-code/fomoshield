@@ -7,6 +7,7 @@ import '../../core/cache/logo_providers.dart';
 import '../../core/cache/sector_providers.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
+import '../../shared/widgets/disclaimer_style.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_button.dart';
@@ -543,11 +544,13 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                     const SizedBox(height: 20),
                     // ── Educational Purpose & Legal Disclaimer ──
                     // Sits directly on the scroll background, no card
-                    // behind it. Color is the same fixed muted gray as
-                    // DisclaimerFooter's reference treatment (2026-08-25:
-                    // unify every card-level disclaimer to that one look)
-                    // — NOT palette-based, so it's readable regardless of
-                    // backdrop in both themes.
+                    // behind it. Colour comes from resolveDisclaimerColor
+                    // so it tracks the theme — it used to be a fixed muted
+                    // grey, with a comment claiming that was "readable
+                    // regardless of backdrop in both themes". That stopped
+                    // being true once the app had five themes: on Black &
+                    // White's light backdrop it rendered grey-on-grey and
+                    // was effectively invisible (user-reported 2026-09-26).
                     StaggerFadeIn(
                       index: visibleWidgets.length + 1,
                       child: Padding(
@@ -560,9 +563,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
-                                color: ThemeV2.textSecondary.withValues(
-                                  alpha: 0.5,
-                                ),
+                                color: resolveDisclaimerColor(palette),
                               ),
                             ),
                             const SizedBox(height: 6),
@@ -571,9 +572,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 9,
-                                color: ThemeV2.textSecondary.withValues(
-                                  alpha: 0.5,
-                                ),
+                                color: resolveDisclaimerColor(palette),
                                 height: 1.5,
                               ),
                             ),

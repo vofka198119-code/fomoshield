@@ -14,6 +14,7 @@ import '../../core/theme/theme_v2.dart';
 import '../../core/theme/typography_helpers.dart';
 import '../../core/theme/fomo_shield_theme.dart';
 import '../../core/theme/app_palette.dart';
+import '../../shared/widgets/disclaimer_style.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_divider.dart';
@@ -848,7 +849,7 @@ class _TradeBreakdownDisclaimer extends StatelessWidget {
     // without needing the "always-dark panel" gating this file's other
     // elements require.
     final disclaimerColor =
-        palette.disclaimerColor ?? ThemeV2.textSecondary.withValues(alpha: 0.5);
+        resolveDisclaimerColor(palette);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(
