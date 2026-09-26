@@ -506,12 +506,6 @@ abstract class AppLocalizations {
   /// **'{days}d'**
   String premiumDaysBadge(int days);
 
-  /// No description provided for @premiumBenefitSearches.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlimited daily searches'**
-  String get premiumBenefitSearches;
-
   /// No description provided for @premiumBenefitPortfolios.
   ///
   /// In en, this message translates to:

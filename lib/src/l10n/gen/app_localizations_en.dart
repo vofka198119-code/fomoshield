@@ -232,9 +232,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get premiumBenefitSearches => 'Unlimited daily searches';
-
-  @override
   String get premiumBenefitPortfolios => '\$10,000 portfolio starting capital';
 
   @override

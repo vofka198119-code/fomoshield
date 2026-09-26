@@ -857,12 +857,6 @@ class _FreeTierUpsellCard extends ConsumerWidget {
           // so this reads as "here's what that card would show" rather
           // than a different pitch.
           _upsellBenefitRow(
-            Icons.search_rounded,
-            l10n.premiumBenefitSearches,
-            accentColor,
-          ),
-          const SizedBox(height: 6),
-          _upsellBenefitRow(
             Icons.account_balance_rounded,
             l10n.premiumBenefitPortfolios,
             accentColor,
@@ -1111,12 +1105,6 @@ class _PremiumStatusCard extends ConsumerWidget {
         ),
         const SizedBox(height: 14),
         // Benefits list
-        _benefitRow(
-          Icons.search_rounded,
-          l10n.premiumBenefitSearches,
-          accentColor,
-        ),
-        const SizedBox(height: 6),
         _benefitRow(
           Icons.account_balance_rounded,
           l10n.premiumBenefitPortfolios,

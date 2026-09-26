@@ -231,9 +231,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get premiumBenefitSearches => 'Неограниченный поиск каждый день';
-
-  @override
   String get premiumBenefitPortfolios => 'Стартовый капитал портфеля \$10 000';
 
   @override

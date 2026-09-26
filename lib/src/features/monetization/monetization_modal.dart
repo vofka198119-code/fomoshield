@@ -70,6 +70,20 @@ Future<void> showMonetizationModal(
 // Sheet
 // ===========================================================================
 
+/// Muted text on this sheet's white surface.
+///
+/// NOT [_mutedOnSheet] (#999999), which measured **2.85:1** on white —
+/// well under the 4.5:1 floor for small text, and this sheet is where the
+/// subscription terms and the "restore purchases" action live, so it is the
+/// worst screen in the app to under-contrast. #6E6E6E reads at **5.1:1**
+/// while staying visibly secondary (2026-09-26).
+///
+/// Deliberately local rather than a change to _mutedOnSheet: that
+/// constant also feeds `bodySmall` and every TextField `hintStyle` through
+/// app_theme.dart, so moving it shifts text app-wide and needs its own
+/// visual pass. Those two are at the same 2.85:1 and are worth revisiting.
+const Color _mutedOnSheet = Color(0xFF6E6E6E);
+
 class _MonetizationSheet extends ConsumerWidget {
   final MonetizationTrigger trigger;
 
@@ -193,7 +207,7 @@ class _MonetizationSheet extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: AppTheme.textDim,
+              color: _mutedOnSheet,
               height: 1.5,
             ),
           ),
@@ -203,7 +217,6 @@ class _MonetizationSheet extends ConsumerWidget {
           // it's about getting UNBLOCKED, not about the full pitch.
           if (isVoluntary) ...[
             const SizedBox(height: 20),
-            _benefitRow(Icons.search_rounded, l10n.premiumBenefitSearches),
             const SizedBox(height: 8),
             _benefitRow(
               Icons.account_balance_rounded,
@@ -232,7 +245,7 @@ class _MonetizationSheet extends ConsumerWidget {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontStyle: FontStyle.italic,
-                color: AppTheme.textDim,
+                color: _mutedOnSheet,
               ),
             ),
           ],
@@ -295,7 +308,7 @@ class _MonetizationSheet extends ConsumerWidget {
             onPressed: isPurchasing
                 ? null
                 : () => _restorePurchases(context, ref, l10n),
-            style: TextButton.styleFrom(foregroundColor: AppTheme.textDim),
+            style: TextButton.styleFrom(foregroundColor: _mutedOnSheet),
             child: Text(
               l10n.monetizationModalRestorePurchases,
               style: GoogleFonts.inter(fontSize: 13),
@@ -323,10 +336,10 @@ class _MonetizationSheet extends ConsumerWidget {
                   l10n.monetizationModalResetCounterAdmin,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    color: AppTheme.textDim,
+                    color: _mutedOnSheet,
                   ),
                 ),
-                style: TextButton.styleFrom(foregroundColor: AppTheme.textDim),
+                style: TextButton.styleFrom(foregroundColor: _mutedOnSheet),
               ),
             ),
           ],
