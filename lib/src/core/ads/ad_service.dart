@@ -113,11 +113,14 @@ class AdService {
     return shown.future;
   }
 
-  /// Loads and shows an App Open ad. Same shape as [showInterstitial] —
-  /// resolves once dismissed (or on any load/show failure), no reward
-  /// payload. Callers own the cold-start/resume trigger and the cooldown
-  /// (see app_open_ad_provider.dart) — this just plays one ad on request.
-  Future<void> showAppOpen() async {
+  /// Loads and shows an App Open ad. Callers own the cold-start/resume
+  /// trigger and the cooldown (see app_open_ad_provider.dart) — this just
+  /// plays one ad on request.
+  ///
+  /// Returns true only if an ad actually played. The caller MUST NOT burn
+  /// its cooldown on false: a no-fill would otherwise cost the next full
+  /// cooldown window for an ad the user never saw.
+  Future<bool> showAppOpen() async {
     final loaded = Completer<AppOpenAd?>();
     AppOpenAd.load(
       adUnitId: AdUnitIds.appOpen,
@@ -128,17 +131,17 @@ class AdService {
       ),
     );
     final ad = await loaded.future;
-    if (ad == null) return;
+    if (ad == null) return false;
 
-    final shown = Completer<void>();
+    final shown = Completer<bool>();
     ad.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (a) {
         a.dispose();
-        if (!shown.isCompleted) shown.complete();
+        if (!shown.isCompleted) shown.complete(true);
       },
       onAdFailedToShowFullScreenContent: (a, _) {
         a.dispose();
-        if (!shown.isCompleted) shown.complete();
+        if (!shown.isCompleted) shown.complete(false);
       },
     );
     ad.show();

@@ -165,7 +165,25 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp>
     }
   }
 
+  /// Guards against two overlapping attempts. This method awaits three
+  /// providers (disclaimer, nickname, tier) before it ever reaches the
+  /// cooldown check, and a resume event landing inside that window would
+  /// otherwise start a second attempt that also reads the cooldown as
+  /// ready. Not hypothetical: showing the ad makes Android pause and resume
+  /// MainActivity, so a resume fires on the way out of every ad.
+  bool _appOpenAdInFlight = false;
+
   Future<void> _maybeShowAppOpenAd() async {
+    if (!mounted || _appOpenAdInFlight) return;
+    _appOpenAdInFlight = true;
+    try {
+      await _showAppOpenAdIfDue();
+    } finally {
+      _appOpenAdInFlight = false;
+    }
+  }
+
+  Future<void> _showAppOpenAdIfDue() async {
     if (!mounted) return;
     // Only show once the user is actually inside the app — logged in, past
     // the disclaimer, and past mandatory nickname setup — not merely
@@ -211,10 +229,19 @@ class _ScanCoAppState extends ConsumerState<ScanCoApp>
     debugPrint('🚪 appOpenAd: cooldown ready=$ready');
     if (!ready) return;
     if (!mounted) return;
-    await cooldown.recordShown();
     debugPrint('🚪 appOpenAd: showAppOpen()');
-    await ref.read(adServiceProvider).showAppOpen();
-    debugPrint('🚪 appOpenAd: dismissed');
+    final shown = await ref.read(adServiceProvider).showAppOpen();
+    debugPrint('🚪 appOpenAd: shown=$shown');
+    // Burn the full cadence only when an ad actually played. Until
+    // 2026-09-26 this was recorded BEFORE the request, so a no-fill cost
+    // the next four hours for an ad nobody saw — and the log line above
+    // said "dismissed" either way, which would have read as success during
+    // the Production-launch ad verification.
+    if (shown) {
+      await cooldown.recordShown();
+    } else {
+      await cooldown.recordFailedAttempt();
+    }
   }
 
   @override
