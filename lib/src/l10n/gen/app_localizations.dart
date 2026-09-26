@@ -563,7 +563,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumBenefitWeeklyPayout.
   ///
   /// In en, this message translates to:
-  /// **'\$100 portfolio top-up every week'**
+  /// **'\$180 portfolio top-up every week'**
   String get premiumBenefitWeeklyPayout;
 
   /// No description provided for @premiumBenefitStressTestDca.
@@ -4518,6 +4518,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To keep the app free, we have to ask you to watch a couple of short ads.'**
   String get companyDetailWatchAdBody;
+
+  /// No description provided for @adUnavailableFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'No ad was available just now — we\'ve let this one through. Thanks for your patience.'**
+  String get adUnavailableFallback;
+
+  /// No description provided for @adUnavailableRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'No ad was available just now. Please try again in a moment.'**
+  String get adUnavailableRetry;
 
   /// No description provided for @companyDetailWatchAdButton.
   ///

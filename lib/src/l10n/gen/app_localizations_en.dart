@@ -261,7 +261,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Billed monthly. Cancel anytime.';
 
   @override
-  String get premiumBenefitWeeklyPayout => '\$100 portfolio top-up every week';
+  String get premiumBenefitWeeklyPayout => '\$180 portfolio top-up every week';
 
   @override
   String get premiumBenefitStressTestDca =>
@@ -2561,6 +2561,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get companyDetailWatchAdBody =>
       'To keep the app free, we have to ask you to watch a couple of short ads.';
+
+  @override
+  String get adUnavailableFallback =>
+      'No ad was available just now — we\'ve let this one through. Thanks for your patience.';
+
+  @override
+  String get adUnavailableRetry =>
+      'No ad was available just now. Please try again in a moment.';
 
   @override
   String get companyDetailWatchAdButton => 'Watch Ad';

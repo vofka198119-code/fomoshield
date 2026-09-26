@@ -86,7 +86,7 @@ class Portfolio {
   List<Transaction> transactions;
   DateTime createdAt;
   double? goalAmount;
-  // When the weekly +$100 premium payout stream last credited this
+  // When the weekly +$180 premium payout stream last credited this
   // portfolio. Null until the user's first premium check-in — see
   // weekly_payout_provider.dart. Not reset on a tier downgrade, so a
   // returning premium user resumes accruing from where they left off

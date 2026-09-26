@@ -261,7 +261,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get premiumBenefitWeeklyPayout =>
-      'Пополнение портфеля на \$100 каждую неделю';
+      'Пополнение портфеля на \$180 каждую неделю';
 
   @override
   String get premiumBenefitStressTestDca =>
@@ -2563,6 +2563,14 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get companyDetailWatchAdBody =>
       'Чтобы приложение оставалось бесплатным, мы вынуждены попросить вас просмотреть пару коротких рекламных роликов.';
+
+  @override
+  String get adUnavailableFallback =>
+      'Реклама сейчас недоступна — пропускаем этот раз. Спасибо за терпение.';
+
+  @override
+  String get adUnavailableRetry =>
+      'Реклама сейчас недоступна. Попробуйте ещё раз через минуту.';
 
   @override
   String get companyDetailWatchAdButton => 'Смотреть рекламу';
