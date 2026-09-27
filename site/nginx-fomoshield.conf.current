@@ -1,0 +1,47 @@
+server {
+    server_name fomoshield.app www.fomoshield.app;
+    root /var/www/fomoshield-app;
+
+    location /privacy {
+        try_files /privacy/index.html =404;
+    }
+    location /terms {
+        try_files /terms/index.html =404;
+    }
+    location /delete-account {
+        try_files /delete-account/index.html =404;
+    }
+    location /premium {
+        try_files /premium/index.html =404;
+    }
+    location / {
+        return 404;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/fomoshield.app/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/fomoshield.app/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+
+}
+server {
+    if ($host = www.fomoshield.app) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    if ($host = fomoshield.app) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name fomoshield.app www.fomoshield.app;
+    return 404; # managed by Certbot
+
+
+
+
+}

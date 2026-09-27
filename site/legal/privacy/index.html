@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — F.O.M.O. Shield</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+         max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; color: #1a1a1a; line-height: 1.6; }
+  h1 { font-size: 28px; margin-bottom: 4px; }
+  h2 { font-size: 19px; margin-top: 36px; color: #1a1a1a; border-bottom: 1px solid #e5e5e5; padding-bottom: 6px; }
+  .meta { color: #666; font-size: 14px; margin-bottom: 32px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 15px; }
+  th, td { border: 1px solid #e0e0e0; padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f7f7f7; }
+  a { color: #0a6b4f; }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<h1>Privacy Policy</h1>
+<div class="meta">Last updated: September 17, 2026 &middot; Effective for app version: 1.0.0 (build 123)</div>
+
+<h2>1. Who We Are</h2>
+<p>F.O.M.O. Shield ("the App", "we", "us") is an educational investing-simulation app. This policy explains what data we collect, why, and what rights you have over it.</p>
+<p><strong>Data controller:</strong> Volodymyr Oleksiienko (individual developer, not a registered company)<br>
+<strong>Contact for privacy questions:</strong> <a href="mailto:fomoshield@gmail.com">fomoshield@gmail.com</a><br>
+<strong>Business address:</strong> not applicable — operated by an individual, not a registered legal entity.</p>
+
+<h2>2. What This App Is (and Isn't)</h2>
+<p>F.O.M.O. Shield is an educational tool for practicing investing decisions using simulated ("paper") money. It is <strong>not</strong> a registered broker-dealer, investment advisor, or financial institution. No real money, securities, or brokerage accounts are ever involved — see the in-app Disclaimer for full detail. This matters for privacy too: we never collect brokerage account numbers, bank details, or real trading credentials, because the app has none.</p>
+
+<h2>3. Data We Collect</h2>
+<table>
+  <tr><th>Category</th><th>What</th><th>Why</th></tr>
+  <tr><td>Account</td><td>Email address (via Supabase Auth, or via Google Sign-In if you use that option)</td><td>Create and secure your account, password-reset/login</td></tr>
+  <tr><td>Your own data</td><td>Watchlist symbols, portfolio/stress-test simulation state, goals you set</td><td>Core app functionality — this is the product</td></tr>
+</table>
+<p>We do <strong>not</strong> collect: real payment/card details (Premium, if purchased, is billed entirely by Apple/Google — we never see your card), real brokerage credentials, precise GPS location, or contacts/photos/microphone access.</p>
+
+<h2>4. Legal Basis for Processing (GDPR, EU/UK users)</h2>
+<ul>
+  <li><strong>Consent</strong> — you actively accept this policy and the Disclaimer at sign-up, and can withdraw consent by deleting your account.</li>
+  <li><strong>Legitimate interest</strong> — securing our backend and preventing abuse (e.g. rate-limiting, API authentication), where this doesn't override your own privacy rights.</li>
+  <li><strong>Contract necessity</strong> — your email is required to create and operate your account; without it we can't provide the service.</li>
+</ul>
+
+<h2>5. Who We Share Data With (Processors)</h2>
+<p>We use the following third-party services to run the app. Each only receives the minimum data needed for its function:</p>
+<ul>
+  <li><strong>Supabase</strong> — authentication and database hosting (your account, app data).</li>
+  <li><strong>Google Sign-In</strong> (if you choose that login method) — authenticates you; we receive your email and name from Google, nothing else.</li>
+  <li><strong>Finnhub</strong> and <strong>Wikipedia APIs</strong> — provide market data and company information; we query them on your behalf via our own backend, they don't receive your personal data.</li>
+  <li><strong>Our own backend server</strong> (proxies market-data requests and stores app configuration), hosted by Hetzner Online GmbH in Nuremberg, Germany.</li>
+  <li><strong>Email delivery</strong> (Gmail SMTP) — sends account-related emails (verification, password reset).</li>
+  <li><strong>Firebase Crashlytics</strong> (Google) — if the App crashes or hits an unhandled error, automatically sends a crash report with basic device diagnostics (device model, OS version, app version, the crash's stack trace) so we can find and fix the bug. Not tied to your account, email, or identity.</li>
+</ul>
+<p>We do not sell your data to advertisers or data brokers, and no ad network or behavioral-analytics SDK is integrated into the App.</p>
+
+<h2>6. Data Retention</h2>
+<p>We keep your account data for as long as your account is active. You can delete your account at any time from Profile &rarr; Delete Account — this permanently and immediately removes your account and all associated data (portfolios, watchlist, stress-test history), except where we're legally required to keep records longer.</p>
+
+<h2>7. Your Rights</h2>
+<p>If you're in the EU/UK/or a jurisdiction with similar protections, you have the right to:</p>
+<ul>
+  <li><strong>Access</strong> the personal data we hold about you.</li>
+  <li><strong>Correct</strong> inaccurate data.</li>
+  <li><strong>Delete</strong> your data ("right to be forgotten") — self-service, instant, via Profile &rarr; Delete Account in the App.</li>
+  <li><strong>Export</strong> your data in a portable format.</li>
+  <li><strong>Object to or restrict</strong> certain processing.</li>
+  <li><strong>Withdraw consent</strong> at any time (this doesn't affect processing already done before withdrawal).</li>
+</ul>
+<p>To exercise any of these, contact us at <a href="mailto:fomoshield@gmail.com">fomoshield@gmail.com</a>. We'll respond within 30 days (GDPR's standard timeline).</p>
+
+<h2>8. International Data Transfers</h2>
+<p>Our backend server is located in Germany (Nuremberg, hosted by Hetzner Online GmbH). Because this is within the EU/EEA, no additional international-transfer safeguard is required for EU/UK users' data.</p>
+
+<h2>9. Children's Privacy</h2>
+<p>This app is not directed at, and should not be used by, anyone under 18 — you confirm this when accepting the Disclaimer at sign-up. We don't knowingly collect data from minors.</p>
+
+<h2>10. Cookies &amp; Local Storage</h2>
+<p>The app stores some data locally on your device (e.g. your accepted policy version, cached preferences) using standard mobile storage — this is not a tracking cookie and isn't shared with third parties.</p>
+
+<h2>11. Security</h2>
+<p>We use industry-standard measures to protect your data: all traffic between the App and our servers is encrypted in transit (HTTPS/TLS), and our database enforces row-level security so each account can only ever read or write its own data, even at the database layer. No system is 100% secure, and we can't guarantee absolute security.</p>
+
+<h2>12. Changes to This Policy</h2>
+<p>If we make material changes, we'll update the version number and prompt you to re-accept the policy the next time you open the app before you can continue.</p>
+
+<h2>13. Contact</h2>
+<p>Questions about this policy: <a href="mailto:fomoshield@gmail.com">fomoshield@gmail.com</a></p>
+
+</body>
+</html>
