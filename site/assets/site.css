@@ -153,6 +153,26 @@ a { color: var(--ink); }
 .card h3 { margin-bottom: 6px; }
 .card p { margin: 0; font-size: 16px; }
 
+/* ---------- theme strip ---------- */
+
+.theme-strip {
+  display: flex; gap: 20px; overflow-x: auto;
+  padding: 4px 24px 22px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.theme-strip figure { margin: 0; flex: 0 0 auto; scroll-snap-align: center; }
+.theme-strip img { width: 190px; }
+.theme-strip figcaption {
+  margin-top: 12px; text-align: center;
+  font-size: 14px; font-weight: 600; color: var(--ink);
+}
+.theme-strip em {
+  display: block; margin-top: 2px; font-style: normal;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
 /* ---------- in-development section ---------- */
 
 .wip { background: #f2f2f3; }
