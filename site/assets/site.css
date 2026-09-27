@@ -96,7 +96,12 @@ a { color: var(--ink); }
   border: 1px solid var(--steel); color: var(--ink-muted); background: #fff;
 }
 .hero p.lead { font-size: clamp(17px, 1.6vw, 20px); margin-bottom: 20px; }
-.hero .negatives { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 0; }
+/* the three negatives sit in the app's own "window" panel treatment —
+   reuses .card, which is that recipe (see the card grid below) */
+.hero .negatives {
+  display: inline-block; padding: 14px 22px;
+  font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 0;
+}
 .hero-shot { margin: 0; align-self: end; }
 .hero-shot img { width: 284px; display: block; }
 
