@@ -157,6 +157,11 @@ a { color: var(--ink); }
 
 .theme-strip {
   display: flex; gap: 20px; overflow-x: auto;
+  /* same column as every other section, so the strip lines up with its own
+     heading instead of running full-bleed; it still scrolls when narrow.
+     Centring is done by the auto margins, not justify-content, which clips
+     the first item once the row overflows. */
+  max-width: var(--wrap); margin-inline: auto;
   padding: 4px 24px 22px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
