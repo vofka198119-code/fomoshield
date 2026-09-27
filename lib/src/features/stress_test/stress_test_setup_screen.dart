@@ -678,9 +678,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
   /// Prompts a Free user to subscribe when tapping a locked feature.
   void _showPremiumUpsell() {
     final l10n = AppLocalizations.of(context)!;
-    final accentColor =
-        resolveAppPalette(ref.read(themeVariantProvider)).marketClockAccent ??
-        const Color(0xFFD4AF37);
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
+    final accentColor = palette.marketClockAccent ?? const Color(0xFFD4AF37);
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
@@ -716,33 +715,49 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    // A locked FEATURE (custom/infinite duration), not a
-                    // numeric limit — "search limit reached" framing
-                    // would make no sense here (found live 2026-09-20).
-                    showMonetizationModal(
-                      context,
-                      ref,
-                      trigger: MonetizationTrigger.voluntary,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              // Gold themes get the metallic gradient; themes with their own
+              // premium accent keep it flat — see premiumCtaGradient.
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: premiumCtaGradient(palette),
+                  color: premiumCtaGradient(palette) == null
+                      ? accentColor
+                      : null,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      // A locked FEATURE (custom/infinite duration), not a
+                      // numeric limit — "search limit reached" framing
+                      // would make no sense here (found live 2026-09-20).
+                      showMonetizationModal(
+                        context,
+                        ref,
+                        trigger: MonetizationTrigger.voluntary,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      elevation: 0,
+                      foregroundColor: premiumCtaContentColor(
+                        palette,
+                        Colors.white,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    l10n.stressTestUpgradeToPremium,
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 14,
+                    child: Text(
+                      l10n.stressTestUpgradeToPremium,
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),

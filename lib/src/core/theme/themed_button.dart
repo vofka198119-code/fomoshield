@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_palette.dart';
+import 'luxury_gold_theme.dart';
 import 'themed_border.dart';
 
 // ---------------------------------------------------------------------------
@@ -55,7 +56,10 @@ Widget themedDarkCtaButtonShell({
     child: Material(
       color: Colors.transparent,
       child: Ink(
-        decoration: BoxDecoration(gradient: gradient, borderRadius: borderRadius),
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: borderRadius,
+        ),
         child: child,
       ),
     ),
@@ -71,6 +75,31 @@ Color themedDarkCtaContentColor(AppPalette palette) {
   if (palette.windowGradient == null) return Colors.white;
   return palette.onButton ?? palette.onWindow ?? palette.textHeader;
 }
+
+// ---------------------------------------------------------------------------
+// "Go Premium" CTA fill — the buttons that actually sell the subscription
+// (Profile's upsell card, Stress Test's locked-feature dialog). They colour
+// themselves from `palette.marketClockAccent ?? <gold>`, so:
+//
+// - Black & White, Graphite and Midnight Sea name their own accent and keep
+//   it FLAT. A gold gradient in a monochrome theme is the same mistake the
+//   trade-breakdown amounts had (fixed 2026-09-27).
+// - Standard and Luxury Gold name none and fall through to the app's gold.
+//   They get it as the two-tone metallic gradient Luxury Gold already uses
+//   for its own buttons, rather than one flat swatch — reused rather than
+//   re-derived, so there is still exactly one definition of "gold button".
+// ---------------------------------------------------------------------------
+
+/// Gradient for a "go Premium" button, or null when the theme should keep
+/// its own flat accent. Pair with [premiumCtaContentColor].
+Gradient? premiumCtaGradient(AppPalette palette) =>
+    palette.marketClockAccent == null ? LuxuryGoldTheme.buttonGradient : null;
+
+/// Text/icon colour to sit on [premiumCtaGradient]. Near-black on the gold,
+/// which is what Profile's button already did; themes that keep their flat
+/// accent keep whatever they passed before.
+Color premiumCtaContentColor(AppPalette palette, Color flatThemeColor) =>
+    premiumCtaGradient(palette) != null ? Colors.black : flatThemeColor;
 
 // ---------------------------------------------------------------------------
 // Themed "Add Widgets" button — the canonical treatment for every screen's
@@ -117,7 +146,8 @@ Widget themedAddWidgetsButton(
     );
   }
   final radius = BorderRadius.circular(30);
-  final onWindowColor = palette.onButton ?? palette.onWindow ?? palette.textHeader;
+  final onWindowColor =
+      palette.onButton ?? palette.onWindow ?? palette.textHeader;
   return themedBorder(
     palette: palette,
     borderRadius: radius,

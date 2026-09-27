@@ -662,10 +662,18 @@ class _CompanyRow extends ConsumerWidget {
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: dialBrassLight, width: 1.5),
+              // Same theme-awareness as this screen's amounts — a brass ring
+              // on Black & White's white card was the other half of the gold
+              // the user asked to remove (2026-09-27).
+              border: Border.all(
+                color: palette.onWindow ?? dialBrassLight,
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: dialBrassLight.withValues(alpha: 0.35),
+                  color: (palette.onWindow ?? dialBrassLight).withValues(
+                    alpha: 0.35,
+                  ),
                   blurRadius: 6,
                 ),
               ],
@@ -758,10 +766,18 @@ class _TradeRow extends ConsumerWidget {
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: dialBrassLight, width: 1.5),
+              // Same theme-awareness as this screen's amounts — a brass ring
+              // on Black & White's white card was the other half of the gold
+              // the user asked to remove (2026-09-27).
+              border: Border.all(
+                color: palette.onWindow ?? dialBrassLight,
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: dialBrassLight.withValues(alpha: 0.35),
+                  color: (palette.onWindow ?? dialBrassLight).withValues(
+                    alpha: 0.35,
+                  ),
                   blurRadius: 6,
                 ),
               ],

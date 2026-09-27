@@ -19,6 +19,7 @@ import '../company_detail/watchlist_ad_provider.dart';
 import '../stress_test/stress_test_engine.dart';
 import '../market_clock/market_clock_dial.dart';
 import '../monetization/monetization_modal.dart';
+import '../../core/theme/themed_button.dart';
 import '../../core/purchases/purchase_service.dart' show premiumProductId;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../core/ads/ad_providers.dart';
@@ -898,34 +899,45 @@ class _FreeTierUpsellCard extends ConsumerWidget {
             accentColor,
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => showMonetizationModal(
-                context,
-                ref,
-                trigger: MonetizationTrigger.voluntary,
-              ),
-              icon: Icon(
-                Icons.workspace_premium_rounded,
-                size: 18,
-                color: Colors.black,
-              ),
-              label: Text(
-                l10n.monetizationModalUpgradeButton,
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                  color: Colors.black,
+          // Gold themes get the metallic gradient instead of a flat swatch;
+          // themes with their own premium accent keep it flat — see
+          // premiumCtaGradient.
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: premiumCtaGradient(palette),
+              color: premiumCtaGradient(palette) == null ? accentColor : null,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => showMonetizationModal(
+                  context,
+                  ref,
+                  trigger: MonetizationTrigger.voluntary,
                 ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: accentColor,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                icon: Icon(
+                  Icons.workspace_premium_rounded,
+                  size: 18,
+                  color: premiumCtaContentColor(palette, Colors.black),
                 ),
-                elevation: 0,
+                label: Text(
+                  l10n.monetizationModalUpgradeButton,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: premiumCtaContentColor(palette, Colors.black),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
               ),
             ),
           ),
