@@ -713,7 +713,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeWidgetShieldSignal.
   ///
   /// In en, this message translates to:
-  /// **'Shield Signal'**
+  /// **'Market Overview'**
   String get homeWidgetShieldSignal;
 
   /// No description provided for @homeWidgetWatchlist.
@@ -743,7 +743,7 @@ abstract class AppLocalizations {
   /// No description provided for @shieldSignalTitle.
   ///
   /// In en, this message translates to:
-  /// **'SHIELD SIGNAL'**
+  /// **'MARKET OVERVIEW'**
   String get shieldSignalTitle;
 
   /// No description provided for @shieldSignalChange.

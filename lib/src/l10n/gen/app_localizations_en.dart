@@ -338,7 +338,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeReset => 'Reset';
 
   @override
-  String get homeWidgetShieldSignal => 'Shield Signal';
+  String get homeWidgetShieldSignal => 'Market Overview';
 
   @override
   String get homeWidgetWatchlist => 'Watchlist';
@@ -353,7 +353,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonLoading => 'Loading...';
 
   @override
-  String get shieldSignalTitle => 'SHIELD SIGNAL';
+  String get shieldSignalTitle => 'MARKET OVERVIEW';
 
   @override
   String get shieldSignalChange => 'CHANGE';

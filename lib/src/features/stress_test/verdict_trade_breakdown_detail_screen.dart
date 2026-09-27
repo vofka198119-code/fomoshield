@@ -508,7 +508,9 @@ class _MoreLessButton extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: dialBrassLight,
+                // same reason as the amounts below — see the note in
+                // verdict_trade_breakdown_widget.dart
+                color: palette.onWindow ?? dialBrassLight,
               ),
             ),
           ),
@@ -613,7 +615,7 @@ class _Row extends StatelessWidget {
             value,
             palette,
             interNums(fontSize: 15, fontWeight: FontWeight.w700),
-            fallbackColor: dialBrassLight,
+            fallbackColor: palette.onWindow ?? dialBrassLight,
           ),
         ],
       ),
@@ -807,7 +809,7 @@ class _TradeRow extends ConsumerWidget {
                 formatUsd(totalValue),
                 palette,
                 interNums(fontSize: 14, fontWeight: FontWeight.w700),
-                fallbackColor: dialBrassLight,
+                fallbackColor: palette.onWindow ?? dialBrassLight,
               ),
               const SizedBox(height: 3),
               Container(
@@ -848,8 +850,7 @@ class _TradeBreakdownDisclaimer extends StatelessWidget {
     // it, 2026-09-05) — readable regardless of backdrop in both themes
     // without needing the "always-dark panel" gating this file's other
     // elements require.
-    final disclaimerColor =
-        resolveDisclaimerColor(palette);
+    final disclaimerColor = resolveDisclaimerColor(palette);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: Column(

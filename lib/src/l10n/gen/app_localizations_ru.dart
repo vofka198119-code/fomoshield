@@ -338,7 +338,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homeReset => 'Сбросить';
 
   @override
-  String get homeWidgetShieldSignal => 'Сигнал рынка';
+  String get homeWidgetShieldSignal => 'Обзор рынка';
 
   @override
   String get homeWidgetWatchlist => 'Список наблюдения';
@@ -353,7 +353,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get commonLoading => 'Загрузка...';
 
   @override
-  String get shieldSignalTitle => 'СИГНАЛ РЫНКА';
+  String get shieldSignalTitle => 'ОБЗОР РЫНКА';
 
   @override
   String get shieldSignalChange => 'ИЗМЕНЕНИЕ';

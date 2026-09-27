@@ -98,11 +98,14 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
                 themedGoldGradient(
                   Text(
                     l10n.verdictTradeBreakdownTitle,
-                    style: FomoShieldTheme.cardTitle(palette.onWindow ?? Colors.white).copyWith(
-                      shadows: palette.titleShadow != null
-                          ? [palette.titleShadow!]
-                          : null,
-                    ),
+                    style:
+                        FomoShieldTheme.cardTitle(
+                          palette.onWindow ?? Colors.white,
+                        ).copyWith(
+                          shadows: palette.titleShadow != null
+                              ? [palette.titleShadow!]
+                              : null,
+                        ),
                   ),
                   palette,
                 ),
@@ -112,7 +115,9 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.chevron_right_rounded,
-                    color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.6),
+                    color: (palette.onWindow ?? Colors.white).withValues(
+                      alpha: 0.6,
+                    ),
                     size: 22,
                   ),
                 ),
@@ -125,7 +130,9 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
                   height: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12),
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.12,
+                  ),
                 ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 16, 22, 18),
@@ -157,7 +164,11 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
           ? null
           : BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.12)),
+                bottom: BorderSide(
+                  color: (palette.onWindow ?? Colors.white).withValues(
+                    alpha: 0.12,
+                  ),
+                ),
               ),
             ),
       child: Row(
@@ -178,7 +189,15 @@ class VerdictTradeBreakdownWidget extends StatelessWidget {
             value,
             palette,
             interNums(fontSize: 15, fontWeight: FontWeight.w700),
-            fallbackColor: dialBrassLight,
+            // dialBrassLight is Market Clock's brass and it is correct ONLY on a dark
+            // instrument panel. _DarkCard follows palette.windowGradient, which is LIGHT
+            // under Black & White, so the brass landed on a white card at about 1.7:1 and
+            // read as an ugly yellow (user-reported 2026-09-27). Falling back through
+            // palette.onWindow first gives each theme the colour the rest of this card's
+            // text already uses; brass stays for the themes that leave onWindow unset and
+            // therefore really do have a dark panel here (Standard, Luxury Gold,
+            // Midnight Sea).
+            fallbackColor: palette.onWindow ?? dialBrassLight,
           ),
         ],
       ),
