@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_palette.dart';
+import 'theme_v2.dart';
 import 'luxury_gold_theme.dart';
 import 'themed_border.dart';
 
@@ -75,6 +76,30 @@ Color themedDarkCtaContentColor(AppPalette palette) {
   if (palette.windowGradient == null) return Colors.white;
   return palette.onButton ?? palette.onWindow ?? palette.textHeader;
 }
+
+// ---------------------------------------------------------------------------
+// Label colour for a button filled with a THEME-DEPENDENT colour.
+//
+// Hardcoding `foregroundColor: Colors.white` over a palette accent is a trap,
+// because some themes' accents are light: Graphite's accentPrimary is
+// literally `Colors.white`, so a white label on it renders at 1.00:1 and is
+// invisible (two live reports, 2026-09-27 and 2026-09-28). Deriving the label
+// from the fill fixes every theme at once instead of special-casing one.
+//
+// Measured on the real fills: near-black accents keep white at ~19.6:1 and
+// the brand green at ~7.9:1, while the gold (#D4AF37) goes from 2.1:1 white
+// to 7.8:1 near-black and Midnight Sea's teal from 2.5:1 to 6.5:1 — which
+// also matches what premiumCtaContentColor below does on gold.
+//
+// Only for FILLS. Accent-coloured text or icons sitting on a card background
+// are a different question and must not go through here.
+// ---------------------------------------------------------------------------
+
+/// White on a dark fill, near-black on a light one.
+Color labelColorOn(Color fill) =>
+    ThemeData.estimateBrightnessForColor(fill) == Brightness.dark
+    ? Colors.white
+    : ThemeV2.textPrimary;
 
 // ---------------------------------------------------------------------------
 // "Go Premium" CTA fill — the buttons that actually sell the subscription

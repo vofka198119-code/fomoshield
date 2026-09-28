@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/theme/themed_button.dart';
 import '../../features/monetization/monetization_modal.dart';
 
 // ---------------------------------------------------------------------------
@@ -74,7 +75,9 @@ Future<bool?> showAdOrPremiumSheet(
                 onPressed: () => Navigator.pop(ctx, true),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: palette.accentPrimary,
-                  foregroundColor: Colors.white,
+                  // Not Colors.white: Graphite's accentPrimary IS white — see
+                  // labelColorOn.
+                  foregroundColor: labelColorOn(palette.accentPrimary),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),

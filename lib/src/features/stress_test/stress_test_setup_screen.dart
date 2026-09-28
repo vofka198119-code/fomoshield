@@ -1264,7 +1264,9 @@ class _RiskDisclaimerModalState extends State<_RiskDisclaimerModal> {
                         backgroundColor: _hasScrolledToBottom || isFreeInfinite
                             ? _accentColor
                             : widget.palette.textBody.withValues(alpha: 0.3),
-                        foregroundColor: Colors.white,
+                        // Enabled only when the fill above is _accentColor,
+                        // so that is what the label has to contrast with.
+                        foregroundColor: labelColorOn(_accentColor),
                         // Was textBody@0.2 fill + hardcoded white38 text —
                         // tuned assuming an always-dark card, so it inverted
                         // into a near-white button with near-invisible
