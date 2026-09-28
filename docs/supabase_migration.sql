@@ -1,4 +1,53 @@
 -- =============================================================================
+-- GRANTS ARE MANDATORY FOR EVERY TABLE CREATED FROM 2026-10-30
+--
+-- Supabase stops auto-granting Data API access to new tables in schema
+-- `public` on 2026-10-30 (announced by email 2026-09-23). Tables that already
+-- existed keep their grants forever: all 17 live tables were audited on
+-- 2026-09-28 and every one holds anon/authenticated/service_role, so nothing
+-- in this file needs backfilling for the production project.
+--
+-- It bites on two things only: tables created from now on, and any FRESH
+-- apply of this file — a new project, a preview branch, or `supabase db
+-- reset`. A table created without grants is invisible to supabase-js,
+-- PostgREST and GraphQL, and all you get back is "permission denied".
+--
+-- So every CREATE TABLE in this repo now carries its grants in the SAME
+-- migration. The block reproduces exactly what Supabase used to hand out
+-- automatically, which is why a fresh apply behaves identically to the live
+-- project:
+--
+--     GRANT ALL ON TABLE public.<table> TO anon, authenticated, service_role;
+--
+-- Access is enforced by RLS, not by these grants. Tighten a grant only as a
+-- deliberate, separately-tested decision — never as tidying, or a fresh
+-- project silently stops matching production.
+--
+-- NEVER drop service_role from the block. service_role bypasses RLS; it does
+-- NOT bypass table privileges. A backend-only table with RLS on and no
+-- policies (subscription_purchases is exactly that) still needs its
+-- service_role grant, or scanco-backend starts failing silently on renewals.
+--
+-- MIGRATION NUMBERING — read before adding one
+-- 001-012  this file, identical on master and feature/etf-fund-emulation.
+-- 013-018  the ETF branch's own — docs/migration_013_018_etf_phases_1_3.sql
+--          on feature/etf-fund-emulation. They used to be appended to the
+--          bottom of THIS file, which is what caused the collision below.
+-- 019      subscription_purchases — docs/migration_019_subscription_purchases.sql
+--          on master. It was numbered "013*" inside this file until
+--          2026-09-28, which collided head-on with the ETF branch's 013
+--          (funds/fund_holdings/fund_nav_snapshots) at the same line of the
+--          same file. Renumbered and moved to its own file so the two
+--          branches merge with no conflict here. Do not reuse 013.
+-- 020-029  separate docs/migration_0NN_*.sql files on the ETF branch.
+-- Next free number: 030. Give it its own file — never append here.
+--
+-- KNOWN DRIFT: public.employment_history is live but has NO migration anywhere
+-- in this repo — it was applied straight from the SQL Editor. Dump its DDL and
+-- add it here before anyone brings up a fresh project from these files.
+-- =============================================================================
+
+-- =============================================================================
 -- F.O.M.O. Shield — Supabase Migration 002
 -- Table: user_data
 -- Description: Stores all user data (portfolios, watchlist, widget settings)
@@ -25,6 +74,11 @@ CREATE TABLE IF NOT EXISTS public.user_data (
 );
 
 ALTER TABLE public.user_data ENABLE ROW LEVEL SECURITY;
+
+-- Data API grants. Mandatory for tables created from 2026-10-30 (see the
+-- header of docs/supabase_migration.sql). Reproduces the default Supabase
+-- used to apply automatically; RLS is what actually restricts access.
+GRANT ALL ON TABLE public.user_data TO anon, authenticated, service_role;
 
 DROP POLICY IF EXISTS "user_data_select_own" ON public.user_data;
 CREATE POLICY "user_data_select_own"
@@ -97,6 +151,11 @@ CREATE TABLE IF NOT EXISTS public.users (
 
 -- 2. Enable Row-Level Security
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+-- Data API grants. Mandatory for tables created from 2026-10-30 (see the
+-- header of docs/supabase_migration.sql). Reproduces the default Supabase
+-- used to apply automatically; RLS is what actually restricts access.
+GRANT ALL ON TABLE public.users TO anon, authenticated, service_role;
 
 -- 3. RLS policies (idempotent — safe to run multiple times)
 
@@ -396,6 +455,11 @@ CREATE TABLE IF NOT EXISTS public.company_encyclopedia (
 
 ALTER TABLE public.company_encyclopedia ENABLE ROW LEVEL SECURITY;
 
+-- Data API grants. Mandatory for tables created from 2026-10-30 (see the
+-- header of docs/supabase_migration.sql). Reproduces the default Supabase
+-- used to apply automatically; RLS is what actually restricts access.
+GRANT ALL ON TABLE public.company_encyclopedia TO anon, authenticated, service_role;
+
 DROP POLICY IF EXISTS "company_encyclopedia_select_authenticated" ON public.company_encyclopedia;
 CREATE POLICY "company_encyclopedia_select_authenticated"
     ON public.company_encyclopedia
@@ -505,38 +569,13 @@ CREATE OR REPLACE TRIGGER guard_user_data_sanity_ceiling_trigger
     EXECUTE FUNCTION public.guard_user_data_sanity_ceiling();
 
 -- =============================================================================
--- F.O.M.O. Shield — Supabase Migration 013*
--- Table: subscription_purchases (NEW)
--- Description: Real Google Play Billing subscriptions (2026-09-20 session).
---              Tracks which Supabase user owns each Play purchase token, so
---              the RTDN webhook (scanco-backend's routes/playRtdn.js) can
---              resync subscription_tier/subscription_expires_at on renewal/
---              cancel/refund events, when all Google's push gives us is the
---              token — not our user id. Written by the backend only
---              (service_role, via services/playBilling.js's
---              syncSubscriptionForUser); the app never reads or writes this
---              table directly, so no RLS policy is needed. Same
---              subscription_tier/subscription_expires_at columns this writes
---              into are the ones Migration 008 already locks down against
---              direct client writes.
+-- END OF THE SHARED MIGRATIONS (001-012).
+-- This file is byte-identical on master and on feature/etf-fund-emulation, on
+-- purpose — that is what lets the two copies merge without a conflict. Keep it
+-- that way: a change up here goes to BOTH branches, byte for byte.
 --
---              * NOTE: this doc file's own numbering was last kept current at
---              Migration 012 — several migrations since (e.g. the nickname
---              system, Migration 017) were applied straight from chat to
---              Supabase's SQL Editor without ever being appended here. Check
---              what's actually live in Supabase before assuming "013" is the
---              real next number; the number itself doesn't matter, only that
---              this table + comment get applied once.
+-- Nothing gets appended below this line, ever again. Everything numbered 013
+-- and up lives in its own docs/migration_0NN_*.sql file, on whichever branch
+-- owns it. Appending to this file is exactly the habit that produced two
+-- different migrations both numbered 013, on a collision course for the merge.
 -- =============================================================================
-CREATE TABLE IF NOT EXISTS public.subscription_purchases (
-    purchase_token text PRIMARY KEY,
-    user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-    product_id text NOT NULL,
-    base_plan_id text NOT NULL,
-    subscription_state text,
-    updated_at timestamptz NOT NULL DEFAULT now()
-);
-
-ALTER TABLE public.subscription_purchases ENABLE ROW LEVEL SECURITY;
--- No policies — service_role (used exclusively by scanco-backend) bypasses
--- RLS entirely, and the app itself never queries this table.
