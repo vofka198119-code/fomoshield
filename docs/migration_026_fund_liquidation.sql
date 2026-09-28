@@ -33,6 +33,11 @@ CREATE INDEX fund_liquidation_payouts_user_unclaimed_idx
 
 ALTER TABLE public.fund_liquidation_payouts ENABLE ROW LEVEL SECURITY;
 
+-- Data API grants. Mandatory for tables created from 2026-10-30 (see the
+-- header of docs/supabase_migration.sql). Reproduces the default Supabase
+-- used to apply automatically; RLS is what actually restricts access.
+GRANT ALL ON TABLE public.fund_liquidation_payouts TO anon, authenticated, service_role;
+
 -- Same shape as funds' own RLS (docs/supabase_migration.sql:530) -- only
 -- service_role (the backend) writes; a signed-in user can read their own
 -- rows straight from Supabase if ever needed, but today's client only

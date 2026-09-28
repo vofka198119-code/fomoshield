@@ -27,6 +27,17 @@ CREATE TABLE fund_trade_proposals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Data API grants. Mandatory for tables created from 2026-10-30 (see the
+-- header of docs/supabase_migration.sql). Reproduces the default Supabase
+-- used to apply automatically; RLS is what actually restricts access.
+GRANT ALL ON TABLE public.fund_trade_proposals TO anon, authenticated, service_role;
+
+-- NOTE: this table shipped WITHOUT row level security, the only one in the
+-- project that did, so the grants above left it wide open to any client
+-- holding the publishable key. Migration 029 enables RLS and closes it.
+-- Do not "fix" it by narrowing the grants instead — that would diverge this
+-- file from what is actually live.
+
 CREATE INDEX fund_trade_proposals_fund_id_idx ON fund_trade_proposals (fund_id);
 CREATE INDEX fund_trade_proposals_proposer_idx ON fund_trade_proposals (proposer_user_id);
 

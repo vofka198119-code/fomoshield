@@ -39,7 +39,17 @@ CREATE TABLE public.fund_succession_acceptances (
 );
 
 ALTER TABLE public.fund_succession_offers ENABLE ROW LEVEL SECURITY;
+
+-- Data API grants. Mandatory for tables created from 2026-10-30 (see the
+-- header of docs/supabase_migration.sql). Reproduces the default Supabase
+-- used to apply automatically; RLS is what actually restricts access.
+GRANT ALL ON TABLE public.fund_succession_offers TO anon, authenticated, service_role;
 ALTER TABLE public.fund_succession_acceptances ENABLE ROW LEVEL SECURITY;
+
+-- Data API grants. Mandatory for tables created from 2026-10-30 (see the
+-- header of docs/supabase_migration.sql). Reproduces the default Supabase
+-- used to apply automatically; RLS is what actually restricts access.
+GRANT ALL ON TABLE public.fund_succession_acceptances TO anon, authenticated, service_role;
 
 -- Same trust model as funds/fund_liquidation_payouts: only service_role
 -- (the backend) writes; a signed-in user can read rows that involve their
