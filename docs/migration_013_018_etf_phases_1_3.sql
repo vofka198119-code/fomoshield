@@ -12,7 +12,7 @@
 -- production.
 --
 -- Migrations 019 (master), 020-028 and 029 each live in their own
--- docs/migration_0NN_*.sql file. Next free number: 030.
+-- docs/migration_0NN_*.sql file. Next free number: 031.
 -- =============================================================================
 
 -- =============================================================================
@@ -501,5 +501,5 @@ CREATE UNIQUE INDEX users_nickname_unique_idx
 -- docs/migration_019_subscription_purchases.sql on master (it used to be
 -- "013*" in this file, colliding with the 013 above; see the file header).
 -- 020-028 are separate docs/migration_0NN_*.sql files on this branch.
--- Next free number is 030, and every new table needs its GRANT block.
+-- Next free number is 031, and every new table needs its GRANT block.
 -- =============================================================================

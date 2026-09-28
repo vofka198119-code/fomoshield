@@ -39,12 +39,15 @@
 --          (funds/fund_holdings/fund_nav_snapshots) at the same line of the
 --          same file. Renumbered and moved to its own file so the two
 --          branches merge with no conflict here. Do not reuse 013.
--- 020-029  separate docs/migration_0NN_*.sql files on the ETF branch.
--- Next free number: 030. Give it its own file — never append here.
+-- 020-030  separate docs/migration_0NN_*.sql files on the ETF branch.
+-- Next free number: 031. Give it its own file — never append here.
 --
--- KNOWN DRIFT: public.employment_history is live but has NO migration anywhere
--- in this repo — it was applied straight from the SQL Editor. Dump its DDL and
--- add it here before anyone brings up a fresh project from these files.
+-- RESOLVED 2026-09-28: public.employment_history was live with NO migration
+-- anywhere in this repo — created straight from the SQL Editor, DDL lost. It is
+-- now reconstructed from the live schema in
+-- docs/migration_030_employment_history.sql on feature/etf-fund-emulation (the
+-- branch that owns the hiring feature). With it, all 17 live tables are
+-- accounted for and a fresh project comes up complete.
 -- =============================================================================
 
 -- =============================================================================
