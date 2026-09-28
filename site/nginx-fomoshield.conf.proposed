@@ -1,43 +1,68 @@
 # Proposed replacement for /etc/nginx/sites-enabled/fomoshield-app.
+# Revised 2026-09-28 after a security pass over the live site.
 #
-# Only two things change from the live config (saved next to this file as
-# nginx-fomoshield.conf.current, pulled 2026-09-27):
+# Changes from the version deployed on 2026-09-27
+# (kept as nginx-fomoshield.conf.current):
 #
-#   1. `location = /` now serves the landing page. It is an exact-match
-#      location, so the catch-all `location / { return 404; }` below still
-#      404s every other unknown path exactly as it does today.
-#   2. `location /assets/` serves the landing page's CSS, JS and images.
-#      Without it those requests fall through to the catch-all and 404 —
-#      which is why dropping index.html in alone would render an unstyled,
-#      image-less page.
+#   1. Security headers. The site previously sent none at all. Note the nginx
+#      inheritance rule this depends on: add_header is inherited by a location
+#      ONLY while that location declares no add_header of its own — none of
+#      the locations below do, so all of them inherit. Adding one add_header
+#      to any location later silently drops every header here from it.
 #
-# The four legal-page locations are untouched, byte for byte.
+#   2. The legal pages moved from four prefix locations to one regex. The
+#      prefix form meant /privacyANYTHING also served the privacy page, so the
+#      same document answered on unlimited URLs. The regex accepts the exact
+#      path with an optional trailing slash and nothing else. Both forms the
+#      app links to (/privacy, /terms, /premium — no trailing slash) still
+#      work, and so does the trailing-slash form that worked before.
+#
+#   3. charset utf-8, so Content-Type carries it instead of relying on each
+#      page's own meta tag.
+#
+# server_tokens is NOT set here on purpose — it is uncommented in
+# /etc/nginx/nginx.conf instead, so the backend's own server blocks stop
+# advertising the nginx version too, not just this one.
 
 server {
     server_name fomoshield.app www.fomoshield.app;
     root /var/www/fomoshield-app;
 
+    charset utf-8;
+
+    # HTTPS only from here on. Deliberately without includeSubDomains: the
+    # certificate covers fomoshield.app and www.fomoshield.app, and committing
+    # every future subdomain to HTTPS sight unseen is a promise this file
+    # cannot keep for infrastructure that does not exist yet.
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+
+    # Everything the site needs now comes from this origin: the fonts were
+    # moved off Google's CDN on 2026-09-28. 'unsafe-inline' is required for
+    # STYLES only, because the four legal pages each carry a single inline
+    # <style> block and the landing page has two inline style attributes.
+    # Scripts stay strict — i18n.js is an external file and the legal pages
+    # run no script at all.
+    add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" always;
+
     location = / {
         try_files /index.html =404;
     }
+
     location /assets/ {
         try_files $uri =404;
         expires 7d;
         access_log off;
     }
 
-    location /privacy {
-        try_files /privacy/index.html =404;
+    location ~ ^/(privacy|terms|premium|delete-account)/?$ {
+        try_files /$1/index.html =404;
     }
-    location /terms {
-        try_files /terms/index.html =404;
-    }
-    location /delete-account {
-        try_files /delete-account/index.html =404;
-    }
-    location /premium {
-        try_files /premium/index.html =404;
-    }
+
     location / {
         return 404;
     }
