@@ -1,6 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../supabase/supabase_providers.dart' show currentUserProvider;
+import '../supabase/supabase_providers.dart'
+    show
+        currentUserProvider,
+        subscriptionTierProvider,
+        subscriptionTierResolvedProvider,
+        SubscriptionTierAccess;
 
 // ---------------------------------------------------------------------------
 // App theme variant — mirrors language_provider.dart's shape, but keyed
@@ -21,6 +26,16 @@ enum AppThemeVariant { standard, luxuryGold, blackWhite, graphite, midnightSea }
 class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
   final Ref _ref;
   bool _hasExplicitChoice = false;
+
+  /// What this account actually PICKED, as opposed to what is on screen.
+  /// The two diverge while the subscription is lapsed: every non-standard
+  /// theme is a paid feature, so [_publish] shows Standard instead — but the
+  /// pick is never erased from SharedPreferences, so resuming Premium brings
+  /// the account's own theme straight back with no action from the user.
+  /// Before this existed the applied theme simply survived expiry forever,
+  /// which is how a lapsed account could still be sitting in Graphite
+  /// (found during an end-of-term audit, 2026-09-28).
+  AppThemeVariant _choice = AppThemeVariant.standard;
 
   /// True from [resetToStandardForSignOut] until the next [restoreFromPrefs]
   /// — blocks [applyAdminDefaultIfUnset] for that whole window. Without
@@ -46,6 +61,25 @@ class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
 
   ThemeVariantNotifier(this._ref) : super(AppThemeVariant.standard) {
     _pendingLoad = _load();
+    // Re-publish whenever the tier changes OR merely becomes known: a user
+    // who is genuinely free produces no CHANGE in the tier value (free ->
+    // free), only a change in whether that free is trustworthy yet, so
+    // listening to the tier alone would miss exactly the downgrade case.
+    _ref.listen(subscriptionTierProvider, (_, _) => _publish());
+    _ref.listen(subscriptionTierResolvedProvider, (_, _) => _publish());
+  }
+
+  /// Pushes [_choice] to the screen, gated on the subscription.
+  ///
+  /// While the tier is still unknown the choice is shown as-is. Downgrading
+  /// on an unresolved tier would flash a paying user back to Standard on
+  /// every cold start, because the tier reads free until the DB answers —
+  /// see [subscriptionTierResolvedProvider].
+  void _publish() {
+    if (_signedOut) return;
+    final resolved = _ref.read(subscriptionTierResolvedProvider);
+    final entitled = _ref.read(subscriptionTierProvider).isPremiumOrAdmin;
+    state = (!resolved || entitled) ? _choice : AppThemeVariant.standard;
   }
 
   /// Scoped to whichever account is signed in RIGHT NOW — read fresh every
@@ -62,7 +96,8 @@ class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
     final name = prefs.getString(_prefsKey);
     final match = AppThemeVariant.values.where((v) => v.name == name);
     _hasExplicitChoice = match.isNotEmpty;
-    if (match.isNotEmpty) state = match.first;
+    if (match.isNotEmpty) _choice = match.first;
+    _publish();
   }
 
   Future<void> _load() async {
@@ -71,7 +106,8 @@ class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
   }
 
   Future<void> setVariant(AppThemeVariant variant) async {
-    state = variant;
+    _choice = variant;
+    _publish();
     _hasExplicitChoice = true;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefsKey, variant.name);
@@ -87,7 +123,8 @@ class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
     if (_signedOut) return;
     await _pendingLoad;
     if (_signedOut || _hasExplicitChoice) return;
-    state = AppThemeVariant.luxuryGold;
+    _choice = AppThemeVariant.luxuryGold;
+    _publish();
   }
 
   /// Forces the in-memory theme back to Standard on sign-out — signed-out
@@ -99,6 +136,7 @@ class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
   /// account is signed in right now to own that flag; [restoreFromPrefs]
   /// re-derives both for whichever account signs in next.
   void resetToStandardForSignOut() {
+    _choice = AppThemeVariant.standard;
     state = AppThemeVariant.standard;
     _signedOut = true;
   }
@@ -110,6 +148,7 @@ class ThemeVariantNotifier extends StateNotifier<AppThemeVariant> {
   /// account has never explicitly picked one.
   Future<void> restoreFromPrefs() async {
     _signedOut = false;
+    _choice = AppThemeVariant.standard;
     state = AppThemeVariant.standard;
     _hasExplicitChoice = false;
     _pendingLoad = _load();

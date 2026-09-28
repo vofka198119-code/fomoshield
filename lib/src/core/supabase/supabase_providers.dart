@@ -97,6 +97,25 @@ final subscriptionTierProvider = Provider<SubscriptionTier>((ref) {
   return SubscriptionTier.free;
 });
 
+/// True once the tier is actually KNOWN, as opposed to merely defaulting.
+///
+/// [subscriptionTierProvider] reports `free` while the DB fetch behind it is
+/// still in flight (see [_premiumLoaderProvider]), which is harmless for
+/// anything that GRANTS on premium — it just re-renders once the real tier
+/// lands. It is not harmless for anything that TAKES SOMETHING AWAY on a
+/// free reading: acting on that early free would punish a paying user for
+/// the length of a network round-trip on every cold start. Gate any such
+/// downgrade on this provider first.
+final subscriptionTierResolvedProvider = Provider<bool>((ref) {
+  final user = ref.watch(currentUserProvider);
+  // Signed out: free is the final answer, nothing is pending.
+  if (user == null) return true;
+  // Admin is decided synchronously from the email, no fetch involved.
+  if (user.email == adminEmail) return true;
+  ref.watch(_premiumLoaderProvider);
+  return ref.watch(_dbSubscriptionTierProvider) != null;
+});
+
 /// True if the current user is an admin (matches hardcoded admin email).
 final isAdminProvider = Provider<bool>((ref) {
   final user = ref.watch(currentUserProvider);
