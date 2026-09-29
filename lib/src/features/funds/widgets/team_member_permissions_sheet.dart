@@ -317,7 +317,7 @@ class _PermissionsSheetState extends ConsumerState<_PermissionsSheet> {
                   : Text(
                       l10n.etfPermissionsSaveButton,
                       style: GoogleFonts.inter(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: contentColor,
                       ),

@@ -266,7 +266,7 @@ class _FundEditScreenState extends ConsumerState<FundEditScreen> {
                   : Text(
                       l10n.etfFundEditSaveButton,
                       style: GoogleFonts.inter(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: contentColor,
                       ),

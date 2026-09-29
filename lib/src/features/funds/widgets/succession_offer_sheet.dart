@@ -247,7 +247,7 @@ class _SuccessionOfferSheetState extends ConsumerState<_SuccessionOfferSheet> {
                           ? l10n.etfSuccessionAcceptButton
                           : l10n.etfSuccessionPremiumRequiredButton,
                       style: GoogleFonts.inter(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: contentColor,
                       ),
