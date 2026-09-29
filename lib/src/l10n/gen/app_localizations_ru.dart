@@ -7379,6 +7379,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Отменить увольнение';
 
   @override
+  String get etfFundEditTitle => 'РЕДАКТИРОВАТЬ ФОНД';
+
+  @override
+  String get etfFundEditShortcutLabel => 'Изменить';
+
+  @override
+  String get etfFundEditSaveButton => 'Сохранить изменения';
+
+  @override
+  String get etfFundEditSavedSnackbar => 'Изменения сохранены';
+
+  @override
+  String get etfFundEditTooLongError =>
+      'Слишком длинный текст — сократи и попробуй снова';
+
+  @override
+  String get etfFundEditGenericError => 'Не удалось сохранить изменения';
+
+  @override
   String get etfRulebookSuccessionSectionHeader => 'Если глава пропал';
 
   @override

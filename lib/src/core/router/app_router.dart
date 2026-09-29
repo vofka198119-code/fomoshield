@@ -70,6 +70,7 @@ import '../../features/funds/screens/fund_management_screen.dart';
 import '../../features/funds/screens/fund_team_screen.dart';
 import '../../features/funds/screens/fund_blotter_screen.dart';
 import '../../features/funds/screens/fund_charts_screen.dart';
+import '../../features/funds/screens/fund_edit_screen.dart';
 import '../../features/funds/screens/fund_investors_screen.dart';
 import '../../features/funds/screens/fund_trade_entry_screen.dart';
 import '../../features/funds/screens/fund_search_screen.dart';
@@ -603,6 +604,14 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return FundInvestorsScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/edit',
+        name: 'fundEdit',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundEditScreen(fundId: id);
         },
       ),
       GoRoute(

@@ -12583,6 +12583,42 @@ abstract class AppLocalizations {
   /// **'Cancel Removal'**
   String get etfTeamMemberCancelTerminationButton;
 
+  /// No description provided for @etfFundEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EDIT FUND'**
+  String get etfFundEditTitle;
+
+  /// No description provided for @etfFundEditShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get etfFundEditShortcutLabel;
+
+  /// No description provided for @etfFundEditSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get etfFundEditSaveButton;
+
+  /// No description provided for @etfFundEditSavedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved'**
+  String get etfFundEditSavedSnackbar;
+
+  /// No description provided for @etfFundEditTooLongError.
+  ///
+  /// In en, this message translates to:
+  /// **'That text is too long — shorten it and try again'**
+  String get etfFundEditTooLongError;
+
+  /// No description provided for @etfFundEditGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the changes'**
+  String get etfFundEditGenericError;
+
   /// No description provided for @etfRulebookSuccessionSectionHeader.
   ///
   /// In en, this message translates to:

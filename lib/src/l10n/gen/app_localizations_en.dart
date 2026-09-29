@@ -7354,6 +7354,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Cancel Removal';
 
   @override
+  String get etfFundEditTitle => 'EDIT FUND';
+
+  @override
+  String get etfFundEditShortcutLabel => 'Edit';
+
+  @override
+  String get etfFundEditSaveButton => 'Save changes';
+
+  @override
+  String get etfFundEditSavedSnackbar => 'Changes saved';
+
+  @override
+  String get etfFundEditTooLongError =>
+      'That text is too long — shorten it and try again';
+
+  @override
+  String get etfFundEditGenericError => 'Could not save the changes';
+
+  @override
   String get etfRulebookSuccessionSectionHeader => 'If the head disappears';
 
   @override

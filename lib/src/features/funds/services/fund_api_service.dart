@@ -152,6 +152,37 @@ class FundApiService {
 
   /// Admin-only dev tool — no other UI calls this yet. Head-only
   /// server-side (checked by head_user_id, same as [deleteFund]).
+  /// Edits a fund's descriptive fields. Each is optional — an omitted one
+  /// is left untouched server-side, so a caller may save just the field
+  /// the user changed. Name, ticker and starting capital are NOT editable
+  /// here: the name has renameFund (uniqueness checks), and the other two
+  /// are deliberately immutable (see updateFundDetails in the backend's
+  /// fundService.js for why).
+  Future<void> updateFundDetails(
+    String id, {
+    String? description,
+    String? strategy,
+    List<String>? sectors,
+  }) async {
+    try {
+      await _dio.patch(
+        '/funds/$id/details',
+        data: {
+          'description': ?description,
+          'strategy': ?strategy,
+          'sectors': ?sectors,
+        },
+      );
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map ? data['code'] as String? : null;
+      throw FundApiException(
+        _errorMessage(e, 'Failed to update fund'),
+        code: code,
+      );
+    }
+  }
+
   Future<void> renameFund(String id, String name) async {
     try {
       await _dio.patch('/funds/$id', data: {'name': name});

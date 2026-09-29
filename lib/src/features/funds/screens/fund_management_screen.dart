@@ -229,6 +229,17 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                             extra: {'fundName': fund.name},
                           ),
                         ),
+                      // Head only: editing a fund's description/strategy/
+                      // sectors is ownership, not a delegated permission —
+                      // unlike Trading above, no role template grants it.
+                      // The name is edited from the ⋮ rename dialog instead
+                      // (it has uniqueness checks these fields don't).
+                      if (isHead)
+                        CircleShortcut(
+                          icon: Icons.edit_rounded,
+                          label: l10n.etfFundEditShortcutLabel,
+                          onTap: () => context.push('/funds/${fund.id}/edit'),
+                        ),
                       // Always last, regardless of whether Trading shows
                       // above it (2026-09-15 ask).
                       CircleShortcut(

@@ -7,11 +7,11 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
-import '../../../core/theme/themed_border.dart';
 import '../../../core/theme/themed_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../providers/fund_providers.dart';
 import '../sector_labels.dart';
+import '../widgets/fund_form_fields.dart';
 import '../services/fund_api_service.dart';
 
 // ---------------------------------------------------------------------------
@@ -197,80 +197,22 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
     }
   }
 
-  // A real header above each field, not a floating labelText shrunk into
-  // the field itself — the small floating label read as unclear/hard to
-  // read at a glance (found live 2026-09-08). Same weight/size as the
-  // Sectors section's own label further down, so every field in this form
-  // now shares one header style.
-  Widget _fieldHeader(AppPalette palette, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text,
-        style: GoogleFonts.inter(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: palette.textHeader,
-        ),
-      ),
-    );
-  }
+  // The four helpers below moved to widgets/fund_form_fields.dart on
+  // 2026-09-29 so the fund EDIT form shares them rather than growing a
+  // hand-made copy that would drift. Kept as thin delegates so every call
+  // site in this 600-line form stays untouched — the implementations, and
+  // the device-found fixes documented on them, now live in one place.
+  Widget _fieldHeader(AppPalette palette, String text) =>
+      fundFieldHeader(palette, text);
 
-  // filled: false is required here — the app-wide InputDecorationTheme
-  // (theme_v2.dart) defaults every text field to filled:true with an
-  // opaque WHITE fillColor. Without this override, that white fill paints
-  // straight over _fieldWrapper's own themed Container background,
-  // making every field look flat white regardless of theme (found live
-  // 2026-09-06 on Luxury Gold — fields looked "very white").
-  InputDecoration _decoration(AppPalette palette, {String? hint}) {
-    return InputDecoration(
-      filled: false,
-      hintText: hint,
-      hintStyle: GoogleFonts.inter(
-        color: palette.textHeader.withValues(alpha: 0.5),
-        fontSize: 13,
-      ),
-      border: InputBorder.none,
-      enabledBorder: InputBorder.none,
-      focusedBorder: InputBorder.none,
-    );
-  }
+  InputDecoration _decoration(AppPalette palette, {String? hint}) =>
+      fundFieldDecoration(palette, hint: hint);
 
-  // hasError draws a plain red border instead of the theme's gradient one —
-  // TextFormField's OWN border is intentionally InputBorder.none in every
-  // state (see _decoration above, so the themed Container below is the only
-  // border anyone sees), which means Flutter's usual automatic red
-  // error-border never had anywhere to paint. Without this override, a
-  // server-side error (e.g. name taken) only ever showed as red helper text
-  // underneath with no visible highlight on the field itself — the app
-  // convention "как в приложениях" of highlighting the invalid field
-  // outright (found live 2026-09-06).
   Widget _fieldWrapper(
     AppPalette palette,
     Widget child, {
     bool hasError = false,
-  }) {
-    final content = Container(
-      decoration: BoxDecoration(
-        gradient: palette.windowGradient,
-        color: palette.windowGradient == null ? palette.card : null,
-        borderRadius: ThemeV2.borderRadiusMedium,
-        border: hasError ? Border.all(color: ThemeV2.loss, width: 1.5) : null,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-      child: child,
-    );
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: hasError
-          ? content
-          : themedBorder(
-              palette: palette,
-              borderRadius: ThemeV2.borderRadiusMedium,
-              child: content,
-            ),
-    );
-  }
+  }) => fundFieldWrapper(palette, child, hasError: hasError);
 
   // Back should feel soft, not abrupt: if the keyboard is open, the first
   // back press only dismisses it — a second press (keyboard already
@@ -585,10 +527,11 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
   }
 
   Widget _sectorChip(AppPalette palette, AppLocalizations l10n, String code) {
-    final selected = _selectedSectors.contains(code);
-    return FilterChip(
-      label: Text(sectorLabel(l10n, code)),
-      selected: selected,
+    return fundSectorChip(
+      palette: palette,
+      l10n: l10n,
+      code: code,
+      selected: _selectedSectors.contains(code),
       onSelected: (value) {
         setState(() {
           if (value) {
@@ -598,15 +541,6 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
           }
         });
       },
-      selectedColor: palette.accentPrimary.withValues(alpha: 0.2),
-      checkmarkColor: palette.accentPrimary,
-      labelStyle: GoogleFonts.inter(
-        fontSize: 12,
-        color: selected ? palette.accentPrimary : palette.textBody,
-        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-      ),
-      backgroundColor: palette.card,
-      side: BorderSide(color: palette.textBody.withValues(alpha: 0.2)),
     );
   }
 }
