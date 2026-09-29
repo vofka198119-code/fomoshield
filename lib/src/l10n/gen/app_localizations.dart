@@ -12688,7 +12688,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfRulebookSuccessionSectionBody.
   ///
   /// In en, this message translates to:
-  /// **'A fund is never left unmanaged. If its head hasn\'t opened the app for 60 days, the fund\'s employees are offered the management.\n\n1. The whole active team sees the offer, but only an employee with Premium can accept it.\n\n2. Accepting is an application, not an instant appointment. The team has 14 days to decide.\n\n3. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n4. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n5. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.'**
+  /// **'A fund is never left unmanaged. If its head stops opening the app, the fund is offered to its employees.\n\n1. Without Premium the head has about two months before that happens. With active Premium they have about half a year — a longer leash, not an unlimited one.\n\n2. The deputy gets first refusal: for the first few days the offer is theirs alone. If they don\'t take it, it opens to every employee with Premium.\n\n3. Accepting is an application, not an instant appointment — except for the deputy inside their own window, who takes the fund straight away. The team has 14 days in total.\n\n4. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n5. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n6. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.'**
   String get etfRulebookSuccessionSectionBody;
 
   /// No description provided for @etfSuccessionCardSubtitle.
@@ -12712,8 +12712,26 @@ abstract class AppLocalizations {
   /// No description provided for @etfSuccessionSheetIntro.
   ///
   /// In en, this message translates to:
-  /// **'This fund\'s head hasn\'t opened the app in a long time. Any active team member can step up.'**
+  /// **'This fund\'s head has been away a long time, so the fund is being offered to its team.'**
   String get etfSuccessionSheetIntro;
+
+  /// No description provided for @etfSuccessionRuleDeputyFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'The deputy gets first refusal. For the first few days the offer is theirs alone; if they don\'t take it, it opens to the rest of the team.'**
+  String get etfSuccessionRuleDeputyFirst;
+
+  /// No description provided for @etfSuccessionErrorDeputyFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'The fund\'s deputy has first refusal for now. If they pass, the offer opens to the whole team.'**
+  String get etfSuccessionErrorDeputyFirst;
+
+  /// No description provided for @etfSuccessionBecameHeadSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'You are now the head of this fund'**
+  String get etfSuccessionBecameHeadSnackbar;
 
   /// No description provided for @etfSuccessionRuleEnterRunning.
   ///
@@ -12724,13 +12742,13 @@ abstract class AppLocalizations {
   /// No description provided for @etfSuccessionRuleSeniorityWins.
   ///
   /// In en, this message translates to:
-  /// **'On the deadline, the fund goes to whoever has been on the team the longest among those who applied.'**
+  /// **'On the deadline the fund goes to whoever has been on the team the longest among those who applied — with the deputy still ahead of everyone.'**
   String get etfSuccessionRuleSeniorityWins;
 
   /// No description provided for @etfSuccessionRuleHeadMayReturn.
   ///
   /// In en, this message translates to:
-  /// **'If the current head opens the app before the deadline, the offer is cancelled and the fund stays theirs.'**
+  /// **'If the head opens the app before the deadline, the offer is cancelled and the fund stays theirs.'**
   String get etfSuccessionRuleHeadMayReturn;
 
   /// No description provided for @etfSuccessionRuleNobodyAccepts.

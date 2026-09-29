@@ -247,9 +247,20 @@ class EmployeeApiService {
   /// Enters the caller into the running for a fund's headship. Idempotent
   /// server-side (unique offer+user), so a double-tap is a harmless no-op
   /// rather than a second entry.
-  Future<void> acceptSuccessionOffer(String offerId) async {
+  ///
+  /// Returns true when the caller became the head THERE AND THEN — which
+  /// happens for the deputy accepting inside their own first-refusal
+  /// window, since nobody else can be competing yet. Everyone else gets
+  /// false: they are in the running, and the winner is settled at the
+  /// deadline. The two outcomes need different words on screen, so this is
+  /// deliberately not a plain void.
+  Future<bool> acceptSuccessionOffer(String offerId) async {
     try {
-      await _dio.post('/employees/me/succession-offers/$offerId/accept');
+      final response = await _dio.post(
+        '/employees/me/succession-offers/$offerId/accept',
+      );
+      final data = response.data;
+      return data is Map && data['becameHead'] == true;
     } on DioException catch (e) {
       throw _apiException(e, 'Failed to accept succession offer');
     }

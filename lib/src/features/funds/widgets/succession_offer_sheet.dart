@@ -27,13 +27,17 @@ import 'etf_premium_required_sheet.dart';
 // existing ETF paywall sheet instead (showEtfPremiumRequiredSheet).
 // ---------------------------------------------------------------------------
 
-Future<bool?> showSuccessionOfferSheet({
+/// What an acceptance actually did — the deputy takes the fund on the
+/// spot, everyone else only joins the running, and the caller says so.
+enum SuccessionAcceptResult { applied, becameHead }
+
+Future<SuccessionAcceptResult?> showSuccessionOfferSheet({
   required BuildContext context,
   required WidgetRef ref,
   required FundSuccessionOffer offer,
   required AppPalette palette,
 }) {
-  return showModalBottomSheet<bool>(
+  return showModalBottomSheet<SuccessionAcceptResult>(
     context: context,
     backgroundColor: palette.card,
     shape: const RoundedRectangleBorder(
@@ -66,16 +70,22 @@ class _SuccessionOfferSheetState extends ConsumerState<_SuccessionOfferSheet> {
       _error = null;
     });
     try {
-      await ref
+      final becameHead = await ref
           .read(employeeApiServiceProvider)
           .acceptSuccessionOffer(widget.offer.id);
       if (!mounted) return;
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop(becameHead ? SuccessionAcceptResult.becameHead : SuccessionAcceptResult.applied);
     } on FundApiException catch (e) {
       setState(() {
         _error = switch (e.code) {
           'offer_not_pending' => l10n.etfSuccessionErrorClosed,
           'not_eligible' => l10n.etfSuccessionErrorNotEligible,
+          // Shouldn't normally be reachable -- the backend hides an offer
+          // entirely while it's the deputy's alone -- but an offer listed
+          // just before the window opened and accepted just after would
+          // land here, and "deputy has first refusal" explains itself far
+          // better than the raw server sentence.
+          'deputy_priority' => l10n.etfSuccessionErrorDeputyFirst,
           _ => e.message,
         };
       });
@@ -120,6 +130,7 @@ class _SuccessionOfferSheetState extends ConsumerState<_SuccessionOfferSheet> {
             style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
           ),
           const SizedBox(height: 16),
+          _rule(palette, l10n.etfSuccessionRuleDeputyFirst),
           _rule(palette, l10n.etfSuccessionRuleEnterRunning),
           _rule(palette, l10n.etfSuccessionRuleSeniorityWins),
           _rule(palette, l10n.etfSuccessionRuleHeadMayReturn),

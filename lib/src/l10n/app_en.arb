@@ -2935,7 +2935,7 @@
   "etfFundEditGenericError": "Could not save the changes",
 
   "etfRulebookSuccessionSectionHeader": "If the head disappears",
-  "etfRulebookSuccessionSectionBody": "A fund is never left unmanaged. If its head hasn't opened the app for 60 days, the fund's employees are offered the management.\n\n1. The whole active team sees the offer, but only an employee with Premium can accept it.\n\n2. Accepting is an application, not an instant appointment. The team has 14 days to decide.\n\n3. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n4. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n5. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.",
+  "etfRulebookSuccessionSectionBody": "A fund is never left unmanaged. If its head stops opening the app, the fund is offered to its employees.\n\n1. Without Premium the head has about two months before that happens. With active Premium they have about half a year — a longer leash, not an unlimited one.\n\n2. The deputy gets first refusal: for the first few days the offer is theirs alone. If they don't take it, it opens to every employee with Premium.\n\n3. Accepting is an application, not an instant appointment — except for the deputy inside their own window, who takes the fund straight away. The team has 14 days in total.\n\n4. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n5. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n6. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.",
 
   "etfSuccessionCardSubtitle": "The head of this fund has gone quiet — the team is being offered the management.",
   "etfSuccessionDaysLeft": "Days left: {days}",
@@ -2943,10 +2943,13 @@
     "placeholders": { "days": { "type": "int" } }
   },
   "etfSuccessionAppliedPill": "You applied",
-  "etfSuccessionSheetIntro": "This fund's head hasn't opened the app in a long time. Any active team member can step up.",
+  "etfSuccessionSheetIntro": "This fund's head has been away a long time, so the fund is being offered to its team.",
+  "etfSuccessionRuleDeputyFirst": "The deputy gets first refusal. For the first few days the offer is theirs alone; if they don't take it, it opens to the rest of the team.",
+  "etfSuccessionErrorDeputyFirst": "The fund's deputy has first refusal for now. If they pass, the offer opens to the whole team.",
+  "etfSuccessionBecameHeadSnackbar": "You are now the head of this fund",
   "etfSuccessionRuleEnterRunning": "Accepting puts you in the running — it does not make you the head right away.",
-  "etfSuccessionRuleSeniorityWins": "On the deadline, the fund goes to whoever has been on the team the longest among those who applied.",
-  "etfSuccessionRuleHeadMayReturn": "If the current head opens the app before the deadline, the offer is cancelled and the fund stays theirs.",
+  "etfSuccessionRuleSeniorityWins": "On the deadline the fund goes to whoever has been on the team the longest among those who applied — with the deputy still ahead of everyone.",
+  "etfSuccessionRuleHeadMayReturn": "If the head opens the app before the deadline, the offer is cancelled and the fund stays theirs.",
   "etfSuccessionRuleNobodyAccepts": "If nobody applies, the fund is liquidated: holdings are sold and investors are paid out.",
   "etfSuccessionRuleMoneyStays": "The fund's cash and holdings stay with the fund — the new head inherits them, not a blank slate.",
   "etfSuccessionDeadlineLabel": "Decision date",

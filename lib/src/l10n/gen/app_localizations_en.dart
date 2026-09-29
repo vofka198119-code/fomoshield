@@ -7409,7 +7409,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfRulebookSuccessionSectionBody =>
-      'A fund is never left unmanaged. If its head hasn\'t opened the app for 60 days, the fund\'s employees are offered the management.\n\n1. The whole active team sees the offer, but only an employee with Premium can accept it.\n\n2. Accepting is an application, not an instant appointment. The team has 14 days to decide.\n\n3. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n4. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n5. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.';
+      'A fund is never left unmanaged. If its head stops opening the app, the fund is offered to its employees.\n\n1. Without Premium the head has about two months before that happens. With active Premium they have about half a year — a longer leash, not an unlimited one.\n\n2. The deputy gets first refusal: for the first few days the offer is theirs alone. If they don\'t take it, it opens to every employee with Premium.\n\n3. Accepting is an application, not an instant appointment — except for the deputy inside their own window, who takes the fund straight away. The team has 14 days in total.\n\n4. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n5. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n6. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.';
 
   @override
   String get etfSuccessionCardSubtitle =>
@@ -7425,7 +7425,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfSuccessionSheetIntro =>
-      'This fund\'s head hasn\'t opened the app in a long time. Any active team member can step up.';
+      'This fund\'s head has been away a long time, so the fund is being offered to its team.';
+
+  @override
+  String get etfSuccessionRuleDeputyFirst =>
+      'The deputy gets first refusal. For the first few days the offer is theirs alone; if they don\'t take it, it opens to the rest of the team.';
+
+  @override
+  String get etfSuccessionErrorDeputyFirst =>
+      'The fund\'s deputy has first refusal for now. If they pass, the offer opens to the whole team.';
+
+  @override
+  String get etfSuccessionBecameHeadSnackbar =>
+      'You are now the head of this fund';
 
   @override
   String get etfSuccessionRuleEnterRunning =>
@@ -7433,11 +7445,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfSuccessionRuleSeniorityWins =>
-      'On the deadline, the fund goes to whoever has been on the team the longest among those who applied.';
+      'On the deadline the fund goes to whoever has been on the team the longest among those who applied — with the deputy still ahead of everyone.';
 
   @override
   String get etfSuccessionRuleHeadMayReturn =>
-      'If the current head opens the app before the deadline, the offer is cancelled and the fund stays theirs.';
+      'If the head opens the app before the deadline, the offer is cancelled and the fund stays theirs.';
 
   @override
   String get etfSuccessionRuleNobodyAccepts =>

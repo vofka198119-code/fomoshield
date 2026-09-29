@@ -12,6 +12,7 @@ import '../../../shared/widgets/card_frame.dart';
 import '../models/employee.dart';
 import '../models/fund_succession_offer.dart';
 import '../providers/employee_providers.dart';
+import '../providers/fund_providers.dart';
 import '../widgets/invitation_detail_sheet.dart';
 import '../widgets/succession_offer_card.dart';
 import '../widgets/succession_offer_sheet.dart';
@@ -158,17 +159,29 @@ class MyInvitationsScreen extends ConsumerWidget {
     AppPalette palette,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final accepted = await showSuccessionOfferSheet(
+    final result = await showSuccessionOfferSheet(
       context: context,
       ref: ref,
       offer: offer,
       palette: palette,
     );
-    if (accepted != true) return;
+    if (result == null) return;
     ref.invalidate(mySuccessionOffersProvider);
+    // A deputy accepting inside their own window IS the new head already,
+    // so it also changes what the funds list and Home's tile should show.
+    if (result == SuccessionAcceptResult.becameHead) {
+      ref.invalidate(fundsListProvider);
+      ref.invalidate(fundDetailProvider(offer.fundId));
+    }
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.etfSuccessionAcceptedSnackbar)),
+      SnackBar(
+        content: Text(
+          result == SuccessionAcceptResult.becameHead
+              ? l10n.etfSuccessionBecameHeadSnackbar
+              : l10n.etfSuccessionAcceptedSnackbar,
+        ),
+      ),
     );
   }
 
