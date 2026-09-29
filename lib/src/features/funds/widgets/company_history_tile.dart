@@ -17,6 +17,14 @@ class CompanyHistoryTile extends StatelessWidget {
   final String fundName;
   final String fundTicker;
   final String roleLabel;
+
+  /// How long the stint lasted, already formatted (employment_labels.dart).
+  /// Optional so the tile stays usable anywhere a duration makes no sense.
+  final String? tenureLabel;
+
+  /// How it ended — "let go", "fund closed", "currently working".
+  final String? outcomeLabel;
+
   final bool isActive;
   final AppPalette palette;
   final VoidCallback? onTap;
@@ -27,6 +35,8 @@ class CompanyHistoryTile extends StatelessWidget {
     required this.fundName,
     required this.fundTicker,
     required this.roleLabel,
+    this.tenureLabel,
+    this.outcomeLabel,
     required this.isActive,
     required this.palette,
     this.onTap,
@@ -90,7 +100,15 @@ class CompanyHistoryTile extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          fundTicker,
+                          // Ticker and tenure share the one subtitle line
+                          // rather than stacking a third row -- this list
+                          // deliberately matches trade_history_tile's own
+                          // two-line row height.
+                          tenureLabel == null
+                              ? fundTicker
+                              : '$fundTicker · $tenureLabel',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             color: palette.textBody,
@@ -100,15 +118,31 @@ class CompanyHistoryTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    roleLabel,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: isActive
-                          ? palette.textHeader
-                          : palette.textBody,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        roleLabel,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: isActive
+                              ? palette.textHeader
+                              : palette.textBody,
+                        ),
+                      ),
+                      if (outcomeLabel != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          outcomeLabel!,
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            color: palette.textBody,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),

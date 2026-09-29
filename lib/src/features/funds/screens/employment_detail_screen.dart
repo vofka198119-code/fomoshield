@@ -9,6 +9,7 @@ import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../employment_labels.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
 
@@ -46,18 +47,37 @@ class _EmploymentDetailScreenState
     }
   }
 
+  // Both of these used to read "not resigned, therefore fired", which was
+  // fine while those were the only two endings. A fund CLOSING is a third
+  // one (Migration 031), and calling it a firing misrepresents the person
+  // to anyone reading their résumé -- so it's matched explicitly, and the
+  // fallback is the neutral wording rather than the harshest one.
   String _statusLabel(AppLocalizations l10n) {
     if (widget.record.isActive) return l10n.etfEmploymentDetailStatusActive;
-    return widget.record.leaveType == 'resigned'
-        ? l10n.etfEmploymentDetailStatusResigned
-        : l10n.etfEmploymentDetailStatusTerminated;
+    switch (widget.record.leaveType) {
+      case 'resigned':
+        return l10n.etfEmploymentDetailStatusResigned;
+      case 'terminated':
+        return l10n.etfEmploymentDetailStatusTerminated;
+      case 'fund_closed':
+        return l10n.etfEmploymentOutcomeFundClosed;
+      default:
+        return l10n.etfEmploymentOutcomeLeft;
+    }
   }
 
-  Color _statusColor() {
+  Color _statusColor(AppPalette palette) {
     if (widget.record.isActive) return ThemeV2.success;
-    return widget.record.leaveType == 'resigned'
-        ? ThemeV2.warning
-        : ThemeV2.loss;
+    switch (widget.record.leaveType) {
+      case 'resigned':
+        return ThemeV2.warning;
+      case 'terminated':
+        return ThemeV2.loss;
+      // The fund closing is nobody's fault and shouldn't be painted like a
+      // firing; neutral body colour says "it ended" without a verdict.
+      default:
+        return palette.textBody;
+    }
   }
 
   Future<void> _confirmLeave(AppPalette palette, AppLocalizations l10n) async {
@@ -233,7 +253,7 @@ class _EmploymentDetailScreenState
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: _statusColor().withValues(alpha: 0.12),
+                            color: _statusColor(palette).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -241,7 +261,7 @@ class _EmploymentDetailScreenState
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: _statusColor(),
+                              color: _statusColor(palette),
                             ),
                           ),
                         ),
@@ -264,6 +284,11 @@ class _EmploymentDetailScreenState
                         l10n.etfEmploymentDetailLeftLabel,
                         dateFormat.format(widget.record.leftAt!.toLocal()),
                       ),
+                    _row(
+                      palette,
+                      l10n.etfEmploymentDetailTenureLabel,
+                      employmentTenureLabel(l10n, widget.record),
+                    ),
                   ],
                 ),
               ),

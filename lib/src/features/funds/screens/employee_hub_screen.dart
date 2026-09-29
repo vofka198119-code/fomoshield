@@ -24,6 +24,7 @@ import '../../../shared/widgets/circle_shortcut_row.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
+import '../employment_labels.dart';
 import '../widgets/company_history_tile.dart';
 import '../widgets/rating_stars_row.dart';
 import '../widgets/employee_identity_card.dart';
@@ -205,6 +206,8 @@ class EmployeeHubScreen extends ConsumerWidget {
               fundName: record.fundName ?? record.fundTicker ?? '—',
               fundTicker: record.fundTicker ?? '',
               roleLabel: _roleLabel(l10n, record.role),
+              tenureLabel: employmentTenureLabel(l10n, record),
+              outcomeLabel: employmentOutcomeLabel(l10n, record),
               isActive: record.isActive,
               palette: palette,
               onTap: () => context.push(

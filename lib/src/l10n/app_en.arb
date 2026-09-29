@@ -2916,6 +2916,25 @@
   "etfTeamMemberPendingTerminationLabel": "Leaving soon",
   "etfTeamMemberCancelTerminationButton": "Cancel Removal",
 
+  "etfEmploymentDetailTenureLabel": "Time at the fund",
+  "etfEmploymentTenureDays": "{days} d",
+  "@etfEmploymentTenureDays": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "etfEmploymentTenureMonths": "{months} mo",
+  "@etfEmploymentTenureMonths": {
+    "placeholders": { "months": { "type": "int" } }
+  },
+  "etfEmploymentTenureYearsMonths": "{years} y {months} mo",
+  "@etfEmploymentTenureYearsMonths": {
+    "placeholders": { "years": { "type": "int" }, "months": { "type": "int" } }
+  },
+  "etfEmploymentOutcomeActive": "currently working",
+  "etfEmploymentOutcomeResigned": "resigned",
+  "etfEmploymentOutcomeTerminated": "let go",
+  "etfEmploymentOutcomeFundClosed": "fund closed",
+  "etfEmploymentOutcomeLeft": "left",
+
   "etfPermissionsSheetIntro": "A role is only a starting template. What this employee may actually do is the switches below.",
   "etfPermissionsSaveButton": "Save permissions",
   "etfPermissionsSaveError": "Could not save the permissions",

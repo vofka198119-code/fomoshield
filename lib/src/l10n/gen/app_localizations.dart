@@ -12583,6 +12583,60 @@ abstract class AppLocalizations {
   /// **'Cancel Removal'**
   String get etfTeamMemberCancelTerminationButton;
 
+  /// No description provided for @etfEmploymentDetailTenureLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time at the fund'**
+  String get etfEmploymentDetailTenureLabel;
+
+  /// No description provided for @etfEmploymentTenureDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d'**
+  String etfEmploymentTenureDays(int days);
+
+  /// No description provided for @etfEmploymentTenureMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{months} mo'**
+  String etfEmploymentTenureMonths(int months);
+
+  /// No description provided for @etfEmploymentTenureYearsMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{years} y {months} mo'**
+  String etfEmploymentTenureYearsMonths(int years, int months);
+
+  /// No description provided for @etfEmploymentOutcomeActive.
+  ///
+  /// In en, this message translates to:
+  /// **'currently working'**
+  String get etfEmploymentOutcomeActive;
+
+  /// No description provided for @etfEmploymentOutcomeResigned.
+  ///
+  /// In en, this message translates to:
+  /// **'resigned'**
+  String get etfEmploymentOutcomeResigned;
+
+  /// No description provided for @etfEmploymentOutcomeTerminated.
+  ///
+  /// In en, this message translates to:
+  /// **'let go'**
+  String get etfEmploymentOutcomeTerminated;
+
+  /// No description provided for @etfEmploymentOutcomeFundClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'fund closed'**
+  String get etfEmploymentOutcomeFundClosed;
+
+  /// No description provided for @etfEmploymentOutcomeLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'left'**
+  String get etfEmploymentOutcomeLeft;
+
   /// No description provided for @etfPermissionsSheetIntro.
   ///
   /// In en, this message translates to:

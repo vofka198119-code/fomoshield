@@ -7354,6 +7354,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Cancel Removal';
 
   @override
+  String get etfEmploymentDetailTenureLabel => 'Time at the fund';
+
+  @override
+  String etfEmploymentTenureDays(int days) {
+    return '$days d';
+  }
+
+  @override
+  String etfEmploymentTenureMonths(int months) {
+    return '$months mo';
+  }
+
+  @override
+  String etfEmploymentTenureYearsMonths(int years, int months) {
+    return '$years y $months mo';
+  }
+
+  @override
+  String get etfEmploymentOutcomeActive => 'currently working';
+
+  @override
+  String get etfEmploymentOutcomeResigned => 'resigned';
+
+  @override
+  String get etfEmploymentOutcomeTerminated => 'let go';
+
+  @override
+  String get etfEmploymentOutcomeFundClosed => 'fund closed';
+
+  @override
+  String get etfEmploymentOutcomeLeft => 'left';
+
+  @override
   String get etfPermissionsSheetIntro =>
       'A role is only a starting template. What this employee may actually do is the switches below.';
 

@@ -7379,6 +7379,39 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Отменить увольнение';
 
   @override
+  String get etfEmploymentDetailTenureLabel => 'Срок работы';
+
+  @override
+  String etfEmploymentTenureDays(int days) {
+    return '$days дн.';
+  }
+
+  @override
+  String etfEmploymentTenureMonths(int months) {
+    return '$months мес.';
+  }
+
+  @override
+  String etfEmploymentTenureYearsMonths(int years, int months) {
+    return '$years г. $months мес.';
+  }
+
+  @override
+  String get etfEmploymentOutcomeActive => 'работает сейчас';
+
+  @override
+  String get etfEmploymentOutcomeResigned => 'ушёл сам';
+
+  @override
+  String get etfEmploymentOutcomeTerminated => 'уволен';
+
+  @override
+  String get etfEmploymentOutcomeFundClosed => 'фонд закрылся';
+
+  @override
+  String get etfEmploymentOutcomeLeft => 'покинул фонд';
+
+  @override
   String get etfPermissionsSheetIntro =>
       'Должность — только стартовый шаблон. Что сотрудник реально может делать, задают переключатели ниже.';
 

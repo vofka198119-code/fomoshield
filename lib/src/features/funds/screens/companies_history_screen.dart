@@ -9,6 +9,7 @@ import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../providers/employee_providers.dart';
+import '../employment_labels.dart';
 import '../widgets/company_history_tile.dart';
 
 // ---------------------------------------------------------------------------
@@ -85,6 +86,8 @@ class CompaniesHistoryScreen extends ConsumerWidget {
                       fundName: history[i].fundName ?? history[i].fundTicker ?? '—',
                       fundTicker: history[i].fundTicker ?? '',
                       roleLabel: _roleLabel(l10n, history[i].role),
+                      tenureLabel: employmentTenureLabel(l10n, history[i]),
+                      outcomeLabel: employmentOutcomeLabel(l10n, history[i]),
                       isActive: history[i].isActive,
                       palette: palette,
                       showDivider: i != history.length - 1,

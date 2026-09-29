@@ -154,7 +154,11 @@ class EmploymentRecord {
   final String role;
   final DateTime joinedAt;
   final DateTime? leftAt;
-  final String? leaveType; // 'resigned' | 'terminated' | null (still active)
+  /// 'resigned' | 'terminated' | 'fund_closed' | null (still working).
+  /// 'fund_closed' arrives with Migration 031 — see employment_labels.dart
+  /// for the display wording, and never assume "not resigned means fired":
+  /// that shortcut is what made a closed fund read as a dismissal.
+  final String? leaveType;
 
   const EmploymentRecord({
     required this.fundId,

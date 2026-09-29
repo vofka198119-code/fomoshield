@@ -2154,6 +2154,16 @@
   "etfTeamMemberPendingTerminationLabel": "Скоро покинет команду",
   "etfTeamMemberCancelTerminationButton": "Отменить увольнение",
 
+  "etfEmploymentDetailTenureLabel": "Срок работы",
+  "etfEmploymentTenureDays": "{days} дн.",
+  "etfEmploymentTenureMonths": "{months} мес.",
+  "etfEmploymentTenureYearsMonths": "{years} г. {months} мес.",
+  "etfEmploymentOutcomeActive": "работает сейчас",
+  "etfEmploymentOutcomeResigned": "ушёл сам",
+  "etfEmploymentOutcomeTerminated": "уволен",
+  "etfEmploymentOutcomeFundClosed": "фонд закрылся",
+  "etfEmploymentOutcomeLeft": "покинул фонд",
+
   "etfPermissionsSheetIntro": "Должность — только стартовый шаблон. Что сотрудник реально может делать, задают переключатели ниже.",
   "etfPermissionsSaveButton": "Сохранить права",
   "etfPermissionsSaveError": "Не удалось сохранить права",
