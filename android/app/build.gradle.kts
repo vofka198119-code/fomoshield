@@ -43,6 +43,26 @@ android {
         versionName = flutter.versionName
     }
 
+    // Lets a locally-built copy (dev flavor) coexist on the same device as
+    // the one installed from Play Store — Android refuses to have two
+    // installs of the SAME applicationId signed with different
+    // certificates (our local keystore vs. Google Play App Signing's own
+    // re-sign), regardless of debug/release build type. `prod` keeps the
+    // real com.scanco.scanco id untouched — always use it for anything
+    // built to actually upload to Play Console.
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            resValue(type = "string", name = "app_name", value = "FOMO Shield Dev")
+        }
+        create("prod") {
+            dimension = "environment"
+            resValue(type = "string", name = "app_name", value = "F.O.M.O. Shield")
+        }
+    }
+
     signingConfigs {
         if (hasReleaseSigning) {
             create("release") {
