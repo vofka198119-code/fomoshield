@@ -1,5 +1,5 @@
 -- =============================================================================
--- F.O.M.O. Shield — Supabase Migration 031   (NOT YET APPLIED)
+-- F.O.M.O. Shield — Supabase Migration 031   (APPLIED 2026-09-29)
 -- Table: employment_history
 -- Feature: ETF Fund Emulation — a third way a stint can end.
 --
@@ -21,6 +21,20 @@
 -- constraint that write fails, and because closeEmploymentHistory only logs
 -- its errors rather than throwing, the failure would be silent -- the fund
 -- would liquidate and the history rows would quietly stay open.
+--
+-- Applied 2026-09-29 on project zbtcpgbelupoybgrwuub (FomoSheild / main), in
+-- the right order: the DB now allows 'fund_closed' and the backend that
+-- writes it is still only committed, not deployed. Verified by reading the
+-- constraint back --
+--   CHECK ((leave_type = ANY (ARRAY['resigned'::text, 'terminated'::text,
+--                                   'fund_closed'::text])))
+-- and exactly ONE constraint row came back, so the DROP really did land
+-- rather than leaving the old two-value one in place beside a new one.
+--
+-- Both clean-up statements matched ZERO rows, checked before running: no
+-- stint was open at an already-bankrupt fund and no roster row belonged to
+-- one. Nothing was deleted. They stay here so a fresh project comes up
+-- consistent.
 -- =============================================================================
 
 ALTER TABLE public.employment_history
