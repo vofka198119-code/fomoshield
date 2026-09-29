@@ -12583,6 +12583,18 @@ abstract class AppLocalizations {
   /// **'Cancel Removal'**
   String get etfTeamMemberCancelTerminationButton;
 
+  /// No description provided for @etfRulebookSuccessionSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'If the head disappears'**
+  String get etfRulebookSuccessionSectionHeader;
+
+  /// No description provided for @etfRulebookSuccessionSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund is never left unmanaged. If its head hasn\'t opened the app for 60 days, the fund\'s employees are offered the management.\n\n1. The whole active team sees the offer, but only an employee with Premium can accept it.\n\n2. Accepting is an application, not an instant appointment. The team has 14 days to decide.\n\n3. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n4. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n5. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.'**
+  String get etfRulebookSuccessionSectionBody;
+
   /// No description provided for @etfSuccessionCardSubtitle.
   ///
   /// In en, this message translates to:

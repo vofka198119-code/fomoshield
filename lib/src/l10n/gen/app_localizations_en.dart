@@ -7354,6 +7354,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Cancel Removal';
 
   @override
+  String get etfRulebookSuccessionSectionHeader => 'If the head disappears';
+
+  @override
+  String get etfRulebookSuccessionSectionBody =>
+      'A fund is never left unmanaged. If its head hasn\'t opened the app for 60 days, the fund\'s employees are offered the management.\n\n1. The whole active team sees the offer, but only an employee with Premium can accept it.\n\n2. Accepting is an application, not an instant appointment. The team has 14 days to decide.\n\n3. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n4. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n5. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.';
+
+  @override
   String get etfSuccessionCardSubtitle =>
       'The head of this fund has gone quiet — the team is being offered the management.';
 

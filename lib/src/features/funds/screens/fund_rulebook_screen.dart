@@ -24,9 +24,18 @@ import '../../company_detail/widgets/metric_info_data.dart' show MetricInfoConte
 // onboarding's per-branch narrative copy -- a reference someone consults
 // from either side of a fund, or before joining one at all.
 //
-// Only describes the FORCED bankruptcy path (Phase A, live) -- Phase B's
-// automatic inactivity/succession trigger isn't built yet, so it isn't
-// documented as if it already exists.
+// Covers BOTH shutdown paths as of 2026-09-29: the head-initiated one
+// (Phase A) and the automatic inactivity/succession one (Phase B, whose
+// client landed the same day). The succession section deliberately follows
+// the bankruptcy section rather than preceding it -- its last step ("if
+// nobody applies, the fund closes") leans on rules the reader has just
+// been given.
+//
+// Its numbers (60 days, 14-day window, seniority) are the ones
+// fundSuccessionService.js actually enforces, NOT the ones
+// docs/ETF_FUND_EMULATION.md still describes -- the two disagreed and the
+// code was ruled authoritative (2026-09-29). Re-check the service before
+// editing this copy, not the design doc.
 // ---------------------------------------------------------------------------
 
 MetricInfoContent fundRulebookContent(AppLocalizations l10n) {
@@ -53,6 +62,10 @@ MetricInfoContent fundRulebookContent(AppLocalizations l10n) {
       MetricInfoSection(
         header: l10n.etfRulebookBankruptcySectionHeader,
         body: l10n.etfRulebookBankruptcySectionBody,
+      ),
+      MetricInfoSection(
+        header: l10n.etfRulebookSuccessionSectionHeader,
+        body: l10n.etfRulebookSuccessionSectionBody,
       ),
       // Same simulator disclaimer copy as onboarding's own closing step --
       // one already-approved piece of text, not a re-drafted duplicate.
