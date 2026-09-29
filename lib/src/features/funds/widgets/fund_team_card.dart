@@ -14,6 +14,7 @@ import '../../../shared/widgets/admin_badge.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
+import 'team_member_permissions_sheet.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Team Card — the real roster (ETF Fund Emulation, Phase 3), replacing
@@ -181,6 +182,9 @@ class FundTeamCard extends ConsumerWidget {
                 children: [
                   for (final member in team)
                     _memberRow(
+                      onTap: isHead && !member.isPendingTermination
+                          ? () => _openPermissions(context, ref, member)
+                          : null,
                       nickname: member.nickname,
                       roleLabel: member.isPendingTermination
                           ? l10n.etfTeamMemberPendingTerminationLabel
@@ -222,14 +226,36 @@ class FundTeamCard extends ConsumerWidget {
     );
   }
 
+  /// Refreshes the roster however the sheet closed, not only on a saved
+  /// result: changing a ROLE saves immediately inside the sheet, so a head
+  /// who changes a role and then dismisses without touching the switches
+  /// has still changed something the list is showing.
+  Future<void> _openPermissions(
+    BuildContext context,
+    WidgetRef ref,
+    FundTeamMember member,
+  ) async {
+    await showTeamMemberPermissionsSheet(
+      context: context,
+      ref: ref,
+      fundId: fundId,
+      member: member,
+      palette: palette,
+    );
+    ref.invalidate(fundTeamProvider(fundId));
+  }
+
   Widget _memberRow({
     required String? nickname,
     required String roleLabel,
     required Color roleColor,
     Widget? nameBadge,
     Widget? trailing,
+    VoidCallback? onTap,
   }) {
-    return Padding(
+    // Only the head ever passes onTap, and only for a member who isn't on
+    // their way out -- everyone else gets the same plain row as before.
+    final row = Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
@@ -263,9 +289,28 @@ class FundTeamCard extends ConsumerWidget {
               ],
             ),
           ),
+          // Without this the row gives no sign it can be opened at all --
+          // the trailing slot already holds the Remove button, so the tap
+          // target would have been invisible. Shown only when the row is
+          // actually tappable.
+          if (onTap != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Icon(
+                Icons.tune_rounded,
+                size: 16,
+                color: palette.accentPrimary,
+              ),
+            ),
           ?trailing,
         ],
       ),
+    );
+    if (onTap == null) return row;
+    return InkWell(
+      borderRadius: ThemeV2.borderRadiusMedium,
+      onTap: onTap,
+      child: row,
     );
   }
 }

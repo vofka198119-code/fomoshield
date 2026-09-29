@@ -2154,6 +2154,17 @@
   "etfTeamMemberPendingTerminationLabel": "Скоро покинет команду",
   "etfTeamMemberCancelTerminationButton": "Отменить увольнение",
 
+  "etfPermissionsSheetIntro": "Должность — только стартовый шаблон. Что сотрудник реально может делать, задают переключатели ниже.",
+  "etfPermissionsSaveButton": "Сохранить права",
+  "etfPermissionsSaveError": "Не удалось сохранить права",
+  "etfPermissionsRoleChangeTitle": "Сменить должность?",
+  "etfPermissionsRoleChangeBody": "Права ниже сбросятся к шаблону этой должности. После этого их можно снова настроить вручную.",
+  "etfPermissionsRoleChangeConfirm": "Сменить",
+  "etfPermissionPropose": "Предлагать сделки",
+  "etfPermissionApprove": "Одобрять и отклонять предложения",
+  "etfPermissionExecute": "Отправлять одобренные заявки в рынок",
+  "etfPermissionFlagRisk": "Помечать предложение рискованным",
+
   "etfFundEditTitle": "РЕДАКТИРОВАТЬ ФОНД",
   "etfFundEditShortcutLabel": "Изменить",
   "etfFundEditSaveButton": "Сохранить изменения",

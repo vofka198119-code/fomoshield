@@ -207,11 +207,11 @@ class _SuccessionOfferSheetState extends ConsumerState<_SuccessionOfferSheet> {
     AppLocalizations l10n,
     bool isPremium,
   ) {
-    final radius = BorderRadius.circular(10);
+    final radius = ThemeV2.borderRadiusMedium;
     final contentColor = themedDarkCtaContentColor(palette);
     return SizedBox(
       width: double.infinity,
-      height: 48,
+      height: ThemeV2.buttonHeight,
       child: Material(
         type: MaterialType.transparency,
         child: themedDarkCtaButtonShell(

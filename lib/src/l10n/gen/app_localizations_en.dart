@@ -7354,6 +7354,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Cancel Removal';
 
   @override
+  String get etfPermissionsSheetIntro =>
+      'A role is only a starting template. What this employee may actually do is the switches below.';
+
+  @override
+  String get etfPermissionsSaveButton => 'Save permissions';
+
+  @override
+  String get etfPermissionsSaveError => 'Could not save the permissions';
+
+  @override
+  String get etfPermissionsRoleChangeTitle => 'Change the role?';
+
+  @override
+  String get etfPermissionsRoleChangeBody =>
+      'The permissions below will be reset to that role\'s defaults. You can adjust them again afterwards.';
+
+  @override
+  String get etfPermissionsRoleChangeConfirm => 'Change role';
+
+  @override
+  String get etfPermissionPropose => 'Propose trades';
+
+  @override
+  String get etfPermissionApprove => 'Approve and reject proposals';
+
+  @override
+  String get etfPermissionExecute => 'Send approved orders to the market';
+
+  @override
+  String get etfPermissionFlagRisk => 'Flag a proposal as risky';
+
+  @override
   String get etfFundEditTitle => 'EDIT FUND';
 
   @override

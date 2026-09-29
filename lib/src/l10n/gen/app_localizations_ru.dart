@@ -7379,6 +7379,38 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Отменить увольнение';
 
   @override
+  String get etfPermissionsSheetIntro =>
+      'Должность — только стартовый шаблон. Что сотрудник реально может делать, задают переключатели ниже.';
+
+  @override
+  String get etfPermissionsSaveButton => 'Сохранить права';
+
+  @override
+  String get etfPermissionsSaveError => 'Не удалось сохранить права';
+
+  @override
+  String get etfPermissionsRoleChangeTitle => 'Сменить должность?';
+
+  @override
+  String get etfPermissionsRoleChangeBody =>
+      'Права ниже сбросятся к шаблону этой должности. После этого их можно снова настроить вручную.';
+
+  @override
+  String get etfPermissionsRoleChangeConfirm => 'Сменить';
+
+  @override
+  String get etfPermissionPropose => 'Предлагать сделки';
+
+  @override
+  String get etfPermissionApprove => 'Одобрять и отклонять предложения';
+
+  @override
+  String get etfPermissionExecute => 'Отправлять одобренные заявки в рынок';
+
+  @override
+  String get etfPermissionFlagRisk => 'Помечать предложение рискованным';
+
+  @override
   String get etfFundEditTitle => 'РЕДАКТИРОВАТЬ ФОНД';
 
   @override

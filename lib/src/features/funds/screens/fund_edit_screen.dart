@@ -236,11 +236,11 @@ class _FundEditScreenState extends ConsumerState<FundEditScreen> {
   }
 
   Widget _saveButton(AppPalette palette, AppLocalizations l10n) {
-    final radius = BorderRadius.circular(10);
+    final radius = ThemeV2.borderRadiusMedium;
     final contentColor = themedDarkCtaContentColor(palette);
     return SizedBox(
       width: double.infinity,
-      height: 48,
+      height: ThemeV2.buttonHeight,
       child: Material(
         type: MaterialType.transparency,
         child: themedDarkCtaButtonShell(

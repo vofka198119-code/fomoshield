@@ -12583,6 +12583,66 @@ abstract class AppLocalizations {
   /// **'Cancel Removal'**
   String get etfTeamMemberCancelTerminationButton;
 
+  /// No description provided for @etfPermissionsSheetIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'A role is only a starting template. What this employee may actually do is the switches below.'**
+  String get etfPermissionsSheetIntro;
+
+  /// No description provided for @etfPermissionsSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save permissions'**
+  String get etfPermissionsSaveButton;
+
+  /// No description provided for @etfPermissionsSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the permissions'**
+  String get etfPermissionsSaveError;
+
+  /// No description provided for @etfPermissionsRoleChangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the role?'**
+  String get etfPermissionsRoleChangeTitle;
+
+  /// No description provided for @etfPermissionsRoleChangeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The permissions below will be reset to that role\'s defaults. You can adjust them again afterwards.'**
+  String get etfPermissionsRoleChangeBody;
+
+  /// No description provided for @etfPermissionsRoleChangeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Change role'**
+  String get etfPermissionsRoleChangeConfirm;
+
+  /// No description provided for @etfPermissionPropose.
+  ///
+  /// In en, this message translates to:
+  /// **'Propose trades'**
+  String get etfPermissionPropose;
+
+  /// No description provided for @etfPermissionApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve and reject proposals'**
+  String get etfPermissionApprove;
+
+  /// No description provided for @etfPermissionExecute.
+  ///
+  /// In en, this message translates to:
+  /// **'Send approved orders to the market'**
+  String get etfPermissionExecute;
+
+  /// No description provided for @etfPermissionFlagRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag a proposal as risky'**
+  String get etfPermissionFlagRisk;
+
   /// No description provided for @etfFundEditTitle.
   ///
   /// In en, this message translates to:

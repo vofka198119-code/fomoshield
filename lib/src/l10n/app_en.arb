@@ -2916,6 +2916,17 @@
   "etfTeamMemberPendingTerminationLabel": "Leaving soon",
   "etfTeamMemberCancelTerminationButton": "Cancel Removal",
 
+  "etfPermissionsSheetIntro": "A role is only a starting template. What this employee may actually do is the switches below.",
+  "etfPermissionsSaveButton": "Save permissions",
+  "etfPermissionsSaveError": "Could not save the permissions",
+  "etfPermissionsRoleChangeTitle": "Change the role?",
+  "etfPermissionsRoleChangeBody": "The permissions below will be reset to that role's defaults. You can adjust them again afterwards.",
+  "etfPermissionsRoleChangeConfirm": "Change role",
+  "etfPermissionPropose": "Propose trades",
+  "etfPermissionApprove": "Approve and reject proposals",
+  "etfPermissionExecute": "Send approved orders to the market",
+  "etfPermissionFlagRisk": "Flag a proposal as risky",
+
   "etfFundEditTitle": "EDIT FUND",
   "etfFundEditShortcutLabel": "Edit",
   "etfFundEditSaveButton": "Save changes",
