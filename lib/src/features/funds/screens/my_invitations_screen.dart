@@ -9,8 +9,12 @@ import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../models/employee.dart';
+import '../models/fund_succession_offer.dart';
 import '../providers/employee_providers.dart';
 import '../widgets/invitation_detail_sheet.dart';
+import '../widgets/succession_offer_card.dart';
+import '../widgets/succession_offer_sheet.dart';
 
 // ---------------------------------------------------------------------------
 // My Invitations — ETF Fund Emulation, Phase 3. The analyst's own envelope
@@ -21,6 +25,13 @@ import '../widgets/invitation_detail_sheet.dart';
 // surface an invite another user's action created. Styled the same way
 // (row list, tap → detail) per the phase plan's "structural analog" note,
 // just with its own real backend-fetched data.
+//
+// Also hosts Phase B's fund-succession offers (SuccessionOfferCard), kept
+// ABOVE the ordinary envelopes: same "someone is offering you something,
+// act before it expires" semantics, but far rarer and far more consequential,
+// so it never gets its own mostly-empty screen. An offer failing to load
+// must not take the invitations list down with it — the two async values
+// are resolved independently, not folded into one combined future.
 // ---------------------------------------------------------------------------
 
 class MyInvitationsScreen extends ConsumerWidget {
@@ -31,6 +42,7 @@ class MyInvitationsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     final invitationsAsync = ref.watch(myInvitationsProvider);
+    final offers = ref.watch(mySuccessionOffersProvider).valueOrNull ?? [];
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -67,7 +79,7 @@ class MyInvitationsScreen extends ConsumerWidget {
             ),
           ),
           data: (invitations) {
-            if (invitations.isEmpty) {
+            if (invitations.isEmpty && offers.isEmpty) {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -101,98 +113,143 @@ class MyInvitationsScreen extends ConsumerWidget {
             }
             return RefreshIndicator(
               color: palette.accentPrimary,
-              onRefresh: () async => ref.invalidate(myInvitationsProvider),
-              child: ListView.builder(
+              onRefresh: () async {
+                ref.invalidate(myInvitationsProvider);
+                ref.invalidate(mySuccessionOffersProvider);
+              },
+              child: ListView(
                 padding: const EdgeInsets.all(16),
-                itemCount: invitations.length,
-                itemBuilder: (context, i) {
-                  final invitation = invitations[i];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: InkWell(
-                      borderRadius: FomoShieldTheme.cardRadius,
-                      onTap: () async {
-                        final joined = await showInvitationDetailSheet(
-                          context: context,
-                          ref: ref,
-                          invitation: invitation,
-                          palette: palette,
-                        );
-                        if (joined == null) return;
-                        ref.invalidate(myInvitationsProvider);
-                        if (joined) {
-                          // New team membership -- without this, the
-                          // fund's own Team screen and this user's
-                          // employment history kept showing pre-join
-                          // state until a fresh (non-cached) mount.
-                          ref.invalidate(
-                            fundTeamProvider(invitation.fundId),
-                          );
-                          ref.invalidate(myEmploymentHistoryProvider);
-                        }
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              joined
-                                  ? l10n.etfInvitationAcceptedSnackbar
-                                  : l10n.etfInvitationDeclinedSnackbar,
-                            ),
-                          ),
-                        );
-                      },
-                      child: CardFrame(
-                        decoration: FomoShieldTheme.cardDecoration,
+                children: [
+                  for (final offer in offers)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: SuccessionOfferCard(
+                        offer: offer,
                         palette: palette,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    invitation.fundName ??
-                                        invitation.fundTicker ??
-                                        '',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: palette.textHeader,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    invitation.message,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: palette.textBody,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (invitation.fundApproxAum != null) ...[
-                              const SizedBox(width: 8),
-                              Text(
-                                formatUsd(invitation.fundApproxAum!),
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: palette.textHeader,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
+                        onTap: () => _openOffer(context, ref, offer, palette),
                       ),
                     ),
-                  );
-                },
+                  for (final invitation in invitations)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _invitationTile(
+                        context,
+                        ref,
+                        invitation,
+                        palette,
+                        l10n,
+                      ),
+                    ),
+                ],
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  /// Tapping a succession offer. Only a fresh acceptance (true) is worth a
+  /// snackbar — dismissing the sheet returns null and should stay silent.
+  Future<void> _openOffer(
+    BuildContext context,
+    WidgetRef ref,
+    FundSuccessionOffer offer,
+    AppPalette palette,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final accepted = await showSuccessionOfferSheet(
+      context: context,
+      ref: ref,
+      offer: offer,
+      palette: palette,
+    );
+    if (accepted != true) return;
+    ref.invalidate(mySuccessionOffersProvider);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.etfSuccessionAcceptedSnackbar)),
+    );
+  }
+
+  Widget _invitationTile(
+    BuildContext context,
+    WidgetRef ref,
+    FundInvitation invitation,
+    AppPalette palette,
+    AppLocalizations l10n,
+  ) {
+    return InkWell(
+      borderRadius: FomoShieldTheme.cardRadius,
+      onTap: () async {
+        final joined = await showInvitationDetailSheet(
+          context: context,
+          ref: ref,
+          invitation: invitation,
+          palette: palette,
+        );
+        if (joined == null) return;
+        ref.invalidate(myInvitationsProvider);
+        if (joined) {
+          // New team membership -- without this, the fund's own Team
+          // screen and this user's employment history kept showing
+          // pre-join state until a fresh (non-cached) mount.
+          ref.invalidate(fundTeamProvider(invitation.fundId));
+          ref.invalidate(myEmploymentHistoryProvider);
+        }
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              joined
+                  ? l10n.etfInvitationAcceptedSnackbar
+                  : l10n.etfInvitationDeclinedSnackbar,
+            ),
+          ),
+        );
+      },
+      child: CardFrame(
+        decoration: FomoShieldTheme.cardDecoration,
+        palette: palette,
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    invitation.fundName ?? invitation.fundTicker ?? '',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: palette.textHeader,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    invitation.message,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: palette.textBody,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (invitation.fundApproxAum != null) ...[
+              const SizedBox(width: 8),
+              Text(
+                formatUsd(invitation.fundApproxAum!),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: palette.textHeader,
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

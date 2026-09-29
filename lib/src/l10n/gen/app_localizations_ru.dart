@@ -7379,6 +7379,68 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Отменить увольнение';
 
   @override
+  String get etfSuccessionCardSubtitle =>
+      'Глава фонда пропал — команде предложено взять управление на себя.';
+
+  @override
+  String etfSuccessionDaysLeft(int days) {
+    return 'Осталось дней: $days';
+  }
+
+  @override
+  String get etfSuccessionAppliedPill => 'Заявка подана';
+
+  @override
+  String get etfSuccessionSheetIntro =>
+      'Глава этого фонда давно не заходил в приложение. Взять управление может любой из действующей команды.';
+
+  @override
+  String get etfSuccessionRuleEnterRunning =>
+      'Согласие ставит тебя в очередь — главой ты становишься не сразу.';
+
+  @override
+  String get etfSuccessionRuleSeniorityWins =>
+      'В день решения фонд достаётся тому из согласившихся, кто дольше всех работает в команде.';
+
+  @override
+  String get etfSuccessionRuleHeadMayReturn =>
+      'Если глава зайдёт в приложение до этой даты, предложение отменяется и фонд остаётся за ним.';
+
+  @override
+  String get etfSuccessionRuleNobodyAccepts =>
+      'Если не согласится никто, фонд ликвидируется: активы распродаются, инвесторам выплачивают деньги.';
+
+  @override
+  String get etfSuccessionRuleMoneyStays =>
+      'Касса и активы остаются у фонда — новый глава получает их, а не пустой счёт.';
+
+  @override
+  String get etfSuccessionDeadlineLabel => 'Дата решения';
+
+  @override
+  String get etfSuccessionAcceptButton => 'Подать заявку на управление';
+
+  @override
+  String get etfSuccessionPremiumRequiredButton => 'Нужен Premium';
+
+  @override
+  String get etfSuccessionAlreadyAppliedBody =>
+      'Заявка подана. В день решения фонд достанется тому, кто дольше всех в команде.';
+
+  @override
+  String get etfSuccessionAcceptedSnackbar => 'Заявка подана';
+
+  @override
+  String get etfSuccessionErrorClosed => 'Это предложение уже закрыто';
+
+  @override
+  String get etfSuccessionErrorNotEligible =>
+      'Взять фонд может только действующий сотрудник с Premium';
+
+  @override
+  String get etfSuccessionErrorGeneric => 'Не удалось отправить заявку';
+
+  @override
   String get etfSectorTechnology => 'Технологии';
 
   @override

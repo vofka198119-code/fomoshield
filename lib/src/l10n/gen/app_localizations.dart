@@ -12583,6 +12583,108 @@ abstract class AppLocalizations {
   /// **'Cancel Removal'**
   String get etfTeamMemberCancelTerminationButton;
 
+  /// No description provided for @etfSuccessionCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The head of this fund has gone quiet — the team is being offered the management.'**
+  String get etfSuccessionCardSubtitle;
+
+  /// No description provided for @etfSuccessionDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Days left: {days}'**
+  String etfSuccessionDaysLeft(int days);
+
+  /// No description provided for @etfSuccessionAppliedPill.
+  ///
+  /// In en, this message translates to:
+  /// **'You applied'**
+  String get etfSuccessionAppliedPill;
+
+  /// No description provided for @etfSuccessionSheetIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This fund\'s head hasn\'t opened the app in a long time. Any active team member can step up.'**
+  String get etfSuccessionSheetIntro;
+
+  /// No description provided for @etfSuccessionRuleEnterRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepting puts you in the running — it does not make you the head right away.'**
+  String get etfSuccessionRuleEnterRunning;
+
+  /// No description provided for @etfSuccessionRuleSeniorityWins.
+  ///
+  /// In en, this message translates to:
+  /// **'On the deadline, the fund goes to whoever has been on the team the longest among those who applied.'**
+  String get etfSuccessionRuleSeniorityWins;
+
+  /// No description provided for @etfSuccessionRuleHeadMayReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'If the current head opens the app before the deadline, the offer is cancelled and the fund stays theirs.'**
+  String get etfSuccessionRuleHeadMayReturn;
+
+  /// No description provided for @etfSuccessionRuleNobodyAccepts.
+  ///
+  /// In en, this message translates to:
+  /// **'If nobody applies, the fund is liquidated: holdings are sold and investors are paid out.'**
+  String get etfSuccessionRuleNobodyAccepts;
+
+  /// No description provided for @etfSuccessionRuleMoneyStays.
+  ///
+  /// In en, this message translates to:
+  /// **'The fund\'s cash and holdings stay with the fund — the new head inherits them, not a blank slate.'**
+  String get etfSuccessionRuleMoneyStays;
+
+  /// No description provided for @etfSuccessionDeadlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Decision date'**
+  String get etfSuccessionDeadlineLabel;
+
+  /// No description provided for @etfSuccessionAcceptButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply for the management'**
+  String get etfSuccessionAcceptButton;
+
+  /// No description provided for @etfSuccessionPremiumRequiredButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium required'**
+  String get etfSuccessionPremiumRequiredButton;
+
+  /// No description provided for @etfSuccessionAlreadyAppliedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have applied. The fund goes to the longest-serving applicant on the decision date.'**
+  String get etfSuccessionAlreadyAppliedBody;
+
+  /// No description provided for @etfSuccessionAcceptedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Application sent'**
+  String get etfSuccessionAcceptedSnackbar;
+
+  /// No description provided for @etfSuccessionErrorClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This offer is already closed'**
+  String get etfSuccessionErrorClosed;
+
+  /// No description provided for @etfSuccessionErrorNotEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'Only an active team member with Premium can take over a fund'**
+  String get etfSuccessionErrorNotEligible;
+
+  /// No description provided for @etfSuccessionErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send the application'**
+  String get etfSuccessionErrorGeneric;
+
   /// No description provided for @etfSectorTechnology.
   ///
   /// In en, this message translates to:

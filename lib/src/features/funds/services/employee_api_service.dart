@@ -3,6 +3,7 @@ import '../../../core/utils/constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../models/employee.dart';
 import '../models/fund_liquidation_payout.dart';
+import '../models/fund_succession_offer.dart';
 import 'fund_api_service.dart' show FundApiException;
 
 // ---------------------------------------------------------------------------
@@ -226,6 +227,31 @@ class EmployeeApiService {
       await _dio.post('/funds/$fundId/team/$userId/cancel-termination');
     } on DioException catch (e) {
       throw _apiException(e, 'Failed to cancel termination');
+    }
+  }
+
+  /// Every pending "your fund's head went missing, want it?" offer the
+  /// caller can see (Phase B). Visible to every active team member of the
+  /// fund; acceptance itself is premium-gated -- see FundSuccessionOffer.
+  Future<List<FundSuccessionOffer>> listMySuccessionOffers() async {
+    try {
+      final response = await _dio.get('/employees/me/succession-offers');
+      final list = ((response.data as Map)['offers'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(FundSuccessionOffer.fromJson).toList();
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to load succession offers'));
+    }
+  }
+
+  /// Enters the caller into the running for a fund's headship. Idempotent
+  /// server-side (unique offer+user), so a double-tap is a harmless no-op
+  /// rather than a second entry.
+  Future<void> acceptSuccessionOffer(String offerId) async {
+    try {
+      await _dio.post('/employees/me/succession-offers/$offerId/accept');
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to accept succession offer');
     }
   }
 

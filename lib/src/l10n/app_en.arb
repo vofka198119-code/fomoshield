@@ -2916,6 +2916,27 @@
   "etfTeamMemberPendingTerminationLabel": "Leaving soon",
   "etfTeamMemberCancelTerminationButton": "Cancel Removal",
 
+  "etfSuccessionCardSubtitle": "The head of this fund has gone quiet — the team is being offered the management.",
+  "etfSuccessionDaysLeft": "Days left: {days}",
+  "@etfSuccessionDaysLeft": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "etfSuccessionAppliedPill": "You applied",
+  "etfSuccessionSheetIntro": "This fund's head hasn't opened the app in a long time. Any active team member can step up.",
+  "etfSuccessionRuleEnterRunning": "Accepting puts you in the running — it does not make you the head right away.",
+  "etfSuccessionRuleSeniorityWins": "On the deadline, the fund goes to whoever has been on the team the longest among those who applied.",
+  "etfSuccessionRuleHeadMayReturn": "If the current head opens the app before the deadline, the offer is cancelled and the fund stays theirs.",
+  "etfSuccessionRuleNobodyAccepts": "If nobody applies, the fund is liquidated: holdings are sold and investors are paid out.",
+  "etfSuccessionRuleMoneyStays": "The fund's cash and holdings stay with the fund — the new head inherits them, not a blank slate.",
+  "etfSuccessionDeadlineLabel": "Decision date",
+  "etfSuccessionAcceptButton": "Apply for the management",
+  "etfSuccessionPremiumRequiredButton": "Premium required",
+  "etfSuccessionAlreadyAppliedBody": "You have applied. The fund goes to the longest-serving applicant on the decision date.",
+  "etfSuccessionAcceptedSnackbar": "Application sent",
+  "etfSuccessionErrorClosed": "This offer is already closed",
+  "etfSuccessionErrorNotEligible": "Only an active team member with Premium can take over a fund",
+  "etfSuccessionErrorGeneric": "Could not send the application",
+
   "etfSectorTechnology": "Technology",
   "etfSectorHealthcare": "Healthcare",
   "etfSectorFinancials": "Financials",

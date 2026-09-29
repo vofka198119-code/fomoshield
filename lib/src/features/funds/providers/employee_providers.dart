@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/employee.dart';
+import '../models/fund_succession_offer.dart';
 import '../services/employee_api_service.dart';
 
 final employeeApiServiceProvider = Provider<EmployeeApiService>((ref) {
@@ -32,6 +33,14 @@ final employeeMarketplaceProvider = FutureProvider.autoDispose
 final myInvitationsProvider =
     FutureProvider.autoDispose<List<FundInvitation>>((ref) {
       return ref.watch(employeeApiServiceProvider).listMyInvitations();
+    });
+
+/// Pending "the head went missing, want the fund?" offers (Phase B).
+/// Watched alongside myInvitationsProvider on My Invitations — both are
+/// "someone is offering you something, act before it expires".
+final mySuccessionOffersProvider =
+    FutureProvider.autoDispose<List<FundSuccessionOffer>>((ref) {
+      return ref.watch(employeeApiServiceProvider).listMySuccessionOffers();
     });
 
 /// A fund's roster — public, like the rest of a fund's data.

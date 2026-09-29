@@ -64,8 +64,13 @@ class EmployeeHubScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+    // Succession offers live on the same screen as the invite envelopes
+    // (see my_invitations_screen.dart), so they must count toward the same
+    // badge -- otherwise a fund-handover offer with no pending invites
+    // alongside it leaves this shortcut looking empty and never gets opened.
     final invitationsCount =
-        ref.watch(myInvitationsProvider).valueOrNull?.length ?? 0;
+        (ref.watch(myInvitationsProvider).valueOrNull?.length ?? 0) +
+        (ref.watch(mySuccessionOffersProvider).valueOrNull?.length ?? 0);
     final isAdmin = ref.watch(isAdminProvider);
     final profile = ref.watch(myEmployeeProfileProvider).valueOrNull;
 

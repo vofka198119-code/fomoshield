@@ -7354,6 +7354,68 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfTeamMemberCancelTerminationButton => 'Cancel Removal';
 
   @override
+  String get etfSuccessionCardSubtitle =>
+      'The head of this fund has gone quiet — the team is being offered the management.';
+
+  @override
+  String etfSuccessionDaysLeft(int days) {
+    return 'Days left: $days';
+  }
+
+  @override
+  String get etfSuccessionAppliedPill => 'You applied';
+
+  @override
+  String get etfSuccessionSheetIntro =>
+      'This fund\'s head hasn\'t opened the app in a long time. Any active team member can step up.';
+
+  @override
+  String get etfSuccessionRuleEnterRunning =>
+      'Accepting puts you in the running — it does not make you the head right away.';
+
+  @override
+  String get etfSuccessionRuleSeniorityWins =>
+      'On the deadline, the fund goes to whoever has been on the team the longest among those who applied.';
+
+  @override
+  String get etfSuccessionRuleHeadMayReturn =>
+      'If the current head opens the app before the deadline, the offer is cancelled and the fund stays theirs.';
+
+  @override
+  String get etfSuccessionRuleNobodyAccepts =>
+      'If nobody applies, the fund is liquidated: holdings are sold and investors are paid out.';
+
+  @override
+  String get etfSuccessionRuleMoneyStays =>
+      'The fund\'s cash and holdings stay with the fund — the new head inherits them, not a blank slate.';
+
+  @override
+  String get etfSuccessionDeadlineLabel => 'Decision date';
+
+  @override
+  String get etfSuccessionAcceptButton => 'Apply for the management';
+
+  @override
+  String get etfSuccessionPremiumRequiredButton => 'Premium required';
+
+  @override
+  String get etfSuccessionAlreadyAppliedBody =>
+      'You have applied. The fund goes to the longest-serving applicant on the decision date.';
+
+  @override
+  String get etfSuccessionAcceptedSnackbar => 'Application sent';
+
+  @override
+  String get etfSuccessionErrorClosed => 'This offer is already closed';
+
+  @override
+  String get etfSuccessionErrorNotEligible =>
+      'Only an active team member with Premium can take over a fund';
+
+  @override
+  String get etfSuccessionErrorGeneric => 'Could not send the application';
+
+  @override
   String get etfSectorTechnology => 'Technology';
 
   @override
