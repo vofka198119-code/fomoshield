@@ -12733,6 +12733,108 @@ abstract class AppLocalizations {
   /// **'Could not save the changes'**
   String get etfFundEditGenericError;
 
+  /// No description provided for @etfRulebookChapterBasics.
+  ///
+  /// In en, this message translates to:
+  /// **'BASICS'**
+  String get etfRulebookChapterBasics;
+
+  /// No description provided for @etfRulebookChapterHead.
+  ///
+  /// In en, this message translates to:
+  /// **'FOR THE HEAD'**
+  String get etfRulebookChapterHead;
+
+  /// No description provided for @etfRulebookChapterEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'FOR EMPLOYEES'**
+  String get etfRulebookChapterEmployee;
+
+  /// No description provided for @etfRulebookCreateSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating a fund'**
+  String get etfRulebookCreateSectionHeader;
+
+  /// No description provided for @etfRulebookCreateSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Any user with Premium can create a fund. One live fund per person.\n\n1. Open \"Become a fund manager\" on the home screen and go through the short introduction.\n\n2. Pick a name and a ticker. A ticker starts with FS followed by one to five capital letters — FSTECH, for example. Both must be free; names are compared ignoring case.\n\n3. Describe the fund: a description, an investment strategy and at least one sector. Sectors are how people find the fund when browsing.\n\n4. Set the starting capital. This is the money the fund begins with, and the initial number of units is derived from it.\n\nThe name, description, strategy and sectors can be changed at any time afterwards. The ticker and the starting capital cannot: investor holdings are recorded against the ticker, and the starting capital is already baked into the number of units issued.'**
+  String get etfRulebookCreateSectionBody;
+
+  /// No description provided for @etfRulebookHireSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Hiring someone'**
+  String get etfRulebookHireSectionHeader;
+
+  /// No description provided for @etfRulebookHireSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund can employ up to five people, not counting the head.\n\n1. Open the employee marketplace — it lists the profiles of people looking for work.\n\n2. Send an invitation: choose a role and write a message. The text is saved as a template and filled in for your next invitations.\n\n3. They either accept or decline. While they haven\'t answered, you can withdraw the invitation.\n\n4. You can\'t send a second invitation to the same person for the same fund while the first is still unanswered.\n\nYou can let someone go at any time, but never instantly: they get five days\' notice and keep working throughout. You can cancel the removal until the notice runs out.'**
+  String get etfRulebookHireSectionBody;
+
+  /// No description provided for @etfRulebookPermissionsSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting permissions'**
+  String get etfRulebookPermissionsSectionHeader;
+
+  /// No description provided for @etfRulebookPermissionsSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A role is only the starting set of permissions at hire time, not a hard limit. What each employee may actually do is set by the head, per person.\n\nThere are four permissions:\n\n• propose trades;\n• approve and reject proposals;\n• send approved orders to the market;\n• flag a proposal as risky.\n\nTo change them, open the fund\'s team and tap an employee\'s row. You can change their role there too — but note that changing a role resets the permissions to that role\'s template, so you\'d set them again afterwards. The app warns you before it does that.\n\nThe head always holds every permission and cannot have them taken away.'**
+  String get etfRulebookPermissionsSectionBody;
+
+  /// No description provided for @etfRulebookApplySectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting hired'**
+  String get etfRulebookApplySectionHeader;
+
+  /// No description provided for @etfRulebookApplySectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone can work for a fund — Premium is not required for this.\n\n1. Fill in your profile: name, a few words about yourself, language and the role you want. Mark yourself as open to offers, or you won\'t appear in the employee marketplace at all.\n\n2. Fund heads browse those profiles and send invitations.\n\n3. Invitations arrive under \"Job offers\". Tapping one shows which fund is asking, for what role and with what message. Then it\'s Join or Decline.\n\nYou can work for more than one fund at a time. Every position goes into your work history.'**
+  String get etfRulebookApplySectionBody;
+
+  /// No description provided for @etfRulebookProposeSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Proposing a trade'**
+  String get etfRulebookProposeSectionHeader;
+
+  /// No description provided for @etfRulebookProposeSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If you may propose trades, you don\'t buy anything yourself — you propose, and the head or their deputy decides.\n\n1. Open the fund\'s trading section and find the company.\n\n2. Set the direction (buy or sell), the quantity, the order type, and a price if it\'s a limit order.\n\n3. Write your reasoning — why the fund should do this. It\'s the main thing that gets read when the decision is made.\n\n4. The proposal lands in the fund\'s blotter as pending.\n\nFour things can happen next: approved, rejected, sent back for revision, or flagged as risky. An approved order is sent to the market by whoever holds that permission.\n\nThe money comes from the fund\'s cash, not from your personal portfolio. Every fund trade carries a 0.5% broker commission.'**
+  String get etfRulebookProposeSectionBody;
+
+  /// No description provided for @etfRulebookLeaveSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaving a fund'**
+  String get etfRulebookLeaveSectionHeader;
+
+  /// No description provided for @etfRulebookLeaveSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can leave at any time and without notice — open the position in your work history and choose to leave.\n\nThis differs from being let go: an employee leaving takes effect immediately, while a head removing someone starts a five-day notice first.\n\nThe position stays in your work history forever and is closed with a reason — resigned, let go, or the fund closed. It can\'t be erased or rewritten: this is the reputation fund heads see.'**
+  String get etfRulebookLeaveSectionBody;
+
+  /// No description provided for @etfRulebookCareerSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Your work history'**
+  String get etfRulebookCareerSectionHeader;
+
+  /// No description provided for @etfRulebookCareerSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every position at a fund is recorded: which fund, in what role, from when, until when, and how it ended.\n\nThe card shows how long you were there and how it finished. There are three endings:\n\n• resigned — you left of your own accord;\n• let go — the head ended the arrangement;\n• fund closed — the fund ceased to exist while you worked there. That is not a dismissal and not your fault.\n\nWhile you\'re still there, the position is marked as current.\n\nWork history can\'t be edited by hand — it fills itself in from what actually happened.'**
+  String get etfRulebookCareerSectionBody;
+
   /// No description provided for @etfRulebookSuccessionSectionHeader.
   ///
   /// In en, this message translates to:

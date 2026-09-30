@@ -6,7 +6,7 @@ import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
-import '../../company_detail/widgets/metric_info_data.dart' show MetricInfoContent, MetricInfoSection;
+import '../../company_detail/widgets/metric_info_data.dart' show MetricInfoSection;
 
 // ---------------------------------------------------------------------------
 // Fund Rulebook — Phase C of the bankruptcy spec
@@ -38,43 +38,101 @@ import '../../company_detail/widgets/metric_info_data.dart' show MetricInfoConte
 // editing this copy, not the design doc.
 // ---------------------------------------------------------------------------
 
-MetricInfoContent fundRulebookContent(AppLocalizations l10n) {
-  return MetricInfoContent(
-    title: l10n.etfRulebookTitle,
-    subtitle: l10n.etfRulebookSubtitle,
-    sections: [
-      MetricInfoSection(
-        header: l10n.etfRulebookFundSectionHeader,
-        body: l10n.etfRulebookFundSectionBody,
-      ),
-      MetricInfoSection(
-        header: l10n.etfRulebookRolesSectionHeader,
-        body: l10n.etfRulebookRolesSectionBody,
-      ),
-      MetricInfoSection(
-        header: l10n.etfRulebookTradeFlowSectionHeader,
-        body: l10n.etfRulebookTradeFlowSectionBody,
-      ),
-      MetricInfoSection(
-        header: l10n.etfRulebookNavSectionHeader,
-        body: l10n.etfRulebookNavSectionBody,
-      ),
-      MetricInfoSection(
-        header: l10n.etfRulebookBankruptcySectionHeader,
-        body: l10n.etfRulebookBankruptcySectionBody,
-      ),
-      MetricInfoSection(
-        header: l10n.etfRulebookSuccessionSectionHeader,
-        body: l10n.etfRulebookSuccessionSectionBody,
-      ),
-      // Same simulator disclaimer copy as onboarding's own closing step --
-      // one already-approved piece of text, not a re-drafted duplicate.
-      MetricInfoSection(
-        header: l10n.etfOnboardingStep7Title,
-        body: l10n.etfOnboardingStep7Body,
-      ),
-    ],
-  );
+/// One chapter of the Rulebook — a heading plus the topics under it.
+/// Grouping is flat-with-headers rather than a second navigation level on
+/// purpose: a reference is read by scanning, and burying "how do I hire
+/// someone" one tap deeper only makes it harder to find.
+class RulebookChapter {
+  final String title;
+  final List<MetricInfoSection> sections;
+
+  const RulebookChapter({required this.title, required this.sections});
+}
+
+/// The Rulebook's own content, split into three chains (2026-09-29 ask):
+/// what a fund IS, what the head does, and what an employee does. Before
+/// that it was one flat list that only explained concepts — there was no
+/// "how to hire", "how to set permissions", "how to propose a trade".
+///
+/// Every number and rule here mirrors what the code actually enforces, not
+/// what docs/ETF_FUND_EMULATION.md originally proposed — the two disagreed
+/// on succession and the code was ruled authoritative.
+List<RulebookChapter> fundRulebookChapters(AppLocalizations l10n) {
+  return [
+    RulebookChapter(
+      title: l10n.etfRulebookChapterBasics,
+      sections: [
+        MetricInfoSection(
+          header: l10n.etfRulebookFundSectionHeader,
+          body: l10n.etfRulebookFundSectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookNavSectionHeader,
+          body: l10n.etfRulebookNavSectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookRolesSectionHeader,
+          body: l10n.etfRulebookRolesSectionBody,
+        ),
+        // Same simulator disclaimer copy as onboarding's own closing step --
+        // one already-approved piece of text, not a re-drafted duplicate.
+        MetricInfoSection(
+          header: l10n.etfOnboardingStep7Title,
+          body: l10n.etfOnboardingStep7Body,
+        ),
+      ],
+    ),
+    RulebookChapter(
+      title: l10n.etfRulebookChapterHead,
+      sections: [
+        MetricInfoSection(
+          header: l10n.etfRulebookCreateSectionHeader,
+          body: l10n.etfRulebookCreateSectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookHireSectionHeader,
+          body: l10n.etfRulebookHireSectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookPermissionsSectionHeader,
+          body: l10n.etfRulebookPermissionsSectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookTradeFlowSectionHeader,
+          body: l10n.etfRulebookTradeFlowSectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookBankruptcySectionHeader,
+          body: l10n.etfRulebookBankruptcySectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookSuccessionSectionHeader,
+          body: l10n.etfRulebookSuccessionSectionBody,
+        ),
+      ],
+    ),
+    RulebookChapter(
+      title: l10n.etfRulebookChapterEmployee,
+      sections: [
+        MetricInfoSection(
+          header: l10n.etfRulebookApplySectionHeader,
+          body: l10n.etfRulebookApplySectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookProposeSectionHeader,
+          body: l10n.etfRulebookProposeSectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookLeaveSectionHeader,
+          body: l10n.etfRulebookLeaveSectionBody,
+        ),
+        MetricInfoSection(
+          header: l10n.etfRulebookCareerSectionHeader,
+          body: l10n.etfRulebookCareerSectionBody,
+        ),
+      ],
+    ),
+  ];
 }
 
 class FundRulebookScreen extends ConsumerWidget {
@@ -84,7 +142,7 @@ class FundRulebookScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
-    final content = fundRulebookContent(l10n);
+    final chapters = fundRulebookChapters(l10n);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -93,7 +151,7 @@ class FundRulebookScreen extends ConsumerWidget {
         centerTitle: true,
         leading: themedBackButton(context, palette),
         title: themedHeaderText(
-          content.title.toUpperCase(),
+          l10n.etfRulebookTitle.toUpperCase(),
           palette,
           GoogleFonts.inter(
             fontSize: 18,
@@ -107,23 +165,38 @@ class FundRulebookScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(20),
           children: [
             Text(
-              content.subtitle,
+              l10n.etfRulebookSubtitle,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: palette.accentPrimary,
               ),
             ),
-            const SizedBox(height: 16),
-            for (final section in content.sections)
+            for (final chapter in chapters) ...[
+              const SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _RulebookRow(
-                  section: section,
-                  palette: palette,
-                  onTap: () => _showRulebookSectionSheet(context, palette, section),
+                padding: const EdgeInsets.only(left: 4, bottom: 10),
+                child: Text(
+                  chapter.title,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                    color: palette.textBody,
+                  ),
                 ),
               ),
+              for (final section in chapter.sections)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _RulebookRow(
+                    section: section,
+                    palette: palette,
+                    onTap: () =>
+                        _showRulebookSectionSheet(context, palette, section),
+                  ),
+                ),
+            ],
           ],
         ),
       ),
