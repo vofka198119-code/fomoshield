@@ -21,7 +21,7 @@
 <body>
 
 <h1>Privacy Policy</h1>
-<div class="meta">Last updated: September 17, 2026 &middot; Effective for app version: 1.0.0 (build 123)</div>
+<div class="meta">Last updated: October 1, 2026 &middot; Effective for app version: 1.0</div>
 
 <h2>1. Who We Are</h2>
 <p>F.O.M.O. Shield ("the App", "we", "us") is an educational investing-simulation app. This policy explains what data we collect, why, and what rights you have over it.</p>
@@ -37,6 +37,7 @@
   <tr><th>Category</th><th>What</th><th>Why</th></tr>
   <tr><td>Account</td><td>Email address (via Supabase Auth, or via Google Sign-In if you use that option)</td><td>Create and secure your account, password-reset/login</td></tr>
   <tr><td>Your own data</td><td>Watchlist symbols, portfolio/stress-test simulation state, goals you set</td><td>Core app functionality — this is the product</td></tr>
+  <tr><td>Advertising identifier</td><td>The resettable advertising ID your device provides to Google AdMob (not collected for Premium subscribers, who see no ads)</td><td>Serve and measure ads &mdash; see &ldquo;Advertising&rdquo; in section 5</td></tr>
 </table>
 <p>We do <strong>not</strong> collect: real payment/card details (Premium, if purchased, is billed entirely by Apple/Google — we never see your card), real brokerage credentials, precise GPS location, or contacts/photos/microphone access.</p>
 
@@ -45,6 +46,7 @@
   <li><strong>Consent</strong> — you actively accept this policy and the Disclaimer at sign-up, and can withdraw consent by deleting your account.</li>
   <li><strong>Legitimate interest</strong> — securing our backend and preventing abuse (e.g. rate-limiting, API authentication), where this doesn't override your own privacy rights.</li>
   <li><strong>Contract necessity</strong> — your email is required to create and operate your account; without it we can't provide the service.</li>
+  <li><strong>Separate consent for advertising</strong> &mdash; personalised advertising relies on the choice you make in Google's consent form, not on your acceptance of this policy. You can decline it, change it later, and keep using the App either way.</li>
 </ul>
 
 <h2>5. Who We Share Data With (Processors)</h2>
@@ -55,9 +57,11 @@
   <li><strong>Finnhub</strong> and <strong>Wikipedia APIs</strong> — provide market data and company information; we query them on your behalf via our own backend, they don't receive your personal data.</li>
   <li><strong>Our own backend server</strong> (proxies market-data requests and stores app configuration), hosted by Hetzner Online GmbH in Nuremberg, Germany.</li>
   <li><strong>Email delivery</strong> (Gmail SMTP) — sends account-related emails (verification, password reset).</li>
+  <li><strong>Google AdMob</strong> — serves the ads described below; receives your device's advertising identifier, not your account or email.</li>
   <li><strong>Firebase Crashlytics</strong> (Google) — if the App crashes or hits an unhandled error, automatically sends a crash report with basic device diagnostics (device model, OS version, app version, the crash's stack trace) so we can find and fix the bug. Not tied to your account, email, or identity.</li>
 </ul>
-<p>We do not sell your data to advertisers or data brokers, and no ad network or behavioral-analytics SDK is integrated into the App.</p>
+<p>We do not sell your data to advertisers or data brokers, and no behavioural-analytics SDK is integrated into the App.</p>
+<p><strong>Advertising.</strong> The App includes Google AdMob. Ads are shown in two places only: as <em>rewarded</em> ads, which you choose to watch in exchange for something in the App, and as an occasional ad when the App is opened. <strong>Premium subscribers are shown no ads at all.</strong> To serve them, Google receives your device's advertising identifier and standard request data (device type, coarse region, app version). If you are in the EU, the UK or another region with equivalent rules, the App asks for your choice through Google's own consent form before any personalised advertising is served; you can decline and still use the App.</p>
 
 <h2>6. Data Retention</h2>
 <p>We keep your account data for as long as your account is active. You can delete your account at any time from Profile &rarr; Delete Account — this permanently and immediately removes your account and all associated data (portfolios, watchlist, stress-test history), except where we're legally required to keep records longer.</p>
