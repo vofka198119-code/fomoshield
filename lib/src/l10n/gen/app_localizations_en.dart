@@ -207,6 +207,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not delete account. Please try again.';
 
   @override
+  String get exitAppTitle => 'Leave the app?';
+
+  @override
+  String get exitAppBody =>
+      'The app will be minimized. Tap Leave only if you meant to.';
+
+  @override
+  String get exitAppStay => 'Stay';
+
+  @override
+  String get exitAppLeave => 'Leave';
+
+  @override
   String get premiumActive => 'Premium Active';
 
   @override

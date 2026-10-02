@@ -10,6 +10,7 @@ import '../../features/auth/forgot_password_screen.dart';
 import '../../features/auth/reset_password_screen.dart';
 import '../../features/auth/password_recovery.dart';
 import '../supabase/supabase_client.dart';
+import 'exit_confirm_dialog.dart';
 
 import '../../features/auth/account_restore_screen.dart';
 import '../../shared/services/finnhub_service.dart' show AccountDeletionStatus;
@@ -559,8 +560,16 @@ class _AppShell extends ConsumerWidget {
   // instead — see MainActivity.kt's "app/lifecycle" channel.
   static const _lifecycleChannel = MethodChannel('app/lifecycle');
 
-  Future<void> _onPopInvoked(bool didPop, Object? result) async {
+  // Confirm first: minimizing is cheap, but HyperOS tends to evict the
+  // minimized app, turning an accidental tap into a cold start. See
+  // exit_confirm_dialog.dart.
+  Future<void> _onPopInvoked(
+    BuildContext context,
+    bool didPop,
+    Object? result,
+  ) async {
     if (didPop) return;
+    if (!await confirmExitApp(context)) return;
     await _lifecycleChannel.invokeMethod('moveTaskToBack');
   }
 
@@ -572,7 +581,8 @@ class _AppShell extends ConsumerWidget {
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: _onPopInvoked,
+      onPopInvokedWithResult: (didPop, result) =>
+          _onPopInvoked(context, didPop, result),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         extendBody: true,
