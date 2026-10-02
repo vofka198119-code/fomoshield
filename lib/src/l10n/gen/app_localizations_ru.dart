@@ -206,6 +206,19 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось удалить аккаунт. Попробуйте ещё раз.';
 
   @override
+  String get exitAppTitle => 'Выйти из приложения?';
+
+  @override
+  String get exitAppBody =>
+      'Приложение свернётся. Нажимайте «Выйти», только если действительно хотели.';
+
+  @override
+  String get exitAppStay => 'Остаться';
+
+  @override
+  String get exitAppLeave => 'Выйти';
+
+  @override
   String get premiumActive => 'Премиум активен';
 
   @override

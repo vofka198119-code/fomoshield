@@ -464,6 +464,30 @@ abstract class AppLocalizations {
   /// **'Could not delete account. Please try again.'**
   String get profileDeleteFailed;
 
+  /// No description provided for @exitAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the app?'**
+  String get exitAppTitle;
+
+  /// No description provided for @exitAppBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The app will be minimized. Tap Leave only if you meant to.'**
+  String get exitAppBody;
+
+  /// No description provided for @exitAppStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get exitAppStay;
+
+  /// No description provided for @exitAppLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get exitAppLeave;
+
   /// No description provided for @premiumActive.
   ///
   /// In en, this message translates to:
