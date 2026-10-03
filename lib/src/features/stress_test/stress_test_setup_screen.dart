@@ -134,10 +134,11 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
       return;
     }
 
-    // Custom-duration funding choice (lump sum vs DCA) was already made
-    // right after the custom-duration picker's Apply — see
-    // _showCustomDurationPicker — well before this disclaimer step.
-    final useDca = _selectedDuration == TestDuration.custom && _useDcaFunding;
+    // The funding choice (lump sum vs weekly deposits) and the dividend
+    // opt-in were both made earlier, on the duration row itself — right
+    // after Apply for Custom, on selection for Infinite — well before this
+    // disclaimer step. See _askFundingOptions / _durationSupportsFunding.
+    final useDca = _durationSupportsFunding(_selectedDuration) && _useDcaFunding;
 
     final notifier = ref.read(stressTestProvider.notifier);
     notifier.renameSession(widget.sessionId, _nameController.text);
@@ -153,7 +154,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     if (useDca) {
       await markStressTestDcaFunded(ref, widget.sessionId);
     }
-    if (_selectedDuration == TestDuration.custom && _enableDividendSimulation) {
+    if (_durationSupportsFunding(_selectedDuration) &&
+        _enableDividendSimulation) {
       await markStressTestDividendSimulationEnabled(ref, widget.sessionId);
     }
     notifier.startTest(widget.sessionId);
@@ -547,11 +549,15 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
               _showPremiumUpsell();
             } else if (isCustomRow) {
               _showCustomDurationPicker();
+            } else if (isInfiniteRow) {
+              setState(() => _selectedDuration = d);
+              _askFundingOptions();
             } else {
               setState(() {
                 _selectedDuration = d;
-                // A DCA/dividend choice only ever applies to Custom —
-                // picking any other duration must not carry it forward.
+                // The fixed presets don't offer either option (see
+                // _durationSupportsFunding) — picking one must not carry a
+                // choice forward from a Custom/Infinite row tapped earlier.
                 _useDcaFunding = false;
                 _enableDividendSimulation = false;
               });
@@ -782,6 +788,51 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
 
   /// Opens a bottom sheet to pick custom duration (14–365 days).
   /// Free users are redirected to [_showPremiumUpsell] instead.
+  /// Durations that offer the weekly-top-up / dividend options.
+  ///
+  /// Both are paid out on a real-time clock — top-ups every 7 days,
+  /// dividends every 30 (14 for REITs). The fixed presets are too short for
+  /// that to mean anything: a 1-week test would see a single top-up land on
+  /// its final day and never a dividend at all, so offering the choice there
+  /// would be a promise the test can't keep. Custom (user-chosen length) and
+  /// Infinite (runs until stopped, minimum 14 days) are the two that can.
+  /// Infinite was added 2026-10-03 — it is the longest-running mode in the
+  /// app and had been the only long one with no income of any kind.
+  static bool _durationSupportsFunding(TestDuration d) =>
+      d == TestDuration.custom || d == TestDuration.infinite;
+
+  /// The two chained opt-in sheets: funding mode, then dividend simulation.
+  /// Shared by the Custom day-picker (asked right after Apply) and the
+  /// Infinite row (asked on selection) so both paths stay identical.
+  Future<void> _askFundingOptions() async {
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
+    final choice = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: palette.card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _FundingModeSheet(palette: palette),
+    );
+    if (choice != null && mounted) {
+      setState(() => _useDcaFunding = choice);
+    }
+    if (!mounted) return;
+    final dividendChoice = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: palette.card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _DividendSimulationSheet(palette: palette),
+    );
+    if (dividendChoice != null && mounted) {
+      setState(() => _enableDividendSimulation = dividendChoice);
+    }
+  }
+
   void _showCustomDurationPicker() async {
     // Awaits the real tier instead of racing subscriptionTierProvider's
     // async DB fetch — a premature "free" read would wrongly show a
@@ -987,44 +1038,7 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
                               // method's, not the closed sheet's `ctx`),
                               // which is still valid — the setup screen
                               // underneath stays mounted.
-                              final choice = await showModalBottomSheet<bool>(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: palette.card,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(20),
-                                  ),
-                                ),
-                                builder: (_) =>
-                                    _FundingModeSheet(palette: palette),
-                              );
-                              if (choice != null && mounted) {
-                                setState(() => _useDcaFunding = choice);
-                              }
-                              if (!mounted) return;
-                              // Dividend simulation opt-in — same chained-
-                              // sheet flow, right after the funding choice.
-                              final dividendChoice =
-                                  await showModalBottomSheet<bool>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: palette.card,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(20),
-                                      ),
-                                    ),
-                                    builder: (_) => _DividendSimulationSheet(
-                                      palette: palette,
-                                    ),
-                                  );
-                              if (dividendChoice != null && mounted) {
-                                setState(
-                                  () => _enableDividendSimulation =
-                                      dividendChoice,
-                                );
-                              }
+                              await _askFundingOptions();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: accentColor,

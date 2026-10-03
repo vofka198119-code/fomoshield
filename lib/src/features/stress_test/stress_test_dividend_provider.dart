@@ -4,12 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../core/overlay/app_notification_popup.dart';
+import '../../core/supabase/free_reading_trust.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/utils/currency_format.dart';
 import 'stress_test_engine.dart';
 import 'stress_test_models.dart';
 import 'stress_test_live_metrics.dart';
+import 'stress_test_funding_sync.dart';
 
 // ---------------------------------------------------------------------------
 // Stress Test Dividend Simulation (Custom-duration only, opt-in)
@@ -79,6 +81,48 @@ Future<void> _saveStore(String? uid, Map<String, _DividendEntry> store) async {
   );
 }
 
+// ── Server sync (Migration 032) ──────────────────────────────────────────
+// Same reasoning as stress_test_dca_provider.dart's pair below its own
+// store — see docs/migration_032_stress_test_funding.sql.
+
+/// The whole store as plain JSON, for [pushStressTestFunding].
+Future<Map<String, dynamic>> exportDividendStore(String? uid) async {
+  final store = await _loadStore(uid);
+  return store.map((k, v) => MapEntry(k, v.toJson()));
+}
+
+/// Merges a server copy into the device's. `enabled` is sticky — true from
+/// either side wins, since nothing in the app ever turns dividends back off.
+/// Per-symbol clocks take the LATER of the two for the same reason DCA does:
+/// a later clock can only under-pay, never pay a period twice.
+Future<void> importDividendStore(String? uid, Map<String, dynamic> raw) async {
+  final incoming = <String, _DividendEntry>{};
+  raw.forEach((k, v) {
+    if (v is Map) {
+      incoming[k] = _DividendEntry.fromJson(Map<String, dynamic>.from(v));
+    }
+  });
+  if (incoming.isEmpty) return;
+  final store = await _loadStore(uid);
+  for (final entry in incoming.entries) {
+    final mine = store[entry.key];
+    if (mine == null) {
+      store[entry.key] = entry.value;
+      continue;
+    }
+    final clocks = Map<String, DateTime>.from(mine.lastPayoutBySymbol);
+    entry.value.lastPayoutBySymbol.forEach((symbol, theirs) {
+      final ours = clocks[symbol];
+      if (ours == null || theirs.isAfter(ours)) clocks[symbol] = theirs;
+    });
+    store[entry.key] = _DividendEntry(
+      enabled: mine.enabled || entry.value.enabled,
+      lastPayoutBySymbol: clocks,
+    );
+  }
+  await _saveStore(uid, store);
+}
+
 /// Marks [sessionId] as dividend-simulation-enabled — call once, right when
 /// the user picks "Simulate dividends" during Custom-duration setup. Seeds
 /// every holding already bought (setup-phase buys) with a clock starting
@@ -100,6 +144,7 @@ Future<void> markStressTestDividendSimulationEnabled(
     },
   );
   await _saveStore(uid, store);
+  await pushStressTestFunding(ref);
 }
 
 Future<bool> isStressTestDividendSimulationEnabled(
@@ -111,6 +156,13 @@ Future<bool> isStressTestDividendSimulationEnabled(
   return store[sessionId]?.enabled ?? false;
 }
 
+// Note for anyone extending this: the two remaining local writes below —
+// pinning the clock while the subscription is lapsed, and seeding a clock
+// for a holding that owes nothing — deliberately do NOT push to the server.
+// They run on every check-in, i.e. every 20s while the screen is open, so
+// syncing them would mean a Supabase write every 20 seconds per viewer. Only
+// opting in and actually crediting push, and those are the two states worth
+// surviving a reinstall anyway.
 /// Catch-up check for one session — credits any elapsed dividend periods,
 /// per holding, if currently premium/admin (Custom-duration is already a
 /// premium-only test mode, but a long-running test can outlive a lapsed
@@ -133,6 +185,8 @@ Future<void> checkStressTestDividendPayout(
   // checkStressTestDcaPayout, see resolveSubscriptionTier's doc comment.
   final tier = await resolveSubscriptionTier(ref);
   if (!tier.isPremiumOrAdmin) {
+    // Same guard as DCA's — see free_reading_trust.dart.
+    if (!await freeReadingIsTrustworthy(ref)) return;
     store[session.id] = _DividendEntry(
       enabled: true,
       lastPayoutBySymbol: {
@@ -196,6 +250,7 @@ Future<void> checkStressTestDividendPayout(
     lastPayoutBySymbol: updatedClocks,
   );
   await _saveStore(uid, store);
+  await pushStressTestFunding(ref);
 
   pushAppNotification(
     ref.read(notificationsProvider.notifier),

@@ -9,6 +9,7 @@ import '../../features/home/home_providers.dart';
 import '../../features/home/widget_order_provider.dart';
 import '../../features/orders/order_provider.dart';
 import '../../features/stress_test/stress_test_engine.dart';
+import '../../features/stress_test/stress_test_funding_sync.dart';
 
 // ---------------------------------------------------------------------------
 // UserDataService — syncs user data between Supabase and local providers
@@ -36,7 +37,7 @@ class UserDataService {
       final response = await _client
           .from('user_data')
           .select(
-            'portfolios, watchlist, widget_order, orders, stress_test_sessions, stress_test_verdicts',
+            'portfolios, watchlist, widget_order, orders, stress_test_sessions, stress_test_verdicts, stress_test_funding',
           )
           .eq('id', userId)
           .maybeSingle();
@@ -49,6 +50,7 @@ class UserDataService {
           'orders': [],
           'stress_test_sessions': [],
           'stress_test_verdicts': [],
+          'stress_test_funding': <String, dynamic>{},
         };
       }
 
@@ -59,6 +61,7 @@ class UserDataService {
         'orders': _decodeJsonList(response['orders']),
         'stress_test_sessions': _decodeJsonList(response['stress_test_sessions']),
         'stress_test_verdicts': _decodeJsonList(response['stress_test_verdicts']),
+        'stress_test_funding': _decodeJsonMap(response['stress_test_funding']),
       };
     } catch (e) {
       debugPrint('🔄 userDataService.loadAll($userId) failed: $e');
@@ -69,6 +72,7 @@ class UserDataService {
         'orders': [],
         'stress_test_sessions': [],
         'stress_test_verdicts': [],
+        'stress_test_funding': <String, dynamic>{},
       };
     }
   }
@@ -154,6 +158,28 @@ class UserDataService {
     }
   }
 
+  // ── Save stress-test funding flags ────────────────────────────────
+  // The Custom-duration weekly top-up / dividend-simulation markers. Local
+  // only until Migration 032 — see that file for the data loss this fixes.
+  // Pushed on every change to the local stores rather than on "significant
+  // events" like the sessions above: these writes are tiny (a handful of
+  // timestamps) and rare (opt-in at setup, then once per credited period).
+
+  Future<void> saveStressTestFunding(
+    String userId,
+    Map<String, dynamic> funding,
+  ) async {
+    try {
+      await _client.from('user_data').upsert({
+        'id': userId,
+        'stress_test_funding': funding,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    } catch (e) {
+      debugPrint('🔄 userDataService.saveStressTestFunding($userId) failed: $e');
+    }
+  }
+
   // ── Save widget order ─────────────────────────────────────────────
 
   Future<void> saveWidgetOrder(
@@ -173,6 +199,24 @@ class UserDataService {
   }
 
   // ── Helpers ───────────────────────────────────────────────────────
+
+  // Same tolerance as _decodeJsonList, for a JSONB object column: Supabase
+  // hands these back already decoded, but a String slips through on some
+  // driver/column-type combinations — the list helper below was written for
+  // exactly that surprise.
+  Map<String, dynamic> _decodeJsonMap(dynamic value) {
+    if (value == null) return {};
+    if (value is Map) return Map<String, dynamic>.from(value);
+    if (value is String) {
+      try {
+        final decoded = jsonDecode(value);
+        return decoded is Map ? Map<String, dynamic>.from(decoded) : {};
+      } catch (_) {
+        return {};
+      }
+    }
+    return {};
+  }
 
   List<dynamic> _decodeJsonList(dynamic value) {
     if (value == null) return [];
@@ -246,6 +290,14 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
   final stressTestSessions = data['stress_test_sessions'] as List<dynamic>;
   if (stressTestSessions.isNotEmpty) {
     ref.read(stressTestProvider.notifier).loadFromSupabase(stressTestSessions);
+  }
+
+  // Restore the Custom-duration funding flags (weekly top-up / dividends)
+  // before anything can credit against them — the stress-test screen's own
+  // catch-up runs on screen open, which is always later than this.
+  final funding = data['stress_test_funding'] as Map<String, dynamic>? ?? {};
+  if (funding.isNotEmpty) {
+    await applyStressTestFunding(user.id, funding);
   }
 
   // Load stress-test verdict archive

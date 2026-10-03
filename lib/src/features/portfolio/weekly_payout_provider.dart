@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/models/app_notification.dart';
 import '../../core/notifications/notification_providers.dart';
 import '../../core/overlay/app_notification_popup.dart';
+import '../../core/supabase/free_reading_trust.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/utils/currency_format.dart';
@@ -114,6 +115,13 @@ Future<void> checkWeeklyPayout(WidgetRef ref, AppLocalizations l10n) async {
     }
     await prefs.setBool(key, true);
   } else {
+    // An unconfirmed `free` reading is not acted on at all — see
+    // free_reading_trust.dart. Bailing before everything below matters for
+    // more than the clock: firing "subscription paused" at a paying user
+    // whose network blipped is the loudest version of this bug, and writing
+    // wasPremium=false here would then fire a phantom "upgraded" notice the
+    // moment the real tier landed.
+    if (!await freeReadingIsTrustworthy(ref)) return;
     // Only fire the "paused" popup on the actual free->premium-lapsed
     // transition (wasPremium == true), not on every free-tier check-in —
     // and only if a payout clock had ever actually started for this

@@ -1,0 +1,34 @@
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 032
+-- Table: user_data (ADD COLUMN)
+-- Description: The two Custom-duration funding options of a Market Simulation
+--              — "weekly top-up" (DCA) and "simulate dividends" — were stored
+--              ONLY in device-local SharedPreferences
+--              (stress_test_dca_provider.dart / stress_test_dividend_provider
+--              .dart), while the session itself syncs to user_data
+--              .stress_test_sessions (Migration 004).
+--
+--              So a reinstall, a cleared app storage or a new device brought
+--              the session back from the server stripped of its funding
+--              flags: no weekly top-up, no dividends, ever again, with
+--              nothing in the UI saying so. Found 2026-10-03 while chasing
+--              "the stress test didn't pay out again".
+--
+--              This is the exact failure Migration 007 already fixed once for
+--              the verdict archive, which was local-only for the same reason.
+--              Same fix, same shape.
+--
+--              Deliberately a column of its own rather than fields on the
+--              session JSON: StressTestSession is reconstructed wholesale at
+--              ~10 call sites, and a field missed at any one of them would
+--              silently reset — which is why these stores were kept beside
+--              the session in the first place. Keeping them beside it here
+--              too preserves that property.
+--
+--              Shape: {"dca": {"<sessionId>": {"lastPayoutAt": "<iso8601>"}},
+--                      "dividends": {"<sessionId>": {"enabled": true,
+--                        "lastPayoutBySymbol": {"<SYM>": "<iso8601>"}}}}
+-- =============================================================================
+
+ALTER TABLE public.user_data
+ADD COLUMN IF NOT EXISTS stress_test_funding JSONB NOT NULL DEFAULT '{}'::jsonb;

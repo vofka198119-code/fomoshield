@@ -16,6 +16,7 @@ import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_border.dart';
 import '../../../core/supabase/supabase_providers.dart';
+import '../../stress_test/stress_test_funding_sync.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../monetization/monetization_modal.dart';
@@ -432,6 +433,13 @@ class StressTestWidget extends ConsumerWidget {
                             ),
                           ),
                         ],
+                        // Weekly deposits / dividends are opt-in, and only
+                        // on a Custom-duration test — so most rows show
+                        // nothing here. Saying it out loud is the cheap half
+                        // of the 2026-10-03 fix: when the markers went
+                        // missing there was no way to tell from the app
+                        // whether a test was ever funded at all.
+                        ..._fundingLines(ref, session.id, l10n, palette),
                       ],
                     ),
                   ),
@@ -567,3 +575,55 @@ class StressTestWidget extends ConsumerWidget {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Funding lines under an active session's row
+// ---------------------------------------------------------------------------
+// Returns nothing at all for the common case (a preset-duration test, or a
+// Custom one where neither option was taken), so the row keeps its current
+// two-line shape unless there is genuinely something to say. While the
+// async read is in flight it also returns nothing — a row that briefly grows
+// by two lines is better than one that flashes placeholder text.
+
+List<Widget> _fundingLines(
+  WidgetRef ref,
+  String sessionId,
+  AppLocalizations l10n,
+  AppPalette palette,
+) {
+  final flags = ref
+      .watch(stressTestFundingFlagsProvider(sessionId))
+      .maybeWhen(data: (f) => f, orElse: () => StressTestFundingFlags.none);
+  if (!flags.any) return const [];
+
+  final color = palette.titleGradient != null
+      ? Colors.white.withValues(alpha: 0.7)
+      : palette.textBody.withValues(alpha: 0.8);
+
+  Widget line(IconData icon, String label) => Padding(
+    padding: const EdgeInsets.only(top: 2),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 11, color: color),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.inter(fontSize: 10, color: color),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  return [
+    if (flags.weeklyTopUp)
+      line(Icons.add_circle_outline_rounded, l10n.fundingModeDcaTitle),
+    if (flags.dividends)
+      line(Icons.savings_outlined, l10n.verdictDividendsLabel),
+  ];
+}
+
