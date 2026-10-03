@@ -780,6 +780,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stressTestWidgetTimer => 'Timer';
 
   @override
+  String get portfolioValueChartTitle => 'Portfolio Value';
+
+  @override
+  String get portfolioValueChartCollecting =>
+      'The chart starts filling in from today — come back tomorrow for the first line.';
+
+  @override
+  String get portfolioWidgetDisplayNameValueChart => 'Portfolio Value Chart';
+
+  @override
   String get portfolioWidgetDisplayNameTarget => 'Target';
 
   @override

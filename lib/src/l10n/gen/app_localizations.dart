@@ -1483,6 +1483,24 @@ abstract class AppLocalizations {
   /// **'Timer'**
   String get stressTestWidgetTimer;
 
+  /// No description provided for @portfolioValueChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio Value'**
+  String get portfolioValueChartTitle;
+
+  /// No description provided for @portfolioValueChartCollecting.
+  ///
+  /// In en, this message translates to:
+  /// **'The chart starts filling in from today — come back tomorrow for the first line.'**
+  String get portfolioValueChartCollecting;
+
+  /// No description provided for @portfolioWidgetDisplayNameValueChart.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio Value Chart'**
+  String get portfolioWidgetDisplayNameValueChart;
+
   /// No description provided for @portfolioWidgetDisplayNameTarget.
   ///
   /// In en, this message translates to:

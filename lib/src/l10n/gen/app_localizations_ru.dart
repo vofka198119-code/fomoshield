@@ -781,6 +781,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get stressTestWidgetTimer => 'Таймер';
 
   @override
+  String get portfolioValueChartTitle => 'Стоимость портфеля';
+
+  @override
+  String get portfolioValueChartCollecting =>
+      'График начинает заполняться с сегодняшнего дня — первая линия появится завтра.';
+
+  @override
+  String get portfolioWidgetDisplayNameValueChart => 'График стоимости';
+
+  @override
   String get portfolioWidgetDisplayNameTarget => 'Цель';
 
   @override

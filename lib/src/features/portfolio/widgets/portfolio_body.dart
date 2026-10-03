@@ -48,6 +48,22 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
         checkFundLiquidationPayouts(ref, AppLocalizations.of(context)!);
       }
     });
+    // Seed the value chart with today's point. Separate from the microtask
+    // above because it has to await the performance provider rather than
+    // fire and forget — and it can't ride on build()'s ref.listen alone,
+    // which only fires on CHANGES: a provider still holding data from an
+    // earlier visit to this screen would never be recorded at all.
+    Future.microtask(() async {
+      if (!mounted) return;
+      try {
+        final perf = await ref.read(
+          portfolioPerformanceProvider(widget.portfolioId).future,
+        );
+        if (mounted) await recordPortfolioValue(ref, perf.currentValue);
+      } catch (_) {
+        // Quotes unavailable — no point to record, try again next refresh.
+      }
+    });
   }
 
   @override
@@ -91,6 +107,14 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
     final performanceAsync = ref.watch(
       portfolioPerformanceProvider(widget.portfolioId),
     );
+    // Every subsequent fresh total — the 5-minute timer, pull-to-refresh, a
+    // trade. recordPortfolioValue keeps one point per calendar day and skips
+    // the write entirely when the day's value hasn't moved, so firing this
+    // often costs nothing.
+    ref.listen(portfolioPerformanceProvider(widget.portfolioId), (_, next) {
+      final value = next.valueOrNull?.currentValue;
+      if (value != null) recordPortfolioValue(ref, value);
+    });
     final widgetConfigs = ref.watch(portfolioWidgetsProvider);
     final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
@@ -183,6 +207,11 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
             hasError: hasError,
             palette: palette,
           ),
+        );
+      case 'value_chart':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: PortfolioValueChartWidget(palette: palette),
         );
       case 'portfolio_cash':
         return Padding(

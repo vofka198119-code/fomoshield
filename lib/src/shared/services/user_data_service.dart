@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../features/portfolio/portfolio_providers.dart';
+import '../../features/portfolio/portfolio_value_history.dart';
 import '../../features/home/home_providers.dart';
 import '../../features/home/widget_order_provider.dart';
 import '../../features/orders/order_provider.dart';
@@ -37,7 +38,7 @@ class UserDataService {
       final response = await _client
           .from('user_data')
           .select(
-            'portfolios, watchlist, widget_order, orders, stress_test_sessions, stress_test_verdicts, stress_test_funding',
+            'portfolios, watchlist, widget_order, orders, stress_test_sessions, stress_test_verdicts, stress_test_funding, portfolio_value_history',
           )
           .eq('id', userId)
           .maybeSingle();
@@ -51,6 +52,7 @@ class UserDataService {
           'stress_test_sessions': [],
           'stress_test_verdicts': [],
           'stress_test_funding': <String, dynamic>{},
+          'portfolio_value_history': [],
         };
       }
 
@@ -62,6 +64,9 @@ class UserDataService {
         'stress_test_sessions': _decodeJsonList(response['stress_test_sessions']),
         'stress_test_verdicts': _decodeJsonList(response['stress_test_verdicts']),
         'stress_test_funding': _decodeJsonMap(response['stress_test_funding']),
+        'portfolio_value_history': _decodeJsonList(
+          response['portfolio_value_history'],
+        ),
       };
     } catch (e) {
       debugPrint('🔄 userDataService.loadAll($userId) failed: $e');
@@ -73,6 +78,7 @@ class UserDataService {
         'stress_test_sessions': [],
         'stress_test_verdicts': [],
         'stress_test_funding': <String, dynamic>{},
+        'portfolio_value_history': [],
       };
     }
   }
@@ -155,6 +161,28 @@ class UserDataService {
       });
     } catch (e) {
       debugPrint('🔄 userDataService.saveVerdictArchive($userId) failed: $e');
+    }
+  }
+
+  // ── Save portfolio value history ──────────────────────────────────
+  // One point per day (Migration 033). Written from
+  // portfolio_value_history.dart, which already skips the write when the
+  // day's stored value hasn't actually moved.
+
+  Future<void> savePortfolioValueHistory(
+    String userId,
+    List<Map<String, dynamic>> points,
+  ) async {
+    try {
+      await _client.from('user_data').upsert({
+        'id': userId,
+        'portfolio_value_history': points,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    } catch (e) {
+      debugPrint(
+        '🔄 userDataService.savePortfolioValueHistory($userId) failed: $e',
+      );
     }
   }
 
@@ -298,6 +326,14 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
   final funding = data['stress_test_funding'] as Map<String, dynamic>? ?? {};
   if (funding.isNotEmpty) {
     await applyStressTestFunding(user.id, funding);
+  }
+
+  // Restore the portfolio value chart's points before the Portfolio screen
+  // can record today's — otherwise a fresh install would start a brand-new
+  // history and the old one would be overwritten on the first write.
+  final valueHistory = data['portfolio_value_history'] as List<dynamic>? ?? [];
+  if (valueHistory.isNotEmpty) {
+    await applyPortfolioHistoryFromSupabase(user.id, valueHistory);
   }
 
   // Load stress-test verdict archive

@@ -20,6 +20,8 @@ import '../orders/pending_orders_checker.dart';
 import 'portfolio_widget_order_provider.dart';
 import 'widgets/portfolio_balance_widget.dart';
 import 'widgets/portfolio_cash_widget.dart';
+import 'widgets/portfolio_value_chart_widget.dart';
+import 'portfolio_value_history.dart';
 import 'widgets/target_widget.dart';
 import 'widgets/portfolio_holdings_widget.dart';
 import 'widgets/portfolio_trade_history_widget.dart';

@@ -13,6 +13,7 @@ import '../../l10n/gen/app_localizations.dart';
 
 const List<String> _defaultPortfolioWidgetOrder = [
   'portfolio_balance',
+  'value_chart',
   'portfolio_cash',
   'target',
   'portfolio_holdings',
@@ -39,6 +40,8 @@ class PortfolioWidgetConfig {
         return l10n.stressTestWidgetPortfolioBalance;
       case 'portfolio_cash':
         return l10n.stressTestWidgetCashAvailable;
+      case 'value_chart':
+        return l10n.portfolioWidgetDisplayNameValueChart;
       case 'target':
         return l10n.portfolioWidgetDisplayNameTarget;
       case 'portfolio_holdings':
