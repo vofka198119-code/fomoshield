@@ -907,6 +907,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get searchRatingsTabLabel => 'Рейтинги';
 
   @override
+  String get searchRatingsPopular => 'Самые просматриваемые';
+
+  @override
+  String get searchRatingsPopularToday => 'Самые просматриваемые сегодня';
+
+  @override
   String get searchRatingsBiggest => 'Крупнейшие по капитализации';
 
   @override

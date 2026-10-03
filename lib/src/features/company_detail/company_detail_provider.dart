@@ -74,7 +74,9 @@ final companyDetailProvider =
         // await, чтобы не складывать их сетевые задержки друг на друга.
         final cachedMetrics = metricsCache.get(symbol);
         final results = await Future.wait([
-          api.companyProfile(symbol),
+          // viewed: this is the screen a person opened — see
+          // FinnhubService.companyProfile's doc comment.
+          api.companyProfile(symbol, viewed: true),
           cachedMetrics != null
               ? Future.value(cachedMetrics)
               : api.metrics(symbol).catchError((_) => <String, dynamic>{}),
@@ -114,7 +116,7 @@ final companyDetailProvider =
           1000;
       final nowSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-      final profileFuture = api.companyProfile(symbol);
+      final profileFuture = api.companyProfile(symbol, viewed: true);
       final metricsFuture = api.metrics(symbol);
       final sectorAveragesFuture = ref.watch(sectorAveragePeProvider.future);
       // 5Y weekly price history for the Historical Trend marker's real

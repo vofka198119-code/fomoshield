@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_palette.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../popularity_provider.dart';
 import '../top_companies_provider.dart';
 import 'browse_lane.dart';
 import 'company_mini_card.dart';
@@ -42,6 +43,11 @@ class RatingsLanes extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final companiesAsync = ref.watch(topCompaniesProvider);
     final iconMap = ref.watch(iconsBatchWarmProvider).valueOrNull ?? const {};
+    // Empty until the counter is deployed, and empty again on any error —
+    // see popularity_provider.dart. Both lanes simply don't render then.
+    final popularity = ref
+        .watch(popularityProvider)
+        .maybeWhen(data: (p) => p, orElse: () => PopularityRanking.empty);
 
     return companiesAsync.when(
       loading: () => Center(
@@ -64,9 +70,29 @@ class RatingsLanes extends ConsumerWidget {
         final lowestPe = rated.take(_previewCount).toList();
         final highestPe = rated.reversed.take(_previewCount).toList();
 
+        // Name lookup for the popularity lanes, which come back as bare
+        // symbols — the counter stores nothing but a ticker and a number.
+        final nameOf = {for (final c in companies) c.symbol: c.name};
+
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
           children: [
+            if (popularity.today.isNotEmpty) ...[
+              _lane(
+                l10n.searchRatingsPopularToday,
+                _entries(popularity.today, nameOf),
+                iconMap,
+              ),
+              const SizedBox(height: 16),
+            ],
+            if (popularity.allTime.isNotEmpty) ...[
+              _lane(
+                l10n.searchRatingsPopular,
+                _entries(popularity.allTime, nameOf),
+                iconMap,
+              ),
+              const SizedBox(height: 16),
+            ],
             _lane(l10n.searchRatingsBiggest, biggest, iconMap),
             const SizedBox(height: 16),
             if (lowestPe.isNotEmpty) ...[
@@ -79,6 +105,23 @@ class RatingsLanes extends ConsumerWidget {
         );
       },
     );
+  }
+
+  // The counter knows only tickers; the roster supplies the names. A symbol
+  // the roster doesn't carry (an index, a delisted ticker) falls back to its
+  // own symbol rather than being dropped — it was genuinely looked at.
+  List<TopCompanyEntry> _entries(
+    List<PopularCompany> ranked,
+    Map<String, String> nameOf,
+  ) {
+    return [
+      for (final p in ranked.take(_previewCount))
+        TopCompanyEntry(
+          symbol: p.symbol,
+          name: nameOf[p.symbol] ?? p.symbol,
+          marketCap: 0,
+        ),
+    ];
   }
 
   Widget _message(String text) => Center(

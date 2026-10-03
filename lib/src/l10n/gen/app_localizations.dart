@@ -1717,6 +1717,18 @@ abstract class AppLocalizations {
   /// **'Ratings'**
   String get searchRatingsTabLabel;
 
+  /// No description provided for @searchRatingsPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'Most viewed'**
+  String get searchRatingsPopular;
+
+  /// No description provided for @searchRatingsPopularToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Most viewed today'**
+  String get searchRatingsPopularToday;
+
   /// No description provided for @searchRatingsBiggest.
   ///
   /// In en, this message translates to:

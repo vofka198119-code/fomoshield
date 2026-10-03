@@ -905,6 +905,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchRatingsTabLabel => 'Ratings';
 
   @override
+  String get searchRatingsPopular => 'Most viewed';
+
+  @override
+  String get searchRatingsPopularToday => 'Most viewed today';
+
+  @override
   String get searchRatingsBiggest => 'Biggest by market cap';
 
   @override

@@ -414,6 +414,8 @@
   "searchTopSp500": "TOP S&P 500",
   "searchOtherSector": "OTHER",
   "searchRatingsTabLabel": "Ratings",
+  "searchRatingsPopular": "Most viewed",
+  "searchRatingsPopularToday": "Most viewed today",
   "searchRatingsBiggest": "Biggest by market cap",
   "searchRatingsLowestPe": "Lowest P/E",
   "searchRatingsHighestPe": "Highest P/E",

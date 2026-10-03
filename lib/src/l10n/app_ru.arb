@@ -269,6 +269,8 @@
   "searchTopSp500": "ТОП S&P 500",
   "searchOtherSector": "ПРОЧИЕ",
   "searchRatingsTabLabel": "Рейтинги",
+  "searchRatingsPopular": "Самые просматриваемые",
+  "searchRatingsPopularToday": "Самые просматриваемые сегодня",
   "searchRatingsBiggest": "Крупнейшие по капитализации",
   "searchRatingsLowestPe": "Самый низкий P/E",
   "searchRatingsHighestPe": "Самый высокий P/E",

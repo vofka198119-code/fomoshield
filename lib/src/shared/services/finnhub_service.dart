@@ -381,8 +381,24 @@ class FinnhubService {
   // Company Profile
   // ---------------------------------------------------------------------------
 
-  Future<Map<String, dynamic>> companyProfile(String symbol) async =>
-      _getFromBackend('/profile/$symbol');
+  /// [viewed] marks a request as a person actually opening this company's
+  /// page, which is what the backend's popularity counter records. Left false
+  /// everywhere else on purpose: this same endpoint also fills the local
+  /// logo/sector cache for every symbol in a browse lane, and counting those
+  /// would make "popular" mean "appeared in a list on a fresh install".
+  Future<Map<String, dynamic>> companyProfile(
+    String symbol, {
+    bool viewed = false,
+  }) async => _getFromBackend(
+    '/profile/$symbol',
+    params: viewed ? const {'viewed': '1'} : null,
+  );
+
+  /// Aggregate view counts per symbol — all-time and for the current day.
+  /// No per-user data exists behind this; see the backend's
+  /// popularityService.js.
+  Future<Map<String, dynamic>> popularCompanies({int limit = 10}) async =>
+      _getFromBackend('/popularity', params: {'limit': '$limit'});
 
   // ---------------------------------------------------------------------------
   // Icon — the one endpoint any screen should use for a ticker's logo.
