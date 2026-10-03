@@ -1711,6 +1711,36 @@ abstract class AppLocalizations {
   /// **'OTHER'**
   String get searchOtherSector;
 
+  /// No description provided for @searchRatingsTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratings'**
+  String get searchRatingsTabLabel;
+
+  /// No description provided for @searchRatingsBiggest.
+  ///
+  /// In en, this message translates to:
+  /// **'Biggest by market cap'**
+  String get searchRatingsBiggest;
+
+  /// No description provided for @searchRatingsLowestPe.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest P/E'**
+  String get searchRatingsLowestPe;
+
+  /// No description provided for @searchRatingsHighestPe.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest P/E'**
+  String get searchRatingsHighestPe;
+
+  /// No description provided for @searchRatingsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Rankings aren\'t available right now. Check your connection and try again.'**
+  String get searchRatingsUnavailable;
+
   /// No description provided for @searchRecentlyViewed.
   ///
   /// In en, this message translates to:

@@ -904,6 +904,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get searchOtherSector => 'ПРОЧИЕ';
 
   @override
+  String get searchRatingsTabLabel => 'Рейтинги';
+
+  @override
+  String get searchRatingsBiggest => 'Крупнейшие по капитализации';
+
+  @override
+  String get searchRatingsLowestPe => 'Самый низкий P/E';
+
+  @override
+  String get searchRatingsHighestPe => 'Самый высокий P/E';
+
+  @override
+  String get searchRatingsUnavailable =>
+      'Рейтинги сейчас недоступны. Проверьте подключение и попробуйте ещё раз.';
+
+  @override
   String get searchRecentlyViewed => 'НЕДАВНО ПРОСМОТРЕННЫЕ';
 
   @override

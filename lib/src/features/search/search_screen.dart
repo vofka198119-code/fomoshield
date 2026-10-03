@@ -16,6 +16,7 @@ import '../home/watchlist_limits_provider.dart';
 import 'search_provider.dart';
 import '../funds/funds_visibility.dart';
 import 'widgets/exchange_badge.dart';
+import 'widgets/ratings_lanes.dart';
 import 'widgets/search_browse_lanes.dart';
 import '../../l10n/gen/app_localizations.dart';
 
@@ -45,6 +46,10 @@ class SearchScreen extends ConsumerStatefulWidget {
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
+// The swipeable lanes of the Search screen. Funds is admin-only for now; the
+// stress-test entry point shows Companies alone and never builds the PageView.
+enum _SearchLane { funds, companies, ratings }
+
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
   // Funds tab's own search field — lives here (not in FundsTabList) so it
@@ -52,16 +57,41 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   // Companies field; see _buildFundsSearchField's own doc comment.
   final _fundsController = TextEditingController();
   String _fundsQuery = '';
-  // 1 (Companies) is the default — preserves the screen's existing
-  // autofocus-search-field entry behavior; Funds (0) is an explicit tap
-  // away, per docs/ETF_FUND_EMULATION.md's "embed into Search, no new
-  // bottom-nav item" decision.
-  int _tabIndex = 1;
-  // Drives the swipe between Funds/Companies (see the PageView in build()
-  // below) — same controller-driven page+dots pattern as the app's one
-  // other swipeable surface (home/widgets/portfolio_widget.dart's
+  // Which lanes this screen has, in swipe order. Funds is admin-only for
+  // now (funds_visibility.dart), so most users get Companies + Ratings —
+  // which is why the lane list is computed rather than a fixed 0/1/2: an
+  // index into a list that changes shape would otherwise land on the wrong
+  // page the moment Funds is hidden.
+  late final List<_SearchLane> _lanes;
+  // Companies is the default wherever it sits — it preserves the screen's
+  // existing autofocus-search-field entry behavior. Funds and Ratings are an
+  // explicit tap or swipe away, per docs/ETF_FUND_EMULATION.md's "embed into
+  // Search, no new bottom-nav item" decision.
+  late int _tabIndex;
+  // Drives the swipe — same controller-driven page+dots pattern as the app's
+  // one other swipeable surface (home/widgets/portfolio_widget.dart's
   // multi-portfolio PageView), just with tab labels standing in for dots.
-  late final _pageController = PageController(initialPage: _tabIndex);
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Read once here rather than watched in build(): the lane list has to be
+    // fixed for the PageController's whole life, and admin status cannot
+    // change while this screen is open. Deliberately NOT consulting the route
+    // here — GoRouterState.of(context) is an InheritedWidget lookup, which
+    // Flutter forbids in initState (the same trap that crashed Market Clock's
+    // home card once). The stress-test entry collapses to Companies alone in
+    // build() instead, bypassing the PageView entirely, exactly as it did
+    // before this screen had more than one lane.
+    _lanes = [
+      if (ref.read(fundsVisibleProvider)) _SearchLane.funds,
+      _SearchLane.companies,
+      _SearchLane.ratings,
+    ];
+    _tabIndex = _lanes.indexOf(_SearchLane.companies);
+    _pageController = PageController(initialPage: _tabIndex);
+  }
   // Consumed by _buildCompaniesSearchField — see its own doc comment.
   bool _companiesAutofocusConsumed = false;
 
@@ -127,13 +157,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     // session" mean something — the author's own words: "залезем в такие
     // дебри что мы сами забудем что и как работает" (2026-09-06).
     final isStressTestEntry = stressTestSource == 'stress-test';
-    // No Funds lane means no swipe and no tab row at all — the screen
-    // collapses to plain Companies, exactly as it already does when Search
-    // is opened from inside a Market Simulation. Two reasons it can be
-    // absent: that stress-test entry, and the module being admin-only for
-    // now (see funds_visibility.dart).
-    final showFundsLane =
-        !isStressTestEntry && ref.watch(fundsVisibleProvider);
+    // Opened from inside a Market Simulation, Search is a symbol picker, not
+    // a place to browse — it collapses to plain Companies with no tab row and
+    // no swipe, and the PageView is never built at all.
+    final showLanes = !isStressTestEntry;
+    final currentLane = _lanes[_tabIndex.clamp(0, _lanes.length - 1)];
 
     // First back press while a query is active just clears search (back to
     // the browse lanes); only a second press with no query actually leaves
@@ -174,16 +202,25 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               // field/state (typed API search for Companies, local filter
               // for Funds — see FundsTabList's own doc comment); only the
               // active one renders here, ordered above the tab labels.
-              if (!showFundsLane)
+              if (!showLanes)
                 _buildCompaniesSearchField(l10n, state, palette)
               else ...[
-                _tabIndex == 0
-                    ? _buildFundsSearchField(l10n, palette)
-                    : _buildCompaniesSearchField(l10n, state, palette),
+                // Ratings has nothing to type into — it is a browse surface,
+                // and leaving a dead field above it would just invite taps
+                // that do nothing.
+                switch (currentLane) {
+                  _SearchLane.funds => _buildFundsSearchField(l10n, palette),
+                  _SearchLane.companies => _buildCompaniesSearchField(
+                    l10n,
+                    state,
+                    palette,
+                  ),
+                  _SearchLane.ratings => const SizedBox(height: 8),
+                },
                 _buildTabHeader(l10n, palette),
               ],
               Expanded(
-                child: !showFundsLane
+                child: !showLanes
                     ? _buildCompaniesResults(
                         l10n,
                         state,
@@ -205,23 +242,34 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         // slide-up-into-place) on every single swipe into
                         // Companies instead of just the screen's first
                         // open — confirmed live 2026-09-07.
+                        // Built from _lanes so the order and the count match
+                        // the tab row exactly — hard-coding three children
+                        // here would swipe into a blank page whenever Funds
+                        // is hidden.
                         children: [
-                          _KeepAlivePage(
-                            child: FundsTabList(
-                              palette: palette,
-                              query: _fundsQuery,
+                          for (final lane in _lanes)
+                            _KeepAlivePage(
+                              child: switch (lane) {
+                                _SearchLane.funds => FundsTabList(
+                                  palette: palette,
+                                  query: _fundsQuery,
+                                ),
+                                _SearchLane.companies =>
+                                  _buildCompaniesResults(
+                                    l10n,
+                                    state,
+                                    palette,
+                                    portfolioId,
+                                    stressTestSource,
+                                    stressTestSessionId,
+                                  ),
+                                _SearchLane.ratings => RatingsLanes(
+                                  palette: palette,
+                                  onTapSymbol: (symbol) =>
+                                      _navigateToCompany(symbol, portfolioId),
+                                ),
+                              },
                             ),
-                          ),
-                          _KeepAlivePage(
-                            child: _buildCompaniesResults(
-                              l10n,
-                              state,
-                              palette,
-                              portfolioId,
-                              stressTestSource,
-                              stressTestSessionId,
-                            ),
-                          ),
                         ],
                       ),
               ),
@@ -578,13 +626,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       child: Row(
         children: [
-          _tabButton(l10n.etfFundsTabLabel, 0, palette),
-          const SizedBox(width: 20),
-          _tabButton(l10n.etfCompaniesTabLabel, 1, palette),
+          for (int i = 0; i < _lanes.length; i++) ...[
+            if (i > 0) const SizedBox(width: 20),
+            _tabButton(_laneLabel(l10n, _lanes[i]), i, palette),
+          ],
         ],
       ),
     );
   }
+
+  String _laneLabel(AppLocalizations l10n, _SearchLane lane) => switch (lane) {
+    _SearchLane.funds => l10n.etfFundsTabLabel,
+    _SearchLane.companies => l10n.etfCompaniesTabLabel,
+    _SearchLane.ratings => l10n.searchRatingsTabLabel,
+  };
 
   Widget _tabButton(String label, int index, AppPalette palette) {
     final active = _tabIndex == index;

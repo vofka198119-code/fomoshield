@@ -902,6 +902,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchOtherSector => 'OTHER';
 
   @override
+  String get searchRatingsTabLabel => 'Ratings';
+
+  @override
+  String get searchRatingsBiggest => 'Biggest by market cap';
+
+  @override
+  String get searchRatingsLowestPe => 'Lowest P/E';
+
+  @override
+  String get searchRatingsHighestPe => 'Highest P/E';
+
+  @override
+  String get searchRatingsUnavailable =>
+      'Rankings aren\'t available right now. Check your connection and try again.';
+
+  @override
   String get searchRecentlyViewed => 'RECENTLY VIEWED';
 
   @override
