@@ -9859,6 +9859,54 @@ abstract class AppLocalizations {
   /// **'I Accept'**
   String get disclaimerScreenAcceptButton;
 
+  /// No description provided for @chooseNicknameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your nickname'**
+  String get chooseNicknameTitle;
+
+  /// No description provided for @chooseNicknameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This is how other users will see you — on a fund\'s team roster, in the hiring marketplace, and anywhere else your activity is shown publicly. Your email is never shown. Choose carefully: it cannot be changed later.'**
+  String get chooseNicknameSubtitle;
+
+  /// No description provided for @chooseNicknameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get chooseNicknameHint;
+
+  /// No description provided for @chooseNicknameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a nickname'**
+  String get chooseNicknameRequired;
+
+  /// No description provided for @chooseNicknameInvalidChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Latin letters, numbers and underscore only, up to 25 characters'**
+  String get chooseNicknameInvalidChars;
+
+  /// No description provided for @chooseNicknameTakenError.
+  ///
+  /// In en, this message translates to:
+  /// **'This nickname is already taken'**
+  String get chooseNicknameTakenError;
+
+  /// No description provided for @chooseNicknameGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save your nickname — try again'**
+  String get chooseNicknameGenericError;
+
+  /// No description provided for @chooseNicknameContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get chooseNicknameContinueButton;
+
   /// No description provided for @disclaimerScreenLinkFailed.
   ///
   /// In en, this message translates to:
@@ -10897,54 +10945,6 @@ abstract class AppLocalizations {
     String percent,
   );
 
-  /// No description provided for @chooseNicknameTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose your nickname'**
-  String get chooseNicknameTitle;
-
-  /// No description provided for @chooseNicknameSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'This is your public handle in the app — it\'s what other users will see. Your email is never shown. Choose carefully: it cannot be changed later.'**
-  String get chooseNicknameSubtitle;
-
-  /// No description provided for @chooseNicknameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Nickname'**
-  String get chooseNicknameHint;
-
-  /// No description provided for @chooseNicknameRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a nickname'**
-  String get chooseNicknameRequired;
-
-  /// No description provided for @chooseNicknameInvalidChars.
-  ///
-  /// In en, this message translates to:
-  /// **'Latin letters, numbers and underscore only, up to 25 characters'**
-  String get chooseNicknameInvalidChars;
-
-  /// No description provided for @chooseNicknameTakenError.
-  ///
-  /// In en, this message translates to:
-  /// **'This nickname is already taken'**
-  String get chooseNicknameTakenError;
-
-  /// No description provided for @chooseNicknameGenericError.
-  ///
-  /// In en, this message translates to:
-  /// **'Couldn\'t save your nickname — try again'**
-  String get chooseNicknameGenericError;
-
-  /// No description provided for @chooseNicknameContinueButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue'**
-  String get chooseNicknameContinueButton;
-
   /// No description provided for @languageOnboardingTitle.
   ///
   /// In en, this message translates to:
@@ -11058,6 +11058,2184 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose your nickname'**
   String get onboardingTourStep5Button;
+
+  /// No description provided for @homeWidgetEtfFunds.
+  ///
+  /// In en, this message translates to:
+  /// **'ETF Funds'**
+  String get homeWidgetEtfFunds;
+
+  /// No description provided for @etfPremiumRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Required'**
+  String get etfPremiumRequiredTitle;
+
+  /// No description provided for @etfPremiumRequiredDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating and managing your own fund requires a Premium subscription.'**
+  String get etfPremiumRequiredDescription;
+
+  /// No description provided for @etfHomeCardTitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Become a Fund Manager'**
+  String get etfHomeCardTitleHead;
+
+  /// No description provided for @etfHomeCardTitleMyFund.
+  ///
+  /// In en, this message translates to:
+  /// **'My Fund'**
+  String get etfHomeCardTitleMyFund;
+
+  /// No description provided for @etfHomeCardTitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Become an Investment Assistant'**
+  String get etfHomeCardTitleAnalyst;
+
+  /// No description provided for @etfHomeCardTitleVacancies.
+  ///
+  /// In en, this message translates to:
+  /// **'Job Offers'**
+  String get etfHomeCardTitleVacancies;
+
+  /// No description provided for @etfEmployeeHubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MY PROFILE'**
+  String get etfEmployeeHubTitle;
+
+  /// No description provided for @etfEmployeeHubCompaniesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPANIES'**
+  String get etfEmployeeHubCompaniesTitle;
+
+  /// No description provided for @etfEmploymentDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EMPLOYMENT'**
+  String get etfEmploymentDetailTitle;
+
+  /// No description provided for @etfEmploymentDetailJoinedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get etfEmploymentDetailJoinedLabel;
+
+  /// No description provided for @etfEmploymentDetailLeftLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get etfEmploymentDetailLeftLabel;
+
+  /// No description provided for @etfEmploymentDetailStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently employed'**
+  String get etfEmploymentDetailStatusActive;
+
+  /// No description provided for @etfEmploymentDetailStatusResigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Resigned'**
+  String get etfEmploymentDetailStatusResigned;
+
+  /// No description provided for @etfEmploymentDetailStatusTerminated.
+  ///
+  /// In en, this message translates to:
+  /// **'Terminated'**
+  String get etfEmploymentDetailStatusTerminated;
+
+  /// No description provided for @etfEmploymentDetailLeaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this fund'**
+  String get etfEmploymentDetailLeaveButton;
+
+  /// No description provided for @etfEmploymentDetailLeaveConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this fund?'**
+  String get etfEmploymentDetailLeaveConfirmTitle;
+
+  /// No description provided for @etfEmploymentDetailLeaveConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll lose access to this fund\'s team tools immediately. This can\'t be undone.'**
+  String get etfEmploymentDetailLeaveConfirmBody;
+
+  /// No description provided for @etfEmploymentDetailLeaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to leave fund'**
+  String get etfEmploymentDetailLeaveError;
+
+  /// No description provided for @etfBlotterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ORDERS'**
+  String get etfBlotterTitle;
+
+  /// No description provided for @etfBlotterShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get etfBlotterShortcutLabel;
+
+  /// No description provided for @etfBlotterEmptyText.
+  ///
+  /// In en, this message translates to:
+  /// **'No trade proposals yet'**
+  String get etfBlotterEmptyText;
+
+  /// No description provided for @etfBlotterEmptyFilteredText.
+  ///
+  /// In en, this message translates to:
+  /// **'No proposals match this filter'**
+  String get etfBlotterEmptyFilteredText;
+
+  /// No description provided for @etfBlotterFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get etfBlotterFilterAll;
+
+  /// No description provided for @etfInvestorsShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Investors'**
+  String get etfInvestorsShortcutLabel;
+
+  /// No description provided for @etfInvestorsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTORS'**
+  String get etfInvestorsScreenTitle;
+
+  /// No description provided for @etfInvestorsStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTOR STATISTICS'**
+  String get etfInvestorsStatsTitle;
+
+  /// No description provided for @etfInvestorsStatsTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Invested'**
+  String get etfInvestorsStatsTotalLabel;
+
+  /// No description provided for @etfInvestorsStatsCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Investors'**
+  String get etfInvestorsStatsCountLabel;
+
+  /// No description provided for @etfInvestorsStatsBankruptcyPayoutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bankruptcy Payout'**
+  String get etfInvestorsStatsBankruptcyPayoutLabel;
+
+  /// No description provided for @etfInvestorsListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTOR LIST'**
+  String get etfInvestorsListTitle;
+
+  /// No description provided for @etfInvestorsListEmptyText.
+  ///
+  /// In en, this message translates to:
+  /// **'No investors yet'**
+  String get etfInvestorsListEmptyText;
+
+  /// No description provided for @etfInvestorsInflowChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTOR INFLOW'**
+  String get etfInvestorsInflowChartTitle;
+
+  /// No description provided for @etfInvestorsOutflowChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVESTOR OUTFLOW'**
+  String get etfInvestorsOutflowChartTitle;
+
+  /// No description provided for @etfInvestorsYearPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SELECT YEAR'**
+  String get etfInvestorsYearPickerTitle;
+
+  /// No description provided for @etfBalanceHistoryChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'BALANCE HISTORY'**
+  String get etfBalanceHistoryChartTitle;
+
+  /// No description provided for @etfChartsShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Charts'**
+  String get etfChartsShortcutLabel;
+
+  /// No description provided for @etfTradingShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Trading'**
+  String get etfTradingShortcutLabel;
+
+  /// No description provided for @etfRulebookShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules'**
+  String get etfRulebookShortcutLabel;
+
+  /// No description provided for @etfChartsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CHARTS'**
+  String get etfChartsScreenTitle;
+
+  /// No description provided for @etfChartsWidgetsSettingsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart Widgets'**
+  String get etfChartsWidgetsSettingsSheetTitle;
+
+  /// No description provided for @etfNavHistoryChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NAV PER UNIT'**
+  String get etfNavHistoryChartTitle;
+
+  /// No description provided for @etfDrawdownChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DRAWDOWN'**
+  String get etfDrawdownChartTitle;
+
+  /// No description provided for @etfAssetAllocationChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ASSET ALLOCATION'**
+  String get etfAssetAllocationChartTitle;
+
+  /// No description provided for @etfAssetAllocationEmptyText.
+  ///
+  /// In en, this message translates to:
+  /// **'No holdings yet'**
+  String get etfAssetAllocationEmptyText;
+
+  /// No description provided for @etfCommissionChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'BROKER COMMISSION'**
+  String get etfCommissionChartTitle;
+
+  /// No description provided for @etfCashVsInvestedChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CASH VS INVESTED'**
+  String get etfCashVsInvestedChartTitle;
+
+  /// No description provided for @etfCashVsInvestedCashLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get etfCashVsInvestedCashLabel;
+
+  /// No description provided for @etfCashVsInvestedInvestedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invested'**
+  String get etfCashVsInvestedInvestedLabel;
+
+  /// No description provided for @etfProposeOrderTypeMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Market'**
+  String get etfProposeOrderTypeMarket;
+
+  /// No description provided for @etfProposeOrderTypeLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit'**
+  String get etfProposeOrderTypeLimit;
+
+  /// No description provided for @etfProposeJustificationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Justification'**
+  String get etfProposeJustificationLabel;
+
+  /// No description provided for @etfProposeJustificationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Why this trade?'**
+  String get etfProposeJustificationHint;
+
+  /// No description provided for @etfProposeSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit proposal'**
+  String get etfProposeSubmitButton;
+
+  /// No description provided for @etfProposeLimitPriceRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid limit price'**
+  String get etfProposeLimitPriceRequired;
+
+  /// No description provided for @etfProposeGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit proposal'**
+  String get etfProposeGenericError;
+
+  /// No description provided for @etfProposalStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get etfProposalStatusPending;
+
+  /// No description provided for @etfProposalStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved — queued'**
+  String get etfProposalStatusApproved;
+
+  /// No description provided for @etfProposalStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get etfProposalStatusRejected;
+
+  /// No description provided for @etfProposalStatusExecuted.
+  ///
+  /// In en, this message translates to:
+  /// **'Executed'**
+  String get etfProposalStatusExecuted;
+
+  /// No description provided for @etfProposalStatusNeedsRevision.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs revision'**
+  String get etfProposalStatusNeedsRevision;
+
+  /// No description provided for @etfProposalFlaggedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Flagged risky'**
+  String get etfProposalFlaggedLabel;
+
+  /// No description provided for @etfProposalApproveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get etfProposalApproveButton;
+
+  /// No description provided for @etfProposalRejectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get etfProposalRejectButton;
+
+  /// No description provided for @etfProposalFlagButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag risky'**
+  String get etfProposalFlagButton;
+
+  /// No description provided for @etfProposalExecuteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Execute'**
+  String get etfProposalExecuteButton;
+
+  /// No description provided for @etfProposalReworkButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send back for revision'**
+  String get etfProposalReworkButton;
+
+  /// No description provided for @etfProposalReworkDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send back for revision'**
+  String get etfProposalReworkDialogTitle;
+
+  /// No description provided for @etfProposalReworkReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What needs to change?'**
+  String get etfProposalReworkReasonHint;
+
+  /// No description provided for @etfProposalReworkReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A reason is required'**
+  String get etfProposalReworkReasonRequired;
+
+  /// No description provided for @etfProposalReworkSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get etfProposalReworkSubmitButton;
+
+  /// No description provided for @etfProposalDetailsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get etfProposalDetailsButton;
+
+  /// No description provided for @etfProposalHeaderBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'BUY ORDER'**
+  String get etfProposalHeaderBuy;
+
+  /// No description provided for @etfProposalHeaderSell.
+  ///
+  /// In en, this message translates to:
+  /// **'SELL ORDER'**
+  String get etfProposalHeaderSell;
+
+  /// No description provided for @etfProposalCreateBuyOrderButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy order'**
+  String get etfProposalCreateBuyOrderButton;
+
+  /// No description provided for @etfProposalCreateSellOrderButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell order'**
+  String get etfProposalCreateSellOrderButton;
+
+  /// No description provided for @etfProposalActionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Action failed'**
+  String get etfProposalActionError;
+
+  /// No description provided for @etfProposalPlacementPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Order placement price'**
+  String get etfProposalPlacementPriceLabel;
+
+  /// No description provided for @etfProposalEstimatedPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current price (estimate)'**
+  String get etfProposalEstimatedPriceLabel;
+
+  /// No description provided for @etfProposalEstimatedCommissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission (estimate)'**
+  String get etfProposalEstimatedCommissionLabel;
+
+  /// No description provided for @etfProposalExecutionPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deal price'**
+  String get etfProposalExecutionPriceLabel;
+
+  /// No description provided for @etfProposalProposedByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Proposed by'**
+  String get etfProposalProposedByLabel;
+
+  /// No description provided for @etfFundBalanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FUND BALANCE'**
+  String get etfFundBalanceTitle;
+
+  /// No description provided for @etfFundBalanceAvailableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get etfFundBalanceAvailableLabel;
+
+  /// No description provided for @etfFundBalanceTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total (incl. P&L)'**
+  String get etfFundBalanceTotalLabel;
+
+  /// No description provided for @etfEmployeeHubInvitationsRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations'**
+  String get etfEmployeeHubInvitationsRow;
+
+  /// No description provided for @etfEmployeeHubApplicationsRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Applications'**
+  String get etfEmployeeHubApplicationsRow;
+
+  /// No description provided for @etfComingSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get etfComingSoonTitle;
+
+  /// No description provided for @etfComingSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is coming in a future update.'**
+  String get etfComingSoonBody;
+
+  /// No description provided for @etfHomeCardPremiumTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get etfHomeCardPremiumTag;
+
+  /// No description provided for @etfOnboardingStep1TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Who Is a Fund Manager?'**
+  String get etfOnboardingStep1TitleHead;
+
+  /// No description provided for @etfOnboardingStep1BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your own investment fund and take on the role of its manager.\n\nInside the fund, you set the strategy, choose the assets, make buy and sell decisions, and manage investors\' capital.\n\nThe fund works like an ETF: a pooled portfolio of assets managed according to a chosen strategy. Other users will be able to invest in your fund, and its performance will depend on your team\'s decisions and market behavior.\n\nReady to create your own fund?'**
+  String get etfOnboardingStep1BodyHead;
+
+  /// No description provided for @etfOnboardingStep2TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'What You Need to Create a Fund'**
+  String get etfOnboardingStep2TitleHead;
+
+  /// No description provided for @etfOnboardingStep2BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening your own fund requires a Premium subscription.\n\nDuring setup, you\'ll create your fund\'s profile: name, logo, description, strategy, and team.\n\nYour fund starts with \$150,000 in virtual capital. These funds are used exclusively inside the simulator and become your fund\'s starting capital.'**
+  String get etfOnboardingStep2BodyHead;
+
+  /// No description provided for @etfOnboardingStep3TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s On a Fund\'s Team?'**
+  String get etfOnboardingStep3TitleHead;
+
+  /// No description provided for @etfOnboardingStep3BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund is rarely run alone — you can hire a team, each with their own role.\n\nAn Analyst proposes trades: which assets to buy or sell, and why.\n\nA Trader sends approved trades to market — without one, an approved order executes automatically instead.\n\nA Risk Manager flags trades as risky — a signal to the team, though the final call always stays with you or a Co-Manager.\n\nA Co-Manager shares your right to approve or reject trades.\n\nYou decide who to hire and what permissions to give them.'**
+  String get etfOnboardingStep3BodyHead;
+
+  /// No description provided for @etfOnboardingStep4TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'How Are Trade Decisions Made?'**
+  String get etfOnboardingStep4TitleHead;
+
+  /// No description provided for @etfOnboardingStep4BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Every trade in a fund follows a clear path.\n\nAn employee with the right permissions proposes a trade: ticker, direction, order type, and reasoning.\n\nYou or your Co-Manager approve it, reject it, or send it back for rework. If the fund has a Trader, they execute the approved order; without one, it executes immediately on approval.\n\nEvery trade carries a 0.5% broker commission, same as a personal portfolio.\n\nThis keeps the fund\'s trading transparent: who proposed it, who approved it, and why.'**
+  String get etfOnboardingStep4BodyHead;
+
+  /// No description provided for @etfOnboardingStep5TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Where Does Investor Money Come From?'**
+  String get etfOnboardingStep5TitleHead;
+
+  /// No description provided for @etfOnboardingStep5BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Other users can invest in your fund by buying its units — the same way they\'d buy shares of a real company.\n\nThe unit price (NAV) is computed automatically: the fund\'s assets plus cash, divided by units outstanding. As the fund\'s assets grow in value, so does NAV — and every unit holder\'s return along with it.\n\nAn investor can redeem their units at any time and get paid out at the current price.\n\nAs manager, your job is to trade in a way that grows NAV — investor trust and the fund\'s reputation depend on it.'**
+  String get etfOnboardingStep5BodyHead;
+
+  /// No description provided for @etfOnboardingStep6TitleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'What Happens If the Fund Fails?'**
+  String get etfOnboardingStep6TitleHead;
+
+  /// No description provided for @etfOnboardingStep6BodyHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Running a fund is a responsibility, not just an opportunity.\n\nIf you decide to close the fund, a bankruptcy procedure kicks in: every holding is sold at market price, and each active employee is paid 1% of what\'s left.\n\nWhatever remains goes to investors: if there\'s enough, everyone gets their investment back plus 5%; if not, they\'re paid proportionally to what they invested, minus the broker commission.\n\nOnce settled, the fund closes for good — its ticker and history remain, but it can no longer be managed.\n\nCreate your fund. Build your team. See how far your decisions can take you.'**
+  String get etfOnboardingStep6BodyHead;
+
+  /// No description provided for @etfOnboardingStep1TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Who Is a Fund Employee?'**
+  String get etfOnboardingStep1TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep1BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t want to manage a fund on your own? Join an existing team instead.\n\nFunds need analysts, traders, risk managers, and other specialists. You\'ll be able to browse open positions on the marketplace, submit applications, and work inside a fund\'s team.\n\nThere are two ways to join: apply to an open position, or get invited directly by a friend who manages a fund.\n\nYour decisions and proposals can become part of a real virtual fund\'s actual strategy.'**
+  String get etfOnboardingStep1BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep2TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Join a Team'**
+  String get etfOnboardingStep2TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep2BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Working as an employee doesn\'t require Premium.\n\nFirst, create your professional profile: choose a role, list your skills and experience, and add some information about yourself.\n\nOnce that\'s done, you can list your profile on the jobs marketplace and wait for invitations from funds.\n\nOr join directly — if a friend who manages a fund invites you.'**
+  String get etfOnboardingStep2BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep3TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Which Role Should You Pick?'**
+  String get etfOnboardingStep3TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep3BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Each role on a fund\'s team has its own area of responsibility.\n\nAn Analyst researches companies and proposes trades — buy or sell an asset, and why.\n\nA Trader sends approved trades to the exchange — the final \"execute\" tap.\n\nA Risk Manager assesses trades for risk and can flag them for the team.\n\nA Co-Manager helps the fund\'s head approve or reject proposals.\n\nPick the role that fits you, and become part of the fund\'s decisions.'**
+  String get etfOnboardingStep3BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep4TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'What Will You Be Able to Do?'**
+  String get etfOnboardingStep4TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep4BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'If you have permission to propose trades, you\'ll enter a ticker, direction, order type, and reasoning — why it\'s worth buying or selling.\n\nThe fund\'s head or Co-Manager reviews it: approves, rejects, or sends it back for rework.\n\nIf you\'re the Trader, you\'re the one who taps the final execute button on approved trades.\n\nEvery trade you make is visible in the fund\'s history — a real record of your contribution to the team\'s result.'**
+  String get etfOnboardingStep4BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep5TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Whose Money Does the Fund Trade With?'**
+  String get etfOnboardingStep5TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep5BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund\'s capital isn\'t just the head\'s money — it\'s also investor capital from people who bought the fund\'s units.\n\nThe unit price (NAV) is computed automatically from the fund\'s assets and cash — the team\'s trades decide whether it grows.\n\nInvestors trust the team with their virtual capital, expecting the fund\'s decisions to pay off.\n\nThe better the team trades, the better the result for everyone, including you.'**
+  String get etfOnboardingStep5BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep6TitleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'What Happens If the Fund Closes?'**
+  String get etfOnboardingStep6TitleAnalyst;
+
+  /// No description provided for @etfOnboardingStep6BodyAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund can close — its head can start the bankruptcy procedure at any time.\n\nIn a bankruptcy, every holding is sold at market price, and each active employee is paid 1% of what\'s left in the fund — including you, if you\'re still on the team.\n\nAfter that, the fund closes for good, and you\'ll need to find another team or start your own fund.\n\nFind your role. Join a team. Help shape a fund\'s decisions.'**
+  String get etfOnboardingStep6BodyAnalyst;
+
+  /// No description provided for @etfOnboardingStep7Title.
+  ///
+  /// In en, this message translates to:
+  /// **'This Is a Simulator'**
+  String get etfOnboardingStep7Title;
+
+  /// No description provided for @etfOnboardingStep7Body.
+  ///
+  /// In en, this message translates to:
+  /// **'FOMO Shield is a fund-management simulator.\n\nAll money, assets, trades, and results inside funds are virtual and have no real monetary value. They cannot be withdrawn, exchanged, or used outside the app.\n\nWhen there aren\'t enough real participants, or to keep the simulation liquid, the system may use synthetic investors. Their actions are generated by the system and are not the actions of real users.\n\nNo statistic, return, rating, or simulation result is financial advice, a guarantee of income, or a promise of future results.'**
+  String get etfOnboardingStep7Body;
+
+  /// No description provided for @etfRulebookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How Funds Work'**
+  String get etfRulebookTitle;
+
+  /// No description provided for @etfRulebookSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A quick reference for FOMO Shield\'s fund simulator — open it any time.'**
+  String get etfRulebookSubtitle;
+
+  /// No description provided for @etfRulebookFundSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'What is a fund'**
+  String get etfRulebookFundSectionHeader;
+
+  /// No description provided for @etfRulebookFundSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund is a simulated investment vehicle run by a head (its creator) and, optionally, a hired team. It starts with \$150,000 in virtual capital. Other users can invest in it by buying its units, and the fund\'s team decides which assets to buy and sell.'**
+  String get etfRulebookFundSectionBody;
+
+  /// No description provided for @etfRulebookRolesSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Team roles'**
+  String get etfRulebookRolesSectionHeader;
+
+  /// No description provided for @etfRulebookRolesSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Head — owns the fund, with full authority to approve or reject trades and manage the team.\n\nCo-head — shares the head\'s right to approve or reject trade proposals.\n\nAnalyst — proposes trades: which asset to buy or sell, and why.\n\nTrader — executes an approved trade on the market. Without a trader, an approved trade executes automatically.\n\nRisk manager — flags a proposal as risky, a signal to the team; the decision still rests with the head or a co-head.'**
+  String get etfRulebookRolesSectionBody;
+
+  /// No description provided for @etfRulebookTradeFlowSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'How a trade proposal moves'**
+  String get etfRulebookTradeFlowSectionHeader;
+
+  /// No description provided for @etfRulebookTradeFlowSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'An employee with the right permission proposes a trade — symbol, side, order type, and a justification.\n\nThe head or a co-head approves, rejects, or sends it back for revision. If the fund has a trader, they execute the approved order; otherwise it executes automatically.\n\nEvery trade carries the same 0.5% broker commission as a personal portfolio.'**
+  String get etfRulebookTradeFlowSectionBody;
+
+  /// No description provided for @etfRulebookNavSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Investors and NAV'**
+  String get etfRulebookNavSectionHeader;
+
+  /// No description provided for @etfRulebookNavSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone can invest in a fund by buying its units, the same way they\'d buy shares of a company.\n\nA unit\'s price (NAV) is calculated automatically: the fund\'s total assets and cash, divided by the number of units outstanding. When the fund\'s holdings gain value, NAV rises — and so does every unit holder\'s return.\n\nAn investor can redeem their units at any time for the current NAV.'**
+  String get etfRulebookNavSectionBody;
+
+  /// No description provided for @etfRulebookBankruptcySectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'If the fund closes'**
+  String get etfRulebookBankruptcySectionHeader;
+
+  /// No description provided for @etfRulebookBankruptcySectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The head can close the fund at any time. When they do:\n\n1. Every holding is sold at market price.\n\n2. Each currently active employee receives 1% of the remaining balance.\n\n3. What\'s left goes to investors: if there\'s enough, each gets their invested amount plus 5%; if not, payouts are made proportionally to each investor\'s stake, after the broker\'s commission on the asset sales.\n\nThe fund then closes permanently — its ticker and name are freed for reuse, and it can never be reopened or managed again.'**
+  String get etfRulebookBankruptcySectionBody;
+
+  /// No description provided for @etfOnboardingContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get etfOnboardingContinueButton;
+
+  /// No description provided for @etfOnboardingStep2ButtonHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Fund'**
+  String get etfOnboardingStep2ButtonHead;
+
+  /// No description provided for @etfOnboardingStep2ButtonAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Profile'**
+  String get etfOnboardingStep2ButtonAnalyst;
+
+  /// No description provided for @etfOnboardingAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept & Continue'**
+  String get etfOnboardingAccept;
+
+  /// No description provided for @etfOnboardingComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment assistant features are coming in a future update.'**
+  String get etfOnboardingComingSoon;
+
+  /// No description provided for @etfCreateFundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CREATE FUND'**
+  String get etfCreateFundTitle;
+
+  /// No description provided for @etfCreateFundNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund Name'**
+  String get etfCreateFundNameLabel;
+
+  /// No description provided for @etfCreateFundNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'English letters and numbers only'**
+  String get etfCreateFundNameHint;
+
+  /// No description provided for @etfCreateFundDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get etfCreateFundDescriptionLabel;
+
+  /// No description provided for @etfCreateFundStrategyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Investment Strategy'**
+  String get etfCreateFundStrategyLabel;
+
+  /// No description provided for @etfCreateFundSectorsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sectors'**
+  String get etfCreateFundSectorsLabel;
+
+  /// No description provided for @etfCreateFundCapitalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting Capital'**
+  String get etfCreateFundCapitalLabel;
+
+  /// No description provided for @etfCreateFundCapitalFixedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This amount is credited to your fund automatically when it\'s created.'**
+  String get etfCreateFundCapitalFixedNote;
+
+  /// No description provided for @etfCreateFundTickerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticker'**
+  String get etfCreateFundTickerLabel;
+
+  /// No description provided for @etfCreateFundTickerTakenError.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund with this ticker already exists'**
+  String get etfCreateFundTickerTakenError;
+
+  /// No description provided for @etfCreateFundTickerInvalidError.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticker must be 1-5 letters after FS'**
+  String get etfCreateFundTickerInvalidError;
+
+  /// No description provided for @etfCreateFundSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Fund'**
+  String get etfCreateFundSubmitButton;
+
+  /// No description provided for @etfCreateFundSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund created!'**
+  String get etfCreateFundSuccessMessage;
+
+  /// No description provided for @etfCreateFundErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create fund. Please try again.'**
+  String get etfCreateFundErrorGeneric;
+
+  /// No description provided for @etfCreateFundSelectAtLeastOneSector.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one sector'**
+  String get etfCreateFundSelectAtLeastOneSector;
+
+  /// No description provided for @etfCreateFundNameEnglishOnlyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund name must be in English (letters, numbers, basic punctuation only)'**
+  String get etfCreateFundNameEnglishOnlyError;
+
+  /// No description provided for @etfCreateFundNameTakenError.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund with this name already exists'**
+  String get etfCreateFundNameTakenError;
+
+  /// No description provided for @etfFundsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search funds by name or ticker...'**
+  String get etfFundsSearchHint;
+
+  /// No description provided for @etfFundsTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ETF Funds'**
+  String get etfFundsTabLabel;
+
+  /// No description provided for @etfCompaniesTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Companies'**
+  String get etfCompaniesTabLabel;
+
+  /// No description provided for @etfFundsEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No funds yet — be the first to create one!'**
+  String get etfFundsEmptyState;
+
+  /// No description provided for @etfFundsListErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load funds. Pull to refresh.'**
+  String get etfFundsListErrorMessage;
+
+  /// No description provided for @etfFundsTopByCap.
+  ///
+  /// In en, this message translates to:
+  /// **'TOP BY CAPITALIZATION'**
+  String get etfFundsTopByCap;
+
+  /// No description provided for @etfFundsNewThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW THIS WEEK'**
+  String get etfFundsNewThisWeek;
+
+  /// No description provided for @etfFundDetailNavLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NAV / Unit'**
+  String get etfFundDetailNavLabel;
+
+  /// No description provided for @etfFundDetailAumLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AUM'**
+  String get etfFundDetailAumLabel;
+
+  /// No description provided for @etfFundDetailInvestorCapitalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Investor Deposits'**
+  String get etfFundDetailInvestorCapitalLabel;
+
+  /// No description provided for @etfFundDetailUnitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Units Outstanding'**
+  String get etfFundDetailUnitsLabel;
+
+  /// No description provided for @fundUnitsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} units'**
+  String fundUnitsCount(String count);
+
+  /// No description provided for @etfFundDetailHoldingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'HOLDINGS'**
+  String get etfFundDetailHoldingsTitle;
+
+  /// No description provided for @etfFundDetailHoldingsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No holdings yet'**
+  String get etfFundDetailHoldingsEmpty;
+
+  /// No description provided for @etfFundBankruptcyStep1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to start deleting your fund?'**
+  String get etfFundBankruptcyStep1Title;
+
+  /// No description provided for @etfFundBankruptcyStep1Confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, continue'**
+  String get etfFundBankruptcyStep1Confirm;
+
+  /// No description provided for @etfFundBankruptcyExplanationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund bankruptcy'**
+  String get etfFundBankruptcyExplanationTitle;
+
+  /// No description provided for @etfFundBankruptcyExplanationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting a fund means declaring it bankrupt. Every holding will be sold at market price. Each active employee will be paid 1% of what\'s left. The remaining cash goes to investors: if there\'s enough, each gets their investment back plus 5%; if not, they\'re paid proportionally to what they invested, minus the broker commission. Afterward the fund\'s balance is zeroed and the fund becomes inaccessible. Every participant will get a notification with their payout breakdown.'**
+  String get etfFundBankruptcyExplanationBody;
+
+  /// No description provided for @etfFundBankruptcyHoldingsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets to sell'**
+  String get etfFundBankruptcyHoldingsLabel;
+
+  /// No description provided for @etfFundBankruptcyCommissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Broker commission'**
+  String get etfFundBankruptcyCommissionLabel;
+
+  /// No description provided for @etfFundBankruptcyEmployeesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To employees ({count} × 1%)'**
+  String etfFundBankruptcyEmployeesLabel(int count);
+
+  /// No description provided for @etfFundBankruptcyInvestorsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To investors'**
+  String get etfFundBankruptcyInvestorsLabel;
+
+  /// No description provided for @etfFundBankruptcySolventNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully covered — everyone gets +5%'**
+  String get etfFundBankruptcySolventNote;
+
+  /// No description provided for @etfFundBankruptcyInsolventNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Not fully covered — paid proportionally'**
+  String get etfFundBankruptcyInsolventNote;
+
+  /// No description provided for @etfFundBankruptcyTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total payout'**
+  String get etfFundBankruptcyTotalLabel;
+
+  /// No description provided for @etfFundBankruptcyConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Start bankruptcy procedure'**
+  String get etfFundBankruptcyConfirmButton;
+
+  /// No description provided for @etfFundBankruptcyCancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get etfFundBankruptcyCancelButton;
+
+  /// No description provided for @etfFundBankruptcySuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund liquidated'**
+  String get etfFundBankruptcySuccessMessage;
+
+  /// No description provided for @etfFundBankruptcyErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to complete the bankruptcy procedure'**
+  String get etfFundBankruptcyErrorMessage;
+
+  /// No description provided for @etfFundBankruptcyPreviewErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the payout calculation'**
+  String get etfFundBankruptcyPreviewErrorMessage;
+
+  /// No description provided for @fundLiquidationNotifTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund bankruptcy settlement'**
+  String get fundLiquidationNotifTitle;
+
+  /// No description provided for @fundLiquidationNotifDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{fundName}\" declared bankruptcy. You were credited {amount}.'**
+  String fundLiquidationNotifDetail(String fundName, String amount);
+
+  /// No description provided for @fundLiquidationDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund settlement'**
+  String get fundLiquidationDetailTitle;
+
+  /// No description provided for @fundLiquidationDetailAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Credited'**
+  String get fundLiquidationDetailAmountLabel;
+
+  /// No description provided for @fundLiquidationDetailFundLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund'**
+  String get fundLiquidationDetailFundLabel;
+
+  /// No description provided for @fundLiquidationDetailReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get fundLiquidationDetailReasonLabel;
+
+  /// No description provided for @fundLiquidationDetailReasonValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund bankruptcy'**
+  String get fundLiquidationDetailReasonValue;
+
+  /// No description provided for @fundLiquidationDetailUnitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Units sold'**
+  String get fundLiquidationDetailUnitsLabel;
+
+  /// No description provided for @fundLiquidationDetailAssetsSoldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets'**
+  String get fundLiquidationDetailAssetsSoldLabel;
+
+  /// No description provided for @fundLiquidationDetailSoldAtMarketValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold at market price'**
+  String get fundLiquidationDetailSoldAtMarketValue;
+
+  /// No description provided for @fundLiquidationDetailCommissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Broker commission'**
+  String get fundLiquidationDetailCommissionLabel;
+
+  /// No description provided for @fundLiquidationDetailNeustoikaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Early-exit bonus (+5%)'**
+  String get fundLiquidationDetailNeustoikaLabel;
+
+  /// No description provided for @fundLiquidationDetailRecipientEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee payout'**
+  String get fundLiquidationDetailRecipientEmployee;
+
+  /// No description provided for @fundLiquidationDetailRecipientInvestor.
+  ///
+  /// In en, this message translates to:
+  /// **'Investor payout'**
+  String get fundLiquidationDetailRecipientInvestor;
+
+  /// No description provided for @etfCreateFundLimitReachedError.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have a fund'**
+  String get etfCreateFundLimitReachedError;
+
+  /// No description provided for @etfFundDetailSectorsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SECTORS'**
+  String get etfFundDetailSectorsTitle;
+
+  /// No description provided for @etfFundDetailStrategyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'STRATEGY'**
+  String get etfFundDetailStrategyTitle;
+
+  /// No description provided for @etfFundDetailDescriptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ABOUT'**
+  String get etfFundDetailDescriptionTitle;
+
+  /// No description provided for @etfFundDetailNavHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NAV HISTORY'**
+  String get etfFundDetailNavHistoryTitle;
+
+  /// No description provided for @etfFundDetailHoldingsCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Companies in Fund'**
+  String get etfFundDetailHoldingsCountLabel;
+
+  /// No description provided for @etfFundDetailInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FUND INFO'**
+  String get etfFundDetailInfoTitle;
+
+  /// No description provided for @etfFundDetailCreatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get etfFundDetailCreatedLabel;
+
+  /// No description provided for @etfFundDetailCreatorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund Manager'**
+  String get etfFundDetailCreatorLabel;
+
+  /// No description provided for @etfFundDetailEmployeesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get etfFundDetailEmployeesLabel;
+
+  /// No description provided for @etfFundDetailHireButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Hire'**
+  String get etfFundDetailHireButton;
+
+  /// No description provided for @etfRoleHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund Head'**
+  String get etfRoleHead;
+
+  /// No description provided for @etfRoleAnalyst.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyst'**
+  String get etfRoleAnalyst;
+
+  /// No description provided for @etfRoleCoManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Co-Manager'**
+  String get etfRoleCoManager;
+
+  /// No description provided for @etfRoleTrader.
+  ///
+  /// In en, this message translates to:
+  /// **'Trader'**
+  String get etfRoleTrader;
+
+  /// No description provided for @etfRoleRiskManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Risk Manager'**
+  String get etfRoleRiskManager;
+
+  /// No description provided for @etfEmployeeProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MY RESUME'**
+  String get etfEmployeeProfileTitle;
+
+  /// No description provided for @etfEmployeeProfileButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get etfEmployeeProfileButtonLabel;
+
+  /// No description provided for @etfEmployeeProfileSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save your profile — try again'**
+  String get etfEmployeeProfileSaveError;
+
+  /// No description provided for @etfEmployeeProfileNicknameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get etfEmployeeProfileNicknameLabel;
+
+  /// No description provided for @etfEmployeeProfileNicknameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'How fund heads will see you'**
+  String get etfEmployeeProfileNicknameHint;
+
+  /// No description provided for @etfEmployeeProfileBioLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio'**
+  String get etfEmployeeProfileBioLabel;
+
+  /// No description provided for @etfEmployeeProfileBioHint.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g.: 5 years analyzing tech-sector stocks, focused on fundamental analysis, looking for a spot on a growing fund'**
+  String get etfEmployeeProfileBioHint;
+
+  /// No description provided for @etfEmployeeProfileLanguageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get etfEmployeeProfileLanguageLabel;
+
+  /// No description provided for @etfEmployeeProfileLanguageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g.: English, Russian'**
+  String get etfEmployeeProfileLanguageHint;
+
+  /// No description provided for @etfEmployeeProfileDesiredRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Desired position'**
+  String get etfEmployeeProfileDesiredRoleLabel;
+
+  /// No description provided for @etfEmployeeProfileDesiredRoleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Not chosen'**
+  String get etfEmployeeProfileDesiredRoleHint;
+
+  /// No description provided for @etfEmployeeProfileAvailableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Available for hire'**
+  String get etfEmployeeProfileAvailableLabel;
+
+  /// No description provided for @etfEmployeeProfileAvailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible on the hiring marketplace to any fund head'**
+  String get etfEmployeeProfileAvailableBody;
+
+  /// No description provided for @etfEmployeeProfileSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Profile'**
+  String get etfEmployeeProfileSaveButton;
+
+  /// No description provided for @etfEmployeeProfileSavedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved'**
+  String get etfEmployeeProfileSavedSnackbar;
+
+  /// No description provided for @etfEmployeeProfileNicknameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname is required'**
+  String get etfEmployeeProfileNicknameRequired;
+
+  /// No description provided for @etfEmployeeProfileNicknameNoEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname can\'t contain an email address'**
+  String get etfEmployeeProfileNicknameNoEmail;
+
+  /// No description provided for @etfEmployeeProfileBioNoEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio can\'t contain an email address'**
+  String get etfEmployeeProfileBioNoEmail;
+
+  /// No description provided for @etfEmployeeProfileStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CAREER RECORD'**
+  String get etfEmployeeProfileStatsTitle;
+
+  /// No description provided for @etfEmployeeProfileStatsApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved proposals'**
+  String get etfEmployeeProfileStatsApproved;
+
+  /// No description provided for @etfEmployeeProfileStatsRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected proposals'**
+  String get etfEmployeeProfileStatsRejected;
+
+  /// No description provided for @etfEmployeeProfileStatsFundsChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds changed'**
+  String get etfEmployeeProfileStatsFundsChanged;
+
+  /// No description provided for @etfEmployeeProfileStatsRegisteredAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered'**
+  String get etfEmployeeProfileStatsRegisteredAt;
+
+  /// No description provided for @etfEmployeeProfileStatsRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get etfEmployeeProfileStatsRating;
+
+  /// No description provided for @etfEmployeeProfileRatingPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough activity yet'**
+  String get etfEmployeeProfileRatingPending;
+
+  /// No description provided for @etfEmployeeProfileRatingCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'RATING'**
+  String get etfEmployeeProfileRatingCardTitle;
+
+  /// No description provided for @etfEmployeeProfileInvitationsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitations ({count})'**
+  String etfEmployeeProfileInvitationsButton(int count);
+
+  /// No description provided for @etfMarketplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'HIRING MARKETPLACE'**
+  String get etfMarketplaceTitle;
+
+  /// No description provided for @etfMarketplaceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No one is available for hire right now'**
+  String get etfMarketplaceEmpty;
+
+  /// No description provided for @etfMarketplaceErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the marketplace'**
+  String get etfMarketplaceErrorMessage;
+
+  /// No description provided for @etfMarketplaceInviteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get etfMarketplaceInviteButton;
+
+  /// No description provided for @etfMarketplaceBioFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'No bio yet'**
+  String get etfMarketplaceBioFallback;
+
+  /// No description provided for @etfSendInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Invitation'**
+  String get etfSendInviteTitle;
+
+  /// No description provided for @etfSendInviteRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get etfSendInviteRoleLabel;
+
+  /// No description provided for @etfSendInviteMessageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get etfSendInviteMessageLabel;
+
+  /// No description provided for @etfSendInviteMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell them about the role and your fund'**
+  String get etfSendInviteMessageHint;
+
+  /// No description provided for @etfSendInviteMessageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A message is required'**
+  String get etfSendInviteMessageRequired;
+
+  /// No description provided for @etfSendInviteSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Invitation'**
+  String get etfSendInviteSubmitButton;
+
+  /// No description provided for @etfSendInviteSuccessSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation sent'**
+  String get etfSendInviteSuccessSnackbar;
+
+  /// No description provided for @etfSendInviteTeamFullError.
+  ///
+  /// In en, this message translates to:
+  /// **'Your team is already at its 5-member limit'**
+  String get etfSendInviteTeamFullError;
+
+  /// No description provided for @etfSendInviteAlreadyMemberError.
+  ///
+  /// In en, this message translates to:
+  /// **'Already on your team'**
+  String get etfSendInviteAlreadyMemberError;
+
+  /// No description provided for @etfSendInviteAlreadyPendingError.
+  ///
+  /// In en, this message translates to:
+  /// **'That person already has a pending invite from you'**
+  String get etfSendInviteAlreadyPendingError;
+
+  /// No description provided for @etfFundDetailManageTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage fund'**
+  String get etfFundDetailManageTooltip;
+
+  /// No description provided for @etfFundManagementViewPublicButton.
+  ///
+  /// In en, this message translates to:
+  /// **'View public page'**
+  String get etfFundManagementViewPublicButton;
+
+  /// No description provided for @etfEmployeeHubTeamRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get etfEmployeeHubTeamRow;
+
+  /// No description provided for @etfPositionFundManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund Manager'**
+  String get etfPositionFundManager;
+
+  /// No description provided for @etfPositionEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee'**
+  String get etfPositionEmployee;
+
+  /// No description provided for @etfAdminBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'ADMIN'**
+  String get etfAdminBadge;
+
+  /// No description provided for @etfAdminRenameNicknameTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename nickname (admin)'**
+  String get etfAdminRenameNicknameTooltip;
+
+  /// No description provided for @etfAdminCreateFundTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Create another fund (admin)'**
+  String get etfAdminCreateFundTooltip;
+
+  /// No description provided for @etfAdminRenameFundTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename fund (admin)'**
+  String get etfAdminRenameFundTooltip;
+
+  /// No description provided for @etfAdminRenameNicknameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename nickname'**
+  String get etfAdminRenameNicknameTitle;
+
+  /// No description provided for @etfAdminRenameFundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename fund'**
+  String get etfAdminRenameFundTitle;
+
+  /// No description provided for @etfAdminRenameFundNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund name is required'**
+  String get etfAdminRenameFundNameRequired;
+
+  /// No description provided for @etfAdminRenameFundGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to rename fund'**
+  String get etfAdminRenameFundGenericError;
+
+  /// No description provided for @etfFundManagementAccessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have access to manage this fund'**
+  String get etfFundManagementAccessDenied;
+
+  /// No description provided for @etfFundManagementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MANAGEMENT PANEL'**
+  String get etfFundManagementTitle;
+
+  /// No description provided for @etfFundHoldingSheetQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund holds'**
+  String get etfFundHoldingSheetQuantity;
+
+  /// No description provided for @etfFundHoldingSheetPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get etfFundHoldingSheetPrice;
+
+  /// No description provided for @etfFundHoldingSheetValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Market value'**
+  String get etfFundHoldingSheetValue;
+
+  /// No description provided for @etfFundHoldingSheetPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'% of fund'**
+  String get etfFundHoldingSheetPercent;
+
+  /// No description provided for @etfFundPositionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FUND POSITION'**
+  String get etfFundPositionTitle;
+
+  /// No description provided for @etfInvitationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MY INVITATIONS'**
+  String get etfInvitationsTitle;
+
+  /// No description provided for @etfInvitationsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending invitations'**
+  String get etfInvitationsEmpty;
+
+  /// No description provided for @etfInvitationsErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your invitations'**
+  String get etfInvitationsErrorMessage;
+
+  /// No description provided for @etfInvitationDetailRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role offered'**
+  String get etfInvitationDetailRoleLabel;
+
+  /// No description provided for @etfInvitationDetailMessageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get etfInvitationDetailMessageLabel;
+
+  /// No description provided for @etfInvitationJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get etfInvitationJoinButton;
+
+  /// No description provided for @etfInvitationDeclineButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get etfInvitationDeclineButton;
+
+  /// No description provided for @etfInvitationAcceptedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'You joined the team'**
+  String get etfInvitationAcceptedSnackbar;
+
+  /// No description provided for @etfInvitationDeclinedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation declined'**
+  String get etfInvitationDeclinedSnackbar;
+
+  /// No description provided for @etfInvitationTeamFullError.
+  ///
+  /// In en, this message translates to:
+  /// **'That fund\'s team is already full'**
+  String get etfInvitationTeamFullError;
+
+  /// No description provided for @etfTeamMemberTerminateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get etfTeamMemberTerminateButton;
+
+  /// No description provided for @etfTeamMemberTerminateConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove team member?'**
+  String get etfTeamMemberTerminateConfirmTitle;
+
+  /// No description provided for @etfTeamMemberTerminateConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They\'ll get a 5-day notice before actually losing access — you can cancel it any time before then.'**
+  String get etfTeamMemberTerminateConfirmBody;
+
+  /// No description provided for @etfTeamMemberTerminateConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start 5-Day Notice'**
+  String get etfTeamMemberTerminateConfirmAction;
+
+  /// No description provided for @etfTeamMemberPendingTerminationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaving soon'**
+  String get etfTeamMemberPendingTerminationLabel;
+
+  /// No description provided for @etfTeamMemberCancelTerminationButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Removal'**
+  String get etfTeamMemberCancelTerminationButton;
+
+  /// No description provided for @etfEmploymentDetailTenureLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time at the fund'**
+  String get etfEmploymentDetailTenureLabel;
+
+  /// No description provided for @etfEmploymentTenureDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d'**
+  String etfEmploymentTenureDays(int days);
+
+  /// No description provided for @etfEmploymentTenureMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{months} mo'**
+  String etfEmploymentTenureMonths(int months);
+
+  /// No description provided for @etfEmploymentTenureYearsMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{years} y {months} mo'**
+  String etfEmploymentTenureYearsMonths(int years, int months);
+
+  /// No description provided for @etfEmploymentOutcomeActive.
+  ///
+  /// In en, this message translates to:
+  /// **'currently working'**
+  String get etfEmploymentOutcomeActive;
+
+  /// No description provided for @etfEmploymentOutcomeResigned.
+  ///
+  /// In en, this message translates to:
+  /// **'resigned'**
+  String get etfEmploymentOutcomeResigned;
+
+  /// No description provided for @etfEmploymentOutcomeTerminated.
+  ///
+  /// In en, this message translates to:
+  /// **'let go'**
+  String get etfEmploymentOutcomeTerminated;
+
+  /// No description provided for @etfEmploymentOutcomeFundClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'fund closed'**
+  String get etfEmploymentOutcomeFundClosed;
+
+  /// No description provided for @etfEmploymentOutcomeLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'left'**
+  String get etfEmploymentOutcomeLeft;
+
+  /// No description provided for @etfPermissionsSheetIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'A role is only a starting template. What this employee may actually do is the switches below.'**
+  String get etfPermissionsSheetIntro;
+
+  /// No description provided for @etfPermissionsSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save permissions'**
+  String get etfPermissionsSaveButton;
+
+  /// No description provided for @etfPermissionsSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the permissions'**
+  String get etfPermissionsSaveError;
+
+  /// No description provided for @etfPermissionsRoleChangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the role?'**
+  String get etfPermissionsRoleChangeTitle;
+
+  /// No description provided for @etfPermissionsRoleChangeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The permissions below will be reset to that role\'s defaults. You can adjust them again afterwards.'**
+  String get etfPermissionsRoleChangeBody;
+
+  /// No description provided for @etfPermissionsRoleChangeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Change role'**
+  String get etfPermissionsRoleChangeConfirm;
+
+  /// No description provided for @etfPermissionPropose.
+  ///
+  /// In en, this message translates to:
+  /// **'Propose trades'**
+  String get etfPermissionPropose;
+
+  /// No description provided for @etfPermissionApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve and reject proposals'**
+  String get etfPermissionApprove;
+
+  /// No description provided for @etfPermissionExecute.
+  ///
+  /// In en, this message translates to:
+  /// **'Send approved orders to the market'**
+  String get etfPermissionExecute;
+
+  /// No description provided for @etfPermissionFlagRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag a proposal as risky'**
+  String get etfPermissionFlagRisk;
+
+  /// No description provided for @etfFundEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EDIT FUND'**
+  String get etfFundEditTitle;
+
+  /// No description provided for @etfFundEditShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get etfFundEditShortcutLabel;
+
+  /// No description provided for @etfFundEditSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get etfFundEditSaveButton;
+
+  /// No description provided for @etfFundEditSavedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved'**
+  String get etfFundEditSavedSnackbar;
+
+  /// No description provided for @etfFundEditTooLongError.
+  ///
+  /// In en, this message translates to:
+  /// **'That text is too long — shorten it and try again'**
+  String get etfFundEditTooLongError;
+
+  /// No description provided for @etfFundEditGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the changes'**
+  String get etfFundEditGenericError;
+
+  /// No description provided for @etfRulebookChapterBasics.
+  ///
+  /// In en, this message translates to:
+  /// **'BASICS'**
+  String get etfRulebookChapterBasics;
+
+  /// No description provided for @etfRulebookChapterHead.
+  ///
+  /// In en, this message translates to:
+  /// **'FOR THE HEAD'**
+  String get etfRulebookChapterHead;
+
+  /// No description provided for @etfRulebookChapterEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'FOR EMPLOYEES'**
+  String get etfRulebookChapterEmployee;
+
+  /// No description provided for @etfRulebookCreateSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating a fund'**
+  String get etfRulebookCreateSectionHeader;
+
+  /// No description provided for @etfRulebookCreateSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Any user with Premium can create a fund. One live fund per person.\n\n1. Open \"Become a fund manager\" on the home screen and go through the short introduction.\n\n2. Pick a name and a ticker. A ticker starts with FS followed by one to five capital letters — FSTECH, for example. Both must be free; names are compared ignoring case.\n\n3. Describe the fund: a description, an investment strategy and at least one sector. Sectors are how people find the fund when browsing.\n\n4. Set the starting capital. This is the money the fund begins with, and the initial number of units is derived from it.\n\nThe name, description, strategy and sectors can be changed at any time afterwards. The ticker and the starting capital cannot: investor holdings are recorded against the ticker, and the starting capital is already baked into the number of units issued.'**
+  String get etfRulebookCreateSectionBody;
+
+  /// No description provided for @etfRulebookHireSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Hiring someone'**
+  String get etfRulebookHireSectionHeader;
+
+  /// No description provided for @etfRulebookHireSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund can employ up to five people, not counting the head.\n\n1. Open the employee marketplace — it lists the profiles of people looking for work.\n\n2. Send an invitation: choose a role and write a message. The text is saved as a template and filled in for your next invitations.\n\n3. They either accept or decline. While they haven\'t answered, you can withdraw the invitation.\n\n4. You can\'t send a second invitation to the same person for the same fund while the first is still unanswered.\n\nYou can let someone go at any time, but never instantly: they get five days\' notice and keep working throughout. You can cancel the removal until the notice runs out.'**
+  String get etfRulebookHireSectionBody;
+
+  /// No description provided for @etfRulebookPermissionsSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting permissions'**
+  String get etfRulebookPermissionsSectionHeader;
+
+  /// No description provided for @etfRulebookPermissionsSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A role is only the starting set of permissions at hire time, not a hard limit. What each employee may actually do is set by the head, per person.\n\nThere are four permissions:\n\n• propose trades;\n• approve and reject proposals;\n• send approved orders to the market;\n• flag a proposal as risky.\n\nTo change them, open the fund\'s team and tap an employee\'s row. You can change their role there too — but note that changing a role resets the permissions to that role\'s template, so you\'d set them again afterwards. The app warns you before it does that.\n\nThe head always holds every permission and cannot have them taken away.'**
+  String get etfRulebookPermissionsSectionBody;
+
+  /// No description provided for @etfRulebookApplySectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting hired'**
+  String get etfRulebookApplySectionHeader;
+
+  /// No description provided for @etfRulebookApplySectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone can work for a fund — Premium is not required for this.\n\n1. Fill in your profile: name, a few words about yourself, language and the role you want. Mark yourself as open to offers, or you won\'t appear in the employee marketplace at all.\n\n2. Fund heads browse those profiles and send invitations.\n\n3. Invitations arrive under \"Job offers\". Tapping one shows which fund is asking, for what role and with what message. Then it\'s Join or Decline.\n\nYou can work for more than one fund at a time. Every position goes into your work history.'**
+  String get etfRulebookApplySectionBody;
+
+  /// No description provided for @etfRulebookProposeSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Proposing a trade'**
+  String get etfRulebookProposeSectionHeader;
+
+  /// No description provided for @etfRulebookProposeSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If you may propose trades, you don\'t buy anything yourself — you propose, and the head or their deputy decides.\n\n1. Open the fund\'s trading section and find the company.\n\n2. Set the direction (buy or sell), the quantity, the order type, and a price if it\'s a limit order.\n\n3. Write your reasoning — why the fund should do this. It\'s the main thing that gets read when the decision is made.\n\n4. The proposal lands in the fund\'s blotter as pending.\n\nFour things can happen next: approved, rejected, sent back for revision, or flagged as risky. An approved order is sent to the market by whoever holds that permission.\n\nThe money comes from the fund\'s cash, not from your personal portfolio. Every fund trade carries a 0.5% broker commission.'**
+  String get etfRulebookProposeSectionBody;
+
+  /// No description provided for @etfRulebookLeaveSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaving a fund'**
+  String get etfRulebookLeaveSectionHeader;
+
+  /// No description provided for @etfRulebookLeaveSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can leave at any time and without notice — open the position in your work history and choose to leave.\n\nThis differs from being let go: an employee leaving takes effect immediately, while a head removing someone starts a five-day notice first.\n\nThe position stays in your work history forever and is closed with a reason — resigned, let go, or the fund closed. It can\'t be erased or rewritten: this is the reputation fund heads see.'**
+  String get etfRulebookLeaveSectionBody;
+
+  /// No description provided for @etfRulebookCareerSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Your work history'**
+  String get etfRulebookCareerSectionHeader;
+
+  /// No description provided for @etfRulebookCareerSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every position at a fund is recorded: which fund, in what role, from when, until when, and how it ended.\n\nThe card shows how long you were there and how it finished. There are three endings:\n\n• resigned — you left of your own accord;\n• let go — the head ended the arrangement;\n• fund closed — the fund ceased to exist while you worked there. That is not a dismissal and not your fault.\n\nWhile you\'re still there, the position is marked as current.\n\nWork history can\'t be edited by hand — it fills itself in from what actually happened.'**
+  String get etfRulebookCareerSectionBody;
+
+  /// No description provided for @etfRulebookSuccessionSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'If the head disappears'**
+  String get etfRulebookSuccessionSectionHeader;
+
+  /// No description provided for @etfRulebookSuccessionSectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A fund is never left unmanaged. If its head stops opening the app, the fund is offered to its employees.\n\n1. Without Premium the head has about two months before that happens. With active Premium they have about half a year — a longer leash, not an unlimited one.\n\n2. The deputy gets first refusal: for the first few days the offer is theirs alone. If they don\'t take it, it opens to every employee with Premium.\n\n3. Accepting is an application, not an instant appointment — except for the deputy inside their own window, who takes the fund straight away. The team has 14 days in total.\n\n4. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n5. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n6. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.'**
+  String get etfRulebookSuccessionSectionBody;
+
+  /// No description provided for @etfSuccessionCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The head of this fund has gone quiet — the team is being offered the management.'**
+  String get etfSuccessionCardSubtitle;
+
+  /// No description provided for @etfSuccessionDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Days left: {days}'**
+  String etfSuccessionDaysLeft(int days);
+
+  /// No description provided for @etfSuccessionAppliedPill.
+  ///
+  /// In en, this message translates to:
+  /// **'You applied'**
+  String get etfSuccessionAppliedPill;
+
+  /// No description provided for @etfSuccessionSheetIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This fund\'s head has been away a long time, so the fund is being offered to its team.'**
+  String get etfSuccessionSheetIntro;
+
+  /// No description provided for @etfSuccessionRuleDeputyFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'The deputy gets first refusal. For the first few days the offer is theirs alone; if they don\'t take it, it opens to the rest of the team.'**
+  String get etfSuccessionRuleDeputyFirst;
+
+  /// No description provided for @etfSuccessionErrorDeputyFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'The fund\'s deputy has first refusal for now. If they pass, the offer opens to the whole team.'**
+  String get etfSuccessionErrorDeputyFirst;
+
+  /// No description provided for @etfSuccessionBecameHeadSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'You are now the head of this fund'**
+  String get etfSuccessionBecameHeadSnackbar;
+
+  /// No description provided for @etfSuccessionRuleEnterRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepting puts you in the running — it does not make you the head right away.'**
+  String get etfSuccessionRuleEnterRunning;
+
+  /// No description provided for @etfSuccessionRuleSeniorityWins.
+  ///
+  /// In en, this message translates to:
+  /// **'On the deadline the fund goes to whoever has been on the team the longest among those who applied — with the deputy still ahead of everyone.'**
+  String get etfSuccessionRuleSeniorityWins;
+
+  /// No description provided for @etfSuccessionRuleHeadMayReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'If the head opens the app before the deadline, the offer is cancelled and the fund stays theirs.'**
+  String get etfSuccessionRuleHeadMayReturn;
+
+  /// No description provided for @etfSuccessionRuleNobodyAccepts.
+  ///
+  /// In en, this message translates to:
+  /// **'If nobody applies, the fund is liquidated: holdings are sold and investors are paid out.'**
+  String get etfSuccessionRuleNobodyAccepts;
+
+  /// No description provided for @etfSuccessionRuleMoneyStays.
+  ///
+  /// In en, this message translates to:
+  /// **'The fund\'s cash and holdings stay with the fund — the new head inherits them, not a blank slate.'**
+  String get etfSuccessionRuleMoneyStays;
+
+  /// No description provided for @etfSuccessionDeadlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Decision date'**
+  String get etfSuccessionDeadlineLabel;
+
+  /// No description provided for @etfSuccessionAcceptButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply for the management'**
+  String get etfSuccessionAcceptButton;
+
+  /// No description provided for @etfSuccessionPremiumRequiredButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium required'**
+  String get etfSuccessionPremiumRequiredButton;
+
+  /// No description provided for @etfSuccessionAlreadyAppliedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have applied. The fund goes to the longest-serving applicant on the decision date.'**
+  String get etfSuccessionAlreadyAppliedBody;
+
+  /// No description provided for @etfSuccessionAcceptedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Application sent'**
+  String get etfSuccessionAcceptedSnackbar;
+
+  /// No description provided for @etfSuccessionErrorClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This offer is already closed'**
+  String get etfSuccessionErrorClosed;
+
+  /// No description provided for @etfSuccessionErrorNotEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'Only an active team member with Premium can take over a fund'**
+  String get etfSuccessionErrorNotEligible;
+
+  /// No description provided for @etfSuccessionErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send the application'**
+  String get etfSuccessionErrorGeneric;
+
+  /// No description provided for @etfSectorTechnology.
+  ///
+  /// In en, this message translates to:
+  /// **'Technology'**
+  String get etfSectorTechnology;
+
+  /// No description provided for @etfSectorHealthcare.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthcare'**
+  String get etfSectorHealthcare;
+
+  /// No description provided for @etfSectorFinancials.
+  ///
+  /// In en, this message translates to:
+  /// **'Financials'**
+  String get etfSectorFinancials;
+
+  /// No description provided for @etfSectorConsumerDiscretionary.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumer Discretionary'**
+  String get etfSectorConsumerDiscretionary;
+
+  /// No description provided for @etfSectorConsumerStaples.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumer Staples'**
+  String get etfSectorConsumerStaples;
+
+  /// No description provided for @etfSectorEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get etfSectorEnergy;
+
+  /// No description provided for @etfSectorIndustrials.
+  ///
+  /// In en, this message translates to:
+  /// **'Industrials'**
+  String get etfSectorIndustrials;
+
+  /// No description provided for @etfSectorMaterials.
+  ///
+  /// In en, this message translates to:
+  /// **'Materials'**
+  String get etfSectorMaterials;
+
+  /// No description provided for @etfSectorUtilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Utilities'**
+  String get etfSectorUtilities;
+
+  /// No description provided for @etfSectorRealEstate.
+  ///
+  /// In en, this message translates to:
+  /// **'Real Estate'**
+  String get etfSectorRealEstate;
+
+  /// No description provided for @etfSectorCommunicationServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Communication Services'**
+  String get etfSectorCommunicationServices;
 }
 
 class _AppLocalizationsDelegate

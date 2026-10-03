@@ -46,6 +46,16 @@ void main() async {
   ]);
   debugPrint('🐛 orientation locked');
 
+  // Locked portrait-only regardless of the device's own rotation-lock
+  // setting or auto-rotate being on — nothing in the UI (fixed-width 430
+  // shell in ScanCoApp.build, chart layouts, etc.) is built to handle
+  // landscape, so letting the OS rotate it free would just show a
+  // squished/broken layout rather than a real landscape mode.
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   // Edge-to-edge with a fully transparent system nav bar — no solid plate
   // behind the 3-button/gesture bar, regardless of the device's system
   // light/dark setting (the app itself is always light-themed).

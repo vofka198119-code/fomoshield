@@ -22,6 +22,7 @@ class AmountKeypad extends StatelessWidget {
   final double displayAmount;
   final VoidCallback? onSubmit;
   final AppPalette palette;
+  final String? submitLabel;
 
   const AmountKeypad({
     super.key,
@@ -33,6 +34,7 @@ class AmountKeypad extends StatelessWidget {
     required this.displayAmount,
     required this.onSubmit,
     required this.palette,
+    this.submitLabel,
   });
 
   @override
@@ -46,6 +48,7 @@ class AmountKeypad extends StatelessWidget {
         onSubmit: onSubmit,
         palette: palette,
         height: 44,
+        label: submitLabel,
       ),
       palette: palette,
     );

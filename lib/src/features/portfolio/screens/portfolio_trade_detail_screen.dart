@@ -21,6 +21,7 @@ import '../../../shared/widgets/card_frame.dart';
 import '../../../core/cache/logo_providers.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/company_logo.dart';
+import '../../funds/providers/fund_providers.dart';
 import '../../orders/order_model.dart';
 import '../../orders/order_provider.dart';
 import '../portfolio_providers.dart';
@@ -100,7 +101,7 @@ class _TradeDetailCard extends ConsumerWidget {
     final isBuy = tx.type == TransactionType.buy;
     final accent = isBuy ? ThemeV2.success : ThemeV2.loss;
     final companyName =
-        ref.watch(resolvedCompanyNameProvider(tx.symbol)).valueOrNull ??
+        ref.watch(resolvedAssetNameProvider(tx.symbol)).valueOrNull ??
         tx.symbol;
 
     return CardFrame(

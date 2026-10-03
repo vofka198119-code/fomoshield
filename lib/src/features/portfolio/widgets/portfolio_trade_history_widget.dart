@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/cache/logo_providers.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../shared/widgets/widget_container.dart';
 import '../../../shared/widgets/trade_history_tile.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../funds/providers/fund_providers.dart';
 import '../portfolio_providers.dart';
 
 // ---------------------------------------------------------------------------
@@ -57,7 +57,7 @@ class PortfolioTradeHistoryWidget extends ConsumerWidget {
               symbol: tx.symbol,
               companyName:
                   ref
-                      .watch(resolvedCompanyNameProvider(tx.symbol))
+                      .watch(resolvedAssetNameProvider(tx.symbol))
                       .valueOrNull ??
                   tx.symbol,
               isBuy: tx.type == TransactionType.buy,

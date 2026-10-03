@@ -9,9 +9,12 @@ import '../../core/theme/themed_header.dart';
 import '../../core/theme/themed_divider.dart';
 import '../../core/theme/themed_border.dart';
 import '../../shared/widgets/company_logo.dart';
+import '../funds/providers/fund_providers.dart';
+import '../funds/widgets/funds_tab_list.dart';
 import '../home/home_providers.dart';
 import '../home/watchlist_limits_provider.dart';
 import 'search_provider.dart';
+import '../funds/funds_visibility.dart';
 import 'widgets/exchange_badge.dart';
 import 'widgets/search_browse_lanes.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -44,16 +47,62 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
+  // Funds tab's own search field — lives here (not in FundsTabList) so it
+  // can render above the Funds/Companies tab labels alongside the
+  // Companies field; see _buildFundsSearchField's own doc comment.
+  final _fundsController = TextEditingController();
+  String _fundsQuery = '';
+  // 1 (Companies) is the default — preserves the screen's existing
+  // autofocus-search-field entry behavior; Funds (0) is an explicit tap
+  // away, per docs/ETF_FUND_EMULATION.md's "embed into Search, no new
+  // bottom-nav item" decision.
+  int _tabIndex = 1;
+  // Drives the swipe between Funds/Companies (see the PageView in build()
+  // below) — same controller-driven page+dots pattern as the app's one
+  // other swipeable surface (home/widgets/portfolio_widget.dart's
+  // multi-portfolio PageView), just with tab labels standing in for dots.
+  late final _pageController = PageController(initialPage: _tabIndex);
+  // Consumed by _buildCompaniesSearchField — see its own doc comment.
+  bool _companiesAutofocusConsumed = false;
 
   @override
   void dispose() {
     _controller.dispose();
+    _fundsController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   void _clear() {
     _controller.clear();
     ref.read(searchProvider.notifier).onSearchInput('');
+  }
+
+  // A fund's units aren't a real company -- Company Detail has no idea what
+  // to do with one, and its own quote lookup would hit the real Finnhub
+  // endpoint for a ticker that doesn't actually exist there (confirmed
+  // live 2026-09-15: a fund reached via this screen showed a frozen price
+  // and an empty NAV history, because it never got here). Same
+  // fundTickerPattern + fundsListProvider match already used by Portfolio
+  // Holdings/Notifications' own row taps -- route to Fund Detail instead
+  // whenever the symbol actually matches a fund that exists, not just the
+  // ticker shape.
+  void _navigateToCompany(String symbol, String? portfolioId) {
+    final matchingFund = fundTickerPattern.hasMatch(symbol)
+        ? ref
+              .read(fundsListProvider)
+              .valueOrNull
+              ?.where((f) => f.ticker == symbol)
+              .firstOrNull
+        : null;
+    if (matchingFund != null) {
+      context.push('/funds/${matchingFund.id}');
+      return;
+    }
+    context.push(
+      '/company/$symbol',
+      extra: portfolioId != null ? {'portfolioId': portfolioId} : null,
+    );
   }
 
   @override
@@ -69,6 +118,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final portfolioId = routeExtra?['portfolioId'] as String?;
     final stressTestSource = routeExtra?['source'] as String?;
     final stressTestSessionId = routeExtra?['sessionId'] as String?;
+    // Stress Test is a fully separate pricing mechanic (synthetic
+    // per-session GBM simulation, see stress_test_engine.dart) from ETF
+    // funds (real multi-investor, real-market-priced — see
+    // docs/ETF_FUND_EMULATION.md). Deliberately keeping the Funds tab out
+    // of Search entirely when opened from Stress Test's stock picker,
+    // rather than trying to make "buying a fund inside a Stress Test
+    // session" mean something — the author's own words: "залезем в такие
+    // дебри что мы сами забудем что и как работает" (2026-09-06).
+    final isStressTestEntry = stressTestSource == 'stress-test';
+    // No Funds lane means no swipe and no tab row at all — the screen
+    // collapses to plain Companies, exactly as it already does when Search
+    // is opened from inside a Market Simulation. Two reasons it can be
+    // absent: that stress-test entry, and the module being admin-only for
+    // now (see funds_visibility.dart).
+    final showFundsLane =
+        !isStressTestEntry && ref.watch(fundsVisibleProvider);
 
     // First back press while a query is active just clears search (back to
     // the browse lanes); only a second press with no query actually leaves
@@ -101,309 +166,63 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           right: false,
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                // Same plain filled-box recipe as the Stress Test "Search
-                // Company" field (see stress_test_search_sheet.dart) — a
-                // search icon inline — wrapped in the same themedBorder
-                // ring every widget/window gets (the Language/Theme picker
-                // rows get theirs from CardFrame's own border handling,
-                // this field isn't inside a CardFrame so needs it applied
-                // directly). The app-wide InputDecorationTheme's
-                // focusedBorder is a hardcoded ThemeV2.primary (green)
-                // OutlineInputBorder — not overridden by the field's own
-                // `border: InputBorder.none` below (Flutter only falls
-                // back to `border` for states that aren't separately
-                // specified), so it showed through whenever this field was
-                // focused (autofocus: true, so immediately on screen open)
-                // — still suppressed explicitly whenever [windowGradient]
-                // is set.
-                child: themedBorder(
-                  palette: palette,
-                  borderRadius: ThemeV2.borderRadiusMedium,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: palette.windowGradient,
-                      borderRadius: ThemeV2.borderRadiusMedium,
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      autofocus: true,
-                      onChanged: (q) =>
-                          ref.read(searchProvider.notifier).onSearchInput(q),
-                      decoration: InputDecoration(
-                        hintText: l10n.searchHint,
-                        hintStyle: GoogleFonts.inter(
-                          color: palette.textBody,
-                          fontSize: 14,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.search_rounded,
-                          color: palette.textBody,
-                        ),
-                        border: InputBorder.none,
-                        enabledBorder: palette.windowGradient == null
-                            ? null
-                            : InputBorder.none,
-                        focusedBorder: palette.windowGradient == null
-                            ? null
-                            : InputBorder.none,
-                        filled: false,
-                        suffixIcon: state.query.isEmpty
-                            ? null
-                            : IconButton(
-                                icon: Icon(
-                                  Icons.close_rounded,
-                                  color: palette.textBody,
-                                  size: 20,
-                                ),
-                                onPressed: _clear,
-                              ),
-                      ),
-                      style: GoogleFonts.inter(
-                        color: palette.textHeader,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
+              // Search field sits directly under the header, above the
+              // Funds/Companies tab labels — previously it rendered BELOW
+              // the tab row (inside each tab's own content), which read as
+              // header → tabs → search, an awkward stack of rows before
+              // any actual content. Each tab still has its own independent
+              // field/state (typed API search for Companies, local filter
+              // for Funds — see FundsTabList's own doc comment); only the
+              // active one renders here, ordered above the tab labels.
+              if (!showFundsLane)
+                _buildCompaniesSearchField(l10n, state, palette)
+              else ...[
+                _tabIndex == 0
+                    ? _buildFundsSearchField(l10n, palette)
+                    : _buildCompaniesSearchField(l10n, state, palette),
+                _buildTabHeader(l10n, palette),
+              ],
               Expanded(
-                child: state.isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: palette.accentPrimary,
-                        ),
+                child: !showFundsLane
+                    ? _buildCompaniesResults(
+                        l10n,
+                        state,
+                        palette,
+                        portfolioId,
+                        stressTestSource,
+                        stressTestSessionId,
                       )
-                    : state.query.isEmpty
-                    ? SearchBrowseLanes(
-                        palette: palette,
-                        onTapSymbol: (symbol) {
-                          // Browsing a lane/recently-viewed doesn't hit
-                          // Finnhub's /search endpoint at all (it's just
-                          // navigating to an already-known symbol from a
-                          // pre-loaded list), so it no longer shares the
-                          // search counter with the typed-result ListTile
-                          // below (changed 2026-09-23) — only kept the
-                          // debounce as a double-tap guard.
-                          ref.read(debouncerProvider).run(() async {
-                            if (stressTestSource == 'stress-test' &&
-                                stressTestSessionId != null) {
-                              context.push(
-                                '/stress-test/$stressTestSessionId/stock/$symbol',
-                              );
-                              return;
-                            }
-                            context.push(
-                              '/company/$symbol',
-                              extra: portfolioId != null
-                                  ? {'portfolioId': portfolioId}
-                                  : null,
-                            );
-                          });
-                        },
-                      )
-                    : state.query.length < 2
-                    ? const SizedBox.shrink()
-                    : state.results.isEmpty && state.query.isNotEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                state.errorType != null
-                                    ? Icons.cloud_off_rounded
-                                    : Icons.search_off_rounded,
-                                color: palette.textBody,
-                                size: 48,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                state.errorType != null
-                                    ? _searchErrorText(l10n, state.errorType!)
-                                    : l10n.searchNoResults,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.inter(
-                                  color: palette.textBody,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              if (state.errorType != null) ...[
-                                const SizedBox(height: 8),
-                                Text(
-                                  l10n.searchApiExhausted,
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.inter(
-                                    color: palette.textBody,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ],
+                    : PageView(
+                        controller: _pageController,
+                        onPageChanged: (i) => setState(() => _tabIndex = i),
+                        // Each child wrapped in _KeepAlivePage — PageView
+                        // doesn't keep an off-viewport page's own subtree
+                        // alive on its own (unlike the old IndexedStack,
+                        // which always fully built both branches). Without
+                        // this, SearchBrowseLanes' State got torn down and
+                        // rebuilt fresh every swipe, which replayed its
+                        // list rows' StaggerFadeIn entrance animation (a
+                        // slide-up-into-place) on every single swipe into
+                        // Companies instead of just the screen's first
+                        // open — confirmed live 2026-09-07.
+                        children: [
+                          _KeepAlivePage(
+                            child: FundsTabList(
+                              palette: palette,
+                              query: _fundsQuery,
+                            ),
                           ),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: state.results.length,
-                        separatorBuilder: (_, _) => palette.dividerGradient != null
-                            ? themedDivider(palette, indent: 0, endIndent: 0)
-                            : const Divider(),
-                        itemBuilder: (context, i) {
-                          final item = state.results[i];
-                          final symbol = item['symbol'] as String? ?? '';
-                          final name = item['description'] as String? ?? '';
-                          final type = item['type'] as String? ?? '';
-
-                          return ListTile(
-                            key: ValueKey(symbol),
-                            leading: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: palette.accentPrimary,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: CompanyLogo(ticker: symbol, radius: 22),
+                          _KeepAlivePage(
+                            child: _buildCompaniesResults(
+                              l10n,
+                              state,
+                              palette,
+                              portfolioId,
+                              stressTestSource,
+                              stressTestSessionId,
                             ),
-                            title: Row(
-                              children: [
-                                Text(
-                                  symbol,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: palette.textHeader,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                ExchangeBadge(
-                                  symbol: symbol,
-                                  type: type,
-                                  palette: palette,
-                                ),
-                              ],
-                            ),
-                            subtitle: Text(
-                              name,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                color: palette.textBody,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Consumer(
-                                  builder: (context, ref, _) {
-                                    final inWatchlist = ref
-                                        .watch(watchlistSymbolsProvider)
-                                        .contains(symbol);
-                                    return IconButton(
-                                      icon: Icon(
-                                        inWatchlist
-                                            ? Icons.bookmark
-                                            : Icons.bookmark_border,
-                                        size: 20,
-                                        color: inWatchlist
-                                            ? palette.accentPrimary
-                                            : palette.textBody,
-                                      ),
-                                      onPressed: () {
-                                        if (inWatchlist) {
-                                          ref
-                                              .read(
-                                                watchlistSymbolsProvider
-                                                    .notifier,
-                                              )
-                                              .remove(symbol);
-                                          return;
-                                        }
-                                        final maxW = ref.read(
-                                          maxWatchlistProvider,
-                                        );
-                                        final current = ref.read(
-                                          watchlistSymbolsProvider,
-                                        );
-                                        if (current.length >= maxW) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                maxW == 30
-                                                    ? l10n.watchlistLimitFree
-                                                    : l10n.watchlistLimitMax(
-                                                        maxW,
-                                                      ),
-                                                style: GoogleFonts.inter(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                              backgroundColor: ThemeV2.primary,
-                                              behavior:
-                                                  SnackBarBehavior.floating,
-                                            ),
-                                          );
-                                          return;
-                                        }
-                                        ref
-                                            .read(
-                                              watchlistSymbolsProvider.notifier,
-                                            )
-                                            .add(symbol);
-                                      },
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              // Search's own per-search limit was retired
-                              // 2026-09-23 — every tap here (like every
-                              // other entry point) already goes through
-                              // Company Detail's own universal view-gate
-                              // (watchlist_ad_provider.dart), so gating it
-                              // a second time here was pure duplicated
-                              // friction unique to this one entry point.
-                              // searchCounterProvider itself is left in
-                              // place (admin reset/unlimited controls,
-                              // Premium's setUnlimited() call still touch
-                              // it) — just no longer consumed or checked
-                              // here. Debounce kept as a double-tap guard.
-                              ref.read(debouncerProvider).run(() async {
-                                // Check if navigating from stress-test context
-                                final extra =
-                                    GoRouterState.of(context).extra
-                                        as Map<String, dynamic>?;
-                                final source = extra?['source'] as String?;
-                                final sessionId =
-                                    extra?['sessionId'] as String?;
-
-                                if (source == 'stress-test' &&
-                                    sessionId != null) {
-                                  context.push(
-                                    '/stress-test/$sessionId/stock/$symbol',
-                                  );
-                                } else {
-                                  context.push(
-                                    '/company/$symbol',
-                                    extra: portfolioId != null
-                                        ? {'portfolioId': portfolioId}
-                                        : null,
-                                  );
-                                }
-                              });
-                            },
-                          );
-                        },
+                          ),
+                        ],
                       ),
               ),
             ],
@@ -411,5 +230,425 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       ),
     );
+  }
+
+  // Same plain filled-box recipe as the Stress Test "Search Company" field
+  // (see stress_test_search_sheet.dart) — a search icon inline — wrapped in
+  // the same themedBorder ring every widget/window gets (the Language/Theme
+  // picker rows get theirs from CardFrame's own border handling, this field
+  // isn't inside a CardFrame so needs it applied directly). The app-wide
+  // InputDecorationTheme's focusedBorder is a hardcoded ThemeV2.primary
+  // (green) OutlineInputBorder — not overridden by the field's own `border:
+  // InputBorder.none` below (Flutter only falls back to `border` for states
+  // that aren't separately specified), so it showed through whenever this
+  // field was focused (autofocus: true, so immediately on screen open) —
+  // still suppressed explicitly whenever [windowGradient] is set.
+  Widget _buildCompaniesSearchField(
+    AppLocalizations l10n,
+    SearchNotifier state,
+    AppPalette palette,
+  ) {
+    // Only the very first time this field is built (screen's initial open,
+    // Companies being the default tab) — not every time the PageView swipes
+    // back onto Companies. This field only exists in the tree while
+    // Companies is the active tab (built fresh from scratch each time,
+    // unlike the old always-mounted IndexedStack version), so a permanent
+    // `autofocus: true` re-opened the keyboard on every swipe INTO this
+    // tab, which read as a vertical snap/jump right after the horizontal
+    // swipe settled — confirmed live 2026-09-07.
+    final autofocus = !_companiesAutofocusConsumed;
+    _companiesAutofocusConsumed = true;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: themedBorder(
+        palette: palette,
+        borderRadius: ThemeV2.borderRadiusMedium,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: palette.windowGradient,
+            borderRadius: ThemeV2.borderRadiusMedium,
+          ),
+          child: TextField(
+            controller: _controller,
+            autofocus: autofocus,
+            onChanged: (q) =>
+                ref.read(searchProvider.notifier).onSearchInput(q),
+            decoration: InputDecoration(
+              hintText: l10n.searchHint,
+              hintStyle: GoogleFonts.inter(
+                color: palette.textBody,
+                fontSize: 14,
+              ),
+              prefixIcon: Icon(Icons.search_rounded, color: palette.textBody),
+              border: InputBorder.none,
+              enabledBorder: palette.windowGradient == null
+                  ? null
+                  : InputBorder.none,
+              focusedBorder: palette.windowGradient == null
+                  ? null
+                  : InputBorder.none,
+              filled: false,
+              suffixIcon: state.query.isEmpty
+                  ? null
+                  : IconButton(
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: palette.textBody,
+                        size: 20,
+                      ),
+                      onPressed: _clear,
+                    ),
+            ),
+            style: GoogleFonts.inter(color: palette.textHeader, fontSize: 14),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Funds tab's own search field — same visual recipe as the Companies
+  // field above, minus autofocus (Funds is never the entry tab) and with
+  // its own separate query state, since it filters a locally-fetched list
+  // rather than driving searchProvider's API search.
+  Widget _buildFundsSearchField(AppLocalizations l10n, AppPalette palette) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: themedBorder(
+        palette: palette,
+        borderRadius: ThemeV2.borderRadiusMedium,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: palette.windowGradient,
+            borderRadius: ThemeV2.borderRadiusMedium,
+          ),
+          child: TextField(
+            controller: _fundsController,
+            onChanged: (q) => setState(() => _fundsQuery = q.trim()),
+            decoration: InputDecoration(
+              filled: false,
+              hintText: l10n.etfFundsSearchHint,
+              hintStyle: GoogleFonts.inter(
+                color: palette.textBody,
+                fontSize: 14,
+              ),
+              prefixIcon: Icon(Icons.search_rounded, color: palette.textBody),
+              border: InputBorder.none,
+              // Same conditional as _buildCompaniesSearchField: on Standard
+              // (windowGradient == null), fall through to null so the
+              // app-wide InputDecorationTheme's own default outline shows
+              // instead of no border at all — hardcoding InputBorder.none
+              // unconditionally here (as this field's old standalone
+              // FundsTabList version did) left Standard with no outline at
+              // all, while every themed variant (which sets windowGradient)
+              // still got its Container fill instead. Confirmed live
+              // 2026-09-07.
+              enabledBorder: palette.windowGradient == null
+                  ? null
+                  : InputBorder.none,
+              focusedBorder: palette.windowGradient == null
+                  ? null
+                  : InputBorder.none,
+              suffixIcon: _fundsQuery.isEmpty
+                  ? null
+                  : IconButton(
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: palette.textBody,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        _fundsController.clear();
+                        setState(() => _fundsQuery = '');
+                      },
+                    ),
+            ),
+            style: GoogleFonts.inter(color: palette.textHeader, fontSize: 14),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompaniesResults(
+    AppLocalizations l10n,
+    SearchNotifier state,
+    AppPalette palette,
+    String? portfolioId,
+    String? stressTestSource,
+    String? stressTestSessionId,
+  ) {
+    return state.isLoading
+        ? Center(child: CircularProgressIndicator(color: palette.accentPrimary))
+        : state.query.isEmpty
+        ? SearchBrowseLanes(
+            palette: palette,
+            onTapSymbol: (symbol) {
+              // Browsing a lane/recently-viewed doesn't hit Finnhub's
+              // /search endpoint at all (it's just navigating to an
+              // already-known symbol from a pre-loaded list), so it no
+              // longer shares the search counter with the typed-result
+              // ListTile below (changed 2026-09-23) — only kept the
+              // debounce as a double-tap guard.
+              ref.read(debouncerProvider).run(() async {
+                if (stressTestSource == 'stress-test' &&
+                    stressTestSessionId != null) {
+                  context.push(
+                    '/stress-test/$stressTestSessionId/stock/$symbol',
+                  );
+                  return;
+                }
+                _navigateToCompany(symbol, portfolioId);
+              });
+            },
+          )
+        : state.query.length < 2
+        ? const SizedBox.shrink()
+        : state.results.isEmpty && state.query.isNotEmpty
+        ? Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    state.errorType != null
+                        ? Icons.cloud_off_rounded
+                        : Icons.search_off_rounded,
+                    color: palette.textBody,
+                    size: 48,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    state.errorType != null
+                        ? _searchErrorText(l10n, state.errorType!)
+                        : l10n.searchNoResults,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      color: palette.textBody,
+                      fontSize: 14,
+                    ),
+                  ),
+                  if (state.errorType != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.searchApiExhausted,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        color: palette.textBody,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          )
+        : ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: state.results.length,
+            separatorBuilder: (_, _) => palette.dividerGradient != null
+                ? themedDivider(palette, indent: 0, endIndent: 0)
+                : const Divider(),
+            itemBuilder: (context, i) {
+              final item = state.results[i];
+              final symbol = item['symbol'] as String? ?? '';
+              final name = item['description'] as String? ?? '';
+              final type = item['type'] as String? ?? '';
+
+              return ListTile(
+                key: ValueKey(symbol),
+                leading: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: palette.accentPrimary,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: CompanyLogo(ticker: symbol, radius: 22),
+                ),
+                title: Text(
+                  name,
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textHeader,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Row(
+                  children: [
+                    Text(
+                      symbol,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: palette.textBody,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    ExchangeBadge(
+                      symbol: symbol,
+                      type: type,
+                      palette: palette,
+                    ),
+                  ],
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final inWatchlist = ref
+                            .watch(watchlistSymbolsProvider)
+                            .contains(symbol);
+                        return IconButton(
+                          icon: Icon(
+                            inWatchlist
+                                ? Icons.bookmark
+                                : Icons.bookmark_border,
+                            size: 20,
+                            color: inWatchlist
+                                ? palette.accentPrimary
+                                : palette.textBody,
+                          ),
+                          onPressed: () {
+                            if (inWatchlist) {
+                              ref
+                                  .read(watchlistSymbolsProvider.notifier)
+                                  .remove(symbol);
+                              return;
+                            }
+                            final maxW = ref.read(maxWatchlistProvider);
+                            final current = ref.read(watchlistSymbolsProvider);
+                            if (current.length >= maxW) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    maxW == 30
+                                        ? l10n.watchlistLimitFree
+                                        : l10n.watchlistLimitMax(maxW),
+                                    style: GoogleFonts.inter(fontSize: 13),
+                                  ),
+                                  backgroundColor: ThemeV2.primary,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                              return;
+                            }
+                            ref
+                                .read(watchlistSymbolsProvider.notifier)
+                                .add(symbol);
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  // Search's own per-search limit was retired 2026-09-23 —
+                  // every tap here (like every other entry point) already
+                  // goes through Company Detail's own universal view-gate
+                  // (watchlist_ad_provider.dart), so gating it a second
+                  // time here was pure duplicated friction unique to this
+                  // one entry point. searchCounterProvider itself is left
+                  // in place (admin reset/unlimited controls, Premium's
+                  // setUnlimited() call still touch it) — just no longer
+                  // consumed or checked here. Debounce kept as a
+                  // double-tap guard.
+                  ref.read(debouncerProvider).run(() async {
+                    if (stressTestSource == 'stress-test' &&
+                        stressTestSessionId != null) {
+                      context.push(
+                        '/stress-test/$stressTestSessionId/stock/$symbol',
+                      );
+                    } else {
+                      _navigateToCompany(symbol, portfolioId);
+                    }
+                  });
+                },
+              );
+            },
+          );
+  }
+
+  Widget _buildTabHeader(AppLocalizations l10n, AppPalette palette) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      child: Row(
+        children: [
+          _tabButton(l10n.etfFundsTabLabel, 0, palette),
+          const SizedBox(width: 20),
+          _tabButton(l10n.etfCompaniesTabLabel, 1, palette),
+        ],
+      ),
+    );
+  }
+
+  Widget _tabButton(String label, int index, AppPalette palette) {
+    final active = _tabIndex == index;
+    return InkWell(
+      onTap: () => _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      ),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                // Active label now matches the underline's accent color
+                // (was textHeader, which on Standard is a plain dark
+                // gray/black — didn't read as "selected" clearly; every
+                // themed variant's accentPrimary already reads fine as a
+                // header color too). Confirmed live 2026-09-07.
+                color: active ? palette.accentPrimary : palette.textBody,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              height: 2,
+              width: 28,
+              color: active ? palette.accentPrimary : Colors.transparent,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Keeps a PageView child's subtree alive while scrolled off-screen — see
+// the PageView's own doc comment above for why this is needed (Search's
+// Funds/Companies swipe was replaying SearchBrowseLanes' entrance
+// animation on every swipe without it).
+// ---------------------------------------------------------------------------
+class _KeepAlivePage extends StatefulWidget {
+  final Widget child;
+
+  const _KeepAlivePage({required this.child});
+
+  @override
+  State<_KeepAlivePage> createState() => _KeepAlivePageState();
+}
+
+class _KeepAlivePageState extends State<_KeepAlivePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
   }
 }

@@ -1,0 +1,112 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
+import '../models/fund.dart';
+import '../models/fund_balance_history.dart';
+import '../models/fund_commission_history.dart';
+import '../models/fund_investor.dart';
+import '../models/fund_investor_flows.dart';
+import '../models/trade_proposal.dart';
+import '../services/fund_api_service.dart';
+
+/// Fund tickers are always "FS" + 1-5 uppercase letters (fundService.js's
+/// TICKER_PREFIX, enforced server-side) — used as a cheap pre-filter
+/// wherever a Portfolio holding's symbol might be a fund's units rather
+/// than a real stock, before paying for a funds-list round trip to confirm
+/// against the actual ticker (a real stock ticker can coincidentally match
+/// this shape, e.g. FSLR — First Solar — so the pattern alone is never
+/// sufficient on its own).
+final RegExp fundTickerPattern = RegExp(r'^FS[A-Z]{1,5}$');
+
+final fundApiServiceProvider = Provider<FundApiService>((ref) {
+  return FundApiService();
+});
+
+final fundSectorsProvider = FutureProvider.autoDispose<List<String>>((ref) {
+  return ref.watch(fundApiServiceProvider).getSectors();
+});
+
+/// The Search screen's Funds tab, and Home's own-fund lookup
+/// (FundEntryWidget). Deliberately NOT autoDispose — unlike Watchlist/
+/// Portfolio Holdings (fomoshield_finnhub_rate_limit_fix memory), this hits
+/// our own backend, not Finnhub, so there's no rate-limit cost to keeping
+/// it warm. Home's own-fund shortcut relies on that: it remounts on every
+/// return to Home (no persistent shell around the bottom-nav screens), and
+/// autoDispose meant that remount always restarted from `loading` (no
+/// value) for a frame, flashing the pre-fund label before flipping to the
+/// real one — confirmed live 2026-09-10. Mutation sites already
+/// ref.invalidate this after creating/deleting a fund.
+final fundsListProvider = FutureProvider<List<Fund>>((ref) {
+  return ref.watch(fundApiServiceProvider).listFunds();
+});
+
+final fundDetailProvider = FutureProvider.autoDispose
+    .family<FundDetail, String>((ref, fundId) {
+      return ref.watch(fundApiServiceProvider).getFundDetail(fundId);
+    });
+
+/// Head + active team members only (server-gated) — the Investors screen
+/// (2026-09-13 ask). Already sorted by net invested descending.
+final fundInvestorsProvider = FutureProvider.autoDispose
+    .family<List<FundInvestor>, String>((ref, fundId) {
+      return ref.watch(fundApiServiceProvider).getFundInvestors(fundId);
+    });
+
+/// One calendar year's monthly inflow/outflow — the Investors screen's two
+/// bar charts, re-requested with a different year when the header's year
+/// picker changes (2026-09-13 ask: "archive" by calendar year). Same
+/// access gate as fundInvestorsProvider.
+final fundInvestorFlowsProvider = FutureProvider.autoDispose
+    .family<FundInvestorFlows, (String, int)>((ref, args) {
+      final (fundId, year) = args;
+      return ref
+          .watch(fundApiServiceProvider)
+          .getFundInvestorFlows(fundId, year: year);
+    });
+
+/// One calendar year's monthly AUM — Fund Management's balance chart. Same
+/// access gate as fundInvestorsProvider.
+final fundBalanceHistoryProvider = FutureProvider.autoDispose
+    .family<FundBalanceHistory, (String, int)>((ref, args) {
+      final (fundId, year) = args;
+      return ref
+          .watch(fundApiServiceProvider)
+          .getFundBalanceHistory(fundId, year: year);
+    });
+
+/// One calendar year's monthly broker commission — Charts screen's Broker
+/// Commission chart. Same access gate as fundInvestorsProvider.
+final fundCommissionHistoryProvider = FutureProvider.autoDispose
+    .family<FundCommissionHistory, (String, int)>((ref, args) {
+      final (fundId, year) = args;
+      return ref
+          .watch(fundApiServiceProvider)
+          .getFundCommissionHistory(fundId, year: year);
+    });
+
+/// Display name for a Portfolio holding/transaction's symbol — resolves a
+/// fund's real name first when the symbol is actually a fund's ticker,
+/// before ever falling through to [resolvedCompanyNameProvider]. That
+/// provider has no concept of funds and, left to its own devices, tries
+/// (and fails) to fetch a Finnhub company profile for one, silently
+/// falling back to the raw ticker — which is why the trade history
+/// widget/screen and trade detail card kept showing "FSFOF" as the title
+/// instead of the fund's name even after PortfolioHoldingsWidget was fixed
+/// to show it correctly. Every UI surface displaying a symbol's name for a
+/// real-Portfolio holding or transaction should watch this one instead of
+/// resolvedCompanyNameProvider directly.
+final resolvedAssetNameProvider = FutureProvider.autoDispose
+    .family<String, String>((ref, symbol) async {
+      if (fundTickerPattern.hasMatch(symbol)) {
+        final funds = await ref.watch(fundsListProvider.future);
+        final match = funds.where((f) => f.ticker == symbol).firstOrNull;
+        if (match != null) return match.name;
+      }
+      return ref.watch(resolvedCompanyNameProvider(symbol).future);
+    });
+
+/// The blotter — every proposal for a fund, newest first. Autodispose:
+/// this screen isn't kept warm across navigation the way the funds list is.
+final fundProposalsProvider = FutureProvider.autoDispose
+    .family<List<TradeProposal>, String>((ref, fundId) {
+      return ref.watch(fundApiServiceProvider).listProposals(fundId);
+    });

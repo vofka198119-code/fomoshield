@@ -5850,6 +5850,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disclaimerScreenAcceptButton => 'I Accept';
 
   @override
+  String get chooseNicknameTitle => 'Choose your nickname';
+
+  @override
+  String get chooseNicknameSubtitle =>
+      'This is how other users will see you — on a fund\'s team roster, in the hiring marketplace, and anywhere else your activity is shown publicly. Your email is never shown. Choose carefully: it cannot be changed later.';
+
+  @override
+  String get chooseNicknameHint => 'Nickname';
+
+  @override
+  String get chooseNicknameRequired => 'Enter a nickname';
+
+  @override
+  String get chooseNicknameInvalidChars =>
+      'Latin letters, numbers and underscore only, up to 25 characters';
+
+  @override
+  String get chooseNicknameTakenError => 'This nickname is already taken';
+
+  @override
+  String get chooseNicknameGenericError =>
+      'Couldn\'t save your nickname — try again';
+
+  @override
+  String get chooseNicknameContinueButton => 'Continue';
+
+  @override
   String get disclaimerScreenLinkFailed =>
       'Couldn\'t open the link. Please check your internet connection.';
 
@@ -6460,33 +6487,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get chooseNicknameTitle => 'Choose your nickname';
-
-  @override
-  String get chooseNicknameSubtitle =>
-      'This is your public handle in the app — it\'s what other users will see. Your email is never shown. Choose carefully: it cannot be changed later.';
-
-  @override
-  String get chooseNicknameHint => 'Nickname';
-
-  @override
-  String get chooseNicknameRequired => 'Enter a nickname';
-
-  @override
-  String get chooseNicknameInvalidChars =>
-      'Latin letters, numbers and underscore only, up to 25 characters';
-
-  @override
-  String get chooseNicknameTakenError => 'This nickname is already taken';
-
-  @override
-  String get chooseNicknameGenericError =>
-      'Couldn\'t save your nickname — try again';
-
-  @override
-  String get chooseNicknameContinueButton => 'Continue';
-
-  @override
   String get languageOnboardingTitle => 'Choose your language';
 
   @override
@@ -6549,4 +6549,1181 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingTourStep5Button => 'Choose your nickname';
+
+  @override
+  String get homeWidgetEtfFunds => 'ETF Funds';
+
+  @override
+  String get etfPremiumRequiredTitle => 'Premium Required';
+
+  @override
+  String get etfPremiumRequiredDescription =>
+      'Creating and managing your own fund requires a Premium subscription.';
+
+  @override
+  String get etfHomeCardTitleHead => 'Become a Fund Manager';
+
+  @override
+  String get etfHomeCardTitleMyFund => 'My Fund';
+
+  @override
+  String get etfHomeCardTitleAnalyst => 'Become an Investment Assistant';
+
+  @override
+  String get etfHomeCardTitleVacancies => 'Job Offers';
+
+  @override
+  String get etfEmployeeHubTitle => 'MY PROFILE';
+
+  @override
+  String get etfEmployeeHubCompaniesTitle => 'COMPANIES';
+
+  @override
+  String get etfEmploymentDetailTitle => 'EMPLOYMENT';
+
+  @override
+  String get etfEmploymentDetailJoinedLabel => 'Joined';
+
+  @override
+  String get etfEmploymentDetailLeftLabel => 'Left';
+
+  @override
+  String get etfEmploymentDetailStatusActive => 'Currently employed';
+
+  @override
+  String get etfEmploymentDetailStatusResigned => 'Resigned';
+
+  @override
+  String get etfEmploymentDetailStatusTerminated => 'Terminated';
+
+  @override
+  String get etfEmploymentDetailLeaveButton => 'Leave this fund';
+
+  @override
+  String get etfEmploymentDetailLeaveConfirmTitle => 'Leave this fund?';
+
+  @override
+  String get etfEmploymentDetailLeaveConfirmBody =>
+      'You\'ll lose access to this fund\'s team tools immediately. This can\'t be undone.';
+
+  @override
+  String get etfEmploymentDetailLeaveError => 'Failed to leave fund';
+
+  @override
+  String get etfBlotterTitle => 'ORDERS';
+
+  @override
+  String get etfBlotterShortcutLabel => 'Orders';
+
+  @override
+  String get etfBlotterEmptyText => 'No trade proposals yet';
+
+  @override
+  String get etfBlotterEmptyFilteredText => 'No proposals match this filter';
+
+  @override
+  String get etfBlotterFilterAll => 'All';
+
+  @override
+  String get etfInvestorsShortcutLabel => 'Investors';
+
+  @override
+  String get etfInvestorsScreenTitle => 'INVESTORS';
+
+  @override
+  String get etfInvestorsStatsTitle => 'INVESTOR STATISTICS';
+
+  @override
+  String get etfInvestorsStatsTotalLabel => 'Total Invested';
+
+  @override
+  String get etfInvestorsStatsCountLabel => 'Investors';
+
+  @override
+  String get etfInvestorsStatsBankruptcyPayoutLabel => 'Bankruptcy Payout';
+
+  @override
+  String get etfInvestorsListTitle => 'INVESTOR LIST';
+
+  @override
+  String get etfInvestorsListEmptyText => 'No investors yet';
+
+  @override
+  String get etfInvestorsInflowChartTitle => 'INVESTOR INFLOW';
+
+  @override
+  String get etfInvestorsOutflowChartTitle => 'INVESTOR OUTFLOW';
+
+  @override
+  String get etfInvestorsYearPickerTitle => 'SELECT YEAR';
+
+  @override
+  String get etfBalanceHistoryChartTitle => 'BALANCE HISTORY';
+
+  @override
+  String get etfChartsShortcutLabel => 'Charts';
+
+  @override
+  String get etfTradingShortcutLabel => 'Trading';
+
+  @override
+  String get etfRulebookShortcutLabel => 'Rules';
+
+  @override
+  String get etfChartsScreenTitle => 'CHARTS';
+
+  @override
+  String get etfChartsWidgetsSettingsSheetTitle => 'Chart Widgets';
+
+  @override
+  String get etfNavHistoryChartTitle => 'NAV PER UNIT';
+
+  @override
+  String get etfDrawdownChartTitle => 'DRAWDOWN';
+
+  @override
+  String get etfAssetAllocationChartTitle => 'ASSET ALLOCATION';
+
+  @override
+  String get etfAssetAllocationEmptyText => 'No holdings yet';
+
+  @override
+  String get etfCommissionChartTitle => 'BROKER COMMISSION';
+
+  @override
+  String get etfCashVsInvestedChartTitle => 'CASH VS INVESTED';
+
+  @override
+  String get etfCashVsInvestedCashLabel => 'Cash';
+
+  @override
+  String get etfCashVsInvestedInvestedLabel => 'Invested';
+
+  @override
+  String get etfProposeOrderTypeMarket => 'Market';
+
+  @override
+  String get etfProposeOrderTypeLimit => 'Limit';
+
+  @override
+  String get etfProposeJustificationLabel => 'Justification';
+
+  @override
+  String get etfProposeJustificationHint => 'Why this trade?';
+
+  @override
+  String get etfProposeSubmitButton => 'Submit proposal';
+
+  @override
+  String get etfProposeLimitPriceRequired => 'Enter a valid limit price';
+
+  @override
+  String get etfProposeGenericError => 'Failed to submit proposal';
+
+  @override
+  String get etfProposalStatusPending => 'Pending';
+
+  @override
+  String get etfProposalStatusApproved => 'Approved — queued';
+
+  @override
+  String get etfProposalStatusRejected => 'Rejected';
+
+  @override
+  String get etfProposalStatusExecuted => 'Executed';
+
+  @override
+  String get etfProposalStatusNeedsRevision => 'Needs revision';
+
+  @override
+  String get etfProposalFlaggedLabel => 'Flagged risky';
+
+  @override
+  String get etfProposalApproveButton => 'Approve';
+
+  @override
+  String get etfProposalRejectButton => 'Reject';
+
+  @override
+  String get etfProposalFlagButton => 'Flag risky';
+
+  @override
+  String get etfProposalExecuteButton => 'Execute';
+
+  @override
+  String get etfProposalReworkButton => 'Send back for revision';
+
+  @override
+  String get etfProposalReworkDialogTitle => 'Send back for revision';
+
+  @override
+  String get etfProposalReworkReasonHint => 'What needs to change?';
+
+  @override
+  String get etfProposalReworkReasonRequired => 'A reason is required';
+
+  @override
+  String get etfProposalReworkSubmitButton => 'Send';
+
+  @override
+  String get etfProposalDetailsButton => 'Details';
+
+  @override
+  String get etfProposalHeaderBuy => 'BUY ORDER';
+
+  @override
+  String get etfProposalHeaderSell => 'SELL ORDER';
+
+  @override
+  String get etfProposalCreateBuyOrderButton => 'Buy order';
+
+  @override
+  String get etfProposalCreateSellOrderButton => 'Sell order';
+
+  @override
+  String get etfProposalActionError => 'Action failed';
+
+  @override
+  String get etfProposalPlacementPriceLabel => 'Order placement price';
+
+  @override
+  String get etfProposalEstimatedPriceLabel => 'Current price (estimate)';
+
+  @override
+  String get etfProposalEstimatedCommissionLabel => 'Commission (estimate)';
+
+  @override
+  String get etfProposalExecutionPriceLabel => 'Deal price';
+
+  @override
+  String get etfProposalProposedByLabel => 'Proposed by';
+
+  @override
+  String get etfFundBalanceTitle => 'FUND BALANCE';
+
+  @override
+  String get etfFundBalanceAvailableLabel => 'Available';
+
+  @override
+  String get etfFundBalanceTotalLabel => 'Total (incl. P&L)';
+
+  @override
+  String get etfEmployeeHubInvitationsRow => 'Invitations';
+
+  @override
+  String get etfEmployeeHubApplicationsRow => 'Applications';
+
+  @override
+  String get etfComingSoonTitle => 'Coming Soon';
+
+  @override
+  String get etfComingSoonBody => 'This feature is coming in a future update.';
+
+  @override
+  String get etfHomeCardPremiumTag => 'Premium';
+
+  @override
+  String get etfOnboardingStep1TitleHead => 'Who Is a Fund Manager?';
+
+  @override
+  String get etfOnboardingStep1BodyHead =>
+      'Create your own investment fund and take on the role of its manager.\n\nInside the fund, you set the strategy, choose the assets, make buy and sell decisions, and manage investors\' capital.\n\nThe fund works like an ETF: a pooled portfolio of assets managed according to a chosen strategy. Other users will be able to invest in your fund, and its performance will depend on your team\'s decisions and market behavior.\n\nReady to create your own fund?';
+
+  @override
+  String get etfOnboardingStep2TitleHead => 'What You Need to Create a Fund';
+
+  @override
+  String get etfOnboardingStep2BodyHead =>
+      'Opening your own fund requires a Premium subscription.\n\nDuring setup, you\'ll create your fund\'s profile: name, logo, description, strategy, and team.\n\nYour fund starts with \$150,000 in virtual capital. These funds are used exclusively inside the simulator and become your fund\'s starting capital.';
+
+  @override
+  String get etfOnboardingStep3TitleHead => 'Who\'s On a Fund\'s Team?';
+
+  @override
+  String get etfOnboardingStep3BodyHead =>
+      'A fund is rarely run alone — you can hire a team, each with their own role.\n\nAn Analyst proposes trades: which assets to buy or sell, and why.\n\nA Trader sends approved trades to market — without one, an approved order executes automatically instead.\n\nA Risk Manager flags trades as risky — a signal to the team, though the final call always stays with you or a Co-Manager.\n\nA Co-Manager shares your right to approve or reject trades.\n\nYou decide who to hire and what permissions to give them.';
+
+  @override
+  String get etfOnboardingStep4TitleHead => 'How Are Trade Decisions Made?';
+
+  @override
+  String get etfOnboardingStep4BodyHead =>
+      'Every trade in a fund follows a clear path.\n\nAn employee with the right permissions proposes a trade: ticker, direction, order type, and reasoning.\n\nYou or your Co-Manager approve it, reject it, or send it back for rework. If the fund has a Trader, they execute the approved order; without one, it executes immediately on approval.\n\nEvery trade carries a 0.5% broker commission, same as a personal portfolio.\n\nThis keeps the fund\'s trading transparent: who proposed it, who approved it, and why.';
+
+  @override
+  String get etfOnboardingStep5TitleHead =>
+      'Where Does Investor Money Come From?';
+
+  @override
+  String get etfOnboardingStep5BodyHead =>
+      'Other users can invest in your fund by buying its units — the same way they\'d buy shares of a real company.\n\nThe unit price (NAV) is computed automatically: the fund\'s assets plus cash, divided by units outstanding. As the fund\'s assets grow in value, so does NAV — and every unit holder\'s return along with it.\n\nAn investor can redeem their units at any time and get paid out at the current price.\n\nAs manager, your job is to trade in a way that grows NAV — investor trust and the fund\'s reputation depend on it.';
+
+  @override
+  String get etfOnboardingStep6TitleHead => 'What Happens If the Fund Fails?';
+
+  @override
+  String get etfOnboardingStep6BodyHead =>
+      'Running a fund is a responsibility, not just an opportunity.\n\nIf you decide to close the fund, a bankruptcy procedure kicks in: every holding is sold at market price, and each active employee is paid 1% of what\'s left.\n\nWhatever remains goes to investors: if there\'s enough, everyone gets their investment back plus 5%; if not, they\'re paid proportionally to what they invested, minus the broker commission.\n\nOnce settled, the fund closes for good — its ticker and history remain, but it can no longer be managed.\n\nCreate your fund. Build your team. See how far your decisions can take you.';
+
+  @override
+  String get etfOnboardingStep1TitleAnalyst => 'Who Is a Fund Employee?';
+
+  @override
+  String get etfOnboardingStep1BodyAnalyst =>
+      'Don\'t want to manage a fund on your own? Join an existing team instead.\n\nFunds need analysts, traders, risk managers, and other specialists. You\'ll be able to browse open positions on the marketplace, submit applications, and work inside a fund\'s team.\n\nThere are two ways to join: apply to an open position, or get invited directly by a friend who manages a fund.\n\nYour decisions and proposals can become part of a real virtual fund\'s actual strategy.';
+
+  @override
+  String get etfOnboardingStep2TitleAnalyst => 'How to Join a Team';
+
+  @override
+  String get etfOnboardingStep2BodyAnalyst =>
+      'Working as an employee doesn\'t require Premium.\n\nFirst, create your professional profile: choose a role, list your skills and experience, and add some information about yourself.\n\nOnce that\'s done, you can list your profile on the jobs marketplace and wait for invitations from funds.\n\nOr join directly — if a friend who manages a fund invites you.';
+
+  @override
+  String get etfOnboardingStep3TitleAnalyst => 'Which Role Should You Pick?';
+
+  @override
+  String get etfOnboardingStep3BodyAnalyst =>
+      'Each role on a fund\'s team has its own area of responsibility.\n\nAn Analyst researches companies and proposes trades — buy or sell an asset, and why.\n\nA Trader sends approved trades to the exchange — the final \"execute\" tap.\n\nA Risk Manager assesses trades for risk and can flag them for the team.\n\nA Co-Manager helps the fund\'s head approve or reject proposals.\n\nPick the role that fits you, and become part of the fund\'s decisions.';
+
+  @override
+  String get etfOnboardingStep4TitleAnalyst => 'What Will You Be Able to Do?';
+
+  @override
+  String get etfOnboardingStep4BodyAnalyst =>
+      'If you have permission to propose trades, you\'ll enter a ticker, direction, order type, and reasoning — why it\'s worth buying or selling.\n\nThe fund\'s head or Co-Manager reviews it: approves, rejects, or sends it back for rework.\n\nIf you\'re the Trader, you\'re the one who taps the final execute button on approved trades.\n\nEvery trade you make is visible in the fund\'s history — a real record of your contribution to the team\'s result.';
+
+  @override
+  String get etfOnboardingStep5TitleAnalyst =>
+      'Whose Money Does the Fund Trade With?';
+
+  @override
+  String get etfOnboardingStep5BodyAnalyst =>
+      'A fund\'s capital isn\'t just the head\'s money — it\'s also investor capital from people who bought the fund\'s units.\n\nThe unit price (NAV) is computed automatically from the fund\'s assets and cash — the team\'s trades decide whether it grows.\n\nInvestors trust the team with their virtual capital, expecting the fund\'s decisions to pay off.\n\nThe better the team trades, the better the result for everyone, including you.';
+
+  @override
+  String get etfOnboardingStep6TitleAnalyst =>
+      'What Happens If the Fund Closes?';
+
+  @override
+  String get etfOnboardingStep6BodyAnalyst =>
+      'A fund can close — its head can start the bankruptcy procedure at any time.\n\nIn a bankruptcy, every holding is sold at market price, and each active employee is paid 1% of what\'s left in the fund — including you, if you\'re still on the team.\n\nAfter that, the fund closes for good, and you\'ll need to find another team or start your own fund.\n\nFind your role. Join a team. Help shape a fund\'s decisions.';
+
+  @override
+  String get etfOnboardingStep7Title => 'This Is a Simulator';
+
+  @override
+  String get etfOnboardingStep7Body =>
+      'FOMO Shield is a fund-management simulator.\n\nAll money, assets, trades, and results inside funds are virtual and have no real monetary value. They cannot be withdrawn, exchanged, or used outside the app.\n\nWhen there aren\'t enough real participants, or to keep the simulation liquid, the system may use synthetic investors. Their actions are generated by the system and are not the actions of real users.\n\nNo statistic, return, rating, or simulation result is financial advice, a guarantee of income, or a promise of future results.';
+
+  @override
+  String get etfRulebookTitle => 'How Funds Work';
+
+  @override
+  String get etfRulebookSubtitle =>
+      'A quick reference for FOMO Shield\'s fund simulator — open it any time.';
+
+  @override
+  String get etfRulebookFundSectionHeader => 'What is a fund';
+
+  @override
+  String get etfRulebookFundSectionBody =>
+      'A fund is a simulated investment vehicle run by a head (its creator) and, optionally, a hired team. It starts with \$150,000 in virtual capital. Other users can invest in it by buying its units, and the fund\'s team decides which assets to buy and sell.';
+
+  @override
+  String get etfRulebookRolesSectionHeader => 'Team roles';
+
+  @override
+  String get etfRulebookRolesSectionBody =>
+      'Head — owns the fund, with full authority to approve or reject trades and manage the team.\n\nCo-head — shares the head\'s right to approve or reject trade proposals.\n\nAnalyst — proposes trades: which asset to buy or sell, and why.\n\nTrader — executes an approved trade on the market. Without a trader, an approved trade executes automatically.\n\nRisk manager — flags a proposal as risky, a signal to the team; the decision still rests with the head or a co-head.';
+
+  @override
+  String get etfRulebookTradeFlowSectionHeader => 'How a trade proposal moves';
+
+  @override
+  String get etfRulebookTradeFlowSectionBody =>
+      'An employee with the right permission proposes a trade — symbol, side, order type, and a justification.\n\nThe head or a co-head approves, rejects, or sends it back for revision. If the fund has a trader, they execute the approved order; otherwise it executes automatically.\n\nEvery trade carries the same 0.5% broker commission as a personal portfolio.';
+
+  @override
+  String get etfRulebookNavSectionHeader => 'Investors and NAV';
+
+  @override
+  String get etfRulebookNavSectionBody =>
+      'Anyone can invest in a fund by buying its units, the same way they\'d buy shares of a company.\n\nA unit\'s price (NAV) is calculated automatically: the fund\'s total assets and cash, divided by the number of units outstanding. When the fund\'s holdings gain value, NAV rises — and so does every unit holder\'s return.\n\nAn investor can redeem their units at any time for the current NAV.';
+
+  @override
+  String get etfRulebookBankruptcySectionHeader => 'If the fund closes';
+
+  @override
+  String get etfRulebookBankruptcySectionBody =>
+      'The head can close the fund at any time. When they do:\n\n1. Every holding is sold at market price.\n\n2. Each currently active employee receives 1% of the remaining balance.\n\n3. What\'s left goes to investors: if there\'s enough, each gets their invested amount plus 5%; if not, payouts are made proportionally to each investor\'s stake, after the broker\'s commission on the asset sales.\n\nThe fund then closes permanently — its ticker and name are freed for reuse, and it can never be reopened or managed again.';
+
+  @override
+  String get etfOnboardingContinueButton => 'Continue';
+
+  @override
+  String get etfOnboardingStep2ButtonHead => 'Create Fund';
+
+  @override
+  String get etfOnboardingStep2ButtonAnalyst => 'Create Profile';
+
+  @override
+  String get etfOnboardingAccept => 'Accept & Continue';
+
+  @override
+  String get etfOnboardingComingSoon =>
+      'Investment assistant features are coming in a future update.';
+
+  @override
+  String get etfCreateFundTitle => 'CREATE FUND';
+
+  @override
+  String get etfCreateFundNameLabel => 'Fund Name';
+
+  @override
+  String get etfCreateFundNameHint => 'English letters and numbers only';
+
+  @override
+  String get etfCreateFundDescriptionLabel => 'Description';
+
+  @override
+  String get etfCreateFundStrategyLabel => 'Investment Strategy';
+
+  @override
+  String get etfCreateFundSectorsLabel => 'Sectors';
+
+  @override
+  String get etfCreateFundCapitalLabel => 'Starting Capital';
+
+  @override
+  String get etfCreateFundCapitalFixedNote =>
+      'This amount is credited to your fund automatically when it\'s created.';
+
+  @override
+  String get etfCreateFundTickerLabel => 'Ticker';
+
+  @override
+  String get etfCreateFundTickerTakenError =>
+      'A fund with this ticker already exists';
+
+  @override
+  String get etfCreateFundTickerInvalidError =>
+      'Ticker must be 1-5 letters after FS';
+
+  @override
+  String get etfCreateFundSubmitButton => 'Create Fund';
+
+  @override
+  String get etfCreateFundSuccessMessage => 'Fund created!';
+
+  @override
+  String get etfCreateFundErrorGeneric =>
+      'Failed to create fund. Please try again.';
+
+  @override
+  String get etfCreateFundSelectAtLeastOneSector =>
+      'Select at least one sector';
+
+  @override
+  String get etfCreateFundNameEnglishOnlyError =>
+      'Fund name must be in English (letters, numbers, basic punctuation only)';
+
+  @override
+  String get etfCreateFundNameTakenError =>
+      'A fund with this name already exists';
+
+  @override
+  String get etfFundsSearchHint => 'Search funds by name or ticker...';
+
+  @override
+  String get etfFundsTabLabel => 'ETF Funds';
+
+  @override
+  String get etfCompaniesTabLabel => 'Companies';
+
+  @override
+  String get etfFundsEmptyState => 'No funds yet — be the first to create one!';
+
+  @override
+  String get etfFundsListErrorMessage =>
+      'Couldn\'t load funds. Pull to refresh.';
+
+  @override
+  String get etfFundsTopByCap => 'TOP BY CAPITALIZATION';
+
+  @override
+  String get etfFundsNewThisWeek => 'NEW THIS WEEK';
+
+  @override
+  String get etfFundDetailNavLabel => 'NAV / Unit';
+
+  @override
+  String get etfFundDetailAumLabel => 'AUM';
+
+  @override
+  String get etfFundDetailInvestorCapitalLabel => 'Investor Deposits';
+
+  @override
+  String get etfFundDetailUnitsLabel => 'Units Outstanding';
+
+  @override
+  String fundUnitsCount(String count) {
+    return '$count units';
+  }
+
+  @override
+  String get etfFundDetailHoldingsTitle => 'HOLDINGS';
+
+  @override
+  String get etfFundDetailHoldingsEmpty => 'No holdings yet';
+
+  @override
+  String get etfFundBankruptcyStep1Title =>
+      'Are you sure you want to start deleting your fund?';
+
+  @override
+  String get etfFundBankruptcyStep1Confirm => 'Yes, continue';
+
+  @override
+  String get etfFundBankruptcyExplanationTitle => 'Fund bankruptcy';
+
+  @override
+  String get etfFundBankruptcyExplanationBody =>
+      'Deleting a fund means declaring it bankrupt. Every holding will be sold at market price. Each active employee will be paid 1% of what\'s left. The remaining cash goes to investors: if there\'s enough, each gets their investment back plus 5%; if not, they\'re paid proportionally to what they invested, minus the broker commission. Afterward the fund\'s balance is zeroed and the fund becomes inaccessible. Every participant will get a notification with their payout breakdown.';
+
+  @override
+  String get etfFundBankruptcyHoldingsLabel => 'Assets to sell';
+
+  @override
+  String get etfFundBankruptcyCommissionLabel => 'Broker commission';
+
+  @override
+  String etfFundBankruptcyEmployeesLabel(int count) {
+    return 'To employees ($count × 1%)';
+  }
+
+  @override
+  String get etfFundBankruptcyInvestorsLabel => 'To investors';
+
+  @override
+  String get etfFundBankruptcySolventNote =>
+      'Fully covered — everyone gets +5%';
+
+  @override
+  String get etfFundBankruptcyInsolventNote =>
+      'Not fully covered — paid proportionally';
+
+  @override
+  String get etfFundBankruptcyTotalLabel => 'Total payout';
+
+  @override
+  String get etfFundBankruptcyConfirmButton => 'Start bankruptcy procedure';
+
+  @override
+  String get etfFundBankruptcyCancelButton => 'Cancel';
+
+  @override
+  String get etfFundBankruptcySuccessMessage => 'Fund liquidated';
+
+  @override
+  String get etfFundBankruptcyErrorMessage =>
+      'Failed to complete the bankruptcy procedure';
+
+  @override
+  String get etfFundBankruptcyPreviewErrorMessage =>
+      'Failed to load the payout calculation';
+
+  @override
+  String get fundLiquidationNotifTitle => 'Fund bankruptcy settlement';
+
+  @override
+  String fundLiquidationNotifDetail(String fundName, String amount) {
+    return '\"$fundName\" declared bankruptcy. You were credited $amount.';
+  }
+
+  @override
+  String get fundLiquidationDetailTitle => 'Fund settlement';
+
+  @override
+  String get fundLiquidationDetailAmountLabel => 'Credited';
+
+  @override
+  String get fundLiquidationDetailFundLabel => 'Fund';
+
+  @override
+  String get fundLiquidationDetailReasonLabel => 'Reason';
+
+  @override
+  String get fundLiquidationDetailReasonValue => 'Fund bankruptcy';
+
+  @override
+  String get fundLiquidationDetailUnitsLabel => 'Units sold';
+
+  @override
+  String get fundLiquidationDetailAssetsSoldLabel => 'Assets';
+
+  @override
+  String get fundLiquidationDetailSoldAtMarketValue => 'Sold at market price';
+
+  @override
+  String get fundLiquidationDetailCommissionLabel => 'Broker commission';
+
+  @override
+  String get fundLiquidationDetailNeustoikaLabel => 'Early-exit bonus (+5%)';
+
+  @override
+  String get fundLiquidationDetailRecipientEmployee => 'Employee payout';
+
+  @override
+  String get fundLiquidationDetailRecipientInvestor => 'Investor payout';
+
+  @override
+  String get etfCreateFundLimitReachedError => 'You already have a fund';
+
+  @override
+  String get etfFundDetailSectorsTitle => 'SECTORS';
+
+  @override
+  String get etfFundDetailStrategyTitle => 'STRATEGY';
+
+  @override
+  String get etfFundDetailDescriptionTitle => 'ABOUT';
+
+  @override
+  String get etfFundDetailNavHistoryTitle => 'NAV HISTORY';
+
+  @override
+  String get etfFundDetailHoldingsCountLabel => 'Companies in Fund';
+
+  @override
+  String get etfFundDetailInfoTitle => 'FUND INFO';
+
+  @override
+  String get etfFundDetailCreatedLabel => 'Created';
+
+  @override
+  String get etfFundDetailCreatorLabel => 'Fund Manager';
+
+  @override
+  String get etfFundDetailEmployeesLabel => 'Team';
+
+  @override
+  String get etfFundDetailHireButton => 'Hire';
+
+  @override
+  String get etfRoleHead => 'Fund Head';
+
+  @override
+  String get etfRoleAnalyst => 'Analyst';
+
+  @override
+  String get etfRoleCoManager => 'Co-Manager';
+
+  @override
+  String get etfRoleTrader => 'Trader';
+
+  @override
+  String get etfRoleRiskManager => 'Risk Manager';
+
+  @override
+  String get etfEmployeeProfileTitle => 'MY RESUME';
+
+  @override
+  String get etfEmployeeProfileButtonLabel => 'Resume';
+
+  @override
+  String get etfEmployeeProfileSaveError =>
+      'Couldn\'t save your profile — try again';
+
+  @override
+  String get etfEmployeeProfileNicknameLabel => 'Nickname';
+
+  @override
+  String get etfEmployeeProfileNicknameHint => 'How fund heads will see you';
+
+  @override
+  String get etfEmployeeProfileBioLabel => 'Bio';
+
+  @override
+  String get etfEmployeeProfileBioHint =>
+      'E.g.: 5 years analyzing tech-sector stocks, focused on fundamental analysis, looking for a spot on a growing fund';
+
+  @override
+  String get etfEmployeeProfileLanguageLabel => 'Language';
+
+  @override
+  String get etfEmployeeProfileLanguageHint => 'E.g.: English, Russian';
+
+  @override
+  String get etfEmployeeProfileDesiredRoleLabel => 'Desired position';
+
+  @override
+  String get etfEmployeeProfileDesiredRoleHint => 'Not chosen';
+
+  @override
+  String get etfEmployeeProfileAvailableLabel => 'Available for hire';
+
+  @override
+  String get etfEmployeeProfileAvailableBody =>
+      'Visible on the hiring marketplace to any fund head';
+
+  @override
+  String get etfEmployeeProfileSaveButton => 'Save Profile';
+
+  @override
+  String get etfEmployeeProfileSavedSnackbar => 'Profile saved';
+
+  @override
+  String get etfEmployeeProfileNicknameRequired => 'Nickname is required';
+
+  @override
+  String get etfEmployeeProfileNicknameNoEmail =>
+      'Nickname can\'t contain an email address';
+
+  @override
+  String get etfEmployeeProfileBioNoEmail =>
+      'Bio can\'t contain an email address';
+
+  @override
+  String get etfEmployeeProfileStatsTitle => 'CAREER RECORD';
+
+  @override
+  String get etfEmployeeProfileStatsApproved => 'Approved proposals';
+
+  @override
+  String get etfEmployeeProfileStatsRejected => 'Rejected proposals';
+
+  @override
+  String get etfEmployeeProfileStatsFundsChanged => 'Funds changed';
+
+  @override
+  String get etfEmployeeProfileStatsRegisteredAt => 'Registered';
+
+  @override
+  String get etfEmployeeProfileStatsRating => 'Rating';
+
+  @override
+  String get etfEmployeeProfileRatingPending => 'Not enough activity yet';
+
+  @override
+  String get etfEmployeeProfileRatingCardTitle => 'RATING';
+
+  @override
+  String etfEmployeeProfileInvitationsButton(int count) {
+    return 'Invitations ($count)';
+  }
+
+  @override
+  String get etfMarketplaceTitle => 'HIRING MARKETPLACE';
+
+  @override
+  String get etfMarketplaceEmpty => 'No one is available for hire right now';
+
+  @override
+  String get etfMarketplaceErrorMessage => 'Couldn\'t load the marketplace';
+
+  @override
+  String get etfMarketplaceInviteButton => 'Invite';
+
+  @override
+  String get etfMarketplaceBioFallback => 'No bio yet';
+
+  @override
+  String get etfSendInviteTitle => 'Send Invitation';
+
+  @override
+  String get etfSendInviteRoleLabel => 'Role';
+
+  @override
+  String get etfSendInviteMessageLabel => 'Message';
+
+  @override
+  String get etfSendInviteMessageHint =>
+      'Tell them about the role and your fund';
+
+  @override
+  String get etfSendInviteMessageRequired => 'A message is required';
+
+  @override
+  String get etfSendInviteSubmitButton => 'Send Invitation';
+
+  @override
+  String get etfSendInviteSuccessSnackbar => 'Invitation sent';
+
+  @override
+  String get etfSendInviteTeamFullError =>
+      'Your team is already at its 5-member limit';
+
+  @override
+  String get etfSendInviteAlreadyMemberError => 'Already on your team';
+
+  @override
+  String get etfSendInviteAlreadyPendingError =>
+      'That person already has a pending invite from you';
+
+  @override
+  String get etfFundDetailManageTooltip => 'Manage fund';
+
+  @override
+  String get etfFundManagementViewPublicButton => 'View public page';
+
+  @override
+  String get etfEmployeeHubTeamRow => 'Team';
+
+  @override
+  String get etfPositionFundManager => 'Fund Manager';
+
+  @override
+  String get etfPositionEmployee => 'Employee';
+
+  @override
+  String get etfAdminBadge => 'ADMIN';
+
+  @override
+  String get etfAdminRenameNicknameTooltip => 'Rename nickname (admin)';
+
+  @override
+  String get etfAdminCreateFundTooltip => 'Create another fund (admin)';
+
+  @override
+  String get etfAdminRenameFundTooltip => 'Rename fund (admin)';
+
+  @override
+  String get etfAdminRenameNicknameTitle => 'Rename nickname';
+
+  @override
+  String get etfAdminRenameFundTitle => 'Rename fund';
+
+  @override
+  String get etfAdminRenameFundNameRequired => 'Fund name is required';
+
+  @override
+  String get etfAdminRenameFundGenericError => 'Failed to rename fund';
+
+  @override
+  String get etfFundManagementAccessDenied =>
+      'You don\'t have access to manage this fund';
+
+  @override
+  String get etfFundManagementTitle => 'MANAGEMENT PANEL';
+
+  @override
+  String get etfFundHoldingSheetQuantity => 'Fund holds';
+
+  @override
+  String get etfFundHoldingSheetPrice => 'Price';
+
+  @override
+  String get etfFundHoldingSheetValue => 'Market value';
+
+  @override
+  String get etfFundHoldingSheetPercent => '% of fund';
+
+  @override
+  String get etfFundPositionTitle => 'FUND POSITION';
+
+  @override
+  String get etfInvitationsTitle => 'MY INVITATIONS';
+
+  @override
+  String get etfInvitationsEmpty => 'No pending invitations';
+
+  @override
+  String get etfInvitationsErrorMessage => 'Couldn\'t load your invitations';
+
+  @override
+  String get etfInvitationDetailRoleLabel => 'Role offered';
+
+  @override
+  String get etfInvitationDetailMessageLabel => 'Message';
+
+  @override
+  String get etfInvitationJoinButton => 'Join';
+
+  @override
+  String get etfInvitationDeclineButton => 'Decline';
+
+  @override
+  String get etfInvitationAcceptedSnackbar => 'You joined the team';
+
+  @override
+  String get etfInvitationDeclinedSnackbar => 'Invitation declined';
+
+  @override
+  String get etfInvitationTeamFullError => 'That fund\'s team is already full';
+
+  @override
+  String get etfTeamMemberTerminateButton => 'Remove';
+
+  @override
+  String get etfTeamMemberTerminateConfirmTitle => 'Remove team member?';
+
+  @override
+  String get etfTeamMemberTerminateConfirmBody =>
+      'They\'ll get a 5-day notice before actually losing access — you can cancel it any time before then.';
+
+  @override
+  String get etfTeamMemberTerminateConfirmAction => 'Start 5-Day Notice';
+
+  @override
+  String get etfTeamMemberPendingTerminationLabel => 'Leaving soon';
+
+  @override
+  String get etfTeamMemberCancelTerminationButton => 'Cancel Removal';
+
+  @override
+  String get etfEmploymentDetailTenureLabel => 'Time at the fund';
+
+  @override
+  String etfEmploymentTenureDays(int days) {
+    return '$days d';
+  }
+
+  @override
+  String etfEmploymentTenureMonths(int months) {
+    return '$months mo';
+  }
+
+  @override
+  String etfEmploymentTenureYearsMonths(int years, int months) {
+    return '$years y $months mo';
+  }
+
+  @override
+  String get etfEmploymentOutcomeActive => 'currently working';
+
+  @override
+  String get etfEmploymentOutcomeResigned => 'resigned';
+
+  @override
+  String get etfEmploymentOutcomeTerminated => 'let go';
+
+  @override
+  String get etfEmploymentOutcomeFundClosed => 'fund closed';
+
+  @override
+  String get etfEmploymentOutcomeLeft => 'left';
+
+  @override
+  String get etfPermissionsSheetIntro =>
+      'A role is only a starting template. What this employee may actually do is the switches below.';
+
+  @override
+  String get etfPermissionsSaveButton => 'Save permissions';
+
+  @override
+  String get etfPermissionsSaveError => 'Could not save the permissions';
+
+  @override
+  String get etfPermissionsRoleChangeTitle => 'Change the role?';
+
+  @override
+  String get etfPermissionsRoleChangeBody =>
+      'The permissions below will be reset to that role\'s defaults. You can adjust them again afterwards.';
+
+  @override
+  String get etfPermissionsRoleChangeConfirm => 'Change role';
+
+  @override
+  String get etfPermissionPropose => 'Propose trades';
+
+  @override
+  String get etfPermissionApprove => 'Approve and reject proposals';
+
+  @override
+  String get etfPermissionExecute => 'Send approved orders to the market';
+
+  @override
+  String get etfPermissionFlagRisk => 'Flag a proposal as risky';
+
+  @override
+  String get etfFundEditTitle => 'EDIT FUND';
+
+  @override
+  String get etfFundEditShortcutLabel => 'Edit';
+
+  @override
+  String get etfFundEditSaveButton => 'Save changes';
+
+  @override
+  String get etfFundEditSavedSnackbar => 'Changes saved';
+
+  @override
+  String get etfFundEditTooLongError =>
+      'That text is too long — shorten it and try again';
+
+  @override
+  String get etfFundEditGenericError => 'Could not save the changes';
+
+  @override
+  String get etfRulebookChapterBasics => 'BASICS';
+
+  @override
+  String get etfRulebookChapterHead => 'FOR THE HEAD';
+
+  @override
+  String get etfRulebookChapterEmployee => 'FOR EMPLOYEES';
+
+  @override
+  String get etfRulebookCreateSectionHeader => 'Creating a fund';
+
+  @override
+  String get etfRulebookCreateSectionBody =>
+      'Any user with Premium can create a fund. One live fund per person.\n\n1. Open \"Become a fund manager\" on the home screen and go through the short introduction.\n\n2. Pick a name and a ticker. A ticker starts with FS followed by one to five capital letters — FSTECH, for example. Both must be free; names are compared ignoring case.\n\n3. Describe the fund: a description, an investment strategy and at least one sector. Sectors are how people find the fund when browsing.\n\n4. Set the starting capital. This is the money the fund begins with, and the initial number of units is derived from it.\n\nThe name, description, strategy and sectors can be changed at any time afterwards. The ticker and the starting capital cannot: investor holdings are recorded against the ticker, and the starting capital is already baked into the number of units issued.';
+
+  @override
+  String get etfRulebookHireSectionHeader => 'Hiring someone';
+
+  @override
+  String get etfRulebookHireSectionBody =>
+      'A fund can employ up to five people, not counting the head.\n\n1. Open the employee marketplace — it lists the profiles of people looking for work.\n\n2. Send an invitation: choose a role and write a message. The text is saved as a template and filled in for your next invitations.\n\n3. They either accept or decline. While they haven\'t answered, you can withdraw the invitation.\n\n4. You can\'t send a second invitation to the same person for the same fund while the first is still unanswered.\n\nYou can let someone go at any time, but never instantly: they get five days\' notice and keep working throughout. You can cancel the removal until the notice runs out.';
+
+  @override
+  String get etfRulebookPermissionsSectionHeader => 'Setting permissions';
+
+  @override
+  String get etfRulebookPermissionsSectionBody =>
+      'A role is only the starting set of permissions at hire time, not a hard limit. What each employee may actually do is set by the head, per person.\n\nThere are four permissions:\n\n• propose trades;\n• approve and reject proposals;\n• send approved orders to the market;\n• flag a proposal as risky.\n\nTo change them, open the fund\'s team and tap an employee\'s row. You can change their role there too — but note that changing a role resets the permissions to that role\'s template, so you\'d set them again afterwards. The app warns you before it does that.\n\nThe head always holds every permission and cannot have them taken away.';
+
+  @override
+  String get etfRulebookApplySectionHeader => 'Getting hired';
+
+  @override
+  String get etfRulebookApplySectionBody =>
+      'Anyone can work for a fund — Premium is not required for this.\n\n1. Fill in your profile: name, a few words about yourself, language and the role you want. Mark yourself as open to offers, or you won\'t appear in the employee marketplace at all.\n\n2. Fund heads browse those profiles and send invitations.\n\n3. Invitations arrive under \"Job offers\". Tapping one shows which fund is asking, for what role and with what message. Then it\'s Join or Decline.\n\nYou can work for more than one fund at a time. Every position goes into your work history.';
+
+  @override
+  String get etfRulebookProposeSectionHeader => 'Proposing a trade';
+
+  @override
+  String get etfRulebookProposeSectionBody =>
+      'If you may propose trades, you don\'t buy anything yourself — you propose, and the head or their deputy decides.\n\n1. Open the fund\'s trading section and find the company.\n\n2. Set the direction (buy or sell), the quantity, the order type, and a price if it\'s a limit order.\n\n3. Write your reasoning — why the fund should do this. It\'s the main thing that gets read when the decision is made.\n\n4. The proposal lands in the fund\'s blotter as pending.\n\nFour things can happen next: approved, rejected, sent back for revision, or flagged as risky. An approved order is sent to the market by whoever holds that permission.\n\nThe money comes from the fund\'s cash, not from your personal portfolio. Every fund trade carries a 0.5% broker commission.';
+
+  @override
+  String get etfRulebookLeaveSectionHeader => 'Leaving a fund';
+
+  @override
+  String get etfRulebookLeaveSectionBody =>
+      'You can leave at any time and without notice — open the position in your work history and choose to leave.\n\nThis differs from being let go: an employee leaving takes effect immediately, while a head removing someone starts a five-day notice first.\n\nThe position stays in your work history forever and is closed with a reason — resigned, let go, or the fund closed. It can\'t be erased or rewritten: this is the reputation fund heads see.';
+
+  @override
+  String get etfRulebookCareerSectionHeader => 'Your work history';
+
+  @override
+  String get etfRulebookCareerSectionBody =>
+      'Every position at a fund is recorded: which fund, in what role, from when, until when, and how it ended.\n\nThe card shows how long you were there and how it finished. There are three endings:\n\n• resigned — you left of your own accord;\n• let go — the head ended the arrangement;\n• fund closed — the fund ceased to exist while you worked there. That is not a dismissal and not your fault.\n\nWhile you\'re still there, the position is marked as current.\n\nWork history can\'t be edited by hand — it fills itself in from what actually happened.';
+
+  @override
+  String get etfRulebookSuccessionSectionHeader => 'If the head disappears';
+
+  @override
+  String get etfRulebookSuccessionSectionBody =>
+      'A fund is never left unmanaged. If its head stops opening the app, the fund is offered to its employees.\n\n1. Without Premium the head has about two months before that happens. With active Premium they have about half a year — a longer leash, not an unlimited one.\n\n2. The deputy gets first refusal: for the first few days the offer is theirs alone. If they don\'t take it, it opens to every employee with Premium.\n\n3. Accepting is an application, not an instant appointment — except for the deputy inside their own window, who takes the fund straight away. The team has 14 days in total.\n\n4. When that window closes, the fund goes to whoever among the applicants has served on the team the longest.\n\n5. If the head opens the app before the window closes, the offer is cancelled and the fund stays theirs.\n\n6. If nobody applies, the fund closes under the rules above.\n\nThe cash and the holdings belong to the fund, not to a person — the new head inherits all of it and never starts from zero.';
+
+  @override
+  String get etfSuccessionCardSubtitle =>
+      'The head of this fund has gone quiet — the team is being offered the management.';
+
+  @override
+  String etfSuccessionDaysLeft(int days) {
+    return 'Days left: $days';
+  }
+
+  @override
+  String get etfSuccessionAppliedPill => 'You applied';
+
+  @override
+  String get etfSuccessionSheetIntro =>
+      'This fund\'s head has been away a long time, so the fund is being offered to its team.';
+
+  @override
+  String get etfSuccessionRuleDeputyFirst =>
+      'The deputy gets first refusal. For the first few days the offer is theirs alone; if they don\'t take it, it opens to the rest of the team.';
+
+  @override
+  String get etfSuccessionErrorDeputyFirst =>
+      'The fund\'s deputy has first refusal for now. If they pass, the offer opens to the whole team.';
+
+  @override
+  String get etfSuccessionBecameHeadSnackbar =>
+      'You are now the head of this fund';
+
+  @override
+  String get etfSuccessionRuleEnterRunning =>
+      'Accepting puts you in the running — it does not make you the head right away.';
+
+  @override
+  String get etfSuccessionRuleSeniorityWins =>
+      'On the deadline the fund goes to whoever has been on the team the longest among those who applied — with the deputy still ahead of everyone.';
+
+  @override
+  String get etfSuccessionRuleHeadMayReturn =>
+      'If the head opens the app before the deadline, the offer is cancelled and the fund stays theirs.';
+
+  @override
+  String get etfSuccessionRuleNobodyAccepts =>
+      'If nobody applies, the fund is liquidated: holdings are sold and investors are paid out.';
+
+  @override
+  String get etfSuccessionRuleMoneyStays =>
+      'The fund\'s cash and holdings stay with the fund — the new head inherits them, not a blank slate.';
+
+  @override
+  String get etfSuccessionDeadlineLabel => 'Decision date';
+
+  @override
+  String get etfSuccessionAcceptButton => 'Apply for the management';
+
+  @override
+  String get etfSuccessionPremiumRequiredButton => 'Premium required';
+
+  @override
+  String get etfSuccessionAlreadyAppliedBody =>
+      'You have applied. The fund goes to the longest-serving applicant on the decision date.';
+
+  @override
+  String get etfSuccessionAcceptedSnackbar => 'Application sent';
+
+  @override
+  String get etfSuccessionErrorClosed => 'This offer is already closed';
+
+  @override
+  String get etfSuccessionErrorNotEligible =>
+      'Only an active team member with Premium can take over a fund';
+
+  @override
+  String get etfSuccessionErrorGeneric => 'Could not send the application';
+
+  @override
+  String get etfSectorTechnology => 'Technology';
+
+  @override
+  String get etfSectorHealthcare => 'Healthcare';
+
+  @override
+  String get etfSectorFinancials => 'Financials';
+
+  @override
+  String get etfSectorConsumerDiscretionary => 'Consumer Discretionary';
+
+  @override
+  String get etfSectorConsumerStaples => 'Consumer Staples';
+
+  @override
+  String get etfSectorEnergy => 'Energy';
+
+  @override
+  String get etfSectorIndustrials => 'Industrials';
+
+  @override
+  String get etfSectorMaterials => 'Materials';
+
+  @override
+  String get etfSectorUtilities => 'Utilities';
+
+  @override
+  String get etfSectorRealEstate => 'Real Estate';
+
+  @override
+  String get etfSectorCommunicationServices => 'Communication Services';
 }

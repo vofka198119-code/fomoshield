@@ -73,6 +73,8 @@ IconData _iconFor(AppNotificationType type) {
       return Icons.pause_circle_rounded;
     case AppNotificationType.subscriptionStatusChanged:
       return Icons.workspace_premium_rounded;
+    case AppNotificationType.fundLiquidation:
+      return Icons.account_balance_rounded;
   }
 }
 
@@ -97,6 +99,7 @@ Color notificationTitleColor(AppNotificationType type, {required Color fallback}
     case AppNotificationType.weeklyPayout:
     case AppNotificationType.weeklyPayoutPaused:
     case AppNotificationType.subscriptionStatusChanged:
+    case AppNotificationType.fundLiquidation:
       return fallback;
   }
 }

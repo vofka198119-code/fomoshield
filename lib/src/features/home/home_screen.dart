@@ -10,12 +10,14 @@ import '../../core/theme/themed_button.dart';
 import '../../core/theme/themed_border.dart';
 import '../../core/theme/theme_variant_provider.dart';
 import '../../core/notifications/notification_providers.dart';
+import '../funds/funds_visibility.dart';
 import '../../l10n/gen/app_localizations.dart';
 import 'home_providers.dart';
 import 'widget_order_provider.dart';
 import 'widgets/shield_signal_widget.dart';
 import 'widgets/watchlist_widget.dart';
 import 'widgets/market_clock_widget.dart';
+import 'widgets/fund_entry_widget.dart';
 import 'widgets/portfolio_widget.dart';
 import 'widgets/stress_test_widget.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
@@ -40,7 +42,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _showWidgetsBottomSheet() {
     final notifier = ref.read(homeWidgetsProvider.notifier);
-    final currentConfigs = ref.read(homeWidgetsProvider);
+    // Funds are admin-only for now (see funds_visibility.dart) — keep the
+    // row out of the reorder/toggle sheet too, not just off the screen,
+    // the same way the admin-only epoch widget is handled in Stress Test.
+    final fundsVisible = ref.read(fundsVisibleProvider);
+    final currentConfigs = ref
+        .read(homeWidgetsProvider)
+        .where((c) => fundsVisible || c.id != 'etf_funds')
+        .toList();
     final palette = resolveAppPalette(ref.read(themeVariantProvider));
 
     showModalBottomSheet(
@@ -70,7 +79,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final widgetConfigs = ref.watch(homeWidgetsProvider);
     final unreadCount = ref.watch(unreadNotificationCountProvider);
 
-    final visibleWidgets = widgetConfigs.where((w) => w.visible).toList();
+    final fundsVisible = ref.watch(fundsVisibleProvider);
+    final visibleWidgets = widgetConfigs
+        .where((w) => w.visible && (fundsVisible || w.id != 'etf_funds'))
+        .toList();
 
     // Resolved once per build from whichever theme is active — see
     // app_palette.dart. The app-wide background gradient itself is now
@@ -167,6 +179,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return const WatchlistWidget();
       case 'news':
         return const MarketClockWidget();
+      case 'etf_funds':
+        return const FundEntryWidget();
       case 'portfolio':
         return const PortfolioWidget();
       case 'stress_test':
@@ -236,6 +250,8 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
         return Icons.bookmark_rounded;
       case 'news':
         return Icons.access_time_filled_rounded;
+      case 'etf_funds':
+        return Icons.account_balance_rounded;
       case 'portfolio':
         return Icons.account_balance_rounded;
       case 'stress_test':
@@ -289,6 +305,7 @@ class _WidgetsSettingsSheetState extends State<_WidgetsSettingsSheet> {
                     setState(() {
                       _configs = [
                         const HomeWidgetConfig(id: 'news', visible: true),
+                        const HomeWidgetConfig(id: 'etf_funds', visible: true),
                         const HomeWidgetConfig(id: 'portfolio', visible: true),
                         const HomeWidgetConfig(
                           id: 'shield_signal',

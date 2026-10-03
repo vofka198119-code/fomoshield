@@ -23,6 +23,11 @@ enum AppNotificationType {
   // Fired on any free↔premium transition, independent of the payout
   // mechanic above.
   subscriptionStatusChanged,
+  // A fund bankruptcy settlement the caller just claimed (employee's 1%
+  // cut, or an investor's solvent/insolvent payout) -- see
+  // fund_liquidation_payout_provider.dart and
+  // fomoshield_etf_bankruptcy_flow_spec memory.
+  fundLiquidation,
 }
 
 /// Which of the app's two separate portfolio systems this notification
@@ -113,6 +118,21 @@ class AppNotification {
   final double? fillQuantity;
   final double? fillPrice;
 
+  /// Set only for [AppNotificationType.fundLiquidation] -- lets the detail
+  /// screen rebuild a localized title/detail and show the itemized
+  /// settlement breakdown instead of just re-reading the English
+  /// [title]/[detail] above. [payoutAmount] already carries the total
+  /// credited (same field weeklyPayout uses); these are the parts unique
+  /// to a liquidation settlement. [fundLiquidationBrokerCommission] and
+  /// [fundLiquidationNeustoika] are null for an employee payout (only
+  /// investors have those line items).
+  final String? fundLiquidationFundName;
+  final String? fundLiquidationRecipientType;
+  final double? fundLiquidationAssetsSoldValue;
+  final double? fundLiquidationUnitsHeld;
+  final double? fundLiquidationBrokerCommission;
+  final double? fundLiquidationNeustoika;
+
   const AppNotification({
     required this.id,
     required this.type,
@@ -138,6 +158,12 @@ class AppNotification {
     this.fillIsBuy,
     this.fillQuantity,
     this.fillPrice,
+    this.fundLiquidationFundName,
+    this.fundLiquidationRecipientType,
+    this.fundLiquidationAssetsSoldValue,
+    this.fundLiquidationUnitsHeld,
+    this.fundLiquidationBrokerCommission,
+    this.fundLiquidationNeustoika,
   });
 
   AppNotification copyWith({bool? read}) => AppNotification(
@@ -165,6 +191,12 @@ class AppNotification {
     fillIsBuy: fillIsBuy,
     fillQuantity: fillQuantity,
     fillPrice: fillPrice,
+    fundLiquidationFundName: fundLiquidationFundName,
+    fundLiquidationRecipientType: fundLiquidationRecipientType,
+    fundLiquidationAssetsSoldValue: fundLiquidationAssetsSoldValue,
+    fundLiquidationUnitsHeld: fundLiquidationUnitsHeld,
+    fundLiquidationBrokerCommission: fundLiquidationBrokerCommission,
+    fundLiquidationNeustoika: fundLiquidationNeustoika,
   );
 
   Map<String, dynamic> toJson() => {
@@ -192,6 +224,12 @@ class AppNotification {
     'fillIsBuy': fillIsBuy,
     'fillQuantity': fillQuantity,
     'fillPrice': fillPrice,
+    'fundLiquidationFundName': fundLiquidationFundName,
+    'fundLiquidationRecipientType': fundLiquidationRecipientType,
+    'fundLiquidationAssetsSoldValue': fundLiquidationAssetsSoldValue,
+    'fundLiquidationUnitsHeld': fundLiquidationUnitsHeld,
+    'fundLiquidationBrokerCommission': fundLiquidationBrokerCommission,
+    'fundLiquidationNeustoika': fundLiquidationNeustoika,
   };
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {
@@ -229,6 +267,17 @@ class AppNotification {
       fillIsBuy: json['fillIsBuy'] as bool?,
       fillQuantity: (json['fillQuantity'] as num?)?.toDouble(),
       fillPrice: (json['fillPrice'] as num?)?.toDouble(),
+      fundLiquidationFundName: json['fundLiquidationFundName'] as String?,
+      fundLiquidationRecipientType:
+          json['fundLiquidationRecipientType'] as String?,
+      fundLiquidationAssetsSoldValue:
+          (json['fundLiquidationAssetsSoldValue'] as num?)?.toDouble(),
+      fundLiquidationUnitsHeld:
+          (json['fundLiquidationUnitsHeld'] as num?)?.toDouble(),
+      fundLiquidationBrokerCommission:
+          (json['fundLiquidationBrokerCommission'] as num?)?.toDouble(),
+      fundLiquidationNeustoika:
+          (json['fundLiquidationNeustoika'] as num?)?.toDouble(),
     );
   }
 }

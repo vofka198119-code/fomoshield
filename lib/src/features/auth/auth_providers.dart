@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -151,13 +150,6 @@ Future<({String route, Object? extra})> resolvePostAuthRoute(
   final disclaimerAccepted = await ref.read(
     isDisclaimerAcceptedProvider.future,
   );
-  // TEMP DEBUG 2026-09-20 — chasing a cross-account state leak on rapid
-  // sign-out/sign-in switches (see mac_migration_gotchas memory). Remove
-  // once confirmed fixed.
-  debugPrint(
-    '🚪 resolvePostAuthRoute: currentUser.id=${SupabaseConfig.client.auth.currentUser?.id} '
-    'disclaimerAccepted=$disclaimerAccepted',
-  );
   if (!disclaimerAccepted) return (route: '/disclaimer', extra: null);
 
   // Global account nickname (Migration 017) — mandatory, one-time. Checked
@@ -176,7 +168,6 @@ Future<({String route, Object? extra})> resolvePostAuthRoute(
   // existing account to the choose-nickname screen.
   ref.invalidate(myNicknameProvider);
   final nickname = await ref.read(myNicknameProvider.future);
-  debugPrint('🚪 resolvePostAuthRoute: nickname=$nickname');
   if (nickname == null) return (route: '/onboarding-choice', extra: null);
 
   return (route: '/home', extra: null);

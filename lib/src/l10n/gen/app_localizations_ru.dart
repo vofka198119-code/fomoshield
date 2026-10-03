@@ -5867,6 +5867,33 @@ class AppLocalizationsRu extends AppLocalizations {
   String get disclaimerScreenAcceptButton => 'Принимаю';
 
   @override
+  String get chooseNicknameTitle => 'Выбери свой никнейм';
+
+  @override
+  String get chooseNicknameSubtitle =>
+      'Именно так тебя увидят другие пользователи — в составе команды фонда, на бирже вакансий и везде, где твоя активность видна публично. Почта нигде не показывается. Выбирай внимательно: сменить ник потом будет нельзя.';
+
+  @override
+  String get chooseNicknameHint => 'Никнейм';
+
+  @override
+  String get chooseNicknameRequired => 'Введи никнейм';
+
+  @override
+  String get chooseNicknameInvalidChars =>
+      'Только латинские буквы, цифры и подчёркивание, до 25 символов';
+
+  @override
+  String get chooseNicknameTakenError => 'Этот никнейм уже занят';
+
+  @override
+  String get chooseNicknameGenericError =>
+      'Не удалось сохранить никнейм — попробуй ещё раз';
+
+  @override
+  String get chooseNicknameContinueButton => 'Продолжить';
+
+  @override
   String get disclaimerScreenLinkFailed =>
       'Не удалось открыть ссылку. Проверьте подключение к интернету.';
 
@@ -6481,33 +6508,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get chooseNicknameTitle => 'Выбери свой никнейм';
-
-  @override
-  String get chooseNicknameSubtitle =>
-      'Это твой публичный ник в приложении — именно его увидят другие пользователи. Почта нигде не показывается. Выбирай внимательно: сменить ник потом будет нельзя.';
-
-  @override
-  String get chooseNicknameHint => 'Никнейм';
-
-  @override
-  String get chooseNicknameRequired => 'Введи никнейм';
-
-  @override
-  String get chooseNicknameInvalidChars =>
-      'Только латинские буквы, цифры и подчёркивание, до 25 символов';
-
-  @override
-  String get chooseNicknameTakenError => 'Этот никнейм уже занят';
-
-  @override
-  String get chooseNicknameGenericError =>
-      'Не удалось сохранить никнейм — попробуй ещё раз';
-
-  @override
-  String get chooseNicknameContinueButton => 'Продолжить';
-
-  @override
   String get languageOnboardingTitle => 'Выбери язык';
 
   @override
@@ -6570,4 +6570,1183 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onboardingTourStep5Button => 'Выбрать никнейм';
+
+  @override
+  String get homeWidgetEtfFunds => 'ETF-фонды';
+
+  @override
+  String get etfPremiumRequiredTitle => 'Нужна подписка Premium';
+
+  @override
+  String get etfPremiumRequiredDescription =>
+      'Для создания и управления собственным фондом нужна подписка Premium.';
+
+  @override
+  String get etfHomeCardTitleHead => 'Стать управляющим фонда';
+
+  @override
+  String get etfHomeCardTitleMyFund => 'Мой фонд';
+
+  @override
+  String get etfHomeCardTitleAnalyst => 'Стать инвестиционным помощником';
+
+  @override
+  String get etfHomeCardTitleVacancies => 'Вакансии';
+
+  @override
+  String get etfEmployeeHubTitle => 'МОЙ ПРОФИЛЬ';
+
+  @override
+  String get etfEmployeeHubCompaniesTitle => 'КОМПАНИИ';
+
+  @override
+  String get etfEmploymentDetailTitle => 'ЗАНЯТОСТЬ';
+
+  @override
+  String get etfEmploymentDetailJoinedLabel => 'Нанят';
+
+  @override
+  String get etfEmploymentDetailLeftLabel => 'Ушёл';
+
+  @override
+  String get etfEmploymentDetailStatusActive => 'Работает сейчас';
+
+  @override
+  String get etfEmploymentDetailStatusResigned => 'Уволился сам';
+
+  @override
+  String get etfEmploymentDetailStatusTerminated => 'Уволен';
+
+  @override
+  String get etfEmploymentDetailLeaveButton => 'Покинуть фонд';
+
+  @override
+  String get etfEmploymentDetailLeaveConfirmTitle => 'Покинуть фонд?';
+
+  @override
+  String get etfEmploymentDetailLeaveConfirmBody =>
+      'Ты сразу потеряешь доступ к инструментам команды этого фонда. Отменить нельзя.';
+
+  @override
+  String get etfEmploymentDetailLeaveError => 'Не удалось покинуть фонд';
+
+  @override
+  String get etfBlotterTitle => 'ЗАЯВКИ';
+
+  @override
+  String get etfBlotterShortcutLabel => 'Заявки';
+
+  @override
+  String get etfBlotterEmptyText => 'Пока нет предложений по сделкам';
+
+  @override
+  String get etfBlotterEmptyFilteredText => 'Нет заявок с таким статусом';
+
+  @override
+  String get etfBlotterFilterAll => 'Все';
+
+  @override
+  String get etfInvestorsShortcutLabel => 'Инвесторы';
+
+  @override
+  String get etfInvestorsScreenTitle => 'ИНВЕСТОРЫ';
+
+  @override
+  String get etfInvestorsStatsTitle => 'СТАТИСТИКА ИНВЕСТОРОВ';
+
+  @override
+  String get etfInvestorsStatsTotalLabel => 'Всего вложено';
+
+  @override
+  String get etfInvestorsStatsCountLabel => 'Инвесторов';
+
+  @override
+  String get etfInvestorsStatsBankruptcyPayoutLabel =>
+      'Выплата при банкротстве';
+
+  @override
+  String get etfInvestorsListTitle => 'СПИСОК ИНВЕСТОРОВ';
+
+  @override
+  String get etfInvestorsListEmptyText => 'Пока нет инвесторов';
+
+  @override
+  String get etfInvestorsInflowChartTitle => 'ПРИТОК ИНВЕСТОРОВ';
+
+  @override
+  String get etfInvestorsOutflowChartTitle => 'ОТТОК ИНВЕСТОРОВ';
+
+  @override
+  String get etfInvestorsYearPickerTitle => 'ВЫБОР ГОДА';
+
+  @override
+  String get etfBalanceHistoryChartTitle => 'ИСТОРИЯ БАЛАНСА';
+
+  @override
+  String get etfChartsShortcutLabel => 'Графики';
+
+  @override
+  String get etfTradingShortcutLabel => 'Торговля';
+
+  @override
+  String get etfRulebookShortcutLabel => 'Правила';
+
+  @override
+  String get etfChartsScreenTitle => 'ГРАФИКИ';
+
+  @override
+  String get etfChartsWidgetsSettingsSheetTitle => 'Виджеты графиков';
+
+  @override
+  String get etfNavHistoryChartTitle => 'NAV НА ПАЙ';
+
+  @override
+  String get etfDrawdownChartTitle => 'ПРОСАДКА';
+
+  @override
+  String get etfAssetAllocationChartTitle => 'РАСПРЕДЕЛЕНИЕ АКТИВОВ';
+
+  @override
+  String get etfAssetAllocationEmptyText => 'Пока нет активов';
+
+  @override
+  String get etfCommissionChartTitle => 'КОМИССИЯ БРОКЕРА';
+
+  @override
+  String get etfCashVsInvestedChartTitle => 'КЭШ И ИНВЕСТИЦИИ';
+
+  @override
+  String get etfCashVsInvestedCashLabel => 'Кэш';
+
+  @override
+  String get etfCashVsInvestedInvestedLabel => 'Инвестировано';
+
+  @override
+  String get etfProposeOrderTypeMarket => 'Рыночный';
+
+  @override
+  String get etfProposeOrderTypeLimit => 'Лимитный';
+
+  @override
+  String get etfProposeJustificationLabel => 'Обоснование';
+
+  @override
+  String get etfProposeJustificationHint => 'Почему эта сделка?';
+
+  @override
+  String get etfProposeSubmitButton => 'Отправить предложение';
+
+  @override
+  String get etfProposeLimitPriceRequired => 'Укажи корректную лимитную цену';
+
+  @override
+  String get etfProposeGenericError => 'Не удалось отправить предложение';
+
+  @override
+  String get etfProposalStatusPending => 'Ожидает решения';
+
+  @override
+  String get etfProposalStatusApproved => 'Одобрено — в очереди';
+
+  @override
+  String get etfProposalStatusRejected => 'Отклонено';
+
+  @override
+  String get etfProposalStatusExecuted => 'Исполнено';
+
+  @override
+  String get etfProposalStatusNeedsRevision => 'На доработке';
+
+  @override
+  String get etfProposalFlaggedLabel => 'Помечено как рискованное';
+
+  @override
+  String get etfProposalApproveButton => 'Одобрить';
+
+  @override
+  String get etfProposalRejectButton => 'Отклонить';
+
+  @override
+  String get etfProposalFlagButton => 'Пометить риск';
+
+  @override
+  String get etfProposalExecuteButton => 'Исполнить';
+
+  @override
+  String get etfProposalReworkButton => 'Отправить на доработку';
+
+  @override
+  String get etfProposalReworkDialogTitle => 'Отправить на доработку';
+
+  @override
+  String get etfProposalReworkReasonHint => 'Что нужно исправить?';
+
+  @override
+  String get etfProposalReworkReasonRequired => 'Укажи причину';
+
+  @override
+  String get etfProposalReworkSubmitButton => 'Отправить';
+
+  @override
+  String get etfProposalDetailsButton => 'Подробности';
+
+  @override
+  String get etfProposalHeaderBuy => 'ОРДЕР НА ПОКУПКУ';
+
+  @override
+  String get etfProposalHeaderSell => 'ОРДЕР НА ПРОДАЖУ';
+
+  @override
+  String get etfProposalCreateBuyOrderButton => 'Ордер на покупку';
+
+  @override
+  String get etfProposalCreateSellOrderButton => 'Ордер на продажу';
+
+  @override
+  String get etfProposalActionError => 'Действие не выполнено';
+
+  @override
+  String get etfProposalPlacementPriceLabel => 'Цена размещения ордера';
+
+  @override
+  String get etfProposalEstimatedPriceLabel => 'Текущая цена (оценка)';
+
+  @override
+  String get etfProposalEstimatedCommissionLabel => 'Комиссия (оценка)';
+
+  @override
+  String get etfProposalExecutionPriceLabel => 'Цена сделки';
+
+  @override
+  String get etfProposalProposedByLabel => 'Предложил';
+
+  @override
+  String get etfFundBalanceTitle => 'БАЛАНС ФОНДА';
+
+  @override
+  String get etfFundBalanceAvailableLabel => 'Доступно';
+
+  @override
+  String get etfFundBalanceTotalLabel => 'Всего (вкл. P&L)';
+
+  @override
+  String get etfEmployeeHubInvitationsRow => 'Приглашения';
+
+  @override
+  String get etfEmployeeHubApplicationsRow => 'Заявки';
+
+  @override
+  String get etfComingSoonTitle => 'Скоро';
+
+  @override
+  String get etfComingSoonBody =>
+      'Эта функция появится в одном из следующих обновлений.';
+
+  @override
+  String get etfHomeCardPremiumTag => 'Premium';
+
+  @override
+  String get etfOnboardingStep1TitleHead => 'Кто такой глава фонда?';
+
+  @override
+  String get etfOnboardingStep1BodyHead =>
+      'Создайте свой инвестиционный фонд и возьмите на себя роль его управляющего.\n\nВнутри фонда вы определяете стратегию, выбираете активы, принимаете решения о покупках и продажах и управляете капиталом инвесторов.\n\nФонд работает по принципу ETF: это объединённый портфель активов, которым управляют по заранее выбранной стратегии. Другие пользователи смогут инвестировать в ваш фонд, а его результат будет зависеть от решений вашей команды и поведения рынка.\n\nГотовы создать свой фонд?';
+
+  @override
+  String get etfOnboardingStep2TitleHead => 'Что нужно для создания фонда?';
+
+  @override
+  String get etfOnboardingStep2BodyHead =>
+      'Чтобы открыть собственный фонд, вам понадобится Premium-подписка.\n\nПри регистрации вы создадите профиль фонда: название, логотип, описание, стратегию и состав команды.\n\nНа старте фонд получает виртуальный капитал \$150 000. Эти средства используются исключительно внутри симулятора и становятся начальным капиталом вашего фонда.';
+
+  @override
+  String get etfOnboardingStep3TitleHead => 'Кто входит в команду фонда?';
+
+  @override
+  String get etfOnboardingStep3BodyHead =>
+      'Фондом редко управляют в одиночку — вы можете нанять команду сотрудников, у каждого своя роль.\n\nАналитик предлагает сделки: какие активы купить или продать и почему.\n\nТрейдер отправляет одобренные сделки на рынок — без него одобренный ордер исполняется автоматически.\n\nРиск-менеджер помечает сделки как рискованные — это сигнал команде, но решение всегда остаётся за вами или со-управляющим.\n\nСо-управляющий разделяет с вами право одобрять и отклонять сделки.\n\nВы сами решаете, кого нанимать и какие права им давать.';
+
+  @override
+  String get etfOnboardingStep4TitleHead =>
+      'Как принимаются решения по сделкам?';
+
+  @override
+  String get etfOnboardingStep4BodyHead =>
+      'Любая сделка в фонде проходит через понятный путь.\n\nСотрудник с нужными правами предлагает сделку: тикер, направление, тип ордера и обоснование.\n\nВы или со-управляющий одобряете, отклоняете или отправляете предложение на доработку. Если в команде есть трейдер — он исполняет одобренный ордер; если трейдера нет, сделка исполняется сразу после одобрения.\n\nКаждая сделка облагается брокерской комиссией 0.5%, как и в личном портфеле.\n\nТак фонд торгует прозрачно: видно, кто предложил сделку, кто её одобрил и почему.';
+
+  @override
+  String get etfOnboardingStep5TitleHead => 'Откуда у фонда деньги инвесторов?';
+
+  @override
+  String get etfOnboardingStep5BodyHead =>
+      'Другие пользователи могут инвестировать в ваш фонд, покупая его паи — так же, как акции обычной компании.\n\nЦена пая (NAV) считается автоматически: стоимость активов и кэша фонда делится на количество паёв в обращении. Растёт стоимость активов фонда — растёт и NAV, а вместе с ним доход всех держателей паёв.\n\nИнвестор может в любой момент погасить свои паи и забрать деньги по текущей цене.\n\nВаша задача как управляющего — торговать так, чтобы NAV рос: от этого зависят доверие инвесторов и репутация фонда.';
+
+  @override
+  String get etfOnboardingStep6TitleHead =>
+      'Что будет, если фонд не справится?';
+
+  @override
+  String get etfOnboardingStep6BodyHead =>
+      'Управление фондом — это ответственность, а не только возможность.\n\nЕсли вы решите закрыть фонд, запускается процедура банкротства: все активы продаются по рыночной цене, и каждому активному сотруднику выплачивается 1% от остатка.\n\nОставшиеся деньги идут инвесторам: если средств хватает — каждый получает вложенное плюс 5%, если нет — выплата пропорциональна вкладу, за вычетом брокерской комиссии.\n\nПосле расчёта фонд закрывается навсегда — тикер и история остаются, но управлять им больше нельзя.\n\nСоздайте фонд. Соберите команду. Посмотрите, насколько далеко приведут ваши решения.';
+
+  @override
+  String get etfOnboardingStep1TitleAnalyst => 'Кто такой сотрудник фонда?';
+
+  @override
+  String get etfOnboardingStep1BodyAnalyst =>
+      'Не хотите управлять фондом самостоятельно? Присоединитесь к уже существующей команде.\n\nФондам нужны аналитики, трейдеры, риск-менеджеры и другие специалисты. Вы сможете искать вакансии на рынке, отправлять заявки и работать внутри команды фонда.\n\nСотрудника можно найти двумя способами: откликнуться на открытую вакансию или получить приглашение от друга — владельца фонда.\n\nВаши решения и предложения могут стать частью реальной стратегии виртуального фонда.';
+
+  @override
+  String get etfOnboardingStep2TitleAnalyst => 'Как попасть в команду?';
+
+  @override
+  String get etfOnboardingStep2BodyAnalyst =>
+      'Для работы сотрудником Premium не требуется.\n\nСначала создайте свою профессиональную анкету: выберите роль, укажите навыки и опыт, добавьте информацию о себе.\n\nПосле этого вы сможете разместить анкету на рынке вакансий и ждать приглашений от фондов.\n\nИли присоединиться напрямую — если вас пригласил друг, который управляет фондом.';
+
+  @override
+  String get etfOnboardingStep3TitleAnalyst => 'Какую роль выбрать?';
+
+  @override
+  String get etfOnboardingStep3BodyAnalyst =>
+      'У каждой роли в команде фонда своя зона ответственности.\n\nАналитик изучает компании и предлагает сделки — купить или продать актив и почему.\n\nТрейдер отправляет одобренные сделки на биржу — финальное нажатие кнопки «исполнить».\n\nРиск-менеджер оценивает сделки на риск и может пометить их как рискованные для команды.\n\nСо-управляющий помогает главе фонда одобрять или отклонять предложения.\n\nВыберите роль, которая ближе вам, и станьте частью решений фонда.';
+
+  @override
+  String get etfOnboardingStep4TitleAnalyst =>
+      'Что вы сможете делать в команде?';
+
+  @override
+  String get etfOnboardingStep4BodyAnalyst =>
+      'Если у вас есть права на предложение сделок, вы указываете тикер, направление, тип ордера и обоснование — почему стоит купить или продать.\n\nГлава фонда или со-управляющий рассматривает предложение: одобряет, отклоняет или отправляет на доработку.\n\nЕсли вы трейдер — именно вы нажимаете кнопку финального исполнения одобренных сделок.\n\nКаждая ваша сделка видна в истории фонда — это ваш реальный вклад в результат команды.';
+
+  @override
+  String get etfOnboardingStep5TitleAnalyst => 'На чьи деньги торгует фонд?';
+
+  @override
+  String get etfOnboardingStep5BodyAnalyst =>
+      'Капитал фонда — это не только деньги главы, но и вложения инвесторов, купивших паи фонда.\n\nЦена пая (NAV) считается автоматически по стоимости активов и кэша фонда — от сделок команды зависит, будет ли она расти.\n\nИнвесторы доверяют команде свои виртуальные средства, ожидая, что решения фонда принесут доход.\n\nЧем удачнее сделки команды — тем выше результат для всех, включая вас.';
+
+  @override
+  String get etfOnboardingStep6TitleAnalyst =>
+      'Что будет, если фонд закроется?';
+
+  @override
+  String get etfOnboardingStep6BodyAnalyst =>
+      'Фонд может закрыться — глава вправе запустить процедуру банкротства в любой момент.\n\nПри банкротстве все активы продаются по рынку, и каждому активному сотруднику выплачивается 1% от остатка фонда — включая вас, если на тот момент вы состоите в команде.\n\nПосле этого фонд закрывается навсегда, и нужно будет искать другую команду или создать собственный фонд.\n\nНайдите свою роль. Попадите в команду. Влияйте на решения фонда.';
+
+  @override
+  String get etfOnboardingStep7Title => 'Это симулятор';
+
+  @override
+  String get etfOnboardingStep7Body =>
+      'FOMO Shield — это симулятор управления инвестиционными фондами.\n\nВсе деньги, активы, сделки и результаты внутри фондов являются виртуальными и не имеют реальной денежной стоимости. Они не могут быть выведены, обменены или использованы вне приложения.\n\nВ периоды недостатка реальных участников или для поддержания ликвидности симуляции система может использовать искусственных инвесторов. Их действия генерируются системой и не являются действиями реальных пользователей.\n\nНикакая статистика, доходность, рейтинг или результат симуляции не являются финансовой рекомендацией, гарантией дохода или обещанием будущих результатов.';
+
+  @override
+  String get etfRulebookTitle => 'Как работают фонды';
+
+  @override
+  String get etfRulebookSubtitle =>
+      'Краткий справочник о работе симулятора фондов FOMO Shield — можно открыть в любой момент.';
+
+  @override
+  String get etfRulebookFundSectionHeader => 'Что такое фонд';
+
+  @override
+  String get etfRulebookFundSectionBody =>
+      'Фонд — это симулированный инвестиционный инструмент, которым управляет глава (его создатель) и, при желании, нанятая команда. На старте фонд получает виртуальный капитал \$150 000. Другие пользователи могут инвестировать в фонд, покупая его паи, а команда фонда решает, какие активы покупать и продавать.';
+
+  @override
+  String get etfRulebookRolesSectionHeader => 'Роли в команде';
+
+  @override
+  String get etfRulebookRolesSectionBody =>
+      'Глава — владелец фонда, обладает полным правом одобрять или отклонять сделки и управлять командой.\n\nСо-управляющий — разделяет с главой право одобрять или отклонять предложения по сделкам.\n\nАналитик — предлагает сделки: какой актив купить или продать и почему.\n\nТрейдер — исполняет одобренную сделку на рынке. Без трейдера одобренная сделка исполняется автоматически.\n\nРиск-менеджер — помечает предложение как рискованное — это сигнал команде, но решение всё равно остаётся за главой или со-управляющим.';
+
+  @override
+  String get etfRulebookTradeFlowSectionHeader => 'Как проходит сделка';
+
+  @override
+  String get etfRulebookTradeFlowSectionBody =>
+      'Сотрудник с нужными правами предлагает сделку — тикер, направление, тип ордера и обоснование.\n\nГлава или со-управляющий одобряет, отклоняет или отправляет предложение на доработку. Если в фонде есть трейдер — он исполняет одобренный ордер, иначе сделка исполняется автоматически.\n\nКаждая сделка облагается той же брокерской комиссией 0.5%, что и в личном портфеле.';
+
+  @override
+  String get etfRulebookNavSectionHeader => 'Инвесторы и NAV';
+
+  @override
+  String get etfRulebookNavSectionBody =>
+      'Инвестировать в фонд можно, купив его паи — так же, как акции компании.\n\nЦена пая (NAV) считается автоматически: суммарная стоимость активов и кэша фонда делится на количество паёв в обращении. Когда активы фонда растут в цене — растёт и NAV, а вместе с ним доход каждого держателя пая.\n\nИнвестор может погасить свои паи в любой момент и получить деньги по текущей цене.';
+
+  @override
+  String get etfRulebookBankruptcySectionHeader => 'Если фонд закрывается';
+
+  @override
+  String get etfRulebookBankruptcySectionBody =>
+      'Глава может закрыть фонд в любой момент. При закрытии:\n\n1. Все активы продаются по рыночной цене.\n\n2. Каждый активный на тот момент сотрудник получает 1% от оставшегося баланса.\n\n3. Остаток идёт инвесторам: если средств хватает — каждый получает вложенное плюс 5%, если нет — выплата пропорциональна вкладу, за вычетом брокерской комиссии со сделок продажи.\n\nПосле этого фонд закрывается навсегда — его тикер и название освобождаются для повторного использования, а управлять им больше нельзя.';
+
+  @override
+  String get etfOnboardingContinueButton => 'Продолжить';
+
+  @override
+  String get etfOnboardingStep2ButtonHead => 'Создать фонд';
+
+  @override
+  String get etfOnboardingStep2ButtonAnalyst => 'Создать анкету';
+
+  @override
+  String get etfOnboardingAccept => 'Принять и продолжить';
+
+  @override
+  String get etfOnboardingComingSoon =>
+      'Функции инвестиционного помощника появятся в одном из следующих обновлений.';
+
+  @override
+  String get etfCreateFundTitle => 'СОЗДАНИЕ ФОНДА';
+
+  @override
+  String get etfCreateFundNameLabel => 'Название фонда';
+
+  @override
+  String get etfCreateFundNameHint => 'Только английские буквы и цифры';
+
+  @override
+  String get etfCreateFundDescriptionLabel => 'Описание';
+
+  @override
+  String get etfCreateFundStrategyLabel => 'Инвестиционная стратегия';
+
+  @override
+  String get etfCreateFundSectorsLabel => 'Секторы';
+
+  @override
+  String get etfCreateFundCapitalLabel => 'Стартовый капитал';
+
+  @override
+  String get etfCreateFundCapitalFixedNote =>
+      'Эта сумма автоматически зачисляется на счёт фонда при создании.';
+
+  @override
+  String get etfCreateFundTickerLabel => 'Тикер';
+
+  @override
+  String get etfCreateFundTickerTakenError =>
+      'Фонд с таким тикером уже существует';
+
+  @override
+  String get etfCreateFundTickerInvalidError =>
+      'Тикер должен быть от 1 до 5 букв после FS';
+
+  @override
+  String get etfCreateFundSubmitButton => 'Создать фонд';
+
+  @override
+  String get etfCreateFundSuccessMessage => 'Фонд создан!';
+
+  @override
+  String get etfCreateFundErrorGeneric =>
+      'Не удалось создать фонд. Попробуйте ещё раз.';
+
+  @override
+  String get etfCreateFundSelectAtLeastOneSector =>
+      'Выберите хотя бы один сектор';
+
+  @override
+  String get etfCreateFundNameEnglishOnlyError =>
+      'Название фонда должно быть на английском (только буквы, цифры и базовая пунктуация)';
+
+  @override
+  String get etfCreateFundNameTakenError =>
+      'Фонд с таким названием уже существует';
+
+  @override
+  String get etfFundsSearchHint => 'Поиск фондов по названию или тикеру...';
+
+  @override
+  String get etfFundsTabLabel => 'Фонды ETF';
+
+  @override
+  String get etfCompaniesTabLabel => 'Компании';
+
+  @override
+  String get etfFundsEmptyState => 'Пока нет фондов — создайте первый!';
+
+  @override
+  String get etfFundsListErrorMessage =>
+      'Не удалось загрузить фонды. Потяните, чтобы обновить.';
+
+  @override
+  String get etfFundsTopByCap => 'ПО КАПИТАЛИЗАЦИИ';
+
+  @override
+  String get etfFundsNewThisWeek => 'НОВЫЕ ЗА НЕДЕЛЮ';
+
+  @override
+  String get etfFundDetailNavLabel => 'NAV / пай';
+
+  @override
+  String get etfFundDetailAumLabel => 'AUM';
+
+  @override
+  String get etfFundDetailInvestorCapitalLabel => 'Вложено инвесторами';
+
+  @override
+  String get etfFundDetailUnitsLabel => 'Паёв в обращении';
+
+  @override
+  String fundUnitsCount(String count) {
+    return '$count паёв';
+  }
+
+  @override
+  String get etfFundDetailHoldingsTitle => 'АКТИВЫ';
+
+  @override
+  String get etfFundDetailHoldingsEmpty => 'Пока нет активов';
+
+  @override
+  String get etfFundBankruptcyStep1Title =>
+      'Вы действительно собираетесь активировать этап удаления вашего фонда?';
+
+  @override
+  String get etfFundBankruptcyStep1Confirm => 'Да, продолжить';
+
+  @override
+  String get etfFundBankruptcyExplanationTitle => 'Банкротство фонда';
+
+  @override
+  String get etfFundBankruptcyExplanationBody =>
+      'Процесс удаления — это объявление о банкротстве фонда. Все активы будут проданы по рыночной цене. Каждому активному сотруднику выплатим 1% от остатка. Оставшиеся средства пойдут инвесторам: если хватает — каждый получит вложенное плюс 5%, если нет — пропорционально вкладу за вычетом брокерской комиссии. После расчётов счёт фонда обнулится, а сам фонд станет недоступен. Каждый участник получит уведомление с разбивкой выплаты.';
+
+  @override
+  String get etfFundBankruptcyHoldingsLabel => 'Активы к продаже';
+
+  @override
+  String get etfFundBankruptcyCommissionLabel => 'Комиссия брокера';
+
+  @override
+  String etfFundBankruptcyEmployeesLabel(int count) {
+    return 'Сотрудникам ($count × 1%)';
+  }
+
+  @override
+  String get etfFundBankruptcyInvestorsLabel => 'Инвесторам';
+
+  @override
+  String get etfFundBankruptcySolventNote => 'Хватает на всех — каждому +5%';
+
+  @override
+  String get etfFundBankruptcyInsolventNote =>
+      'Не хватает — пропорционально вкладу';
+
+  @override
+  String get etfFundBankruptcyTotalLabel => 'Итого к выплате';
+
+  @override
+  String get etfFundBankruptcyConfirmButton => 'Начать процедуру банкротства';
+
+  @override
+  String get etfFundBankruptcyCancelButton => 'Отменить';
+
+  @override
+  String get etfFundBankruptcySuccessMessage => 'Фонд ликвидирован';
+
+  @override
+  String get etfFundBankruptcyErrorMessage =>
+      'Не удалось выполнить процедуру банкротства';
+
+  @override
+  String get etfFundBankruptcyPreviewErrorMessage =>
+      'Не удалось загрузить расчёт выплат';
+
+  @override
+  String get fundLiquidationNotifTitle => 'Расчёт по банкротству фонда';
+
+  @override
+  String fundLiquidationNotifDetail(String fundName, String amount) {
+    return '«$fundName» объявил банкротство. Вам зачислено $amount.';
+  }
+
+  @override
+  String get fundLiquidationDetailTitle => 'Расчёт по фонду';
+
+  @override
+  String get fundLiquidationDetailAmountLabel => 'Зачислено';
+
+  @override
+  String get fundLiquidationDetailFundLabel => 'Фонд';
+
+  @override
+  String get fundLiquidationDetailReasonLabel => 'Причина';
+
+  @override
+  String get fundLiquidationDetailReasonValue => 'Банкротство фонда';
+
+  @override
+  String get fundLiquidationDetailUnitsLabel => 'Продано паёв';
+
+  @override
+  String get fundLiquidationDetailAssetsSoldLabel => 'Активы';
+
+  @override
+  String get fundLiquidationDetailSoldAtMarketValue =>
+      'Продано по рыночной цене';
+
+  @override
+  String get fundLiquidationDetailCommissionLabel => 'Комиссия брокера';
+
+  @override
+  String get fundLiquidationDetailNeustoikaLabel => 'Неустойка (+5%)';
+
+  @override
+  String get fundLiquidationDetailRecipientEmployee => 'Выплата сотруднику';
+
+  @override
+  String get fundLiquidationDetailRecipientInvestor => 'Выплата инвестору';
+
+  @override
+  String get etfCreateFundLimitReachedError => 'У вас уже есть фонд';
+
+  @override
+  String get etfFundDetailSectorsTitle => 'СЕКТОРЫ';
+
+  @override
+  String get etfFundDetailStrategyTitle => 'СТРАТЕГИЯ';
+
+  @override
+  String get etfFundDetailDescriptionTitle => 'О ФОНДЕ';
+
+  @override
+  String get etfFundDetailNavHistoryTitle => 'ИСТОРИЯ NAV';
+
+  @override
+  String get etfFundDetailHoldingsCountLabel => 'Компаний в фонде';
+
+  @override
+  String get etfFundDetailInfoTitle => 'ИНФОРМАЦИЯ О ФОНДЕ';
+
+  @override
+  String get etfFundDetailCreatedLabel => 'Дата создания';
+
+  @override
+  String get etfFundDetailCreatorLabel => 'Управляющий';
+
+  @override
+  String get etfFundDetailEmployeesLabel => 'Сотрудники';
+
+  @override
+  String get etfFundDetailHireButton => 'Нанять';
+
+  @override
+  String get etfRoleHead => 'Глава фонда';
+
+  @override
+  String get etfRoleAnalyst => 'Аналитик';
+
+  @override
+  String get etfRoleCoManager => 'Зам. управляющего';
+
+  @override
+  String get etfRoleTrader => 'Трейдер';
+
+  @override
+  String get etfRoleRiskManager => 'Риск-менеджер';
+
+  @override
+  String get etfEmployeeProfileTitle => 'МОЯ АНКЕТА';
+
+  @override
+  String get etfEmployeeProfileButtonLabel => 'Анкета';
+
+  @override
+  String get etfEmployeeProfileSaveError =>
+      'Не удалось сохранить анкету — попробуй ещё раз';
+
+  @override
+  String get etfEmployeeProfileNicknameLabel => 'Никнейм';
+
+  @override
+  String get etfEmployeeProfileNicknameHint => 'Так тебя увидят главы фондов';
+
+  @override
+  String get etfEmployeeProfileBioLabel => 'О себе';
+
+  @override
+  String get etfEmployeeProfileBioHint =>
+      'Например: 5 лет анализирую акции технологического сектора, специализируюсь на фундаментальном анализе, ищу позицию в растущем фонде';
+
+  @override
+  String get etfEmployeeProfileLanguageLabel => 'Язык';
+
+  @override
+  String get etfEmployeeProfileLanguageHint => 'Например: русский, английский';
+
+  @override
+  String get etfEmployeeProfileDesiredRoleLabel => 'Желаемая должность';
+
+  @override
+  String get etfEmployeeProfileDesiredRoleHint => 'Не выбрано';
+
+  @override
+  String get etfEmployeeProfileAvailableLabel => 'Открыт для найма';
+
+  @override
+  String get etfEmployeeProfileAvailableBody =>
+      'Виден на бирже вакансий любому главе фонда';
+
+  @override
+  String get etfEmployeeProfileSaveButton => 'Сохранить анкету';
+
+  @override
+  String get etfEmployeeProfileSavedSnackbar => 'Анкета сохранена';
+
+  @override
+  String get etfEmployeeProfileNicknameRequired => 'Никнейм обязателен';
+
+  @override
+  String get etfEmployeeProfileNicknameNoEmail =>
+      'Никнейм не может содержать email';
+
+  @override
+  String get etfEmployeeProfileBioNoEmail =>
+      'Описание не может содержать email';
+
+  @override
+  String get etfEmployeeProfileStatsTitle => 'КАРЬЕРНАЯ СТАТИСТИКА';
+
+  @override
+  String get etfEmployeeProfileStatsApproved => 'Одобренных предложений';
+
+  @override
+  String get etfEmployeeProfileStatsRejected => 'Отклонённых предложений';
+
+  @override
+  String get etfEmployeeProfileStatsFundsChanged => 'Смен фондов';
+
+  @override
+  String get etfEmployeeProfileStatsRegisteredAt => 'Дата регистрации';
+
+  @override
+  String get etfEmployeeProfileStatsRating => 'Рейтинг';
+
+  @override
+  String get etfEmployeeProfileRatingPending => 'Пока недостаточно активности';
+
+  @override
+  String get etfEmployeeProfileRatingCardTitle => 'РЕЙТИНГ';
+
+  @override
+  String etfEmployeeProfileInvitationsButton(int count) {
+    return 'Приглашения ($count)';
+  }
+
+  @override
+  String get etfMarketplaceTitle => 'БИРЖА ВАКАНСИЙ';
+
+  @override
+  String get etfMarketplaceEmpty => 'Пока никто не ищет работу';
+
+  @override
+  String get etfMarketplaceErrorMessage => 'Не удалось загрузить биржу';
+
+  @override
+  String get etfMarketplaceInviteButton => 'Пригласить';
+
+  @override
+  String get etfMarketplaceBioFallback => 'Пока нет описания';
+
+  @override
+  String get etfSendInviteTitle => 'Отправить приглашение';
+
+  @override
+  String get etfSendInviteRoleLabel => 'Должность';
+
+  @override
+  String get etfSendInviteMessageLabel => 'Сообщение';
+
+  @override
+  String get etfSendInviteMessageHint => 'Расскажи о должности и своём фонде';
+
+  @override
+  String get etfSendInviteMessageRequired => 'Сообщение обязательно';
+
+  @override
+  String get etfSendInviteSubmitButton => 'Отправить приглашение';
+
+  @override
+  String get etfSendInviteSuccessSnackbar => 'Приглашение отправлено';
+
+  @override
+  String get etfSendInviteTeamFullError =>
+      'У твоей команды уже максимум 5 сотрудников';
+
+  @override
+  String get etfSendInviteAlreadyMemberError => 'Уже в твоей команде';
+
+  @override
+  String get etfSendInviteAlreadyPendingError =>
+      'У этого человека уже есть приглашение от тебя';
+
+  @override
+  String get etfFundDetailManageTooltip => 'Управление фондом';
+
+  @override
+  String get etfFundManagementViewPublicButton => 'Открыть публичную карточку';
+
+  @override
+  String get etfEmployeeHubTeamRow => 'Сотрудники';
+
+  @override
+  String get etfPositionFundManager => 'Управляющий фондом';
+
+  @override
+  String get etfPositionEmployee => 'Сотрудник';
+
+  @override
+  String get etfAdminBadge => 'АДМИН';
+
+  @override
+  String get etfAdminRenameNicknameTooltip => 'Переименовать ник (админ)';
+
+  @override
+  String get etfAdminCreateFundTooltip => 'Создать ещё фонд (админ)';
+
+  @override
+  String get etfAdminRenameFundTooltip => 'Переименовать фонд (админ)';
+
+  @override
+  String get etfAdminRenameNicknameTitle => 'Переименовать ник';
+
+  @override
+  String get etfAdminRenameFundTitle => 'Переименовать фонд';
+
+  @override
+  String get etfAdminRenameFundNameRequired => 'Название фонда обязательно';
+
+  @override
+  String get etfAdminRenameFundGenericError => 'Не удалось переименовать фонд';
+
+  @override
+  String get etfFundManagementAccessDenied =>
+      'У тебя нет доступа к управлению этим фондом';
+
+  @override
+  String get etfFundManagementTitle => 'ПАНЕЛЬ УПРАВЛЕНИЯ';
+
+  @override
+  String get etfFundHoldingSheetQuantity => 'В портфеле фонда';
+
+  @override
+  String get etfFundHoldingSheetPrice => 'Цена';
+
+  @override
+  String get etfFundHoldingSheetValue => 'Стоимость';
+
+  @override
+  String get etfFundHoldingSheetPercent => 'Доля в фонде';
+
+  @override
+  String get etfFundPositionTitle => 'ПОЗИЦИЯ ФОНДА';
+
+  @override
+  String get etfInvitationsTitle => 'МОИ ПРИГЛАШЕНИЯ';
+
+  @override
+  String get etfInvitationsEmpty => 'Нет входящих приглашений';
+
+  @override
+  String get etfInvitationsErrorMessage => 'Не удалось загрузить приглашения';
+
+  @override
+  String get etfInvitationDetailRoleLabel => 'Предложенная должность';
+
+  @override
+  String get etfInvitationDetailMessageLabel => 'Сообщение';
+
+  @override
+  String get etfInvitationJoinButton => 'Присоединиться';
+
+  @override
+  String get etfInvitationDeclineButton => 'Отказаться';
+
+  @override
+  String get etfInvitationAcceptedSnackbar => 'Ты присоединился к команде';
+
+  @override
+  String get etfInvitationDeclinedSnackbar => 'Приглашение отклонено';
+
+  @override
+  String get etfInvitationTeamFullError => 'Команда этого фонда уже заполнена';
+
+  @override
+  String get etfTeamMemberTerminateButton => 'Убрать';
+
+  @override
+  String get etfTeamMemberTerminateConfirmTitle => 'Убрать сотрудника?';
+
+  @override
+  String get etfTeamMemberTerminateConfirmBody =>
+      'Он получит уведомление за 5 дней до реальной потери доступа — до этого можно отменить.';
+
+  @override
+  String get etfTeamMemberTerminateConfirmAction =>
+      'Начать 5-дневное уведомление';
+
+  @override
+  String get etfTeamMemberPendingTerminationLabel => 'Скоро покинет команду';
+
+  @override
+  String get etfTeamMemberCancelTerminationButton => 'Отменить увольнение';
+
+  @override
+  String get etfEmploymentDetailTenureLabel => 'Срок работы';
+
+  @override
+  String etfEmploymentTenureDays(int days) {
+    return '$days дн.';
+  }
+
+  @override
+  String etfEmploymentTenureMonths(int months) {
+    return '$months мес.';
+  }
+
+  @override
+  String etfEmploymentTenureYearsMonths(int years, int months) {
+    return '$years г. $months мес.';
+  }
+
+  @override
+  String get etfEmploymentOutcomeActive => 'работает сейчас';
+
+  @override
+  String get etfEmploymentOutcomeResigned => 'ушёл сам';
+
+  @override
+  String get etfEmploymentOutcomeTerminated => 'уволен';
+
+  @override
+  String get etfEmploymentOutcomeFundClosed => 'фонд закрылся';
+
+  @override
+  String get etfEmploymentOutcomeLeft => 'покинул фонд';
+
+  @override
+  String get etfPermissionsSheetIntro =>
+      'Должность — только стартовый шаблон. Что сотрудник реально может делать, задают переключатели ниже.';
+
+  @override
+  String get etfPermissionsSaveButton => 'Сохранить права';
+
+  @override
+  String get etfPermissionsSaveError => 'Не удалось сохранить права';
+
+  @override
+  String get etfPermissionsRoleChangeTitle => 'Сменить должность?';
+
+  @override
+  String get etfPermissionsRoleChangeBody =>
+      'Права ниже сбросятся к шаблону этой должности. После этого их можно снова настроить вручную.';
+
+  @override
+  String get etfPermissionsRoleChangeConfirm => 'Сменить';
+
+  @override
+  String get etfPermissionPropose => 'Предлагать сделки';
+
+  @override
+  String get etfPermissionApprove => 'Одобрять и отклонять предложения';
+
+  @override
+  String get etfPermissionExecute => 'Отправлять одобренные заявки в рынок';
+
+  @override
+  String get etfPermissionFlagRisk => 'Помечать предложение рискованным';
+
+  @override
+  String get etfFundEditTitle => 'РЕДАКТИРОВАТЬ ФОНД';
+
+  @override
+  String get etfFundEditShortcutLabel => 'Изменить';
+
+  @override
+  String get etfFundEditSaveButton => 'Сохранить изменения';
+
+  @override
+  String get etfFundEditSavedSnackbar => 'Изменения сохранены';
+
+  @override
+  String get etfFundEditTooLongError =>
+      'Слишком длинный текст — сократи и попробуй снова';
+
+  @override
+  String get etfFundEditGenericError => 'Не удалось сохранить изменения';
+
+  @override
+  String get etfRulebookChapterBasics => 'ОСНОВЫ';
+
+  @override
+  String get etfRulebookChapterHead => 'ГЛАВЕ ФОНДА';
+
+  @override
+  String get etfRulebookChapterEmployee => 'СОТРУДНИКУ';
+
+  @override
+  String get etfRulebookCreateSectionHeader => 'Как создать фонд';
+
+  @override
+  String get etfRulebookCreateSectionBody =>
+      'Создать фонд может любой пользователь с Premium. Один действующий фонд на человека.\n\n1. Открой «Стать главой фонда» на главном экране и пройди короткое вступление.\n\n2. Придумай название и тикер. Тикер начинается с FS и дальше от одной до пяти заглавных букв — например, FSTECH. Название и тикер должны быть свободны; названия сравниваются без учёта регистра.\n\n3. Опиши фонд: описание, инвестиционная стратегия и хотя бы один сектор. Сектора нужны, чтобы фонд находили на витрине.\n\n4. Укажи стартовый капитал. Это деньги, с которыми фонд начинает работу, и от них считается начальное число паёв.\n\nПосле создания название, описание, стратегию и сектора можно менять в любой момент. Тикер и стартовый капитал изменить нельзя: по тикеру записаны доли инвесторов, а стартовый капитал уже заложен в число выпущенных паёв.';
+
+  @override
+  String get etfRulebookHireSectionHeader => 'Как нанять сотрудника';
+
+  @override
+  String get etfRulebookHireSectionBody =>
+      'В команду фонда можно нанять до пяти человек, не считая главы.\n\n1. Открой биржу сотрудников — там анкеты тех, кто ищет работу.\n\n2. Отправь приглашение: выбери должность и напиши сообщение. Текст сохраняется как шаблон и подставляется в следующие приглашения.\n\n3. Человек получает приглашение и либо принимает его, либо отказывается. Пока он не ответил, приглашение можно отозвать.\n\n4. Повторное приглашение тому же человеку в тот же фонд отправить нельзя, пока первое висит без ответа.\n\nУволить сотрудника можно в любой момент, но не мгновенно: он получает уведомление за пять дней и всё это время продолжает работать. Увольнение можно отменить, пока срок не вышел.';
+
+  @override
+  String get etfRulebookPermissionsSectionHeader => 'Как раздать права';
+
+  @override
+  String get etfRulebookPermissionsSectionBody =>
+      'Должность — это только стартовый набор прав при найме, а не жёсткое ограничение. Реальные права глава выставляет каждому сотруднику отдельно.\n\nПрав четыре:\n\n• предлагать сделки;\n• одобрять и отклонять предложения;\n• отправлять одобренные заявки в рынок;\n• помечать предложение рискованным.\n\nЧтобы изменить их, открой команду фонда и нажми на строку сотрудника. Там же можно сменить должность — но учти: смена должности сбрасывает права к шаблону этой должности, и настраивать их придётся заново. Приложение предупредит об этом перед сменой.\n\nУ главы все права есть всегда и отнять их нельзя.';
+
+  @override
+  String get etfRulebookApplySectionHeader => 'Как устроиться в фонд';
+
+  @override
+  String get etfRulebookApplySectionBody =>
+      'Сотрудником фонда может стать любой пользователь — Premium для этого не нужен.\n\n1. Заполни анкету: имя, о себе, язык и желаемая должность. Отметь, что открыт для предложений, иначе тебя не будет видно на бирже сотрудников.\n\n2. Главы фондов просматривают анкеты и отправляют приглашения.\n\n3. Приглашения приходят в раздел «Вакансии». По нажатию видно, какой фонд зовёт, на какую должность и с каким сообщением. Дальше — «Присоединиться» или «Отказаться».\n\nРаботать одновременно можно больше чем в одном фонде. Каждое место работы попадает в послужной список.';
+
+  @override
+  String get etfRulebookProposeSectionHeader => 'Как предложить сделку';
+
+  @override
+  String get etfRulebookProposeSectionBody =>
+      'Если у тебя есть право предлагать сделки, ты не покупаешь бумаги сам — ты предлагаешь, а решает глава или его зам.\n\n1. Открой раздел торговли в фонде и найди компанию.\n\n2. Укажи направление (купить или продать), количество, тип заявки и цену, если заявка лимитная.\n\n3. Обязательно напиши обоснование — зачем фонду эта сделка. Это главное, что будут читать при решении.\n\n4. Предложение попадает в блотер фонда со статусом «на рассмотрении».\n\nДальше возможны четыре исхода: одобрено, отклонено, отправлено на доработку или помечено как рискованное. Одобренную заявку отправляет в рынок тот, у кого есть на это право.\n\nДеньги на сделку берутся из кассы фонда, а не из твоего личного портфеля. С каждой сделки фонда удерживается брокерская комиссия 0,5%.';
+
+  @override
+  String get etfRulebookLeaveSectionHeader => 'Как уйти из фонда';
+
+  @override
+  String get etfRulebookLeaveSectionBody =>
+      'Уйти можно в любой момент и без предупреждения — открой место работы в послужном списке и выбери уход.\n\nЭто отличается от увольнения: когда уходит сотрудник, это происходит сразу; когда увольняет глава, сначала идёт пятидневное уведомление.\n\nВ послужном списке место работы остаётся навсегда и закрывается с причиной — ушёл сам, уволен или фонд закрылся. Стереть или переписать эту запись нельзя: это и есть твоя репутация, которую видят главы фондов.';
+
+  @override
+  String get etfRulebookCareerSectionHeader => 'Послужной список';
+
+  @override
+  String get etfRulebookCareerSectionBody =>
+      'Каждое место работы в фонде записывается: какой фонд, на какой должности, с какого числа, по какое и чем закончилось.\n\nСрок работы и причина ухода видны в карточке. Причин ухода три:\n\n• ушёл сам — уволился по своей воле;\n• уволен — глава прекратил сотрудничество;\n• фонд закрылся — фонд перестал существовать, пока ты в нём работал. Это не увольнение и не твоя вина.\n\nПока ты работаешь, место отмечено как действующее.\n\nПослужной список нельзя изменить вручную — он заполняется сам по реальным событиям.';
+
+  @override
+  String get etfRulebookSuccessionSectionHeader => 'Если глава пропал';
+
+  @override
+  String get etfRulebookSuccessionSectionBody =>
+      'Фонд не остаётся без управления. Если глава перестал заходить в приложение, фонд предлагают его сотрудникам.\n\n1. Без Premium у главы есть примерно два месяца. С действующим Premium — около полугода: поводок длиннее, но не бесконечный.\n\n2. Первое слово за замом: несколько первых дней предложение видит только он. Не взял — открывается всем сотрудникам с Premium.\n\n3. Согласие — это заявка, а не мгновенное назначение. Исключение — зам в свои дни: он забирает фонд сразу. Всего у команды 14 дней.\n\n4. Когда срок выйдет, фонд достаётся тому из согласившихся, кто дольше всех работает в команде.\n\n5. Если глава зайдёт в приложение раньше срока, предложение отменяется и фонд остаётся за ним.\n\n6. Если не согласится никто, фонд закрывается по правилам выше.\n\nКасса и активы принадлежат фонду, а не человеку — новый глава получает их целиком и не начинает с нуля.';
+
+  @override
+  String get etfSuccessionCardSubtitle =>
+      'Глава фонда пропал — команде предложено взять управление на себя.';
+
+  @override
+  String etfSuccessionDaysLeft(int days) {
+    return 'Осталось дней: $days';
+  }
+
+  @override
+  String get etfSuccessionAppliedPill => 'Заявка подана';
+
+  @override
+  String get etfSuccessionSheetIntro =>
+      'Глава этого фонда давно не появляется, поэтому фонд предлагают команде.';
+
+  @override
+  String get etfSuccessionRuleDeputyFirst =>
+      'Первое слово за замом. Несколько первых дней предложение видит только он; если не берёт — открывается остальной команде.';
+
+  @override
+  String get etfSuccessionErrorDeputyFirst =>
+      'Пока первое слово за замом фонда. Если он откажется, предложение откроется всей команде.';
+
+  @override
+  String get etfSuccessionBecameHeadSnackbar => 'Теперь ты глава этого фонда';
+
+  @override
+  String get etfSuccessionRuleEnterRunning =>
+      'Согласие ставит тебя в очередь — главой ты становишься не сразу.';
+
+  @override
+  String get etfSuccessionRuleSeniorityWins =>
+      'В день решения фонд достаётся тому из согласившихся, кто дольше всех работает в команде, — при этом зам всё равно идёт впереди всех.';
+
+  @override
+  String get etfSuccessionRuleHeadMayReturn =>
+      'Если глава зайдёт в приложение до этой даты, предложение отменяется и фонд остаётся за ним.';
+
+  @override
+  String get etfSuccessionRuleNobodyAccepts =>
+      'Если не согласится никто, фонд ликвидируется: активы распродаются, инвесторам выплачивают деньги.';
+
+  @override
+  String get etfSuccessionRuleMoneyStays =>
+      'Касса и активы остаются у фонда — новый глава получает их, а не пустой счёт.';
+
+  @override
+  String get etfSuccessionDeadlineLabel => 'Дата решения';
+
+  @override
+  String get etfSuccessionAcceptButton => 'Подать заявку на управление';
+
+  @override
+  String get etfSuccessionPremiumRequiredButton => 'Нужен Premium';
+
+  @override
+  String get etfSuccessionAlreadyAppliedBody =>
+      'Заявка подана. В день решения фонд достанется тому, кто дольше всех в команде.';
+
+  @override
+  String get etfSuccessionAcceptedSnackbar => 'Заявка подана';
+
+  @override
+  String get etfSuccessionErrorClosed => 'Это предложение уже закрыто';
+
+  @override
+  String get etfSuccessionErrorNotEligible =>
+      'Взять фонд может только действующий сотрудник с Premium';
+
+  @override
+  String get etfSuccessionErrorGeneric => 'Не удалось отправить заявку';
+
+  @override
+  String get etfSectorTechnology => 'Технологии';
+
+  @override
+  String get etfSectorHealthcare => 'Здравоохранение';
+
+  @override
+  String get etfSectorFinancials => 'Финансы';
+
+  @override
+  String get etfSectorConsumerDiscretionary => 'Товары вторичной необходимости';
+
+  @override
+  String get etfSectorConsumerStaples => 'Товары первой необходимости';
+
+  @override
+  String get etfSectorEnergy => 'Энергетика';
+
+  @override
+  String get etfSectorIndustrials => 'Промышленность';
+
+  @override
+  String get etfSectorMaterials => 'Материалы';
+
+  @override
+  String get etfSectorUtilities => 'Коммунальные услуги';
+
+  @override
+  String get etfSectorRealEstate => 'Недвижимость';
+
+  @override
+  String get etfSectorCommunicationServices => 'Услуги связи';
 }

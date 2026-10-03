@@ -44,33 +44,43 @@ final sectorAveragePeProvider = FutureProvider<Map<GicsSector, double>>((
 final companyDetailProvider =
     FutureProvider.family<Map<String, dynamic>, String>((ref, symbol) async {
       final cache = ref.read(companyCacheProvider);
-
-      // Check per-ticker cache first (4h TTL)
-      final cached = cache.get(symbol);
-      if (cached != null) return cached;
-
       final api = ref.read(finnhubServiceProvider);
+
+      // Price is fetched fresh on EVERY call, never trapped in the 4h
+      // per-ticker cache below — unlike profile/metrics/score, a quote
+      // has no business sitting still for hours. Without this, a bundled
+      // quote fetched once could stay frozen for up to 4h with no way to
+      // force it live again: `ref.invalidate(companyDetailProvider(...))`
+      // (the pull-to-refresh action) only resets Riverpod's own state, it
+      // never touches this separate manual cache, so a cache HIT below
+      // would just hand back the same stale quote again — confirmed live
+      // 2026-09-16, NVDA stuck showing yesterday's close for hours across
+      // repeated pull-to-refreshes and full screen reopens.
+      final freshQuote = await api.quote(symbol);
+
+      // Check per-ticker cache first (4h TTL) for everything else.
+      final cached = cache.get(symbol);
+      if (cached != null) return {...cached, 'quote': freshQuote};
+
       final scoreCache = ref.read(scoreCacheProvider);
       final metricsCache = ref.read(metricsCacheProvider);
 
       // Check 30-day score cache before full API call (экономия трафика)
       final cachedScore = scoreCache.get(symbol);
       if (cachedScore != null) {
-        // Score актуален — берём только profile + quote (+ metrics, если
-        // не в 30-дневном кэше) — все три запроса независимы друг от
-        // друга, поэтому запускаем параллельно вместо последовательных
+        // Score актуален — берём только profile (+ metrics, если не в
+        // 30-дневном кэше); quote уже получен выше. Оба независимы друг
+        // от друга, поэтому запускаем параллельно вместо последовательных
         // await, чтобы не складывать их сетевые задержки друг на друга.
         final cachedMetrics = metricsCache.get(symbol);
         final results = await Future.wait([
           api.companyProfile(symbol),
-          api.quote(symbol),
           cachedMetrics != null
               ? Future.value(cachedMetrics)
               : api.metrics(symbol).catchError((_) => <String, dynamic>{}),
         ]);
         final profile = results[0];
-        final quote = results[1];
-        final metrics = results[2];
+        final metrics = results[1];
 
         cacheCompanyLogo(ref, symbol, profile);
 
@@ -78,25 +88,25 @@ final companyDetailProvider =
           metricsCache.set(symbol, metrics);
         }
 
-        final data = {
+        final cacheableData = {
           'profile': profile,
-          'quote': quote,
           'metrics': metrics,
           'score': cachedScore,
         };
 
-        // Store in 4h cache
-        cache.set(symbol, Map<String, dynamic>.from(data));
-        return data;
+        // Store in 4h cache (quote excluded — always fetched fresh above)
+        cache.set(symbol, Map<String, dynamic>.from(cacheableData));
+        return {...cacheableData, 'quote': freshQuote};
       }
 
-      // Score кэш пуст — полный запрос к Finnhub. profile/quote/metrics,
+      // Score кэш пуст — полный запрос к Finnhub. profile/metrics,
       // sectorAveragePeProvider (S&P-500 ranking — first-ever call this
       // session, otherwise instant from cache) и 5-летние недельные
-      // candles друг от друга не зависят, поэтому запускаем всё
-      // параллельно вместо пяти последовательных await — раньше их
-      // задержки складывались друг с другом и превращали первое открытие
-      // карточки компании в сессии в ~20-секундную загрузку.
+      // candles друг от друга не зависят, поэтому запускаем их
+      // параллельно вместо последовательных await (quote уже получен
+      // выше) — раньше их задержки складывались друг с другом и
+      // превращали первое открытие карточки компании в сессии в
+      // ~20-секундную загрузку.
       final fiveYearsAgo =
           DateTime.now()
               .subtract(const Duration(days: 1825))
@@ -105,7 +115,6 @@ final companyDetailProvider =
       final nowSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       final profileFuture = api.companyProfile(symbol);
-      final quoteFuture = api.quote(symbol);
       final metricsFuture = api.metrics(symbol);
       final sectorAveragesFuture = ref.watch(sectorAveragePeProvider.future);
       // 5Y weekly price history for the Historical Trend marker's real
@@ -118,7 +127,6 @@ final companyDetailProvider =
           .catchError((_) => <String, dynamic>{});
 
       final profile = await profileFuture;
-      final quote = await quoteFuture;
       final metrics = await metricsFuture;
       final sectorAverages = await sectorAveragesFuture;
       final candleData = await candlesFuture;
@@ -158,17 +166,16 @@ final companyDetailProvider =
       // Сохранить сырые метрики в 30-дневный кэш
       metricsCache.set(symbol, Map<String, dynamic>.from(metrics));
 
-      final data = {
+      final cacheableData = {
         'profile': profile,
-        'quote': quote,
         'metrics': metrics,
         'score': score,
       };
 
-      // Store in per-ticker cache (4h)
-      cache.set(symbol, Map<String, dynamic>.from(data));
+      // Store in per-ticker cache (4h) — quote excluded, always fresh above
+      cache.set(symbol, Map<String, dynamic>.from(cacheableData));
 
-      return data;
+      return {...cacheableData, 'quote': freshQuote};
     });
 
 /// Price at the point the user is currently dragging on `PriceChart`, or

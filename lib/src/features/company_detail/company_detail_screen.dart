@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../core/cache/logo_providers.dart';
+import '../../core/cache/security_type_cache.dart';
+import '../../shared/services/finnhub_service.dart' show isEtfSecurityType;
 import '../../core/cache/sector_providers.dart';
 import '../../core/theme/theme_v2.dart';
 import '../../core/theme/app_palette.dart';
@@ -35,6 +37,7 @@ import '../../core/ads/ad_service.dart';
 import '../../core/ads/ad_failure_notice.dart';
 import '../../core/ads/ad_loading_overlay.dart';
 import '../search/recently_viewed_provider.dart';
+import '../funds/widgets/fund_position_section.dart';
 
 // ---------------------------------------------------------------------------
 // Screen
@@ -48,11 +51,17 @@ class CompanyDetailScreen extends ConsumerStatefulWidget {
   // (Search, Watchlist, Recently Viewed) — the picker is the right call
   // there since we don't know which portfolio the user means.
   final String? contextPortfolioId;
+  // Set when navigated here from FundManagementScreen's holdings widget
+  // (2026-09-12) — swaps the 'position' widget slot to show the FUND's own
+  // holding instead of the viewer's personal "Мои инвестиции" position.
+  // Two separate sandboxes; never both at once.
+  final FundHoldingContext? fundContext;
 
   const CompanyDetailScreen({
     super.key,
     required this.symbol,
     this.contextPortfolioId,
+    this.fundContext,
   });
 
   @override
@@ -247,6 +256,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
           symbol: widget.symbol,
           data: data,
           contextPortfolioId: widget.contextPortfolioId,
+          fundContext: widget.fundContext,
         ),
       ),
     );
@@ -257,11 +267,13 @@ class _CompanyDetailBody extends ConsumerStatefulWidget {
   final String symbol;
   final Map<String, dynamic> data;
   final String? contextPortfolioId;
+  final FundHoldingContext? fundContext;
 
   const _CompanyDetailBody({
     required this.symbol,
     required this.data,
     this.contextPortfolioId,
+    this.fundContext,
   });
 
   @override
@@ -308,6 +320,19 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
       'companyName': profile['name'] as String? ?? widget.symbol,
       'logo': profile['logo'] as String?,
     };
+  }
+
+  void _openProposeTrade(String side) {
+    final fundContext = widget.fundContext;
+    if (fundContext == null) return;
+    context.push(
+      '/funds/${fundContext.fundId}/propose',
+      extra: {
+        'symbol': widget.symbol,
+        'symbolName': _quoteExtra['companyName'] as String?,
+        'side': side,
+      },
+    );
   }
 
   void _openOrderEntry(String type) {
@@ -588,13 +613,29 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
           ),
         ),
         // --- Sticky Bottom Bar: BUY / SELL ---
-        CompanyBottomBar(
-          price: price,
-          isUp: isUp,
-          onBuy: () => _openOrderEntry('buy'),
-          onSell: () => _openOrderEntry('sell'),
-          palette: palette,
-        ),
+        // In fund context (2026-09-12) this opens Propose Trade with the
+        // symbol prefilled instead of trading into the VIEWER's own
+        // personal portfolio -- that would be exactly the sandbox-mixing
+        // this whole fund/personal split exists to prevent. Relabeled
+        // "Создать ордер на покупку/продажу" so it reads as creating a
+        // proposal, not executing a trade on the spot.
+        widget.fundContext == null
+            ? CompanyBottomBar(
+                price: price,
+                isUp: isUp,
+                onBuy: () => _openOrderEntry('buy'),
+                onSell: () => _openOrderEntry('sell'),
+                palette: palette,
+              )
+            : CompanyBottomBar(
+                price: price,
+                isUp: isUp,
+                buyLabel: l10n.etfProposalCreateBuyOrderButton,
+                sellLabel: l10n.etfProposalCreateSellOrderButton,
+                onBuy: () => _openProposeTrade('buy'),
+                onSell: () => _openProposeTrade('sell'),
+                palette: palette,
+              ),
       ],
     );
   }
@@ -640,6 +681,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                   : l10n.companyDetailChangeLabel,
               fsScore: scoreData['financial_score'] as int?,
               palette: palette,
+              isEtf: isEtfSecurityType(securityTypeCache[symbol]),
             ),
             const SizedBox(height: 16),
           ],
@@ -681,9 +723,19 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
           ],
         );
       case 'position':
+        final fundContext = widget.fundContext;
         return Column(
           children: [
-            PositionSection(symbol: symbol, price: price, palette: palette),
+            fundContext != null
+                ? FundPositionSection(
+                    fundContext: fundContext,
+                    palette: palette,
+                  )
+                : PositionSection(
+                    symbol: symbol,
+                    price: price,
+                    palette: palette,
+                  ),
             const SizedBox(height: 24),
           ],
         );

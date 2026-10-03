@@ -27,6 +27,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
         ref.invalidate(portfolioPerformanceProvider(widget.portfolioId));
         checkPendingOrders(ref);
         checkWeeklyPayout(ref, AppLocalizations.of(context)!);
+        checkFundLiquidationPayouts(ref, AppLocalizations.of(context)!);
       }
     });
     // Also check once right away — deferred to a microtask (not called
@@ -44,6 +45,7 @@ class _PortfolioBodyState extends ConsumerState<_PortfolioBody> {
       if (mounted) {
         checkPendingOrders(ref);
         checkWeeklyPayout(ref, AppLocalizations.of(context)!);
+        checkFundLiquidationPayouts(ref, AppLocalizations.of(context)!);
       }
     });
   }

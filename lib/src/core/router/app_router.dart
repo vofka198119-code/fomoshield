@@ -23,6 +23,7 @@ import '../../features/home/home_screen.dart';
 import '../../features/home/screens/watchlist_full_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
 import '../../features/notifications/weekly_payout_detail_screen.dart';
+import '../../features/notifications/fund_liquidation_detail_screen.dart';
 import '../models/app_notification.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/search/top_companies_provider.dart';
@@ -39,6 +40,8 @@ import '../../features/profile/theme_picker_screen.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/company_detail/company_detail_screen.dart';
+import '../../features/funds/widgets/fund_position_section.dart'
+    show FundHoldingContext;
 import '../../features/company_detail/widgets/metric_info_screen.dart';
 import '../../features/company_detail/widgets/metric_info_data.dart';
 import '../../features/stress_test/stress_test_setup_screen.dart';
@@ -60,9 +63,35 @@ import '../../features/assets/screens/assets_screen.dart';
 import '../../features/assets/screens/stock_detail_screen.dart';
 import '../../features/assets/screens/why_today_screen.dart';
 import '../../features/assets/screens/order_entry_screen.dart';
+import '../../features/funds/models/fund.dart';
+import '../../features/funds/onboarding/fund_onboarding_providers.dart';
+import '../../features/funds/onboarding/fund_onboarding_screen.dart';
+import '../../features/funds/screens/create_fund_screen.dart';
+import '../../features/funds/screens/employee_marketplace_screen.dart';
+import '../../features/funds/screens/coming_soon_screen.dart';
+import '../../features/funds/screens/employee_hub_screen.dart';
+import '../../features/funds/screens/employee_profile_screen.dart';
+import '../../features/funds/screens/fund_detail_screen.dart';
+import '../../features/funds/screens/fund_management_screen.dart';
+import '../../features/funds/screens/fund_team_screen.dart';
+import '../../features/funds/screens/fund_blotter_screen.dart';
+import '../../features/funds/screens/fund_charts_screen.dart';
+import '../../features/funds/screens/fund_edit_screen.dart';
+import '../../features/funds/screens/fund_investors_screen.dart';
+import '../../features/funds/screens/fund_trade_entry_screen.dart';
+import '../../features/funds/screens/fund_search_screen.dart';
+import '../../features/funds/screens/fund_rulebook_screen.dart';
+import '../../features/funds/screens/proposal_detail_screen.dart';
+import '../../features/funds/models/trade_proposal.dart' show TradeProposal;
+import '../../features/funds/screens/companies_history_screen.dart';
+import '../../features/funds/screens/employment_detail_screen.dart';
+import '../../features/funds/models/employee.dart' show EmploymentRecord;
+import '../../features/funds/screens/my_invitations_screen.dart';
+import '../../features/funds/widgets/fund_list_screen.dart';
 import '../theme/app_palette.dart';
 import '../theme/theme_variant_provider.dart';
-import '../supabase/supabase_providers.dart' show isAdminProvider;
+import '../supabase/supabase_providers.dart'
+    show isAdminProvider, adminEmail;
 import 'navigation_history_provider.dart';
 
 /// Bridges a Stream (Supabase's auth-state stream) into a [Listenable] so
@@ -123,6 +152,16 @@ class AppRouter {
       // password.
       if (isInPasswordRecovery && state.matchedLocation != '/reset-password') {
         return '/reset-password';
+      }
+      // The Funds module is admin-only for now (see funds_visibility.dart,
+      // which gates the Home card and Search's lane the same way). Guarding
+      // the routes too means a bookmark, a notification tap or a stale deep
+      // link can't walk straight past the hidden UI into a half-tested
+      // feature. Same synchronous email check isAdminProvider makes, so no
+      // provider plumbing is needed inside this static redirect.
+      if (state.matchedLocation.startsWith('/funds') &&
+          SupabaseConfig.client.auth.currentUser?.email != adminEmail) {
+        return '/home';
       }
       if (_authExemptPaths.contains(state.matchedLocation)) return null;
       final hasSession = SupabaseConfig.client.auth.currentSession != null;
@@ -222,9 +261,20 @@ class AppRouter {
         builder: (context, state) {
           final symbol = state.pathParameters['symbol'] ?? '';
           final extra = state.extra as Map<String, dynamic>?;
+          final fc = extra?['fundContext'] as Map<String, dynamic>?;
           return CompanyDetailScreen(
             symbol: symbol.toUpperCase(),
             contextPortfolioId: extra?['portfolioId'] as String?,
+            fundContext: fc == null
+                ? null
+                : FundHoldingContext(
+                    fundId: fc['fundId'] as String,
+                    fundName: fc['fundName'] as String,
+                    quantity: (fc['quantity'] as num).toDouble(),
+                    price: (fc['price'] as num).toDouble(),
+                    value: (fc['value'] as num).toDouble(),
+                    percentOfFund: (fc['percentOfFund'] as num).toDouble(),
+                  ),
           );
         },
       ),
@@ -266,6 +316,13 @@ class AppRouter {
         path: '/notifications/weekly-payout-detail',
         name: 'weeklyPayoutDetail',
         builder: (context, state) => WeeklyPayoutDetailScreen(
+          notification: state.extra as AppNotification?,
+        ),
+      ),
+      GoRoute(
+        path: '/notifications/fund-liquidation-detail',
+        name: 'fundLiquidationDetail',
+        builder: (context, state) => FundLiquidationDetailScreen(
           notification: state.extra as AppNotification?,
         ),
       ),
@@ -470,7 +527,197 @@ class AppRouter {
             initialPrice: (extra['price'] as num?)?.toDouble(),
             companyName: extra['companyName'] as String?,
             logo: extra['logo'] as String?,
+            fundId: extra['fundId'] as String?,
           );
+        },
+      ),
+      GoRoute(
+        path: '/funds/onboarding',
+        name: 'fundOnboarding',
+        builder: (context, state) {
+          final branch =
+              state.extra as FundOnboardingBranch? ?? FundOnboardingBranch.head;
+          return FundOnboardingScreen(branch: branch);
+        },
+      ),
+      GoRoute(
+        path: '/funds/create',
+        name: 'fundCreate',
+        builder: (context, state) => const CreateFundScreen(),
+      ),
+      // Funds browse lane "see all" — same real-pushed-route + extra Map
+      // pattern as '/search/company-list' (see its own doc comment on this
+      // route list for why extra doesn't survive a killed-process restore).
+      // Registered before '/funds/:id' so this literal path wins the match.
+      GoRoute(
+        path: '/funds/list',
+        name: 'fundsList',
+        redirect: (context, state) =>
+            state.extra is Map<String, dynamic> ? null : '/search',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return FundListScreen(
+            title: extra['title'] as String,
+            funds: extra['funds'] as List<Fund>,
+            onTapFund: extra['onTapFund'] as void Function(Fund),
+          );
+        },
+      ),
+      // Phase 3 — registered before '/funds/:id' so these literal paths
+      // win the match, same reasoning as '/funds/list' above.
+      GoRoute(
+        path: '/funds/employee-hub',
+        name: 'employeeHub',
+        builder: (context, state) => const EmployeeHubScreen(),
+      ),
+      GoRoute(
+        path: '/funds/employee-profile',
+        name: 'employeeProfile',
+        builder: (context, state) => const EmployeeProfileScreen(),
+      ),
+      GoRoute(
+        path: '/funds/invitations',
+        name: 'myInvitations',
+        builder: (context, state) => const MyInvitationsScreen(),
+      ),
+      GoRoute(
+        path: '/funds/vacancies',
+        name: 'vacancies',
+        builder: (context, state) => ComingSoonScreen(
+          title: AppLocalizations.of(context)!.etfHomeCardTitleVacancies,
+          icon: Icons.work_outline_rounded,
+        ),
+      ),
+      GoRoute(
+        path: '/funds/my-applications',
+        name: 'myApplications',
+        builder: (context, state) => ComingSoonScreen(
+          title: AppLocalizations.of(context)!.etfEmployeeHubApplicationsRow,
+          icon: Icons.assignment_outlined,
+        ),
+      ),
+      // Registered before '/funds/:id' so these literal paths win the
+      // match, same reasoning as '/funds/list' etc. above.
+      GoRoute(
+        path: '/funds/employment-history',
+        name: 'employmentHistory',
+        builder: (context, state) => const CompaniesHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/funds/employment-history/detail',
+        name: 'employmentDetail',
+        builder: (context, state) {
+          final record = state.extra as EmploymentRecord;
+          return EmploymentDetailScreen(record: record);
+        },
+      ),
+      GoRoute(
+        path: '/funds/rulebook',
+        name: 'fundRulebook',
+        builder: (context, state) => const FundRulebookScreen(),
+      ),
+      GoRoute(
+        path: '/funds/:id',
+        name: 'fundDetail',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundDetailScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/marketplace',
+        name: 'employeeMarketplace',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return EmployeeMarketplaceScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/manage',
+        name: 'fundManagement',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundManagementScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/team',
+        name: 'fundTeam',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundTeamScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/blotter',
+        name: 'fundBlotter',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundBlotterScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/investors',
+        name: 'fundInvestors',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundInvestorsScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/edit',
+        name: 'fundEdit',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundEditScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/charts',
+        name: 'fundCharts',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundChartsScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/search',
+        name: 'fundSearch',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extra = state.extra as Map<String, dynamic>?;
+          return FundSearchScreen(
+            fundId: id,
+            fundName: extra?['fundName'] as String? ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/propose',
+        name: 'proposeTrade',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final extra = state.extra as Map<String, dynamic>?;
+          // Only reachable from a specific company's Buy/Sell (Company
+          // Detail in fund context) -- symbol is always resolved by the
+          // time this route is pushed (see FundSearchScreen -> fund-context
+          // Company Detail -> here, and the Blotter's old symbol-less "+"
+          // entry point, removed 2026-09-15 now that this search-first flow
+          // replaces it).
+          return FundTradeEntryScreen(
+            fundId: id,
+            symbol: extra?['symbol'] as String? ?? '',
+            companyName: extra?['symbolName'] as String?,
+            initialSide: extra?['side'] as String? ?? 'buy',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/proposals/detail',
+        name: 'proposalDetail',
+        builder: (context, state) {
+          final proposal = state.extra as TradeProposal;
+          return ProposalDetailScreen(proposal: proposal);
         },
       ),
       GoRoute(

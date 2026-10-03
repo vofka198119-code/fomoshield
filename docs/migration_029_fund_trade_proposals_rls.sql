@@ -1,0 +1,35 @@
+-- =============================================================================
+-- F.O.M.O. Shield — Supabase Migration 029  (APPLIED 2026-09-28)
+-- Table: fund_trade_proposals
+-- Description: Closes a hole found during the 2026-09-28 grants audit.
+--              Migration 020 created this table without ever enabling row
+--              level security — it is the only table in the project missing
+--              it. Combined with the Data API grants every table carries
+--              (anon/authenticated/service_role), that means any client
+--              holding the publishable key can read and write fund trade
+--              proposals directly: forge a proposal, approve their own,
+--              clear another fund's flagged_risky — every role check in
+--              fundTradeService.js bypassed by going straight to PostgREST.
+--
+--              Enabling RLS with no policies is the safe fix here, and it is
+--              the same shape subscription_purchases already uses. Verified
+--              before writing this: the Flutter app never queries the table
+--              (`grep -rn fund_trade_proposals lib` finds only a comment in
+--              models/trade_proposal.dart), the only readers and writers are
+--              scanco-backend's fundService.js and fundTradeService.js, and
+--              those run as service_role, which bypasses RLS. So the feature
+--              keeps working unchanged and the direct client path closes.
+--
+--              Applied 2026-09-28 via the Supabase SQL Editor and confirmed:
+--              `select relrowsecurity from pg_class where relname =
+--              'fund_trade_proposals'` returns true. There is only the one
+--              Supabase project (zbtcpgbelupoybgrwuub / FomoSheild / main),
+--              so there was nowhere else to apply it.
+-- =============================================================================
+ALTER TABLE public.fund_trade_proposals ENABLE ROW LEVEL SECURITY;
+
+-- Deliberately no policies: nothing but service_role should ever touch this
+-- table. If a future phase lets the app read proposals directly, add the
+-- policies HERE rather than turning RLS back off.
+
+-- Grants are unchanged from Migration 020 — RLS is what restricts now.

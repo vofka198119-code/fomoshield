@@ -39,6 +39,7 @@ import '../portfolio_limits_provider.dart';
 import '../portfolio_providers.dart';
 import '../../orders/order_model.dart' as orders;
 import '../../orders/order_provider.dart';
+import '../../funds/providers/fund_providers.dart';
 import 'order_entry/order_header.dart';
 import 'order_entry/order_amount_section.dart';
 import 'order_entry/order_config_section.dart';
@@ -69,6 +70,13 @@ class PortfolioOrderEntryScreen extends ConsumerStatefulWidget {
   final double? initialPrice;
   final String? companyName;
   final String? logo;
+  // Non-null when this order is for fund units, not a real stock — see
+  // FundDetailScreen's buy/sell buttons. Routes execution through
+  // FundApiService.subscribe/redeem (which settles the fund's own cash/
+  // units_outstanding ledger) instead of Portfolio's plain client-side
+  // Transaction log, and forces Market-only (NAV is computed on-demand,
+  // not ticking, so a Limit order against it wouldn't mean anything).
+  final String? fundId;
 
   const PortfolioOrderEntryScreen({
     super.key,
@@ -78,6 +86,7 @@ class PortfolioOrderEntryScreen extends ConsumerStatefulWidget {
     this.initialPrice,
     this.companyName,
     this.logo,
+    this.fundId,
   });
 
   @override
@@ -370,8 +379,12 @@ class _PortfolioOrderEntryScreenState
       // Mirrors _fillOrder's own fee stamp (order_execution_service.dart)
       // — without this margin, an order sized for exactly 100% of
       // available cash would pass this check but then push cash negative
-      // once the commission comes out on fill.
-      final orderCostWithFee = orderCost * (1 + brokerCommissionRate);
+      // once the commission comes out on fill. Fund unit trades carry no
+      // commission (see the `applyCommission` note on _submitOrder below),
+      // so no margin is needed there.
+      final orderCostWithFee = widget.fundId == null
+          ? orderCost * (1 + brokerCommissionRate)
+          : orderCost;
       if (orderCostWithFee > _availableCash + 0.01) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -421,7 +434,9 @@ class _PortfolioOrderEntryScreenState
     }
 
     final orderPrice = limitPrice ?? _currentPrice;
-    final orderFee = shares * orderPrice * brokerCommissionRate;
+    final orderFee = widget.fundId == null
+        ? shares * orderPrice * brokerCommissionRate
+        : 0.0;
     final confirmed = await showOrderConfirmationSheet(
       context: context,
       palette: resolveAppPalette(ref.read(themeVariantProvider)),
@@ -446,12 +461,11 @@ class _PortfolioOrderEntryScreenState
     }
     if (!mounted) return;
 
-    _executeOrder(
+    await _executeOrder(
       orderType: orderType,
       session: session,
       side: side,
       shares: shares,
-      amount: amount,
       limitPrice: limitPrice,
     );
   }
@@ -509,16 +523,70 @@ class _PortfolioOrderEntryScreenState
     }
   }
 
-  /// Central order execution logic (called directly or after confirmation)
-  void _executeOrder({
+  /// Central order execution logic (called directly or after confirmation).
+  /// For a fund order (widget.fundId != null), this first settles the
+  /// fund's own side of the ledger via FundApiService.subscribe/redeem —
+  /// that call is the authoritative source of the actual fill (units for a
+  /// buy, NAV for either side), since Fund state is server-authoritative
+  /// unlike the rest of Portfolio. The locally-computed [shares]/
+  /// [_currentPrice] are only ever a same-order-of-magnitude estimate used
+  /// for the confirmation sheet and cash/shares limit checks above.
+  Future<void> _executeOrder({
     required orders.OrderType orderType,
     required orders.MarketSession session,
     required orders.OrderSide side,
     required double shares,
-    required double amount,
     double? limitPrice,
-  }) {
+  }) async {
     final l10n = AppLocalizations.of(context)!;
+
+    double executionShares = shares;
+    double executionPrice = _currentPrice;
+
+    if (widget.fundId != null) {
+      try {
+        if (_isBuy) {
+          // NOT the raw [amount] param -- in shares-input mode that's a
+          // share COUNT, not a dollar figure (see _submitOrder: `shares =
+          // amount` when not in cost mode), and subscribe() only ever
+          // takes a $ amount. Passing it straight through silently bought
+          // far fewer units than typed (confirmed live 2026-09-15: typed
+          // "56" meaning 56 units, subscribe() received $56, bought 5.6).
+          // [shares] is already correctly resolved for either input mode,
+          // so re-deriving the dollar cost from it here is always right;
+          // fund subscribe has no limit-price concept, so this is always
+          // priced off the live [_currentPrice], not [limitPrice].
+          final result = await ref
+              .read(fundApiServiceProvider)
+              .subscribe(widget.fundId!, shares * _currentPrice);
+          executionShares = result.unitsIssued;
+          executionPrice = result.navPerUnit;
+        } else {
+          final result = await ref
+              .read(fundApiServiceProvider)
+              .redeem(widget.fundId!, shares);
+          executionPrice = result.navPerUnit;
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.toString())));
+        }
+        return;
+      }
+      if (!mounted) return;
+      // subscribe/redeem move the fund's own cash/units/NAV and the
+      // investor ledger server-side -- without this, Fund Detail/
+      // Management/Investors/Charts kept showing pre-trade data until the
+      // user left and re-opened those screens (same staleness bug already
+      // fixed for trade-proposal approve/execute, 2026-09-14).
+      ref.invalidate(fundDetailProvider(widget.fundId!));
+      ref.invalidate(fundInvestorsProvider(widget.fundId!));
+      ref.invalidate(fundInvestorFlowsProvider);
+      ref.invalidate(fundBalanceHistoryProvider);
+    }
+
     final order = ref
         .read(ordersProvider.notifier)
         .placeOrder(
@@ -527,11 +595,16 @@ class _PortfolioOrderEntryScreenState
           companyName: widget.companyName ?? widget.symbol,
           side: side,
           type: orderType,
-          quantity: shares,
-          createdPrice: _currentPrice,
+          quantity: executionShares,
+          createdPrice: executionPrice,
           limitPrice: limitPrice,
           stopPrice: null,
           session: session,
+          // Fund subscribe/redeem already settled server-side at full NAV,
+          // no fee either way (see FundApiService.subscribe/redeem above) —
+          // this generic engine must not tack its own 0.5% onto a fund
+          // unit trade on top of that.
+          applyCommission: widget.fundId == null,
         );
 
     if (mounted) {
@@ -560,9 +633,9 @@ class _PortfolioOrderEntryScreenState
                 ? l10n.orderEntryNotifYouBought
                 : l10n.orderEntryNotifYouSold,
             detail: l10n.orderEntryNotifFilledDetail(
-              shares.toStringAsFixed(4),
+              executionShares.toStringAsFixed(4),
               companyName,
-              formatUsd(_currentPrice),
+              formatUsd(executionPrice),
             ),
             createdAt: DateTime.now(),
             // Market buy/sell fires and resolves instantly — the user
@@ -739,11 +812,12 @@ class _PortfolioOrderEntryScreenState
               price: _currentPrice,
               palette: palette,
             ),
-            OrderTypeTabs(
-              isLimit: _selectedOrderType == _OrderType.limit,
-              onChanged: _onOrderTypeChanged,
-              palette: palette,
-            ),
+            if (widget.fundId == null)
+              OrderTypeTabs(
+                isLimit: _selectedOrderType == _OrderType.limit,
+                onChanged: _onOrderTypeChanged,
+                palette: palette,
+              ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.only(bottom: 100),
@@ -764,7 +838,8 @@ class _PortfolioOrderEntryScreenState
                           setState(() => _activeKeypad = _ActiveKeypad.amount),
                       palette: palette,
                     ),
-                    _commissionNotice(l10n, palette, displayAmount),
+                    if (widget.fundId == null)
+                      _commissionNotice(l10n, palette, displayAmount),
                     OrderConfigSection(
                       isLimit: _selectedOrderType == _OrderType.limit,
                       limitPriceController: _limitPriceController,

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
@@ -281,18 +280,12 @@ final isSetupCompleteProvider = FutureProvider<bool>((ref) async {
 // Global account nickname (Migration 017) — one persistent handle per user,
 // chosen once via ChooseNicknameScreen and never editable after. Stored on
 // public.users so it survives a reinstall (unlike anything in
-// SharedPreferences).
+// SharedPreferences) — see that screen's own doc comment for the full flow.
 // ---------------------------------------------------------------------------
 
 /// The current user's chosen nickname, or null if they haven't set one yet.
 final myNicknameProvider = FutureProvider<String?>((ref) async {
   final user = SupabaseConfig.client.auth.currentUser;
-  // TEMP DEBUG 2026-09-20 — chasing a cross-account nickname leak on rapid
-  // sign-out/sign-in switches (see mac_migration_gotchas memory). Remove
-  // once confirmed fixed.
-  debugPrint(
-    '👤 myNicknameProvider: currentUser.id=${user?.id} email=${user?.email}',
-  );
   if (user == null) return null;
 
   final response = await SupabaseConfig.client
@@ -300,9 +293,6 @@ final myNicknameProvider = FutureProvider<String?>((ref) async {
       .select('nickname')
       .eq('id', user.id)
       .maybeSingle();
-  debugPrint(
-    '👤 myNicknameProvider: fetched nickname=${response?['nickname']} for id=${user.id}',
-  );
   return response?['nickname'] as String?;
 });
 

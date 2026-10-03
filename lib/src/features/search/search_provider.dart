@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/services/finnhub_service.dart';
+import '../../core/cache/security_type_cache.dart';
 
 // ---------------------------------------------------------------------------
 // Search Provider with 500ms Debounce
@@ -86,6 +87,11 @@ class SearchNotifier extends ChangeNotifier {
       results = newResults;
       errorType = newError;
       isLoading = false;
+      for (final r in newResults) {
+        final sym = r['symbol'] as String?;
+        final type = r['type'] as String?;
+        if (sym != null && type != null) securityTypeCache[sym] = type;
+      }
       notifyListeners();
     });
   }
