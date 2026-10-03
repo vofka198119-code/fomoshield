@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../shared/widgets/disclaimer_style.dart';
 import '../../../core/theme/theme_variant_provider.dart';

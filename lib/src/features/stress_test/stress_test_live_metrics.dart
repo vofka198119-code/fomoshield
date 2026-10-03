@@ -36,9 +36,8 @@ Map<String, dynamic> liveKeyMetrics(StressTestHolding holding, double currentPri
 
   return {
     'metric': {
-      if (livePe != null) 'peTTM': livePe,
-      if (liveDividendYield != null)
-        'dividendYieldIndicatedAnnual': liveDividendYield,
+      'peTTM': ?livePe,
+      'dividendYieldIndicatedAnnual': ?liveDividendYield,
       if (holding.entryNetMargin != null)
         'netProfitMarginTTM': holding.entryNetMargin,
       if (holding.entryOpMargin != null)

@@ -282,7 +282,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                ExchangeBadge(symbol: symbol, type: type),
+                                ExchangeBadge(
+                                  symbol: symbol,
+                                  type: type,
+                                  palette: palette,
+                                ),
                               ],
                             ),
                             subtitle: Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../shared/services/finnhub_service.dart' show isEtfSecurityType;
 
@@ -11,7 +12,19 @@ class ExchangeBadge extends StatelessWidget {
   final String symbol;
   final String type;
 
-  const ExchangeBadge({super.key, required this.symbol, required this.type});
+  /// Needed for the fallback-exchange badge only. The US/London/ETF badges
+  /// are saturated colors that read on any backdrop; the fallback used
+  /// ThemeV2.textSecondary, which is near-black and disappeared completely
+  /// on the dark themes (Black & White's lower gradient, Graphite, Luxury
+  /// Gold) — Search is one of the two screens where that was reported.
+  final AppPalette palette;
+
+  const ExchangeBadge({
+    super.key,
+    required this.symbol,
+    required this.type,
+    required this.palette,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +42,7 @@ class ExchangeBadge extends StatelessWidget {
               ? ThemeV2.primary
               : exchange == 'L'
               ? const Color(0xFF9B59B6)
-              : ThemeV2.textSecondary,
+              : palette.textBody,
         ),
         if (isEtf) ...[
           const SizedBox(width: 4),
