@@ -31,6 +31,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   // ── Rate Limiting (brute-force protection) ──────────────────────
   int _failedAttempts = 0;
   DateTime? _blockedUntil;
+  Timer? _blockTimer;
 
   AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
@@ -51,7 +52,47 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       final level = (_failedAttempts - 3) % durations.length;
       final seconds = durations[level];
       _blockedUntil = DateTime.now().add(Duration(seconds: seconds));
+      _startBlockCountdown();
     }
+  }
+
+  // The lockout is time-based, so the screen has to tick for it. Without
+  // this it didn't: "retry in 29 sec" froze at the number it was built
+  // with, and — the part that actually traps someone — the Sign In button
+  // stayed disabled long after the block had expired, because nothing ever
+  // rebuilt the screen to re-evaluate [_isBlocked]. The only way out was to
+  // leave the screen and come back. Found on device 2026-10-05 while the
+  // author was locked out of his own account.
+  //
+  // Same treatment [_startCooldownFromMessage] already gave Supabase's
+  // resend limit a few lines below — that one was written with a ticker
+  // from the start; this one was not.
+  void _startBlockCountdown() {
+    _blockTimer?.cancel();
+    _blockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (!_isBlocked) {
+        timer.cancel();
+        setState(() {
+          _blockedUntil = null;
+          // Only clear the line this countdown owns — a Supabase cooldown
+          // may be running its own message at the same time.
+          if (_cooldownSecondsLeft == null) _errorText = null;
+        });
+        return;
+      }
+      setState(() => _errorText = _blockRemaining);
+    });
+  }
+
+  void _clearBlock() {
+    _blockTimer?.cancel();
+    _blockTimer = null;
+    _failedAttempts = 0;
+    _blockedUntil = null;
   }
 
   // ── Email resend cooldown (Supabase anti-abuse limit) ────────────
@@ -108,6 +149,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _cooldownTimer?.cancel();
+    _blockTimer?.cancel();
     super.dispose();
   }
 
@@ -139,8 +181,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           password: password,
         );
         // Success → reset failed attempts counter
-        _failedAttempts = 0;
-        _blockedUntil = null;
+        _clearBlock();
       } else {
         // ── Sign Up — check for duplicate email first ────────────
         // Try signing in first — if it succeeds, email is already taken
@@ -195,8 +236,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         }
 
         // Sign up success → reset failed attempts
-        _failedAttempts = 0;
-        _blockedUntil = null;
+        _clearBlock();
       }
 
       if (!mounted) return;
