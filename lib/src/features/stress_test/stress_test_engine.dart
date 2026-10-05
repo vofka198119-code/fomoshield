@@ -359,6 +359,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       _verdictArchive = rawArchive
           .map((e) => VerdictArchiveEntry.fromJson(e as Map<String, dynamic>))
           .toList();
+      _archiveChanged();
       _save();
     } catch (e) {
       debugPrint('🔄 StressTestNotifier.loadVerdictArchiveFromSupabase failed: $e');
@@ -483,6 +484,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
       } catch (_) {
         _verdictArchive = [];
       }
+      _archiveChanged();
     }
   }
 
@@ -825,6 +827,17 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// Returns the verdict archive (lightweight completed test records).
   List<VerdictArchiveEntry> get verdictArchive => _verdictArchive;
 
+  /// Fired whenever [_verdictArchive] changes. The archive is a plain field,
+  /// not [state], so nothing about mutating it notifies Riverpod — every
+  /// screen reading [verdictArchiveProvider] would otherwise keep showing
+  /// whatever the archive held the first time that provider was built.
+  /// Wired in the provider below to invalidate it. Found on device
+  /// 2026-10-05: a completed test's verdict sat in Supabase and in memory
+  /// while "Completed simulations" insisted there were none.
+  VoidCallback? onArchiveChanged;
+
+  void _archiveChanged() => onArchiveChanged?.call();
+
   /// Increment the open counter and return true if an ad should be shown
   /// (every Nth opening for free users who are past their first session).
   bool checkAndIncrementOpenCounter() {
@@ -908,6 +921,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     if (state.isEmpty && _testCounter == 0 && _verdictArchive.isEmpty) return;
     state = [];
     _verdictArchive = [];
+    _archiveChanged();
     _testCounter = 0;
     _sessionRandom.clear();
     _save();
@@ -1395,6 +1409,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
     if (_verdictArchive.length > 20) {
       _verdictArchive.removeAt(0);
     }
+    _archiveChanged();
 
     _onNotify?.call(
       AppNotification(
@@ -1744,6 +1759,7 @@ final stressTestProvider =
         supabaseService: supabaseService,
         finnhubService: ref.read(finnhubServiceProvider),
       );
+      notifier.onArchiveChanged = () => ref.invalidate(verdictArchiveProvider);
       notifier.onNotify = (notification) {
         pushAppNotification(
           ref.read(notificationsProvider.notifier),
@@ -1794,8 +1810,19 @@ final timelineSnapshotProvider = Provider.family<TimelineSnapshot?, String>((
 });
 
 /// Verdict archive — lightweight history of completed stress tests.
-final verdictArchiveProvider = Provider<List<VerdictArchiveEntry>>((ref) {
-  final notifier = ref.read(stressTestProvider.notifier);
+// `watch`, not `read` (fixed 2026-10-05): with `read` this provider depended
+// on nothing at all, so it computed once and cached that answer for the life
+// of the app. Two consequences, both seen on device — a verdict restored from
+// Supabase after the first read never appeared ("Completed simulations" said
+// there were none while the row held one), and after an account switch the
+// previous user's archive was still being served, since the rebuilt notifier
+// went unnoticed. Watching the notifier fixes the second; [onArchiveChanged]
+// below fixes the first.
+// The explicit variable type breaks a declaration cycle: stressTestProvider's
+// body now names this provider, and this one names stressTestProvider.
+final Provider<List<VerdictArchiveEntry>>
+verdictArchiveProvider = Provider<List<VerdictArchiveEntry>>((ref) {
+  final notifier = ref.watch(stressTestProvider.notifier);
   return notifier.verdictArchive;
 });
 
