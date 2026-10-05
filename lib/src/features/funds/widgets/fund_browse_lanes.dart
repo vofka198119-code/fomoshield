@@ -27,7 +27,7 @@ import 'fund_mini_card.dart';
 // see that file before starting Phase 2.
 // ---------------------------------------------------------------------------
 
-const _lanePreviewCount = 6;
+const _lanePreviewCount = 4;
 const _seeAllLimit = 30;
 
 class FundBrowseLanes extends StatelessWidget {

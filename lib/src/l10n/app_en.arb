@@ -375,7 +375,7 @@
   "stressTestWidgetTradeHistory": "Trade History",
   "stressTestWidgetLimitOrders": "My Limit Orders",
   "stressTestWidgetTimer": "Timer",
-  "portfolioValueChartTitle": "Portfolio Value",
+  "portfolioValueChartTitle": "PORTFOLIO VALUE",
   "portfolioValueChartCollecting": "The chart starts filling in from today — come back tomorrow for the first line.",
   "portfolioWidgetDisplayNameValueChart": "Portfolio Value Chart",
   "portfolioWidgetDisplayNameTarget": "Target",
@@ -447,6 +447,7 @@
   "commonFailedToLoad": "Failed to load",
   "commonOther": "Other",
   "commonLess": "Less",
+  "commonShowMore": "Show more",
   "commonMore": "More",
   "commonMoreCount": "More ({count})",
   "@commonMoreCount": {

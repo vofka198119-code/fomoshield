@@ -63,7 +63,7 @@ final _persistedSectorOverridesProvider =
 // that records each view.
 // ---------------------------------------------------------------------------
 
-const _lanePreviewCount = 6;
+const _lanePreviewCount = 4;
 
 // The "TOP S&P 500" lane's own "see all" used to hand company_list_sheet
 // all ~500 ranked constituents at once — opening it fired a burst of
@@ -203,11 +203,17 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                   iconMap,
                 ),
                 palette: widget.palette,
-                onSeeAll: () => _openList(
-                  context,
-                  sector.localizedLabel(l10n).toUpperCase(),
-                  bySector[sector]!,
-                ),
+                // Guarded since 2026-10-05: with the lane preview down to
+                // four rows and a visible "Show more" pill, an unguarded
+                // chevron would offer to expand a sector that has nothing
+                // left to expand.
+                onSeeAll: bySector[sector]!.length > _lanePreviewCount
+                    ? () => _openList(
+                        context,
+                        sector.localizedLabel(l10n).toUpperCase(),
+                        bySector[sector]!,
+                      )
+                    : null,
               ),
           if (unclassified.isNotEmpty)
             BrowseLane(
@@ -217,12 +223,14 @@ class _SearchBrowseLanesState extends ConsumerState<SearchBrowseLanes> {
                 iconMap,
               ),
               palette: widget.palette,
-              onSeeAll: () => _openList(
-                context,
-                l10n.searchOtherSector,
-                unclassified,
-                suppressSector: true,
-              ),
+              onSeeAll: unclassified.length > _lanePreviewCount
+                  ? () => _openList(
+                      context,
+                      l10n.searchOtherSector,
+                      unclassified,
+                      suppressSector: true,
+                    )
+                  : null,
             ),
           if (recentlyViewed.isNotEmpty)
             BrowseLane(

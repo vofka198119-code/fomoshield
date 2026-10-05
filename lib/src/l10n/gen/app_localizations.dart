@@ -1486,7 +1486,7 @@ abstract class AppLocalizations {
   /// No description provided for @portfolioValueChartTitle.
   ///
   /// In en, this message translates to:
-  /// **'Portfolio Value'**
+  /// **'PORTFOLIO VALUE'**
   String get portfolioValueChartTitle;
 
   /// No description provided for @portfolioValueChartCollecting.
@@ -1872,6 +1872,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Less'**
   String get commonLess;
+
+  /// No description provided for @commonShowMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get commonShowMore;
 
   /// No description provided for @commonMore.
   ///

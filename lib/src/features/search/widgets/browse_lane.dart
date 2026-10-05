@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
+import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/widgets/more_less_pill.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
@@ -30,9 +32,13 @@ class BrowseLane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final hasSeeAll = onSeeAll != null;
     return CardFrame(
       decoration: FomoShieldTheme.cardDecoration,
-      padding: const EdgeInsets.fromLTRB(0, 14, 0, 16),
+      // The pill carries its own 16pt bottom margin, so the card drops its
+      // own padding there rather than stacking the two into a 32pt gap.
+      padding: EdgeInsets.fromLTRB(0, 14, 0, hasSeeAll ? 0 : 16),
       palette: palette,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,6 +80,12 @@ class BrowseLane extends StatelessWidget {
                   color: Color(0x0F000000),
                 ),
           for (int i = 0; i < items.length; i++) items[i],
+          if (hasSeeAll)
+            MoreLessPill(
+              label: l10n.commonShowMore,
+              onTap: onSeeAll!,
+              palette: palette,
+            ),
         ],
       ),
     );

@@ -780,7 +780,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stressTestWidgetTimer => 'Timer';
 
   @override
-  String get portfolioValueChartTitle => 'Portfolio Value';
+  String get portfolioValueChartTitle => 'PORTFOLIO VALUE';
 
   @override
   String get portfolioValueChartCollecting =>
@@ -987,6 +987,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonLess => 'Less';
+
+  @override
+  String get commonShowMore => 'Show more';
 
   @override
   String get commonMore => 'More';

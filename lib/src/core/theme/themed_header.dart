@@ -33,6 +33,14 @@ Widget themedGoldGradient(Widget child, AppPalette palette) {
   );
 }
 
+/// Card and screen headers are UPPERCASE throughout the app. That was a
+/// convention held by hand until 2026-10-05 — most strings carried the caps
+/// in the .arb itself, five call sites bolted on their own `.toUpperCase()`,
+/// and a new widget (Portfolio's value chart) shipped in sentence case
+/// because nobody remembered. It belongs here instead, so a header is
+/// uppercase by construction and a new one can't quietly break the row.
+/// Call sites that already uppercase their own text are harmless — this is
+/// idempotent — and tickers/symbols passed through are unaffected.
 Widget themedHeaderText(
   String text,
   AppPalette palette,
@@ -42,7 +50,7 @@ Widget themedHeaderText(
 }) {
   return themedGoldGradient(
     Text(
-      text,
+      text.toUpperCase(),
       overflow: overflow,
       maxLines: maxLines,
       style: baseStyle.copyWith(
