@@ -37,6 +37,7 @@ import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/chart_touch.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
 import '../stress_test_engine.dart';
@@ -190,7 +191,7 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
   double? _touchDx;
   int? _touchedSpotIndex;
 
-  static const _revealDelay = Duration(milliseconds: 1200);
+  static const _revealDelay = Duration(milliseconds: 800);
   Timer? _touchHoldTimer;
   bool _touchRevealed = false;
   double? _pendingDx;
@@ -287,7 +288,10 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
             ),
             child: palette.dividerGradient != null
                 ? themedDivider(palette, indent: 0, endIndent: 0)
-                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+                : Divider(
+                    height: 1,
+                    color: Colors.black.withValues(alpha: 0.06),
+                  ),
           ),
           const SizedBox(height: 12),
 
@@ -443,6 +447,12 @@ class _MarketValueChartState extends ConsumerState<MarketValueChart> {
                       ),
                       borderData: FlBorderData(show: false),
                       lineTouchData: LineTouchData(
+                        // Scaled to the gap between points — fl_chart's 10px default
+                        // leaves a sparse chart untouchable. See chartTouchThreshold.
+                        touchSpotThreshold: chartTouchThreshold(
+                          plotWidth,
+                          spots.length,
+                        ),
                         // fl_chart's own tooltip bubble is replaced by a custom
                         // fixed-position one drawn outside the chart below.
                         touchTooltipData: LineTouchTooltipData(

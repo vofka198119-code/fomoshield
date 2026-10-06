@@ -11,6 +11,7 @@ import '../../../../../core/theme/themed_header.dart';
 import '../../../../../core/theme/themed_divider.dart';
 import '../../../../../shared/widgets/card_frame.dart';
 import '../../../../../shared/utils/currency_format.dart';
+import '../../../../../shared/utils/chart_touch.dart';
 import '../../../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../../../../l10n/gen/app_localizations.dart';
 import '../../../../market_clock/market_clock_dial.dart'
@@ -129,7 +130,7 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
   double? _touchDx;
   int? _touchedSpotIndex;
 
-  static const _revealDelay = Duration(milliseconds: 1200);
+  static const _revealDelay = Duration(milliseconds: 800);
   Timer? _touchHoldTimer;
   bool _touchRevealed = false;
   double? _pendingDx;
@@ -220,7 +221,10 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
             ),
             child: palette.dividerGradient != null
                 ? themedDivider(palette, indent: 0, endIndent: 0)
-                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+                : Divider(
+                    height: 1,
+                    color: Colors.black.withValues(alpha: 0.06),
+                  ),
           ),
           const SizedBox(height: 12),
           Padding(
@@ -450,6 +454,12 @@ class _StockSparklineChartState extends State<StockSparklineChart> {
                       ),
                       borderData: FlBorderData(show: false),
                       lineTouchData: LineTouchData(
+                        // Scaled to the gap between points — fl_chart's 10px default
+                        // leaves a sparse chart untouchable. See chartTouchThreshold.
+                        touchSpotThreshold: chartTouchThreshold(
+                          plotWidth,
+                          spots.length,
+                        ),
                         touchTooltipData: LineTouchTooltipData(
                           getTooltipItems: (touchedSpots) =>
                               touchedSpots.map((_) => null).toList(),

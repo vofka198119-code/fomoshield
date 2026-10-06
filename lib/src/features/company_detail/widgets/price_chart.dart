@@ -12,6 +12,7 @@ import '../../../core/theme/themed_divider.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../../shared/utils/currency_format.dart';
+import '../../../shared/utils/chart_touch.dart';
 import '../../../shared/widgets/chart_line_glow_painter.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
@@ -115,12 +116,12 @@ class _PriceChartState extends ConsumerState<PriceChart> {
   double? _touchDx;
   int? _touchedSpotIndex;
 
-  // The indicator/tooltip only appears after a 1.2s hold — an instant
+  // The indicator/tooltip only appears after a short hold — an instant
   // reveal on first touch made quick swipes over the chart (e.g.
   // scrolling the page) feel like the chart was grabbing them. A quick
   // tap/swipe that releases before the hold completes shows nothing at
   // all, same as before this existed.
-  static const _revealDelay = Duration(milliseconds: 1200);
+  static const _revealDelay = Duration(milliseconds: 800);
   Timer? _touchHoldTimer;
   bool _touchRevealed = false;
   double? _pendingDx;
@@ -161,7 +162,9 @@ class _PriceChartState extends ConsumerState<PriceChart> {
       final status = data['s'] as String? ?? '';
       if (status == 'no_data') {
         setState(() {
-          _error = AppLocalizations.of(context)!.companyDetailNoPriceDataAvailable;
+          _error = AppLocalizations.of(
+            context,
+          )!.companyDetailNoPriceDataAvailable;
           _isLoading = false;
         });
         return;
@@ -185,7 +188,10 @@ class _PriceChartState extends ConsumerState<PriceChart> {
         ref.read(chartPeriodChangeProvider(widget.symbol).notifier).state = (
           change: periodChange,
           changePercent: periodChangePercent,
-          periodLabel: _periodLabel(AppLocalizations.of(context)!, _selectedPeriod),
+          periodLabel: _periodLabel(
+            AppLocalizations.of(context)!,
+            _selectedPeriod,
+          ),
         );
       }
     } catch (e) {
@@ -251,7 +257,10 @@ class _PriceChartState extends ConsumerState<PriceChart> {
             ),
             child: widget.palette.dividerGradient != null
                 ? themedDivider(widget.palette, indent: 0, endIndent: 0)
-                : Divider(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+                : Divider(
+                    height: 1,
+                    color: Colors.black.withValues(alpha: 0.06),
+                  ),
           ),
           const SizedBox(height: 12),
 
@@ -450,6 +459,12 @@ class _PriceChartState extends ConsumerState<PriceChart> {
                       ),
                       borderData: FlBorderData(show: false),
                       lineTouchData: LineTouchData(
+                        // Scaled to the gap between points — fl_chart's 10px default
+                        // leaves a sparse chart untouchable. See chartTouchThreshold.
+                        touchSpotThreshold: chartTouchThreshold(
+                          plotWidth,
+                          spots.length,
+                        ),
                         // fl_chart's own tooltip bubble is replaced by a custom
                         // fixed-position one drawn outside the chart (see the
                         // Positioned widget below) — suppress its default content
