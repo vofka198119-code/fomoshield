@@ -275,6 +275,14 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   // project_fomo_shield_premium_subscription_system memory.
   bool _loadedFromSupabase = false;
 
+  /// The same guard for the verdict archive, which [_load] reads on its own
+  /// path (see [_loadArchive]) and so was never covered by the flag above.
+  /// It only started to matter on 2026-10-06, when an empty archive from the
+  /// server became a real instruction to clear rather than something to skip:
+  /// without this, a local read landing afterwards would put the cleared
+  /// verdicts straight back.
+  bool _loadedArchiveFromSupabase = false;
+
   /// Per-session RNG map: sessionId → Random(simulationSeed).
   /// Каждая сессия использует свой изолированный генератор,
   /// что гарантирует детерминизм и отсутствие cross-session утечек.
@@ -333,8 +341,12 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   }
 
   /// Load sessions from Supabase (replaces local). Called on login.
+  ///
+  /// An empty list is applied, not ignored: having no active test is a real
+  /// state (every test finished, or an admin reset), and the caller has
+  /// already established that the server genuinely said so rather than
+  /// failing to answer — see UserDataSnapshot.isAuthoritative.
   void loadFromSupabase(List<dynamic> rawSessions) {
-    if (rawSessions.isEmpty) return;
     _loadedFromSupabase = true;
     try {
       state = rawSessions
@@ -353,8 +365,13 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   /// Load the verdict archive (completed test results) from Supabase —
   /// replaces local, same as loadFromSupabase above. Added 2026-08-06:
   /// the archive used to be local-only, so it never survived a reinstall.
+  ///
+  /// An empty list clears the archive rather than being skipped (2026-10-06).
+  /// Skipping it meant an admin reset could never reach a second install,
+  /// which then pushed its stale verdicts back to the server on its next
+  /// significant action.
   void loadVerdictArchiveFromSupabase(List<dynamic> rawArchive) {
-    if (rawArchive.isEmpty) return;
+    _loadedArchiveFromSupabase = true;
     try {
       _verdictArchive = rawArchive
           .map((e) => VerdictArchiveEntry.fromJson(e as Map<String, dynamic>))
@@ -475,6 +492,7 @@ class StressTestNotifier extends StateNotifier<List<StressTestSession>> {
   }
 
   void _loadArchive(SharedPreferences prefs) {
+    if (_loadedArchiveFromSupabase) return;
     final raw = prefs.getString(_archiveStorageKey);
     if (raw != null) {
       try {

@@ -26,6 +26,63 @@ import '../../features/stress_test/stress_test_funding_sync.dart';
 // On logout: clear all providers
 // ---------------------------------------------------------------------------
 
+/// Stand-in payload for the two answers that carry no information
+/// ([UserDataSource.missing] and [UserDataSource.error]). Nothing should read
+/// it — check [UserDataSnapshot.isAuthoritative] first — but it keeps every
+/// key present so a careless caller gets an empty list rather than a crash.
+const Map<String, dynamic> _noData = {
+  'portfolios': <dynamic>[],
+  'watchlist': <dynamic>[],
+  'widget_order': <dynamic>[],
+  'orders': <dynamic>[],
+  'stress_test_sessions': <dynamic>[],
+  'stress_test_verdicts': <dynamic>[],
+  'stress_test_funding': <String, dynamic>{},
+  'portfolio_value_history': <dynamic>[],
+};
+
+/// Where a [UserDataService.loadAll] answer came from.
+///
+/// These three used to be indistinguishable — every one of them returned the
+/// same empty lists — and two opposite bugs grew out of that (both found
+/// 2026-10-06):
+///
+///  * To keep a failed read from wiping anything, the restore ignored empty
+///    lists. So a deletion made on one install never reached another: an
+///    admin "Reset all stress tests" cleared the server, the other install
+///    kept showing its stale verdicts, and its next significant action
+///    pushed them straight back up, undoing the reset.
+///  * The watchlist was deliberately exempted from that guard so deletions
+///    WOULD propagate — which meant a failed read at sign-in silently
+///    emptied the watchlist instead, locally and then on the server.
+///
+/// Knowing which case we are in fixes both: only [row] is authoritative, and
+/// only then is an empty list a real answer rather than an absence of one.
+enum UserDataSource {
+  /// The user's row was read successfully. Its contents are the truth,
+  /// including the columns that came back empty.
+  row,
+
+  /// No row exists for this user yet. Says nothing about what they have
+  /// locally — a first sign-in must not erase it.
+  missing,
+
+  /// The read failed (offline, timeout, Supabase error). Tells us nothing
+  /// at all; every local provider must be left exactly as it is.
+  error,
+}
+
+class UserDataSnapshot {
+  final UserDataSource source;
+  final Map<String, dynamic> data;
+
+  const UserDataSnapshot(this.source, this.data);
+
+  /// Whether an empty list in [data] means "the user has none of these"
+  /// rather than "we could not find out".
+  bool get isAuthoritative => source == UserDataSource.row;
+}
+
 class UserDataService {
   final SupabaseClient _client;
 
@@ -33,7 +90,7 @@ class UserDataService {
 
   // ── Load all data for a user ──────────────────────────────────────
 
-  Future<Map<String, dynamic>> loadAll(String userId) async {
+  Future<UserDataSnapshot> loadAll(String userId) async {
     try {
       final response = await _client
           .from('user_data')
@@ -44,19 +101,10 @@ class UserDataService {
           .maybeSingle();
 
       if (response == null) {
-        return {
-          'portfolios': [],
-          'watchlist': [],
-          'widget_order': [],
-          'orders': [],
-          'stress_test_sessions': [],
-          'stress_test_verdicts': [],
-          'stress_test_funding': <String, dynamic>{},
-          'portfolio_value_history': [],
-        };
+        return const UserDataSnapshot(UserDataSource.missing, _noData);
       }
 
-      return {
+      return UserDataSnapshot(UserDataSource.row, {
         'portfolios': _decodeJsonList(response['portfolios']),
         'watchlist': _decodeJsonList(response['watchlist']),
         'widget_order': _decodeJsonList(response['widget_order']),
@@ -67,19 +115,10 @@ class UserDataService {
         'portfolio_value_history': _decodeJsonList(
           response['portfolio_value_history'],
         ),
-      };
+      });
     } catch (e) {
       debugPrint('🔄 userDataService.loadAll($userId) failed: $e');
-      return {
-        'portfolios': [],
-        'watchlist': [],
-        'widget_order': [],
-        'orders': [],
-        'stress_test_sessions': [],
-        'stress_test_verdicts': [],
-        'stress_test_funding': <String, dynamic>{},
-        'portfolio_value_history': [],
-      };
+      return const UserDataSnapshot(UserDataSource.error, _noData);
     }
   }
 
@@ -276,7 +315,13 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
   if (user == null) return;
 
   final service = ref.read(userDataServiceProvider);
-  final data = await service.loadAll(user.id);
+  final snapshot = await service.loadAll(user.id);
+  final data = snapshot.data;
+
+  // Nothing below may run unless the row was actually read: a failed request
+  // and a not-yet-created row both arrive as empty lists, and acting on those
+  // would erase whatever the device already holds.
+  if (!snapshot.isAuthoritative) return;
 
   // Load portfolios
   final portfolioList = (data['portfolios'] as List<dynamic>)
@@ -289,7 +334,9 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
   // Load watchlist — including an empty list, so a watchlist genuinely
   // cleared on another device actually propagates here (unlike portfolios/
   // widget order below, an empty watchlist is a normal, reachable user
-  // state, not just "nothing synced yet").
+  // state, not just "nothing synced yet"). Safe to apply an empty list only
+  // because of the isAuthoritative check above — before that existed, a
+  // failed read at sign-in emptied the watchlist for real.
   final watchlist = (data['watchlist'] as List<dynamic>)
       .map((e) => e.toString())
       .toList();
@@ -306,19 +353,17 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
     ref.read(homeWidgetsProvider.notifier).loadFromSupabase(widgetOrder);
   }
 
-  // Load orders
+  // Load orders — empty included: cancelling your last limit order is a
+  // normal state, and it has to be able to reach this device.
   final ordersList = data['orders'] as List<dynamic>? ?? [];
-  if (ordersList.isNotEmpty) {
-    ref.read(ordersProvider.notifier).loadFromSupabase(
-          ordersList.cast<Map<String, dynamic>>(),
-        );
-  }
+  ref.read(ordersProvider.notifier).loadFromSupabase(
+        ordersList.cast<Map<String, dynamic>>(),
+      );
 
-  // Load stress-test sessions
+  // Load stress-test sessions — empty included, same reasoning: finishing or
+  // deleting every test leaves none, and that must propagate.
   final stressTestSessions = data['stress_test_sessions'] as List<dynamic>;
-  if (stressTestSessions.isNotEmpty) {
-    ref.read(stressTestProvider.notifier).loadFromSupabase(stressTestSessions);
-  }
+  ref.read(stressTestProvider.notifier).loadFromSupabase(stressTestSessions);
 
   // Restore the Custom-duration funding flags (weekly top-up / dividends)
   // before anything can credit against them — the stress-test screen's own
@@ -336,11 +381,12 @@ final userDataSyncProvider = FutureProvider<void>((ref) async {
     await applyPortfolioHistoryFromSupabase(user.id, valueHistory);
   }
 
-  // Load stress-test verdict archive
+  // Load stress-test verdict archive — empty included. An admin reset clears
+  // it on the server, and until 2026-10-06 that deletion could never reach a
+  // second install: it kept its stale archive and pushed it back up on the
+  // next trade or test, quietly undoing the reset.
   final stressTestVerdicts = data['stress_test_verdicts'] as List<dynamic>;
-  if (stressTestVerdicts.isNotEmpty) {
-    ref
-        .read(stressTestProvider.notifier)
-        .loadVerdictArchiveFromSupabase(stressTestVerdicts);
-  }
+  ref
+      .read(stressTestProvider.notifier)
+      .loadVerdictArchiveFromSupabase(stressTestVerdicts);
 });
