@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_palette.dart';
@@ -9,6 +10,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/daily_snapshot_chart.dart';
 import '../models/fund.dart';
+import '../providers/fund_chart_hover_provider.dart';
 
 // The fund's whole balance over time, for the management panel — the same
 // number FundBalanceCard shows live, drawn on the same daily points the
@@ -19,7 +21,7 @@ import '../models/fund.dart';
 // Days with no stored balance are skipped rather than drawn as zero: rows
 // written before the server started returning `aum` have none, and a dip to
 // zero would read as the fund having briefly gone broke.
-class FundBalanceHistoryChart extends StatelessWidget {
+class FundBalanceHistoryChart extends ConsumerWidget {
   final FundDetail fund;
   final AppPalette palette;
 
@@ -30,7 +32,7 @@ class FundBalanceHistoryChart extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final points = [
       for (final p in fund.navHistory)
@@ -82,7 +84,17 @@ class FundBalanceHistoryChart extends StatelessWidget {
               ),
             )
           else
-            DailySnapshotChart(palette: palette, points: points),
+            DailySnapshotChart(
+              palette: palette,
+              points: points,
+              // Hand the held day to the BALANCE card above, so the big
+              // number there follows the finger the same way a fund's price
+              // header follows its NAV chart.
+              onHoverChanged: (point, previous) {
+                ref.read(fundBalanceHoverProvider(fund.id).notifier).state =
+                    point == null ? null : (point: point, previous: previous);
+              },
+            ),
         ],
       ),
     );

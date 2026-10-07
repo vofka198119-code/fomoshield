@@ -281,74 +281,86 @@ class _DailySnapshotChartState extends State<DailySnapshotChart> {
             ),
         ];
 
-        return Stack(
-          children: [
-            SizedBox(
-              width: plotWidth,
-              height: _plotHeight,
-              child: Stack(
-                children: [
-                  CustomPaint(
-                    size: Size(plotWidth, _plotHeight),
-                    painter: ChartLineGlowPainter(
-                      pixelPoints: pixelPoints,
-                      color: lineGlowColor,
-                    ),
-                  ),
-                  LineChart(
-                    LineChartData(
-                      minY: chartMinY,
-                      maxY: chartMaxY,
-                      gridData: const FlGridData(show: false),
-                      titlesData: const FlTitlesData(show: false),
-                      borderData: FlBorderData(show: false),
-                      lineTouchData: _touchData(
-                        points,
-                        chartTouchThreshold(plotWidth, spots.length),
+        // The Stack is forced to the FULL width rather than being left to
+        // size itself to the plot: a Stack takes the size of its largest
+        // non-positioned child, so with only the (narrower) plot inside it,
+        // `right: 3` pinned the scale labels to the plot's edge and left the
+        // whole label gutter empty to their right — about 50 logical pixels
+        // of nothing, clearly visible on a fund's balance card (2026-10-07).
+        // PriceChart avoids this by padding its chart instead of shrinking
+        // it; same result, reached the other way round.
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: _plotHeight,
+          child: Stack(
+            children: [
+              SizedBox(
+                width: plotWidth,
+                height: _plotHeight,
+                child: Stack(
+                  children: [
+                    CustomPaint(
+                      size: Size(plotWidth, _plotHeight),
+                      painter: ChartLineGlowPainter(
+                        pixelPoints: pixelPoints,
+                        color: lineGlowColor,
                       ),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: spots,
-                          // Straight segments: each point is a real recorded
-                          // day, and a spline would invent values between them
-                          // that were never measured.
-                          isCurved: false,
-                          color: lineGradient == null ? lineColor : null,
-                          gradient: lineGradient,
-                          barWidth: 2.5,
-                          isStrokeCapRound: true,
-                          // A dot on the last point only — anchors the eye to
-                          // where the line currently ends.
-                          dotData: FlDotData(
-                            show: true,
-                            checkToShowDot: (spot, barData) =>
-                                spot == barData.spots.last,
-                            getDotPainter: (spot, percent, barData, index) =>
-                                FlDotCirclePainter(
-                                  radius: 3,
-                                  color: lineGlowColor,
-                                  strokeWidth: 0,
-                                ),
-                          ),
-                          belowBarData: BarAreaData(
-                            show: areaGradient != null,
-                            gradient: areaGradient,
-                          ),
-                        ),
-                      ],
                     ),
-                    duration: Duration.zero,
-                  ),
-                ],
+                    LineChart(
+                      LineChartData(
+                        minY: chartMinY,
+                        maxY: chartMaxY,
+                        gridData: const FlGridData(show: false),
+                        titlesData: const FlTitlesData(show: false),
+                        borderData: FlBorderData(show: false),
+                        lineTouchData: _touchData(
+                          points,
+                          chartTouchThreshold(plotWidth, spots.length),
+                        ),
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: spots,
+                            // Straight segments: each point is a real recorded
+                            // day, and a spline would invent values between them
+                            // that were never measured.
+                            isCurved: false,
+                            color: lineGradient == null ? lineColor : null,
+                            gradient: lineGradient,
+                            barWidth: 2.5,
+                            isStrokeCapRound: true,
+                            // A dot on the last point only — anchors the eye to
+                            // where the line currently ends.
+                            dotData: FlDotData(
+                              show: true,
+                              checkToShowDot: (spot, barData) =>
+                                  spot == barData.spots.last,
+                              getDotPainter: (spot, percent, barData, index) =>
+                                  FlDotCirclePainter(
+                                    radius: 3,
+                                    color: lineGlowColor,
+                                    strokeWidth: 0,
+                                  ),
+                            ),
+                            belowBarData: BarAreaData(
+                              show: areaGradient != null,
+                              gradient: areaGradient,
+                            ),
+                          ),
+                        ],
+                      ),
+                      duration: Duration.zero,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Positioned(top: 0, right: 3, child: _scaleLabel(maxY)),
-            Positioned(bottom: 0, right: 3, child: _scaleLabel(minY)),
-            if (_touchDx != null &&
-                _touchedIndex != null &&
-                _touchedIndex! < points.length)
-              _tooltip(points[_touchedIndex!], constraints.maxWidth),
-          ],
+              Positioned(top: 0, right: 3, child: _scaleLabel(maxY)),
+              Positioned(bottom: 0, right: 3, child: _scaleLabel(minY)),
+              if (_touchDx != null &&
+                  _touchedIndex != null &&
+                  _touchedIndex! < points.length)
+                _tooltip(points[_touchedIndex!], constraints.maxWidth),
+            ],
+          ),
         );
       },
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -10,6 +11,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/fund.dart';
+import '../providers/fund_chart_hover_provider.dart';
 
 // ---------------------------------------------------------------------------
 // FundBalanceCard — 2026-09-13 redesign: "Доступно" moved out into its own
@@ -26,14 +28,14 @@ import '../models/fund.dart';
 // cost basis yet, not a real gain" guard as FundManagementHoldingsCard's
 // own per-row P&L (a holding bought before Migration 021 reports avgCost 0).
 // ---------------------------------------------------------------------------
-class FundBalanceCard extends StatelessWidget {
+class FundBalanceCard extends ConsumerWidget {
   final FundDetail fund;
   final AppPalette palette;
 
   const FundBalanceCard({super.key, required this.fund, required this.palette});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final priced = fund.holdings.where((h) => h.avgCost > 0);
     final costBasis = priced.fold<double>(0, (s, h) => s + h.costBasis);
@@ -47,12 +49,43 @@ class FundBalanceCard extends StatelessWidget {
         : isPositive
         ? ThemeV2.success
         : ThemeV2.loss;
-    final pnlText = !hasPnl
+    var pnlText = !hasPnl
         ? '—'
         : isZero
         ? formatUsd(0)
         : '${formatUsdSigned(pnl)} '
               '(${isPositive ? '+' : ''}${pnlPercent.toStringAsFixed(2)}%)';
+
+    // While a day is held on the balance chart below, this card shows THAT
+    // day instead of the live total. The second line switches with it: the
+    // live P&L is measured against the holdings' cost basis, which we have
+    // no historical equivalent of, so showing today's P&L under a past
+    // balance would pair two numbers that never belonged together. Day-over
+    // -day change is the honest reading of a point on this series, and it
+    // matches what a fund's price header does on its own chart.
+    final hover = ref.watch(fundBalanceHoverProvider(fund.id));
+    var total = fund.aum;
+    var totalColor = pnlColor;
+    if (hover != null) {
+      total = hover.point.value;
+      final before = hover.previous?.value;
+      if (before == null) {
+        pnlText = '—';
+        totalColor = ThemeV2.textSecondary;
+      } else {
+        final delta = total - before;
+        final deltaPercent = before == 0 ? 0.0 : delta / before * 100;
+        final up = delta >= 0;
+        pnlText =
+            '${formatUsdSigned(delta)} '
+            '(${up ? '+' : ''}${deltaPercent.toStringAsFixed(2)}%)';
+        totalColor = delta == 0
+            ? ThemeV2.textSecondary
+            : up
+            ? ThemeV2.success
+            : ThemeV2.loss;
+      }
+    }
 
     return CardFrame(
       decoration: FomoShieldTheme.cardDecoration,
@@ -85,7 +118,7 @@ class FundBalanceCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 themedPriceText(
-                  formatUsd(fund.aum),
+                  formatUsd(total),
                   palette,
                   interNums(fontSize: 28, fontWeight: FontWeight.w600),
                 ),
@@ -95,7 +128,7 @@ class FundBalanceCard extends StatelessWidget {
                   style: interNums(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: pnlColor,
+                    color: totalColor,
                   ),
                 ),
               ],

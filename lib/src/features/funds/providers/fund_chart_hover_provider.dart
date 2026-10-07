@@ -20,3 +20,12 @@ final fundChartHoverProvider = StateProvider.autoDispose
     .family<({DailySnapshotPoint point, DailySnapshotPoint? previous})?, String>(
       (ref, fundId) => null,
     );
+
+/// The same thing for the management panel's balance chart, kept separate
+/// from [fundChartHoverProvider] because the two charts live on different
+/// screens and plot different series — sharing one would let a held point
+/// from the public card's unit price drive the panel's balance figure.
+final fundBalanceHoverProvider = StateProvider.autoDispose
+    .family<({DailySnapshotPoint point, DailySnapshotPoint? previous})?, String>(
+      (ref, fundId) => null,
+    );
