@@ -1976,6 +1976,7 @@
   "etfFundBalanceTitle": "БАЛАНС ФОНДА",
   "etfFundBalanceAvailableLabel": "Доступно",
   "etfFundBalanceTotalLabel": "Всего (вкл. P&L)",
+  "etfFundBalanceHistoryTitle": "История баланса",
   "etfEmployeeHubInvitationsRow": "Приглашения",
   "etfEmployeeHubApplicationsRow": "Заявки",
   "etfComingSoonTitle": "Скоро",

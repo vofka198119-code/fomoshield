@@ -22,6 +22,7 @@ import '../providers/fund_providers.dart';
 import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart';
 import '../widgets/fund_balance_card.dart';
+import '../widgets/fund_balance_history_chart.dart';
 import '../widgets/fund_cash_widget.dart';
 import '../widgets/fund_bankruptcy_flow.dart';
 import '../widgets/fund_key_metrics_card.dart';
@@ -251,6 +252,8 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                   ),
                   const SizedBox(height: 12),
                   FundBalanceCard(fund: fund, palette: palette),
+                  const SizedBox(height: 12),
+                  FundBalanceHistoryChart(fund: fund, palette: palette),
                   const SizedBox(height: 12),
                   FundCashWidget(cash: fund.cash, palette: palette),
                   const SizedBox(height: 12),

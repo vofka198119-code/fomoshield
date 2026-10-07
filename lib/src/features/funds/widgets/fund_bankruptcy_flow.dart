@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/typography_helpers.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -158,12 +159,23 @@ Future<bool?> _showSimpleConfirmSheet({
                       onPressed: () => Navigator.pop(ctx, true),
                       style: FilledButton.styleFrom(
                         backgroundColor: palette.accentPrimary,
+                        // Without this the label keeps the theme's own
+                        // default foreground while the fill is overridden
+                        // here — and Graphite's accentPrimary IS white, so
+                        // the button rendered as a blank white slab with an
+                        // invisible label (seen on-device 2026-10-07).
+                        foregroundColor: labelColorOn(palette.accentPrimary),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: Text(
                         confirmLabel,
+                        // A button centres a single line on its own, but
+                        // once the label wraps the LINES align to the start
+                        // unless told otherwise — which is why this read as
+                        // left-shoved the moment it had two of them.
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -296,12 +308,18 @@ class _BankruptcyExplanationSheet extends StatelessWidget {
                         onPressed: () => Navigator.pop(context, true),
                         style: FilledButton.styleFrom(
                           backgroundColor: ThemeV2.loss,
+                          // Same reasoning as step 1's button: the fill is
+                          // set here, so the label must be too rather than
+                          // inheriting whatever the theme happens to pair
+                          // with its own primary.
+                          foregroundColor: labelColorOn(ThemeV2.loss),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: Text(
                           l10n.etfFundBankruptcyConfirmButton,
+                          textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,

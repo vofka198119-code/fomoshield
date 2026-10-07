@@ -94,11 +94,23 @@ class FundNavPoint {
   final DateTime date;
   final double navPerUnit;
 
-  const FundNavPoint({required this.date, required this.navPerUnit});
+  /// The fund's whole balance that day (cash plus holdings at market), the
+  /// same figure the management panel's BALANCE card shows live. Nullable
+  /// because rows written before the server started sending it have none —
+  /// a chart of it simply skips those days rather than drawing them as
+  /// zero, which would look like the fund had briefly gone broke.
+  final double? aum;
+
+  const FundNavPoint({
+    required this.date,
+    required this.navPerUnit,
+    this.aum,
+  });
 
   factory FundNavPoint.fromJson(Map<String, dynamic> json) => FundNavPoint(
     date: DateTime.parse(json['date'] as String),
     navPerUnit: (json['navPerUnit'] as num).toDouble(),
+    aum: (json['aum'] as num?)?.toDouble(),
   );
 }
 

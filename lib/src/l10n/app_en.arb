@@ -2753,6 +2753,7 @@
   "etfFundBalanceTitle": "FUND BALANCE",
   "etfFundBalanceAvailableLabel": "Available",
   "etfFundBalanceTotalLabel": "Total (incl. P&L)",
+  "etfFundBalanceHistoryTitle": "Balance history",
   "etfEmployeeHubInvitationsRow": "Invitations",
   "etfEmployeeHubApplicationsRow": "Applications",
   "etfComingSoonTitle": "Coming Soon",

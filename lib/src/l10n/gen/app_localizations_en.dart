@@ -6843,6 +6843,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfFundBalanceTotalLabel => 'Total (incl. P&L)';
 
   @override
+  String get etfFundBalanceHistoryTitle => 'Balance history';
+
+  @override
   String get etfEmployeeHubInvitationsRow => 'Invitations';
 
   @override

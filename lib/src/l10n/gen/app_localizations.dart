@@ -11635,6 +11635,12 @@ abstract class AppLocalizations {
   /// **'Total (incl. P&L)'**
   String get etfFundBalanceTotalLabel;
 
+  /// No description provided for @etfFundBalanceHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance history'**
+  String get etfFundBalanceHistoryTitle;
+
   /// No description provided for @etfEmployeeHubInvitationsRow.
   ///
   /// In en, this message translates to:
