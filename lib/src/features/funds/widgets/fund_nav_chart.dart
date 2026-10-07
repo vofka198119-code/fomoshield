@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_palette.dart';
@@ -9,20 +10,21 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/daily_snapshot_chart.dart';
 import '../models/fund.dart';
+import '../providers/fund_chart_hover_provider.dart';
 
 // Card chrome only — the plot itself is DailySnapshotChart, the same one the
 // Portfolio value chart uses. Fund NAV is one recorded value per day, exactly
 // the shape that widget exists for; before this it was a hand-thinned copy of
 // Company Detail's PriceChart that had lost the scale labels, the end dot and
 // the touch tooltip.
-class FundNavChart extends StatelessWidget {
+class FundNavChart extends ConsumerWidget {
   final FundDetail fund;
   final AppPalette palette;
 
   const FundNavChart({super.key, required this.fund, required this.palette});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
     return CardFrame(
@@ -72,6 +74,13 @@ class FundNavChart extends StatelessWidget {
                 for (final p in fund.navHistory)
                   DailySnapshotPoint(at: p.date, value: p.navPerUnit),
               ],
+              // Hand the held point to the card's header so the price and
+              // the change badge follow the scrub, the way they do on a
+              // company's card.
+              onHoverChanged: (point, previous) {
+                ref.read(fundChartHoverProvider(fund.id).notifier).state =
+                    point == null ? null : (point: point, previous: previous);
+              },
             ),
         ],
       ),

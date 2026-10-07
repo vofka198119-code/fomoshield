@@ -73,11 +73,21 @@ class DailySnapshotChart extends StatefulWidget {
   /// Defaults to the app-wide USD standard.
   final String Function(double) formatValue;
 
+  /// Fires while a point is held, with that point and the one before it in
+  /// the series (null for the first point), and again with both null when
+  /// the finger lifts. Lets a card's own header follow the scrub — the same
+  /// decoupling PriceChart and PriceHeader use via chartHoverPriceProvider,
+  /// so the chart never needs to know who is listening. Optional: the
+  /// Portfolio card has no header to move and passes nothing.
+  final void Function(DailySnapshotPoint? point, DailySnapshotPoint? previous)?
+  onHoverChanged;
+
   const DailySnapshotChart({
     super.key,
     required this.points,
     required this.palette,
     this.formatValue = formatUsd,
+    this.onHoverChanged,
   });
 
   @override
@@ -140,6 +150,7 @@ class _DailySnapshotChartState extends State<DailySnapshotChart> {
     _holdTimer = null;
     _revealed = false;
     if (_touchDx == null && _touchedIndex == null) return;
+    widget.onHoverChanged?.call(null, null);
     if (rebuild) {
       setState(() {
         _touchDx = null;
@@ -292,6 +303,7 @@ class _DailySnapshotChartState extends State<DailySnapshotChart> {
                       titlesData: const FlTitlesData(show: false),
                       borderData: FlBorderData(show: false),
                       lineTouchData: _touchData(
+                        points,
                         chartTouchThreshold(plotWidth, spots.length),
                       ),
                       lineBarsData: [
@@ -342,7 +354,10 @@ class _DailySnapshotChartState extends State<DailySnapshotChart> {
     );
   }
 
-  LineTouchData _touchData(double touchThreshold) => LineTouchData(
+  LineTouchData _touchData(
+    List<DailySnapshotPoint> points,
+    double touchThreshold,
+  ) => LineTouchData(
     // Scaled to the gap between points — fl_chart's 10px default makes a
     // two-point chart untouchable. See chartTouchThreshold.
     touchSpotThreshold: touchThreshold,
@@ -382,6 +397,7 @@ class _DailySnapshotChartState extends State<DailySnapshotChart> {
           _touchDx = _pendingDx;
           _touchedIndex = _pendingIndex;
         });
+        _notifyHover(points);
       } else {
         _holdTimer ??= Timer(_revealDelay, () {
           _holdTimer = null;
@@ -391,10 +407,22 @@ class _DailySnapshotChartState extends State<DailySnapshotChart> {
             _touchDx = _pendingDx;
             _touchedIndex = _pendingIndex;
           });
+          _notifyHover(points);
         });
       }
     },
   );
+
+  void _notifyHover(List<DailySnapshotPoint> points) {
+    final cb = widget.onHoverChanged;
+    if (cb == null) return;
+    final i = _touchedIndex;
+    if (i == null || i < 0 || i >= points.length) {
+      cb(null, null);
+      return;
+    }
+    cb(points[i], i > 0 ? points[i - 1] : null);
+  }
 
   Widget _scaleLabel(double value) => Text(
     widget.formatValue(value),
