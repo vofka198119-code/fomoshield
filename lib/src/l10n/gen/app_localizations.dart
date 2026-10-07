@@ -11617,6 +11617,90 @@ abstract class AppLocalizations {
   /// **'Proposed by'**
   String get etfProposalProposedByLabel;
 
+  /// No description provided for @etfProposalImpactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What this does to the fund'**
+  String get etfProposalImpactTitle;
+
+  /// No description provided for @etfProposalImpactNoPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'The fund holds none of this yet'**
+  String get etfProposalImpactNoPosition;
+
+  /// No description provided for @etfProposalImpactAlreadyHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'Already held'**
+  String get etfProposalImpactAlreadyHeld;
+
+  /// No description provided for @etfProposalImpactPositionValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Position value'**
+  String get etfProposalImpactPositionValue;
+
+  /// No description provided for @etfProposalImpactAvgCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Average cost'**
+  String get etfProposalImpactAvgCost;
+
+  /// No description provided for @etfProposalImpactAvgCostAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Average cost becomes'**
+  String get etfProposalImpactAvgCostAfter;
+
+  /// No description provided for @etfProposalImpactUnrealized.
+  ///
+  /// In en, this message translates to:
+  /// **'Position P&L'**
+  String get etfProposalImpactUnrealized;
+
+  /// No description provided for @etfProposalImpactShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share of the fund'**
+  String get etfProposalImpactShare;
+
+  /// No description provided for @etfProposalImpactCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get etfProposalImpactCash;
+
+  /// No description provided for @etfProposalImpactNotEnoughCash.
+  ///
+  /// In en, this message translates to:
+  /// **'There is not enough cash for this trade'**
+  String get etfProposalImpactNotEnoughCash;
+
+  /// No description provided for @etfProposalImpactSellingShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share of the position sold'**
+  String get etfProposalImpactSellingShare;
+
+  /// No description provided for @etfProposalImpactRealized.
+  ///
+  /// In en, this message translates to:
+  /// **'P&L locked in'**
+  String get etfProposalImpactRealized;
+
+  /// No description provided for @etfProposalImpactRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares left'**
+  String get etfProposalImpactRemaining;
+
+  /// No description provided for @etfProposalImpactConcentration.
+  ///
+  /// In en, this message translates to:
+  /// **'After this, one holding would be over a fifth of the fund'**
+  String get etfProposalImpactConcentration;
+
   /// No description provided for @etfFundBalanceTitle.
   ///
   /// In en, this message translates to:

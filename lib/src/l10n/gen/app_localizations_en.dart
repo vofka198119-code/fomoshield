@@ -6834,6 +6834,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfProposalProposedByLabel => 'Proposed by';
 
   @override
+  String get etfProposalImpactTitle => 'What this does to the fund';
+
+  @override
+  String get etfProposalImpactNoPosition => 'The fund holds none of this yet';
+
+  @override
+  String get etfProposalImpactAlreadyHeld => 'Already held';
+
+  @override
+  String get etfProposalImpactPositionValue => 'Position value';
+
+  @override
+  String get etfProposalImpactAvgCost => 'Average cost';
+
+  @override
+  String get etfProposalImpactAvgCostAfter => 'Average cost becomes';
+
+  @override
+  String get etfProposalImpactUnrealized => 'Position P&L';
+
+  @override
+  String get etfProposalImpactShare => 'Share of the fund';
+
+  @override
+  String get etfProposalImpactCash => 'Available';
+
+  @override
+  String get etfProposalImpactNotEnoughCash =>
+      'There is not enough cash for this trade';
+
+  @override
+  String get etfProposalImpactSellingShare => 'Share of the position sold';
+
+  @override
+  String get etfProposalImpactRealized => 'P&L locked in';
+
+  @override
+  String get etfProposalImpactRemaining => 'Shares left';
+
+  @override
+  String get etfProposalImpactConcentration =>
+      'After this, one holding would be over a fifth of the fund';
+
+  @override
   String get etfFundBalanceTitle => 'FUND BALANCE';
 
   @override

@@ -6856,6 +6856,49 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfProposalProposedByLabel => 'Предложил';
 
   @override
+  String get etfProposalImpactTitle => 'Что это изменит в фонде';
+
+  @override
+  String get etfProposalImpactNoPosition => 'Этой бумаги в фонде сейчас нет';
+
+  @override
+  String get etfProposalImpactAlreadyHeld => 'Уже в фонде';
+
+  @override
+  String get etfProposalImpactPositionValue => 'Стоимость позиции';
+
+  @override
+  String get etfProposalImpactAvgCost => 'Средняя цена покупки';
+
+  @override
+  String get etfProposalImpactAvgCostAfter => 'Средняя цена станет';
+
+  @override
+  String get etfProposalImpactUnrealized => 'Прибыль по позиции';
+
+  @override
+  String get etfProposalImpactShare => 'Доля в фонде';
+
+  @override
+  String get etfProposalImpactCash => 'Доступно';
+
+  @override
+  String get etfProposalImpactNotEnoughCash => 'Денег на эту сделку не хватает';
+
+  @override
+  String get etfProposalImpactSellingShare => 'Продаётся от позиции';
+
+  @override
+  String get etfProposalImpactRealized => 'Зафиксируется прибыль';
+
+  @override
+  String get etfProposalImpactRemaining => 'Останется акций';
+
+  @override
+  String get etfProposalImpactConcentration =>
+      'После сделки на одну бумагу придётся больше пятой части фонда';
+
+  @override
   String get etfFundBalanceTitle => 'БАЛАНС ФОНДА';
 
   @override

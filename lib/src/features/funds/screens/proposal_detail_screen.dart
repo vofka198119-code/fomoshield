@@ -12,6 +12,7 @@ import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 import '../widgets/proposal_card.dart';
+import '../widgets/proposal_impact_card.dart';
 
 // ---------------------------------------------------------------------------
 // Proposal Detail — one trade proposal, full screen. Reached from
@@ -126,45 +127,63 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: ProposalCard(
-            proposal: _proposal,
-            palette: palette,
-            l10n: l10n,
-            canApprove: canApprove,
-            canFlagRisk: canFlagRisk,
-            canExecute: canExecute,
-            onApprove: () => _act(
-              () => ref
-                  .read(fundApiServiceProvider)
-                  .approveProposal(fundId, _proposal.id),
-              l10n,
-              alsoInvalidateFundData: true,
-            ),
-            onReject: () => _act(
-              () => ref
-                  .read(fundApiServiceProvider)
-                  .rejectProposal(fundId, _proposal.id),
-              l10n,
-            ),
-            onRework: (reason) => _act(
-              () => ref
-                  .read(fundApiServiceProvider)
-                  .reworkProposal(fundId, _proposal.id, reason: reason),
-              l10n,
-            ),
-            onFlag: () => _act(
-              () => ref
-                  .read(fundApiServiceProvider)
-                  .flagProposal(fundId, _proposal.id),
-              l10n,
-            ),
-            onExecute: () => _act(
-              () => ref
-                  .read(fundApiServiceProvider)
-                  .executeProposal(fundId, _proposal.id),
-              l10n,
-              alsoInvalidateFundData: true,
-            ),
+          child: Column(
+            children: [
+              ProposalCard(
+                proposal: _proposal,
+                palette: palette,
+                l10n: l10n,
+                canApprove: canApprove,
+                canFlagRisk: canFlagRisk,
+                canExecute: canExecute,
+                onApprove: () => _act(
+                  () => ref
+                      .read(fundApiServiceProvider)
+                      .approveProposal(fundId, _proposal.id),
+                  l10n,
+                  alsoInvalidateFundData: true,
+                ),
+                onReject: () => _act(
+                  () => ref
+                      .read(fundApiServiceProvider)
+                      .rejectProposal(fundId, _proposal.id),
+                  l10n,
+                ),
+                onRework: (reason) => _act(
+                  () => ref
+                      .read(fundApiServiceProvider)
+                      .reworkProposal(fundId, _proposal.id, reason: reason),
+                  l10n,
+                ),
+                onFlag: () => _act(
+                  () => ref
+                      .read(fundApiServiceProvider)
+                      .flagProposal(fundId, _proposal.id),
+                  l10n,
+                ),
+                onExecute: () => _act(
+                  () => ref
+                      .read(fundApiServiceProvider)
+                      .executeProposal(fundId, _proposal.id),
+                  l10n,
+                  alsoInvalidateFundData: true,
+                ),
+              ),
+              // Only once the fund is actually loaded — the impact figures
+              // are meaningless without its holdings and cash, and a card
+              // of dashes would be worse than no card.
+              ...?fundAsync.valueOrNull == null
+                  ? null
+                  : [
+                      const SizedBox(height: 20),
+                      ProposalImpactCard(
+                        proposal: _proposal,
+                        fund: fundAsync.value!,
+                        palette: palette,
+                        l10n: l10n,
+                      ),
+                    ],
+            ],
           ),
         ),
       ),

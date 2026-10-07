@@ -23,7 +23,11 @@ import '../models/trade_proposal.dart';
 // shape as every other screen's own _fetchPrice, just as a provider since
 // ProposalCard itself stays a plain ConsumerWidget rather than turning
 // stateful just for this.
-final _proposalLivePriceProvider = FutureProvider.autoDispose
+/// Live price for a proposal's symbol. Public because the impact card on
+/// the detail screen has to value the same trade with the same number —
+/// two screens quoting a company differently is worse than either being
+/// slightly stale.
+final proposalLivePriceProvider = FutureProvider.autoDispose
     .family<double, String>((ref, symbol) async {
       final quote = await ref.watch(finnhubServiceProvider).quote(symbol);
       return (quote['c'] as num?)?.toDouble() ?? 0;
@@ -451,7 +455,7 @@ class ProposalCard extends ConsumerWidget {
     final needsLiveEstimate =
         proposal.executedPrice == null && placementPrice == null;
     final estimatedPrice = needsLiveEstimate
-        ? ref.watch(_proposalLivePriceProvider(proposal.symbol)).valueOrNull
+        ? ref.watch(proposalLivePriceProvider(proposal.symbol)).valueOrNull
         : null;
     final totalValuePrice =
         proposal.executedPrice ?? placementPrice ?? estimatedPrice;
