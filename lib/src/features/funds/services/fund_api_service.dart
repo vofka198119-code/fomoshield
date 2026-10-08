@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../core/utils/constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../models/fund.dart';
+import '../models/fund_target_weight.dart';
 import '../models/fund_balance_history.dart';
 import '../models/fund_bankruptcy_preview.dart';
 import '../models/fund_commission_history.dart';
@@ -390,6 +391,40 @@ class FundApiService {
         _errorMessage(e, 'Failed to propose trade'),
         code: code,
       );
+    }
+  }
+
+  /// The fund's target allocation. Insiders only server-side — the head and
+  /// any active team member; an outside investor gets a 403, since the plan
+  /// is internal even though the holdings themselves are public.
+  Future<List<FundTargetWeight>> getFundTargets(String fundId) async {
+    try {
+      final response = await _dio.get('/funds/$fundId/targets');
+      final list = ((response.data as Map)['targets'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(FundTargetWeight.fromJson).toList();
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to load targets'));
+    }
+  }
+
+  /// Replaces the whole set at once — the server takes a complete picture,
+  /// not a patch, because the percentages only mean anything relative to
+  /// each other. An empty list clears the plan. Requires canSetTargets.
+  Future<List<FundTargetWeight>> setFundTargets(
+    String fundId,
+    List<FundTargetWeight> targets,
+  ) async {
+    try {
+      final response = await _dio.put(
+        '/funds/$fundId/targets',
+        data: {'targets': targets.map((t) => t.toJson()).toList()},
+      );
+      final list = ((response.data as Map)['targets'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(FundTargetWeight.fromJson).toList();
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to save targets'));
     }
   }
 

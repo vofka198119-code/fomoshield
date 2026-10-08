@@ -11359,6 +11359,126 @@ abstract class AppLocalizations {
   /// **'Rules'**
   String get etfRulebookShortcutLabel;
 
+  /// No description provided for @etfBalancingShortcutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Balancing'**
+  String get etfBalancingShortcutLabel;
+
+  /// No description provided for @etfBalancingScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Balancing'**
+  String get etfBalancingScreenTitle;
+
+  /// No description provided for @etfBalancingCurrentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get etfBalancingCurrentTitle;
+
+  /// No description provided for @etfBalancingTargetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Target weights'**
+  String get etfBalancingTargetTitle;
+
+  /// No description provided for @etfBalancingEnterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Target weight'**
+  String get etfBalancingEnterTitle;
+
+  /// No description provided for @etfBalancingEnterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'0 to 100, two decimals'**
+  String get etfBalancingEnterHint;
+
+  /// No description provided for @etfBalancingNoHoldings.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy the first asset first — there is nothing to allocate yet.'**
+  String get etfBalancingNoHoldings;
+
+  /// No description provided for @etfBalancingNoTargets.
+  ///
+  /// In en, this message translates to:
+  /// **'No target weights set. Set them to see how far the fund has drifted from its plan.'**
+  String get etfBalancingNoTargets;
+
+  /// No description provided for @etfBalancingTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Allocated'**
+  String get etfBalancingTotalLabel;
+
+  /// No description provided for @etfBalancingUnallocated.
+  ///
+  /// In en, this message translates to:
+  /// **'Unallocated'**
+  String get etfBalancingUnallocated;
+
+  /// No description provided for @etfBalancingOverAllocated.
+  ///
+  /// In en, this message translates to:
+  /// **'Over by'**
+  String get etfBalancingOverAllocated;
+
+  /// No description provided for @etfBalancingAutoButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Even out to 100%'**
+  String get etfBalancingAutoButton;
+
+  /// No description provided for @etfBalancingOverHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The excess can be spread automatically — weights shrink in proportion, the plan keeps its shape.'**
+  String get etfBalancingOverHint;
+
+  /// No description provided for @etfBalancingUnderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The remainder can be spread automatically — weights grow in proportion, the plan keeps its shape.'**
+  String get etfBalancingUnderHint;
+
+  /// No description provided for @etfBalancingSeedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No targets yet, so there is nothing to spread — weights start out equal and you adjust from there.'**
+  String get etfBalancingSeedHint;
+
+  /// No description provided for @etfBalancingSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get etfBalancingSaveButton;
+
+  /// No description provided for @etfBalancingSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Target weights saved'**
+  String get etfBalancingSavedMessage;
+
+  /// No description provided for @etfBalancingSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the target weights'**
+  String get etfBalancingSaveError;
+
+  /// No description provided for @etfBalancingReadOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the head, and anyone they grant the right to, can change target weights.'**
+  String get etfBalancingReadOnlyNote;
+
+  /// No description provided for @etfPermissionSetTargets.
+  ///
+  /// In en, this message translates to:
+  /// **'Set target weights'**
+  String get etfPermissionSetTargets;
+
   /// No description provided for @etfChartsScreenTitle.
   ///
   /// In en, this message translates to:

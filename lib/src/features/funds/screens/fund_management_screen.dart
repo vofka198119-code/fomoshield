@@ -221,6 +221,17 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                         label: l10n.etfChartsShortcutLabel,
                         onTap: () => context.push('/funds/${fund.id}/charts'),
                       ),
+                      // Everything about proportions in one place: what the
+                      // fund holds now against what it should. Shown to the
+                      // whole team — reading the plan is not the same as
+                      // changing it, and the editor inside gates itself on
+                      // canSetTargets.
+                      CircleShortcut(
+                        icon: Icons.donut_small_rounded,
+                        label: l10n.etfBalancingShortcutLabel,
+                        onTap: () =>
+                            context.push('/funds/${fund.id}/balancing'),
+                      ),
                       if (canPropose)
                         CircleShortcut(
                           icon: Icons.swap_horiz_rounded,

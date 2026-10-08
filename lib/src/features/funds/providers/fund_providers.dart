@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
 import '../models/fund.dart';
+import '../models/fund_target_weight.dart';
 import '../models/fund_balance_history.dart';
 import '../models/fund_commission_history.dart';
 import '../models/fund_investor.dart';
@@ -42,6 +43,15 @@ final fundsListProvider = FutureProvider<List<Fund>>((ref) {
 final fundDetailProvider = FutureProvider.autoDispose
     .family<FundDetail, String>((ref, fundId) {
       return ref.watch(fundApiServiceProvider).getFundDetail(fundId);
+    });
+
+/// A fund's target allocation — what each company SHOULD be, as opposed to
+/// what it is. Insiders only (server-gated): the head and active team
+/// members. Separate from fundDetailProvider on purpose, so saving targets
+/// refreshes this without re-pricing every holding.
+final fundTargetsProvider = FutureProvider.autoDispose
+    .family<List<FundTargetWeight>, String>((ref, fundId) {
+      return ref.watch(fundApiServiceProvider).getFundTargets(fundId);
     });
 
 /// Head + active team members only (server-gated) — the Investors screen

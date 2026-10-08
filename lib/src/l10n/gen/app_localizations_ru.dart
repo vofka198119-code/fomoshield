@@ -6727,6 +6727,72 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfRulebookShortcutLabel => 'Правила';
 
   @override
+  String get etfBalancingShortcutLabel => 'Балансировка';
+
+  @override
+  String get etfBalancingScreenTitle => 'Балансировка';
+
+  @override
+  String get etfBalancingCurrentTitle => 'Сейчас';
+
+  @override
+  String get etfBalancingTargetTitle => 'Целевые доли';
+
+  @override
+  String get etfBalancingEnterTitle => 'Целевая доля';
+
+  @override
+  String get etfBalancingEnterHint => 'от 0 до 100, до сотых';
+
+  @override
+  String get etfBalancingNoHoldings =>
+      'Сначала купите первый актив — распределять пока нечего.';
+
+  @override
+  String get etfBalancingNoTargets =>
+      'Целевые доли не заданы. Задайте их, чтобы видеть, насколько фонд отошёл от плана.';
+
+  @override
+  String get etfBalancingTotalLabel => 'Распределено';
+
+  @override
+  String get etfBalancingUnallocated => 'Не распределено';
+
+  @override
+  String get etfBalancingOverAllocated => 'Перебор';
+
+  @override
+  String get etfBalancingAutoButton => 'Выровнять до 100%';
+
+  @override
+  String get etfBalancingOverHint =>
+      'Излишек можно разнести автоматически — доли уменьшатся пропорционально весу, план не изменится.';
+
+  @override
+  String get etfBalancingUnderHint =>
+      'Остаток можно разнести автоматически — доли вырастут пропорционально весу, план не изменится.';
+
+  @override
+  String get etfBalancingSeedHint =>
+      'Целей пока нет, поэтому разносить нечего — доли встанут поровну, дальше поправишь вручную.';
+
+  @override
+  String get etfBalancingSaveButton => 'Сохранить';
+
+  @override
+  String get etfBalancingSavedMessage => 'Целевые доли сохранены';
+
+  @override
+  String get etfBalancingSaveError => 'Не удалось сохранить целевые доли';
+
+  @override
+  String get etfBalancingReadOnlyNote =>
+      'Менять целевые доли может глава фонда и тот, кому он дал это право.';
+
+  @override
+  String get etfPermissionSetTargets => 'Задавать целевые доли';
+
+  @override
   String get etfChartsScreenTitle => 'ГРАФИКИ';
 
   @override

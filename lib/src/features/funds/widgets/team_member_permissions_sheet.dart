@@ -27,7 +27,17 @@ import '../services/fund_api_service.dart' show FundApiException;
 // re-reads what the server actually produced.
 // ---------------------------------------------------------------------------
 
-const _permissionKeys = ['canPropose', 'canApprove', 'canExecute', 'canFlagRisk'];
+// canSetTargets last (2026-10-08): it is the newest, and unlike the other
+// four it is not about one trade but about the fund's whole plan — the head
+// hands it over deliberately, so it reads better at the end of the list than
+// mixed in among the trade permissions.
+const _permissionKeys = [
+  'canPropose',
+  'canApprove',
+  'canExecute',
+  'canFlagRisk',
+  'canSetTargets',
+];
 const _roles = ['analyst', 'co_manager', 'trader', 'risk_manager'];
 
 Future<bool?> showTeamMemberPermissionsSheet({
@@ -73,6 +83,8 @@ String _permissionLabel(AppLocalizations l10n, String key) {
       return l10n.etfPermissionExecute;
     case 'canFlagRisk':
       return l10n.etfPermissionFlagRisk;
+    case 'canSetTargets':
+      return l10n.etfPermissionSetTargets;
     default:
       return l10n.etfPermissionPropose;
   }

@@ -6705,6 +6705,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfRulebookShortcutLabel => 'Rules';
 
   @override
+  String get etfBalancingShortcutLabel => 'Balancing';
+
+  @override
+  String get etfBalancingScreenTitle => 'Balancing';
+
+  @override
+  String get etfBalancingCurrentTitle => 'Now';
+
+  @override
+  String get etfBalancingTargetTitle => 'Target weights';
+
+  @override
+  String get etfBalancingEnterTitle => 'Target weight';
+
+  @override
+  String get etfBalancingEnterHint => '0 to 100, two decimals';
+
+  @override
+  String get etfBalancingNoHoldings =>
+      'Buy the first asset first — there is nothing to allocate yet.';
+
+  @override
+  String get etfBalancingNoTargets =>
+      'No target weights set. Set them to see how far the fund has drifted from its plan.';
+
+  @override
+  String get etfBalancingTotalLabel => 'Allocated';
+
+  @override
+  String get etfBalancingUnallocated => 'Unallocated';
+
+  @override
+  String get etfBalancingOverAllocated => 'Over by';
+
+  @override
+  String get etfBalancingAutoButton => 'Even out to 100%';
+
+  @override
+  String get etfBalancingOverHint =>
+      'The excess can be spread automatically — weights shrink in proportion, the plan keeps its shape.';
+
+  @override
+  String get etfBalancingUnderHint =>
+      'The remainder can be spread automatically — weights grow in proportion, the plan keeps its shape.';
+
+  @override
+  String get etfBalancingSeedHint =>
+      'No targets yet, so there is nothing to spread — weights start out equal and you adjust from there.';
+
+  @override
+  String get etfBalancingSaveButton => 'Save';
+
+  @override
+  String get etfBalancingSavedMessage => 'Target weights saved';
+
+  @override
+  String get etfBalancingSaveError => 'Could not save the target weights';
+
+  @override
+  String get etfBalancingReadOnlyNote =>
+      'Only the head, and anyone they grant the right to, can change target weights.';
+
+  @override
+  String get etfPermissionSetTargets => 'Set target weights';
+
+  @override
   String get etfChartsScreenTitle => 'CHARTS';
 
   @override
