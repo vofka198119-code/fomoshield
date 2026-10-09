@@ -153,25 +153,35 @@ Widget themedAddWidgetsButton(
   // Management's "open public card") can reuse this exact per-theme pill
   // shape instead of a plain TextButton that doesn't follow theme at all.
   IconData icon = Icons.add_rounded,
+  // Standard theme only: the colour of the label, icon and ring. Null (every
+  // original call site) keeps the accent, which is right on the light cards
+  // this button was built for. Pass the card's own text colour when the
+  // button sits on a DARK card — accent-on-dark-green is the same text the
+  // card is painted in, and the button all but disappeared on the fund
+  // management panel until this was spotted on the phone (2026-10-09).
+  // Themed variants ignore it: there the pill has its own windowGradient
+  // fill and onButton/onWindow already answer this question.
+  Color? foreground,
 }) {
   final gradient = palette.windowGradient;
   if (gradient == null) {
+    final color = foreground ?? palette.accentPrimary;
     return TextButton.icon(
       onPressed: onTap,
-      icon: Icon(icon, color: palette.accentPrimary, size: 20),
+      icon: Icon(icon, color: color, size: 20),
       label: Text(
         label,
         style: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: palette.accentPrimary,
+          color: color,
         ),
       ),
       style: TextButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
-          side: BorderSide(color: palette.accentPrimary, width: 0.5),
+          side: BorderSide(color: color, width: 0.5),
         ),
       ),
     );

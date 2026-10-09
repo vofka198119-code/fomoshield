@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../../core/theme/themed_border.dart';
 import '../../../core/supabase/supabase_providers.dart'
     show myNicknameProvider, isAdminProvider, currentUserProvider;
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/admin_badge.dart';
+import '../../../shared/widgets/dark_card_chip.dart';
 import '../../../shared/widgets/card_frame.dart';
-import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
+import '../../market_clock/market_clock_dial.dart'
+    show darkCardDecoration, dialBrassLight;
 import '../providers/fund_providers.dart';
 
 // ---------------------------------------------------------------------------
@@ -32,6 +33,10 @@ class EmployeeIdentityCard extends ConsumerWidget {
   final AppPalette palette;
 
   const EmployeeIdentityCard({super.key, required this.palette});
+
+  /// PriceHeader's own ring expression: the theme's market-clock accent,
+  /// brass when it has none.
+  Color get _ringColour => palette.marketClockAccent ?? dialBrassLight;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,10 +71,13 @@ class EmployeeIdentityCard extends ConsumerWidget {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: palette.accentPrimary, width: 1.5),
+                // Brass, like PriceHeader's logo ring and the fund card's —
+                // an accent-green ring on this dark green card is a green
+                // line on green (2026-10-09).
+                border: Border.all(color: _ringColour, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: palette.accentPrimary.withValues(alpha: 0.35),
+                    color: _ringColour.withValues(alpha: 0.35),
                     blurRadius: 6,
                   ),
                 ],
@@ -93,7 +101,8 @@ class EmployeeIdentityCard extends ConsumerWidget {
                 ),
                 child: Icon(
                   Icons.person_rounded,
-                  color: palette.accentPrimary,
+                  // Same brass as the ring around it.
+                  color: _ringColour,
                   size: 32,
                 ),
               ),
@@ -122,7 +131,7 @@ class EmployeeIdentityCard extends ConsumerWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      _PositionChip(label: positionLabel, palette: palette),
+                      DarkCardChip(label: positionLabel, palette: palette),
                       if (isAdmin) ...[
                         const SizedBox(width: 6),
                         const AdminBadge(),
@@ -133,43 +142,6 @@ class EmployeeIdentityCard extends ConsumerWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// Same visual recipe as PriceHeader's sector chip (price_header.dart):
-// themedBorder ring (no-op under Standard) + a windowGradient/flat-tint
-// pill, accentPrimary text.
-class _PositionChip extends StatelessWidget {
-  final String label;
-  final AppPalette palette;
-
-  const _PositionChip({required this.label, required this.palette});
-
-  @override
-  Widget build(BuildContext context) {
-    final hasThemedBorder = palette.borderGradient != null;
-    return themedBorder(
-      palette: palette,
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-        decoration: BoxDecoration(
-          color: hasThemedBorder
-              ? null
-              : palette.accentPrimary.withValues(alpha: 0.15),
-          gradient: hasThemedBorder ? palette.windowGradient : null,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: palette.accentPrimary,
-          ),
         ),
       ),
     );

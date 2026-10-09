@@ -6,6 +6,7 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/themed_border.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../../shared/widgets/dark_card_chip.dart';
 import '../../../core/services/gics_sector_mapper.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/utils/currency_format.dart';
@@ -95,16 +96,10 @@ class PriceHeader extends StatelessWidget {
       isUp ? ThemeV2.successBg : ThemeV2.lossBg,
       Colors.white,
     );
-    // Home Portfolio widget's tints are 10%-alpha, meant for a light card
-    // background — flattened to opaque here so they still read as distinct
-    // boxes on top of/next to this card's dark-green gradient instead of
-    // nearly disappearing into it.
-    final sectorBadgeBg = Color.alphaBlend(ThemeV2.primaryBg, Colors.white);
+    // The sector chip's own "10%-alpha tint flattened to opaque so it reads
+    // on the dark card" reasoning now lives in DarkCardChip, along with the
+    // themedBorder gating it used to need here.
     final sector = resolveGicsSector(symbol, companyName: companyName);
-    // themedBorder no-ops when this is null (Standard theme) — gates the
-    // flat white/mint fills below so they only swap to the gold-ring +
-    // windowGradient "inner panel" look under Luxury Gold.
-    final hasThemedBorder = palette.borderGradient != null;
 
     return Column(
       children: [
@@ -163,34 +158,17 @@ class PriceHeader extends StatelessWidget {
                       ),
                       if (sector != null || isEtf) ...[
                         const SizedBox(height: 6),
-                        themedBorder(
+                        // The one chip recipe, now shared — the fund
+                        // management panel and the employee profile had
+                        // hand-copies of this that lost the opaque fill and
+                        // became unreadable on the dark card (2026-10-09).
+                        DarkCardChip(
+                          label: isEtf
+                              ? 'ETF'
+                              : sector!.localizedLabel(
+                                  AppLocalizations.of(context)!,
+                                ),
                           palette: palette,
-                          borderRadius: BorderRadius.circular(6),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color: hasThemedBorder ? null : sectorBadgeBg,
-                              gradient: hasThemedBorder
-                                  ? palette.windowGradient
-                                  : null,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              isEtf
-                                  ? 'ETF'
-                                  : sector!.localizedLabel(
-                                      AppLocalizations.of(context)!,
-                                    ),
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: palette.accentPrimary,
-                              ),
-                            ),
-                          ),
                         ),
                       ],
                     ],

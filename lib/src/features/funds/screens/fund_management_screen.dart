@@ -15,8 +15,10 @@ import '../../../core/theme/themed_header.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
-import '../../market_clock/market_clock_dial.dart' show darkCardDecoration;
+import '../../market_clock/market_clock_dial.dart'
+    show darkCardDecoration, dialBrassLight;
 import '../../../shared/widgets/circle_shortcut_row.dart';
+import '../../../shared/widgets/dark_card_chip.dart';
 import '../models/fund.dart';
 import '../providers/fund_providers.dart';
 import '../providers/employee_providers.dart';
@@ -313,6 +315,12 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
     );
   }
 
+  /// The ring around the fund's icon. PriceHeader's own expression — the
+  /// theme's market-clock accent, brass when it has none — so the fund card
+  /// and a company card ring their badge identically.
+  Color _ringColour(AppPalette palette) =>
+      palette.marketClockAccent ?? dialBrassLight;
+
   // Same avatar/name/chip visual as EmployeeIdentityCard (2026-09-11, per
   // explicit "тот же стиль как и мой профиль" ask) — a fund-icon ring
   // instead of a person icon, the fund's ticker as the descriptor chip
@@ -345,10 +353,14 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: palette.accentPrimary, width: 1.5),
+                  // Brass, not the accent — the same ring PriceHeader draws
+                  // around a company logo, and for the same reason: this
+                  // card is dark green, so an accent-green ring is a green
+                  // line on green (spotted on the phone, 2026-10-09).
+                  border: Border.all(color: _ringColour(palette), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: palette.accentPrimary.withValues(alpha: 0.35),
+                      color: _ringColour(palette).withValues(alpha: 0.35),
                       blurRadius: 6,
                     ),
                   ],
@@ -371,7 +383,9 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                   ),
                   child: Icon(
                     Icons.account_balance_rounded,
-                    color: palette.accentPrimary,
+                    // Same brass as the ring around it — a green glyph on
+                    // the dark fill was the other half of the same problem.
+                    color: _ringColour(palette),
                     size: 32,
                   ),
                 ),
@@ -395,7 +409,7 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    _chip(fund.ticker, palette),
+                    DarkCardChip(label: fund.ticker, palette: palette),
                   ],
                 ),
               ),
@@ -419,6 +433,10 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
               palette,
               icon: Icons.open_in_new_rounded,
               label: l10n.etfFundManagementViewPublicButton,
+              // This pill sits on the card's dark green, not on a light
+              // card — so it takes the same colour the fund's name above it
+              // takes, instead of the accent it would disappear into.
+              foreground: palette.onWindow ?? Colors.white,
               onTap: () => context.push('/funds/${fund.id}'),
             ),
           ),
@@ -452,32 +470,6 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
           'percentOfFund': percent,
         },
       },
-    );
-  }
-
-  Widget _chip(String label, AppPalette palette) {
-    final hasThemedBorder = palette.borderGradient != null;
-    return themedBorder(
-      palette: palette,
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-        decoration: BoxDecoration(
-          color: hasThemedBorder
-              ? null
-              : palette.accentPrimary.withValues(alpha: 0.15),
-          gradient: hasThemedBorder ? palette.windowGradient : null,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: palette.accentPrimary,
-          ),
-        ),
-      ),
     );
   }
 
