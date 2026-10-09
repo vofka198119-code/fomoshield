@@ -9,10 +9,12 @@ import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../models/fund.dart';
+import '../models/fund_drift.dart';
 import '../models/fund_target_weight.dart';
 import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
 import '../widgets/fund_asset_allocation_card.dart';
+import '../widgets/fund_drift_card.dart';
 import '../widgets/fund_target_editor.dart';
 
 // ---------------------------------------------------------------------------
@@ -20,10 +22,10 @@ import '../widgets/fund_target_editor.dart';
 // management panel's circle-shortcut row (2026-10-08 ask: "соберём всё по
 // этой теме в новое окно").
 //
-// Two parts for now: what the fund holds right now (the same allocation card
-// the Charts screen shows — reused, not reimplemented, so the two cannot
-// drift), and what it should hold. The third part — the drift reading and a
-// rebalance that turns the gap into trade proposals — comes next.
+// Three parts: what the fund holds right now (the same allocation card the
+// Charts screen shows — reused, not reimplemented, so the two cannot drift),
+// how far that has wandered from the plan, and the plan itself. The fourth —
+// a rebalance that turns the gap into trade proposals — comes next.
 //
 // Named "Балансировка" rather than "Планирование": the screen is about
 // "it is like this, it should be like that, bring it into line", and that
@@ -129,6 +131,22 @@ class _FundBalancingScreenState extends ConsumerState<FundBalancingScreen> {
                 FundAssetAllocationCard(
                   holdings: fund.holdings,
                   palette: palette,
+                ),
+                const SizedBox(height: 12),
+                // The reading sits between the two lists it compares: what
+                // the fund holds above it, the plan it is measured against
+                // below. It reads the SAVED plan, so an edit in progress
+                // does not move the distance until it is saved — the number
+                // means "how far the fund is from the plan it has", not
+                // "from the plan you are typing".
+                FundDriftCard(
+                  drift: FundDrift.from(
+                    holdings: fund.holdings,
+                    targets:
+                        targetsAsync.valueOrNull ?? const <FundTargetWeight>[],
+                  ),
+                  palette: palette,
+                  l10n: l10n,
                 ),
                 const SizedBox(height: 12),
                 FundTargetEditor(

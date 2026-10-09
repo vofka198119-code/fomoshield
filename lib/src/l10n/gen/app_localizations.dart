@@ -11473,6 +11473,60 @@ abstract class AppLocalizations {
   /// **'Only the head, and anyone they grant the right to, can change target weights.'**
   String get etfBalancingReadOnlyNote;
 
+  /// No description provided for @etfBalancingDriftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drift from the plan'**
+  String get etfBalancingDriftTitle;
+
+  /// No description provided for @etfBalancingDriftLargestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest gap'**
+  String get etfBalancingDriftLargestLabel;
+
+  /// No description provided for @etfBalancingDriftAbove.
+  ///
+  /// In en, this message translates to:
+  /// **'above target'**
+  String get etfBalancingDriftAbove;
+
+  /// No description provided for @etfBalancingDriftBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'below target'**
+  String get etfBalancingDriftBelow;
+
+  /// No description provided for @etfBalancingDriftNowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get etfBalancingDriftNowLabel;
+
+  /// No description provided for @etfBalancingDriftTargetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'target'**
+  String get etfBalancingDriftTargetLabel;
+
+  /// No description provided for @etfBalancingDriftOffLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Off the plan by more than {threshold}%'**
+  String etfBalancingDriftOffLabel(String threshold);
+
+  /// No description provided for @etfBalancingDriftOffValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {total}'**
+  String etfBalancingDriftOffValue(int count, int total);
+
+  /// No description provided for @etfBalancingDriftOnPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Every company is within {threshold}% of its target — the fund follows its plan.'**
+  String etfBalancingDriftOnPlan(String threshold);
+
   /// No description provided for @etfPermissionSetTargets.
   ///
   /// In en, this message translates to:

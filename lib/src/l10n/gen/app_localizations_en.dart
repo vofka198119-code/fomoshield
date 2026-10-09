@@ -6768,6 +6768,39 @@ class AppLocalizationsEn extends AppLocalizations {
       'Only the head, and anyone they grant the right to, can change target weights.';
 
   @override
+  String get etfBalancingDriftTitle => 'Drift from the plan';
+
+  @override
+  String get etfBalancingDriftLargestLabel => 'Largest gap';
+
+  @override
+  String get etfBalancingDriftAbove => 'above target';
+
+  @override
+  String get etfBalancingDriftBelow => 'below target';
+
+  @override
+  String get etfBalancingDriftNowLabel => 'now';
+
+  @override
+  String get etfBalancingDriftTargetLabel => 'target';
+
+  @override
+  String etfBalancingDriftOffLabel(String threshold) {
+    return 'Off the plan by more than $threshold%';
+  }
+
+  @override
+  String etfBalancingDriftOffValue(int count, int total) {
+    return '$count of $total';
+  }
+
+  @override
+  String etfBalancingDriftOnPlan(String threshold) {
+    return 'Every company is within $threshold% of its target — the fund follows its plan.';
+  }
+
+  @override
   String get etfPermissionSetTargets => 'Set target weights';
 
   @override

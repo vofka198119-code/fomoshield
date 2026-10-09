@@ -378,3 +378,19 @@ AppPalette resolveAppPalette(AppThemeVariant variant) => switch (variant) {
   AppThemeVariant.graphite => AppPalette.graphite,
   AppThemeVariant.midnightSea => AppPalette.midnightSea,
 };
+
+/// The colour a "this is how it IS" figure is drawn in, where the same line
+/// also carries a "this is how it SHOULD be" figure next to it (the fund's
+/// target weights and its drift reading). Green belongs to the plan; this is
+/// the fact.
+///
+/// It lives in [chartLineGradient] rather than the accent: Graphite's
+/// accentPrimary is white-steel while its charts are amber, so reading the
+/// accent there printed plain white and lost the distinction. Luxury Gold is
+/// the reverse — no chart gradient, gold in the accent. Taking the chart
+/// line's colour first and falling back to the accent covers every theme,
+/// and is the expression PriceChart already uses for its own glow.
+extension AppPaletteFigureColours on AppPalette {
+  Color get actualFigureColour =>
+      chartLineGradient?.colors.last ?? accentPrimary;
+}

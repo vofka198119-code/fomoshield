@@ -6790,6 +6790,39 @@ class AppLocalizationsRu extends AppLocalizations {
       'Менять целевые доли может глава фонда и тот, кому он дал это право.';
 
   @override
+  String get etfBalancingDriftTitle => 'Расхождение с планом';
+
+  @override
+  String get etfBalancingDriftLargestLabel => 'Наибольшее расхождение';
+
+  @override
+  String get etfBalancingDriftAbove => 'выше цели';
+
+  @override
+  String get etfBalancingDriftBelow => 'ниже цели';
+
+  @override
+  String get etfBalancingDriftNowLabel => 'факт';
+
+  @override
+  String get etfBalancingDriftTargetLabel => 'цель';
+
+  @override
+  String etfBalancingDriftOffLabel(String threshold) {
+    return 'Разошлись с планом больше чем на $threshold%';
+  }
+
+  @override
+  String etfBalancingDriftOffValue(int count, int total) {
+    return '$count из $total';
+  }
+
+  @override
+  String etfBalancingDriftOnPlan(String threshold) {
+    return 'Ни одна бумага не отошла от цели больше чем на $threshold% — фонд идёт по плану.';
+  }
+
+  @override
   String get etfPermissionSetTargets => 'Задавать целевые доли';
 
   @override

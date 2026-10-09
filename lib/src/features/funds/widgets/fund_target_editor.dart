@@ -101,19 +101,6 @@ class _FundTargetEditorState extends State<FundTargetEditor> {
   double get _total =>
       _targets.values.fold<double>(0, (sum, v) => sum + v);
 
-  /// The colour the CURRENT weight is drawn in — "the orange that's in the
-  /// chart, gold under Luxury Gold, and so on per theme" (2026-10-08).
-  ///
-  /// That orange lives in chartLineGradient, not in the accent: Graphite's
-  /// accentPrimary is white-steel, so reading the accent there produced
-  /// plain white text and lost his whole point. Luxury Gold is the other way
-  /// round — no chart gradient, gold in the accent. Taking the line colour
-  /// first and falling back to the accent covers every theme, and is the
-  /// same expression PriceChart uses to colour its own glow.
-  Color _actualColour() =>
-      widget.palette.chartLineGradient?.colors.last ??
-      widget.palette.accentPrimary;
-
   double _actualPercent(String symbol) {
     final total = widget.holdings.fold<double>(0, (s, h) => s + h.value);
     if (total <= 0) return 0;
@@ -420,7 +407,7 @@ class _FundTargetEditorState extends State<FundTargetEditor> {
                         style: interNums(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: _actualColour(),
+                          color: palette.actualFigureColour,
                         ),
                       ),
                       // Green is the target, the theme's accent is where the
