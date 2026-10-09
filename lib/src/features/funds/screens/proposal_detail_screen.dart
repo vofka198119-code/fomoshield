@@ -115,7 +115,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         centerTitle: true,
         leading: themedBackButton(context, palette),
         title: themedHeaderText(
-          _proposal.symbol,
+          // A batch is titled by what it is; only a single trade has a
+          // company to name.
+          _proposal.symbol ?? l10n.etfRebalanceProposalTitle,
           palette,
           GoogleFonts.inter(
             fontSize: 18,

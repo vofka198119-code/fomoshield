@@ -1,3 +1,5 @@
+import 'rebalance_leg.dart';
+
 // ---------------------------------------------------------------------------
 // Trade Proposal — ETF Fund Emulation, Phase 4. Mirrors
 // scanco-backend's fundTradeService.js shape (fund_trade_proposals table).
@@ -11,11 +13,26 @@ class TradeProposal {
   final String fundId;
   final String proposerUserId;
   final String? proposerNickname;
-  final String symbol;
-  final String side; // 'buy' | 'sell'
-  final String orderType; // 'market' | 'limit'
+
+  /// 'trade' — one company, the shape every proposal had before phase 4.
+  /// 'rebalance' — a whole batch, carried in [legs] (Migration 035).
+  final String kind;
+
+  /// The batch, for a rebalance. Null for an ordinary trade.
+  final List<RebalanceLeg>? legs;
+
+  /// 'cash' or 'full' — which route produced the batch. Null for a trade.
+  final String? rebalanceMode;
+
+  // The four below describe a single trade and are therefore NULL on a
+  // rebalance. Nullable on purpose: every screen that shows a proposal has
+  // to decide what it does with a batch, and the compiler is a better
+  // reminder of that than a comment.
+  final String? symbol;
+  final String? side; // 'buy' | 'sell'
+  final String? orderType; // 'market' | 'limit'
   final double? limitPrice;
-  final double quantity;
+  final double? quantity;
   final String? justification;
   final String status; // 'pending' | 'approved' | 'rejected' | 'executed'
   final bool flaggedRisky;
@@ -33,11 +50,14 @@ class TradeProposal {
     required this.fundId,
     required this.proposerUserId,
     this.proposerNickname,
-    required this.symbol,
-    required this.side,
-    required this.orderType,
+    this.kind = 'trade',
+    this.legs,
+    this.rebalanceMode,
+    this.symbol,
+    this.side,
+    this.orderType,
     this.limitPrice,
-    required this.quantity,
+    this.quantity,
     this.justification,
     required this.status,
     required this.flaggedRisky,
@@ -51,7 +71,12 @@ class TradeProposal {
     required this.createdAt,
   });
 
+  bool get isRebalance => kind == 'rebalance';
   bool get isBuy => side == 'buy';
+
+  /// Legs, or an empty list — saves every caller a null check on a list that
+  /// means "nothing to show" when absent.
+  List<RebalanceLeg> get legList => legs ?? const [];
   bool get isPending => status == 'pending';
   bool get isApproved => status == 'approved';
 
@@ -60,11 +85,18 @@ class TradeProposal {
     fundId: json['fundId'] as String,
     proposerUserId: json['proposerUserId'] as String,
     proposerNickname: json['proposerNickname'] as String?,
-    symbol: json['symbol'] as String,
-    side: json['side'] as String,
-    orderType: json['orderType'] as String,
+    // Defaults to 'trade' so a server that has not been updated yet, or a
+    // row written before Migration 035, still reads correctly.
+    kind: json['kind'] as String? ?? 'trade',
+    legs: (json['legs'] as List?)
+        ?.map((e) => RebalanceLeg.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    rebalanceMode: json['rebalanceMode'] as String?,
+    symbol: json['symbol'] as String?,
+    side: json['side'] as String?,
+    orderType: json['orderType'] as String?,
     limitPrice: (json['limitPrice'] as num?)?.toDouble(),
-    quantity: (json['quantity'] as num).toDouble(),
+    quantity: (json['quantity'] as num?)?.toDouble(),
     justification: json['justification'] as String?,
     status: json['status'] as String,
     flaggedRisky: json['flaggedRisky'] as bool? ?? false,

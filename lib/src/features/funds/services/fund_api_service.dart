@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../../core/utils/constants.dart';
 import '../../../core/supabase/auth_retry_interceptor.dart';
 import '../../../core/supabase/auth_token.dart';
+import '../models/rebalance_leg.dart';
 import '../models/fund.dart';
 import '../models/fund_target_weight.dart';
 import '../models/fund_balance_history.dart';
@@ -430,6 +431,38 @@ class FundApiService {
       return list.map(FundTargetWeight.fromJson).toList();
     } on DioException catch (e) {
       throw Exception(_errorMessage(e, 'Failed to save targets'));
+    }
+  }
+
+  /// What a rebalance WOULD do — the plan, before anyone commits to it.
+  /// Changes nothing on the server.
+  Future<RebalancePlan> previewRebalance(String fundId, String mode) async {
+    try {
+      final response = await _dio.get(
+        '/funds/$fundId/rebalance',
+        queryParameters: {'mode': mode},
+      );
+      return RebalancePlan.fromJson((response.data as Map).cast<String, dynamic>());
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to plan the rebalance'));
+    }
+  }
+
+  /// Files that plan as ONE proposal carrying every leg (Migration 035), for
+  /// the fund's usual approval chain. Returns how many trades are in it.
+  Future<int> proposeRebalance(
+    String fundId,
+    String mode, {
+    String? justification,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/rebalance',
+        data: {'mode': mode, 'justification': ?justification},
+      );
+      return ((response.data as Map)['legCount'] as num?)?.toInt() ?? 0;
+    } on DioException catch (e) {
+      throw Exception(_errorMessage(e, 'Failed to propose the rebalance'));
     }
   }
 

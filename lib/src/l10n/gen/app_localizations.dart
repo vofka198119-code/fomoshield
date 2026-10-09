@@ -11527,6 +11527,126 @@ abstract class AppLocalizations {
   /// **'Every company is within {threshold}% of its target — the fund follows its plan.'**
   String etfBalancingDriftOnPlan(String threshold);
 
+  /// No description provided for @etfRebalanceProposalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebalance'**
+  String get etfRebalanceProposalTitle;
+
+  /// No description provided for @etfRebalanceModeCashShort.
+  ///
+  /// In en, this message translates to:
+  /// **'free cash only'**
+  String get etfRebalanceModeCashShort;
+
+  /// No description provided for @etfRebalanceModeFullShort.
+  ///
+  /// In en, this message translates to:
+  /// **'sell and buy'**
+  String get etfRebalanceModeFullShort;
+
+  /// No description provided for @etfRebalanceLegCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} trade} other{{count} trades}}'**
+  String etfRebalanceLegCount(int count);
+
+  /// No description provided for @etfRebalanceLegsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trades in this batch'**
+  String get etfRebalanceLegsTitle;
+
+  /// No description provided for @etfRebalanceSellTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell'**
+  String get etfRebalanceSellTotal;
+
+  /// No description provided for @etfRebalanceBuyTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get etfRebalanceBuyTotal;
+
+  /// No description provided for @etfRebalanceLegFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'not filled'**
+  String get etfRebalanceLegFailed;
+
+  /// No description provided for @etfRebalanceButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebalance'**
+  String get etfRebalanceButton;
+
+  /// No description provided for @etfRebalanceSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What the rebalance will do'**
+  String get etfRebalanceSheetTitle;
+
+  /// No description provided for @etfRebalanceModeCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Spend free cash'**
+  String get etfRebalanceModeCash;
+
+  /// No description provided for @etfRebalanceModeCashHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is sold. The free cash goes where the fund is furthest below its plan.'**
+  String get etfRebalanceModeCashHint;
+
+  /// No description provided for @etfRebalanceModeFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell the excess, buy the shortfall'**
+  String get etfRebalanceModeFull;
+
+  /// No description provided for @etfRebalanceModeFullHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Brings the fund onto its plan exactly. Commission is charged on every trade.'**
+  String get etfRebalanceModeFullHint;
+
+  /// No description provided for @etfRebalanceNothingToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to rebalance — the fund already matches its plan.'**
+  String get etfRebalanceNothingToDo;
+
+  /// No description provided for @etfRebalanceNoTargets.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the target weights first.'**
+  String get etfRebalanceNoTargets;
+
+  /// No description provided for @etfRebalanceMissingPrices.
+  ///
+  /// In en, this message translates to:
+  /// **'No price for {symbols} right now, so the batch cannot be worked out.'**
+  String etfRebalanceMissingPrices(String symbols);
+
+  /// No description provided for @etfRebalanceConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Propose'**
+  String get etfRebalanceConfirmButton;
+
+  /// No description provided for @etfRebalanceCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebalance proposed'**
+  String get etfRebalanceCreated;
+
+  /// No description provided for @etfRebalanceError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not work out the rebalance'**
+  String get etfRebalanceError;
+
   /// No description provided for @etfPermissionSetTargets.
   ///
   /// In en, this message translates to:

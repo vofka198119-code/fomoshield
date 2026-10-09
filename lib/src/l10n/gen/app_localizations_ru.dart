@@ -6823,6 +6823,81 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get etfRebalanceProposalTitle => 'Ребалансировка';
+
+  @override
+  String get etfRebalanceModeCashShort => 'на свободные деньги';
+
+  @override
+  String get etfRebalanceModeFullShort => 'продажи и покупки';
+
+  @override
+  String etfRebalanceLegCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сделки',
+      many: '$count сделок',
+      few: '$count сделки',
+      one: '$count сделка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get etfRebalanceLegsTitle => 'Сделки в пачке';
+
+  @override
+  String get etfRebalanceSellTotal => 'Продать';
+
+  @override
+  String get etfRebalanceBuyTotal => 'Докупить';
+
+  @override
+  String get etfRebalanceLegFailed => 'не исполнено';
+
+  @override
+  String get etfRebalanceButton => 'Ребалансировать';
+
+  @override
+  String get etfRebalanceSheetTitle => 'Что сделает ребалансировка';
+
+  @override
+  String get etfRebalanceModeCash => 'Вложить свободные деньги';
+
+  @override
+  String get etfRebalanceModeCashHint =>
+      'Ничего не продаём. Свободные деньги уходят туда, где фонд сильнее всего отстал от плана.';
+
+  @override
+  String get etfRebalanceModeFull => 'Продать лишнее, докупить недостающее';
+
+  @override
+  String get etfRebalanceModeFullHint =>
+      'Приводит фонд точно к плану. Комиссия берётся с каждой сделки.';
+
+  @override
+  String get etfRebalanceNothingToDo =>
+      'Ребалансировать нечего — фонд уже стоит по плану.';
+
+  @override
+  String get etfRebalanceNoTargets => 'Сначала задайте целевые доли.';
+
+  @override
+  String etfRebalanceMissingPrices(String symbols) {
+    return 'Сейчас нет цены по $symbols, поэтому посчитать пачку нельзя.';
+  }
+
+  @override
+  String get etfRebalanceConfirmButton => 'Предложить';
+
+  @override
+  String get etfRebalanceCreated => 'Заявка на ребалансировку создана';
+
+  @override
+  String get etfRebalanceError => 'Не удалось посчитать ребалансировку';
+
+  @override
   String get etfPermissionSetTargets => 'Задавать целевые доли';
 
   @override

@@ -6801,6 +6801,79 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get etfRebalanceProposalTitle => 'Rebalance';
+
+  @override
+  String get etfRebalanceModeCashShort => 'free cash only';
+
+  @override
+  String get etfRebalanceModeFullShort => 'sell and buy';
+
+  @override
+  String etfRebalanceLegCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count trades',
+      one: '$count trade',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get etfRebalanceLegsTitle => 'Trades in this batch';
+
+  @override
+  String get etfRebalanceSellTotal => 'Sell';
+
+  @override
+  String get etfRebalanceBuyTotal => 'Buy';
+
+  @override
+  String get etfRebalanceLegFailed => 'not filled';
+
+  @override
+  String get etfRebalanceButton => 'Rebalance';
+
+  @override
+  String get etfRebalanceSheetTitle => 'What the rebalance will do';
+
+  @override
+  String get etfRebalanceModeCash => 'Spend free cash';
+
+  @override
+  String get etfRebalanceModeCashHint =>
+      'Nothing is sold. The free cash goes where the fund is furthest below its plan.';
+
+  @override
+  String get etfRebalanceModeFull => 'Sell the excess, buy the shortfall';
+
+  @override
+  String get etfRebalanceModeFullHint =>
+      'Brings the fund onto its plan exactly. Commission is charged on every trade.';
+
+  @override
+  String get etfRebalanceNothingToDo =>
+      'Nothing to rebalance — the fund already matches its plan.';
+
+  @override
+  String get etfRebalanceNoTargets => 'Set the target weights first.';
+
+  @override
+  String etfRebalanceMissingPrices(String symbols) {
+    return 'No price for $symbols right now, so the batch cannot be worked out.';
+  }
+
+  @override
+  String get etfRebalanceConfirmButton => 'Propose';
+
+  @override
+  String get etfRebalanceCreated => 'Rebalance proposed';
+
+  @override
+  String get etfRebalanceError => 'Could not work out the rebalance';
+
+  @override
   String get etfPermissionSetTargets => 'Set target weights';
 
   @override

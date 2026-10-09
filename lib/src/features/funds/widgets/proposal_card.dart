@@ -15,6 +15,7 @@ import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/company_logo.dart';
 import '../../portfolio/portfolio_providers.dart' show brokerCommissionRate;
+import 'rebalance_legs_list.dart';
 import '../models/trade_proposal.dart';
 
 // A still-pending/approved market order has no stored price at all (see
@@ -272,11 +273,19 @@ class ProposalListTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logoUrl = ref.watch(cachedLogoProvider(proposal.symbol)).valueOrNull;
-    final companyName =
-        ref.watch(resolvedCompanyNameProvider(proposal.symbol)).valueOrNull ??
-        proposal.symbol;
-    final accent = proposal.isBuy ? ThemeV2.success : ThemeV2.loss;
+    // A rebalance names no company — the tile says what it is and how many
+    // trades it carries, and the card behind it holds the list.
+    final isBatch = proposal.isRebalance;
+    final symbol = proposal.symbol ?? '';
+    final logoUrl = isBatch
+        ? null
+        : ref.watch(cachedLogoProvider(symbol)).valueOrNull;
+    final companyName = isBatch
+        ? l10n.etfRebalanceProposalTitle
+        : ref.watch(resolvedCompanyNameProvider(symbol)).valueOrNull ?? symbol;
+    final accent = isBatch
+        ? palette.accentPrimary
+        : (proposal.isBuy ? ThemeV2.success : ThemeV2.loss);
 
     return InkWell(
       onTap: onTap,
@@ -288,9 +297,11 @@ class ProposalListTile extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              proposal.isBuy
-                  ? l10n.etfProposalHeaderBuy
-                  : l10n.etfProposalHeaderSell,
+              isBatch
+                  ? l10n.etfRebalanceProposalTitle.toUpperCase()
+                  : (proposal.isBuy
+                        ? l10n.etfProposalHeaderBuy
+                        : l10n.etfProposalHeaderSell),
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
@@ -309,18 +320,24 @@ class ProposalListTile extends ConsumerWidget {
                     border: Border.all(color: palette.accentPrimary, width: 1.5),
                   ),
                   padding: const EdgeInsets.all(2),
-                  child: ClipOval(
-                    child: SizedBox(
-                      width: 34,
-                      height: 34,
-                      child: CompanyLogo(
-                        ticker: proposal.symbol,
-                        logoUrl: logoUrl,
-                        radius: 17,
-                        resolveIfMissing: false,
-                      ),
-                    ),
-                  ),
+                  child: isBatch
+                      ? Icon(
+                          Icons.balance_rounded,
+                          color: palette.accentPrimary,
+                          size: 20,
+                        )
+                      : ClipOval(
+                          child: SizedBox(
+                            width: 34,
+                            height: 34,
+                            child: CompanyLogo(
+                              ticker: symbol,
+                              logoUrl: logoUrl,
+                              radius: 17,
+                              resolveIfMissing: false,
+                            ),
+                          ),
+                        ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -339,7 +356,11 @@ class ProposalListTile extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        proposal.symbol,
+                        isBatch
+                            ? l10n.etfRebalanceLegCount(
+                                proposal.legList.length,
+                              )
+                            : symbol,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: palette.textBody,
@@ -437,10 +458,18 @@ class ProposalCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logoUrl = ref.watch(cachedLogoProvider(proposal.symbol)).valueOrNull;
-    final companyName =
-        ref.watch(resolvedCompanyNameProvider(proposal.symbol)).valueOrNull ??
-        proposal.symbol;
+    // A rebalance has no single company, so none of the per-trade lookups
+    // below mean anything for one — and watching a logo for an empty symbol
+    // would start a pointless network resolve.
+    final isBatch = proposal.isRebalance;
+    final symbol = proposal.symbol ?? '';
+    final quantity = proposal.quantity ?? 0;
+    final logoUrl = isBatch
+        ? null
+        : ref.watch(cachedLogoProvider(symbol)).valueOrNull;
+    final companyName = isBatch
+        ? ''
+        : ref.watch(resolvedCompanyNameProvider(symbol)).valueOrNull ?? symbol;
     final directionAccent = proposal.isBuy ? ThemeV2.success : ThemeV2.loss;
     // Order placement price only means something for a limit order -- a
     // market order has no price at the moment it's proposed, only once it
@@ -453,9 +482,9 @@ class ProposalCard extends ConsumerWidget {
         ? proposal.limitPrice
         : null;
     final needsLiveEstimate =
-        proposal.executedPrice == null && placementPrice == null;
+        !isBatch && proposal.executedPrice == null && placementPrice == null;
     final estimatedPrice = needsLiveEstimate
-        ? ref.watch(proposalLivePriceProvider(proposal.symbol)).valueOrNull
+        ? ref.watch(proposalLivePriceProvider(symbol)).valueOrNull
         : null;
     final totalValuePrice =
         proposal.executedPrice ?? placementPrice ?? estimatedPrice;
@@ -478,6 +507,9 @@ class ProposalCard extends ConsumerWidget {
               // Theme-accent ring (Watchlist's own convention), NOT a
               // green/red directional ring -- direction is communicated by
               // the BUY/SELL badge to the right instead (explicit user ask).
+              // A batch gets the same 52px ring, with the balance glyph
+              // where a company's logo goes — the card still reads as "a
+              // proposal about something", and the something is the plan.
               Container(
                 width: 52,
                 height: 52,
@@ -486,18 +518,24 @@ class ProposalCard extends ConsumerWidget {
                   border: Border.all(color: palette.accentPrimary, width: 1.5),
                 ),
                 padding: const EdgeInsets.all(2),
-                child: ClipOval(
-                  child: SizedBox(
-                    width: 46,
-                    height: 46,
-                    child: CompanyLogo(
-                      ticker: proposal.symbol,
-                      logoUrl: logoUrl,
-                      radius: 23,
-                      resolveIfMissing: false,
-                    ),
-                  ),
-                ),
+                child: isBatch
+                    ? Icon(
+                        Icons.balance_rounded,
+                        color: palette.accentPrimary,
+                        size: 26,
+                      )
+                    : ClipOval(
+                        child: SizedBox(
+                          width: 46,
+                          height: 46,
+                          child: CompanyLogo(
+                            ticker: symbol,
+                            logoUrl: logoUrl,
+                            radius: 23,
+                            resolveIfMissing: false,
+                          ),
+                        ),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -505,7 +543,7 @@ class ProposalCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      companyName,
+                      isBatch ? l10n.etfRebalanceProposalTitle : companyName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
@@ -515,7 +553,11 @@ class ProposalCard extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      proposal.symbol,
+                      isBatch
+                          ? (proposal.rebalanceMode == 'cash'
+                                ? l10n.etfRebalanceModeCashShort
+                                : l10n.etfRebalanceModeFullShort)
+                          : symbol,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: palette.textBody,
@@ -527,15 +569,18 @@ class ProposalCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: directionAccent.withValues(alpha: 0.12),
+                  color: (isBatch ? palette.accentPrimary : directionAccent)
+                      .withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  proposal.isBuy ? l10n.tradeBuy : l10n.tradeSell,
+                  isBatch
+                      ? l10n.etfRebalanceLegCount(proposal.legList.length)
+                      : (proposal.isBuy ? l10n.tradeBuy : l10n.tradeSell),
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: directionAccent,
+                    color: isBatch ? palette.accentPrimary : directionAccent,
                   ),
                 ),
               ),
@@ -562,58 +607,69 @@ class ProposalCard extends ConsumerWidget {
           const SizedBox(height: 16),
           themedDivider(palette, indent: 0, endIndent: 0, height: 1),
           const SizedBox(height: 16),
-          _detailRow(
-            label: l10n.tradeOrderTypeLabel,
-            value: proposal.orderType == 'limit'
-                ? l10n.etfProposeOrderTypeLimit
-                : l10n.etfProposeOrderTypeMarket,
-            palette: palette,
-          ),
-          if (placementPrice != null)
-            _detailRow(
-              label: l10n.etfProposalPlacementPriceLabel,
-              value: formatUsd(placementPrice),
+          // The per-trade figures only exist for a single trade. A batch
+          // shows its own list instead — same question answered, one line
+          // per company.
+          if (isBatch)
+            RebalanceLegsList(
+              legs: proposal.legList,
               palette: palette,
-            ),
-          if (estimatedPrice != null)
-            _detailRow(
-              label: l10n.etfProposalEstimatedPriceLabel,
-              value: formatUsd(estimatedPrice),
-              palette: palette,
-            ),
-          _detailRow(
-            label: proposal.isBuy
-                ? l10n.tradeSharesBoughtLabel
-                : l10n.tradeSharesSoldLabel,
-            value: proposal.quantity.toStringAsFixed(4),
-            palette: palette,
-          ),
-          if (proposal.executedPrice != null)
-            _detailRow(
-              label: l10n.etfProposalExecutionPriceLabel,
-              value: formatUsd(proposal.executedPrice!),
-              palette: palette,
-            ),
-          if (totalValuePrice != null)
-            _detailRow(
-              label: l10n.tradeTotalValueLabel,
-              value: formatUsd(proposal.quantity * totalValuePrice),
-              palette: palette,
-            ),
-          if (proposal.commission != null)
-            _detailRow(
-              label: l10n.tradeCommissionLabel,
-              value: formatUsd(proposal.commission!),
-              palette: palette,
+              l10n: l10n,
             )
-          else if (estimatedPrice != null)
+          else ...[
             _detailRow(
-              label: l10n.etfProposalEstimatedCommissionLabel,
-              value: formatUsd(
-                proposal.quantity * estimatedPrice * brokerCommissionRate,
-              ),
+              label: l10n.tradeOrderTypeLabel,
+              value: proposal.orderType == 'limit'
+                  ? l10n.etfProposeOrderTypeLimit
+                  : l10n.etfProposeOrderTypeMarket,
               palette: palette,
             ),
+            if (placementPrice != null)
+              _detailRow(
+                label: l10n.etfProposalPlacementPriceLabel,
+                value: formatUsd(placementPrice),
+                palette: palette,
+              ),
+            if (estimatedPrice != null)
+              _detailRow(
+                label: l10n.etfProposalEstimatedPriceLabel,
+                value: formatUsd(estimatedPrice),
+                palette: palette,
+              ),
+            _detailRow(
+              label: proposal.isBuy
+                  ? l10n.tradeSharesBoughtLabel
+                  : l10n.tradeSharesSoldLabel,
+              value: quantity.toStringAsFixed(4),
+              palette: palette,
+            ),
+            if (proposal.executedPrice != null)
+              _detailRow(
+                label: l10n.etfProposalExecutionPriceLabel,
+                value: formatUsd(proposal.executedPrice!),
+                palette: palette,
+              ),
+            if (totalValuePrice != null)
+              _detailRow(
+                label: l10n.tradeTotalValueLabel,
+                value: formatUsd(quantity * totalValuePrice),
+                palette: palette,
+              ),
+            if (proposal.commission != null)
+              _detailRow(
+                label: l10n.tradeCommissionLabel,
+                value: formatUsd(proposal.commission!),
+                palette: palette,
+              )
+            else if (estimatedPrice != null)
+              _detailRow(
+                label: l10n.etfProposalEstimatedCommissionLabel,
+                value: formatUsd(
+                    quantity * estimatedPrice * brokerCommissionRate,
+                ),
+                palette: palette,
+              ),
+          ],
           _detailRow(
             label: l10n.tradeDateLabel,
             value: _formatDate(context, proposal.createdAt),

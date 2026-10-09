@@ -52,11 +52,18 @@ class ProposalImpactCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // A rebalance has no single company to measure, and needs none: its own
+    // list already carries share-before and share-after for every line in
+    // it, which is this card's whole content said once per company.
+    if (proposal.isRebalance) return const SizedBox.shrink();
+    final symbol = proposal.symbol!;
+    final quantity = proposal.quantity!;
+
     // The same price ProposalCard shows, from the same provider: an executed
     // trade keeps its real price, a limit order uses its own, and anything
     // else is a live estimate.
     final livePrice = ref
-        .watch(proposalLivePriceProvider(proposal.symbol))
+        .watch(proposalLivePriceProvider(symbol))
         .valueOrNull;
     final price =
         proposal.executedPrice ??
@@ -65,7 +72,7 @@ class ProposalImpactCard extends ConsumerWidget {
     if (price == null || price <= 0) return const SizedBox.shrink();
 
     final held = _heldPosition();
-    final tradeValue = proposal.quantity * price;
+    final tradeValue = quantity * price;
     final commission = proposal.commission ?? tradeValue * brokerCommissionRate;
 
     // Commission is the only money that actually leaves the fund — a buy
@@ -166,12 +173,14 @@ class ProposalImpactCard extends ConsumerWidget {
     double price,
     double tradeValue,
   ) {
+    // Reached only from build, which has already turned a rebalance away.
+    final quantity = proposal.quantity!;
     if (proposal.isBuy) {
       if (held == null || held.avgCost <= 0) return const [];
       // Topping up always drags the average towards today's price; seeing
       // where it lands is half the decision on a position already in profit.
       final avgAfter =
-          (held.costBasis + tradeValue) / (held.quantity + proposal.quantity);
+          (held.costBasis + tradeValue) / (held.quantity + quantity);
       return [
         _row(
           l10n.etfProposalImpactAvgCostAfter,
@@ -181,8 +190,8 @@ class ProposalImpactCard extends ConsumerWidget {
     }
 
     if (held == null || held.quantity <= 0) return const [];
-    final soldShare = (proposal.quantity / held.quantity * 100).clamp(0, 100);
-    final remaining = (held.quantity - proposal.quantity).clamp(
+    final soldShare = (quantity / held.quantity * 100).clamp(0, 100);
+    final remaining = (held.quantity - quantity).clamp(
       0,
       double.infinity,
     );
@@ -194,7 +203,7 @@ class ProposalImpactCard extends ConsumerWidget {
       if (held.avgCost > 0)
         _row(
           l10n.etfProposalImpactRealized,
-          formatUsdSigned(proposal.quantity * (price - held.avgCost)),
+          formatUsdSigned(quantity * (price - held.avgCost)),
           valueColor: price >= held.avgCost ? ThemeV2.success : ThemeV2.loss,
         ),
       _row(
