@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../../../core/utils/constants.dart';
-import '../../../core/supabase/supabase_client.dart';
+import '../../../core/supabase/auth_retry_interceptor.dart';
+import '../../../core/supabase/auth_token.dart';
 import '../models/fund.dart';
 import '../models/fund_target_weight.dart';
 import '../models/fund_balance_history.dart';
@@ -78,11 +79,12 @@ class FundApiService {
       ) {
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
-          // Read the current session token fresh on every request — see
-          // FinnhubService's identical comment on why this can't be cached.
-          final accessToken =
-              SupabaseConfig.client.auth.currentSession?.accessToken;
+        onRequest: (options, handler) async {
+          // Not just "read it fresh" — WAIT for a valid one. A token restored
+          // from disk at launch can already be expired, and that is what made
+          // the app's first screen fail while a retry worked (2026-10-09, see
+          // freshAccessToken).
+          final accessToken = await freshAccessToken();
           if (accessToken != null) {
             options.headers['Authorization'] = 'Bearer $accessToken';
           }
@@ -90,6 +92,9 @@ class FundApiService {
         },
       ),
     );
+    // Last in the chain: it only ever acts on an error the others let
+    // through.
+    _dio.interceptors.add(AuthRetryInterceptor(_dio));
   }
 
   String _errorMessage(DioException e, String fallback) {

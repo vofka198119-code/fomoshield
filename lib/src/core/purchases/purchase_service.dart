@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
-import '../supabase/supabase_client.dart';
+import '../supabase/auth_retry_interceptor.dart';
+import '../supabase/auth_token.dart';
 import '../supabase/supabase_providers.dart';
 import '../utils/constants.dart';
 
@@ -44,11 +45,12 @@ class PurchaseService {
     );
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
-          // Read fresh on every request, not cached at construction time —
-          // see the identical comment in finnhub_service.dart.
-          final accessToken =
-              SupabaseConfig.client.auth.currentSession?.accessToken;
+        onRequest: (options, handler) async {
+          // Not just "read it fresh" — WAIT for a valid one. A token restored
+          // from disk at launch can already be expired, and that is what made
+          // the app's first screen fail while a retry worked (2026-10-09, see
+          // freshAccessToken).
+          final accessToken = await freshAccessToken();
           if (accessToken != null) {
             options.headers['Authorization'] = 'Bearer $accessToken';
           }
@@ -56,6 +58,9 @@ class PurchaseService {
         },
       ),
     );
+    // Last in the chain: it only ever acts on an error the others let
+    // through.
+    _dio.interceptors.add(AuthRetryInterceptor(_dio));
   }
 
   final InAppPurchase _iap = InAppPurchase.instance;

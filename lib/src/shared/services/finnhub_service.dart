@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../../core/utils/constants.dart';
-import '../../core/supabase/supabase_client.dart';
+import '../../core/supabase/auth_retry_interceptor.dart';
+import '../../core/supabase/auth_token.dart';
 
 /// True if a search result's `type` field (Finnhub's own `/search`, or the
 /// backend's local index) identifies an ETF. Both sources label real ETFs
@@ -96,13 +97,12 @@ class FinnhubService {
       ) {
     _backendDio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
-          // Read the CURRENT session token fresh on every request (not
-          // cached at Dio-construction time) — supabase_flutter auto-
-          // refreshes it in the background, so a stale copy would start
-          // failing the backend's JWT verification after expiry.
-          final accessToken =
-              SupabaseConfig.client.auth.currentSession?.accessToken;
+        onRequest: (options, handler) async {
+          // Not just "read it fresh" — WAIT for a valid one. A token restored
+          // from disk at launch can already be expired, and that is what made
+          // the app's first screen fail while a retry worked (2026-10-09, see
+          // freshAccessToken).
+          final accessToken = await freshAccessToken();
           if (accessToken != null) {
             options.headers['Authorization'] = 'Bearer $accessToken';
           }
@@ -125,6 +125,9 @@ class FinnhubService {
         },
       ),
     );
+    // Last in the chain: it only ever acts on an error the others let
+    // through.
+    _backendDio.interceptors.add(AuthRetryInterceptor(_backendDio));
   }
 
   /// Get from scanco-backend (top-level JSON object), `backend:`-prefixed
