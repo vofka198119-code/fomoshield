@@ -16,6 +16,7 @@ import '../models/employee.dart';
 import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 import '../widgets/employee_identity_card.dart';
+import '../widgets/role_picker_field.dart';
 
 // ---------------------------------------------------------------------------
 // Employee Profile — ETF Fund Emulation, Phase 3. The analyst's public
@@ -186,100 +187,18 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
     );
   }
 
-  // Same role list + label mapping as send_invite_sheet.dart's own role
-  // selector (a head choosing a role when inviting someone) — this is the
-  // analyst-side wishlist equivalent, so it reuses the exact same
-  // employeeRoles list for consistency.
-  String _roleLabel(AppLocalizations l10n, String role) {
-    switch (role) {
-      case 'co_manager':
-        return l10n.etfRoleCoManager;
-      case 'trader':
-        return l10n.etfRoleTrader;
-      case 'risk_manager':
-        return l10n.etfRoleRiskManager;
-      default:
-        return l10n.etfRoleAnalyst;
-    }
-  }
-
   // A single field, same box as every other field on this form (and the
   // read-only nickname box above) — a value + chevron, tap opens a popup
   // menu anchored under the field, picking an item writes it into the box
   // and closes the popup. Not a multi-chip picker — explicit correction
   // 2026-09-12 after a first pass used ChoiceChips instead.
-  Future<void> _showRoleMenu(
-    BuildContext fieldContext,
-    AppPalette palette,
-    AppLocalizations l10n,
-  ) async {
-    final box = fieldContext.findRenderObject() as RenderBox;
-    final overlay =
-        Navigator.of(fieldContext).overlay!.context.findRenderObject()
-            as RenderBox;
-    final position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        box.localToGlobal(Offset(0, box.size.height), ancestor: overlay),
-        box.localToGlobal(box.size.bottomRight(Offset.zero), ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-    final selected = await showMenu<String>(
-      context: fieldContext,
-      position: position,
-      color: palette.card,
-      items: [
-        for (final role in employeeRoles)
-          PopupMenuItem<String>(
-            value: role,
-            child: Text(
-              _roleLabel(l10n, role),
-              style: GoogleFonts.inter(color: palette.textHeader),
-            ),
-          ),
-      ],
-    );
-    if (selected != null) setState(() => _desiredRole = selected);
-  }
 
   Widget _desiredRoleField(AppPalette palette, AppLocalizations l10n) {
-    return _fieldWrapper(
-      palette,
-      Builder(
-        builder: (fieldContext) => InkWell(
-          onTap: () => _showRoleMenu(fieldContext, palette, l10n),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _desiredRole != null
-                        ? _roleLabel(l10n, _desiredRole!)
-                        : l10n.etfEmployeeProfileDesiredRoleHint,
-                    // fontSize matches the Bio/Language TextFormFields'
-                    // own rendered size (their unset fontSize falls back
-                    // to the input theme's default, 16) — this field reads
-                    // as one more entry in the same form, not a plain Text
-                    // widget with its own ambient (smaller) default.
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      color: _desiredRole != null
-                          ? palette.textHeader
-                          : palette.textHeader.withValues(alpha: 0.5),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: palette.textBody,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return RolePickerField(
+      palette: palette,
+      value: _desiredRole,
+      hint: l10n.etfEmployeeProfileDesiredRoleHint,
+      onChanged: (role) => setState(() => _desiredRole = role),
     );
   }
 

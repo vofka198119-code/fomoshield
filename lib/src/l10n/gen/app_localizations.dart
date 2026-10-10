@@ -13060,8 +13060,14 @@ abstract class AppLocalizations {
   /// No description provided for @etfSendInviteRoleLabel.
   ///
   /// In en, this message translates to:
-  /// **'Role'**
+  /// **'Offer a role'**
   String get etfSendInviteRoleLabel;
+
+  /// No description provided for @etfSendInviteToLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get etfSendInviteToLabel;
 
   /// No description provided for @etfSendInviteMessageLabel.
   ///

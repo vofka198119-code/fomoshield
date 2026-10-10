@@ -7681,7 +7681,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfSendInviteTitle => 'Отправить приглашение';
 
   @override
-  String get etfSendInviteRoleLabel => 'Должность';
+  String get etfSendInviteRoleLabel => 'Предложить должность';
+
+  @override
+  String get etfSendInviteToLabel => 'Кому';
 
   @override
   String get etfSendInviteMessageLabel => 'Сообщение';

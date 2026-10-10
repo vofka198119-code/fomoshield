@@ -10,7 +10,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 import '../widgets/fund_form_fields.dart';
-import '../widgets/team_member_permissions_sheet.dart' show roleLabelFor;
+import '../widgets/role_picker_field.dart';
 
 // ---------------------------------------------------------------------------
 // Post Vacancy — the head's side of the exchange (migration 036). A pushed
@@ -20,8 +20,6 @@ import '../widgets/team_member_permissions_sheet.dart' show roleLabelFor;
 // Reuses the fund form's own field chrome, so an advert is typed into the
 // same boxes a fund is created in.
 // ---------------------------------------------------------------------------
-
-const _roles = ['analyst', 'co_manager', 'trader', 'risk_manager'];
 
 class PostVacancyScreen extends ConsumerStatefulWidget {
   final String fundId;
@@ -135,29 +133,10 @@ class _PostVacancyScreenState extends ConsumerState<PostVacancyScreen> {
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
           children: [
             fundFieldHeader(palette, l10n.etfVacancyPostRoleLabel),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _roles.map((role) {
-                final selected = role == _role;
-                return ChoiceChip(
-                  label: Text(roleLabelFor(l10n, role)),
-                  selected: selected,
-                  onSelected: _submitting
-                      ? null
-                      : (_) => setState(() => _role = role),
-                  selectedColor: palette.accentPrimary.withValues(alpha: 0.2),
-                  labelStyle: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: selected ? palette.accentPrimary : palette.textBody,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  ),
-                  backgroundColor: palette.card,
-                  side: BorderSide(
-                    color: palette.textBody.withValues(alpha: 0.2),
-                  ),
-                );
-              }).toList(),
+            RolePickerField(
+              palette: palette,
+              value: _role,
+              onChanged: (role) => setState(() => _role = role),
             ),
             const SizedBox(height: 20),
             fundFieldHeader(palette, l10n.etfVacancyPostPitchLabel),

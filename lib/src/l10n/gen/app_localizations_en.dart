@@ -7652,7 +7652,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfSendInviteTitle => 'Send Invitation';
 
   @override
-  String get etfSendInviteRoleLabel => 'Role';
+  String get etfSendInviteRoleLabel => 'Offer a role';
+
+  @override
+  String get etfSendInviteToLabel => 'To';
 
   @override
   String get etfSendInviteMessageLabel => 'Message';

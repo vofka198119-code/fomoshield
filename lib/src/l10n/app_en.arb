@@ -3025,7 +3025,8 @@
   "etfMarketplaceBioFallback": "No bio yet",
 
   "etfSendInviteTitle": "Send Invitation",
-  "etfSendInviteRoleLabel": "Role",
+  "etfSendInviteRoleLabel": "Offer a role",
+  "etfSendInviteToLabel": "To",
   "etfSendInviteMessageLabel": "Message",
   "etfSendInviteMessageHint": "Tell them about the role and your fund",
   "etfSendInviteMessageRequired": "A message is required",

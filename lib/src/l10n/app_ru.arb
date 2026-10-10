@@ -2248,7 +2248,8 @@
   "etfMarketplaceBioFallback": "Пока нет описания",
 
   "etfSendInviteTitle": "Отправить приглашение",
-  "etfSendInviteRoleLabel": "Должность",
+  "etfSendInviteRoleLabel": "Предложить должность",
+  "etfSendInviteToLabel": "Кому",
   "etfSendInviteMessageLabel": "Сообщение",
   "etfSendInviteMessageHint": "Расскажи о должности и своём фонде",
   "etfSendInviteMessageRequired": "Сообщение обязательно",

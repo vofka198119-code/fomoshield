@@ -7,6 +7,8 @@ import '../../../core/theme/themed_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
+import '../providers/fund_providers.dart';
+import 'role_picker_field.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 
 // ---------------------------------------------------------------------------
@@ -37,19 +39,6 @@ Future<bool?> showSendInviteSheet({
   );
 }
 
-String _roleLabel(AppLocalizations l10n, String role) {
-  switch (role) {
-    case 'co_manager':
-      return l10n.etfRoleCoManager;
-    case 'trader':
-      return l10n.etfRoleTrader;
-    case 'risk_manager':
-      return l10n.etfRoleRiskManager;
-    default:
-      return l10n.etfRoleAnalyst;
-  }
-}
-
 class _SendInviteSheet extends ConsumerStatefulWidget {
   final String fundId;
   final EmployeeProfile profile;
@@ -69,7 +58,10 @@ class _SendInviteSheet extends ConsumerStatefulWidget {
 
 class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
   late final TextEditingController _messageController;
-  String _role = employeeRoles.first;
+  // Explicitly the junior role, not employeeRoles.first -- that list is
+  // ordered by seniority now, and defaulting an invite to deputy would hand
+  // out approval rights on a mis-tap.
+  String _role = 'analyst';
   bool _submitting = false;
   String? _error;
 
@@ -126,7 +118,9 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
       }
       setState(() => _error = text);
     } catch (_) {
-      setState(() => _error = AppLocalizations.of(context)!.etfMarketplaceErrorMessage);
+      setState(
+        () => _error = AppLocalizations.of(context)!.etfMarketplaceErrorMessage,
+      );
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -138,7 +132,12 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
     final palette = widget.palette;
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        // viewInsets alone lifts the sheet over the keyboard but not over
+        // the system navigation bar, which left the send button sitting on
+        // top of the phone's own buttons (found on device 2026-10-10).
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -150,18 +149,40 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Text(
+                l10n.etfSendInviteTitle,
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: palette.textHeader,
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            // Which fund is doing the inviting, drawn the way a fund is drawn
+            // everywhere else -- ring avatar carrying the ticker, name, then
+            // the ticker in full (FundMiniCard's own recipe). An invite that
+            // only named the candidate left the fund implicit, and the two
+            // names here can even be the same word.
+            _fundRow(palette),
+            const SizedBox(height: 12),
             Text(
-              l10n.etfSendInviteTitle,
+              l10n.etfSendInviteToLabel,
               style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
                 color: palette.textHeader,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               widget.profile.nickname,
-              style: GoogleFonts.inter(fontSize: 14, color: palette.textBody),
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: palette.textBody,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -173,26 +194,12 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
               ),
             ),
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: employeeRoles.map((role) {
-                final selected = role == _role;
-                return ChoiceChip(
-                  label: Text(_roleLabel(l10n, role)),
-                  selected: selected,
-                  onSelected: (_) => setState(() => _role = role),
-                  selectedColor: palette.accentPrimary.withValues(alpha: 0.2),
-                  labelStyle: GoogleFonts.inter(
-                    color: selected
-                        ? palette.accentPrimary
-                        : palette.textBody,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  ),
-                );
-              }).toList(),
+            RolePickerField(
+              palette: palette,
+              value: _role,
+              onChanged: (role) => setState(() => _role = role),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 4),
             Text(
               l10n.etfSendInviteMessageLabel,
               style: GoogleFonts.inter(
@@ -220,7 +227,10 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: palette.accentPrimary, width: 2),
+                  borderSide: BorderSide(
+                    color: palette.accentPrimary,
+                    width: 2,
+                  ),
                 ),
               ),
             ),
@@ -273,6 +283,65 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
           ],
         ),
       ),
+    );
+  }
+
+  /// The inviting fund, in the app's own fund-row style.
+  Widget _fundRow(AppPalette palette) {
+    final fund = ref.watch(fundDetailProvider(widget.fundId)).valueOrNull;
+    if (fund == null) return const SizedBox.shrink();
+    final short = fund.ticker.length > 4
+        ? fund.ticker.substring(0, 4)
+        : fund.ticker;
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: palette.accentPrimary, width: 1.5),
+          ),
+          child: CircleAvatar(
+            radius: 18,
+            backgroundColor: palette.accentPrimary.withValues(alpha: 0.15),
+            child: Text(
+              short,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: palette.accentPrimary,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                fund.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: palette.textHeader,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                fund.ticker,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: palette.textBody,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

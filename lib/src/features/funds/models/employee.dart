@@ -5,11 +5,17 @@
 // and the /funds/:id/team, /funds/:id/invitations routes in that repo.
 // ---------------------------------------------------------------------------
 
+/// Ordered by how much of the fund each role may move, because that is the
+/// order a head reads them in when hiring (2026-10-10): the deputy signs off
+/// other people's trades, the trader sends approved orders to the market,
+/// the risk manager only flags, and the analyst proposes. Anything that
+/// wants a default picks one by name -- `.first` here is the most senior
+/// role and is nobody's sensible default.
 const List<String> employeeRoles = [
-  'analyst',
   'co_manager',
   'trader',
   'risk_manager',
+  'analyst',
 ];
 
 class EmployeeProfile {
