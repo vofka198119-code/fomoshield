@@ -7893,6 +7893,122 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get etfVacancyBoardTitle => 'Vacancy board';
+
+  @override
+  String get etfVacancyMyProfileTitle => 'My CV';
+
+  @override
+  String get etfVacancyMyProfileListed =>
+      'Listed on the board — fund heads can see you';
+
+  @override
+  String get etfVacancyMyProfileHidden => 'Not listed — nobody can find you';
+
+  @override
+  String get etfVacancyMyProfileNone =>
+      'No CV yet. Without one you do not exist on the board';
+
+  @override
+  String get etfVacancyPublishButton => 'List me on the board';
+
+  @override
+  String get etfVacancyWithdrawButton => 'Take me off the board';
+
+  @override
+  String get etfVacancyFillProfileButton => 'Fill in the CV';
+
+  @override
+  String get etfVacancyPublishedMessage => 'Your CV is on the board';
+
+  @override
+  String get etfVacancyWithdrawnMessage => 'Your CV is off the board';
+
+  @override
+  String get etfVacancyProfileError => 'Could not change that — try again';
+
+  @override
+  String get etfVacancyOpenSectionTitle => 'Open vacancies';
+
+  @override
+  String get etfVacancyBoardEmpty =>
+      'Nobody is hiring right now. Fund heads post the vacancies — look again later';
+
+  @override
+  String etfVacancyCardTeamSize(int size, int max) {
+    return '$size of $max on the team';
+  }
+
+  @override
+  String etfVacancyCardHead(String nickname) {
+    return 'Head: $nickname';
+  }
+
+  @override
+  String etfVacancyCardBudget(String amount) {
+    return 'Offers a limit up to $amount';
+  }
+
+  @override
+  String get etfVacancyCardOpenFund => 'Open the fund';
+
+  @override
+  String get etfVacancyFundSectionTitle => 'This fund\'s vacancies';
+
+  @override
+  String get etfVacancyFundSectionEmpty =>
+      'This fund has posted nothing. Until it does, nobody is looking for you';
+
+  @override
+  String get etfVacancyPostTitle => 'Post a vacancy';
+
+  @override
+  String get etfVacancyPostRoleLabel => 'Role';
+
+  @override
+  String get etfVacancyPostPitchLabel => 'Who you are looking for';
+
+  @override
+  String get etfVacancyPostPitchHint =>
+      'For example: an analyst for the technology sector, experience optional — we will work it out together';
+
+  @override
+  String get etfVacancyPostBudgetLabel => 'Spend-alone limit offered';
+
+  @override
+  String get etfVacancyPostBudgetHelp =>
+      'A promise in the advert, not a granted right. You set the real limit on the employee after hiring';
+
+  @override
+  String get etfVacancyPostButton => 'Post it';
+
+  @override
+  String get etfVacancyCloseButton => 'Withdraw';
+
+  @override
+  String get etfVacancyPostedMessage => 'Vacancy posted';
+
+  @override
+  String get etfVacancyClosedMessage => 'Vacancy withdrawn';
+
+  @override
+  String get etfVacancyErrorRoleOpen =>
+      'This fund already has an open vacancy for that role';
+
+  @override
+  String get etfVacancyErrorNoSeat =>
+      'No seats left: the team and the adverts together already fill all five';
+
+  @override
+  String get etfVacancyErrorGeneric => 'That did not work — try again';
+
+  @override
+  String get etfVacancyStatusClosed => 'Withdrawn';
+
+  @override
+  String get etfVacancyStatusFilled => 'Filled';
+
+  @override
   String get etfFundEditTitle => 'EDIT FUND';
 
   @override

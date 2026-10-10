@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/employee.dart';
+import '../models/fund_vacancy.dart';
 import '../models/fund_succession_offer.dart';
 import '../services/employee_api_service.dart';
 
@@ -30,10 +31,11 @@ final employeeMarketplaceProvider = FutureProvider.autoDispose
     });
 
 /// The caller's own pending invite envelopes.
-final myInvitationsProvider =
-    FutureProvider.autoDispose<List<FundInvitation>>((ref) {
-      return ref.watch(employeeApiServiceProvider).listMyInvitations();
-    });
+final myInvitationsProvider = FutureProvider.autoDispose<List<FundInvitation>>((
+  ref,
+) {
+  return ref.watch(employeeApiServiceProvider).listMyInvitations();
+});
 
 /// Pending "the head went missing, want the fund?" offers (Phase B).
 /// Watched alongside myInvitationsProvider on My Invitations — both are
@@ -44,6 +46,21 @@ final mySuccessionOffersProvider =
     });
 
 /// A fund's roster — public, like the rest of a fund's data.
+/// The exchange board — every open advert, for anyone. autoDispose so it is
+/// re-read each time the screen is opened: an advert posted a minute ago by
+/// somebody else should be there.
+final vacancyBoardProvider = FutureProvider.autoDispose<List<FundVacancy>>((
+  ref,
+) {
+  return ref.watch(employeeApiServiceProvider).listVacancyBoard();
+});
+
+/// One fund's own adverts, for its head.
+final fundVacanciesProvider = FutureProvider.autoDispose
+    .family<List<FundVacancy>, String>((ref, fundId) {
+      return ref.watch(employeeApiServiceProvider).listFundVacancies(fundId);
+    });
+
 final fundTeamProvider = FutureProvider.autoDispose
     .family<List<FundTeamMember>, String>((ref, fundId) {
       return ref.watch(employeeApiServiceProvider).getTeam(fundId);

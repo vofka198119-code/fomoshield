@@ -3125,6 +3125,64 @@
       }
     }
   },
+  "etfVacancyBoardTitle": "Vacancy board",
+  "etfVacancyMyProfileTitle": "My CV",
+  "etfVacancyMyProfileListed": "Listed on the board — fund heads can see you",
+  "etfVacancyMyProfileHidden": "Not listed — nobody can find you",
+  "etfVacancyMyProfileNone": "No CV yet. Without one you do not exist on the board",
+  "etfVacancyPublishButton": "List me on the board",
+  "etfVacancyWithdrawButton": "Take me off the board",
+  "etfVacancyFillProfileButton": "Fill in the CV",
+  "etfVacancyPublishedMessage": "Your CV is on the board",
+  "etfVacancyWithdrawnMessage": "Your CV is off the board",
+  "etfVacancyProfileError": "Could not change that — try again",
+  "etfVacancyOpenSectionTitle": "Open vacancies",
+  "etfVacancyBoardEmpty": "Nobody is hiring right now. Fund heads post the vacancies — look again later",
+  "etfVacancyCardTeamSize": "{size} of {max} on the team",
+  "@etfVacancyCardTeamSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "etfVacancyCardHead": "Head: {nickname}",
+  "@etfVacancyCardHead": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "etfVacancyCardBudget": "Offers a limit up to {amount}",
+  "@etfVacancyCardBudget": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "etfVacancyCardOpenFund": "Open the fund",
+  "etfVacancyFundSectionTitle": "This fund's vacancies",
+  "etfVacancyFundSectionEmpty": "This fund has posted nothing. Until it does, nobody is looking for you",
+  "etfVacancyPostTitle": "Post a vacancy",
+  "etfVacancyPostRoleLabel": "Role",
+  "etfVacancyPostPitchLabel": "Who you are looking for",
+  "etfVacancyPostPitchHint": "For example: an analyst for the technology sector, experience optional — we will work it out together",
+  "etfVacancyPostBudgetLabel": "Spend-alone limit offered",
+  "etfVacancyPostBudgetHelp": "A promise in the advert, not a granted right. You set the real limit on the employee after hiring",
+  "etfVacancyPostButton": "Post it",
+  "etfVacancyCloseButton": "Withdraw",
+  "etfVacancyPostedMessage": "Vacancy posted",
+  "etfVacancyClosedMessage": "Vacancy withdrawn",
+  "etfVacancyErrorRoleOpen": "This fund already has an open vacancy for that role",
+  "etfVacancyErrorNoSeat": "No seats left: the team and the adverts together already fill all five",
+  "etfVacancyErrorGeneric": "That did not work — try again",
+  "etfVacancyStatusClosed": "Withdrawn",
+  "etfVacancyStatusFilled": "Filled",
 
   "etfFundEditTitle": "EDIT FUND",
   "etfFundEditShortcutLabel": "Edit",

@@ -7922,6 +7922,124 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get etfVacancyBoardTitle => 'Биржа вакансий';
+
+  @override
+  String get etfVacancyMyProfileTitle => 'Моя анкета';
+
+  @override
+  String get etfVacancyMyProfileListed =>
+      'Размещена на бирже — главы фондов тебя видят';
+
+  @override
+  String get etfVacancyMyProfileHidden =>
+      'Не размещена — найти тебя никто не может';
+
+  @override
+  String get etfVacancyMyProfileNone =>
+      'Анкеты пока нет. Без неё на бирже тебя не существует';
+
+  @override
+  String get etfVacancyPublishButton => 'Разместить на бирже';
+
+  @override
+  String get etfVacancyWithdrawButton => 'Снять с биржи';
+
+  @override
+  String get etfVacancyFillProfileButton => 'Заполнить анкету';
+
+  @override
+  String get etfVacancyPublishedMessage => 'Анкета размещена на бирже';
+
+  @override
+  String get etfVacancyWithdrawnMessage => 'Анкета снята с биржи';
+
+  @override
+  String get etfVacancyProfileError =>
+      'Не удалось изменить размещение — попробуй ещё раз';
+
+  @override
+  String get etfVacancyOpenSectionTitle => 'Открытые вакансии';
+
+  @override
+  String get etfVacancyBoardEmpty =>
+      'Сейчас никто не ищет сотрудников. Вакансии размещают главы фондов — заглядывай позже';
+
+  @override
+  String etfVacancyCardTeamSize(int size, int max) {
+    return '$size из $max в команде';
+  }
+
+  @override
+  String etfVacancyCardHead(String nickname) {
+    return 'Глава: $nickname';
+  }
+
+  @override
+  String etfVacancyCardBudget(String amount) {
+    return 'Обещают лимит до $amount';
+  }
+
+  @override
+  String get etfVacancyCardOpenFund => 'Открыть фонд';
+
+  @override
+  String get etfVacancyFundSectionTitle => 'Вакансии фонда';
+
+  @override
+  String get etfVacancyFundSectionEmpty =>
+      'Фонд ничего не разместил. Пока не разместишь — тебя не ищут на бирже';
+
+  @override
+  String get etfVacancyPostTitle => 'Разместить вакансию';
+
+  @override
+  String get etfVacancyPostRoleLabel => 'Должность';
+
+  @override
+  String get etfVacancyPostPitchLabel => 'Кого ищем';
+
+  @override
+  String get etfVacancyPostPitchHint =>
+      'Например: нужен аналитик по технологическому сектору, опыт не обязателен — разберёмся вместе';
+
+  @override
+  String get etfVacancyPostBudgetLabel => 'Обещанный лимит без подтверждения';
+
+  @override
+  String get etfVacancyPostBudgetHelp =>
+      'Это обещание в объявлении, а не выданное право. Настоящий лимит ты задашь сотруднику после найма';
+
+  @override
+  String get etfVacancyPostButton => 'Разместить';
+
+  @override
+  String get etfVacancyCloseButton => 'Снять';
+
+  @override
+  String get etfVacancyPostedMessage => 'Вакансия размещена';
+
+  @override
+  String get etfVacancyClosedMessage => 'Вакансия снята';
+
+  @override
+  String get etfVacancyErrorRoleOpen =>
+      'На эту должность у фонда уже есть открытая вакансия';
+
+  @override
+  String get etfVacancyErrorNoSeat =>
+      'Мест больше нет: команда и объявления вместе уже занимают все пять';
+
+  @override
+  String get etfVacancyErrorGeneric => 'Не удалось — попробуй ещё раз';
+
+  @override
+  String get etfVacancyStatusClosed => 'Снята';
+
+  @override
+  String get etfVacancyStatusFilled => 'Закрыта наймом';
+
+  @override
   String get etfFundEditTitle => 'РЕДАКТИРОВАТЬ ФОНД';
 
   @override

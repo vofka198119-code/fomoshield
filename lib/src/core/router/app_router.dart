@@ -67,6 +67,8 @@ import '../../features/funds/models/fund.dart';
 import '../../features/funds/onboarding/fund_onboarding_providers.dart';
 import '../../features/funds/onboarding/fund_onboarding_screen.dart';
 import '../../features/funds/screens/create_fund_screen.dart';
+import '../../features/funds/screens/post_vacancy_screen.dart';
+import '../../features/funds/screens/vacancy_board_screen.dart';
 import '../../features/funds/screens/employee_marketplace_screen.dart';
 import '../../features/funds/screens/coming_soon_screen.dart';
 import '../../features/funds/screens/employee_hub_screen.dart';
@@ -584,12 +586,15 @@ class AppRouter {
         builder: (context, state) => const MyInvitationsScreen(),
       ),
       GoRoute(
+        path: '/funds/:id/post-vacancy',
+        name: 'postVacancy',
+        builder: (context, state) =>
+            PostVacancyScreen(fundId: state.pathParameters['id']!),
+      ),
+      GoRoute(
         path: '/funds/vacancies',
         name: 'vacancies',
-        builder: (context, state) => ComingSoonScreen(
-          title: AppLocalizations.of(context)!.etfHomeCardTitleVacancies,
-          icon: Icons.work_outline_rounded,
-        ),
+        builder: (context, state) => const VacancyBoardScreen(),
       ),
       GoRoute(
         path: '/funds/my-applications',

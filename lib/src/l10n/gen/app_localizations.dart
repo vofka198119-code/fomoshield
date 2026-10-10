@@ -13495,6 +13495,210 @@ abstract class AppLocalizations {
   /// **'Trades up to {amount} go through on your own — the head\'s approval is not needed.'**
   String etfTradeSpendAloneNote(String amount);
 
+  /// No description provided for @etfVacancyBoardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancy board'**
+  String get etfVacancyBoardTitle;
+
+  /// No description provided for @etfVacancyMyProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My CV'**
+  String get etfVacancyMyProfileTitle;
+
+  /// No description provided for @etfVacancyMyProfileListed.
+  ///
+  /// In en, this message translates to:
+  /// **'Listed on the board — fund heads can see you'**
+  String get etfVacancyMyProfileListed;
+
+  /// No description provided for @etfVacancyMyProfileHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Not listed — nobody can find you'**
+  String get etfVacancyMyProfileHidden;
+
+  /// No description provided for @etfVacancyMyProfileNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No CV yet. Without one you do not exist on the board'**
+  String get etfVacancyMyProfileNone;
+
+  /// No description provided for @etfVacancyPublishButton.
+  ///
+  /// In en, this message translates to:
+  /// **'List me on the board'**
+  String get etfVacancyPublishButton;
+
+  /// No description provided for @etfVacancyWithdrawButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Take me off the board'**
+  String get etfVacancyWithdrawButton;
+
+  /// No description provided for @etfVacancyFillProfileButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in the CV'**
+  String get etfVacancyFillProfileButton;
+
+  /// No description provided for @etfVacancyPublishedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your CV is on the board'**
+  String get etfVacancyPublishedMessage;
+
+  /// No description provided for @etfVacancyWithdrawnMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your CV is off the board'**
+  String get etfVacancyWithdrawnMessage;
+
+  /// No description provided for @etfVacancyProfileError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not change that — try again'**
+  String get etfVacancyProfileError;
+
+  /// No description provided for @etfVacancyOpenSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open vacancies'**
+  String get etfVacancyOpenSectionTitle;
+
+  /// No description provided for @etfVacancyBoardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody is hiring right now. Fund heads post the vacancies — look again later'**
+  String get etfVacancyBoardEmpty;
+
+  /// No description provided for @etfVacancyCardTeamSize.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} of {max} on the team'**
+  String etfVacancyCardTeamSize(int size, int max);
+
+  /// No description provided for @etfVacancyCardHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Head: {nickname}'**
+  String etfVacancyCardHead(String nickname);
+
+  /// No description provided for @etfVacancyCardBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Offers a limit up to {amount}'**
+  String etfVacancyCardBudget(String amount);
+
+  /// No description provided for @etfVacancyCardOpenFund.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the fund'**
+  String get etfVacancyCardOpenFund;
+
+  /// No description provided for @etfVacancyFundSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This fund\'s vacancies'**
+  String get etfVacancyFundSectionTitle;
+
+  /// No description provided for @etfVacancyFundSectionEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This fund has posted nothing. Until it does, nobody is looking for you'**
+  String get etfVacancyFundSectionEmpty;
+
+  /// No description provided for @etfVacancyPostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post a vacancy'**
+  String get etfVacancyPostTitle;
+
+  /// No description provided for @etfVacancyPostRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get etfVacancyPostRoleLabel;
+
+  /// No description provided for @etfVacancyPostPitchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Who you are looking for'**
+  String get etfVacancyPostPitchLabel;
+
+  /// No description provided for @etfVacancyPostPitchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: an analyst for the technology sector, experience optional — we will work it out together'**
+  String get etfVacancyPostPitchHint;
+
+  /// No description provided for @etfVacancyPostBudgetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Spend-alone limit offered'**
+  String get etfVacancyPostBudgetLabel;
+
+  /// No description provided for @etfVacancyPostBudgetHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'A promise in the advert, not a granted right. You set the real limit on the employee after hiring'**
+  String get etfVacancyPostBudgetHelp;
+
+  /// No description provided for @etfVacancyPostButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Post it'**
+  String get etfVacancyPostButton;
+
+  /// No description provided for @etfVacancyCloseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdraw'**
+  String get etfVacancyCloseButton;
+
+  /// No description provided for @etfVacancyPostedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancy posted'**
+  String get etfVacancyPostedMessage;
+
+  /// No description provided for @etfVacancyClosedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancy withdrawn'**
+  String get etfVacancyClosedMessage;
+
+  /// No description provided for @etfVacancyErrorRoleOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'This fund already has an open vacancy for that role'**
+  String get etfVacancyErrorRoleOpen;
+
+  /// No description provided for @etfVacancyErrorNoSeat.
+  ///
+  /// In en, this message translates to:
+  /// **'No seats left: the team and the adverts together already fill all five'**
+  String get etfVacancyErrorNoSeat;
+
+  /// No description provided for @etfVacancyErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'That did not work — try again'**
+  String get etfVacancyErrorGeneric;
+
+  /// No description provided for @etfVacancyStatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdrawn'**
+  String get etfVacancyStatusClosed;
+
+  /// No description provided for @etfVacancyStatusFilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Filled'**
+  String get etfVacancyStatusFilled;
+
   /// No description provided for @etfFundEditTitle.
   ///
   /// In en, this message translates to:

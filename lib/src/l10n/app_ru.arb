@@ -2339,6 +2339,64 @@
       }
     }
   },
+  "etfVacancyBoardTitle": "Биржа вакансий",
+  "etfVacancyMyProfileTitle": "Моя анкета",
+  "etfVacancyMyProfileListed": "Размещена на бирже — главы фондов тебя видят",
+  "etfVacancyMyProfileHidden": "Не размещена — найти тебя никто не может",
+  "etfVacancyMyProfileNone": "Анкеты пока нет. Без неё на бирже тебя не существует",
+  "etfVacancyPublishButton": "Разместить на бирже",
+  "etfVacancyWithdrawButton": "Снять с биржи",
+  "etfVacancyFillProfileButton": "Заполнить анкету",
+  "etfVacancyPublishedMessage": "Анкета размещена на бирже",
+  "etfVacancyWithdrawnMessage": "Анкета снята с биржи",
+  "etfVacancyProfileError": "Не удалось изменить размещение — попробуй ещё раз",
+  "etfVacancyOpenSectionTitle": "Открытые вакансии",
+  "etfVacancyBoardEmpty": "Сейчас никто не ищет сотрудников. Вакансии размещают главы фондов — заглядывай позже",
+  "etfVacancyCardTeamSize": "{size} из {max} в команде",
+  "@etfVacancyCardTeamSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "etfVacancyCardHead": "Глава: {nickname}",
+  "@etfVacancyCardHead": {
+    "placeholders": {
+      "nickname": {
+        "type": "String"
+      }
+    }
+  },
+  "etfVacancyCardBudget": "Обещают лимит до {amount}",
+  "@etfVacancyCardBudget": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "etfVacancyCardOpenFund": "Открыть фонд",
+  "etfVacancyFundSectionTitle": "Вакансии фонда",
+  "etfVacancyFundSectionEmpty": "Фонд ничего не разместил. Пока не разместишь — тебя не ищут на бирже",
+  "etfVacancyPostTitle": "Разместить вакансию",
+  "etfVacancyPostRoleLabel": "Должность",
+  "etfVacancyPostPitchLabel": "Кого ищем",
+  "etfVacancyPostPitchHint": "Например: нужен аналитик по технологическому сектору, опыт не обязателен — разберёмся вместе",
+  "etfVacancyPostBudgetLabel": "Обещанный лимит без подтверждения",
+  "etfVacancyPostBudgetHelp": "Это обещание в объявлении, а не выданное право. Настоящий лимит ты задашь сотруднику после найма",
+  "etfVacancyPostButton": "Разместить",
+  "etfVacancyCloseButton": "Снять",
+  "etfVacancyPostedMessage": "Вакансия размещена",
+  "etfVacancyClosedMessage": "Вакансия снята",
+  "etfVacancyErrorRoleOpen": "На эту должность у фонда уже есть открытая вакансия",
+  "etfVacancyErrorNoSeat": "Мест больше нет: команда и объявления вместе уже занимают все пять",
+  "etfVacancyErrorGeneric": "Не удалось — попробуй ещё раз",
+  "etfVacancyStatusClosed": "Снята",
+  "etfVacancyStatusFilled": "Закрыта наймом",
 
   "etfFundEditTitle": "РЕДАКТИРОВАТЬ ФОНД",
   "etfFundEditShortcutLabel": "Изменить",

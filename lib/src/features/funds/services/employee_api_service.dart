@@ -3,6 +3,7 @@ import '../../../core/utils/constants.dart';
 import '../../../core/supabase/auth_retry_interceptor.dart';
 import '../../../core/supabase/auth_token.dart';
 import '../models/employee.dart';
+import '../models/fund_vacancy.dart';
 import '../models/fund_liquidation_payout.dart';
 import '../models/fund_succession_offer.dart';
 import 'fund_api_service.dart' show FundApiException;
@@ -226,6 +227,67 @@ class EmployeeApiService {
       return FundTeamMember.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw _apiException(e, 'Failed to update team member');
+    }
+  }
+
+  // --- Hiring adverts (migration 036) ---------------------------------------
+
+  /// The board: every open advert from every active fund. Open to any
+  /// signed-in user — the exchange is the part of this module free users
+  /// were always meant to reach.
+  Future<List<FundVacancy>> listVacancyBoard() async {
+    try {
+      final response = await _dio.get('/vacancies');
+      final list = ((response.data as Map)['vacancies'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(FundVacancy.fromJson).toList();
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to load the vacancy board');
+    }
+  }
+
+  /// One fund's own adverts, open ones first — the head's view of what they
+  /// have advertised.
+  Future<List<FundVacancy>> listFundVacancies(String fundId) async {
+    try {
+      final response = await _dio.get('/funds/$fundId/vacancies');
+      final list = ((response.data as Map)['vacancies'] as List)
+          .cast<Map<String, dynamic>>();
+      return list.map(FundVacancy.fromJson).toList();
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to load the fund vacancies');
+    }
+  }
+
+  Future<FundVacancy> postVacancy({
+    required String fundId,
+    required String role,
+    String? pitch,
+    double? offeredLimitAmount,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/vacancies',
+        data: {
+          'role': role,
+          'pitch': ?pitch,
+          'offeredLimitAmount': ?offeredLimitAmount,
+        },
+      );
+      return FundVacancy.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to post the vacancy');
+    }
+  }
+
+  Future<FundVacancy> closeVacancy(String fundId, String vacancyId) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/vacancies/$vacancyId/close',
+      );
+      return FundVacancy.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to close the vacancy');
     }
   }
 
