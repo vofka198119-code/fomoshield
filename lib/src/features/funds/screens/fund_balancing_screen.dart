@@ -15,6 +15,7 @@ import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
 import '../widgets/fund_asset_allocation_card.dart';
 import '../widgets/fund_drift_card.dart';
+import '../widgets/fund_rebalance_card.dart';
 import '../widgets/fund_target_editor.dart';
 
 // ---------------------------------------------------------------------------
@@ -84,6 +85,20 @@ class _FundBalancingScreenState extends ConsumerState<FundBalancingScreen> {
     return false;
   }
 
+  /// A rebalance is a pile of proposals, so the right to start one is the
+  /// right to propose. Same shape as [_canEdit], different flag.
+  bool _canPropose(FundDetail fund, List<dynamic> team) {
+    final userId = ref.read(currentUserProvider)?.id;
+    if (userId == null) return false;
+    if (fund.headUserId == userId) return true;
+    for (final member in team) {
+      if (member.userId == userId && member.status == 'active') {
+        return member.permissions['canPropose'] == true;
+      }
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -147,6 +162,19 @@ class _FundBalancingScreenState extends ConsumerState<FundBalancingScreen> {
                   ),
                   palette: palette,
                   l10n: l10n,
+                ),
+                const SizedBox(height: 12),
+                // Acting on the drift sits directly under the reading of it,
+                // and above the plan — "this is the distance, here is what
+                // closes it, here is the plan it closes towards".
+                FundRebalanceCard(
+                  fundId: widget.fundId,
+                  palette: palette,
+                  l10n: l10n,
+                  canPropose: _canPropose(
+                    fund,
+                    teamAsync.valueOrNull ?? const [],
+                  ),
                 ),
                 const SizedBox(height: 12),
                 FundTargetEditor(
