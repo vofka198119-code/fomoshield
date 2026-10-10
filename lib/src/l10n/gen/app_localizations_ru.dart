@@ -6953,6 +6953,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Что фонд держит прямо сейчас, от самой крупной позиции к мелким.';
 
   @override
+  String get etfAllocationScreenTitle => 'СОСТАВ ФОНДА';
+
+  @override
   String etfAllocationCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

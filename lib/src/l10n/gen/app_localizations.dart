@@ -11731,6 +11731,12 @@ abstract class AppLocalizations {
   /// **'What the fund actually holds right now, largest position first.'**
   String get etfAllocationIntro;
 
+  /// No description provided for @etfAllocationScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FUND HOLDINGS'**
+  String get etfAllocationScreenTitle;
+
   /// No description provided for @etfAllocationCount.
   ///
   /// In en, this message translates to:

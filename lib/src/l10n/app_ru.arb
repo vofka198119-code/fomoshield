@@ -1998,6 +1998,7 @@
   "etfDrawdownChartTitle": "ПРОСАДКА",
   "etfAssetAllocationChartTitle": "РАСПРЕДЕЛЕНИЕ АКТИВОВ",
   "etfAllocationIntro": "Что фонд держит прямо сейчас, от самой крупной позиции к мелким.",
+  "etfAllocationScreenTitle": "СОСТАВ ФОНДА",
   "etfAllocationCount": "{count, plural, one{{count} бумага} few{{count} бумаги} many{{count} бумаг} other{{count} бумаги}}",
   "@etfAllocationCount": {"placeholders": {"count": {"type": "int"}}},
   "etfAllocationOpenButton": "Смотреть состав",

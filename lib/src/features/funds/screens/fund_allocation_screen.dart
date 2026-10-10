@@ -39,7 +39,9 @@ class FundAllocationScreen extends ConsumerWidget {
         centerTitle: true,
         leading: themedBackButton(context, palette),
         title: themedHeaderText(
-          l10n.etfAssetAllocationChartTitle,
+          // Short enough for the bar: the full phrase was cut to
+          // "РАСПРЕДЕЛЕНИЕ АКТИВ…" on a normal phone.
+          l10n.etfAllocationScreenTitle,
           palette,
           GoogleFonts.inter(
             fontSize: 20,
@@ -65,6 +67,7 @@ class FundAllocationScreen extends ConsumerWidget {
               FundAssetAllocationCard(
                 holdings: fund.holdings,
                 palette: palette,
+                alwaysExpanded: true,
               ),
             ],
           ),

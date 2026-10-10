@@ -6927,6 +6927,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'What the fund actually holds right now, largest position first.';
 
   @override
+  String get etfAllocationScreenTitle => 'FUND HOLDINGS';
+
+  @override
   String etfAllocationCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

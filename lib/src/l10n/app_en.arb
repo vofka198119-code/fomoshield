@@ -2775,6 +2775,7 @@
   "etfDrawdownChartTitle": "DRAWDOWN",
   "etfAssetAllocationChartTitle": "ASSET ALLOCATION",
   "etfAllocationIntro": "What the fund actually holds right now, largest position first.",
+  "etfAllocationScreenTitle": "FUND HOLDINGS",
   "etfAllocationCount": "{count, plural, one{{count} company} other{{count} companies}}",
   "@etfAllocationCount": {"placeholders": {"count": {"type": "int"}}},
   "etfAllocationOpenButton": "Open the breakdown",

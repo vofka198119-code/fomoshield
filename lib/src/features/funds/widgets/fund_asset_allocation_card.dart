@@ -32,10 +32,17 @@ class FundAssetAllocationCard extends ConsumerStatefulWidget {
   final List<FundHolding> holdings;
   final AppPalette palette;
 
+  /// On a screen that exists only to show this, there is nothing to reveal
+  /// and nothing to hide: every holding is drawn and the chevron goes away.
+  /// Opening a whole screen to find three rows of forty-four and a small
+  /// arrow was, in his words, глупо (2026-10-10).
+  final bool alwaysExpanded;
+
   const FundAssetAllocationCard({
     super.key,
     required this.holdings,
     required this.palette,
+    this.alwaysExpanded = false,
   });
 
   @override
@@ -60,9 +67,11 @@ class _FundAssetAllocationCardState
     final totalValue = sorted.fold<double>(0, (s, h) => s + h.value);
     final hasData = sorted.isNotEmpty && totalValue > 0;
 
-    final visibleCount = _expanded
-        ? _revealedCount.clamp(0, sorted.length)
-        : _collapsedCount.clamp(0, sorted.length);
+    final visibleCount = widget.alwaysExpanded
+        ? sorted.length
+        : (_expanded
+              ? _revealedCount.clamp(0, sorted.length)
+              : _collapsedCount.clamp(0, sorted.length));
     final display = sorted.take(visibleCount).toList();
     final remaining = sorted.length - display.length;
 
@@ -84,7 +93,9 @@ class _FundAssetAllocationCardState
               // collapsed, so once the list was open there was no way to shut
               // it again — on this screen and on the Charts screen alike
               // (found on the phone, 2026-10-10).
-              if (hasData && sorted.length > _collapsedCount)
+              if (hasData &&
+                  !widget.alwaysExpanded &&
+                  sorted.length > _collapsedCount)
                 InkWell(
                   onTap: () => setState(() {
                     _expanded = !_expanded;
@@ -120,7 +131,7 @@ class _FundAssetAllocationCardState
                 percent: holding.value / totalValue * 100,
                 palette: palette,
               ),
-            if (_expanded && remaining > 0)
+            if (!widget.alwaysExpanded && _expanded && remaining > 0)
               MoreLessPill(
                 label: l10n.commonMoreCount(
                   remaining < _pageSize ? remaining : _pageSize,
