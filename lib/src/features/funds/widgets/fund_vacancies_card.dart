@@ -133,7 +133,7 @@ class FundVacanciesCard extends ConsumerWidget {
           roleLabelFor(l10n, v.role),
           style: GoogleFonts.inter(
             fontSize: 16,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             color: palette.textHeader,
           ),
         ),
