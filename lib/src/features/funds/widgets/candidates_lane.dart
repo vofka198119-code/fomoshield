@@ -141,6 +141,16 @@ class CandidatesLane extends ConsumerWidget {
                 onPressed: () => _openInvite(context, ref, profile),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: palette.accentPrimary),
+                  // The app-wide OutlinedButton theme asks for
+                  // Size(double.infinity, 48) -- every outlined button in
+                  // this app is a full-width one. Inside a Row that demands
+                  // infinite width, the layout throws and Flutter renders
+                  // the whole card as nothing, which is why this list looked
+                  // empty from the day it was written. A button beside text
+                  // has to state its own size.
+                  minimumSize: const Size(0, 38),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 child: Text(
                   l10n.etfMarketplaceInviteButton,
