@@ -8,6 +8,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
+import 'fund_form_fields.dart';
 import 'role_picker_field.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 
@@ -132,19 +133,24 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
     final palette = widget.palette;
     return Padding(
       padding: EdgeInsets.only(
-        // viewInsets alone lifts the sheet over the keyboard but not over
-        // the system navigation bar, which left the send button sitting on
-        // top of the phone's own buttons (found on device 2026-10-10).
-        bottom:
-            MediaQuery.of(context).viewInsets.bottom +
-            MediaQuery.of(context).padding.bottom,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
         decoration: BoxDecoration(
           color: ThemeV2.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+        // The navigation bar's height is padding INSIDE the sheet, not a gap
+        // under it: lifting the whole sheet cleared the phone's buttons but
+        // left the scrim showing through beneath it as a black strip (found
+        // on device 2026-10-10). The card now reaches the screen's edge and
+        // only its contents stop short of the buttons.
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          24 + MediaQuery.of(context).padding.bottom,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,16 +181,38 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
                 color: palette.textHeader,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              widget.profile.nickname,
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: palette.textBody,
+            const SizedBox(height: 8),
+            // In a box of its own: as plain text it sat between two labels
+            // and read as one more of them, which matters more than usual
+            // here because a nickname can be any word at all.
+            fundFieldWrapper(
+              palette,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.person_outline_rounded,
+                      size: 18,
+                      color: palette.textBody,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        widget.profile.nickname,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: palette.textHeader,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
             Text(
               l10n.etfSendInviteRoleLabel,
               style: GoogleFonts.inter(
@@ -212,7 +240,7 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
             TextField(
               controller: _messageController,
               maxLines: 4,
-              maxLength: 500,
+              maxLength: 1000,
               style: GoogleFonts.inter(color: palette.textHeader),
               decoration: InputDecoration(
                 hintText: l10n.etfSendInviteMessageHint,
@@ -302,12 +330,12 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
             border: Border.all(color: palette.accentPrimary, width: 1.5),
           ),
           child: CircleAvatar(
-            radius: 18,
+            radius: 23,
             backgroundColor: palette.accentPrimary.withValues(alpha: 0.15),
             child: Text(
               short,
               style: GoogleFonts.inter(
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: FontWeight.w800,
                 color: palette.accentPrimary,
               ),
@@ -324,7 +352,7 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.inter(
-                  fontSize: 15,
+                  fontSize: 17,
                   fontWeight: FontWeight.w700,
                   color: palette.textHeader,
                 ),
@@ -333,7 +361,7 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
               Text(
                 fund.ticker,
                 style: GoogleFonts.inter(
-                  fontSize: 11,
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                   color: palette.textBody,
                 ),
