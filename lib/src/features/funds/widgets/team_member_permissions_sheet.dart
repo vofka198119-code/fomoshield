@@ -6,6 +6,7 @@ import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_button.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../fund_labels.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
@@ -62,31 +63,6 @@ Future<bool?> showTeamMemberPermissionsSheet({
     builder: (_) =>
         _PermissionsSheet(fundId: fundId, member: member, palette: palette),
   );
-}
-
-/// Whole dollars when the stored number is whole -- "2000", not "2000.00",
-/// which it will be every time a head typed it. Cents survive only if the
-/// column somehow holds them. One rule, used both by the field below and by
-/// the roster line in fund_team_card.dart.
-String treasurerBudgetDigits(double amount) => amount == amount.roundToDouble()
-    ? amount.toStringAsFixed(0)
-    : amount.toStringAsFixed(2);
-
-/// The same number as money, for anywhere it is read rather than edited.
-String treasurerBudgetMoney(double amount) =>
-    '\$${treasurerBudgetDigits(amount)}';
-
-String roleLabelFor(AppLocalizations l10n, String role) {
-  switch (role) {
-    case 'co_manager':
-      return l10n.etfRoleCoManager;
-    case 'trader':
-      return l10n.etfRoleTrader;
-    case 'risk_manager':
-      return l10n.etfRoleRiskManager;
-    default:
-      return l10n.etfRoleAnalyst;
-  }
 }
 
 String _permissionLabel(AppLocalizations l10n, String key) {

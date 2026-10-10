@@ -15,8 +15,7 @@ import '../models/fund.dart';
 import '../providers/fund_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 import '../providers/employee_providers.dart' show fundTeamProvider;
-import '../widgets/team_member_permissions_sheet.dart'
-    show treasurerBudgetMoney;
+import '../fund_labels.dart' show treasurerBudgetMoney;
 import '../../portfolio/screens/order_entry/order_header.dart';
 import '../../portfolio/screens/order_entry/order_amount_section.dart';
 import '../../portfolio/screens/order_entry/order_config_section.dart';

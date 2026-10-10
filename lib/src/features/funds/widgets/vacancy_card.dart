@@ -8,8 +8,7 @@ import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/fund_vacancy.dart';
 import '../../../shared/widgets/dark_card_chip.dart';
-import 'team_member_permissions_sheet.dart'
-    show roleLabelFor, treasurerBudgetMoney;
+import '../fund_labels.dart' show roleLabelFor, treasurerBudgetMoney;
 
 // ---------------------------------------------------------------------------
 // Vacancy Card — one advert, either on the exchange board (where it carries

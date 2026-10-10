@@ -13,6 +13,7 @@ import '../../../core/supabase/supabase_providers.dart'
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/admin_badge.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../fund_labels.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
 import 'team_member_permissions_sheet.dart';

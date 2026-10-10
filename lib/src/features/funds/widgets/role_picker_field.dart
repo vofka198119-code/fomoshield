@@ -4,7 +4,7 @@ import '../../../core/theme/app_palette.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../models/employee.dart';
 import 'fund_form_fields.dart';
-import 'team_member_permissions_sheet.dart' show roleLabelFor;
+import '../fund_labels.dart' show roleLabelFor;
 
 // ---------------------------------------------------------------------------
 // Role picker — one field with a chevron that drops the four roles under it,

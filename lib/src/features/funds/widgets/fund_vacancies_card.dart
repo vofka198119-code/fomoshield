@@ -13,8 +13,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/fund_vacancy.dart';
 import '../providers/employee_providers.dart';
-import 'team_member_permissions_sheet.dart'
-    show roleLabelFor, treasurerBudgetMoney;
+import '../fund_labels.dart' show roleLabelFor, treasurerBudgetMoney;
 
 // ---------------------------------------------------------------------------
 // Fund Vacancies Card — what this fund is advertising, sitting under the
