@@ -146,7 +146,10 @@ class _FundAssetAllocationCardState
               child: Center(
                 child: Text(
                   l10n.etfAssetAllocationEmptyText,
-                  style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: palette.textBody,
+                  ),
                 ),
               ),
             ),

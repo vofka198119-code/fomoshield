@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -143,16 +144,9 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                     // ask), same reasoning ThemeV2.loss is used as a flat
                     // color everywhere else in the app rather than a
                     // per-theme accent.
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      color: ThemeV2.loss,
-                    ),
-                    onPressed: () => showFundBankruptcyFlow(
-                      context,
-                      ref,
-                      fund.id,
-                      palette,
-                    ),
+                    icon: const Icon(Icons.delete_outline, color: ThemeV2.loss),
+                    onPressed: () =>
+                        showFundBankruptcyFlow(context, ref, fund.id, palette),
                   )
                 : const SizedBox.shrink(),
             orElse: () => const SizedBox.shrink(),
@@ -185,7 +179,8 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
                 break;
               }
             }
-            final canPropose = isHead || (myPermissions?['canPropose'] ?? false);
+            final canPropose =
+                isHead || (myPermissions?['canPropose'] ?? false);
 
             Widget buildBody() => RefreshIndicator(
               color: palette.accentPrimary,
@@ -528,14 +523,10 @@ class _FundManagementScreenState extends ConsumerState<FundManagementScreen> {
             );
     }
 
-    showModalBottomSheet(
+    showAppSheet<void>(
       context: context,
-      useRootNavigator: true,
-      backgroundColor: palette.card,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      isScrollControlled: true,
+      palette: palette,
+      padded: false,
       builder: (sheetContext) => Padding(
         padding: EdgeInsets.only(
           left: 16,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_variant_provider.dart';
@@ -119,14 +120,10 @@ class _FundRebalancePreviewScreenState
       text: (_amount ?? _cash).toStringAsFixed(2),
     );
 
-    final entered = await showModalBottomSheet<String>(
+    final entered = await showAppSheet<String>(
       context: context,
-      backgroundColor: palette.card,
-      isScrollControlled: true,
-      useSafeArea: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      palette: palette,
+      padded: false,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheet) => SafeArea(
           top: false,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_button.dart';
@@ -37,13 +38,10 @@ Future<SuccessionAcceptResult?> showSuccessionOfferSheet({
   required FundSuccessionOffer offer,
   required AppPalette palette,
 }) {
-  return showModalBottomSheet<SuccessionAcceptResult>(
+  return showAppSheet<SuccessionAcceptResult>(
     context: context,
-    backgroundColor: palette.card,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    isScrollControlled: true,
+    palette: palette,
+    scrollable: true,
     builder: (_) => _SuccessionOfferSheet(offer: offer, palette: palette),
   );
 }
@@ -74,7 +72,11 @@ class _SuccessionOfferSheetState extends ConsumerState<_SuccessionOfferSheet> {
           .read(employeeApiServiceProvider)
           .acceptSuccessionOffer(widget.offer.id);
       if (!mounted) return;
-      Navigator.of(context).pop(becameHead ? SuccessionAcceptResult.becameHead : SuccessionAcceptResult.applied);
+      Navigator.of(context).pop(
+        becameHead
+            ? SuccessionAcceptResult.becameHead
+            : SuccessionAcceptResult.applied,
+      );
     } on FundApiException catch (e) {
       setState(() {
         _error = switch (e.code) {
@@ -105,80 +107,73 @@ class _SuccessionOfferSheetState extends ConsumerState<_SuccessionOfferSheet> {
     final deadline = DateFormat.yMMMd(locale).format(offer.deadline.toLocal());
     final isPremium = ref.watch(subscriptionTierProvider).isPremiumOrAdmin;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        left: 20,
-        right: 20,
-        top: 20,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            offer.displayName,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: palette.textHeader,
-            ),
+    // Card, corners and insets are the shell's (app_sheet.dart).
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          offer.displayName,
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: palette.textHeader,
           ),
-          const SizedBox(height: 4),
-          Text(
-            l10n.etfSuccessionSheetIntro,
-            style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
-          ),
-          const SizedBox(height: 16),
-          _rule(palette, l10n.etfSuccessionRuleDeputyFirst),
-          _rule(palette, l10n.etfSuccessionRuleEnterRunning),
-          _rule(palette, l10n.etfSuccessionRuleSeniorityWins),
-          _rule(palette, l10n.etfSuccessionRuleHeadMayReturn),
-          _rule(palette, l10n.etfSuccessionRuleNobodyAccepts),
-          _rule(palette, l10n.etfSuccessionRuleMoneyStays),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.etfSuccessionDeadlineLabel,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: palette.textBody,
-                ),
-              ),
-              Text(
-                deadline,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: palette.textHeader,
-                ),
-              ),
-            ],
-          ),
-          if (_error != null) ...[
-            const SizedBox(height: 12),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          l10n.etfSuccessionSheetIntro,
+          style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
+        ),
+        const SizedBox(height: 16),
+        _rule(palette, l10n.etfSuccessionRuleDeputyFirst),
+        _rule(palette, l10n.etfSuccessionRuleEnterRunning),
+        _rule(palette, l10n.etfSuccessionRuleSeniorityWins),
+        _rule(palette, l10n.etfSuccessionRuleHeadMayReturn),
+        _rule(palette, l10n.etfSuccessionRuleNobodyAccepts),
+        _rule(palette, l10n.etfSuccessionRuleMoneyStays),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
             Text(
-              _error!,
-              style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
+              l10n.etfSuccessionDeadlineLabel,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: palette.textBody,
+              ),
             ),
-          ],
-          const SizedBox(height: 20),
-          if (offer.alreadyAccepted)
             Text(
-              l10n.etfSuccessionAlreadyAppliedBody,
+              deadline,
               style: GoogleFonts.inter(
                 fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: palette.accentPrimary,
+                fontWeight: FontWeight.w700,
+                color: palette.textHeader,
               ),
-            )
-          else
-            _acceptButton(palette, l10n, isPremium),
+            ),
+          ],
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            _error!,
+            style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
+          ),
         ],
-      ),
+        const SizedBox(height: 20),
+        if (offer.alreadyAccepted)
+          Text(
+            l10n.etfSuccessionAlreadyAppliedBody,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: palette.accentPrimary,
+            ),
+          )
+        else
+          _acceptButton(palette, l10n, isPremium),
+      ],
     );
   }
 
@@ -189,11 +184,7 @@ class _SuccessionOfferSheetState extends ConsumerState<_SuccessionOfferSheet> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 5),
-          child: Icon(
-            Icons.circle,
-            size: 5,
-            color: palette.accentPrimary,
-          ),
+          child: Icon(Icons.circle, size: 5, color: palette.accentPrimary),
         ),
         const SizedBox(width: 10),
         Expanded(

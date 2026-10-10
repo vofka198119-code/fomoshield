@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_button.dart';
@@ -27,10 +28,10 @@ Future<bool?> showSendInviteSheet({
   required AppPalette palette,
   String? initialMessage,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    palette: palette,
+    scrollable: true,
     builder: (ctx) => _SendInviteSheet(
       fundId: fundId,
       profile: profile,
@@ -135,206 +136,165 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final palette = widget.palette;
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: ThemeV2.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        appSheetTitle(l10n.etfSendInviteTitle, palette),
+        const SizedBox(height: 14),
+        // Which fund is doing the inviting, drawn the way a fund is drawn
+        // everywhere else -- ring avatar carrying the ticker, name, then
+        // the ticker in full (FundMiniCard's own recipe). An invite that
+        // only named the candidate left the fund implicit, and the two
+        // names here can even be the same word.
+        _fundRow(palette),
+        const SizedBox(height: 12),
+        Text(
+          l10n.etfSendInviteToLabel,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: palette.textHeader,
+          ),
         ),
-        // The navigation bar's height is padding INSIDE the sheet, not a gap
-        // under it: lifting the whole sheet cleared the phone's buttons but
-        // left the scrim showing through beneath it as a black strip (found
-        // on device 2026-10-10). The card now reaches the screen's edge and
-        // only its contents stop short of the buttons.
-        padding: EdgeInsets.fromLTRB(
-          20,
-          20,
-          20,
-          24 + MediaQuery.of(context).padding.bottom,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                l10n.etfSendInviteTitle,
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: palette.textHeader,
+        const SizedBox(height: 8),
+        // In a box of its own: as plain text it sat between two labels
+        // and read as one more of them, which matters more than usual
+        // here because a nickname can be any word at all.
+        fundFieldWrapper(
+          palette,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.person_outline_rounded,
+                  size: 18,
+                  color: palette.textBody,
                 ),
-              ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.profile.nickname,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: palette.textHeader,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 14),
-            // Which fund is doing the inviting, drawn the way a fund is drawn
-            // everywhere else -- ring avatar carrying the ticker, name, then
-            // the ticker in full (FundMiniCard's own recipe). An invite that
-            // only named the candidate left the fund implicit, and the two
-            // names here can even be the same word.
-            _fundRow(palette),
-            const SizedBox(height: 12),
-            Text(
-              l10n.etfSendInviteToLabel,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: palette.textHeader,
-              ),
-            ),
-            const SizedBox(height: 8),
-            // In a box of its own: as plain text it sat between two labels
-            // and read as one more of them, which matters more than usual
-            // here because a nickname can be any word at all.
-            fundFieldWrapper(
+          ),
+        ),
+        Text(
+          l10n.etfSendInviteRoleLabel,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: palette.textHeader,
+          ),
+        ),
+        const SizedBox(height: 8),
+        RolePickerField(
+          palette: palette,
+          value: _role,
+          onChanged: (role) => setState(() => _role = role),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          l10n.etfSendInviteMessageLabel,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: palette.textHeader,
+          ),
+        ),
+        const SizedBox(height: 8),
+        // The same box as the two fields above it -- it used to draw its
+        // own outline, which is why it looked like a different kind of
+        // thing on the same sheet.
+        fundFieldWrapper(
+          palette,
+          TextField(
+            controller: _messageController,
+            maxLines: 4,
+            maxLength: _maxMessageLength,
+            style: GoogleFonts.inter(fontSize: 14, color: palette.textHeader),
+            // The field's own counter would sit INSIDE the box; this
+            // keeps it under the box where it was, and where it reads as
+            // a note about the field rather than part of it.
+            buildCounter:
+                (_, {required currentLength, required isFocused, maxLength}) =>
+                    null,
+            decoration: fundFieldDecoration(
               palette,
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline_rounded,
-                      size: 18,
-                      color: palette.textBody,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        widget.profile.nickname,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: palette.textHeader,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              hint: l10n.etfSendInviteMessageHint,
             ),
-            Text(
-              l10n.etfSendInviteRoleLabel,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: palette.textHeader,
-              ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _messageController,
+            builder: (_, value, _) => Text(
+              // Counted the way the server counts, not by grapheme:
+              // otherwise an emoji reads as one here and as two to the
+              // check that actually refuses the message.
+              '${value.text.length}/$_maxMessageLength',
+              style: GoogleFonts.inter(fontSize: 11, color: palette.textBody),
             ),
-            const SizedBox(height: 8),
-            RolePickerField(
+          ),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            _error!,
+            style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
+          ),
+        ],
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          height: ThemeV2.buttonHeight,
+          child: Material(
+            type: MaterialType.transparency,
+            child: themedDarkCtaButtonShell(
               palette: palette,
-              value: _role,
-              onChanged: (role) => setState(() => _role = role),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l10n.etfSendInviteMessageLabel,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: palette.textHeader,
+              borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
+              standardDecoration: BoxDecoration(
+                color: ThemeV2.primary,
+                borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
               ),
-            ),
-            const SizedBox(height: 8),
-            // The same box as the two fields above it -- it used to draw its
-            // own outline, which is why it looked like a different kind of
-            // thing on the same sheet.
-            fundFieldWrapper(
-              palette,
-              TextField(
-                controller: _messageController,
-                maxLines: 4,
-                maxLength: _maxMessageLength,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: palette.textHeader,
-                ),
-                // The field's own counter would sit INSIDE the box; this
-                // keeps it under the box where it was, and where it reads as
-                // a note about the field rather than part of it.
-                buildCounter:
-                    (
-                      _, {
-                      required currentLength,
-                      required isFocused,
-                      maxLength,
-                    }) => null,
-                decoration: fundFieldDecoration(
-                  palette,
-                  hint: l10n.etfSendInviteMessageHint,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
+                onTap: _submitting ? null : _submit,
+                child: Center(
+                  child: _submitting
+                      ? SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: themedDarkCtaContentColor(palette),
+                          ),
+                        )
+                      : Text(
+                          l10n.etfSendInviteSubmitButton,
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: themedDarkCtaContentColor(palette),
+                          ),
+                        ),
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ValueListenableBuilder<TextEditingValue>(
-                valueListenable: _messageController,
-                builder: (_, value, _) => Text(
-                  // Counted the way the server counts, not by grapheme:
-                  // otherwise an emoji reads as one here and as two to the
-                  // check that actually refuses the message.
-                  '${value.text.length}/$_maxMessageLength',
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: palette.textBody,
-                  ),
-                ),
-              ),
-            ),
-            if (_error != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _error!,
-                style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
-              ),
-            ],
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: ThemeV2.buttonHeight,
-              child: Material(
-                type: MaterialType.transparency,
-                child: themedDarkCtaButtonShell(
-                  palette: palette,
-                  borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
-                  standardDecoration: BoxDecoration(
-                    color: ThemeV2.primary,
-                    borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(ThemeV2.buttonRadius),
-                    onTap: _submitting ? null : _submit,
-                    child: Center(
-                      child: _submitting
-                          ? SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: themedDarkCtaContentColor(palette),
-                              ),
-                            )
-                          : Text(
-                              l10n.etfSendInviteSubmitButton,
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: themedDarkCtaContentColor(palette),
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -99,8 +100,7 @@ class _FundTargetEditorState extends State<FundTargetEditor> {
     return list;
   }
 
-  double get _total =>
-      _targets.values.fold<double>(0, (sum, v) => sum + v);
+  double get _total => _targets.values.fold<double>(0, (sum, v) => sum + v);
 
   double _actualPercent(String symbol) {
     final total = widget.holdings.fold<double>(0, (s, h) => s + h.value);
@@ -160,13 +160,10 @@ class _FundTargetEditorState extends State<FundTargetEditor> {
       text: current == null ? '' : current.toStringAsFixed(2),
     );
 
-    final entered = await showModalBottomSheet<String>(
+    final entered = await showAppSheet<String>(
       context: context,
-      backgroundColor: palette.card,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      palette: palette,
+      padded: false,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheet) => SafeArea(
           top: false,
@@ -394,10 +391,7 @@ class _FundTargetEditorState extends State<FundTargetEditor> {
               const SizedBox(height: 12),
               Text(
                 l10n.etfBalancingReadOnlyNote,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: palette.textBody,
-                ),
+                style: GoogleFonts.inter(fontSize: 12, color: palette.textBody),
               ),
             ],
           ],

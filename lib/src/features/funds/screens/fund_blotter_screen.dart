@@ -170,9 +170,14 @@ class _FundBlotterScreenState extends ConsumerState<FundBlotterScreen> {
             }, palette),
             for (final status in _statusFilterOrder) ...[
               const SizedBox(width: 8),
-              _chip(proposalStatusLabel(l10n, status), _statusFilter == status, () {
-                setState(() => _statusFilter = status);
-              }, palette),
+              _chip(
+                proposalStatusLabel(l10n, status),
+                _statusFilter == status,
+                () {
+                  setState(() => _statusFilter = status);
+                },
+                palette,
+              ),
             ],
           ],
         ),
@@ -192,7 +197,9 @@ class _FundBlotterScreenState extends ConsumerState<FundBlotterScreen> {
       onSelected: (_) => onTap(),
       selectedColor: palette.accentPrimary.withValues(alpha: 0.2),
       backgroundColor: palette.card,
-      side: BorderSide(color: selected ? palette.accentPrimary : palette.border),
+      side: BorderSide(
+        color: selected ? palette.accentPrimary : palette.border,
+      ),
       labelStyle: GoogleFonts.inter(
         fontSize: 12,
         fontWeight: selected ? FontWeight.w700 : FontWeight.w500,

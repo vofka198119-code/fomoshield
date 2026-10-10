@@ -42,7 +42,10 @@ class FundSubscribeResult {
   final double navPerUnit;
   final double unitsIssued;
 
-  const FundSubscribeResult({required this.navPerUnit, required this.unitsIssued});
+  const FundSubscribeResult({
+    required this.navPerUnit,
+    required this.unitsIssued,
+  });
 
   factory FundSubscribeResult.fromJson(Map<String, dynamic> json) =>
       FundSubscribeResult(
@@ -439,6 +442,7 @@ class FundApiService {
   Future<RebalancePlan> previewRebalance(
     String fundId,
     String mode, {
+
     /// Companies the head has unticked — left exactly as they are.
     List<String> exclude = const [],
 
@@ -454,7 +458,9 @@ class FundApiService {
           'amount': ?amount,
         },
       );
-      return RebalancePlan.fromJson((response.data as Map).cast<String, dynamic>());
+      return RebalancePlan.fromJson(
+        (response.data as Map).cast<String, dynamic>(),
+      );
     } on DioException catch (e) {
       throw Exception(_errorMessage(e, 'Failed to plan the rebalance'));
     }
@@ -498,7 +504,10 @@ class FundApiService {
     }
   }
 
-  Future<TradeProposal> approveProposal(String fundId, String proposalId) async {
+  Future<TradeProposal> approveProposal(
+    String fundId,
+    String proposalId,
+  ) async {
     try {
       final response = await _dio.post(
         '/funds/$fundId/proposals/$proposalId/approve',
@@ -556,7 +565,10 @@ class FundApiService {
     }
   }
 
-  Future<TradeProposal> executeProposal(String fundId, String proposalId) async {
+  Future<TradeProposal> executeProposal(
+    String fundId,
+    String proposalId,
+  ) async {
     try {
       final response = await _dio.post(
         '/funds/$fundId/proposals/$proposalId/execute',

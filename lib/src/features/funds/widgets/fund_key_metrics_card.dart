@@ -28,10 +28,7 @@ class FundKeyMetricsCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final items = <(String, String)>[
       (l10n.etfFundDetailAumLabel, formatUsd(fund.aum)),
-      (
-        l10n.etfFundDetailInvestorCapitalLabel,
-        formatUsd(fund.investorCapital),
-      ),
+      (l10n.etfFundDetailInvestorCapitalLabel, formatUsd(fund.investorCapital)),
       (l10n.etfFundDetailUnitsLabel, fund.unitsOutstanding.toStringAsFixed(0)),
       (l10n.etfFundDetailHoldingsCountLabel, fund.holdings.length.toString()),
     ];

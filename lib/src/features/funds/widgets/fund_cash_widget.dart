@@ -44,13 +44,14 @@ class FundCashWidget extends StatelessWidget {
               child: themedGoldGradient(
                 Text(
                   AppLocalizations.of(context)!.etfFundBalanceAvailableLabel,
-                  style: FomoShieldTheme.cardTitle(
-                    palette.onWindow ?? Colors.white,
-                  ).copyWith(
-                    shadows: palette.titleShadow != null
-                        ? [palette.titleShadow!]
-                        : null,
-                  ),
+                  style:
+                      FomoShieldTheme.cardTitle(
+                        palette.onWindow ?? Colors.white,
+                      ).copyWith(
+                        shadows: palette.titleShadow != null
+                            ? [palette.titleShadow!]
+                            : null,
+                      ),
                 ),
                 palette,
               ),

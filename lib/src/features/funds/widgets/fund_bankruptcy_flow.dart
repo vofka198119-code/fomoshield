@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_button.dart';
@@ -53,13 +54,10 @@ Future<void> showFundBankruptcyFlow(
   }
   if (!context.mounted) return;
 
-  final step2 = await showModalBottomSheet<bool>(
+  final step2 = await showAppSheet<bool>(
     context: context,
-    backgroundColor: palette.card,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
+    palette: palette,
+    padded: false,
     builder: (ctx) =>
         _BankruptcyExplanationSheet(preview: preview, palette: palette),
   );
@@ -94,13 +92,10 @@ Future<bool?> _showSimpleConfirmSheet({
   required String confirmLabel,
   required String cancelLabel,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    backgroundColor: palette.card,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
+    palette: palette,
+    padded: false,
     builder: (ctx) => SafeArea(
       top: false,
       child: Padding(

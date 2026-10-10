@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../../core/theme/app_palette.dart' show AppPalette, resolveAppPalette;
+import '../../../core/theme/app_palette.dart'
+    show AppPalette, resolveAppPalette;
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
@@ -208,11 +209,7 @@ class _FundSearchScreenState extends ConsumerState<FundSearchScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.search_off_rounded,
-                color: palette.textBody,
-                size: 48,
-              ),
+              Icon(Icons.search_off_rounded, color: palette.textBody, size: 48),
               const SizedBox(height: 12),
               Text(
                 l10n.searchNoResults,
@@ -262,11 +259,7 @@ class _FundSearchScreenState extends ConsumerState<FundSearchScreen> {
                 style: GoogleFonts.inter(fontSize: 12, color: palette.textBody),
               ),
               const SizedBox(width: 6),
-              ExchangeBadge(
-                symbol: symbol,
-                type: type,
-                palette: palette,
-              ),
+              ExchangeBadge(symbol: symbol, type: type, palette: palette),
             ],
           ),
           onTap: () => _openCompany(symbol),

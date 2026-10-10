@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -22,13 +23,12 @@ Future<bool?> showInvitationDetailSheet({
   required FundInvitation invitation,
   required AppPalette palette,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    backgroundColor: Colors.transparent,
-    builder: (ctx) => _InvitationDetailSheet(
-      invitation: invitation,
-      palette: palette,
-    ),
+    palette: palette,
+    scrollable: true,
+    builder: (ctx) =>
+        _InvitationDetailSheet(invitation: invitation, palette: palette),
   );
 }
 
@@ -49,7 +49,10 @@ class _InvitationDetailSheet extends ConsumerStatefulWidget {
   final FundInvitation invitation;
   final AppPalette palette;
 
-  const _InvitationDetailSheet({required this.invitation, required this.palette});
+  const _InvitationDetailSheet({
+    required this.invitation,
+    required this.palette,
+  });
 
   @override
   ConsumerState<_InvitationDetailSheet> createState() =>
@@ -95,111 +98,105 @@ class _InvitationDetailSheetState
     final palette = widget.palette;
     final invitation = widget.invitation;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: ThemeV2.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            invitation.fundName ?? invitation.fundTicker ?? '',
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: palette.textHeader,
-            ),
+    // Card, corners and insets come from the shell (app_sheet.dart).
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          invitation.fundName ?? invitation.fundTicker ?? '',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: palette.textHeader,
           ),
-          if (invitation.fundApproxAum != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              formatUsd(invitation.fundApproxAum!),
-              style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
-            ),
-          ],
-          const SizedBox(height: 16),
-          Text(
-            l10n.etfInvitationDetailRoleLabel,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: palette.textBody,
-            ),
-          ),
+        ),
+        if (invitation.fundApproxAum != null) ...[
           const SizedBox(height: 4),
           Text(
-            _roleLabel(l10n, invitation.role),
-            style: GoogleFonts.inter(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: palette.textHeader,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            l10n.etfInvitationDetailMessageLabel,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: palette.textBody,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            invitation.message,
-            style: GoogleFonts.inter(fontSize: 14, color: palette.textHeader),
-          ),
-          if (_error != null) ...[
-            const SizedBox(height: 12),
-            Text(
-              _error!,
-              style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
-            ),
-          ],
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _submitting ? null : () => _respond(false),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                    side: BorderSide(color: palette.textBody),
-                  ),
-                  child: Text(
-                    l10n.etfInvitationDeclineButton,
-                    style: GoogleFonts.inter(color: palette.textBody),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _submitting ? null : () => _respond(true),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                    backgroundColor: ThemeV2.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: _submitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(l10n.etfInvitationJoinButton),
-                ),
-              ),
-            ],
+            formatUsd(invitation.fundApproxAum!),
+            style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
           ),
         ],
-      ),
+        const SizedBox(height: 16),
+        Text(
+          l10n.etfInvitationDetailRoleLabel,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: palette.textBody,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          _roleLabel(l10n, invitation.role),
+          style: GoogleFonts.inter(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: palette.textHeader,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          l10n.etfInvitationDetailMessageLabel,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: palette.textBody,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          invitation.message,
+          style: GoogleFonts.inter(fontSize: 14, color: palette.textHeader),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            _error!,
+            style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
+          ),
+        ],
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: _submitting ? null : () => _respond(false),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                  side: BorderSide(color: palette.textBody),
+                ),
+                child: Text(
+                  l10n.etfInvitationDeclineButton,
+                  style: GoogleFonts.inter(color: palette.textBody),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: _submitting ? null : () => _respond(true),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                  backgroundColor: ThemeV2.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: _submitting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(l10n.etfInvitationJoinButton),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

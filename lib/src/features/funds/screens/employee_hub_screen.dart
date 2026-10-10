@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -423,14 +424,10 @@ class EmployeeHubScreen extends ConsumerWidget {
       );
     }
 
-    showModalBottomSheet(
+    showAppSheet<void>(
       context: context,
-      useRootNavigator: true,
-      backgroundColor: palette.card,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      isScrollControlled: true,
+      palette: palette,
+      padded: false,
       builder: (sheetContext) => Padding(
         padding: EdgeInsets.only(
           left: 16,

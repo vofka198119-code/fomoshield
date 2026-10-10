@@ -48,10 +48,7 @@ class FundInvestorFlowChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).languageCode;
-    final maxValue = monthlyValues.fold<double>(
-      0,
-      (m, v) => v > m ? v : m,
-    );
+    final maxValue = monthlyValues.fold<double>(0, (m, v) => v > m ? v : m);
     final chartMaxY = maxValue > 0 ? maxValue * 1.2 : 1.0;
 
     return CardFrame(
@@ -152,9 +149,9 @@ class FundInvestorFlowChart extends StatelessWidget {
                           // "июнь") run into each other across 12 narrow
                           // bars; English's own 3-letter form (Jan, Feb...)
                           // already fits, so this is a no-op there.
-                          final rawLabel = DateFormat.MMM(
-                            locale,
-                          ).format(DateTime(2000, index + 1, 1)).replaceAll('.', '');
+                          final rawLabel = DateFormat.MMM(locale)
+                              .format(DateTime(2000, index + 1, 1))
+                              .replaceAll('.', '');
                           final label = rawLabel.length > 3
                               ? rawLabel.substring(0, 3)
                               : rawLabel;
@@ -198,4 +195,3 @@ class FundInvestorFlowChart extends StatelessWidget {
     );
   }
 }
-

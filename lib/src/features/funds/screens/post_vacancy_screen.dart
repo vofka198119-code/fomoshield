@@ -148,7 +148,7 @@ class _PostVacancyScreenState extends ConsumerState<PostVacancyScreen> {
                 maxLines: 4,
                 maxLength: 500,
                 style: GoogleFonts.inter(
-                  fontSize: 14,
+                  fontSize: 16,
                   color: palette.textHeader,
                 ),
                 decoration: fundFieldDecoration(
@@ -167,7 +167,7 @@ class _PostVacancyScreenState extends ConsumerState<PostVacancyScreen> {
                   decimal: true,
                 ),
                 style: GoogleFonts.inter(
-                  fontSize: 14,
+                  fontSize: 16,
                   color: palette.textHeader,
                 ),
                 decoration:
@@ -177,7 +177,7 @@ class _PostVacancyScreenState extends ConsumerState<PostVacancyScreen> {
                     ).copyWith(
                       prefixText: '\$',
                       prefixStyle: GoogleFonts.inter(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: palette.textHeader,
                       ),
@@ -187,7 +187,11 @@ class _PostVacancyScreenState extends ConsumerState<PostVacancyScreen> {
             ),
             Text(
               l10n.etfVacancyPostBudgetHelp,
-              style: GoogleFonts.inter(fontSize: 11, color: palette.textBody),
+              style: GoogleFonts.inter(
+                fontSize: 12.5,
+                height: 1.35,
+                color: palette.textBody,
+              ),
             ),
             const SizedBox(height: 24),
             SizedBox(

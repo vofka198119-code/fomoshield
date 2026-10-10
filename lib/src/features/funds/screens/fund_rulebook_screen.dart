@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
-import '../../company_detail/widgets/metric_info_data.dart' show MetricInfoSection;
+import '../../company_detail/widgets/metric_info_data.dart'
+    show MetricInfoSection;
 
 // ---------------------------------------------------------------------------
 // Fund Rulebook — Phase C of the bankruptcy spec
@@ -258,13 +260,10 @@ void _showRulebookSectionSheet(
   AppPalette palette,
   MetricInfoSection section,
 ) {
-  showModalBottomSheet<void>(
+  showAppSheet<void>(
     context: context,
-    backgroundColor: palette.card,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
+    palette: palette,
+    scrollable: true,
     builder: (ctx) => _RulebookSectionSheet(section: section, palette: palette),
   );
 }

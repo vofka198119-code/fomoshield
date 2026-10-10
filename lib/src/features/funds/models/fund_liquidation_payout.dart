@@ -26,9 +26,11 @@ class FundLiquidationPayout {
 
   String? get fundName => details['fundName'] as String?;
   String? get fundTicker => details['fundTicker'] as String?;
-  double? get assetsSoldValue => (details['assetsSoldValue'] as num?)?.toDouble();
+  double? get assetsSoldValue =>
+      (details['assetsSoldValue'] as num?)?.toDouble();
   double? get unitsHeld => (details['unitsHeld'] as num?)?.toDouble();
-  double? get brokerCommission => (details['brokerCommission'] as num?)?.toDouble();
+  double? get brokerCommission =>
+      (details['brokerCommission'] as num?)?.toDouble();
   double? get neustoika => (details['neustoika'] as num?)?.toDouble();
 
   factory FundLiquidationPayout.fromJson(Map<String, dynamic> json) {

@@ -70,18 +70,19 @@ class FundDrift {
       for (final t in targets) t.symbol: t.targetPercent,
     };
 
-    final rows = <FundDriftRow>[
-      for (final symbol in {...actual.keys, ...planned.keys})
-        FundDriftRow(
-          symbol: symbol,
-          actualPercent: actual[symbol] ?? 0,
-          targetPercent: planned[symbol] ?? 0,
-        ),
-    ]..sort((a, b) {
-      final byGap = b.gap.abs().compareTo(a.gap.abs());
-      // Ties alphabetically, so the list never reshuffles between rebuilds.
-      return byGap != 0 ? byGap : a.symbol.compareTo(b.symbol);
-    });
+    final rows =
+        <FundDriftRow>[
+          for (final symbol in {...actual.keys, ...planned.keys})
+            FundDriftRow(
+              symbol: symbol,
+              actualPercent: actual[symbol] ?? 0,
+              targetPercent: planned[symbol] ?? 0,
+            ),
+        ]..sort((a, b) {
+          final byGap = b.gap.abs().compareTo(a.gap.abs());
+          // Ties alphabetically, so the list never reshuffles between rebuilds.
+          return byGap != 0 ? byGap : a.symbol.compareTo(b.symbol);
+        });
 
     return FundDrift(
       rows: rows,

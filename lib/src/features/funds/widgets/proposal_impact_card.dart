@@ -62,9 +62,7 @@ class ProposalImpactCard extends ConsumerWidget {
     // The same price ProposalCard shows, from the same provider: an executed
     // trade keeps its real price, a limit order uses its own, and anything
     // else is a live estimate.
-    final livePrice = ref
-        .watch(proposalLivePriceProvider(symbol))
-        .valueOrNull;
+    final livePrice = ref.watch(proposalLivePriceProvider(symbol)).valueOrNull;
     final price =
         proposal.executedPrice ??
         (proposal.orderType == 'limit' ? proposal.limitPrice : null) ??
@@ -106,10 +104,13 @@ class ProposalImpactCard extends ConsumerWidget {
           themedDivider(palette, indent: 0, endIndent: 0),
           const SizedBox(height: 16),
           ..._positionRows(held),
-          _row(l10n.etfProposalImpactShare, _arrow(
-            '${shareNow.toStringAsFixed(2)}%',
-            '${shareAfter.toStringAsFixed(2)}%',
-          )),
+          _row(
+            l10n.etfProposalImpactShare,
+            _arrow(
+              '${shareNow.toStringAsFixed(2)}%',
+              '${shareAfter.toStringAsFixed(2)}%',
+            ),
+          ),
           _row(
             l10n.etfProposalImpactCash,
             _arrow(formatUsd(fund.cash), formatUsd(cashAfter)),
@@ -144,10 +145,7 @@ class ProposalImpactCard extends ConsumerWidget {
       ];
     }
     return [
-      _row(
-        l10n.etfProposalImpactAlreadyHeld,
-        held.quantity.toStringAsFixed(4),
-      ),
+      _row(l10n.etfProposalImpactAlreadyHeld, held.quantity.toStringAsFixed(4)),
       _row(l10n.etfProposalImpactPositionValue, formatUsd(held.value)),
       // avgCost 0 means "bought before the cost basis existed", not a real
       // zero — the same guard every other fund P&L in the app uses.
@@ -191,10 +189,7 @@ class ProposalImpactCard extends ConsumerWidget {
 
     if (held == null || held.quantity <= 0) return const [];
     final soldShare = (quantity / held.quantity * 100).clamp(0, 100);
-    final remaining = (held.quantity - quantity).clamp(
-      0,
-      double.infinity,
-    );
+    final remaining = (held.quantity - quantity).clamp(0, double.infinity);
     return [
       _row(
         l10n.etfProposalImpactSellingShare,
@@ -206,10 +201,7 @@ class ProposalImpactCard extends ConsumerWidget {
           formatUsdSigned(quantity * (price - held.avgCost)),
           valueColor: price >= held.avgCost ? ThemeV2.success : ThemeV2.loss,
         ),
-      _row(
-        l10n.etfProposalImpactRemaining,
-        remaining.toStringAsFixed(4),
-      ),
+      _row(l10n.etfProposalImpactRemaining, remaining.toStringAsFixed(4)),
     ];
   }
 

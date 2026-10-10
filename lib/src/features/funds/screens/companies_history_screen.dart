@@ -83,7 +83,8 @@ class CompaniesHistoryScreen extends ConsumerWidget {
                 children: [
                   for (int i = 0; i < history.length; i++)
                     CompanyHistoryTile(
-                      fundName: history[i].fundName ?? history[i].fundTicker ?? '—',
+                      fundName:
+                          history[i].fundName ?? history[i].fundTicker ?? '—',
                       fundTicker: history[i].fundTicker ?? '',
                       roleLabel: _roleLabel(l10n, history[i].role),
                       tenureLabel: employmentTenureLabel(l10n, history[i]),

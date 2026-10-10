@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
@@ -25,13 +26,9 @@ import '../../monetization/monetization_modal.dart';
 
 Future<void> showEtfPremiumRequiredSheet(BuildContext context, WidgetRef ref) {
   final palette = resolveAppPalette(ref.read(themeVariantProvider));
-  return showModalBottomSheet(
+  return showAppSheet<void>(
     context: context,
-    backgroundColor: palette.card,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    isScrollControlled: true,
+    palette: palette,
     builder: (_) => _EtfPremiumRequiredSheet(palette: palette, parentRef: ref),
   );
 }
@@ -52,88 +49,74 @@ class _EtfPremiumRequiredSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        left: 24,
-        right: 24,
-        top: 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 36,
-            height: 4,
-            decoration: BoxDecoration(
-              color: palette.textBody.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
+    // The card, its corners and every inset are the shell's now
+    // (app_sheet.dart). The grab handle went with them: no other sheet in
+    // this module has one, and the panel closes on a tap outside either way.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: palette.accentPrimary.withValues(alpha: 0.15),
+            shape: BoxShape.circle,
           ),
-          const SizedBox(height: 24),
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: palette.accentPrimary.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.workspace_premium_rounded,
-              color: palette.accentPrimary,
-              size: 32,
-            ),
+          child: Icon(
+            Icons.workspace_premium_rounded,
+            color: palette.accentPrimary,
+            size: 32,
           ),
-          const SizedBox(height: 20),
-          Text(
-            l10n.etfPremiumRequiredTitle,
-            style: GoogleFonts.inter(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: palette.textHeader,
-            ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          l10n.etfPremiumRequiredTitle,
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: palette.textHeader,
           ),
-          const SizedBox(height: 12),
-          Text(
-            l10n.etfPremiumRequiredDescription,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: palette.textHeader,
-              height: 1.5,
-            ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          l10n.etfPremiumRequiredDescription,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: palette.textHeader,
+            height: 1.5,
           ),
-          const SizedBox(height: 28),
-          _sheetButton(
-            palette: palette,
-            label: l10n.monetizationModalUpgradeButton,
-            onTap: () {
-              Navigator.pop(context);
-              showMonetizationModal(
-                context,
-                parentRef,
-                trigger: MonetizationTrigger.voluntary,
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: () => Navigator.pop(context),
-              style: TextButton.styleFrom(foregroundColor: palette.textBody),
-              child: Text(
-                l10n.verdictBackToHome,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+        ),
+        const SizedBox(height: 28),
+        _sheetButton(
+          palette: palette,
+          label: l10n.monetizationModalUpgradeButton,
+          onTap: () {
+            Navigator.pop(context);
+            showMonetizationModal(
+              context,
+              parentRef,
+              trigger: MonetizationTrigger.voluntary,
+            );
+          },
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(foregroundColor: palette.textBody),
+            child: Text(
+              l10n.verdictBackToHome,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          const SizedBox(height: 8),
-        ],
-      ),
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 

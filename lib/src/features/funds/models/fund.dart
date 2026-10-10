@@ -101,11 +101,7 @@ class FundNavPoint {
   /// zero, which would look like the fund had briefly gone broke.
   final double? aum;
 
-  const FundNavPoint({
-    required this.date,
-    required this.navPerUnit,
-    this.aum,
-  });
+  const FundNavPoint({required this.date, required this.navPerUnit, this.aum});
 
   factory FundNavPoint.fromJson(Map<String, dynamic> json) => FundNavPoint(
     date: DateTime.parse(json['date'] as String),

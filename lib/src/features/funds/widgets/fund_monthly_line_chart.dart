@@ -277,7 +277,10 @@ class FundMonthlyLineChart extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
                     label,
-                    style: GoogleFonts.inter(fontSize: 10, color: palette.textBody),
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      color: palette.textBody,
+                    ),
                   ),
                 );
               },

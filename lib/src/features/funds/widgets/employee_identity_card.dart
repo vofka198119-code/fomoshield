@@ -44,9 +44,10 @@ class EmployeeIdentityCard extends ConsumerWidget {
     final isAdmin = ref.watch(isAdminProvider);
     final userId = ref.watch(currentUserProvider)?.id;
     final headsAFund =
-        ref.watch(fundsListProvider).valueOrNull?.any(
-          (f) => f.headUserId == userId,
-        ) ??
+        ref
+            .watch(fundsListProvider)
+            .valueOrNull
+            ?.any((f) => f.headUserId == userId) ??
         false;
     final positionLabel = headsAFund
         ? l10n.etfPositionFundManager

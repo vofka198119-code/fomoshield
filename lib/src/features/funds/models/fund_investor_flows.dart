@@ -17,9 +17,8 @@ class FundInvestorFlows {
   });
 
   factory FundInvestorFlows.fromJson(Map<String, dynamic> json) {
-    List<double> monthly(String key) => (json[key] as List<dynamic>)
-        .map((e) => (e as num).toDouble())
-        .toList();
+    List<double> monthly(String key) =>
+        (json[key] as List<dynamic>).map((e) => (e as num).toDouble()).toList();
     return FundInvestorFlows(
       year: json['year'] as int,
       inflow: monthly('inflow'),

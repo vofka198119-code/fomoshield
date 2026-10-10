@@ -142,9 +142,8 @@ class RebalancePlan {
 
   bool get isEmpty => legs.isEmpty;
 
-  double get sellTotal => legs
-      .where((l) => !l.isBuy)
-      .fold<double>(0, (sum, l) => sum + l.amount);
+  double get sellTotal =>
+      legs.where((l) => !l.isBuy).fold<double>(0, (sum, l) => sum + l.amount);
 
   double get buyTotal =>
       legs.where((l) => l.isBuy).fold<double>(0, (sum, l) => sum + l.amount);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/overlay/app_sheet.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/themed_button.dart';
@@ -54,13 +55,10 @@ Future<bool?> showTeamMemberPermissionsSheet({
   required FundTeamMember member,
   required AppPalette palette,
 }) {
-  return showModalBottomSheet<bool>(
+  return showAppSheet<bool>(
     context: context,
-    backgroundColor: palette.card,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    isScrollControlled: true,
+    palette: palette,
+    scrollable: true,
     builder: (_) =>
         _PermissionsSheet(fundId: fundId, member: member, palette: palette),
   );
@@ -257,113 +255,100 @@ class _PermissionsSheetState extends ConsumerState<_PermissionsSheet> {
     final l10n = AppLocalizations.of(context)!;
     final palette = widget.palette;
 
-    // Scrollable since 2026-10-10: the budget field raises the keyboard, and
-    // a Column sized to its children had nowhere to put the rest of the
-    // sheet once the viewInsets padding grew.
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        left: 20,
-        right: 20,
-        top: 20,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.member.nickname ?? l10n.etfRoleAnalyst,
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: palette.textHeader,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l10n.etfPermissionsSheetIntro,
-              style: GoogleFonts.inter(fontSize: 12, color: palette.textBody),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.etfInvitationDetailRoleLabel,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: palette.textBody,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _roles.map((role) {
-                final selected = role == _role;
-                return ChoiceChip(
-                  label: Text(roleLabelFor(l10n, role)),
-                  selected: selected,
-                  onSelected: _submitting || selected
-                      ? null
-                      : (_) => _changeRole(role),
-                  selectedColor: palette.accentPrimary.withValues(alpha: 0.2),
-                  labelStyle: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: selected ? palette.accentPrimary : palette.textBody,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  ),
-                  backgroundColor: palette.card,
-                  side: BorderSide(
-                    color: palette.textBody.withValues(alpha: 0.2),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-            // Label-left / Switch-right with activeTrackColor, exactly as
-            // employee_profile_screen.dart's own toggle — SwitchListTile would
-            // have brought Material's default accent in with it and read as a
-            // stray blue on every admin theme.
-            for (final key in _permissionKeys)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _permissionLabel(l10n, key),
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: palette.textHeader,
-                        ),
-                      ),
-                    ),
-                    Switch(
-                      value: _permissions[key] ?? false,
-                      onChanged: _submitting
-                          ? null
-                          : (value) =>
-                                setState(() => _permissions[key] = value),
-                      activeTrackColor: palette.accentPrimary,
-                    ),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 16),
-            _budgetField(palette, l10n),
-            if (_error != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _error!,
-                style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
-              ),
-            ],
-            const SizedBox(height: 16),
-            _saveButton(palette, l10n),
-          ],
+    // The card, its insets and the scrolling are the shell's
+    // (app_sheet.dart) since every sheet in this module was brought to one
+    // shape on 2026-10-10.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.member.nickname ?? l10n.etfRoleAnalyst,
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: palette.textHeader,
+          ),
         ),
-      ),
+        const SizedBox(height: 4),
+        Text(
+          l10n.etfPermissionsSheetIntro,
+          style: GoogleFonts.inter(fontSize: 12, color: palette.textBody),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          l10n.etfInvitationDetailRoleLabel,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: palette.textBody,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _roles.map((role) {
+            final selected = role == _role;
+            return ChoiceChip(
+              label: Text(roleLabelFor(l10n, role)),
+              selected: selected,
+              onSelected: _submitting || selected
+                  ? null
+                  : (_) => _changeRole(role),
+              selectedColor: palette.accentPrimary.withValues(alpha: 0.2),
+              labelStyle: GoogleFonts.inter(
+                fontSize: 12,
+                color: selected ? palette.accentPrimary : palette.textBody,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
+              backgroundColor: palette.card,
+              side: BorderSide(color: palette.textBody.withValues(alpha: 0.2)),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 16),
+        // Label-left / Switch-right with activeTrackColor, exactly as
+        // employee_profile_screen.dart's own toggle — SwitchListTile would
+        // have brought Material's default accent in with it and read as a
+        // stray blue on every admin theme.
+        for (final key in _permissionKeys)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _permissionLabel(l10n, key),
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: palette.textHeader,
+                    ),
+                  ),
+                ),
+                Switch(
+                  value: _permissions[key] ?? false,
+                  onChanged: _submitting
+                      ? null
+                      : (value) => setState(() => _permissions[key] = value),
+                  activeTrackColor: palette.accentPrimary,
+                ),
+              ],
+            ),
+          ),
+        const SizedBox(height: 16),
+        _budgetField(palette, l10n),
+        if (_error != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            _error!,
+            style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
+          ),
+        ],
+        const SizedBox(height: 16),
+        _saveButton(palette, l10n),
+      ],
     );
   }
 
@@ -378,7 +363,10 @@ class _PermissionsSheetState extends ConsumerState<_PermissionsSheet> {
             controller: _budgetController,
             enabled: !_submitting,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            style: GoogleFonts.inter(fontSize: 14, color: palette.textHeader),
+            // 16, the size every other field in a fund form renders at --
+            // this one was typed at 14 and read as a footnote beside them
+            // (found on the device, 2026-10-10).
+            style: GoogleFonts.inter(fontSize: 16, color: palette.textHeader),
             decoration:
                 fundFieldDecoration(
                   palette,
@@ -386,7 +374,7 @@ class _PermissionsSheetState extends ConsumerState<_PermissionsSheet> {
                 ).copyWith(
                   prefixText: '\$',
                   prefixStyle: GoogleFonts.inter(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: palette.textHeader,
                   ),
@@ -396,7 +384,7 @@ class _PermissionsSheetState extends ConsumerState<_PermissionsSheet> {
         ),
         Text(
           l10n.etfTreasurerBudgetHelp,
-          style: GoogleFonts.inter(fontSize: 11, color: palette.textBody),
+          style: GoogleFonts.inter(fontSize: 12.5, color: palette.textBody),
         ),
       ],
     );

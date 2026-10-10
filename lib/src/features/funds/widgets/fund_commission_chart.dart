@@ -41,10 +41,7 @@ class FundCommissionChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).languageCode;
-    final maxValue = monthlyCommission.fold<double>(
-      0,
-      (m, v) => v > m ? v : m,
-    );
+    final maxValue = monthlyCommission.fold<double>(0, (m, v) => v > m ? v : m);
     final chartMaxY = maxValue > 0 ? maxValue * 1.2 : 1.0;
     final barColor = palette.accentPrimary;
 

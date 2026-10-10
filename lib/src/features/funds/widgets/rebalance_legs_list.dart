@@ -60,12 +60,7 @@ class RebalanceLegsList extends ConsumerWidget {
         _totals(sells, buys),
         const SizedBox(height: 14),
         for (final leg in [...sells, ...buys])
-          _LegRow(
-            leg: leg,
-            palette: palette,
-            l10n: l10n,
-            onToggle: onToggle,
-          ),
+          _LegRow(leg: leg, palette: palette, l10n: l10n, onToggle: onToggle),
         // The ones left alone sit at the bottom, muted — out of the way of
         // what is actually being done, but still reachable.
         for (final holding in untouched)

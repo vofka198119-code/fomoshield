@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/cache/logo_providers.dart' show resolvedCompanyNameProvider;
+import '../../../core/cache/logo_providers.dart'
+    show resolvedCompanyNameProvider;
 import '../models/fund.dart';
 import '../models/fund_target_weight.dart';
 import '../models/fund_balance_history.dart';

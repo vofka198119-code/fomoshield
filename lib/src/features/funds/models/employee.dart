@@ -50,20 +50,21 @@ class EmployeeProfile {
     required this.updatedAt,
   });
 
-  factory EmployeeProfile.fromJson(Map<String, dynamic> json) => EmployeeProfile(
-    userId: json['userId'] as String,
-    nickname: json['nickname'] as String,
-    bio: json['bio'] as String?,
-    language: json['language'] as String?,
-    desiredRole: json['desiredRole'] as String?,
-    availableForHire: json['availableForHire'] as bool,
-    approvedProposalsCount: json['approvedProposalsCount'] as int,
-    rejectedProposalsCount: json['rejectedProposalsCount'] as int,
-    fundsChangedCount: json['fundsChangedCount'] as int,
-    rating: (json['rating'] as num?)?.toDouble(),
-    createdAt: DateTime.parse(json['createdAt'] as String),
-    updatedAt: DateTime.parse(json['updatedAt'] as String),
-  );
+  factory EmployeeProfile.fromJson(Map<String, dynamic> json) =>
+      EmployeeProfile(
+        userId: json['userId'] as String,
+        nickname: json['nickname'] as String,
+        bio: json['bio'] as String?,
+        language: json['language'] as String?,
+        desiredRole: json['desiredRole'] as String?,
+        availableForHire: json['availableForHire'] as bool,
+        approvedProposalsCount: json['approvedProposalsCount'] as int,
+        rejectedProposalsCount: json['rejectedProposalsCount'] as int,
+        fundsChangedCount: json['fundsChangedCount'] as int,
+        rating: (json['rating'] as num?)?.toDouble(),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        updatedAt: DateTime.parse(json['updatedAt'] as String),
+      );
 }
 
 class FundTeamMember {
@@ -160,6 +161,7 @@ class EmploymentRecord {
   final String role;
   final DateTime joinedAt;
   final DateTime? leftAt;
+
   /// 'resigned' | 'terminated' | 'fund_closed' | null (still working).
   /// 'fund_closed' arrives with Migration 031 — see employment_labels.dart
   /// for the display wording, and never assume "not resigned means fired":
@@ -178,13 +180,16 @@ class EmploymentRecord {
 
   bool get isActive => leftAt == null;
 
-  factory EmploymentRecord.fromJson(Map<String, dynamic> json) => EmploymentRecord(
-    fundId: json['fundId'] as String,
-    fundName: json['fundName'] as String?,
-    fundTicker: json['fundTicker'] as String?,
-    role: json['role'] as String,
-    joinedAt: DateTime.parse(json['joinedAt'] as String),
-    leftAt: json['leftAt'] != null ? DateTime.parse(json['leftAt'] as String) : null,
-    leaveType: json['leaveType'] as String?,
-  );
+  factory EmploymentRecord.fromJson(Map<String, dynamic> json) =>
+      EmploymentRecord(
+        fundId: json['fundId'] as String,
+        fundName: json['fundName'] as String?,
+        fundTicker: json['fundTicker'] as String?,
+        role: json['role'] as String,
+        joinedAt: DateTime.parse(json['joinedAt'] as String),
+        leftAt: json['leftAt'] != null
+            ? DateTime.parse(json['leftAt'] as String)
+            : null,
+        leaveType: json['leaveType'] as String?,
+      );
 }
