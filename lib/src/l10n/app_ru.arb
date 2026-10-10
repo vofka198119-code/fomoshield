@@ -2381,7 +2381,7 @@
   },
   "etfVacancyCardOpenFund": "Открыть фонд",
   "etfVacancyFundSectionTitle": "Вакансии фонда",
-  "etfVacancyFundSectionEmpty": "Фонд ничего не разместил. Пока не разместишь — тебя не ищут на бирже",
+  "etfVacancyFundSectionEmpty": "Фонд ничего не разместил — соискатели о нём не узнают. Разместишь вакансию, и она появится на бирже",
   "etfVacancyPostTitle": "Разместить вакансию",
   "etfVacancyPostRoleLabel": "Должность",
   "etfVacancyPostPitchLabel": "Кого ищем",

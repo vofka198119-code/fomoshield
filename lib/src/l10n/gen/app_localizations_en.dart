@@ -7957,7 +7957,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfVacancyFundSectionEmpty =>
-      'This fund has posted nothing. Until it does, nobody is looking for you';
+      'This fund has advertised nothing, so candidates never hear of it. Post a vacancy and it appears on the board';
 
   @override
   String get etfVacancyPostTitle => 'Post a vacancy';

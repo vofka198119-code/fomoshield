@@ -7988,7 +7988,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get etfVacancyFundSectionEmpty =>
-      'Фонд ничего не разместил. Пока не разместишь — тебя не ищут на бирже';
+      'Фонд ничего не разместил — соискатели о нём не узнают. Разместишь вакансию, и она появится на бирже';
 
   @override
   String get etfVacancyPostTitle => 'Разместить вакансию';

@@ -13606,7 +13606,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfVacancyFundSectionEmpty.
   ///
   /// In en, this message translates to:
-  /// **'This fund has posted nothing. Until it does, nobody is looking for you'**
+  /// **'This fund has advertised nothing, so candidates never hear of it. Post a vacancy and it appears on the board'**
   String get etfVacancyFundSectionEmpty;
 
   /// No description provided for @etfVacancyPostTitle.
