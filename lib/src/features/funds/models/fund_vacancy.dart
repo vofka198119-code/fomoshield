@@ -50,7 +50,13 @@ class FundVacancy {
   });
 
   bool get isOpen => status == 'open';
-  bool get isPaused => status == 'paused';
+
+  /// Anything that is not open is paused, rather than strictly 'paused'.
+  /// There are only two states since migration 037, and asking the strict
+  /// question let a leftover 'closed' row from the old schema read as paused
+  /// in the status line while the button beside it still offered to pause
+  /// it -- two tests for one fact, disagreeing on screen (2026-10-10).
+  bool get isPaused => !isOpen;
 
   factory FundVacancy.fromJson(Map<String, dynamic> json) => FundVacancy(
     id: json['id'] as String,

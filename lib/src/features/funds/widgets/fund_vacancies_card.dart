@@ -80,7 +80,9 @@ class FundVacanciesCard extends ConsumerWidget {
               );
             },
           ),
-          const SizedBox(height: 6),
+          // Room between the last advert's own button and the card's: pressed
+          // together they read as a pair of choices about the same advert.
+          const SizedBox(height: 22),
           SizedBox(
             width: double.infinity,
             child: brandCtaButton(
