@@ -12,6 +12,7 @@ import '../../../shared/widgets/card_frame.dart';
 import '../employment_labels.dart';
 import '../models/employee.dart';
 import '../providers/employee_providers.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Employment Detail — one fund stint: period worked, how it ended
@@ -123,11 +124,9 @@ class _EmploymentDetailScreenState
       Navigator.of(context).pop();
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.etfEmploymentDetailLeaveError),
-          backgroundColor: ThemeV2.loss,
-        ),
+      showAppBanner(
+        l10n.etfEmploymentDetailLeaveError,
+        tone: AppBannerTone.failure,
       );
     } finally {
       if (mounted) setState(() => _leaving = false);
@@ -253,7 +252,9 @@ class _EmploymentDetailScreenState
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: _statusColor(palette).withValues(alpha: 0.12),
+                            color: _statusColor(
+                              palette,
+                            ).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -297,7 +298,9 @@ class _EmploymentDetailScreenState
                 SizedBox(
                   height: ThemeV2.buttonHeight,
                   child: OutlinedButton(
-                    onPressed: _leaving ? null : () => _confirmLeave(palette, l10n),
+                    onPressed: _leaving
+                        ? null
+                        : () => _confirmLeave(palette, l10n),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: ThemeV2.loss),
                     ),

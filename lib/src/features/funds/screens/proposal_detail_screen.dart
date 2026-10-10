@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/supabase/supabase_providers.dart';
@@ -13,6 +12,7 @@ import '../providers/fund_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 import '../widgets/proposal_card.dart';
 import '../widgets/proposal_impact_card.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Proposal Detail — one trade proposal, full screen. Reached from
@@ -72,17 +72,10 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       setState(() => _proposal = updated);
     } on FundApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message), backgroundColor: ThemeV2.loss),
-      );
+      showAppBanner(e.message, tone: AppBannerTone.failure);
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.etfProposalActionError),
-          backgroundColor: ThemeV2.loss,
-        ),
-      );
+      showAppBanner(l10n.etfProposalActionError, tone: AppBannerTone.failure);
     }
   }
 

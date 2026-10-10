@@ -28,6 +28,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../shared/widgets/disclaimer_footer.dart';
 import '../../shared/services/finnhub_service.dart';
+import '../../core/overlay/app_banner.dart';
 
 /// App version + build number, read from the actual installed build (not
 /// hardcoded) — build number auto-increments on every commit, see
@@ -103,15 +104,7 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
   } catch (_) {
     if (!context.mounted) return;
     Navigator.of(context, rootNavigator: true).pop(); // dismiss spinner
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.profileDeleteFailed,
-          style: GoogleFonts.inter(fontSize: 13),
-        ),
-        backgroundColor: ThemeV2.loss,
-      ),
-    );
+    showAppBanner(l10n.profileDeleteFailed, tone: AppBannerTone.failure);
   }
 }
 
@@ -728,13 +721,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   void _showSnack(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('🔧 $message'),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    showAppBanner('🔧 $message', tone: AppBannerTone.info);
   }
 
   Widget _section(String title, AppPalette palette) {

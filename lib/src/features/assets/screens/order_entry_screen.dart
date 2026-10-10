@@ -20,7 +20,6 @@ import '../../../core/models/app_notification.dart';
 import '../../../core/notifications/notification_providers.dart';
 import '../../../core/overlay/app_notification_popup.dart';
 import '../../../core/supabase/supabase_providers.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/theme_variant_provider.dart';
@@ -37,6 +36,7 @@ import '../../portfolio/screens/order_entry/order_config_section.dart';
 import '../../portfolio/screens/order_entry/order_bottom_button.dart';
 import '../../portfolio/screens/order_entry/order_confirmation_sheet.dart';
 import '../../portfolio/screens/order_entry/amount_keypad.dart';
+import '../../../core/overlay/app_banner.dart';
 
 enum _OrderType { market, limit }
 
@@ -235,9 +235,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryEnterAmount)));
+      showAppBanner(l10n.orderEntryEnterAmount, tone: AppBannerTone.failure);
       return;
     }
 
@@ -254,9 +252,10 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     }
 
     if (shares <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryInvalidQuantity)));
+      showAppBanner(
+        l10n.orderEntryInvalidQuantity,
+        tone: AppBannerTone.failure,
+      );
       return;
     }
 
@@ -274,9 +273,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       widget.sessionId,
       tier,
     )) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.tradesEngineSlotFrozen)));
+      showAppBanner(l10n.tradesEngineSlotFrozen, tone: AppBannerTone.failure);
       return;
     }
 
@@ -284,8 +281,9 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
     if (_selectedOrderType == _OrderType.limit) {
       limitPrice = double.tryParse(_limitPriceController.text);
       if (limitPrice == null || limitPrice <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.orderEntryEnterValidLimitPrice)),
+        showAppBanner(
+          l10n.orderEntryEnterValidLimitPrice,
+          tone: AppBannerTone.failure,
         );
         return;
       }
@@ -302,12 +300,9 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
       // the engine once the commission is added on top.
       final orderCostWithFee = orderCost * (1 + stressTestCommissionRate);
       if (orderCostWithFee > _availableCash + 0.01) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.orderEntryNotEnoughCash(formatUsd(_availableCash)),
-            ),
-          ),
+        showAppBanner(
+          l10n.orderEntryNotEnoughCash(formatUsd(_availableCash)),
+          tone: AppBannerTone.failure,
         );
         return;
       }
@@ -391,9 +386,7 @@ class _OrderEntryScreenState extends ConsumerState<OrderEntryScreen> {
         );
 
     if (!result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.reason), backgroundColor: ThemeV2.loss),
-      );
+      showAppBanner(result.reason, tone: AppBannerTone.failure);
       return;
     }
 

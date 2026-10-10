@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/supabase/supabase_providers.dart';
 import '../../../core/theme/app_palette.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -13,6 +12,7 @@ import '../models/fund_target_weight.dart';
 import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
 import '../widgets/fund_target_editor.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Setting the plan, on a screen of its own.
@@ -46,17 +46,10 @@ class _FundTargetsScreenState extends ConsumerState<FundTargetsScreen> {
           .setFundTargets(widget.fundId, targets);
       ref.invalidate(fundTargetsProvider(widget.fundId));
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.etfBalancingSavedMessage)),
-      );
+      showAppBanner(l10n.etfBalancingSavedMessage, tone: AppBannerTone.success);
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.etfBalancingSaveError),
-          backgroundColor: ThemeV2.loss,
-        ),
-      );
+      showAppBanner(l10n.etfBalancingSaveError, tone: AppBannerTone.failure);
     } finally {
       if (mounted) setState(() => _saving = false);
     }

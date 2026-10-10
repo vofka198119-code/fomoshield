@@ -47,6 +47,7 @@ import 'order_entry/order_bottom_button.dart';
 import 'order_entry/order_confirmation_sheet.dart';
 import 'order_entry/amount_keypad.dart';
 import 'order_entry/market_closed_dialog.dart';
+import '../../../core/overlay/app_banner.dart';
 
 /// Order type. Stop/StopLimit exist in the order model and are still fully
 /// handled by _mapOrderType/_executeOrder below, but the UI only exposes
@@ -319,9 +320,7 @@ class _PortfolioOrderEntryScreenState
     final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryEnterAmount)));
+      showAppBanner(l10n.orderEntryEnterAmount, tone: AppBannerTone.failure);
       return;
     }
 
@@ -333,9 +332,10 @@ class _PortfolioOrderEntryScreenState
     }
 
     if (shares <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryInvalidQuantity)));
+      showAppBanner(
+        l10n.orderEntryInvalidQuantity,
+        tone: AppBannerTone.failure,
+      );
       return;
     }
 
@@ -365,8 +365,9 @@ class _PortfolioOrderEntryScreenState
     if (orderType == orders.OrderType.limit) {
       limitPrice = double.tryParse(_limitPriceController.text);
       if (limitPrice == null || limitPrice <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.orderEntryEnterValidLimitPrice)),
+        showAppBanner(
+          l10n.orderEntryEnterValidLimitPrice,
+          tone: AppBannerTone.failure,
         );
         return;
       }
@@ -386,12 +387,9 @@ class _PortfolioOrderEntryScreenState
           ? orderCost * (1 + brokerCommissionRate)
           : orderCost;
       if (orderCostWithFee > _availableCash + 0.01) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.orderEntryNotEnoughCash(formatUsd(_availableCash)),
-            ),
-          ),
+        showAppBanner(
+          l10n.orderEntryNotEnoughCash(formatUsd(_availableCash)),
+          tone: AppBannerTone.failure,
         );
         return;
       }
@@ -422,12 +420,9 @@ class _PortfolioOrderEntryScreenState
       }
     } else {
       if (shares > _heldShares + 0.0001) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.orderEntryNotEnoughShares(_heldShares.toStringAsFixed(4)),
-            ),
-          ),
+        showAppBanner(
+          l10n.orderEntryNotEnoughShares(_heldShares.toStringAsFixed(4)),
+          tone: AppBannerTone.failure,
         );
         return;
       }
@@ -569,9 +564,7 @@ class _PortfolioOrderEntryScreenState
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(e.toString())));
+          showAppBanner(e.toString(), tone: AppBannerTone.failure);
         }
         return;
       }

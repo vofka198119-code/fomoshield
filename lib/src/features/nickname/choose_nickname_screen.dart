@@ -10,6 +10,7 @@ import '../../core/theme/themed_border.dart';
 import '../../core/theme/themed_button.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Choose Nickname (Migration 017) — mandatory, one-time global account
@@ -70,11 +71,9 @@ class _ChooseNicknameScreenState extends ConsumerState<ChooseNicknameScreen> {
       _formKey.currentState!.validate();
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.chooseNicknameGenericError),
-          backgroundColor: ThemeV2.loss,
-        ),
+      showAppBanner(
+        l10n.chooseNicknameGenericError,
+        tone: AppBannerTone.failure,
       );
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -184,10 +183,7 @@ class _ChooseNicknameScreenState extends ConsumerState<ChooseNicknameScreen> {
                   Text(
                     _serverError!,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: ThemeV2.loss,
-                    ),
+                    style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
                   ),
                 ],
                 const SizedBox(height: 24),

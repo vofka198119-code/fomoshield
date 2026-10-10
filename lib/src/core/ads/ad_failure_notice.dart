@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // User-facing notices for a rewarded ad that failed to load/show (AdMob
@@ -26,10 +27,5 @@ void showAdRetryNotice(BuildContext context) =>
 void _notice(BuildContext context, String Function(AppLocalizations) message) {
   final l10n = AppLocalizations.of(context);
   if (l10n == null) return;
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(message(l10n)),
-      behavior: SnackBarBehavior.floating,
-    ),
-  );
+  showAppBanner(message(l10n), tone: AppBannerTone.info);
 }

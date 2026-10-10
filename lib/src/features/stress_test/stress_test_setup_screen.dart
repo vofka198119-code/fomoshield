@@ -29,6 +29,7 @@ import 'stress_test_engine.dart';
 import 'stress_test_dca_provider.dart';
 import 'stress_test_dividend_provider.dart';
 import 'stress_test_nav_ad_trigger.dart';
+import '../../core/overlay/app_banner.dart';
 
 // Market Clock ring's gold accent — used for every "PREMIUM" tag on this
 // screen.
@@ -127,8 +128,9 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
           trigger: MonetizationTrigger.stressTestLimit,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.stressTestMaxSessionsReached)),
+        showAppBanner(
+          l10n.stressTestMaxSessionsReached,
+          tone: AppBannerTone.info,
         );
       }
       return;
@@ -138,7 +140,8 @@ class _StressTestSetupScreenState extends ConsumerState<StressTestSetupScreen> {
     // opt-in were both made earlier, on the duration row itself — right
     // after Apply for Custom, on selection for Infinite — well before this
     // disclaimer step. See _askFundingOptions / _durationSupportsFunding.
-    final useDca = _durationSupportsFunding(_selectedDuration) && _useDcaFunding;
+    final useDca =
+        _durationSupportsFunding(_selectedDuration) && _useDcaFunding;
 
     final notifier = ref.read(stressTestProvider.notifier);
     notifier.renameSession(widget.sessionId, _nameController.text);

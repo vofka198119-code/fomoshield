@@ -17,6 +17,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../shared/services/finnhub_service.dart';
 import '../disclaimer/disclaimer_providers.dart';
 import 'auth_providers.dart';
+import '../../core/overlay/app_banner.dart';
 
 class AccountRestoreScreen extends ConsumerStatefulWidget {
   final int daysRemaining;
@@ -49,14 +50,9 @@ class _AccountRestoreScreenState extends ConsumerState<AccountRestoreScreen> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _busy = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.accountRestoreScreenRestoreFailed,
-            style: GoogleFonts.inter(fontSize: 13),
-          ),
-          backgroundColor: ThemeV2.loss,
-        ),
+      showAppBanner(
+        AppLocalizations.of(context)!.accountRestoreScreenRestoreFailed,
+        tone: AppBannerTone.failure,
       );
     }
   }

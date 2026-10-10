@@ -20,6 +20,7 @@ import '../widgets/fund_holdings_card.dart';
 import '../widgets/fund_text_card.dart';
 import '../widgets/fund_info_card.dart';
 import '../widgets/fund_team_card.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Detail — the PUBLIC card: what anyone browsing Search's Funds tab
@@ -55,9 +56,7 @@ class FundDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final portfolios = ref.read(portfoliosProvider);
     if (portfolios.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.companyDetailNoPortfolios)));
+      showAppBanner(l10n.companyDetailNoPortfolios, tone: AppBannerTone.info);
       return;
     }
     context.push(
@@ -88,10 +87,10 @@ class FundDetailScreen extends ConsumerWidget {
             fund.ticker,
             palette,
             GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.5,
-          ),
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
+            ),
           ),
           orElse: () => const SizedBox.shrink(),
         ),

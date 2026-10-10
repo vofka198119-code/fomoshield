@@ -9,6 +9,7 @@ import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_border.dart';
 import '../../../core/theme/themed_button.dart';
 import '../../../core/supabase/supabase_providers.dart' show myNicknameProvider;
+import '../../../core/overlay/app_banner.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/employee.dart';
@@ -97,8 +98,9 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
         _profile = saved;
         _loadedOnce = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.etfEmployeeProfileSavedSnackbar)),
+      showAppBanner(
+        l10n.etfEmployeeProfileSavedSnackbar,
+        tone: AppBannerTone.success,
       );
     } on FundApiException catch (e) {
       if (!mounted) return;
@@ -108,17 +110,13 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
           _formKey.currentState!.validate();
           break;
         default:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message), backgroundColor: ThemeV2.loss),
-          );
+          showAppBanner(e.message, tone: AppBannerTone.failure);
       }
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.etfEmployeeProfileSaveError),
-          backgroundColor: ThemeV2.loss,
-        ),
+      showAppBanner(
+        l10n.etfEmployeeProfileSaveError,
+        tone: AppBannerTone.failure,
       );
     } finally {
       if (mounted) setState(() => _submitting = false);

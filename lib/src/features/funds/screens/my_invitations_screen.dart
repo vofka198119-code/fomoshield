@@ -16,6 +16,7 @@ import '../providers/fund_providers.dart';
 import '../widgets/invitation_detail_sheet.dart';
 import '../widgets/succession_offer_card.dart';
 import '../widgets/succession_offer_sheet.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // My Invitations — ETF Fund Emulation, Phase 3. The analyst's own envelope
@@ -174,14 +175,11 @@ class MyInvitationsScreen extends ConsumerWidget {
       ref.invalidate(fundDetailProvider(offer.fundId));
     }
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          result == SuccessionAcceptResult.becameHead
-              ? l10n.etfSuccessionBecameHeadSnackbar
-              : l10n.etfSuccessionAcceptedSnackbar,
-        ),
-      ),
+    showAppBanner(
+      result == SuccessionAcceptResult.becameHead
+          ? l10n.etfSuccessionBecameHeadSnackbar
+          : l10n.etfSuccessionAcceptedSnackbar,
+      tone: AppBannerTone.success,
     );
   }
 
@@ -211,14 +209,11 @@ class MyInvitationsScreen extends ConsumerWidget {
           ref.invalidate(myEmploymentHistoryProvider);
         }
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              joined
-                  ? l10n.etfInvitationAcceptedSnackbar
-                  : l10n.etfInvitationDeclinedSnackbar,
-            ),
-          ),
+        showAppBanner(
+          joined
+              ? l10n.etfInvitationAcceptedSnackbar
+              : l10n.etfInvitationDeclinedSnackbar,
+          tone: AppBannerTone.success,
         );
       },
       child: CardFrame(

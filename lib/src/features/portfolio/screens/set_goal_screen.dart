@@ -26,6 +26,7 @@ import '../../../shared/widgets/numeric_keypad.dart';
 import '../../../core/supabase/supabase_providers.dart';
 import '../portfolio_limits_provider.dart';
 import '../portfolio_providers.dart';
+import '../../../core/overlay/app_banner.dart';
 
 class SetGoalScreen extends ConsumerStatefulWidget {
   final String portfolioId;
@@ -75,12 +76,9 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
     final amount = double.tryParse(_controller.text);
     final minGoal = _minGoal;
     if (amount == null || amount < minGoal) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.setGoalScreenMinimumTargetError(formatUsd(minGoal)),
-          ),
-        ),
+      showAppBanner(
+        l10n.setGoalScreenMinimumTargetError(formatUsd(minGoal)),
+        tone: AppBannerTone.failure,
       );
       return;
     }
@@ -225,7 +223,10 @@ class _SetGoalScreenState extends ConsumerState<SetGoalScreen> {
             else
               Padding(
                 padding: const EdgeInsets.all(22),
-                child: _saveButton(height: ThemeV2.buttonHeight, palette: palette),
+                child: _saveButton(
+                  height: ThemeV2.buttonHeight,
+                  palette: palette,
+                ),
               ),
           ],
         ),

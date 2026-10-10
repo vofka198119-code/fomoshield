@@ -19,6 +19,7 @@ import 'widgets/exchange_badge.dart';
 import 'widgets/ratings_lanes.dart';
 import 'widgets/search_browse_lanes.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../core/overlay/app_banner.dart';
 
 String _searchErrorText(AppLocalizations l10n, SearchErrorType type) {
   switch (type) {
@@ -92,6 +93,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     _tabIndex = _lanes.indexOf(_SearchLane.companies);
     _pageController = PageController(initialPage: _tabIndex);
   }
+
   // Consumed by _buildCompaniesSearchField — see its own doc comment.
   bool _companiesAutofocusConsumed = false;
 
@@ -254,15 +256,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   palette: palette,
                                   query: _fundsQuery,
                                 ),
-                                _SearchLane.companies =>
-                                  _buildCompaniesResults(
-                                    l10n,
-                                    state,
-                                    palette,
-                                    portfolioId,
-                                    stressTestSource,
-                                    stressTestSessionId,
-                                  ),
+                                _SearchLane.companies => _buildCompaniesResults(
+                                  l10n,
+                                  state,
+                                  palette,
+                                  portfolioId,
+                                  stressTestSource,
+                                  stressTestSessionId,
+                                ),
                                 _SearchLane.ratings => RatingsLanes(
                                   palette: palette,
                                   onTapSymbol: (symbol) =>
@@ -536,11 +537,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    ExchangeBadge(
-                      symbol: symbol,
-                      type: type,
-                      palette: palette,
-                    ),
+                    ExchangeBadge(symbol: symbol, type: type, palette: palette),
                   ],
                 ),
                 trailing: Row(
@@ -571,17 +568,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             final maxW = ref.read(maxWatchlistProvider);
                             final current = ref.read(watchlistSymbolsProvider);
                             if (current.length >= maxW) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    maxW == 30
-                                        ? l10n.watchlistLimitFree
-                                        : l10n.watchlistLimitMax(maxW),
-                                    style: GoogleFonts.inter(fontSize: 13),
-                                  ),
-                                  backgroundColor: ThemeV2.primary,
-                                  behavior: SnackBarBehavior.floating,
-                                ),
+                              showAppBanner(
+                                maxW == 30
+                                    ? l10n.watchlistLimitFree
+                                    : l10n.watchlistLimitMax(maxW),
+                                tone: AppBannerTone.info,
                               );
                               return;
                             }

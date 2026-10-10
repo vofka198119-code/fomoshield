@@ -5,8 +5,10 @@ import '../../core/purchases/purchase_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../l10n/gen/app_localizations.dart';
-import '../portfolio/portfolio_limits_provider.dart' show premiumMaxHoldingsPerPortfolio;
+import '../portfolio/portfolio_limits_provider.dart'
+    show premiumMaxHoldingsPerPortfolio;
 import '../search/search_counter_provider.dart';
+import '../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Monetization Modal — one sheet, three reasons to show it, each with its
@@ -132,19 +134,14 @@ class _MonetizationSheet extends ConsumerWidget {
       switch (next) {
         case PurchaseOutcome.success:
           if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.subscriptionUpgradedDetail),
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 3),
-            ),
+          showAppBanner(
+            l10n.subscriptionUpgradedDetail,
+            tone: AppBannerTone.success,
           );
         case PurchaseOutcome.error:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.monetizationModalPurchaseError),
-              behavior: SnackBarBehavior.floating,
-            ),
+          showAppBanner(
+            l10n.monetizationModalPurchaseError,
+            tone: AppBannerTone.failure,
           );
         case PurchaseOutcome.canceled:
           // User backed out of Play's own sheet — nothing to say.
@@ -324,20 +321,15 @@ class _MonetizationSheet extends ConsumerWidget {
                 onPressed: () {
                   Navigator.pop(context);
                   ref.read(searchCounterProvider.notifier).resetToFree();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.monetizationModalCounterResetAdmin),
-                      behavior: SnackBarBehavior.floating,
-                    ),
+                  showAppBanner(
+                    l10n.monetizationModalCounterResetAdmin,
+                    tone: AppBannerTone.info,
                   );
                 },
                 icon: const Icon(Icons.admin_panel_settings_rounded, size: 18),
                 label: Text(
                   l10n.monetizationModalResetCounterAdmin,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: _mutedOnSheet,
-                  ),
+                  style: GoogleFonts.inter(fontSize: 13, color: _mutedOnSheet),
                 ),
                 style: TextButton.styleFrom(foregroundColor: _mutedOnSheet),
               ),
@@ -396,20 +388,16 @@ Future<void> _startPurchase(
   if (userId == null) return;
 
   ref.read(purchaseInFlightProvider.notifier).state = true;
-  final started = await ref
-      .read(purchaseServiceProvider)
-      .buyMonthly(userId);
+  final started = await ref.read(purchaseServiceProvider).buyMonthly(userId);
   if (!started) {
     // Nothing launched at all (billing unavailable, product/offer not
     // found) — no purchaseStream event will ever arrive for this
     // attempt, so reset the spinner ourselves instead of waiting.
     ref.read(purchaseInFlightProvider.notifier).state = false;
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.monetizationModalPurchaseError),
-          behavior: SnackBarBehavior.floating,
-        ),
+      showAppBanner(
+        l10n.monetizationModalPurchaseError,
+        tone: AppBannerTone.failure,
       );
     }
   }
@@ -431,11 +419,9 @@ Future<void> _restorePurchases(
   if (ref.read(purchaseInFlightProvider)) {
     ref.read(purchaseInFlightProvider.notifier).state = false;
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.monetizationModalRestoreNotFound),
-          behavior: SnackBarBehavior.floating,
-        ),
+      showAppBanner(
+        l10n.monetizationModalRestoreNotFound,
+        tone: AppBannerTone.info,
       );
     }
   }

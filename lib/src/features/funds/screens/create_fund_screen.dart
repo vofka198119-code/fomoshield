@@ -13,6 +13,7 @@ import '../providers/fund_providers.dart';
 import '../sector_labels.dart';
 import '../widgets/fund_form_fields.dart';
 import '../services/fund_api_service.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Create Fund — ETF Fund Emulation, Phase 1. Ticker generation/uniqueness
@@ -111,8 +112,9 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
     if (_selectedSectors.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.etfCreateFundSelectAtLeastOneSector)),
+      showAppBanner(
+        l10n.etfCreateFundSelectAtLeastOneSector,
+        tone: AppBannerTone.failure,
       );
       return;
     }
@@ -135,9 +137,10 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
           );
       ref.invalidate(fundsListProvider);
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.etfCreateFundSuccessMessage)));
+      showAppBanner(
+        l10n.etfCreateFundSuccessMessage,
+        tone: AppBannerTone.success,
+      );
       context.pushReplacement('/funds/${fund.id}/manage');
     } on FundApiException catch (e) {
       if (!mounted) return;
@@ -167,30 +170,28 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
           break;
         case 'sectors_empty':
         case 'sectors_invalid':
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.etfCreateFundSelectAtLeastOneSector)),
+          showAppBanner(
+            l10n.etfCreateFundSelectAtLeastOneSector,
+            tone: AppBannerTone.failure,
           );
           break;
         case 'fund_limit_reached':
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.etfCreateFundLimitReachedError)),
+          showAppBanner(
+            l10n.etfCreateFundLimitReachedError,
+            tone: AppBannerTone.failure,
           );
           break;
         default:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.etfCreateFundErrorGeneric),
-              backgroundColor: ThemeV2.loss,
-            ),
+          showAppBanner(
+            l10n.etfCreateFundErrorGeneric,
+            tone: AppBannerTone.failure,
           );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.etfCreateFundErrorGeneric),
-          backgroundColor: ThemeV2.loss,
-        ),
+      showAppBanner(
+        l10n.etfCreateFundErrorGeneric,
+        tone: AppBannerTone.failure,
       );
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -256,10 +257,10 @@ class _CreateFundScreenState extends ConsumerState<CreateFundScreen> {
             l10n.etfCreateFundTitle,
             palette,
             GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.5,
-          ),
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
         body: SafeArea(

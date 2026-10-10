@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/themed_divider.dart';
@@ -18,6 +17,7 @@ import '../../../shared/widgets/numeric_keypad.dart';
 import '../models/rebalance_leg.dart';
 import '../providers/fund_providers.dart';
 import '../widgets/rebalance_legs_list.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // What the rebalance would do — a screen, not a sheet.
@@ -219,12 +219,9 @@ class _FundRebalancePreviewScreenState
       // re-read rather than showing one that predates it.
       ref.invalidate(fundProposalsProvider(widget.fundId));
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '${l10n.etfRebalanceCreated} — ${l10n.etfRebalanceLegCount(count)}',
-          ),
-        ),
+      showAppBanner(
+        '${l10n.etfRebalanceCreated} — ${l10n.etfRebalanceLegCount(count)}',
+        tone: AppBannerTone.success,
       );
       // Back to the Balancing screen: the decision is made and this screen
       // has nothing left to say.
@@ -232,12 +229,7 @@ class _FundRebalancePreviewScreenState
     } catch (_) {
       if (!mounted) return;
       setState(() => _proposing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.etfRebalanceError),
-          backgroundColor: ThemeV2.loss,
-        ),
-      );
+      showAppBanner(l10n.etfRebalanceError, tone: AppBannerTone.failure);
     }
   }
 

@@ -9,6 +9,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../auth/auth_providers.dart' show resolvePostAuthRoute;
 
 import 'disclaimer_providers.dart';
+import '../../core/overlay/app_banner.dart';
 
 class DisclaimerScreen extends ConsumerStatefulWidget {
   const DisclaimerScreen({super.key});
@@ -25,11 +26,9 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.disclaimerScreenLinkFailed),
-          backgroundColor: ThemeV2.loss,
-        ),
+      showAppBanner(
+        AppLocalizations.of(context)!.disclaimerScreenLinkFailed,
+        tone: AppBannerTone.failure,
       );
     }
   }
@@ -162,15 +161,10 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () =>
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                l10n.disclaimerScreenAppWillClose,
-                              ),
-                              backgroundColor: ThemeV2.loss,
-                            ),
-                          ),
+                      onPressed: () => showAppBanner(
+                        l10n.disclaimerScreenAppWillClose,
+                        tone: AppBannerTone.failure,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ThemeV2.loss,
                         foregroundColor: Colors.white,
@@ -280,9 +274,7 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                             height: 1.5,
                           ),
                           children: [
-                            TextSpan(
-                              text: l10n.disclaimerScreenAcceptPrefix,
-                            ),
+                            TextSpan(text: l10n.disclaimerScreenAcceptPrefix),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
@@ -314,9 +306,8 @@ class _DisclaimerScreenState extends ConsumerState<DisclaimerScreen> {
                               alignment: PlaceholderAlignment.baseline,
                               baseline: TextBaseline.alphabetic,
                               child: GestureDetector(
-                                onTap: () => _openLink(
-                                  'https://fomoshield.app/privacy',
-                                ),
+                                onTap: () =>
+                                    _openLink('https://fomoshield.app/privacy'),
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     border: Border(

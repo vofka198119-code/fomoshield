@@ -23,6 +23,7 @@ import '../../portfolio/screens/order_entry/order_config_section.dart';
 import '../../portfolio/screens/order_entry/order_bottom_button.dart';
 import '../../portfolio/screens/order_entry/order_confirmation_sheet.dart';
 import '../../portfolio/screens/order_entry/amount_keypad.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Trade Entry — the real Buy/Sell order-entry screen's visual/state
@@ -178,9 +179,7 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
     final l10n = AppLocalizations.of(context)!;
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryEnterAmount)));
+      showAppBanner(l10n.orderEntryEnterAmount, tone: AppBannerTone.failure);
       return;
     }
 
@@ -192,9 +191,10 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
     }
 
     if (shares <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.orderEntryInvalidQuantity)));
+      showAppBanner(
+        l10n.orderEntryInvalidQuantity,
+        tone: AppBannerTone.failure,
+      );
       return;
     }
 
@@ -202,8 +202,9 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
     if (_isLimit) {
       limitPrice = double.tryParse(_limitPriceController.text);
       if (limitPrice == null || limitPrice <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.etfProposeLimitPriceRequired)),
+        showAppBanner(
+          l10n.etfProposeLimitPriceRequired,
+          tone: AppBannerTone.failure,
         );
         return;
       }
@@ -275,21 +276,15 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
         'approved' => l10n.etfProposeAwaitsTrader,
         _ => l10n.etfProposeSubmitButton,
       };
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      showAppBanner(message, tone: AppBannerTone.success);
       Navigator.of(context).pop();
     } on FundApiException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.message)));
+        showAppBanner(e.message, tone: AppBannerTone.failure);
       }
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.etfProposeGenericError)));
+        showAppBanner(l10n.etfProposeGenericError, tone: AppBannerTone.failure);
       }
     } finally {
       if (mounted) setState(() => _submitting = false);

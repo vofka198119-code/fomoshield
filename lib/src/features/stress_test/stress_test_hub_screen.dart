@@ -26,6 +26,7 @@ import '../../shared/widgets/card_frame.dart';
 import '../market_clock/market_clock_dial.dart';
 import 'stress_test_models.dart';
 import 'stress_test_engine.dart';
+import '../../core/overlay/app_banner.dart';
 
 // Market Clock ring's gold accent — used for the play-button badge and the
 // "premium" tag below.
@@ -305,7 +306,9 @@ class StressTestHubScreen extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.2),
+                color: (palette.onWindow ?? Colors.white).withValues(
+                  alpha: 0.2,
+                ),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
@@ -338,7 +341,9 @@ class StressTestHubScreen extends ConsumerWidget {
                         : l10n.stressTestEmotionalResilience,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: (palette.onWindow ?? Colors.white).withValues(alpha: 0.7),
+                      color: (palette.onWindow ?? Colors.white).withValues(
+                        alpha: 0.7,
+                      ),
                     ),
                   ),
                 ],
@@ -410,8 +415,9 @@ class StressTestHubScreen extends ConsumerWidget {
           trigger: MonetizationTrigger.stressTestLimit,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.stressTestMaxSessionsReached)),
+        showAppBanner(
+          l10n.stressTestMaxSessionsReached,
+          tone: AppBannerTone.info,
         );
       }
       return;
@@ -501,7 +507,8 @@ class StressTestHubScreen extends ConsumerWidget {
     final tier = ref.watch(subscriptionTierProvider);
     final isPremiumTier = tier.isPremiumOrAdmin;
     final accentColor = palette.marketClockAccent ?? dialBrassLight;
-    if (index == 1) return isPremiumTier ? accentColor : (palette.onWindow ?? Colors.white);
+    if (index == 1)
+      return isPremiumTier ? accentColor : (palette.onWindow ?? Colors.white);
     return accentColor;
   }
 

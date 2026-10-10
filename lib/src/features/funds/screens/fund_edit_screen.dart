@@ -12,6 +12,7 @@ import '../providers/fund_providers.dart';
 import '../sector_labels.dart';
 import '../services/fund_api_service.dart' show FundApiException;
 import '../widgets/fund_form_fields.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Edit — the head's "everything except the name" form (asked for
@@ -70,8 +71,9 @@ class _FundEditScreenState extends ConsumerState<FundEditScreen> {
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context)!;
     if (_selectedSectors.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.etfCreateFundSelectAtLeastOneSector)),
+      showAppBanner(
+        l10n.etfCreateFundSelectAtLeastOneSector,
+        tone: AppBannerTone.failure,
       );
       return;
     }
@@ -92,20 +94,14 @@ class _FundEditScreenState extends ConsumerState<FundEditScreen> {
       ref.invalidate(fundDetailProvider(widget.fundId));
       ref.invalidate(fundsListProvider);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.etfFundEditSavedSnackbar)),
-      );
+      showAppBanner(l10n.etfFundEditSavedSnackbar, tone: AppBannerTone.success);
       Navigator.of(context).pop();
     } on FundApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_errorText(l10n, e))),
-      );
+      showAppBanner(_errorText(l10n, e), tone: AppBannerTone.failure);
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.etfFundEditGenericError)),
-      );
+      showAppBanner(l10n.etfFundEditGenericError, tone: AppBannerTone.failure);
     } finally {
       if (mounted) setState(() => _submitting = false);
     }

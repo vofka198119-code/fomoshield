@@ -38,6 +38,7 @@ import '../../core/ads/ad_failure_notice.dart';
 import '../../core/ads/ad_loading_overlay.dart';
 import '../search/recently_viewed_provider.dart';
 import '../funds/widgets/fund_position_section.dart';
+import '../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Screen
@@ -341,9 +342,7 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
     final tier = ref.read(subscriptionTierProvider);
     final isPremiumTier = tier.isPremiumOrAdmin;
     if (portfolios.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.companyDetailNoPortfolios)));
+      showAppBanner(l10n.companyDetailNoPortfolios, tone: AppBannerTone.info);
       return;
     }
 
@@ -499,17 +498,11 @@ class _CompanyDetailBodyState extends ConsumerState<_CompanyDetailBody> {
                         }
                         final maxW = ref.read(maxWatchlistProvider);
                         if (watchlist.length >= maxW) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                maxW == 30
-                                    ? l10n.watchlistLimitFree
-                                    : l10n.watchlistLimitMax(maxW),
-                                style: GoogleFonts.inter(fontSize: 13),
-                              ),
-                              backgroundColor: ThemeV2.primary,
-                              behavior: SnackBarBehavior.floating,
-                            ),
+                          showAppBanner(
+                            maxW == 30
+                                ? l10n.watchlistLimitFree
+                                : l10n.watchlistLimitMax(maxW),
+                            tone: AppBannerTone.info,
                           );
                           return;
                         }

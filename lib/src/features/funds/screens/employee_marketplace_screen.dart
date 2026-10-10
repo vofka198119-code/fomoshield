@@ -11,6 +11,7 @@ import '../models/employee.dart';
 import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
 import '../widgets/send_invite_sheet.dart';
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Hiring Marketplace — ETF Fund Emulation, Phase 3. Every available analyst
@@ -41,10 +42,9 @@ class EmployeeMarketplaceScreen extends ConsumerWidget {
     );
     if (sent == true && context.mounted) {
       ref.invalidate(employeeMarketplaceProvider(fundId));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.etfSendInviteSuccessSnackbar),
-        ),
+      showAppBanner(
+        AppLocalizations.of(context)!.etfSendInviteSuccessSnackbar,
+        tone: AppBannerTone.success,
       );
     }
   }
@@ -109,8 +109,9 @@ class EmployeeMarketplaceScreen extends ConsumerWidget {
                         children: [
                           CircleAvatar(
                             radius: 20,
-                            backgroundColor: palette.accentPrimary
-                                .withValues(alpha: 0.2),
+                            backgroundColor: palette.accentPrimary.withValues(
+                              alpha: 0.2,
+                            ),
                             child: Text(
                               profile.nickname.isNotEmpty
                                   ? profile.nickname[0].toUpperCase()

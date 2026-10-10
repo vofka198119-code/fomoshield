@@ -11,6 +11,7 @@ import '../../../shared/utils/currency_format.dart';
 import '../models/fund_bankruptcy_preview.dart';
 import '../providers/fund_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
+import '../../../core/overlay/app_banner.dart';
 
 // ---------------------------------------------------------------------------
 // Fund Bankruptcy Flow — replaces the old plain-delete AlertDialog stub
@@ -44,11 +45,9 @@ Future<void> showFundBankruptcyFlow(
     preview = await ref.read(fundApiServiceProvider).previewBankruptcy(fundId);
   } catch (_) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.etfFundBankruptcyPreviewErrorMessage),
-        backgroundColor: ThemeV2.loss,
-      ),
+    showAppBanner(
+      l10n.etfFundBankruptcyPreviewErrorMessage,
+      tone: AppBannerTone.failure,
     );
     return;
   }
@@ -71,22 +70,19 @@ Future<void> showFundBankruptcyFlow(
     ref.invalidate(fundsListProvider);
     ref.invalidate(fundDetailProvider(fundId));
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.etfFundBankruptcySuccessMessage)),
+    showAppBanner(
+      l10n.etfFundBankruptcySuccessMessage,
+      tone: AppBannerTone.success,
     );
     Navigator.of(context).pop();
   } on FundApiException catch (e) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(e.message), backgroundColor: ThemeV2.loss),
-    );
+    showAppBanner(e.message, tone: AppBannerTone.failure);
   } catch (_) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.etfFundBankruptcyErrorMessage),
-        backgroundColor: ThemeV2.loss,
-      ),
+    showAppBanner(
+      l10n.etfFundBankruptcyErrorMessage,
+      tone: AppBannerTone.failure,
     );
   }
 }
