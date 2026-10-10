@@ -3,11 +3,33 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_client.dart';
 
 // ---------------------------------------------------------------------------
-// Admin email for testing — hardcoded until remote config is implemented
+// Admin emails for testing — hardcoded until remote config is implemented
 // ---------------------------------------------------------------------------
 
-/// Email that unlocks the Admin Sandbox panel.
+/// Email that unlocks the Admin Sandbox panel. The primary one, kept as its
+/// own constant for anywhere that means *the* admin rather than "is this an
+/// admin" — use [isAdminEmail] for the latter.
 const String adminEmail = 'fomoshield@gmail.com';
+
+/// A second address, added 2026-10-10. The fund team features — hiring,
+/// permissions, the treasurer's budget — cannot be exercised by one account
+/// at all: somebody has to be the employee, and the Funds module redirects
+/// every non-admin away from /funds (see funds_visibility.dart and
+/// app_router's own redirect). Both addresses here belong to the author, so
+/// the module stays exactly as closed to real users as it was behind one.
+const String adminEmailSecondary = 'vofka198119@gmail.com';
+
+const List<String> adminEmails = [adminEmail, adminEmailSecondary];
+
+/// Case-insensitive on purpose: a sign-in form will take
+/// "Fomoshield@Gmail.com" without complaint, and an address differing only
+/// in case is the same mailbox. The same trap already cost a premium grant
+/// in Supabase, which had to be rewritten with ILIKE.
+bool isAdminEmail(String? email) {
+  if (email == null) return false;
+  final normalized = email.trim().toLowerCase();
+  return adminEmails.any((candidate) => candidate == normalized);
+}
 
 // ---------------------------------------------------------------------------
 // Subscription tier
@@ -42,7 +64,7 @@ final _premiumLoaderProvider = FutureProvider<void>((ref) async {
     return;
   }
   // Admin is detected synchronously, no need for DB call
-  if (user.email == adminEmail) return;
+  if (isAdminEmail(user.email)) return;
 
   try {
     final response = await SupabaseConfig.client
@@ -84,7 +106,7 @@ final _premiumLoaderProvider = FutureProvider<void>((ref) async {
 final subscriptionTierProvider = Provider<SubscriptionTier>((ref) {
   final user = ref.watch(currentUserProvider);
   if (user == null) return SubscriptionTier.free;
-  if (user.email == adminEmail) return SubscriptionTier.admin;
+  if (isAdminEmail(user.email)) return SubscriptionTier.admin;
 
   // Trigger DB load (runs once, re-runs on user change)
   ref.watch(_premiumLoaderProvider);
@@ -110,15 +132,15 @@ final subscriptionTierResolvedProvider = Provider<bool>((ref) {
   // Signed out: free is the final answer, nothing is pending.
   if (user == null) return true;
   // Admin is decided synchronously from the email, no fetch involved.
-  if (user.email == adminEmail) return true;
+  if (isAdminEmail(user.email)) return true;
   ref.watch(_premiumLoaderProvider);
   return ref.watch(_dbSubscriptionTierProvider) != null;
 });
 
-/// True if the current user is an admin (matches hardcoded admin email).
+/// True if the current user is an admin (one of [adminEmails]).
 final isAdminProvider = Provider<bool>((ref) {
   final user = ref.watch(currentUserProvider);
-  return user?.email == adminEmail;
+  return isAdminEmail(user?.email);
 });
 
 /// Awaits the async DB fetch behind [subscriptionTierProvider] so a caller
@@ -150,7 +172,7 @@ Future<SubscriptionTier> resolveSubscriptionTier(
   }
 
   final user = ref.read(currentUserProvider);
-  if (user != null && user.email != adminEmail) {
+  if (user != null && !isAdminEmail(user.email)) {
     try {
       await ref.read(_premiumLoaderProvider.future).timeout(timeout);
     } catch (_) {
@@ -209,7 +231,7 @@ final premiumDetailsProvider = FutureProvider<PremiumDetails?>((ref) async {
   // Admin status is a hardcoded-email override (see isAdminProvider above),
   // not necessarily reflected in the DB's subscription_tier — always
   // lifetime, regardless of what that row says.
-  if (user.email == adminEmail) return PremiumDetails();
+  if (isAdminEmail(user.email)) return PremiumDetails();
 
   try {
     final response = await SupabaseConfig.client

@@ -94,8 +94,7 @@ import '../../features/funds/screens/my_invitations_screen.dart';
 import '../../features/funds/widgets/fund_list_screen.dart';
 import '../theme/app_palette.dart';
 import '../theme/theme_variant_provider.dart';
-import '../supabase/supabase_providers.dart'
-    show isAdminProvider, adminEmail;
+import '../supabase/supabase_providers.dart' show isAdminProvider, isAdminEmail;
 import 'navigation_history_provider.dart';
 
 /// Bridges a Stream (Supabase's auth-state stream) into a [Listenable] so
@@ -164,7 +163,7 @@ class AppRouter {
       // feature. Same synchronous email check isAdminProvider makes, so no
       // provider plumbing is needed inside this static redirect.
       if (state.matchedLocation.startsWith('/funds') &&
-          SupabaseConfig.client.auth.currentUser?.email != adminEmail) {
+          !isAdminEmail(SupabaseConfig.client.auth.currentUser?.email)) {
         return '/home';
       }
       if (_authExemptPaths.contains(state.matchedLocation)) return null;
