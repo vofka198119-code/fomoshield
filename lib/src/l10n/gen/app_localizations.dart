@@ -11581,6 +11581,18 @@ abstract class AppLocalizations {
   /// **'Rebalance'**
   String get etfRebalanceButton;
 
+  /// No description provided for @etfRebalanceCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic rebalancing'**
+  String get etfRebalanceCardTitle;
+
+  /// No description provided for @etfRebalanceCardIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'The app works out what to sell and what to buy. The trades arrive as a proposal — nothing is executed without approval.'**
+  String get etfRebalanceCardIntro;
+
   /// No description provided for @etfRebalanceSheetTitle.
   ///
   /// In en, this message translates to:
@@ -11647,6 +11659,36 @@ abstract class AppLocalizations {
   /// **'Could not work out the rebalance'**
   String get etfRebalanceError;
 
+  /// No description provided for @etfBalancingTargetsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'What share of the fund each company should hold. The drift and the rebalance are both measured against this plan.'**
+  String get etfBalancingTargetsIntro;
+
+  /// No description provided for @etfBalancingTargetsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No plan set yet.'**
+  String get etfBalancingTargetsEmpty;
+
+  /// No description provided for @etfBalancingTargetsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} company in the plan} other{{count} companies in the plan}}'**
+  String etfBalancingTargetsCount(int count);
+
+  /// No description provided for @etfBalancingTargetsSetButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Set target weights'**
+  String get etfBalancingTargetsSetButton;
+
+  /// No description provided for @etfBalancingTargetsEditButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Change target weights'**
+  String get etfBalancingTargetsEditButton;
+
   /// No description provided for @etfPermissionSetTargets.
   ///
   /// In en, this message translates to:
@@ -11682,6 +11724,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ASSET ALLOCATION'**
   String get etfAssetAllocationChartTitle;
+
+  /// No description provided for @etfAllocationIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'What the fund actually holds right now, largest position first.'**
+  String get etfAllocationIntro;
+
+  /// No description provided for @etfAllocationCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} company} other{{count} companies}}'**
+  String etfAllocationCount(int count);
+
+  /// No description provided for @etfAllocationOpenButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the breakdown'**
+  String get etfAllocationOpenButton;
 
   /// No description provided for @etfAssetAllocationEmptyText.
   ///

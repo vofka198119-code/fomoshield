@@ -6836,6 +6836,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfRebalanceButton => 'Rebalance';
 
   @override
+  String get etfRebalanceCardTitle => 'Automatic rebalancing';
+
+  @override
+  String get etfRebalanceCardIntro =>
+      'The app works out what to sell and what to buy. The trades arrive as a proposal — nothing is executed without approval.';
+
+  @override
   String get etfRebalanceSheetTitle => 'What the rebalance will do';
 
   @override
@@ -6874,6 +6881,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfRebalanceError => 'Could not work out the rebalance';
 
   @override
+  String get etfBalancingTargetsIntro =>
+      'What share of the fund each company should hold. The drift and the rebalance are both measured against this plan.';
+
+  @override
+  String get etfBalancingTargetsEmpty => 'No plan set yet.';
+
+  @override
+  String etfBalancingTargetsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count companies in the plan',
+      one: '$count company in the plan',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get etfBalancingTargetsSetButton => 'Set target weights';
+
+  @override
+  String get etfBalancingTargetsEditButton => 'Change target weights';
+
+  @override
   String get etfPermissionSetTargets => 'Set target weights';
 
   @override
@@ -6890,6 +6921,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfAssetAllocationChartTitle => 'ASSET ALLOCATION';
+
+  @override
+  String get etfAllocationIntro =>
+      'What the fund actually holds right now, largest position first.';
+
+  @override
+  String etfAllocationCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count companies',
+      one: '$count company',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get etfAllocationOpenButton => 'Open the breakdown';
 
   @override
   String get etfAssetAllocationEmptyText => 'No holdings yet';

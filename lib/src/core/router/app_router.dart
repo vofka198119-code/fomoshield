@@ -76,6 +76,9 @@ import '../../features/funds/screens/fund_management_screen.dart';
 import '../../features/funds/screens/fund_team_screen.dart';
 import '../../features/funds/screens/fund_blotter_screen.dart';
 import '../../features/funds/screens/fund_balancing_screen.dart';
+import '../../features/funds/screens/fund_targets_screen.dart';
+import '../../features/funds/screens/fund_rebalance_preview_screen.dart';
+import '../../features/funds/screens/fund_allocation_screen.dart';
 import '../../features/funds/screens/fund_charts_screen.dart';
 import '../../features/funds/screens/fund_edit_screen.dart';
 import '../../features/funds/screens/fund_investors_screen.dart';
@@ -679,6 +682,33 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return FundBalancingScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/targets',
+        name: 'fundTargets',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundTargetsScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/allocation',
+        name: 'fundAllocation',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return FundAllocationScreen(fundId: id);
+        },
+      ),
+      GoRoute(
+        path: '/funds/:id/rebalance',
+        name: 'fundRebalance',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          // 'full' is the route that actually brings a fund onto its plan,
+          // so it is what an unqualified link means.
+          final mode = state.uri.queryParameters['mode'] ?? 'full';
+          return FundRebalancePreviewScreen(fundId: id, mode: mode);
         },
       ),
       GoRoute(

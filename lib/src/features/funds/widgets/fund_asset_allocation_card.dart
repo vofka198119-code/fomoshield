@@ -80,14 +80,25 @@ class _FundAssetAllocationCardState
                 palette,
                 FomoShieldTheme.cardTitle(),
               ),
-              if (hasData && !_expanded && sorted.length > _collapsedCount)
+              // A toggle, not a one-way door. It used to be drawn only while
+              // collapsed, so once the list was open there was no way to shut
+              // it again — on this screen and on the Charts screen alike
+              // (found on the phone, 2026-10-10).
+              if (hasData && sorted.length > _collapsedCount)
                 InkWell(
-                  onTap: () => setState(() => _expanded = true),
+                  onTap: () => setState(() {
+                    _expanded = !_expanded;
+                    // A reopened list starts from the first page again
+                    // rather than remembering how far it was paged.
+                    if (!_expanded) _revealedCount = _pageSize;
+                  }),
                   borderRadius: BorderRadius.circular(20),
                   child: Padding(
                     padding: const EdgeInsets.all(4),
                     child: Icon(
-                      Icons.chevron_right_rounded,
+                      _expanded
+                          ? Icons.expand_less_rounded
+                          : Icons.chevron_right_rounded,
                       color: palette.textBody,
                       size: 22,
                     ),

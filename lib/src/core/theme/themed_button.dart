@@ -4,6 +4,8 @@ import 'app_palette.dart';
 import 'theme_v2.dart';
 import 'luxury_gold_theme.dart';
 import 'themed_border.dart';
+import '../../features/market_clock/market_clock_dial.dart'
+    show buyButtonDecoration;
 
 // ---------------------------------------------------------------------------
 // Themed dark CTA button shell — for full-width text/icon action buttons
@@ -215,6 +217,115 @@ Widget themedAddWidgetsButton(
             ],
           ),
         ),
+      ),
+    ),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// The pair of buttons a sheet or an editor ends with: the brand action on the
+// right, the way out on the left.
+//
+// Written down here because the fund screens kept growing their own —
+// a FilledButton tinted with accentPrimary, which is not what any other CTA
+// in this app looks like, and which under Graphite (white accent) or Luxury
+// Gold reads as a different app entirely. The house CTA is the dark-green
+// "dial" gradient, swapped for the instrument-panel treatment under themes
+// that define one; that logic already lives in themedDarkCtaButtonShell and
+// is simply reused here (DESIGN_TOKENS §6, user ask 2026-10-10: "кнопки
+// нужно покрасить в данной теме, это тёмно-зелёный градиент как везде").
+// ---------------------------------------------------------------------------
+
+/// The brand action. [onTap] null disables it; [busy] swaps the label for a
+/// spinner without changing the button's size, so a row of them does not jump
+/// while one is working.
+///
+/// Sized like the order-confirmation sheet's own confirm button — 50 tall,
+/// and paired with [cancelButton] at `Expanded(flex: 2)` against the
+/// cancel's 1, which is the proportion the app already uses for "the way out
+/// beside the commitment".
+Widget brandCtaButton({
+  required AppPalette palette,
+  required String label,
+  required VoidCallback? onTap,
+  bool busy = false,
+  double fontSize = 15,
+  double height = 50,
+}) {
+  final radius = BorderRadius.circular(14);
+  final enabled = onTap != null && !busy;
+  final content = Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 12),
+    child: Center(
+      child: busy
+          ? SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: themedDarkCtaContentColor(palette),
+              ),
+            )
+          : Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              style: GoogleFonts.inter(
+                fontSize: fontSize,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+                color: themedDarkCtaContentColor(palette),
+              ),
+            ),
+    ),
+  );
+
+  return Opacity(
+    // Dimming the whole shell keeps the gradient's shape while saying it is
+    // unavailable — a disabled fill colour cannot be set on a gradient.
+    opacity: enabled ? 1 : 0.45,
+    child: SizedBox(
+      height: height,
+      child: themedDarkCtaButtonShell(
+      palette: palette,
+      borderRadius: radius,
+      standardDecoration: buyButtonDecoration(borderRadius: radius),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: radius,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: radius,
+          child: content,
+        ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// The way out, beside it. A plain label, no outline and no fill — exactly
+/// how the order-confirmation sheet draws its own cancel, so the eye lands on
+/// the action and not on the escape.
+Widget cancelButton({
+  required AppPalette palette,
+  required String label,
+  required VoidCallback? onTap,
+  double fontSize = 15,
+}) {
+  return TextButton(
+    onPressed: onTap,
+    style: TextButton.styleFrom(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+    ),
+    child: Text(
+      label,
+      textAlign: TextAlign.center,
+      maxLines: 2,
+      style: GoogleFonts.inter(
+        fontSize: fontSize,
+        fontWeight: FontWeight.w600,
+        color: palette.textBody,
       ),
     ),
   );

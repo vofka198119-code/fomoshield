@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_palette.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -13,10 +12,10 @@ import '../models/fund_drift.dart';
 import '../models/fund_target_weight.dart';
 import '../providers/employee_providers.dart';
 import '../providers/fund_providers.dart';
-import '../widgets/fund_asset_allocation_card.dart';
+import '../widgets/fund_allocation_summary_card.dart';
 import '../widgets/fund_drift_card.dart';
 import '../widgets/fund_rebalance_card.dart';
-import '../widgets/fund_target_editor.dart';
+import '../widgets/fund_targets_summary_card.dart';
 
 // ---------------------------------------------------------------------------
 // Balancing — everything about PROPORTIONS in one place, reached from the
@@ -44,33 +43,6 @@ class FundBalancingScreen extends ConsumerStatefulWidget {
 }
 
 class _FundBalancingScreenState extends ConsumerState<FundBalancingScreen> {
-  bool _saving = false;
-
-  Future<void> _save(List<FundTargetWeight> targets) async {
-    final l10n = AppLocalizations.of(context)!;
-    setState(() => _saving = true);
-    try {
-      await ref
-          .read(fundApiServiceProvider)
-          .setFundTargets(widget.fundId, targets);
-      ref.invalidate(fundTargetsProvider(widget.fundId));
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.etfBalancingSavedMessage)),
-      );
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.etfBalancingSaveError),
-          backgroundColor: ThemeV2.loss,
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
-  }
-
   /// The head always may; anyone else needs the permission granted to them.
   /// Mirrored server-side — this only decides whether the controls are live.
   bool _canEdit(FundDetail fund, List<dynamic> team) {
@@ -143,9 +115,11 @@ class _FundBalancingScreenState extends ConsumerState<FundBalancingScreen> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               children: [
-                FundAssetAllocationCard(
+                FundAllocationSummaryCard(
+                  fundId: widget.fundId,
                   holdings: fund.holdings,
                   palette: palette,
+                  l10n: l10n,
                 ),
                 const SizedBox(height: 12),
                 // The reading sits between the two lists it compares: what
@@ -177,18 +151,16 @@ class _FundBalancingScreenState extends ConsumerState<FundBalancingScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                FundTargetEditor(
-                  holdings: fund.holdings,
+                FundTargetsSummaryCard(
+                  fundId: widget.fundId,
                   // An unreadable target list (a 403, or still loading) is
                   // shown as "none set" rather than blocking the screen —
                   // the allocation above is worth seeing either way.
-                  initialTargets:
+                  targets:
                       targetsAsync.valueOrNull ?? const <FundTargetWeight>[],
                   palette: palette,
                   l10n: l10n,
                   canEdit: _canEdit(fund, teamAsync.valueOrNull ?? const []),
-                  saving: _saving,
-                  onSave: _save,
                 ),
               ],
             ),

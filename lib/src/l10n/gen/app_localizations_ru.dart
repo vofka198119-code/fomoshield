@@ -6860,6 +6860,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfRebalanceButton => 'Ребалансировать';
 
   @override
+  String get etfRebalanceCardTitle => 'Автоматическая ребалансировка';
+
+  @override
+  String get etfRebalanceCardIntro =>
+      'Приложение само посчитает, что продать и что докупить. Сделки придут одной заявкой — без одобрения ничего не исполнится.';
+
+  @override
   String get etfRebalanceSheetTitle => 'Что сделает ребалансировка';
 
   @override
@@ -6898,6 +6905,32 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfRebalanceError => 'Не удалось посчитать ребалансировку';
 
   @override
+  String get etfBalancingTargetsIntro =>
+      'Какую долю фонда должна занимать каждая бумага. По этому плану считается и расхождение, и ребалансировка.';
+
+  @override
+  String get etfBalancingTargetsEmpty => 'План пока не задан.';
+
+  @override
+  String etfBalancingTargetsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count бумаги в плане',
+      many: '$count бумаг в плане',
+      few: '$count бумаги в плане',
+      one: '$count бумага в плане',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get etfBalancingTargetsSetButton => 'Выставить доли';
+
+  @override
+  String get etfBalancingTargetsEditButton => 'Изменить доли';
+
+  @override
   String get etfPermissionSetTargets => 'Задавать целевые доли';
 
   @override
@@ -6914,6 +6947,26 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get etfAssetAllocationChartTitle => 'РАСПРЕДЕЛЕНИЕ АКТИВОВ';
+
+  @override
+  String get etfAllocationIntro =>
+      'Что фонд держит прямо сейчас, от самой крупной позиции к мелким.';
+
+  @override
+  String etfAllocationCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count бумаги',
+      many: '$count бумаг',
+      few: '$count бумаги',
+      one: '$count бумага',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get etfAllocationOpenButton => 'Смотреть состав';
 
   @override
   String get etfAssetAllocationEmptyText => 'Пока нет активов';

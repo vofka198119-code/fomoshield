@@ -11,6 +11,7 @@ import '../../../core/theme/typography_helpers.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../../../shared/widgets/numeric_keypad.dart';
+import '../../../shared/widgets/ringed_company_logo.dart';
 import '../models/fund.dart';
 import '../models/fund_target_weight.dart';
 
@@ -302,8 +303,42 @@ class _FundTargetEditorState extends State<FundTargetEditor> {
     if (adjusted > 0) _targets[heaviest.key] = adjusted;
   }
 
+  /// Whether anything has actually changed since the last save. Compared
+  /// against the saved set rather than tracked with a flag, so an edit that
+  /// walks back to where it started counts as no edit — nudging a target up
+  /// and down again should leave the button asleep.
+  ///
+  /// The tolerance is half of the stored precision: two values that both
+  /// round to the same hundredth are the same value.
+  bool get _isDirty {
+    final saved = {
+      for (final t in widget.initialTargets) t.symbol: t.targetPercent,
+    };
+    if (saved.length != _targets.length) return true;
+    for (final entry in _targets.entries) {
+      final before = saved[entry.key];
+      if (before == null || (before - entry.value).abs() > 0.005) return true;
+    }
+    return false;
+  }
+
+  /// Puts every number back the way it was saved. His ask, 2026-10-10: after
+  /// touching the steppers there was no way out of the edit except leaving
+  /// the screen and hoping nothing had been kept.
+  void _revert() {
+    setState(() {
+      _targets = {
+        for (final t in widget.initialTargets) t.symbol: t.targetPercent,
+      };
+    });
+  }
+
   bool get _canSave {
     if (!widget.canEdit || widget.saving) return false;
+    // Nothing to save is not a thing to offer — his ask, 2026-10-10: after a
+    // save the button went on looking ready, which reads as "something is
+    // still unsaved" when nothing is.
+    if (!_isDirty) return false;
     if (_targets.isEmpty) return true; // clearing the plan is allowed
     return (_total - 100).abs() <= 1;
   }
@@ -380,6 +415,11 @@ class _FundTargetEditorState extends State<FundTargetEditor> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
+          // Smaller than the rebalance list's, because this row also carries
+          // two steppers and a tappable value and still has to fit a narrow
+          // phone.
+          RingedCompanyLogo(symbol: symbol, palette: palette, size: 26),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,67 +596,56 @@ class _FundTargetEditorState extends State<FundTargetEditor> {
   Widget _buttons() {
     final palette = widget.palette;
     final l10n = widget.l10n;
-    return Row(
+    final settled = (100 - _total).abs() <= 0.009;
+
+    return Column(
       children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: (widget.saving || (100 - _total).abs() <= 0.009)
-                ? null
-                : _evenOut,
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: palette.border),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              l10n.etfBalancingAutoButton,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: palette.textHeader,
-              ),
+        // Secondary, and only while there is something to even out.
+        // The app's one secondary-action pill (Home, Market Clock, Stress
+        // Test all use it), not a second cancel-looking button.
+        if (!settled) ...[
+          Center(
+            child: themedAddWidgetsButton(
+              context,
+              palette,
+              icon: Icons.balance_rounded,
+              label: l10n.etfBalancingAutoButton,
+              onTap: widget.saving ? () {} : _evenOut,
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: FilledButton(
-            onPressed: _canSave
-                ? () => widget.onSave([
-                    for (final e in _targets.entries)
-                      FundTargetWeight(symbol: e.key, targetPercent: e.value),
-                  ])
-                : null,
-            style: FilledButton.styleFrom(
-              backgroundColor: palette.accentPrimary,
-              // Same trap as the fund delete button (2026-10-07): set the
-              // fill here and the label colour must be set with it.
-              foregroundColor: labelColorOn(palette.accentPrimary),
-              // And the disabled pair too. Flutter falls back to its own
-              // greys otherwise, which on this dark card made the button
-              // vanish completely while the total was off — it read as a
-              // missing button rather than an unavailable one (2026-10-08).
-              disabledBackgroundColor: palette.accentPrimary.withValues(
-                alpha: 0.25,
-              ),
-              disabledForegroundColor: palette.textBody,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 12),
+        ],
+        // The pair every editor in the app should end with: the way out on
+        // the left, the commitment on the right. Both asleep when nothing
+        // has changed — there is nothing to undo and nothing to save.
+        Row(
+          children: [
+            Expanded(
+              child: cancelButton(
+                palette: palette,
+                label: l10n.orderConfirmCancelButton,
+                onTap: (_isDirty && !widget.saving) ? _revert : null,
               ),
             ),
-            child: Text(
-              l10n.etfBalancingSaveButton,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: brandCtaButton(
+                palette: palette,
+                label: l10n.etfBalancingSaveButton,
+                busy: widget.saving,
+                onTap: _canSave
+                    ? () => widget.onSave([
+                        for (final e in _targets.entries)
+                          FundTargetWeight(
+                            symbol: e.key,
+                            targetPercent: e.value,
+                          ),
+                      ])
+                    : null,
               ),
             ),
-          ),
+          ],
         ),
       ],
     );
