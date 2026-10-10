@@ -30,19 +30,32 @@ const Duration _exitDuration = Duration(milliseconds: 450);
 /// Answers false when the app's overlay is not mounted yet (before the first
 /// frame); nothing is shown in that case, and a caller who must not lose its
 /// message should say so some other way.
+/// Whatever is on screen right now, so the next card can take its place.
+/// One slot, deliberately: both cards are pinned to the top edge, so a
+/// second one does not queue behind the first the way a SnackBar did -- it
+/// lands exactly on top of it, and the two animate through each other. The
+/// newest message is the one worth reading, so it evicts the old one instead.
+VoidCallback? _dismissCurrent;
+
 bool showSlideDownCard({
   required Widget Function(BuildContext context, VoidCallback dismiss) builder,
   Duration hold = defaultSlideDownHold,
 }) {
   final overlayState = appOverlayKey.currentState;
   if (overlayState == null) return false;
+
+  _dismissCurrent?.call();
+
   late OverlayEntry entry;
   var removed = false;
   void remove() {
     if (removed) return;
     removed = true;
+    if (_dismissCurrent == remove) _dismissCurrent = null;
     entry.remove();
   }
+
+  _dismissCurrent = remove;
 
   entry = OverlayEntry(
     builder: (context) => _SlideDownHost(
