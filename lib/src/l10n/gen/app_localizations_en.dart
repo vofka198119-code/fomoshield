@@ -7634,7 +7634,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get etfMarketplaceTitle => 'HIRING MARKETPLACE';
+  String get etfMarketplaceTitle => 'Employee exchange';
 
   @override
   String get etfMarketplaceEmpty => 'No one is available for hire right now';
@@ -7893,6 +7893,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get etfExchangeTitle => 'Exchange';
+
+  @override
+  String get etfExchangeTabVacancies => 'Vacancies';
+
+  @override
+  String get etfExchangeTabCandidates => 'Candidates';
+
+  @override
   String get etfVacancyBoardTitle => 'Vacancy board';
 
   @override
@@ -7951,6 +7960,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get etfVacancyCardOpenFund => 'Open the fund';
+
+  @override
+  String get etfFundTeamHireFullButton => 'Hire an employee';
 
   @override
   String get etfVacancyFundSectionTitle => 'This fund\'s vacancies';

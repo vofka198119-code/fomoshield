@@ -3018,7 +3018,7 @@
     "placeholders": { "count": { "type": "int" } }
   },
 
-  "etfMarketplaceTitle": "HIRING MARKETPLACE",
+  "etfMarketplaceTitle": "Employee exchange",
   "etfMarketplaceEmpty": "No one is available for hire right now",
   "etfMarketplaceErrorMessage": "Couldn't load the marketplace",
   "etfMarketplaceInviteButton": "Invite",
@@ -3125,6 +3125,9 @@
       }
     }
   },
+  "etfExchangeTitle": "Exchange",
+  "etfExchangeTabVacancies": "Vacancies",
+  "etfExchangeTabCandidates": "Candidates",
   "etfVacancyBoardTitle": "Vacancy board",
   "etfVacancyMyProfileTitle": "My CV",
   "etfVacancyMyProfileListed": "Listed on the board — fund heads can see you",
@@ -3166,6 +3169,7 @@
     }
   },
   "etfVacancyCardOpenFund": "Open the fund",
+  "etfFundTeamHireFullButton": "Hire an employee",
   "etfVacancyFundSectionTitle": "This fund's vacancies",
   "etfVacancyFundSectionEmpty": "This fund has advertised nothing, so candidates never hear of it. Post a vacancy and it appears on the board",
   "etfVacancyPostTitle": "Post a vacancy",

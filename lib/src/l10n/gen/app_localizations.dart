@@ -13024,7 +13024,7 @@ abstract class AppLocalizations {
   /// No description provided for @etfMarketplaceTitle.
   ///
   /// In en, this message translates to:
-  /// **'HIRING MARKETPLACE'**
+  /// **'Employee exchange'**
   String get etfMarketplaceTitle;
 
   /// No description provided for @etfMarketplaceEmpty.
@@ -13495,6 +13495,24 @@ abstract class AppLocalizations {
   /// **'Trades up to {amount} go through on your own — the head\'s approval is not needed.'**
   String etfTradeSpendAloneNote(String amount);
 
+  /// No description provided for @etfExchangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange'**
+  String get etfExchangeTitle;
+
+  /// No description provided for @etfExchangeTabVacancies.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancies'**
+  String get etfExchangeTabVacancies;
+
+  /// No description provided for @etfExchangeTabCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidates'**
+  String get etfExchangeTabCandidates;
+
   /// No description provided for @etfVacancyBoardTitle.
   ///
   /// In en, this message translates to:
@@ -13596,6 +13614,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open the fund'**
   String get etfVacancyCardOpenFund;
+
+  /// No description provided for @etfFundTeamHireFullButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Hire an employee'**
+  String get etfFundTeamHireFullButton;
 
   /// No description provided for @etfVacancyFundSectionTitle.
   ///

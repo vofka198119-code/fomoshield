@@ -131,8 +131,8 @@ class EmployeeHubScreen extends ConsumerWidget {
                 ),
                 CircleShortcut(
                   icon: Icons.work_outline_rounded,
-                  label: l10n.etfHomeCardTitleVacancies,
-                  onTap: () => context.push('/funds/vacancies'),
+                  label: l10n.etfExchangeTitle,
+                  onTap: () => context.push('/funds/exchange'),
                 ),
                 CircleShortcut(
                   icon: Icons.assignment_outlined,
@@ -291,7 +291,11 @@ class EmployeeHubScreen extends ConsumerWidget {
   // used to be one more stat row there; pulled out into its own card since
   // a 0-10 star rating with a fractional fill genuinely needs the room a
   // plain label/value row doesn't have.
-  Widget _ratingCard(AppPalette palette, AppLocalizations l10n, double? rating) {
+  Widget _ratingCard(
+    AppPalette palette,
+    AppLocalizations l10n,
+    double? rating,
+  ) {
     return CardFrame(
       padding: EdgeInsets.zero,
       decoration: FomoShieldTheme.cardDecoration,

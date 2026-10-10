@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/overlay/app_banner.dart';
 import '../../../core/theme/app_palette.dart';
-import '../../../core/theme/theme_v2.dart';
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/themed_header.dart';
@@ -214,49 +213,14 @@ class _PostVacancyScreenState extends ConsumerState<PostVacancyScreen> {
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              height: ThemeV2.buttonHeight,
-              child: _submitButton(palette, l10n),
+              child: brandCtaButton(
+                palette: palette,
+                label: l10n.etfVacancyPostButton,
+                onTap: _submitting ? null : _submit,
+                busy: _submitting,
+              ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _submitButton(AppPalette palette, AppLocalizations l10n) {
-    final radius = ThemeV2.borderRadiusMedium;
-    final contentColor = themedDarkCtaContentColor(palette);
-    return Material(
-      type: MaterialType.transparency,
-      child: themedDarkCtaButtonShell(
-        palette: palette,
-        borderRadius: radius,
-        standardDecoration: BoxDecoration(
-          color: ThemeV2.primary,
-          borderRadius: radius,
-        ),
-        child: InkWell(
-          borderRadius: radius,
-          onTap: _submitting ? null : _submit,
-          child: Center(
-            child: _submitting
-                ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: contentColor,
-                    ),
-                  )
-                : Text(
-                    l10n.etfVacancyPostButton,
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: contentColor,
-                    ),
-                  ),
-          ),
         ),
       ),
     );

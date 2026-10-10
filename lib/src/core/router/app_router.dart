@@ -68,8 +68,7 @@ import '../../features/funds/onboarding/fund_onboarding_providers.dart';
 import '../../features/funds/onboarding/fund_onboarding_screen.dart';
 import '../../features/funds/screens/create_fund_screen.dart';
 import '../../features/funds/screens/post_vacancy_screen.dart';
-import '../../features/funds/screens/vacancy_board_screen.dart';
-import '../../features/funds/screens/employee_marketplace_screen.dart';
+import '../../features/funds/screens/exchange_screen.dart';
 import '../../features/funds/screens/coming_soon_screen.dart';
 import '../../features/funds/screens/employee_hub_screen.dart';
 import '../../features/funds/screens/employee_profile_screen.dart';
@@ -591,10 +590,19 @@ class AppRouter {
         builder: (context, state) =>
             PostVacancyScreen(fundId: state.pathParameters['id']!),
       ),
+      // One exchange, two lanes (2026-10-10). `fund` is the fund doing the
+      // hiring when a head arrives from their own team screen -- it is what
+      // turns the candidates lane from browsing into hiring; `tab` says which
+      // lane to land on.
       GoRoute(
-        path: '/funds/vacancies',
-        name: 'vacancies',
-        builder: (context, state) => const VacancyBoardScreen(),
+        path: '/funds/exchange',
+        name: 'exchange',
+        builder: (context, state) => ExchangeScreen(
+          fundId: state.uri.queryParameters['fund'],
+          initialLane: state.uri.queryParameters['tab'] == 'candidates'
+              ? ExchangeLane.candidates
+              : ExchangeLane.vacancies,
+        ),
       ),
       GoRoute(
         path: '/funds/my-applications',
@@ -630,14 +638,6 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return FundDetailScreen(fundId: id);
-        },
-      ),
-      GoRoute(
-        path: '/funds/:id/marketplace',
-        name: 'employeeMarketplace',
-        builder: (context, state) {
-          final id = state.pathParameters['id'] ?? '';
-          return EmployeeMarketplaceScreen(fundId: id);
         },
       ),
       GoRoute(

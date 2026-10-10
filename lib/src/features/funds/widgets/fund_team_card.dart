@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../core/supabase/supabase_providers.dart'
@@ -165,17 +166,6 @@ class FundTeamCard extends ConsumerWidget {
                 palette,
                 FomoShieldTheme.cardTitle(),
               ),
-              if (isHead)
-                TextButton(
-                  onPressed: () => context.push('/funds/$fundId/marketplace'),
-                  child: Text(
-                    l10n.etfFundDetailHireButton,
-                    style: GoogleFonts.inter(
-                      color: palette.accentPrimary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
             ],
           ),
           const SizedBox(height: 4),
@@ -238,6 +228,24 @@ class FundTeamCard extends ConsumerWidget {
               );
             },
           ),
+          // A real button, at the bottom of the card, the way every other
+          // fund card offers its action (fund_rebalance_card.dart and
+          // fund_allocation_summary_card.dart both do exactly this). The
+          // word used to sit in the header as plain text on the right and
+          // did not read as something you could press -- his words,
+          // 2026-10-10.
+          if (isHead) ...[
+            const SizedBox(height: 6),
+            SizedBox(
+              width: double.infinity,
+              child: brandCtaButton(
+                palette: palette,
+                label: l10n.etfFundTeamHireFullButton,
+                onTap: () =>
+                    context.push('/funds/exchange?fund=$fundId&tab=candidates'),
+              ),
+            ),
+          ],
         ],
       ),
     );

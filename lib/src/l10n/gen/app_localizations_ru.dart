@@ -7663,7 +7663,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get etfMarketplaceTitle => 'БИРЖА ВАКАНСИЙ';
+  String get etfMarketplaceTitle => 'Биржа сотрудников';
 
   @override
   String get etfMarketplaceEmpty => 'Пока никто не ищет работу';
@@ -7922,6 +7922,15 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get etfExchangeTitle => 'Биржа';
+
+  @override
+  String get etfExchangeTabVacancies => 'Вакансии';
+
+  @override
+  String get etfExchangeTabCandidates => 'Соискатели';
+
+  @override
   String get etfVacancyBoardTitle => 'Биржа вакансий';
 
   @override
@@ -7982,6 +7991,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get etfVacancyCardOpenFund => 'Открыть фонд';
+
+  @override
+  String get etfFundTeamHireFullButton => 'Нанять сотрудника';
 
   @override
   String get etfVacancyFundSectionTitle => 'Вакансии фонда';

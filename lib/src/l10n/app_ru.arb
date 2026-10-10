@@ -2241,7 +2241,7 @@
     "placeholders": { "count": { "type": "int" } }
   },
 
-  "etfMarketplaceTitle": "БИРЖА ВАКАНСИЙ",
+  "etfMarketplaceTitle": "Биржа сотрудников",
   "etfMarketplaceEmpty": "Пока никто не ищет работу",
   "etfMarketplaceErrorMessage": "Не удалось загрузить биржу",
   "etfMarketplaceInviteButton": "Пригласить",
@@ -2339,6 +2339,9 @@
       }
     }
   },
+  "etfExchangeTitle": "Биржа",
+  "etfExchangeTabVacancies": "Вакансии",
+  "etfExchangeTabCandidates": "Соискатели",
   "etfVacancyBoardTitle": "Биржа вакансий",
   "etfVacancyMyProfileTitle": "Моя анкета",
   "etfVacancyMyProfileListed": "Размещена на бирже — главы фондов тебя видят",
@@ -2380,6 +2383,7 @@
     }
   },
   "etfVacancyCardOpenFund": "Открыть фонд",
+  "etfFundTeamHireFullButton": "Нанять сотрудника",
   "etfVacancyFundSectionTitle": "Вакансии фонда",
   "etfVacancyFundSectionEmpty": "Фонд ничего не разместил — соискатели о нём не узнают. Разместишь вакансию, и она появится на бирже",
   "etfVacancyPostTitle": "Разместить вакансию",

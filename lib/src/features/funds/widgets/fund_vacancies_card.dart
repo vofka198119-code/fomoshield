@@ -6,6 +6,7 @@ import '../../../core/overlay/app_banner.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
+import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_header.dart';
 import '../../../l10n/gen/app_localizations.dart';
@@ -66,25 +67,10 @@ class FundVacanciesCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              themedHeaderText(
-                l10n.etfVacancyFundSectionTitle.toUpperCase(),
-                palette,
-                FomoShieldTheme.cardTitle(),
-              ),
-              TextButton(
-                onPressed: () => context.push('/funds/$fundId/post-vacancy'),
-                child: Text(
-                  l10n.etfVacancyPostButton,
-                  style: GoogleFonts.inter(
-                    color: palette.accentPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
+          themedHeaderText(
+            l10n.etfVacancyFundSectionTitle.toUpperCase(),
+            palette,
+            FomoShieldTheme.cardTitle(),
           ),
           const SizedBox(height: 4),
           themedDivider(palette, indent: 0, endIndent: 0),
@@ -106,6 +92,15 @@ class FundVacanciesCard extends ConsumerWidget {
                 ],
               );
             },
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            width: double.infinity,
+            child: brandCtaButton(
+              palette: palette,
+              label: l10n.etfVacancyPostTitle,
+              onTap: () => context.push('/funds/$fundId/post-vacancy'),
+            ),
           ),
         ],
       ),
