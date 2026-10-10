@@ -323,13 +323,20 @@ void main() {
     test('5.1 Buy trade updates cash and holdings', () async {
       final notifier = await createNotifier();
       final id = notifier.createSession(TestDuration.month1, 5000);
-      // Leave $100 cash for trading during active phase
-      await notifier.buyAssetSetup(id, 'AAPL', 4900, 150.0);
+      // Leave the trade AND its commission behind. Active-phase trades have
+      // carried a 0.5% broker fee since 2026-08-29, so a $100 buy costs
+      // $100.50; the setup used to leave exactly $100 and the trade was
+      // refused for insufficient cash. Setup purchases themselves are
+      // fee-free (buyAssetSetup), which is why leaving cost+fee lands the
+      // session on exactly zero below.
+      const tradeCost = 100.0;
+      final fee = tradeCost * stressTestCommissionRate;
+      await notifier.buyAssetSetup(id, 'AAPL', 5000 - tradeCost - fee, 150.0);
       notifier.startTest(id);
 
       notifier.refreshPrices(id);
-      final r = notifier.executeTrade(id, 'AAPL', true, 100);
-      expect(r.success, isTrue);
+      final r = notifier.executeTrade(id, 'AAPL', true, tradeCost);
+      expect(r.success, isTrue, reason: r.reason);
 
       final session = notifier.getSession(id);
       expect(session!.cash, closeTo(0, 0.1));
@@ -467,10 +474,7 @@ void main() {
       // "deleted" when the session disappears from active state — confirms
       // the archive entry is already present (not just non-empty) by the
       // time getSession returns null, since terminateTest is synchronous.
-      expect(
-        reloaded.verdictArchive.any((e) => e.sessionId == id),
-        isTrue,
-      );
+      expect(reloaded.verdictArchive.any((e) => e.sessionId == id), isTrue);
       print(
         '  Terminated — Verdict: ${reloaded.verdictArchive.first.verdict.title}',
       );
@@ -1298,38 +1302,41 @@ void main() {
   // ═════════════════════════════════════════════════════════════════
 
   group('15. Ephemeral Session Wipe on Complete/Delete', () {
-    test('15.1 Active session is wiped from state after terminateTest', () async {
-      final notifier = await createNotifier();
-      final id = notifier.createSession(TestDuration.infinite, 5000);
-      await notifier.buyAssetSetup(id, 'KO', 4000, 60.0);
-      notifier.startTest(id);
-      notifier.refreshPrices(id);
-      expect(notifier.executeTrade(id, 'KO', true, 100).success, isTrue);
+    test(
+      '15.1 Active session is wiped from state after terminateTest',
+      () async {
+        final notifier = await createNotifier();
+        final id = notifier.createSession(TestDuration.infinite, 5000);
+        await notifier.buyAssetSetup(id, 'KO', 4000, 60.0);
+        notifier.startTest(id);
+        notifier.refreshPrices(id);
+        expect(notifier.executeTrade(id, 'KO', true, 100).success, isTrue);
 
-      final before = notifier.getSession(id);
-      expect(before, isNotNull);
-      expect(before!.status, equals(StressTestStatus.active));
+        final before = notifier.getSession(id);
+        expect(before, isNotNull);
+        expect(before!.status, equals(StressTestStatus.active));
 
-      // canExitInfinite is time-based (14 real days elapsed) — simulate
-      // that having passed so terminateTest's real gate actually opens.
-      final reloaded = await backdateStartedAtAndReload(
-        'test_user',
-        id,
-        const Duration(days: 15),
-      );
+        // canExitInfinite is time-based (14 real days elapsed) — simulate
+        // that having passed so terminateTest's real gate actually opens.
+        final reloaded = await backdateStartedAtAndReload(
+          'test_user',
+          id,
+          const Duration(days: 15),
+        );
 
-      // Terminate → _completeTest wipes from state
-      final terminated = reloaded.terminateTest(id);
-      expect(terminated, isTrue);
+        // Terminate → _completeTest wipes from state
+        final terminated = reloaded.terminateTest(id);
+        expect(terminated, isTrue);
 
-      // Session must be null — fully removed from active state
-      expect(reloaded.getSession(id), isNull);
+        // Session must be null — fully removed from active state
+        expect(reloaded.getSession(id), isNull);
 
-      // State list must NOT contain the session
-      expect(reloaded.state.any((s) => s.id == id), isFalse);
+        // State list must NOT contain the session
+        expect(reloaded.state.any((s) => s.id == id), isFalse);
 
-      print('  ✅ Active session wiped: getSession → null, state has 0 refs');
-    });
+        print('  ✅ Active session wiped: getSession → null, state has 0 refs');
+      },
+    );
 
     test('15.2 deleteSession wipes session from state and RNG map', () async {
       final notifier = await createNotifier();
