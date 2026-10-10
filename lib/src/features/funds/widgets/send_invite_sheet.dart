@@ -57,6 +57,10 @@ class _SendInviteSheet extends ConsumerStatefulWidget {
   ConsumerState<_SendInviteSheet> createState() => _SendInviteSheetState();
 }
 
+/// Kept in step with fundTeamService.MAX_INVITE_MESSAGE_LENGTH -- the server
+/// is the one that refuses, this only stops the typing.
+const int _maxMessageLength = 1000;
+
 class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
   late final TextEditingController _messageController;
   // Explicitly the junior role, not employeeRoles.first -- that list is
@@ -237,27 +241,47 @@ class _SendInviteSheetState extends ConsumerState<_SendInviteSheet> {
               ),
             ),
             const SizedBox(height: 8),
-            TextField(
-              controller: _messageController,
-              maxLines: 4,
-              maxLength: 1000,
-              style: GoogleFonts.inter(color: palette.textHeader),
-              decoration: InputDecoration(
-                hintText: l10n.etfSendInviteMessageHint,
-                hintStyle: GoogleFonts.inter(
-                  color: palette.textBody,
+            // The same box as the two fields above it -- it used to draw its
+            // own outline, which is why it looked like a different kind of
+            // thing on the same sheet.
+            fundFieldWrapper(
+              palette,
+              TextField(
+                controller: _messageController,
+                maxLines: 4,
+                maxLength: _maxMessageLength,
+                style: GoogleFonts.inter(
                   fontSize: 14,
+                  color: palette.textHeader,
                 ),
-                filled: false,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: palette.border),
+                // The field's own counter would sit INSIDE the box; this
+                // keeps it under the box where it was, and where it reads as
+                // a note about the field rather than part of it.
+                buildCounter:
+                    (
+                      _, {
+                      required currentLength,
+                      required isFocused,
+                      maxLength,
+                    }) => null,
+                decoration: fundFieldDecoration(
+                  palette,
+                  hint: l10n.etfSendInviteMessageHint,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: palette.accentPrimary,
-                    width: 2,
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _messageController,
+                builder: (_, value, _) => Text(
+                  // Counted the way the server counts, not by grapheme:
+                  // otherwise an emoji reads as one here and as two to the
+                  // check that actually refuses the message.
+                  '${value.text.length}/$_maxMessageLength',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: palette.textBody,
                   ),
                 ),
               ),
