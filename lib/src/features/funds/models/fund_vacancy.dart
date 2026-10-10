@@ -21,7 +21,7 @@ class FundVacancy {
   /// the team member after hiring.
   final double? offeredLimitAmount;
 
-  final String status; // 'open' | 'closed' | 'filled'
+  final String status; // 'open' | 'paused' (migration 037)
   final DateTime createdAt;
   final DateTime? closedAt;
 
@@ -50,6 +50,7 @@ class FundVacancy {
   });
 
   bool get isOpen => status == 'open';
+  bool get isPaused => status == 'paused';
 
   factory FundVacancy.fromJson(Map<String, dynamic> json) => FundVacancy(
     id: json['id'] as String,

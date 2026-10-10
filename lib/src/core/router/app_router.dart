@@ -68,6 +68,7 @@ import '../../features/funds/onboarding/fund_onboarding_providers.dart';
 import '../../features/funds/onboarding/fund_onboarding_screen.dart';
 import '../../features/funds/screens/create_fund_screen.dart';
 import '../../features/funds/screens/post_vacancy_screen.dart';
+import '../../features/funds/screens/vacancy_detail_screen.dart';
 import '../../features/funds/screens/exchange_screen.dart';
 import '../../features/funds/screens/coming_soon_screen.dart';
 import '../../features/funds/screens/employee_hub_screen.dart';
@@ -583,6 +584,14 @@ class AppRouter {
         path: '/funds/invitations',
         name: 'myInvitations',
         builder: (context, state) => const MyInvitationsScreen(),
+      ),
+      GoRoute(
+        path: '/funds/:id/vacancies/:vacancyId',
+        name: 'vacancyDetail',
+        builder: (context, state) => VacancyDetailScreen(
+          fundId: state.pathParameters['id']!,
+          vacancyId: state.pathParameters['vacancyId']!,
+        ),
       ),
       GoRoute(
         path: '/funds/:id/post-vacancy',

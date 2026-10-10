@@ -8049,6 +8049,45 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfVacancyErrorGeneric => 'Не удалось — попробуй ещё раз';
 
   @override
+  String get etfVacancyStatusActive => 'Активная вакансия';
+
+  @override
+  String get etfVacancyStatusPaused => 'Приостановлена';
+
+  @override
+  String get etfVacancyEditButton => 'Редактировать';
+
+  @override
+  String get etfVacancyEditTitle => 'Вакансия';
+
+  @override
+  String get etfVacancySaveButton => 'Сохранить';
+
+  @override
+  String get etfVacancyCancelButton => 'Отменить';
+
+  @override
+  String get etfVacancyDeleteButton => 'Удалить';
+
+  @override
+  String get etfVacancyPauseButton => 'Пауза';
+
+  @override
+  String get etfVacancyResumeButton => 'Возобновить';
+
+  @override
+  String get etfVacancySavedMessage => 'Вакансия сохранена';
+
+  @override
+  String get etfVacancyDeletedMessage => 'Вакансия удалена';
+
+  @override
+  String get etfVacancyPausedMessage => 'Вакансия приостановлена';
+
+  @override
+  String get etfVacancyResumedMessage => 'Вакансия снова на бирже';
+
+  @override
   String get etfVacancyStatusClosed => 'Снята';
 
   @override

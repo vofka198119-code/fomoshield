@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/overlay/app_banner.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/fomo_shield_theme.dart';
 import '../../../core/theme/theme_v2.dart';
@@ -13,7 +12,7 @@ import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/widgets/card_frame.dart';
 import '../models/fund_vacancy.dart';
 import '../providers/employee_providers.dart';
-import '../fund_labels.dart' show roleLabelFor, treasurerBudgetMoney;
+import '../fund_labels.dart' show roleLabelFor;
 
 // ---------------------------------------------------------------------------
 // Fund Vacancies Card — what this fund is advertising, sitting under the
@@ -37,23 +36,6 @@ class FundVacanciesCard extends ConsumerWidget {
     required this.fundId,
     required this.palette,
   });
-
-  Future<void> _close(
-    WidgetRef ref,
-    String vacancyId,
-    AppLocalizations l10n,
-  ) async {
-    try {
-      await ref
-          .read(employeeApiServiceProvider)
-          .closeVacancy(fundId, vacancyId);
-      ref.invalidate(fundVacanciesProvider(fundId));
-      ref.invalidate(vacancyBoardProvider);
-      showAppBanner(l10n.etfVacancyClosedMessage, tone: AppBannerTone.info);
-    } catch (_) {
-      showAppBanner(l10n.etfVacancyErrorGeneric, tone: AppBannerTone.failure);
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -86,8 +68,14 @@ class FundVacanciesCard extends ConsumerWidget {
               }
               return Column(
                 children: [
-                  for (final vacancy in vacancies)
-                    _vacancyRow(ref, l10n, vacancy),
+                  for (var i = 0; i < vacancies.length; i++) ...[
+                    if (i > 0) ...[
+                      const SizedBox(height: 14),
+                      themedDivider(palette, indent: 0, endIndent: 0),
+                      const SizedBox(height: 14),
+                    ],
+                    _vacancyRow(context, l10n, vacancies[i]),
+                  ],
                 ],
               );
             },
@@ -106,62 +94,61 @@ class FundVacanciesCard extends ConsumerWidget {
     );
   }
 
-  /// Same two-line shape as FundTeamCard's member row: what it is on top,
-  /// the detail under it, the action on the right.
-  Widget _vacancyRow(WidgetRef ref, AppLocalizations l10n, FundVacancy v) {
-    final detail = <String>[
-      if ((v.pitch ?? '').isNotEmpty) v.pitch!.trim(),
-      if (v.offeredLimitAmount != null && v.offeredLimitAmount! > 0)
-        l10n.etfVacancyCardBudget(treasurerBudgetMoney(v.offeredLimitAmount!)),
-    ].join(' · ');
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  roleLabelFor(l10n, v.role),
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: palette.textHeader,
-                  ),
-                ),
-                if (detail.isNotEmpty)
-                  Text(
-                    detail,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: palette.textBody,
-                    ),
-                  ),
-              ],
+  /// One advert as he asked for it (2026-10-10): what state it is in, in
+  /// colour; what the job is; and one wide way in. The pitch is deliberately
+  /// NOT here -- it belongs on the advert's own screen, and in a list it only
+  /// made two rows run together.
+  Widget _vacancyRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    FundVacancy v,
+  ) {
+    final active = v.isOpen;
+    final statusColor = active ? ThemeV2.success : ThemeV2.loss;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              active ? Icons.circle : Icons.pause_circle_filled_rounded,
+              size: active ? 9 : 14,
+              color: statusColor,
             ),
-          ),
-          if (v.isOpen)
-            TextButton(
-              onPressed: () => _close(ref, v.id, l10n),
-              child: Text(
-                l10n.etfVacancyCloseButton,
-                style: GoogleFonts.inter(fontSize: 12, color: ThemeV2.loss),
-              ),
-            )
-          else
+            const SizedBox(width: 7),
             Text(
-              v.status == 'filled'
-                  ? l10n.etfVacancyStatusFilled
-                  : l10n.etfVacancyStatusClosed,
-              style: GoogleFonts.inter(fontSize: 12, color: palette.textBody),
+              active
+                  ? l10n.etfVacancyStatusActive
+                  : l10n.etfVacancyStatusPaused,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: statusColor,
+              ),
             ),
-        ],
-      ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          roleLabelFor(l10n, v.role),
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: palette.textHeader,
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: brandCtaButton(
+            palette: palette,
+            label: l10n.etfVacancyEditButton,
+            onTap: () => context.push('/funds/$fundId/vacancies/${v.id}'),
+            fontSize: 13,
+            height: 40,
+          ),
+        ),
+      ],
     );
   }
 

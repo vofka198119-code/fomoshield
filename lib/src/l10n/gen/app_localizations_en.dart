@@ -8018,6 +8018,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfVacancyErrorGeneric => 'That did not work — try again';
 
   @override
+  String get etfVacancyStatusActive => 'Active vacancy';
+
+  @override
+  String get etfVacancyStatusPaused => 'Paused';
+
+  @override
+  String get etfVacancyEditButton => 'Edit';
+
+  @override
+  String get etfVacancyEditTitle => 'Vacancy';
+
+  @override
+  String get etfVacancySaveButton => 'Save';
+
+  @override
+  String get etfVacancyCancelButton => 'Cancel';
+
+  @override
+  String get etfVacancyDeleteButton => 'Delete';
+
+  @override
+  String get etfVacancyPauseButton => 'Pause';
+
+  @override
+  String get etfVacancyResumeButton => 'Resume';
+
+  @override
+  String get etfVacancySavedMessage => 'Vacancy saved';
+
+  @override
+  String get etfVacancyDeletedMessage => 'Vacancy deleted';
+
+  @override
+  String get etfVacancyPausedMessage => 'Vacancy paused';
+
+  @override
+  String get etfVacancyResumedMessage => 'Vacancy back on the board';
+
+  @override
   String get etfVacancyStatusClosed => 'Withdrawn';
 
   @override

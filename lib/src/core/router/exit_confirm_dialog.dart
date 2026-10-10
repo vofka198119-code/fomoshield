@@ -32,10 +32,7 @@ Future<bool> confirmExitApp(BuildContext context) async {
           l10n.exitAppTitle,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
         ),
-        content: Text(
-          l10n.exitAppBody,
-          style: GoogleFonts.inter(fontSize: 14),
-        ),
+        content: Text(l10n.exitAppBody, style: GoogleFonts.inter(fontSize: 14)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),

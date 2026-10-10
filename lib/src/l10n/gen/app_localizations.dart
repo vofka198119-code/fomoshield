@@ -13717,6 +13717,84 @@ abstract class AppLocalizations {
   /// **'That did not work — try again'**
   String get etfVacancyErrorGeneric;
 
+  /// No description provided for @etfVacancyStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active vacancy'**
+  String get etfVacancyStatusActive;
+
+  /// No description provided for @etfVacancyStatusPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get etfVacancyStatusPaused;
+
+  /// No description provided for @etfVacancyEditButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get etfVacancyEditButton;
+
+  /// No description provided for @etfVacancyEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancy'**
+  String get etfVacancyEditTitle;
+
+  /// No description provided for @etfVacancySaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get etfVacancySaveButton;
+
+  /// No description provided for @etfVacancyCancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get etfVacancyCancelButton;
+
+  /// No description provided for @etfVacancyDeleteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get etfVacancyDeleteButton;
+
+  /// No description provided for @etfVacancyPauseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get etfVacancyPauseButton;
+
+  /// No description provided for @etfVacancyResumeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get etfVacancyResumeButton;
+
+  /// No description provided for @etfVacancySavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancy saved'**
+  String get etfVacancySavedMessage;
+
+  /// No description provided for @etfVacancyDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancy deleted'**
+  String get etfVacancyDeletedMessage;
+
+  /// No description provided for @etfVacancyPausedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancy paused'**
+  String get etfVacancyPausedMessage;
+
+  /// No description provided for @etfVacancyResumedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Vacancy back on the board'**
+  String get etfVacancyResumedMessage;
+
   /// No description provided for @etfVacancyStatusClosed.
   ///
   /// In en, this message translates to:

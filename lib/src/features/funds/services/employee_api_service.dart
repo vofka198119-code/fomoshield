@@ -280,14 +280,52 @@ class EmployeeApiService {
     }
   }
 
-  Future<FundVacancy> closeVacancy(String fundId, String vacancyId) async {
+  /// Edit in place. Every field is optional; an omitted one is left alone.
+  Future<FundVacancy> updateVacancy({
+    required String fundId,
+    required String vacancyId,
+    String? role,
+    String? pitch,
+    bool setOfferedLimit = false,
+    double? offeredLimitAmount,
+  }) async {
     try {
-      final response = await _dio.post(
-        '/funds/$fundId/vacancies/$vacancyId/close',
+      final response = await _dio.patch(
+        '/funds/$fundId/vacancies/$vacancyId',
+        data: {
+          'role': ?role,
+          'pitch': ?pitch,
+          if (setOfferedLimit) 'offeredLimitAmount': offeredLimitAmount,
+        },
       );
       return FundVacancy.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw _apiException(e, 'Failed to close the vacancy');
+      throw _apiException(e, 'Failed to update the vacancy');
+    }
+  }
+
+  /// Off the board without losing the advert, and back on again.
+  Future<FundVacancy> setVacancyPaused({
+    required String fundId,
+    required String vacancyId,
+    required bool paused,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/funds/$fundId/vacancies/$vacancyId/${paused ? 'pause' : 'resume'}',
+      );
+      return FundVacancy.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to change the vacancy');
+    }
+  }
+
+  /// Really gone -- there is no archived state for an advert (migration 037).
+  Future<void> deleteVacancy(String fundId, String vacancyId) async {
+    try {
+      await _dio.delete('/funds/$fundId/vacancies/$vacancyId');
+    } on DioException catch (e) {
+      throw _apiException(e, 'Failed to delete the vacancy');
     }
   }
 
