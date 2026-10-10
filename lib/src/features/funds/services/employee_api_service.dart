@@ -199,11 +199,19 @@ class EmployeeApiService {
     }
   }
 
+  /// The discretionary budget is three-valued — leave it alone, set a
+  /// number, or clear it back to no budget at all — and a nullable argument
+  /// can only say two of those: a null passed on purpose and an omitted one
+  /// look identical at the call site. So [setTreasurerLimit] is what decides
+  /// whether the key is sent, and [treasurerLimitAmount] may then be null
+  /// meaning "no budget". Until 2026-10-10 the limit could be set over this
+  /// method and never cleared again.
   Future<FundTeamMember> updateTeamMember({
     required String fundId,
     required String userId,
     String? role,
     Map<String, bool>? permissions,
+    bool setTreasurerLimit = false,
     double? treasurerLimitAmount,
   }) async {
     try {
@@ -212,7 +220,7 @@ class EmployeeApiService {
         data: {
           'role': ?role,
           'permissions': ?permissions,
-          'treasurerLimitAmount': ?treasurerLimitAmount,
+          if (setTreasurerLimit) 'treasurerLimitAmount': treasurerLimitAmount,
         },
       );
       return FundTeamMember.fromJson(response.data as Map<String, dynamic>);

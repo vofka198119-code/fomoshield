@@ -7886,6 +7886,42 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfPermissionFlagRisk => 'Помечать предложение рискованным';
 
   @override
+  String get etfTreasurerBudgetLabel => 'Лимит без подтверждения';
+
+  @override
+  String get etfTreasurerBudgetHint => 'Без лимита';
+
+  @override
+  String get etfTreasurerBudgetHelp =>
+      'Сделки до этой суммы сотрудник проводит сам, минуя твоё подтверждение. Оставь пусто — каждая сделка придёт к тебе.';
+
+  @override
+  String get etfTreasurerBudgetInvalid =>
+      'Введи сумму в долларах или оставь поле пустым';
+
+  @override
+  String etfTreasurerBudgetBadge(String amount) {
+    return 'Сам до $amount';
+  }
+
+  @override
+  String get etfProposalOwnNeedsHead =>
+      'Своё предложение подтверждаешь не ты — его смотрит глава.';
+
+  @override
+  String get etfProposeWentToMarket =>
+      'В твоём лимите — сделка ушла в рынок сразу.';
+
+  @override
+  String get etfProposeAwaitsTrader =>
+      'В твоём лимите — подтверждение не нужно. Ждёт трейдера.';
+
+  @override
+  String etfTradeSpendAloneNote(String amount) {
+    return 'Сделки до $amount ты проводишь сам — подтверждение главы не нужно.';
+  }
+
+  @override
   String get etfFundEditTitle => 'РЕДАКТИРОВАТЬ ФОНД';
 
   @override

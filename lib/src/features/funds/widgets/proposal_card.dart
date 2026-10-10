@@ -317,7 +317,10 @@ class ProposalListTile extends ConsumerWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: palette.accentPrimary, width: 1.5),
+                    border: Border.all(
+                      color: palette.accentPrimary,
+                      width: 1.5,
+                    ),
                   ),
                   padding: const EdgeInsets.all(2),
                   child: isBatch
@@ -357,9 +360,7 @@ class ProposalListTile extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Text(
                         isBatch
-                            ? l10n.etfRebalanceLegCount(
-                                proposal.legList.length,
-                              )
+                            ? l10n.etfRebalanceLegCount(proposal.legList.length)
                             : symbol,
                         style: GoogleFonts.inter(
                           fontSize: 11,
@@ -433,6 +434,13 @@ class ProposalCard extends ConsumerWidget {
   final AppPalette palette;
   final AppLocalizations l10n;
   final bool canApprove;
+
+  /// True when this proposal is the viewer's own and the viewer is not the
+  /// head. The server refuses `own_proposal` (fundDiscretion.js: nobody
+  /// signs off their own trade but the head), so the Approve button would
+  /// only ever produce an error. Reject stays on the screen -- taking back
+  /// your own suggestion is allowed, and is the only way to withdraw one.
+  final bool needsAnotherApprover;
   final bool canFlagRisk;
   final bool canExecute;
   final VoidCallback? onApprove;
@@ -447,6 +455,7 @@ class ProposalCard extends ConsumerWidget {
     required this.palette,
     required this.l10n,
     required this.canApprove,
+    required this.needsAnotherApprover,
     required this.canFlagRisk,
     required this.canExecute,
     this.onApprove,
@@ -665,7 +674,7 @@ class ProposalCard extends ConsumerWidget {
               _detailRow(
                 label: l10n.etfProposalEstimatedCommissionLabel,
                 value: formatUsd(
-                    quantity * estimatedPrice * brokerCommissionRate,
+                  quantity * estimatedPrice * brokerCommissionRate,
                 ),
                 palette: palette,
               ),
@@ -734,17 +743,29 @@ class ProposalCard extends ConsumerWidget {
                       label: l10n.etfProposalRejectButton,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _themedFilledButton(
-                      palette: palette,
-                      onPressed: onApprove,
-                      icon: Icons.check_rounded,
-                      label: l10n.etfProposalApproveButton,
+                  if (!needsAnotherApprover) ...[
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _themedFilledButton(
+                        palette: palette,
+                        onPressed: onApprove,
+                        icon: Icons.check_rounded,
+                        label: l10n.etfProposalApproveButton,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
+              if (needsAnotherApprover) ...[
+                const SizedBox(height: 8),
+                Text(
+                  l10n.etfProposalOwnNeedsHead,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: palette.textBody,
+                  ),
+                ),
+              ],
               const SizedBox(height: 8),
               _themedOutlineButton(
                 palette: palette,

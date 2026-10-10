@@ -3102,6 +3102,29 @@
   "etfPermissionApprove": "Approve and reject proposals",
   "etfPermissionExecute": "Send approved orders to the market",
   "etfPermissionFlagRisk": "Flag a proposal as risky",
+  "etfTreasurerBudgetLabel": "Spend-alone limit",
+  "etfTreasurerBudgetHint": "No limit",
+  "etfTreasurerBudgetHelp": "Trades up to this amount go through on their own, without your approval. Leave it empty and every trade comes to you.",
+  "etfTreasurerBudgetInvalid": "Enter an amount in dollars, or leave the field empty",
+  "etfTreasurerBudgetBadge": "Alone up to {amount}",
+  "@etfTreasurerBudgetBadge": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "etfProposalOwnNeedsHead": "Your own proposal is not yours to approve — the head looks at it.",
+  "etfProposeWentToMarket": "Inside your limit — the trade went straight to market.",
+  "etfProposeAwaitsTrader": "Inside your limit — no approval needed. Waiting for the Trader.",
+  "etfTradeSpendAloneNote": "Trades up to {amount} go through on your own — the head's approval is not needed.",
+  "@etfTradeSpendAloneNote": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
 
   "etfFundEditTitle": "EDIT FUND",
   "etfFundEditShortcutLabel": "Edit",

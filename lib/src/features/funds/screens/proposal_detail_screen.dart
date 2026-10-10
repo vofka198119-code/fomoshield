@@ -105,6 +105,13 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       }
     }
     final canApprove = isHead || (myPermissions?['canApprove'] ?? false);
+    // The head approves their own proposals as a matter of course -- that is
+    // the ordinary flow. Everyone else needs someone else's signature, and
+    // the server enforces it (fundDiscretion.js, `own_proposal`); the right
+    // way for a member to act alone is a spend-alone limit, which never
+    // files a pending proposal in the first place.
+    final needsAnotherApprover =
+        !isHead && _proposal.proposerUserId == currentUserId;
     final canFlagRisk = isHead || (myPermissions?['canFlagRisk'] ?? false);
     final canExecute = isHead || (myPermissions?['canExecute'] ?? false);
 
@@ -136,6 +143,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                 palette: palette,
                 l10n: l10n,
                 canApprove: canApprove,
+                needsAnotherApprover: needsAnotherApprover,
                 canFlagRisk: canFlagRisk,
                 canExecute: canExecute,
                 onApprove: () => _act(

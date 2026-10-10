@@ -13441,6 +13441,60 @@ abstract class AppLocalizations {
   /// **'Flag a proposal as risky'**
   String get etfPermissionFlagRisk;
 
+  /// No description provided for @etfTreasurerBudgetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Spend-alone limit'**
+  String get etfTreasurerBudgetLabel;
+
+  /// No description provided for @etfTreasurerBudgetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No limit'**
+  String get etfTreasurerBudgetHint;
+
+  /// No description provided for @etfTreasurerBudgetHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Trades up to this amount go through on their own, without your approval. Leave it empty and every trade comes to you.'**
+  String get etfTreasurerBudgetHelp;
+
+  /// No description provided for @etfTreasurerBudgetInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount in dollars, or leave the field empty'**
+  String get etfTreasurerBudgetInvalid;
+
+  /// No description provided for @etfTreasurerBudgetBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Alone up to {amount}'**
+  String etfTreasurerBudgetBadge(String amount);
+
+  /// No description provided for @etfProposalOwnNeedsHead.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own proposal is not yours to approve — the head looks at it.'**
+  String get etfProposalOwnNeedsHead;
+
+  /// No description provided for @etfProposeWentToMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Inside your limit — the trade went straight to market.'**
+  String get etfProposeWentToMarket;
+
+  /// No description provided for @etfProposeAwaitsTrader.
+  ///
+  /// In en, this message translates to:
+  /// **'Inside your limit — no approval needed. Waiting for the Trader.'**
+  String get etfProposeAwaitsTrader;
+
+  /// No description provided for @etfTradeSpendAloneNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Trades up to {amount} go through on your own — the head\'s approval is not needed.'**
+  String etfTradeSpendAloneNote(String amount);
+
   /// No description provided for @etfFundEditTitle.
   ///
   /// In en, this message translates to:

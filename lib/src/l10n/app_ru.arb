@@ -2316,6 +2316,29 @@
   "etfPermissionApprove": "Одобрять и отклонять предложения",
   "etfPermissionExecute": "Отправлять одобренные заявки в рынок",
   "etfPermissionFlagRisk": "Помечать предложение рискованным",
+  "etfTreasurerBudgetLabel": "Лимит без подтверждения",
+  "etfTreasurerBudgetHint": "Без лимита",
+  "etfTreasurerBudgetHelp": "Сделки до этой суммы сотрудник проводит сам, минуя твоё подтверждение. Оставь пусто — каждая сделка придёт к тебе.",
+  "etfTreasurerBudgetInvalid": "Введи сумму в долларах или оставь поле пустым",
+  "etfTreasurerBudgetBadge": "Сам до {amount}",
+  "@etfTreasurerBudgetBadge": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "etfProposalOwnNeedsHead": "Своё предложение подтверждаешь не ты — его смотрит глава.",
+  "etfProposeWentToMarket": "В твоём лимите — сделка ушла в рынок сразу.",
+  "etfProposeAwaitsTrader": "В твоём лимите — подтверждение не нужно. Ждёт трейдера.",
+  "etfTradeSpendAloneNote": "Сделки до {amount} ты проводишь сам — подтверждение главы не нужно.",
+  "@etfTradeSpendAloneNote": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
 
   "etfFundEditTitle": "РЕДАКТИРОВАТЬ ФОНД",
   "etfFundEditShortcutLabel": "Изменить",

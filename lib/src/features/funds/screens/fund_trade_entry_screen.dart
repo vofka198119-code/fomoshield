@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/theme_v2.dart';
-import '../../../core/theme/app_palette.dart' show AppPalette, resolveAppPalette;
+import '../../../core/theme/app_palette.dart'
+    show AppPalette, resolveAppPalette;
 import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_header.dart';
+import '../../../core/supabase/supabase_providers.dart'
+    show currentUserProvider;
 import '../../../l10n/gen/app_localizations.dart';
 import '../../../shared/services/finnhub_service.dart';
 import '../../portfolio/portfolio_providers.dart' show brokerCommissionRate;
 import '../models/fund.dart';
 import '../providers/fund_providers.dart';
 import '../services/fund_api_service.dart' show FundApiException;
+import '../providers/employee_providers.dart' show fundTeamProvider;
+import '../widgets/team_member_permissions_sheet.dart'
+    show treasurerBudgetMoney;
 import '../../portfolio/screens/order_entry/order_header.dart';
 import '../../portfolio/screens/order_entry/order_amount_section.dart';
 import '../../portfolio/screens/order_entry/order_config_section.dart';
@@ -236,7 +242,7 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _submitting = true);
     try {
-      await ref
+      final created = await ref
           .read(fundApiServiceProvider)
           .proposeTrade(
             fundId: widget.fundId,
@@ -248,10 +254,30 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
             justification: _justificationController.text.trim(),
           );
       ref.invalidate(fundProposalsProvider(widget.fundId));
+      // A trade inside the proposer's spend-alone limit never becomes a
+      // pending proposal: the server files it already approved and sends it
+      // to market unless a Trader is there to do that
+      // (fundDiscretion.js). So the money may already have moved, and the
+      // holdings/charts caches are as stale here as they are after an
+      // approval -- same invalidations as ProposalDetailScreen's own, and
+      // for the same reason.
+      final wentThrough = created.status != 'pending';
+      if (wentThrough) {
+        ref.invalidate(fundDetailProvider(widget.fundId));
+        ref.invalidate(fundBalanceHistoryProvider);
+        ref.invalidate(fundCommissionHistoryProvider);
+      }
       if (!mounted) return;
+      // What happened, as the server reports it, rather than one message
+      // that assumes every proposal waits for someone.
+      final message = switch (created.status) {
+        'executed' => l10n.etfProposeWentToMarket,
+        'approved' => l10n.etfProposeAwaitsTrader,
+        _ => l10n.etfProposeSubmitButton,
+      };
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.etfProposeSubmitButton)));
+      ).showSnackBar(SnackBar(content: Text(message)));
       Navigator.of(context).pop();
     } on FundApiException catch (e) {
       if (mounted) {
@@ -268,6 +294,28 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
+  }
+
+  Widget _spendAloneNote(
+    AppPalette palette,
+    AppLocalizations l10n,
+    double limit,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Row(
+        children: [
+          Icon(Icons.bolt_rounded, size: 14, color: palette.accentPrimary),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              l10n.etfTradeSpendAloneNote(treasurerBudgetMoney(limit)),
+              style: GoogleFonts.inter(fontSize: 11, color: palette.textBody),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _justificationField(AppLocalizations l10n, AppPalette palette) {
@@ -317,6 +365,26 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
     final l10n = AppLocalizations.of(context)!;
     final fundAsync = ref.watch(fundDetailProvider(widget.fundId));
     final palette = resolveAppPalette(ref.watch(themeVariantProvider));
+
+    // What this person may put through without the head seeing it first --
+    // a fact worth knowing BEFORE tapping Buy, since a trade inside it is
+    // not a proposal at all but a filled order (fundDiscretion.js). The
+    // screen states the limit and nothing more: whether THIS trade fits is
+    // the server's call, at a price that is about to move anyway, and a
+    // second copy of that arithmetic here would only drift from it.
+    final currentUserId = ref.watch(currentUserProvider)?.id;
+    final team = ref.watch(fundTeamProvider(widget.fundId)).valueOrNull ?? [];
+    double? spendAloneLimit;
+    if (currentUserId != null &&
+        fundAsync.valueOrNull?.headUserId != currentUserId) {
+      for (final member in team) {
+        if (member.userId == currentUserId) {
+          final limit = member.treasurerLimitAmount;
+          if (limit != null && limit > 0) spendAloneLimit = limit;
+          break;
+        }
+      }
+    }
     final title =
         '${_isBuy ? l10n.tradeBuy : l10n.tradeSell} ${widget.companyName ?? widget.symbol}';
 
@@ -451,6 +519,8 @@ class _FundTradeEntryScreenState extends ConsumerState<FundTradeEntryScreen> {
                       // hides the toggle entirely (same as Stress Test).
                       palette: palette,
                     ),
+                    if (spendAloneLimit != null)
+                      _spendAloneNote(palette, l10n, spendAloneLimit),
                     _justificationField(l10n, palette),
                   ],
                 ),

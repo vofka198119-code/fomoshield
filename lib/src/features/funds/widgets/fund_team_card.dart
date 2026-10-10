@@ -26,6 +26,23 @@ import 'team_member_permissions_sheet.dart';
 // check).
 // ---------------------------------------------------------------------------
 
+/// The spend-alone limit belongs on the roster line and not only inside the
+/// permissions sheet: it is the one setting that lets someone trade without
+/// the head, and a head should see who holds one without opening four
+/// sheets. Shown to the head alone -- the roster itself is public, and who
+/// may spend what inside the team is the head's business.
+String _roleWithBudget(
+  AppLocalizations l10n,
+  FundTeamMember member, {
+  required bool showBudget,
+}) {
+  final role = _roleLabel(l10n, member.role);
+  final budget = member.treasurerLimitAmount;
+  if (!showBudget || budget == null || budget <= 0) return role;
+  return '$role · '
+      '${l10n.etfTreasurerBudgetBadge(treasurerBudgetMoney(budget))}';
+}
+
 String _roleLabel(AppLocalizations l10n, String role) {
   switch (role) {
     case 'co_manager':
@@ -188,7 +205,7 @@ class FundTeamCard extends ConsumerWidget {
                       nickname: member.nickname,
                       roleLabel: member.isPendingTermination
                           ? l10n.etfTeamMemberPendingTerminationLabel
-                          : _roleLabel(l10n, member.role),
+                          : _roleWithBudget(l10n, member, showBudget: isHead),
                       roleColor: member.isPendingTermination
                           ? ThemeV2.loss
                           : palette.textBody,

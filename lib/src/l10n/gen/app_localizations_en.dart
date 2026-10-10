@@ -7857,6 +7857,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get etfPermissionFlagRisk => 'Flag a proposal as risky';
 
   @override
+  String get etfTreasurerBudgetLabel => 'Spend-alone limit';
+
+  @override
+  String get etfTreasurerBudgetHint => 'No limit';
+
+  @override
+  String get etfTreasurerBudgetHelp =>
+      'Trades up to this amount go through on their own, without your approval. Leave it empty and every trade comes to you.';
+
+  @override
+  String get etfTreasurerBudgetInvalid =>
+      'Enter an amount in dollars, or leave the field empty';
+
+  @override
+  String etfTreasurerBudgetBadge(String amount) {
+    return 'Alone up to $amount';
+  }
+
+  @override
+  String get etfProposalOwnNeedsHead =>
+      'Your own proposal is not yours to approve — the head looks at it.';
+
+  @override
+  String get etfProposeWentToMarket =>
+      'Inside your limit — the trade went straight to market.';
+
+  @override
+  String get etfProposeAwaitsTrader =>
+      'Inside your limit — no approval needed. Waiting for the Trader.';
+
+  @override
+  String etfTradeSpendAloneNote(String amount) {
+    return 'Trades up to $amount go through on your own — the head\'s approval is not needed.';
+  }
+
+  @override
   String get etfFundEditTitle => 'EDIT FUND';
 
   @override
