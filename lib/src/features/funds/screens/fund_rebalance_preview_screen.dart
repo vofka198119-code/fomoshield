@@ -10,8 +10,11 @@ import '../../../core/theme/theme_variant_provider.dart';
 import '../../../core/theme/themed_button.dart';
 import '../../../core/theme/themed_divider.dart';
 import '../../../core/theme/themed_header.dart';
+import '../../../core/theme/typography_helpers.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../../shared/utils/currency_format.dart';
 import '../../../shared/widgets/card_frame.dart';
+import '../../../shared/widgets/numeric_keypad.dart';
 import '../models/rebalance_leg.dart';
 import '../providers/fund_providers.dart';
 import '../widgets/rebalance_legs_list.dart';
@@ -50,12 +53,47 @@ class _FundRebalancePreviewScreenState
   late Future<RebalancePlan> _plan;
   bool _proposing = false;
 
+  /// Companies he has unticked. Sent with every recalculation and with the
+  /// proposal itself, so what is filed is what he was looking at.
+  final Set<String> _excluded = {};
+
+  /// 'cash' mode only: how much of the free cash to put to work. Null means
+  /// all of it, which is also what the screen starts with.
+  double? _amount;
+
+  /// The fund's free cash, learnt from the first plan — the ceiling for the
+  /// amount field and the number shown when nothing has been typed.
+  double _cash = 0;
+
+  bool get _isCashMode => widget.mode == 'cash';
+
   @override
   void initState() {
     super.initState();
-    _plan = ref
+    _plan = _load();
+  }
+
+  Future<RebalancePlan> _load() async {
+    final plan = await ref
         .read(fundApiServiceProvider)
-        .previewRebalance(widget.fundId, widget.mode);
+        .previewRebalance(
+          widget.fundId,
+          widget.mode,
+          exclude: _excluded.toList(),
+          amount: _amount,
+        );
+    _cash = plan.cash;
+    return plan;
+  }
+
+  /// Every tick recalculates on the server rather than in the phone: the
+  /// numbers in the proposal have to be the numbers he approved, and only
+  /// one of the two can be the authority.
+  void _toggle(String symbol) {
+    setState(() {
+      if (!_excluded.remove(symbol)) _excluded.add(symbol);
+      _plan = _load();
+    });
   }
 
   String _emptyReason(RebalancePlan plan, AppLocalizations l10n) {
@@ -71,6 +109,97 @@ class _FundRebalancePreviewScreenState
     }
   }
 
+  /// How much of the free cash to spend. The app's own keypad in a themed
+  /// sheet — the same one the target editor and order entry use; a system
+  /// keyboard over a white box would belong to a different program.
+  Future<void> _editAmount() async {
+    final palette = resolveAppPalette(ref.read(themeVariantProvider));
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController(
+      text: (_amount ?? _cash).toStringAsFixed(2),
+    );
+
+    final entered = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: palette.card,
+      isScrollControlled: true,
+      useSafeArea: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
+              Text(
+                l10n.etfRebalanceAmountLabel,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: palette.textBody,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                controller.text.isEmpty
+                    ? '—'
+                    : formatUsd(double.tryParse(controller.text) ?? 0),
+                style: interNums(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w600,
+                  color: palette.textHeader,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${l10n.etfRebalanceAmountAvailable} ${formatUsd(_cash)}',
+                style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
+              ),
+              const SizedBox(height: 16),
+              NumericKeypad(
+                controller: controller,
+                onChanged: () => setSheet(() {
+                  // Never more than the fund has — a number it cannot spend
+                  // would only be silently cut down later.
+                  final typed = double.tryParse(controller.text);
+                  if (typed != null && typed > _cash) {
+                    controller.text = _cash.toStringAsFixed(2);
+                  }
+                }),
+                onDone: () => Navigator.pop(ctx, controller.text),
+                palette: palette,
+                header: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  child: SizedBox(
+                    height: 44,
+                    width: double.infinity,
+                    child: brandCtaButton(
+                      palette: palette,
+                      label: l10n.commonOk,
+                      height: 44,
+                      onTap: () => Navigator.pop(ctx, controller.text),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (entered == null) return;
+    final parsed = double.tryParse(entered.replaceAll(',', '.').trim());
+    if (parsed == null || parsed <= 0) return;
+    setState(() {
+      _amount = parsed.clamp(0, _cash).toDouble();
+      _plan = _load();
+    });
+  }
+
   Future<void> _propose() async {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _proposing = true);
@@ -80,6 +209,8 @@ class _FundRebalancePreviewScreenState
           .proposeRebalance(
             widget.fundId,
             widget.mode,
+            exclude: _excluded.toList(),
+            amount: _amount,
             justification: widget.mode == 'cash'
                 ? l10n.etfRebalanceModeCash
                 : l10n.etfRebalanceModeFull,
@@ -195,11 +326,77 @@ class _FundRebalancePreviewScreenState
                     const SizedBox(height: 10),
                     themedDivider(palette, indent: 0, endIndent: 0),
                     const SizedBox(height: 14),
+                    // Only the free-cash route takes an amount: in the other
+                    // one the size of the trades is decided by the drift, not
+                    // by what anyone feels like spending (his call).
+                    if (_isCashMode) ...[
+                      InkWell(
+                        onTap: _proposing ? null : _editAmount,
+                        borderRadius: BorderRadius.circular(10),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                l10n.etfRebalanceAmountLabel,
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  color: palette.textBody,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    formatUsd(_amount ?? plan.cash),
+                                    style: interNums(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: palette.textHeader,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.edit_rounded,
+                                    size: 16,
+                                    color: palette.textBody,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      themedDivider(palette, indent: 0, endIndent: 0),
+                      const SizedBox(height: 14),
+                    ],
                     RebalanceLegsList(
                       legs: plan.legs,
                       palette: palette,
                       l10n: l10n,
+                      untouched: plan.untouched,
+                      onToggle: _proposing ? null : _toggle,
                     ),
+                    // What the batch will not fix — rounding dust when
+                    // everything is ticked, the price of his choice when it
+                    // is not.
+                    if (plan.residual != null &&
+                        plan.residual!.gap.abs() >= 0.01) ...[
+                      const SizedBox(height: 6),
+                      themedDivider(palette, indent: 0, endIndent: 0),
+                      const SizedBox(height: 12),
+                      Text(
+                        l10n.etfRebalanceResidual(
+                          plan.residual!.symbol,
+                          plan.residual!.gap.abs().toStringAsFixed(2),
+                        ),
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: palette.textBody,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

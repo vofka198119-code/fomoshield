@@ -11575,6 +11575,30 @@ abstract class AppLocalizations {
   /// **'not filled'**
   String get etfRebalanceLegFailed;
 
+  /// No description provided for @etfRebalanceUntouchedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'left alone'**
+  String get etfRebalanceUntouchedLabel;
+
+  /// No description provided for @etfRebalanceAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount to invest'**
+  String get etfRebalanceAmountLabel;
+
+  /// No description provided for @etfRebalanceAmountAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Free cash:'**
+  String get etfRebalanceAmountAvailable;
+
+  /// No description provided for @etfRebalanceResidual.
+  ///
+  /// In en, this message translates to:
+  /// **'After these trades {symbol} will still be {gap}% away from its target.'**
+  String etfRebalanceResidual(String symbol, String gap);
+
   /// No description provided for @etfRebalanceButton.
   ///
   /// In en, this message translates to:

@@ -436,11 +436,23 @@ class FundApiService {
 
   /// What a rebalance WOULD do — the plan, before anyone commits to it.
   /// Changes nothing on the server.
-  Future<RebalancePlan> previewRebalance(String fundId, String mode) async {
+  Future<RebalancePlan> previewRebalance(
+    String fundId,
+    String mode, {
+    /// Companies the head has unticked — left exactly as they are.
+    List<String> exclude = const [],
+
+    /// 'cash' mode only: spend at most this much of the free cash.
+    double? amount,
+  }) async {
     try {
       final response = await _dio.get(
         '/funds/$fundId/rebalance',
-        queryParameters: {'mode': mode},
+        queryParameters: {
+          'mode': mode,
+          if (exclude.isNotEmpty) 'exclude': exclude.join(','),
+          'amount': ?amount,
+        },
       );
       return RebalancePlan.fromJson((response.data as Map).cast<String, dynamic>());
     } on DioException catch (e) {
@@ -454,11 +466,20 @@ class FundApiService {
     String fundId,
     String mode, {
     String? justification,
+    List<String> exclude = const [],
+    double? amount,
   }) async {
     try {
       final response = await _dio.post(
         '/funds/$fundId/rebalance',
-        data: {'mode': mode, 'justification': ?justification},
+        // The same choices the preview was drawn with, so what is filed is
+        // what he was looking at.
+        data: {
+          'mode': mode,
+          'justification': ?justification,
+          if (exclude.isNotEmpty) 'exclude': exclude,
+          'amount': ?amount,
+        },
       );
       return ((response.data as Map)['legCount'] as num?)?.toInt() ?? 0;
     } on DioException catch (e) {

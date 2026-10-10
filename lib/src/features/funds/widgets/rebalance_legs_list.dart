@@ -29,11 +29,22 @@ class RebalanceLegsList extends ConsumerWidget {
   final AppPalette palette;
   final AppLocalizations l10n;
 
+  /// Companies left alone — drawn unticked so the box can be put back on.
+  /// They have no trade, only a current share and the target they are
+  /// missing.
+  final List<UntouchedHolding> untouched;
+
+  /// Null for a read-only list (a filed proposal). When given, every row
+  /// carries a box and this is called with the company that was tapped.
+  final void Function(String symbol)? onToggle;
+
   const RebalanceLegsList({
     super.key,
     required this.legs,
     required this.palette,
     required this.l10n,
+    this.untouched = const [],
+    this.onToggle,
   });
 
   @override
@@ -48,11 +59,22 @@ class RebalanceLegsList extends ConsumerWidget {
       children: [
         _totals(sells, buys),
         const SizedBox(height: 14),
-        for (final leg in [...sells, ...buys]) _LegRow(
-          leg: leg,
-          palette: palette,
-          l10n: l10n,
-        ),
+        for (final leg in [...sells, ...buys])
+          _LegRow(
+            leg: leg,
+            palette: palette,
+            l10n: l10n,
+            onToggle: onToggle,
+          ),
+        // The ones left alone sit at the bottom, muted — out of the way of
+        // what is actually being done, but still reachable.
+        for (final holding in untouched)
+          _UntouchedRow(
+            holding: holding,
+            palette: palette,
+            l10n: l10n,
+            onToggle: onToggle,
+          ),
       ],
     );
   }
@@ -114,15 +136,42 @@ class RebalanceLegsList extends ConsumerWidget {
       );
 }
 
+/// The app's own checkbox — an icon inside a tappable area, the way the
+/// stress test draws its acceptance box, with the theme's colours rather
+/// than hardcoded ones.
+Widget _box({
+  required bool ticked,
+  required AppPalette palette,
+  required VoidCallback? onTap,
+}) {
+  if (onTap == null) return const SizedBox.shrink();
+  return Padding(
+    padding: const EdgeInsets.only(right: 8),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Icon(
+        ticked
+            ? Icons.check_box_rounded
+            : Icons.check_box_outline_blank_rounded,
+        size: 22,
+        color: ticked ? palette.accentPrimary : palette.textBody,
+      ),
+    ),
+  );
+}
+
 class _LegRow extends ConsumerWidget {
   final RebalanceLeg leg;
   final AppPalette palette;
   final AppLocalizations l10n;
+  final void Function(String symbol)? onToggle;
 
   const _LegRow({
     required this.leg,
     required this.palette,
     required this.l10n,
+    this.onToggle,
   });
 
   @override
@@ -132,6 +181,11 @@ class _LegRow extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
+          _box(
+            ticked: true,
+            palette: palette,
+            onTap: onToggle == null ? null : () => onToggle!(leg.symbol),
+          ),
           RingedCompanyLogo(symbol: leg.symbol, palette: palette),
           const SizedBox(width: 10),
           Expanded(
@@ -203,6 +257,73 @@ class _LegRow extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A company the head has unticked: no trade, no amount, and a plain note of
+/// where it stands against its target so the cost of leaving it alone is
+/// visible on its own line.
+class _UntouchedRow extends StatelessWidget {
+  final UntouchedHolding holding;
+  final AppPalette palette;
+  final AppLocalizations l10n;
+  final void Function(String symbol)? onToggle;
+
+  const _UntouchedRow({
+    required this.holding,
+    required this.palette,
+    required this.l10n,
+    this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Opacity(
+        opacity: 0.55,
+        child: Row(
+          children: [
+            _box(
+              ticked: false,
+              palette: palette,
+              onTap: onToggle == null ? null : () => onToggle!(holding.symbol),
+            ),
+            RingedCompanyLogo(symbol: holding.symbol, palette: palette),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    holding.symbol,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: palette.textHeader,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${holding.shareNow.toStringAsFixed(2)}%  /  '
+                    '${holding.targetPercent.toStringAsFixed(2)}%',
+                    style: interNums(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: palette.textBody,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              l10n.etfRebalanceUntouchedLabel,
+              style: GoogleFonts.inter(fontSize: 13, color: palette.textBody),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6857,6 +6857,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get etfRebalanceLegFailed => 'не исполнено';
 
   @override
+  String get etfRebalanceUntouchedLabel => 'не трогаем';
+
+  @override
+  String get etfRebalanceAmountLabel => 'Сколько вложить';
+
+  @override
+  String get etfRebalanceAmountAvailable => 'Свободно:';
+
+  @override
+  String etfRebalanceResidual(String symbol, String gap) {
+    return 'После этих сделок $symbol останется в $gap% от своей цели.';
+  }
+
+  @override
   String get etfRebalanceButton => 'Ребалансировать';
 
   @override
